@@ -141,32 +141,90 @@ instance : ToJS FilePickerOptions := ⟨fun d => Internal.fields #[("types", Int
 @[macro_inline] def DataTransferItem.getAsFileSystemHandle (self : DataTransferItem) : Async (Option FileSystemHandle) := Internal.api "Lasm.JS.Web.DataTransferItem.getAsFileSystemHandle" do
   self.val.callMethodAwait "getAsFileSystemHandle" (Internal.args #[]) (Option FileSystemHandle)
 
+/-- `Promise<FileSystemHandle?> getAsFileSystemHandle()` where the platform has it (`'getAsFileSystemHandle' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def DataTransferItem.getAsFileSystemHandle? (self' : DataTransferItem) : Async (Option (Option FileSystemHandle)) := Internal.api "Lasm.JS.Web.DataTransferItem.getAsFileSystemHandle?" do
+  let self := self'
+  if !(← Internal.has self.val "getAsFileSystemHandle") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "getAsFileSystemHandle" (Internal.args #[]) (Option FileSystemHandle)
+  return some lasmGuarded
+
 /-- `Promise<PermissionState> queryPermission(optional FileSystemHandlePermissionDescriptor descriptor)` -/
 @[macro_inline] def FileSystemHandle.queryPermission (self : FileSystemHandle) (descriptor : Option FileSystemHandlePermissionDescriptor := none) : Async PermissionState := Internal.api "Lasm.JS.Web.FileSystemHandle.queryPermission" do
   self.val.callMethodAwait "queryPermission" (Internal.args #[Internal.optional descriptor]) PermissionState
+
+/-- `Promise<PermissionState> queryPermission(optional FileSystemHandlePermissionDescriptor descriptor)` where the platform has it (`'queryPermission' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def FileSystemHandle.queryPermission? (self' : FileSystemHandle) (descriptor : Option FileSystemHandlePermissionDescriptor := none) : Async (Option PermissionState) := Internal.api "Lasm.JS.Web.FileSystemHandle.queryPermission?" do
+  let self := self'
+  if !(← Internal.has self.val "queryPermission") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "queryPermission" (Internal.args #[Internal.optional descriptor]) PermissionState
+  return some lasmGuarded
 
 /-- `Promise<PermissionState> requestPermission(optional FileSystemHandlePermissionDescriptor descriptor)` -/
 @[macro_inline] def FileSystemHandle.requestPermission (self : FileSystemHandle) (descriptor : Option FileSystemHandlePermissionDescriptor := none) : Async PermissionState := Internal.api "Lasm.JS.Web.FileSystemHandle.requestPermission" do
   self.val.callMethodAwait "requestPermission" (Internal.args #[Internal.optional descriptor]) PermissionState
 
+/-- `Promise<PermissionState> requestPermission(optional FileSystemHandlePermissionDescriptor descriptor)` where the platform has it (`'requestPermission' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def FileSystemHandle.requestPermission? (self' : FileSystemHandle) (descriptor : Option FileSystemHandlePermissionDescriptor := none) : Async (Option PermissionState) := Internal.api "Lasm.JS.Web.FileSystemHandle.requestPermission?" do
+  let self := self'
+  if !(← Internal.has self.val "requestPermission") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "requestPermission" (Internal.args #[Internal.optional descriptor]) PermissionState
+  return some lasmGuarded
+
 /-- `Promise<sequence<FileSystemFileHandle>> showOpenFilePicker(optional OpenFilePickerOptions options)` -/
 @[macro_inline] def Window.showOpenFilePicker (self : Window) (options : Option OpenFilePickerOptions := none) : Async (Array FileSystemFileHandle) := Internal.api "Lasm.JS.Web.Window.showOpenFilePicker" do
   self.val.callMethodAwait "showOpenFilePicker" (Internal.args #[Internal.optional options]) (Array FileSystemFileHandle)
+
+/-- `Promise<sequence<FileSystemFileHandle>> showOpenFilePicker(optional OpenFilePickerOptions options)` where the platform has it (`'showOpenFilePicker' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.showOpenFilePicker? (self' : Window) (options : Option OpenFilePickerOptions := none) : Async (Option (Array FileSystemFileHandle)) := Internal.api "Lasm.JS.Web.Window.showOpenFilePicker?" do
+  let self := self'
+  if !(← Internal.has self.val "showOpenFilePicker") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "showOpenFilePicker" (Internal.args #[Internal.optional options]) (Array FileSystemFileHandle)
+  return some lasmGuarded
 
 /-- `Promise<FileSystemFileHandle> showSaveFilePicker(optional SaveFilePickerOptions options)` -/
 @[macro_inline] def Window.showSaveFilePicker (self : Window) (options : Option SaveFilePickerOptions := none) : Async FileSystemFileHandle := Internal.api "Lasm.JS.Web.Window.showSaveFilePicker" do
   let r ← self.val.callMethodAwait "showSaveFilePicker" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
+/-- `Promise<FileSystemFileHandle> showSaveFilePicker(optional SaveFilePickerOptions options)` where the platform has it (`'showSaveFilePicker' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.showSaveFilePicker? (self' : Window) (options : Option SaveFilePickerOptions := none) : Async (Option FileSystemFileHandle) := Internal.api "Lasm.JS.Web.Window.showSaveFilePicker?" do
+  let self := self'
+  if !(← Internal.has self.val "showSaveFilePicker") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethodAwait "showSaveFilePicker" (Internal.args #[Internal.optional options]) Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `Promise<FileSystemDirectoryHandle> showDirectoryPicker(optional DirectoryPickerOptions options)` -/
 @[macro_inline] def Window.showDirectoryPicker (self : Window) (options : Option DirectoryPickerOptions := none) : Async FileSystemDirectoryHandle := Internal.api "Lasm.JS.Web.Window.showDirectoryPicker" do
   let r ← self.val.callMethodAwait "showDirectoryPicker" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
+/-- `Promise<FileSystemDirectoryHandle> showDirectoryPicker(optional DirectoryPickerOptions options)` where the platform has it (`'showDirectoryPicker' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.showDirectoryPicker? (self' : Window) (options : Option DirectoryPickerOptions := none) : Async (Option FileSystemDirectoryHandle) := Internal.api "Lasm.JS.Web.Window.showDirectoryPicker?" do
+  let self := self'
+  if !(← Internal.has self.val "showDirectoryPicker") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethodAwait "showDirectoryPicker" (Internal.args #[Internal.optional options]) Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `Promise<sequence<FileSystemFileHandle>> showOpenFilePicker(optional OpenFilePickerOptions options)` (File System Access (https://wicg.github.io/file-system-access/)) -/
 @[macro_inline] def showOpenFilePicker (options : Option OpenFilePickerOptions := none) : Async (Array FileSystemFileHandle) := Internal.api "Lasm.JS.Web.showOpenFilePicker" do
   Lasm.JS.Binding.invokeAsync (Array FileSystemFileHandle) { name := "Lasm.JS.Web.showOpenFilePicker", module := "globalThis", path := "showOpenFilePicker", construct := false, arity := 1 }
     (Internal.args #[Internal.optional options])
+
+/-- `Promise<sequence<FileSystemFileHandle>> showOpenFilePicker(optional OpenFilePickerOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def showOpenFilePicker? (options : Option OpenFilePickerOptions := none) : Async (Option (Array FileSystemFileHandle)) := Internal.api "Lasm.JS.Web.showOpenFilePicker?" do
+  if !(← Internal.hasGlobal ["showOpenFilePicker"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync (Array FileSystemFileHandle) { name := "Lasm.JS.Web.showOpenFilePicker?", module := "globalThis", path := "showOpenFilePicker", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional options])
+  return some lasmGuarded
 
 /-- `Promise<FileSystemFileHandle> showSaveFilePicker(optional SaveFilePickerOptions options)` (File System Access (https://wicg.github.io/file-system-access/)) -/
 @[macro_inline] def showSaveFilePicker (options : Option SaveFilePickerOptions := none) : Async FileSystemFileHandle := Internal.api "Lasm.JS.Web.showSaveFilePicker" do
@@ -174,10 +232,28 @@ instance : ToJS FilePickerOptions := ⟨fun d => Internal.fields #[("types", Int
     (Internal.args #[Internal.optional options])
   pure { val := r }
 
+/-- `Promise<FileSystemFileHandle> showSaveFilePicker(optional SaveFilePickerOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def showSaveFilePicker? (options : Option SaveFilePickerOptions := none) : Async (Option FileSystemFileHandle) := Internal.api "Lasm.JS.Web.showSaveFilePicker?" do
+  if !(← Internal.hasGlobal ["showSaveFilePicker"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.showSaveFilePicker?", module := "globalThis", path := "showSaveFilePicker", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional options])
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `Promise<FileSystemDirectoryHandle> showDirectoryPicker(optional DirectoryPickerOptions options)` (File System Access (https://wicg.github.io/file-system-access/)) -/
 @[macro_inline] def showDirectoryPicker (options : Option DirectoryPickerOptions := none) : Async FileSystemDirectoryHandle := Internal.api "Lasm.JS.Web.showDirectoryPicker" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.showDirectoryPicker", module := "globalThis", path := "showDirectoryPicker", construct := false, arity := 1 }
     (Internal.args #[Internal.optional options])
   pure { val := r }
+
+/-- `Promise<FileSystemDirectoryHandle> showDirectoryPicker(optional DirectoryPickerOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def showDirectoryPicker? (options : Option DirectoryPickerOptions := none) : Async (Option FileSystemDirectoryHandle) := Internal.api "Lasm.JS.Web.showDirectoryPicker?" do
+  if !(← Internal.hasGlobal ["showDirectoryPicker"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.showDirectoryPicker?", module := "globalThis", path := "showDirectoryPicker", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional options])
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

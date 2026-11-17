@@ -18,4 +18,12 @@ set_option compiler.extract_closed false
 @[macro_inline] def Navigator.cpuPerformance (self : Navigator) : IO Nat := Internal.api "Lasm.JS.Web.Navigator.cpuPerformance" do
   self.val.get "cpuPerformance" Nat
 
+/-- `readonly attribute unsigned short cpuPerformance` where the platform has it (`'cpuPerformance' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.cpuPerformance? (self' : Navigator) : IO (Option Nat) := Internal.api "Lasm.JS.Web.Navigator.cpuPerformance?" do
+  let self := self'
+  if !(← Internal.has self.val "cpuPerformance") then return none
+  let lasmGuarded ← do
+    self.val.get "cpuPerformance" Nat
+  return some lasmGuarded
+
 end Lasm.JS.Web

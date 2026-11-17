@@ -25,14 +25,38 @@ instance : ToJS RTCDiagnosticLoggingOptions := ⟨fun d => Internal.fields #[("m
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Web.RTCPeerConnection.startDiagnosticLogging", module := "globalThis", path := "RTCPeerConnection.startDiagnosticLogging", construct := false, arity := 1 }
     (Internal.args #[Internal.optional options]) (await := false)
 
+/-- `static DOMString startDiagnosticLogging(optional RTCDiagnosticLoggingOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCPeerConnection.startDiagnosticLogging? (options : Option RTCDiagnosticLoggingOptions := none) : IO (Option String) := Internal.api "Lasm.JS.Web.RTCPeerConnection.startDiagnosticLogging?" do
+  if !(← Internal.hasGlobal ["RTCPeerConnection", "startDiagnosticLogging"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke String { name := "Lasm.JS.Web.RTCPeerConnection.startDiagnosticLogging?", module := "globalThis", path := "RTCPeerConnection.startDiagnosticLogging", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `static undefined stopDiagnosticLogging()` -/
 @[macro_inline] def RTCPeerConnection.stopDiagnosticLogging : IO Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.stopDiagnosticLogging" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.RTCPeerConnection.stopDiagnosticLogging", module := "globalThis", path := "RTCPeerConnection.stopDiagnosticLogging", construct := false, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `static undefined stopDiagnosticLogging()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCPeerConnection.stopDiagnosticLogging? : IO (Option Unit) := Internal.api "Lasm.JS.Web.RTCPeerConnection.stopDiagnosticLogging?" do
+  if !(← Internal.hasGlobal ["RTCPeerConnection", "stopDiagnosticLogging"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.RTCPeerConnection.stopDiagnosticLogging?", module := "globalThis", path := "RTCPeerConnection.stopDiagnosticLogging", construct := false, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `static undefined cancelDiagnosticLogging()` -/
 @[macro_inline] def RTCPeerConnection.cancelDiagnosticLogging : IO Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.cancelDiagnosticLogging" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.RTCPeerConnection.cancelDiagnosticLogging", module := "globalThis", path := "RTCPeerConnection.cancelDiagnosticLogging", construct := false, arity := 0 }
     (Internal.args #[]) (await := false)
+
+/-- `static undefined cancelDiagnosticLogging()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCPeerConnection.cancelDiagnosticLogging? : IO (Option Unit) := Internal.api "Lasm.JS.Web.RTCPeerConnection.cancelDiagnosticLogging?" do
+  if !(← Internal.hasGlobal ["RTCPeerConnection", "cancelDiagnosticLogging"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.RTCPeerConnection.cancelDiagnosticLogging?", module := "globalThis", path := "RTCPeerConnection.cancelDiagnosticLogging", construct := false, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
 
 end Lasm.JS.Web

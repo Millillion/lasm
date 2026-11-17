@@ -18,6 +18,14 @@ set_option compiler.extract_closed false
 @[macro_inline] def HTMLIFrameElement.credentialless (self : HTMLIFrameElement) : IO Bool := Internal.api "Lasm.JS.Web.HTMLIFrameElement.credentialless" do
   self.val.get "credentialless" Bool
 
+/-- `attribute boolean credentialless` where the platform has it (`'credentialless' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLIFrameElement.credentialless? (self' : HTMLIFrameElement) : IO (Option Bool) := Internal.api "Lasm.JS.Web.HTMLIFrameElement.credentialless?" do
+  let self := self'
+  if !(← Internal.has self.val "credentialless") then return none
+  let lasmGuarded ← do
+    self.val.get "credentialless" Bool
+  return some lasmGuarded
+
 /-- Sets `credentialless`: `attribute boolean credentialless` -/
 @[macro_inline] def HTMLIFrameElement.setCredentialless (self : HTMLIFrameElement) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.HTMLIFrameElement.setCredentialless" do
   self.val.set "credentialless" (toJS value)
@@ -26,8 +34,23 @@ set_option compiler.extract_closed false
 @[macro_inline] def Window.credentialless (self : Window) : IO Bool := Internal.api "Lasm.JS.Web.Window.credentialless" do
   self.val.get "credentialless" Bool
 
+/-- `readonly attribute boolean credentialless` where the platform has it (`'credentialless' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.credentialless? (self' : Window) : IO (Option Bool) := Internal.api "Lasm.JS.Web.Window.credentialless?" do
+  let self := self'
+  if !(← Internal.has self.val "credentialless") then return none
+  let lasmGuarded ← do
+    self.val.get "credentialless" Bool
+  return some lasmGuarded
+
 /-- `readonly attribute boolean credentialless` (Iframe credentialless (https://wicg.github.io/anonymous-iframe/)) -/
 @[macro_inline] def credentialless : IO Bool := Internal.api "Lasm.JS.Web.credentialless" do
   Internal.getGlobal ["credentialless"] Bool
+
+/-- `readonly attribute boolean credentialless` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def credentialless? : IO (Option Bool) := Internal.api "Lasm.JS.Web.credentialless?" do
+  if !(← Internal.hasGlobal ["credentialless"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["credentialless"] Bool
+  return some lasmGuarded
 
 end Lasm.JS.Web

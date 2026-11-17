@@ -29,6 +29,14 @@ set_option compiler.extract_closed false
 @[macro_inline] def PerformanceResourceTiming.deliveryType (self : PerformanceResourceTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.deliveryType" do
   self.val.get "deliveryType" String
 
+/-- `readonly attribute DOMString deliveryType` where the platform has it (`'deliveryType' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformanceResourceTiming.deliveryType? (self' : PerformanceResourceTiming) : IO (Option String) := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.deliveryType?" do
+  let self := self'
+  if !(← Internal.has self.val "deliveryType") then return none
+  let lasmGuarded ← do
+    self.val.get "deliveryType" String
+  return some lasmGuarded
+
 /-- `readonly attribute ByteString nextHopProtocol` -/
 @[macro_inline] def PerformanceResourceTiming.nextHopProtocol (self : PerformanceResourceTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.nextHopProtocol" do
   self.val.get "nextHopProtocol" String
@@ -77,9 +85,25 @@ set_option compiler.extract_closed false
 @[macro_inline] def PerformanceResourceTiming.finalResponseHeadersStart (self : PerformanceResourceTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.finalResponseHeadersStart" do
   self.val.get "finalResponseHeadersStart" Float
 
+/-- `readonly attribute DOMHighResTimeStamp finalResponseHeadersStart` where the platform has it (`'finalResponseHeadersStart' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformanceResourceTiming.finalResponseHeadersStart? (self' : PerformanceResourceTiming) : IO (Option Float) := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.finalResponseHeadersStart?" do
+  let self := self'
+  if !(← Internal.has self.val "finalResponseHeadersStart") then return none
+  let lasmGuarded ← do
+    self.val.get "finalResponseHeadersStart" Float
+  return some lasmGuarded
+
 /-- `readonly attribute DOMHighResTimeStamp firstInterimResponseStart` -/
 @[macro_inline] def PerformanceResourceTiming.firstInterimResponseStart (self : PerformanceResourceTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.firstInterimResponseStart" do
   self.val.get "firstInterimResponseStart" Float
+
+/-- `readonly attribute DOMHighResTimeStamp firstInterimResponseStart` where the platform has it (`'firstInterimResponseStart' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformanceResourceTiming.firstInterimResponseStart? (self' : PerformanceResourceTiming) : IO (Option Float) := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.firstInterimResponseStart?" do
+  let self := self'
+  if !(← Internal.has self.val "firstInterimResponseStart") then return none
+  let lasmGuarded ← do
+    self.val.get "firstInterimResponseStart" Float
+  return some lasmGuarded
 
 /-- `readonly attribute DOMHighResTimeStamp responseStart` -/
 @[macro_inline] def PerformanceResourceTiming.responseStart (self : PerformanceResourceTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.responseStart" do
@@ -93,17 +117,49 @@ set_option compiler.extract_closed false
 @[macro_inline] def PerformanceResourceTiming.workerRouterEvaluationStart (self : PerformanceResourceTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.workerRouterEvaluationStart" do
   self.val.get "workerRouterEvaluationStart" Float
 
+/-- `readonly attribute DOMHighResTimeStamp workerRouterEvaluationStart` where the platform has it (`'workerRouterEvaluationStart' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformanceResourceTiming.workerRouterEvaluationStart? (self' : PerformanceResourceTiming) : IO (Option Float) := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.workerRouterEvaluationStart?" do
+  let self := self'
+  if !(← Internal.has self.val "workerRouterEvaluationStart") then return none
+  let lasmGuarded ← do
+    self.val.get "workerRouterEvaluationStart" Float
+  return some lasmGuarded
+
 /-- `readonly attribute DOMHighResTimeStamp workerCacheLookupStart` -/
 @[macro_inline] def PerformanceResourceTiming.workerCacheLookupStart (self : PerformanceResourceTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.workerCacheLookupStart" do
   self.val.get "workerCacheLookupStart" Float
+
+/-- `readonly attribute DOMHighResTimeStamp workerCacheLookupStart` where the platform has it (`'workerCacheLookupStart' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformanceResourceTiming.workerCacheLookupStart? (self' : PerformanceResourceTiming) : IO (Option Float) := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.workerCacheLookupStart?" do
+  let self := self'
+  if !(← Internal.has self.val "workerCacheLookupStart") then return none
+  let lasmGuarded ← do
+    self.val.get "workerCacheLookupStart" Float
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString workerMatchedRouterSource` -/
 @[macro_inline] def PerformanceResourceTiming.workerMatchedRouterSource (self : PerformanceResourceTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.workerMatchedRouterSource" do
   self.val.get "workerMatchedRouterSource" String
 
+/-- `readonly attribute DOMString workerMatchedRouterSource` where the platform has it (`'workerMatchedRouterSource' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformanceResourceTiming.workerMatchedRouterSource? (self' : PerformanceResourceTiming) : IO (Option String) := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.workerMatchedRouterSource?" do
+  let self := self'
+  if !(← Internal.has self.val "workerMatchedRouterSource") then return none
+  let lasmGuarded ← do
+    self.val.get "workerMatchedRouterSource" String
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString workerFinalRouterSource` -/
 @[macro_inline] def PerformanceResourceTiming.workerFinalRouterSource (self : PerformanceResourceTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.workerFinalRouterSource" do
   self.val.get "workerFinalRouterSource" String
+
+/-- `readonly attribute DOMString workerFinalRouterSource` where the platform has it (`'workerFinalRouterSource' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformanceResourceTiming.workerFinalRouterSource? (self' : PerformanceResourceTiming) : IO (Option String) := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.workerFinalRouterSource?" do
+  let self := self'
+  if !(← Internal.has self.val "workerFinalRouterSource") then return none
+  let lasmGuarded ← do
+    self.val.get "workerFinalRouterSource" String
+  return some lasmGuarded
 
 /-- `readonly attribute unsigned long long transferSize` -/
 @[macro_inline] def PerformanceResourceTiming.transferSize (self : PerformanceResourceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.transferSize" do
@@ -121,17 +177,49 @@ set_option compiler.extract_closed false
 @[macro_inline] def PerformanceResourceTiming.responseStatus (self : PerformanceResourceTiming) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.responseStatus" do
   self.val.get "responseStatus" Nat
 
+/-- `readonly attribute unsigned short responseStatus` where the platform has it (`'responseStatus' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformanceResourceTiming.responseStatus? (self' : PerformanceResourceTiming) : IO (Option Nat) := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.responseStatus?" do
+  let self := self'
+  if !(← Internal.has self.val "responseStatus") then return none
+  let lasmGuarded ← do
+    self.val.get "responseStatus" Nat
+  return some lasmGuarded
+
 /-- `readonly attribute RenderBlockingStatusType renderBlockingStatus` -/
 @[macro_inline] def PerformanceResourceTiming.renderBlockingStatus (self : PerformanceResourceTiming) : IO RenderBlockingStatusType := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.renderBlockingStatus" do
   self.val.get "renderBlockingStatus" RenderBlockingStatusType
+
+/-- `readonly attribute RenderBlockingStatusType renderBlockingStatus` where the platform has it (`'renderBlockingStatus' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformanceResourceTiming.renderBlockingStatus? (self' : PerformanceResourceTiming) : IO (Option RenderBlockingStatusType) := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.renderBlockingStatus?" do
+  let self := self'
+  if !(← Internal.has self.val "renderBlockingStatus") then return none
+  let lasmGuarded ← do
+    self.val.get "renderBlockingStatus" RenderBlockingStatusType
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString contentType` -/
 @[macro_inline] def PerformanceResourceTiming.contentType (self : PerformanceResourceTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.contentType" do
   self.val.get "contentType" String
 
+/-- `readonly attribute DOMString contentType` where the platform has it (`'contentType' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformanceResourceTiming.contentType? (self' : PerformanceResourceTiming) : IO (Option String) := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.contentType?" do
+  let self := self'
+  if !(← Internal.has self.val "contentType") then return none
+  let lasmGuarded ← do
+    self.val.get "contentType" String
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString contentEncoding` -/
 @[macro_inline] def PerformanceResourceTiming.contentEncoding (self : PerformanceResourceTiming) : IO String := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.contentEncoding" do
   self.val.get "contentEncoding" String
+
+/-- `readonly attribute DOMString contentEncoding` where the platform has it (`'contentEncoding' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformanceResourceTiming.contentEncoding? (self' : PerformanceResourceTiming) : IO (Option String) := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.contentEncoding?" do
+  let self := self'
+  if !(← Internal.has self.val "contentEncoding") then return none
+  let lasmGuarded ← do
+    self.val.get "contentEncoding" String
+  return some lasmGuarded
 
 /-- `object toJSON()` -/
 @[macro_inline] def PerformanceResourceTiming.toJSON (self : PerformanceResourceTiming) : IO Data := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.toJSON" do
@@ -149,8 +237,24 @@ set_option compiler.extract_closed false
 @[macro_inline] def Performance.clearResourceTimings (self : Performance) : IO Unit := Internal.api "Lasm.JS.Web.Performance.clearResourceTimings" do
   self.val.callMethod "clearResourceTimings" (Internal.args #[]) Unit
 
+/-- `undefined clearResourceTimings()` where the platform has it (`'clearResourceTimings' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Performance.clearResourceTimings? (self' : Performance) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Performance.clearResourceTimings?" do
+  let self := self'
+  if !(← Internal.has self.val "clearResourceTimings") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "clearResourceTimings" (Internal.args #[]) Unit
+  return some lasmGuarded
+
 /-- `undefined setResourceTimingBufferSize(unsigned long maxSize)` -/
 @[macro_inline] def Performance.setResourceTimingBufferSize (self : Performance) (maxSize : Nat) : IO Unit := Internal.api "Lasm.JS.Web.Performance.setResourceTimingBufferSize" do
   self.val.callMethod "setResourceTimingBufferSize" (Internal.args #[toJS maxSize]) Unit
+
+/-- `undefined setResourceTimingBufferSize(unsigned long maxSize)` where the platform has it (`'setResourceTimingBufferSize' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Performance.setResourceTimingBufferSize? (self' : Performance) (maxSize : Nat) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Performance.setResourceTimingBufferSize?" do
+  let self := self'
+  if !(← Internal.has self.val "setResourceTimingBufferSize") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "setResourceTimingBufferSize" (Internal.args #[toJS maxSize]) Unit
+  return some lasmGuarded
 
 end Lasm.JS.Web

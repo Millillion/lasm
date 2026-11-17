@@ -82,6 +82,14 @@ instance : ToJS PerformanceObserverInit := ⟨fun d => Internal.fields #[("durat
 @[macro_inline] def PerformanceEntry.navigationId (self : PerformanceEntry) : IO Nat := Internal.api "Lasm.JS.Web.PerformanceEntry.navigationId" do
   self.val.get "navigationId" Nat
 
+/-- `readonly attribute unsigned long long navigationId` where the platform has it (`'navigationId' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformanceEntry.navigationId? (self' : PerformanceEntry) : IO (Option Nat) := Internal.api "Lasm.JS.Web.PerformanceEntry.navigationId?" do
+  let self := self'
+  if !(← Internal.has self.val "navigationId") then return none
+  let lasmGuarded ← do
+    self.val.get "navigationId" Nat
+  return some lasmGuarded
+
 /-- `object toJSON()` -/
 @[macro_inline] def PerformanceEntry.toJSON (self : PerformanceEntry) : IO Data := Internal.api "Lasm.JS.Web.PerformanceEntry.toJSON" do
   self.val.callMethod "toJSON" (Internal.args #[]) Data
@@ -95,9 +103,24 @@ instance : ToJS PerformanceObserverInit := ⟨fun d => Internal.fields #[("durat
   Lasm.JS.Binding.invoke PerformanceObserver { name := "Lasm.JS.Web.PerformanceObserver.new", module := "globalThis", path := "PerformanceObserver", construct := true, arity := 1 }
     (Internal.args #[toJS callback]) (await := false)
 
+/-- `constructor(PerformanceObserverCallback callback)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformanceObserver.new? (callback : PerformanceObserverCallback) : IO (Option PerformanceObserver) := Internal.api "Lasm.JS.Web.PerformanceObserver.new?" do
+  if !(← Internal.hasGlobal ["PerformanceObserver"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PerformanceObserver { name := "Lasm.JS.Web.PerformanceObserver.new?", module := "globalThis", path := "PerformanceObserver", construct := true, arity := 1 }
+      (Internal.args #[toJS callback]) (await := false)
+  return some lasmGuarded
+
 /-- `static readonly attribute FrozenArray<DOMString> supportedEntryTypes` -/
 @[macro_inline] def PerformanceObserver.supportedEntryTypes : IO (Array String) := Internal.api "Lasm.JS.Web.PerformanceObserver.supportedEntryTypes" do
   Internal.getGlobal ["PerformanceObserver", "supportedEntryTypes"] (Array String)
+
+/-- `static readonly attribute FrozenArray<DOMString> supportedEntryTypes` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformanceObserver.supportedEntryTypes? : IO (Option (Array String)) := Internal.api "Lasm.JS.Web.PerformanceObserver.supportedEntryTypes?" do
+  if !(← Internal.hasGlobal ["PerformanceObserver", "supportedEntryTypes"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["PerformanceObserver", "supportedEntryTypes"] (Array String)
+  return some lasmGuarded
 
 /-- `undefined observe(optional PerformanceObserverInit options)` -/
 @[macro_inline] def PerformanceObserver.observe (self : PerformanceObserver) (options : Option PerformanceObserverInit := none) : IO Unit := Internal.api "Lasm.JS.Web.PerformanceObserver.observe" do
@@ -119,24 +142,72 @@ instance : ToJS PerformanceObserverInit := ⟨fun d => Internal.fields #[("durat
 @[macro_inline] def PerformanceObserverEntryList.getEntries (self : PerformanceObserverEntryList) : IO (Array PerformanceEntry) := Internal.api "Lasm.JS.Web.PerformanceObserverEntryList.getEntries" do
   self.val.callMethod "getEntries" (Internal.args #[]) (Array PerformanceEntry)
 
+/-- `PerformanceEntryList getEntries()` where the platform has it (`'getEntries' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformanceObserverEntryList.getEntries? (self' : PerformanceObserverEntryList) : IO (Option (Array PerformanceEntry)) := Internal.api "Lasm.JS.Web.PerformanceObserverEntryList.getEntries?" do
+  let self := self'
+  if !(← Internal.has self.val "getEntries") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getEntries" (Internal.args #[]) (Array PerformanceEntry)
+  return some lasmGuarded
+
 /-- `PerformanceEntryList getEntriesByType(DOMString type)` -/
 @[macro_inline] def PerformanceObserverEntryList.getEntriesByType (self : PerformanceObserverEntryList) (type : String) : IO (Array PerformanceEntry) := Internal.api "Lasm.JS.Web.PerformanceObserverEntryList.getEntriesByType" do
   self.val.callMethod "getEntriesByType" (Internal.args #[toJS type]) (Array PerformanceEntry)
+
+/-- `PerformanceEntryList getEntriesByType(DOMString type)` where the platform has it (`'getEntriesByType' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformanceObserverEntryList.getEntriesByType? (self' : PerformanceObserverEntryList) (type : String) : IO (Option (Array PerformanceEntry)) := Internal.api "Lasm.JS.Web.PerformanceObserverEntryList.getEntriesByType?" do
+  let self := self'
+  if !(← Internal.has self.val "getEntriesByType") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getEntriesByType" (Internal.args #[toJS type]) (Array PerformanceEntry)
+  return some lasmGuarded
 
 /-- `PerformanceEntryList getEntriesByName(DOMString name, optional DOMString type)` -/
 @[macro_inline] def PerformanceObserverEntryList.getEntriesByName (self : PerformanceObserverEntryList) (name : String) (type : Option String := none) : IO (Array PerformanceEntry) := Internal.api "Lasm.JS.Web.PerformanceObserverEntryList.getEntriesByName" do
   self.val.callMethod "getEntriesByName" (Internal.args #[toJS name, Internal.optional type]) (Array PerformanceEntry)
 
+/-- `PerformanceEntryList getEntriesByName(DOMString name, optional DOMString type)` where the platform has it (`'getEntriesByName' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformanceObserverEntryList.getEntriesByName? (self' : PerformanceObserverEntryList) (name : String) (type : Option String := none) : IO (Option (Array PerformanceEntry)) := Internal.api "Lasm.JS.Web.PerformanceObserverEntryList.getEntriesByName?" do
+  let self := self'
+  if !(← Internal.has self.val "getEntriesByName") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getEntriesByName" (Internal.args #[toJS name, Internal.optional type]) (Array PerformanceEntry)
+  return some lasmGuarded
+
 /-- `PerformanceEntryList getEntries()` -/
 @[macro_inline] def Performance.getEntries (self : Performance) : IO (Array PerformanceEntry) := Internal.api "Lasm.JS.Web.Performance.getEntries" do
   self.val.callMethod "getEntries" (Internal.args #[]) (Array PerformanceEntry)
+
+/-- `PerformanceEntryList getEntries()` where the platform has it (`'getEntries' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Performance.getEntries? (self' : Performance) : IO (Option (Array PerformanceEntry)) := Internal.api "Lasm.JS.Web.Performance.getEntries?" do
+  let self := self'
+  if !(← Internal.has self.val "getEntries") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getEntries" (Internal.args #[]) (Array PerformanceEntry)
+  return some lasmGuarded
 
 /-- `PerformanceEntryList getEntriesByType(DOMString type)` -/
 @[macro_inline] def Performance.getEntriesByType (self : Performance) (type : String) : IO (Array PerformanceEntry) := Internal.api "Lasm.JS.Web.Performance.getEntriesByType" do
   self.val.callMethod "getEntriesByType" (Internal.args #[toJS type]) (Array PerformanceEntry)
 
+/-- `PerformanceEntryList getEntriesByType(DOMString type)` where the platform has it (`'getEntriesByType' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Performance.getEntriesByType? (self' : Performance) (type : String) : IO (Option (Array PerformanceEntry)) := Internal.api "Lasm.JS.Web.Performance.getEntriesByType?" do
+  let self := self'
+  if !(← Internal.has self.val "getEntriesByType") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getEntriesByType" (Internal.args #[toJS type]) (Array PerformanceEntry)
+  return some lasmGuarded
+
 /-- `PerformanceEntryList getEntriesByName(DOMString name, optional DOMString type)` -/
 @[macro_inline] def Performance.getEntriesByName (self : Performance) (name : String) (type : Option String := none) : IO (Array PerformanceEntry) := Internal.api "Lasm.JS.Web.Performance.getEntriesByName" do
   self.val.callMethod "getEntriesByName" (Internal.args #[toJS name, Internal.optional type]) (Array PerformanceEntry)
+
+/-- `PerformanceEntryList getEntriesByName(DOMString name, optional DOMString type)` where the platform has it (`'getEntriesByName' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Performance.getEntriesByName? (self' : Performance) (name : String) (type : Option String := none) : IO (Option (Array PerformanceEntry)) := Internal.api "Lasm.JS.Web.Performance.getEntriesByName?" do
+  let self := self'
+  if !(← Internal.has self.val "getEntriesByName") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getEntriesByName" (Internal.args #[toJS name, Internal.optional type]) (Array PerformanceEntry)
+  return some lasmGuarded
 
 end Lasm.JS.Web

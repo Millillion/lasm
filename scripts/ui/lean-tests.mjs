@@ -20,6 +20,24 @@ const root = fileURLToPath(new URL('../../', import.meta.url));
 const writeFixtures = process.argv.includes('--fixtures');
 const work = mkdtempSync(join(tmpdir(), 'lasm-ui-lean-'));
 const failures = [];
+/** The directory's own modules that `programs` import, directly or not, in an
+ * order where each comes after the local modules it imports (a topological sort
+ * of the `import` lines; imports of other packages are ignored). */
+function localModuleOrder(dir, programs) {
+  const local = new Set(readdirSync(dir).filter(f => f.endsWith('.lean')).map(f => f.slice(0, -5)));
+  const imports = m => [...readFileSync(join(dir, m + '.lean'), 'utf8').matchAll(/^import\s+(\S+)/gm)].map(x => x[1]).filter(i => local.has(i));
+  const order = [], state = new Map();
+  const visit = (m, path) => {
+    if (state.get(m) === 'done') return;
+    if (state.get(m) === 'visiting') throw new Error(`import cycle in ${dir}: ${[...path, m].join(' → ')}`);
+    state.set(m, 'visiting');
+    for (const i of imports(m)) visit(i, [...path, m]);
+    state.set(m, 'done');
+    order.push(m);
+  };
+  for (const p of programs) for (const i of imports(p)) visit(i, [p]);
+  return order;
+}
 try {
   writeFileSync(join(work, 'Main.lean'), 'import Lean\ndef main : IO Unit := pure ()\n');
   writeFileSync(join(work, 'lean-toolchain'), 'leanprover/lean4:v4.35.0\n');
@@ -67,7 +85,7 @@ try {
     if (readFileSync(file, 'utf8') !== fixtures) throw new Error('test/fixtures/ui/patches.json is stale: run node scripts/ui/lean-tests.mjs --fixtures');
     return `${JSON.parse(fixtures).length} scenarios`;
   });
-  // Examples: each directory's modules, Main last (others in dependency order by name list).
+  // Examples: each directory's modules in import order, then Main.
   const examples = join(root, 'examples/ui');
   for (const name of readdirSync(examples).sort()) {
     const dir = join(examples, name);
@@ -75,7 +93,7 @@ try {
     check(`examples/ui/${name} elaborates`, () => {
       const out = join(work, 'examples', name);
       mkdirSync(out, { recursive: true });
-      const modules = readdirSync(dir).filter(f => f.endsWith('.lean') && f !== 'Main.lean').map(f => f.slice(0, -5));
+      const modules = localModuleOrder(dir, ['Main']);
       let log = '';
       for (const m of modules) log += run(['-R', dir, '-o', join(out, m + '.olean'), join(dir, m + '.lean')], [out]);
       log += run(['-R', dir, join(dir, 'Main.lean')], [out]);
@@ -83,15 +101,17 @@ try {
       return modules.length ? `with ${modules.join(', ')}` : '';
     });
   }
-  // The fullstack template: shared modules first (Lake's libraries), then both programs.
+  // The fullstack template: the modules the browser app and the Node server
+  // import, in import order (from their import lines), then both programs.
   check('templates/fullstack elaborates (its theorems included)', () => {
     const dir = join(root, 'templates/fullstack'), out = join(work, 'fullstack');
     mkdirSync(out, { recursive: true });
+    const programs = ['Client', 'Server'], modules = localModuleOrder(dir, programs);
     let log = '';
-    for (const m of ['Shared', 'View']) log += run(['-R', dir, '-o', join(out, m + '.olean'), join(dir, m + '.lean')], [out]);
-    for (const m of ['Client', 'Server']) log += run(['-R', dir, join(dir, m + '.lean')], [out]);
+    for (const m of modules) log += run(['-R', dir, '-o', join(out, m + '.olean'), join(dir, m + '.lean')], [out]);
+    for (const m of programs) log += run(['-R', dir, join(dir, m + '.lean')], [out]);
     if (/declaration uses `sorry`|error:/.test(log)) throw Object.assign(new Error('sorry or error'), { stdout: log });
-    return '';
+    return `with ${modules.join(', ')}`;
   });
 } finally { rmSync(work, { recursive: true, force: true }); }
 if (failures.length) { console.log(`${failures.length} failed: ${failures.join(', ')}`); process.exit(1); }

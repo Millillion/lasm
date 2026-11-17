@@ -45,9 +45,25 @@ instance : FromJS CaptureHandle where
 @[macro_inline] def MediaDevices.setCaptureHandleConfig (self : MediaDevices) (config : Option CaptureHandleConfig := none) : IO Unit := Internal.api "Lasm.JS.Web.MediaDevices.setCaptureHandleConfig" do
   self.val.callMethod "setCaptureHandleConfig" (Internal.args #[Internal.optional config]) Unit
 
+/-- `undefined setCaptureHandleConfig(optional CaptureHandleConfig config)` where the platform has it (`'setCaptureHandleConfig' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaDevices.setCaptureHandleConfig? (self' : MediaDevices) (config : Option CaptureHandleConfig := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.MediaDevices.setCaptureHandleConfig?" do
+  let self := self'
+  if !(← Internal.has self.val "setCaptureHandleConfig") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "setCaptureHandleConfig" (Internal.args #[Internal.optional config]) Unit
+  return some lasmGuarded
+
 /-- `attribute EventHandler oncapturehandlechange` -/
 @[macro_inline] def MediaStreamTrack.oncapturehandlechange (self : MediaStreamTrack) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MediaStreamTrack.oncapturehandlechange" do
   self.val.get "oncapturehandlechange" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler oncapturehandlechange` where the platform has it (`'oncapturehandlechange' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaStreamTrack.oncapturehandlechange? (self' : MediaStreamTrack) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.MediaStreamTrack.oncapturehandlechange?" do
+  let self := self'
+  if !(← Internal.has self.val "oncapturehandlechange") then return none
+  let lasmGuarded ← do
+    self.val.get "oncapturehandlechange" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `oncapturehandlechange`: `attribute EventHandler oncapturehandlechange` -/
 @[macro_inline] def MediaStreamTrack.setOncapturehandlechange (self : MediaStreamTrack) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MediaStreamTrack.setOncapturehandlechange" do
@@ -56,5 +72,13 @@ instance : FromJS CaptureHandle where
 /-- `CaptureHandle? getCaptureHandle()` -/
 @[macro_inline] def MediaStreamTrack.getCaptureHandle (self : MediaStreamTrack) : IO (Option CaptureHandle) := Internal.api "Lasm.JS.Web.MediaStreamTrack.getCaptureHandle" do
   self.val.callMethod "getCaptureHandle" (Internal.args #[]) (Option CaptureHandle)
+
+/-- `CaptureHandle? getCaptureHandle()` where the platform has it (`'getCaptureHandle' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaStreamTrack.getCaptureHandle? (self' : MediaStreamTrack) : IO (Option (Option CaptureHandle)) := Internal.api "Lasm.JS.Web.MediaStreamTrack.getCaptureHandle?" do
+  let self := self'
+  if !(← Internal.has self.val "getCaptureHandle") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getCaptureHandle" (Internal.args #[]) (Option CaptureHandle)
+  return some lasmGuarded
 
 end Lasm.JS.Web

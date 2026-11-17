@@ -53,6 +53,14 @@ instance : ToJS TransitionEventInit := ⟨fun d => Internal.fields #[("bubbles",
   Lasm.JS.Binding.invoke TransitionEvent { name := "Lasm.JS.Web.TransitionEvent.new", module := "globalThis", path := "TransitionEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional transitionEventInitDict]) (await := false)
 
+/-- `constructor(CSSOMString type, optional TransitionEventInit transitionEventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def TransitionEvent.new? (type : String) (transitionEventInitDict : Option TransitionEventInit := none) : IO (Option TransitionEvent) := Internal.api "Lasm.JS.Web.TransitionEvent.new?" do
+  if !(← Internal.hasGlobal ["TransitionEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke TransitionEvent { name := "Lasm.JS.Web.TransitionEvent.new?", module := "globalThis", path := "TransitionEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional transitionEventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute CSSOMString propertyName` -/
 @[macro_inline] def TransitionEvent.propertyName (self : TransitionEvent) : IO String := Internal.api "Lasm.JS.Web.TransitionEvent.propertyName" do
   self.val.get "propertyName" String
@@ -229,16 +237,44 @@ instance : ToJS TransitionEventInit := ⟨fun d => Internal.fields #[("bubbles",
 @[macro_inline] def ontransitionrun : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ontransitionrun" do
   Internal.getGlobal ["ontransitionrun"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler ontransitionrun` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ontransitionrun? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ontransitionrun?" do
+  if !(← Internal.hasGlobal ["ontransitionrun"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ontransitionrun"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler ontransitionstart` (CSS Transitions Module Level 1 (https://drafts.csswg.org/css-transitions-1/)) -/
 @[macro_inline] def ontransitionstart : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ontransitionstart" do
   Internal.getGlobal ["ontransitionstart"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler ontransitionstart` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ontransitionstart? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ontransitionstart?" do
+  if !(← Internal.hasGlobal ["ontransitionstart"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ontransitionstart"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler ontransitionend` (CSS Transitions Module Level 1 (https://drafts.csswg.org/css-transitions-1/)) -/
 @[macro_inline] def ontransitionend : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ontransitionend" do
   Internal.getGlobal ["ontransitionend"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler ontransitionend` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ontransitionend? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ontransitionend?" do
+  if !(← Internal.hasGlobal ["ontransitionend"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ontransitionend"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler ontransitioncancel` (CSS Transitions Module Level 1 (https://drafts.csswg.org/css-transitions-1/)) -/
 @[macro_inline] def ontransitioncancel : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ontransitioncancel" do
   Internal.getGlobal ["ontransitioncancel"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler ontransitioncancel` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ontransitioncancel? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ontransitioncancel?" do
+  if !(← Internal.hasGlobal ["ontransitioncancel"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ontransitioncancel"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 end Lasm.JS.Web

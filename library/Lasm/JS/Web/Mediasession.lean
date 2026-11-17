@@ -144,6 +144,14 @@ instance : ToJS MediaPositionState := ⟨fun d => Internal.fields #[("duration",
   Lasm.JS.Binding.invoke MediaMetadata { name := "Lasm.JS.Web.MediaMetadata.new", module := "globalThis", path := "MediaMetadata", construct := true, arity := 1 }
     (Internal.args #[Internal.optional init]) (await := false)
 
+/-- `constructor(optional MediaMetadataInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaMetadata.new? (init : Option MediaMetadataInit := none) : IO (Option MediaMetadata) := Internal.api "Lasm.JS.Web.MediaMetadata.new?" do
+  if !(← Internal.hasGlobal ["MediaMetadata"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke MediaMetadata { name := "Lasm.JS.Web.MediaMetadata.new?", module := "globalThis", path := "MediaMetadata", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional init]) (await := false)
+  return some lasmGuarded
+
 /-- `attribute DOMString title` -/
 @[macro_inline] def MediaMetadata.title (self : MediaMetadata) : IO String := Internal.api "Lasm.JS.Web.MediaMetadata.title" do
   self.val.get "title" String
@@ -180,6 +188,14 @@ instance : ToJS MediaPositionState := ⟨fun d => Internal.fields #[("duration",
 @[macro_inline] def MediaMetadata.chapterInfo (self : MediaMetadata) : IO (Array ChapterInformation) := Internal.api "Lasm.JS.Web.MediaMetadata.chapterInfo" do
   self.val.get "chapterInfo" (Array ChapterInformation)
 
+/-- `readonly attribute FrozenArray<ChapterInformation> chapterInfo` where the platform has it (`'chapterInfo' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaMetadata.chapterInfo? (self' : MediaMetadata) : IO (Option (Array ChapterInformation)) := Internal.api "Lasm.JS.Web.MediaMetadata.chapterInfo?" do
+  let self := self'
+  if !(← Internal.has self.val "chapterInfo") then return none
+  let lasmGuarded ← do
+    self.val.get "chapterInfo" (Array ChapterInformation)
+  return some lasmGuarded
+
 /-- `v instanceof MediaSession`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MediaSession`). -/
 @[macro_inline] def MediaSession.cast? (v : Value) : IO (Option MediaSession) := Internal.api "Lasm.JS.Web.MediaSession.cast?" do
   Internal.cast (Internal.getGlobal ["MediaSession"] Value) (fun x => { val := x }) v
@@ -212,17 +228,50 @@ instance : ToJS MediaPositionState := ⟨fun d => Internal.fields #[("duration",
 @[macro_inline] def MediaSession.setMicrophoneActive (self : MediaSession) (active : Bool) : Async Unit := Internal.api "Lasm.JS.Web.MediaSession.setMicrophoneActive" do
   self.val.callMethodAwait "setMicrophoneActive" (Internal.args #[toJS active]) Unit
 
+/-- `Promise<undefined> setMicrophoneActive(boolean active)` where the platform has it (`'setMicrophoneActive' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaSession.setMicrophoneActive? (self' : MediaSession) (active : Bool) : Async (Option Unit) := Internal.api "Lasm.JS.Web.MediaSession.setMicrophoneActive?" do
+  let self := self'
+  if !(← Internal.has self.val "setMicrophoneActive") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "setMicrophoneActive" (Internal.args #[toJS active]) Unit
+  return some lasmGuarded
+
 /-- `Promise<undefined> setCameraActive(boolean active)` -/
 @[macro_inline] def MediaSession.setCameraActive (self : MediaSession) (active : Bool) : Async Unit := Internal.api "Lasm.JS.Web.MediaSession.setCameraActive" do
   self.val.callMethodAwait "setCameraActive" (Internal.args #[toJS active]) Unit
+
+/-- `Promise<undefined> setCameraActive(boolean active)` where the platform has it (`'setCameraActive' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaSession.setCameraActive? (self' : MediaSession) (active : Bool) : Async (Option Unit) := Internal.api "Lasm.JS.Web.MediaSession.setCameraActive?" do
+  let self := self'
+  if !(← Internal.has self.val "setCameraActive") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "setCameraActive" (Internal.args #[toJS active]) Unit
+  return some lasmGuarded
 
 /-- `Promise<undefined> setScreenshareActive(boolean active)` -/
 @[macro_inline] def MediaSession.setScreenshareActive (self : MediaSession) (active : Bool) : Async Unit := Internal.api "Lasm.JS.Web.MediaSession.setScreenshareActive" do
   self.val.callMethodAwait "setScreenshareActive" (Internal.args #[toJS active]) Unit
 
+/-- `Promise<undefined> setScreenshareActive(boolean active)` where the platform has it (`'setScreenshareActive' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaSession.setScreenshareActive? (self' : MediaSession) (active : Bool) : Async (Option Unit) := Internal.api "Lasm.JS.Web.MediaSession.setScreenshareActive?" do
+  let self := self'
+  if !(← Internal.has self.val "setScreenshareActive") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "setScreenshareActive" (Internal.args #[toJS active]) Unit
+  return some lasmGuarded
+
 /-- `readonly attribute MediaSession mediaSession` -/
 @[macro_inline] def Navigator.mediaSession (self : Navigator) : IO MediaSession := Internal.api "Lasm.JS.Web.Navigator.mediaSession" do
   let r ← self.val.get "mediaSession" Value
   pure { val := r }
+
+/-- `readonly attribute MediaSession mediaSession` where the platform has it (`'mediaSession' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.mediaSession? (self' : Navigator) : IO (Option MediaSession) := Internal.api "Lasm.JS.Web.Navigator.mediaSession?" do
+  let self := self'
+  if !(← Internal.has self.val "mediaSession") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "mediaSession" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

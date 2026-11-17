@@ -72,6 +72,14 @@ instance : ToJS SpatialNavigationSearchOptions := ⟨fun d => Internal.fields #[
   Lasm.JS.Binding.invoke NavigationEvent { name := "Lasm.JS.Web.NavigationEvent.new", module := "globalThis", path := "NavigationEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional NavigationEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def NavigationEvent.new? (type : String) (eventInitDict : Option NavigationEventInit := none) : IO (Option NavigationEvent) := Internal.api "Lasm.JS.Web.NavigationEvent.new?" do
+  if !(← Internal.hasGlobal ["NavigationEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke NavigationEvent { name := "Lasm.JS.Web.NavigationEvent.new?", module := "globalThis", path := "NavigationEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute SpatialNavigationDirection dir` -/
 @[macro_inline] def NavigationEvent.dir (self : NavigationEvent) : IO SpatialNavigationDirection := Internal.api "Lasm.JS.Web.NavigationEvent.dir" do
   self.val.get "dir" SpatialNavigationDirection
@@ -101,5 +109,13 @@ instance : ToJS SpatialNavigationSearchOptions := ⟨fun d => Internal.fields #[
 @[macro_inline] def navigate (dir : SpatialNavigationDirection) : IO Unit := Internal.api "Lasm.JS.Web.navigate" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.navigate", module := "globalThis", path := "navigate", construct := false, arity := 1 }
     (Internal.args #[toJS dir]) (await := false)
+
+/-- `undefined navigate(SpatialNavigationDirection dir)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def navigate? (dir : SpatialNavigationDirection) : IO (Option Unit) := Internal.api "Lasm.JS.Web.navigate?" do
+  if !(← Internal.hasGlobal ["navigate"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.navigate?", module := "globalThis", path := "navigate", construct := false, arity := 1 }
+      (Internal.args #[toJS dir]) (await := false)
+  return some lasmGuarded
 
 end Lasm.JS.Web

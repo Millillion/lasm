@@ -730,6 +730,14 @@ instance : ToJS RTCStats := ⟨fun d => Internal.fields #[("timestamp", toJS d.t
   Lasm.JS.Binding.invoke RTCDTMFToneChangeEvent { name := "Lasm.JS.Web.RTCDTMFToneChangeEvent.new", module := "globalThis", path := "RTCDTMFToneChangeEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional RTCDTMFToneChangeEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCDTMFToneChangeEvent.new? (type : String) (eventInitDict : Option RTCDTMFToneChangeEventInit := none) : IO (Option RTCDTMFToneChangeEvent) := Internal.api "Lasm.JS.Web.RTCDTMFToneChangeEvent.new?" do
+  if !(← Internal.hasGlobal ["RTCDTMFToneChangeEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke RTCDTMFToneChangeEvent { name := "Lasm.JS.Web.RTCDTMFToneChangeEvent.new?", module := "globalThis", path := "RTCDTMFToneChangeEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString tone` -/
 @[macro_inline] def RTCDTMFToneChangeEvent.tone (self : RTCDTMFToneChangeEvent) : IO String := Internal.api "Lasm.JS.Web.RTCDTMFToneChangeEvent.tone" do
   self.val.get "tone" String
@@ -867,6 +875,14 @@ instance : ToJS RTCStats := ⟨fun d => Internal.fields #[("timestamp", toJS d.t
   Lasm.JS.Binding.invoke RTCDataChannelEvent { name := "Lasm.JS.Web.RTCDataChannelEvent.new", module := "globalThis", path := "RTCDataChannelEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, RTCDataChannelEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCDataChannelEvent.new? (type : String) (eventInitDict : RTCDataChannelEventInit) : IO (Option RTCDataChannelEvent) := Internal.api "Lasm.JS.Web.RTCDataChannelEvent.new?" do
+  if !(← Internal.hasGlobal ["RTCDataChannelEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke RTCDataChannelEvent { name := "Lasm.JS.Web.RTCDataChannelEvent.new?", module := "globalThis", path := "RTCDataChannelEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute RTCDataChannel channel` -/
 @[macro_inline] def RTCDataChannelEvent.channel (self : RTCDataChannelEvent) : IO RTCDataChannel := Internal.api "Lasm.JS.Web.RTCDataChannelEvent.channel" do
   let r ← self.val.get "channel" Value
@@ -915,6 +931,14 @@ instance : ToJS RTCStats := ⟨fun d => Internal.fields #[("timestamp", toJS d.t
   Lasm.JS.Binding.invoke RTCError { name := "Lasm.JS.Web.RTCError.new", module := "globalThis", path := "RTCError", construct := true, arity := 2 }
     (Internal.args #[toJS init, Internal.optional message]) (await := false)
 
+/-- `constructor(RTCErrorInit init, optional DOMString message)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCError.new? (init : RTCErrorInit) (message : Option String := none) : IO (Option RTCError) := Internal.api "Lasm.JS.Web.RTCError.new?" do
+  if !(← Internal.hasGlobal ["RTCError"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke RTCError { name := "Lasm.JS.Web.RTCError.new?", module := "globalThis", path := "RTCError", construct := true, arity := 2 }
+      (Internal.args #[toJS init, Internal.optional message]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute RTCErrorDetailType errorDetail` -/
 @[macro_inline] def RTCError.errorDetail (self : RTCError) : IO RTCErrorDetailType := Internal.api "Lasm.JS.Web.RTCError.errorDetail" do
   self.val.get "errorDetail" RTCErrorDetailType
@@ -944,6 +968,14 @@ instance : ToJS RTCStats := ⟨fun d => Internal.fields #[("timestamp", toJS d.t
   Lasm.JS.Binding.invoke RTCErrorEvent { name := "Lasm.JS.Web.RTCErrorEvent.new", module := "globalThis", path := "RTCErrorEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, RTCErrorEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCErrorEvent.new? (type : String) (eventInitDict : RTCErrorEventInit) : IO (Option RTCErrorEvent) := Internal.api "Lasm.JS.Web.RTCErrorEvent.new?" do
+  if !(← Internal.hasGlobal ["RTCErrorEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke RTCErrorEvent { name := "Lasm.JS.Web.RTCErrorEvent.new?", module := "globalThis", path := "RTCErrorEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute RTCError error` -/
 @[macro_inline] def RTCErrorEvent.error (self : RTCErrorEvent) : IO RTCError := Internal.api "Lasm.JS.Web.RTCErrorEvent.error" do
   let r ← self.val.get "error" Value
@@ -957,6 +989,14 @@ instance : ToJS RTCStats := ⟨fun d => Internal.fields #[("timestamp", toJS d.t
 @[macro_inline] def RTCIceCandidate.new (candidateInitDict : Option RTCLocalIceCandidateInit := none) : IO RTCIceCandidate := Internal.api "Lasm.JS.Web.RTCIceCandidate.new" do
   Lasm.JS.Binding.invoke RTCIceCandidate { name := "Lasm.JS.Web.RTCIceCandidate.new", module := "globalThis", path := "RTCIceCandidate", construct := true, arity := 1 }
     (Internal.args #[Internal.optional candidateInitDict]) (await := false)
+
+/-- `constructor(optional RTCLocalIceCandidateInit candidateInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCIceCandidate.new? (candidateInitDict : Option RTCLocalIceCandidateInit := none) : IO (Option RTCIceCandidate) := Internal.api "Lasm.JS.Web.RTCIceCandidate.new?" do
+  if !(← Internal.hasGlobal ["RTCIceCandidate"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke RTCIceCandidate { name := "Lasm.JS.Web.RTCIceCandidate.new?", module := "globalThis", path := "RTCIceCandidate", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional candidateInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString candidate` -/
 @[macro_inline] def RTCIceCandidate.candidate (self : RTCIceCandidate) : IO String := Internal.api "Lasm.JS.Web.RTCIceCandidate.candidate" do
@@ -1018,9 +1058,25 @@ instance : ToJS RTCStats := ⟨fun d => Internal.fields #[("timestamp", toJS d.t
 @[macro_inline] def RTCIceCandidate.relayProtocol (self : RTCIceCandidate) : IO (Option RTCIceServerTransportProtocol) := Internal.api "Lasm.JS.Web.RTCIceCandidate.relayProtocol" do
   self.val.get "relayProtocol" (Option RTCIceServerTransportProtocol)
 
+/-- `readonly attribute RTCIceServerTransportProtocol? relayProtocol` where the platform has it (`'relayProtocol' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCIceCandidate.relayProtocol? (self' : RTCIceCandidate) : IO (Option (Option RTCIceServerTransportProtocol)) := Internal.api "Lasm.JS.Web.RTCIceCandidate.relayProtocol?" do
+  let self := self'
+  if !(← Internal.has self.val "relayProtocol") then return none
+  let lasmGuarded ← do
+    self.val.get "relayProtocol" (Option RTCIceServerTransportProtocol)
+  return some lasmGuarded
+
 /-- `readonly attribute USVString? url` -/
 @[macro_inline] def RTCIceCandidate.url (self : RTCIceCandidate) : IO (Option String) := Internal.api "Lasm.JS.Web.RTCIceCandidate.url" do
   self.val.get "url" (Option String)
+
+/-- `readonly attribute USVString? url` where the platform has it (`'url' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCIceCandidate.url? (self' : RTCIceCandidate) : IO (Option (Option String)) := Internal.api "Lasm.JS.Web.RTCIceCandidate.url?" do
+  let self := self'
+  if !(← Internal.has self.val "url") then return none
+  let lasmGuarded ← do
+    self.val.get "url" (Option String)
+  return some lasmGuarded
 
 /-- `RTCIceCandidateInit toJSON()` -/
 @[macro_inline] def RTCIceCandidate.toJSON (self : RTCIceCandidate) : IO RTCIceCandidateInit := Internal.api "Lasm.JS.Web.RTCIceCandidate.toJSON" do
@@ -1047,6 +1103,14 @@ instance : ToJS RTCStats := ⟨fun d => Internal.fields #[("timestamp", toJS d.t
 /-- `readonly attribute RTCIceRole role` -/
 @[macro_inline] def RTCIceTransport.role (self : RTCIceTransport) : IO RTCIceRole := Internal.api "Lasm.JS.Web.RTCIceTransport.role" do
   self.val.get "role" RTCIceRole
+
+/-- `readonly attribute RTCIceRole role` where the platform has it (`'role' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCIceTransport.role? (self' : RTCIceTransport) : IO (Option RTCIceRole) := Internal.api "Lasm.JS.Web.RTCIceTransport.role?" do
+  let self := self'
+  if !(← Internal.has self.val "role") then return none
+  let lasmGuarded ← do
+    self.val.get "role" RTCIceRole
+  return some lasmGuarded
 
 /-- `readonly attribute RTCIceComponent component` -/
 @[macro_inline] def RTCIceTransport.component (self : RTCIceTransport) : IO RTCIceComponent := Internal.api "Lasm.JS.Web.RTCIceTransport.component" do
@@ -1088,9 +1152,25 @@ instance : ToJS RTCStats := ⟨fun d => Internal.fields #[("timestamp", toJS d.t
 @[macro_inline] def RTCIceTransport.getLocalCandidates (self : RTCIceTransport) : IO (Array RTCIceCandidate) := Internal.api "Lasm.JS.Web.RTCIceTransport.getLocalCandidates" do
   self.val.callMethod "getLocalCandidates" (Internal.args #[]) (Array RTCIceCandidate)
 
+/-- `sequence<RTCIceCandidate> getLocalCandidates()` where the platform has it (`'getLocalCandidates' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCIceTransport.getLocalCandidates? (self' : RTCIceTransport) : IO (Option (Array RTCIceCandidate)) := Internal.api "Lasm.JS.Web.RTCIceTransport.getLocalCandidates?" do
+  let self := self'
+  if !(← Internal.has self.val "getLocalCandidates") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getLocalCandidates" (Internal.args #[]) (Array RTCIceCandidate)
+  return some lasmGuarded
+
 /-- `sequence<RTCIceCandidate> getRemoteCandidates()` -/
 @[macro_inline] def RTCIceTransport.getRemoteCandidates (self : RTCIceTransport) : IO (Array RTCIceCandidate) := Internal.api "Lasm.JS.Web.RTCIceTransport.getRemoteCandidates" do
   self.val.callMethod "getRemoteCandidates" (Internal.args #[]) (Array RTCIceCandidate)
+
+/-- `sequence<RTCIceCandidate> getRemoteCandidates()` where the platform has it (`'getRemoteCandidates' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCIceTransport.getRemoteCandidates? (self' : RTCIceTransport) : IO (Option (Array RTCIceCandidate)) := Internal.api "Lasm.JS.Web.RTCIceTransport.getRemoteCandidates?" do
+  let self := self'
+  if !(← Internal.has self.val "getRemoteCandidates") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getRemoteCandidates" (Internal.args #[]) (Array RTCIceCandidate)
+  return some lasmGuarded
 
 /-- `RTCIceCandidatePair? getSelectedCandidatePair()` -/
 @[macro_inline] def RTCIceTransport.getSelectedCandidatePair (self : RTCIceTransport) : IO (Option RTCIceCandidatePair) := Internal.api "Lasm.JS.Web.RTCIceTransport.getSelectedCandidatePair" do
@@ -1100,9 +1180,25 @@ instance : ToJS RTCStats := ⟨fun d => Internal.fields #[("timestamp", toJS d.t
 @[macro_inline] def RTCIceTransport.getLocalParameters (self : RTCIceTransport) : IO (Option RTCIceParameters) := Internal.api "Lasm.JS.Web.RTCIceTransport.getLocalParameters" do
   self.val.callMethod "getLocalParameters" (Internal.args #[]) (Option RTCIceParameters)
 
+/-- `RTCIceParameters? getLocalParameters()` where the platform has it (`'getLocalParameters' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCIceTransport.getLocalParameters? (self' : RTCIceTransport) : IO (Option (Option RTCIceParameters)) := Internal.api "Lasm.JS.Web.RTCIceTransport.getLocalParameters?" do
+  let self := self'
+  if !(← Internal.has self.val "getLocalParameters") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getLocalParameters" (Internal.args #[]) (Option RTCIceParameters)
+  return some lasmGuarded
+
 /-- `RTCIceParameters? getRemoteParameters()` -/
 @[macro_inline] def RTCIceTransport.getRemoteParameters (self : RTCIceTransport) : IO (Option RTCIceParameters) := Internal.api "Lasm.JS.Web.RTCIceTransport.getRemoteParameters" do
   self.val.callMethod "getRemoteParameters" (Internal.args #[]) (Option RTCIceParameters)
+
+/-- `RTCIceParameters? getRemoteParameters()` where the platform has it (`'getRemoteParameters' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCIceTransport.getRemoteParameters? (self' : RTCIceTransport) : IO (Option (Option RTCIceParameters)) := Internal.api "Lasm.JS.Web.RTCIceTransport.getRemoteParameters?" do
+  let self := self'
+  if !(← Internal.has self.val "getRemoteParameters") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getRemoteParameters" (Internal.args #[]) (Option RTCIceParameters)
+  return some lasmGuarded
 
 /-- `v instanceof RTCPeerConnection`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCPeerConnection`). -/
 @[macro_inline] def RTCPeerConnection.cast? (v : Value) : IO (Option RTCPeerConnection) := Internal.api "Lasm.JS.Web.RTCPeerConnection.cast?" do
@@ -1112,6 +1208,14 @@ instance : ToJS RTCStats := ⟨fun d => Internal.fields #[("timestamp", toJS d.t
 @[macro_inline] def RTCPeerConnection.new (configuration : Option RTCConfiguration := none) : IO RTCPeerConnection := Internal.api "Lasm.JS.Web.RTCPeerConnection.new" do
   Lasm.JS.Binding.invoke RTCPeerConnection { name := "Lasm.JS.Web.RTCPeerConnection.new", module := "globalThis", path := "RTCPeerConnection", construct := true, arity := 1 }
     (Internal.args #[Internal.optional configuration]) (await := false)
+
+/-- `constructor(optional RTCConfiguration configuration)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCPeerConnection.new? (configuration : Option RTCConfiguration := none) : IO (Option RTCPeerConnection) := Internal.api "Lasm.JS.Web.RTCPeerConnection.new?" do
+  if !(← Internal.hasGlobal ["RTCPeerConnection"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke RTCPeerConnection { name := "Lasm.JS.Web.RTCPeerConnection.new?", module := "globalThis", path := "RTCPeerConnection", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional configuration]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute RTCSessionDescription? localDescription` -/
 @[macro_inline] def RTCPeerConnection.localDescription (self : RTCPeerConnection) : IO (Option RTCSessionDescription) := Internal.api "Lasm.JS.Web.RTCPeerConnection.localDescription" do
@@ -1295,6 +1399,15 @@ instance : ToJS RTCStats := ⟨fun d => Internal.fields #[("timestamp", toJS d.t
     (Internal.args #[toJS keygenAlgorithm])
   pure { val := r }
 
+/-- `static Promise<RTCCertificate> generateCertificate(AlgorithmIdentifier keygenAlgorithm)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCPeerConnection.generateCertificate? (keygenAlgorithm : AlgorithmIdentifier) : Async (Option RTCCertificate) := Internal.api "Lasm.JS.Web.RTCPeerConnection.generateCertificate?" do
+  if !(← Internal.hasGlobal ["RTCPeerConnection", "generateCertificate"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.RTCPeerConnection.generateCertificate?", module := "globalThis", path := "RTCPeerConnection.generateCertificate", construct := false, arity := 1 }
+      (Internal.args #[toJS keygenAlgorithm])
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `sequence<RTCRtpSender> getSenders()` -/
 @[macro_inline] def RTCPeerConnection.getSenders (self : RTCPeerConnection) : IO (Array RTCRtpSender) := Internal.api "Lasm.JS.Web.RTCPeerConnection.getSenders" do
   self.val.callMethod "getSenders" (Internal.args #[]) (Array RTCRtpSender)
@@ -1340,6 +1453,14 @@ instance : ToJS RTCStats := ⟨fun d => Internal.fields #[("timestamp", toJS d.t
   Lasm.JS.Binding.invoke RTCPeerConnectionIceErrorEvent { name := "Lasm.JS.Web.RTCPeerConnectionIceErrorEvent.new", module := "globalThis", path := "RTCPeerConnectionIceErrorEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, RTCPeerConnectionIceErrorEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCPeerConnectionIceErrorEvent.new? (type : String) (eventInitDict : RTCPeerConnectionIceErrorEventInit) : IO (Option RTCPeerConnectionIceErrorEvent) := Internal.api "Lasm.JS.Web.RTCPeerConnectionIceErrorEvent.new?" do
+  if !(← Internal.hasGlobal ["RTCPeerConnectionIceErrorEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke RTCPeerConnectionIceErrorEvent { name := "Lasm.JS.Web.RTCPeerConnectionIceErrorEvent.new?", module := "globalThis", path := "RTCPeerConnectionIceErrorEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString? address` -/
 @[macro_inline] def RTCPeerConnectionIceErrorEvent.address (self : RTCPeerConnectionIceErrorEvent) : IO (Option String) := Internal.api "Lasm.JS.Web.RTCPeerConnectionIceErrorEvent.address" do
   self.val.get "address" (Option String)
@@ -1369,6 +1490,14 @@ instance : ToJS RTCStats := ⟨fun d => Internal.fields #[("timestamp", toJS d.t
   Lasm.JS.Binding.invoke RTCPeerConnectionIceEvent { name := "Lasm.JS.Web.RTCPeerConnectionIceEvent.new", module := "globalThis", path := "RTCPeerConnectionIceEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional RTCPeerConnectionIceEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCPeerConnectionIceEvent.new? (type : String) (eventInitDict : Option RTCPeerConnectionIceEventInit := none) : IO (Option RTCPeerConnectionIceEvent) := Internal.api "Lasm.JS.Web.RTCPeerConnectionIceEvent.new?" do
+  if !(← Internal.hasGlobal ["RTCPeerConnectionIceEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke RTCPeerConnectionIceEvent { name := "Lasm.JS.Web.RTCPeerConnectionIceEvent.new?", module := "globalThis", path := "RTCPeerConnectionIceEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute RTCIceCandidate? candidate` -/
 @[macro_inline] def RTCPeerConnectionIceEvent.candidate (self : RTCPeerConnectionIceEvent) : IO (Option RTCIceCandidate) := Internal.api "Lasm.JS.Web.RTCPeerConnectionIceEvent.candidate" do
   self.val.get "candidate" (Option RTCIceCandidate)
@@ -1376,6 +1505,14 @@ instance : ToJS RTCStats := ⟨fun d => Internal.fields #[("timestamp", toJS d.t
 /-- `readonly attribute USVString? url` -/
 @[macro_inline] def RTCPeerConnectionIceEvent.url (self : RTCPeerConnectionIceEvent) : IO (Option String) := Internal.api "Lasm.JS.Web.RTCPeerConnectionIceEvent.url" do
   self.val.get "url" (Option String)
+
+/-- `readonly attribute USVString? url` where the platform has it (`'url' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCPeerConnectionIceEvent.url? (self' : RTCPeerConnectionIceEvent) : IO (Option (Option String)) := Internal.api "Lasm.JS.Web.RTCPeerConnectionIceEvent.url?" do
+  let self := self'
+  if !(← Internal.has self.val "url") then return none
+  let lasmGuarded ← do
+    self.val.get "url" (Option String)
+  return some lasmGuarded
 
 /-- `v instanceof RTCRtpReceiver`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RTCRtpReceiver`). -/
 @[macro_inline] def RTCRtpReceiver.cast? (v : Value) : IO (Option RTCRtpReceiver) := Internal.api "Lasm.JS.Web.RTCRtpReceiver.cast?" do
@@ -1394,6 +1531,14 @@ instance : ToJS RTCStats := ⟨fun d => Internal.fields #[("timestamp", toJS d.t
 @[macro_inline] def RTCRtpReceiver.jitterBufferTarget (self : RTCRtpReceiver) : IO (Option Float) := Internal.api "Lasm.JS.Web.RTCRtpReceiver.jitterBufferTarget" do
   self.val.get "jitterBufferTarget" (Option Float)
 
+/-- `attribute DOMHighResTimeStamp? jitterBufferTarget` where the platform has it (`'jitterBufferTarget' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCRtpReceiver.jitterBufferTarget? (self' : RTCRtpReceiver) : IO (Option (Option Float)) := Internal.api "Lasm.JS.Web.RTCRtpReceiver.jitterBufferTarget?" do
+  let self := self'
+  if !(← Internal.has self.val "jitterBufferTarget") then return none
+  let lasmGuarded ← do
+    self.val.get "jitterBufferTarget" (Option Float)
+  return some lasmGuarded
+
 /-- Sets `jitterBufferTarget`: `attribute DOMHighResTimeStamp? jitterBufferTarget` -/
 @[macro_inline] def RTCRtpReceiver.setJitterBufferTarget (self : RTCRtpReceiver) (value : Option Float) : IO Unit := Internal.api "Lasm.JS.Web.RTCRtpReceiver.setJitterBufferTarget" do
   self.val.set "jitterBufferTarget" (toJS value)
@@ -1402,6 +1547,14 @@ instance : ToJS RTCStats := ⟨fun d => Internal.fields #[("timestamp", toJS d.t
 @[macro_inline] def RTCRtpReceiver.getCapabilities (kind : String) : IO (Option RTCRtpCapabilities) := Internal.api "Lasm.JS.Web.RTCRtpReceiver.getCapabilities" do
   Lasm.JS.Binding.invoke (Option RTCRtpCapabilities) { name := "Lasm.JS.Web.RTCRtpReceiver.getCapabilities", module := "globalThis", path := "RTCRtpReceiver.getCapabilities", construct := false, arity := 1 }
     (Internal.args #[toJS kind]) (await := false)
+
+/-- `static RTCRtpCapabilities? getCapabilities(DOMString kind)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCRtpReceiver.getCapabilities? (kind : String) : IO (Option (Option RTCRtpCapabilities)) := Internal.api "Lasm.JS.Web.RTCRtpReceiver.getCapabilities?" do
+  if !(← Internal.hasGlobal ["RTCRtpReceiver", "getCapabilities"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke (Option RTCRtpCapabilities) { name := "Lasm.JS.Web.RTCRtpReceiver.getCapabilities?", module := "globalThis", path := "RTCRtpReceiver.getCapabilities", construct := false, arity := 1 }
+      (Internal.args #[toJS kind]) (await := false)
+  return some lasmGuarded
 
 /-- `RTCRtpReceiveParameters getParameters()` -/
 @[macro_inline] def RTCRtpReceiver.getParameters (self : RTCRtpReceiver) : IO RTCRtpReceiveParameters := Internal.api "Lasm.JS.Web.RTCRtpReceiver.getParameters" do
@@ -1440,6 +1593,14 @@ instance : ToJS RTCStats := ⟨fun d => Internal.fields #[("timestamp", toJS d.t
 @[macro_inline] def RTCRtpSender.getCapabilities (kind : String) : IO (Option RTCRtpCapabilities) := Internal.api "Lasm.JS.Web.RTCRtpSender.getCapabilities" do
   Lasm.JS.Binding.invoke (Option RTCRtpCapabilities) { name := "Lasm.JS.Web.RTCRtpSender.getCapabilities", module := "globalThis", path := "RTCRtpSender.getCapabilities", construct := false, arity := 1 }
     (Internal.args #[toJS kind]) (await := false)
+
+/-- `static RTCRtpCapabilities? getCapabilities(DOMString kind)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCRtpSender.getCapabilities? (kind : String) : IO (Option (Option RTCRtpCapabilities)) := Internal.api "Lasm.JS.Web.RTCRtpSender.getCapabilities?" do
+  if !(← Internal.hasGlobal ["RTCRtpSender", "getCapabilities"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke (Option RTCRtpCapabilities) { name := "Lasm.JS.Web.RTCRtpSender.getCapabilities?", module := "globalThis", path := "RTCRtpSender.getCapabilities", construct := false, arity := 1 }
+      (Internal.args #[toJS kind]) (await := false)
+  return some lasmGuarded
 
 /-- `Promise<undefined> setParameters(RTCRtpSendParameters parameters, optional RTCSetParameterOptions setParameterOptions)` -/
 @[macro_inline] def RTCRtpSender.setParameters (self : RTCRtpSender) (parameters : RTCRtpSendParameters) (setParameterOptions : Option RTCSetParameterOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.RTCRtpSender.setParameters" do
@@ -1538,6 +1699,14 @@ instance : ToJS RTCStats := ⟨fun d => Internal.fields #[("timestamp", toJS d.t
   Lasm.JS.Binding.invoke RTCSessionDescription { name := "Lasm.JS.Web.RTCSessionDescription.new", module := "globalThis", path := "RTCSessionDescription", construct := true, arity := 1 }
     (Internal.args #[toJS descriptionInitDict]) (await := false)
 
+/-- `constructor(RTCSessionDescriptionInit descriptionInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCSessionDescription.new? (descriptionInitDict : RTCSessionDescriptionInit) : IO (Option RTCSessionDescription) := Internal.api "Lasm.JS.Web.RTCSessionDescription.new?" do
+  if !(← Internal.hasGlobal ["RTCSessionDescription"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke RTCSessionDescription { name := "Lasm.JS.Web.RTCSessionDescription.new?", module := "globalThis", path := "RTCSessionDescription", construct := true, arity := 1 }
+      (Internal.args #[toJS descriptionInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute RTCSdpType type` -/
 @[macro_inline] def RTCSessionDescription.type (self : RTCSessionDescription) : IO RTCSdpType := Internal.api "Lasm.JS.Web.RTCSessionDescription.type" do
   self.val.get "type" RTCSdpType
@@ -1562,6 +1731,14 @@ instance : ToJS RTCStats := ⟨fun d => Internal.fields #[("timestamp", toJS d.t
 @[macro_inline] def RTCTrackEvent.new (type : String) (eventInitDict : RTCTrackEventInit) : IO RTCTrackEvent := Internal.api "Lasm.JS.Web.RTCTrackEvent.new" do
   Lasm.JS.Binding.invoke RTCTrackEvent { name := "Lasm.JS.Web.RTCTrackEvent.new", module := "globalThis", path := "RTCTrackEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, RTCTrackEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCTrackEvent.new? (type : String) (eventInitDict : RTCTrackEventInit) : IO (Option RTCTrackEvent) := Internal.api "Lasm.JS.Web.RTCTrackEvent.new?" do
+  if !(← Internal.hasGlobal ["RTCTrackEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke RTCTrackEvent { name := "Lasm.JS.Web.RTCTrackEvent.new?", module := "globalThis", path := "RTCTrackEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute RTCRtpReceiver receiver` -/
 @[macro_inline] def RTCTrackEvent.receiver (self : RTCTrackEvent) : IO RTCRtpReceiver := Internal.api "Lasm.JS.Web.RTCTrackEvent.receiver" do

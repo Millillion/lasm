@@ -92,6 +92,15 @@ instance : Coe StartViewTransitionOptions ViewTransitionUpdateCallbackOrStartVie
   let r ← self.val.get "transitionRoot" Value
   pure { val := r }
 
+/-- `readonly attribute Element transitionRoot` where the platform has it (`'transitionRoot' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ViewTransition.transitionRoot? (self' : ViewTransition) : IO (Option Element) := Internal.api "Lasm.JS.Web.ViewTransition.transitionRoot?" do
+  let self := self'
+  if !(← Internal.has self.val "transitionRoot") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "transitionRoot" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `undefined skipTransition()` -/
 @[macro_inline] def ViewTransition.skipTransition (self : ViewTransition) : IO Unit := Internal.api "Lasm.JS.Web.ViewTransition.skipTransition" do
   self.val.callMethod "skipTransition" (Internal.args #[]) Unit
@@ -99,6 +108,14 @@ instance : Coe StartViewTransitionOptions ViewTransitionUpdateCallbackOrStartVie
 /-- `undefined waitUntil(Promise<any> promise)` -/
 @[macro_inline] def ViewTransition.waitUntil (self : ViewTransition) (promise : Value) : IO Unit := Internal.api "Lasm.JS.Web.ViewTransition.waitUntil" do
   self.val.callMethod "waitUntil" (Internal.args #[toJS promise]) Unit
+
+/-- `undefined waitUntil(Promise<any> promise)` where the platform has it (`'waitUntil' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ViewTransition.waitUntil? (self' : ViewTransition) (promise : Value) : IO (Option Unit) := Internal.api "Lasm.JS.Web.ViewTransition.waitUntil?" do
+  let self := self'
+  if !(← Internal.has self.val "waitUntil") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "waitUntil" (Internal.args #[toJS promise]) Unit
+  return some lasmGuarded
 
 /-- `v instanceof ViewTransitionTypeSet`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ViewTransitionTypeSet`). -/
 @[macro_inline] def ViewTransitionTypeSet.cast? (v : Value) : IO (Option ViewTransitionTypeSet) := Internal.api "Lasm.JS.Web.ViewTransitionTypeSet.cast?" do
@@ -117,9 +134,26 @@ instance : Coe StartViewTransitionOptions ViewTransitionUpdateCallbackOrStartVie
 @[macro_inline] def Element.activeViewTransition (self : Element) : IO (Option ViewTransition) := Internal.api "Lasm.JS.Web.Element.activeViewTransition" do
   self.val.get "activeViewTransition" (Option ViewTransition)
 
+/-- `readonly attribute ViewTransition? activeViewTransition` where the platform has it (`'activeViewTransition' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Element.activeViewTransition? (self' : Element) : IO (Option (Option ViewTransition)) := Internal.api "Lasm.JS.Web.Element.activeViewTransition?" do
+  let self := self'
+  if !(← Internal.has self.val "activeViewTransition") then return none
+  let lasmGuarded ← do
+    self.val.get "activeViewTransition" (Option ViewTransition)
+  return some lasmGuarded
+
 /-- `ViewTransition startViewTransition(optional (ViewTransitionUpdateCallback or StartViewTransitionOptions) callbackOptions)` -/
 @[macro_inline] def Element.startViewTransition (self : Element) (callbackOptions : Option ViewTransitionUpdateCallbackOrStartViewTransitionOptions := none) : IO ViewTransition := Internal.api "Lasm.JS.Web.Element.startViewTransition" do
   let r ← self.val.callMethod "startViewTransition" (Internal.args #[Internal.optional callbackOptions]) Value
   pure { val := r }
+
+/-- `ViewTransition startViewTransition(optional (ViewTransitionUpdateCallback or StartViewTransitionOptions) callbackOptions)` where the platform has it (`'startViewTransition' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Element.startViewTransition? (self' : Element) (callbackOptions : Option ViewTransitionUpdateCallbackOrStartViewTransitionOptions := none) : IO (Option ViewTransition) := Internal.api "Lasm.JS.Web.Element.startViewTransition?" do
+  let self := self'
+  if !(← Internal.has self.val "startViewTransition") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethod "startViewTransition" (Internal.args #[Internal.optional callbackOptions]) Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

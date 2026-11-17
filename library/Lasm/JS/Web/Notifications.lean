@@ -131,13 +131,35 @@ instance : ToJS GetNotificationOptions := ⟨fun d => Internal.fields #[("tag", 
   Lasm.JS.Binding.invoke Notification { name := "Lasm.JS.Web.Notification.new", module := "globalThis", path := "Notification", construct := true, arity := 2 }
     (Internal.args #[toJS title, Internal.optional options]) (await := false)
 
+/-- `constructor(DOMString title, optional NotificationOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Notification.new? (title : String) (options : Option NotificationOptions := none) : IO (Option Notification) := Internal.api "Lasm.JS.Web.Notification.new?" do
+  if !(← Internal.hasGlobal ["Notification"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Notification { name := "Lasm.JS.Web.Notification.new?", module := "globalThis", path := "Notification", construct := true, arity := 2 }
+      (Internal.args #[toJS title, Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `static readonly attribute NotificationPermission permission` -/
 @[macro_inline] def Notification.permission : IO NotificationPermission := Internal.api "Lasm.JS.Web.Notification.permission" do
   Internal.getGlobal ["Notification", "permission"] NotificationPermission
 
+/-- `static readonly attribute NotificationPermission permission` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Notification.permission? : IO (Option NotificationPermission) := Internal.api "Lasm.JS.Web.Notification.permission?" do
+  if !(← Internal.hasGlobal ["Notification", "permission"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["Notification", "permission"] NotificationPermission
+  return some lasmGuarded
+
 /-- `static readonly attribute unsigned long maxActions` -/
 @[macro_inline] def Notification.maxActions : IO Nat := Internal.api "Lasm.JS.Web.Notification.maxActions" do
   Internal.getGlobal ["Notification", "maxActions"] Nat
+
+/-- `static readonly attribute unsigned long maxActions` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Notification.maxActions? : IO (Option Nat) := Internal.api "Lasm.JS.Web.Notification.maxActions?" do
+  if !(← Internal.hasGlobal ["Notification", "maxActions"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["Notification", "maxActions"] Nat
+  return some lasmGuarded
 
 /-- `attribute EventHandler onclick` -/
 @[macro_inline] def Notification.onclick (self : Notification) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Notification.onclick" do
@@ -191,29 +213,85 @@ instance : ToJS GetNotificationOptions := ⟨fun d => Internal.fields #[("tag", 
 @[macro_inline] def Notification.navigate (self : Notification) : IO String := Internal.api "Lasm.JS.Web.Notification.navigate" do
   self.val.get "navigate" String
 
+/-- `readonly attribute USVString navigate` where the platform has it (`'navigate' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Notification.navigate? (self' : Notification) : IO (Option String) := Internal.api "Lasm.JS.Web.Notification.navigate?" do
+  let self := self'
+  if !(← Internal.has self.val "navigate") then return none
+  let lasmGuarded ← do
+    self.val.get "navigate" String
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString tag` -/
 @[macro_inline] def Notification.tag (self : Notification) : IO String := Internal.api "Lasm.JS.Web.Notification.tag" do
   self.val.get "tag" String
+
+/-- `readonly attribute DOMString tag` where the platform has it (`'tag' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Notification.tag? (self' : Notification) : IO (Option String) := Internal.api "Lasm.JS.Web.Notification.tag?" do
+  let self := self'
+  if !(← Internal.has self.val "tag") then return none
+  let lasmGuarded ← do
+    self.val.get "tag" String
+  return some lasmGuarded
 
 /-- `readonly attribute USVString image` -/
 @[macro_inline] def Notification.image (self : Notification) : IO String := Internal.api "Lasm.JS.Web.Notification.image" do
   self.val.get "image" String
 
+/-- `readonly attribute USVString image` where the platform has it (`'image' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Notification.image? (self' : Notification) : IO (Option String) := Internal.api "Lasm.JS.Web.Notification.image?" do
+  let self := self'
+  if !(← Internal.has self.val "image") then return none
+  let lasmGuarded ← do
+    self.val.get "image" String
+  return some lasmGuarded
+
 /-- `readonly attribute USVString icon` -/
 @[macro_inline] def Notification.icon (self : Notification) : IO String := Internal.api "Lasm.JS.Web.Notification.icon" do
   self.val.get "icon" String
+
+/-- `readonly attribute USVString icon` where the platform has it (`'icon' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Notification.icon? (self' : Notification) : IO (Option String) := Internal.api "Lasm.JS.Web.Notification.icon?" do
+  let self := self'
+  if !(← Internal.has self.val "icon") then return none
+  let lasmGuarded ← do
+    self.val.get "icon" String
+  return some lasmGuarded
 
 /-- `readonly attribute USVString badge` -/
 @[macro_inline] def Notification.badge (self : Notification) : IO String := Internal.api "Lasm.JS.Web.Notification.badge" do
   self.val.get "badge" String
 
+/-- `readonly attribute USVString badge` where the platform has it (`'badge' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Notification.badge? (self' : Notification) : IO (Option String) := Internal.api "Lasm.JS.Web.Notification.badge?" do
+  let self := self'
+  if !(← Internal.has self.val "badge") then return none
+  let lasmGuarded ← do
+    self.val.get "badge" String
+  return some lasmGuarded
+
 /-- `readonly attribute EpochTimeStamp timestamp` -/
 @[macro_inline] def Notification.timestamp (self : Notification) : IO Nat := Internal.api "Lasm.JS.Web.Notification.timestamp" do
   self.val.get "timestamp" Nat
 
+/-- `readonly attribute EpochTimeStamp timestamp` where the platform has it (`'timestamp' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Notification.timestamp? (self' : Notification) : IO (Option Nat) := Internal.api "Lasm.JS.Web.Notification.timestamp?" do
+  let self := self'
+  if !(← Internal.has self.val "timestamp") then return none
+  let lasmGuarded ← do
+    self.val.get "timestamp" Nat
+  return some lasmGuarded
+
 /-- `readonly attribute boolean renotify` -/
 @[macro_inline] def Notification.renotify (self : Notification) : IO Bool := Internal.api "Lasm.JS.Web.Notification.renotify" do
   self.val.get "renotify" Bool
+
+/-- `readonly attribute boolean renotify` where the platform has it (`'renotify' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Notification.renotify? (self' : Notification) : IO (Option Bool) := Internal.api "Lasm.JS.Web.Notification.renotify?" do
+  let self := self'
+  if !(← Internal.has self.val "renotify") then return none
+  let lasmGuarded ← do
+    self.val.get "renotify" Bool
+  return some lasmGuarded
 
 /-- `readonly attribute boolean? silent` -/
 @[macro_inline] def Notification.silent (self : Notification) : IO (Option Bool) := Internal.api "Lasm.JS.Web.Notification.silent" do
@@ -223,6 +301,14 @@ instance : ToJS GetNotificationOptions := ⟨fun d => Internal.fields #[("tag", 
 @[macro_inline] def Notification.requireInteraction (self : Notification) : IO Bool := Internal.api "Lasm.JS.Web.Notification.requireInteraction" do
   self.val.get "requireInteraction" Bool
 
+/-- `readonly attribute boolean requireInteraction` where the platform has it (`'requireInteraction' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Notification.requireInteraction? (self' : Notification) : IO (Option Bool) := Internal.api "Lasm.JS.Web.Notification.requireInteraction?" do
+  let self := self'
+  if !(← Internal.has self.val "requireInteraction") then return none
+  let lasmGuarded ← do
+    self.val.get "requireInteraction" Bool
+  return some lasmGuarded
+
 /-- `readonly attribute any data` -/
 @[macro_inline] def Notification.data (self : Notification) : IO Data := Internal.api "Lasm.JS.Web.Notification.data" do
   self.val.get "data" Data
@@ -231,10 +317,26 @@ instance : ToJS GetNotificationOptions := ⟨fun d => Internal.fields #[("tag", 
 @[macro_inline] def Notification.actions (self : Notification) : IO (Array NotificationAction) := Internal.api "Lasm.JS.Web.Notification.actions" do
   self.val.get "actions" (Array NotificationAction)
 
+/-- `readonly attribute FrozenArray<NotificationAction> actions` where the platform has it (`'actions' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Notification.actions? (self' : Notification) : IO (Option (Array NotificationAction)) := Internal.api "Lasm.JS.Web.Notification.actions?" do
+  let self := self'
+  if !(← Internal.has self.val "actions") then return none
+  let lasmGuarded ← do
+    self.val.get "actions" (Array NotificationAction)
+  return some lasmGuarded
+
 /-- `static Promise<NotificationPermission> requestPermission(optional NotificationPermissionCallback deprecatedCallback)` -/
 @[macro_inline] def Notification.requestPermission (deprecatedCallback : Option NotificationPermissionCallback := none) : Async NotificationPermission := Internal.api "Lasm.JS.Web.Notification.requestPermission" do
   Lasm.JS.Binding.invokeAsync NotificationPermission { name := "Lasm.JS.Web.Notification.requestPermission", module := "globalThis", path := "Notification.requestPermission", construct := false, arity := 1 }
     (Internal.args #[Internal.optional deprecatedCallback])
+
+/-- `static Promise<NotificationPermission> requestPermission(optional NotificationPermissionCallback deprecatedCallback)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Notification.requestPermission? (deprecatedCallback : Option NotificationPermissionCallback := none) : Async (Option NotificationPermission) := Internal.api "Lasm.JS.Web.Notification.requestPermission?" do
+  if !(← Internal.hasGlobal ["Notification", "requestPermission"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync NotificationPermission { name := "Lasm.JS.Web.Notification.requestPermission?", module := "globalThis", path := "Notification.requestPermission", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional deprecatedCallback])
+  return some lasmGuarded
 
 /-- `undefined close()` -/
 @[macro_inline] def Notification.close (self : Notification) : IO Unit := Internal.api "Lasm.JS.Web.Notification.close" do
@@ -249,14 +351,39 @@ instance : ToJS GetNotificationOptions := ⟨fun d => Internal.fields #[("tag", 
   Lasm.JS.Binding.invoke NotificationEvent { name := "Lasm.JS.Web.NotificationEvent.new", module := "globalThis", path := "NotificationEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, NotificationEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def NotificationEvent.new? (type : String) (eventInitDict : NotificationEventInit) : IO (Option NotificationEvent) := Internal.api "Lasm.JS.Web.NotificationEvent.new?" do
+  if !(← Internal.hasGlobal ["NotificationEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke NotificationEvent { name := "Lasm.JS.Web.NotificationEvent.new?", module := "globalThis", path := "NotificationEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute Notification notification` -/
 @[macro_inline] def NotificationEvent.notification (self : NotificationEvent) : IO Notification := Internal.api "Lasm.JS.Web.NotificationEvent.notification" do
   let r ← self.val.get "notification" Value
   pure { val := r }
 
+/-- `readonly attribute Notification notification` where the platform has it (`'notification' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def NotificationEvent.notification? (self' : NotificationEvent) : IO (Option Notification) := Internal.api "Lasm.JS.Web.NotificationEvent.notification?" do
+  let self := self'
+  if !(← Internal.has self.val "notification") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "notification" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString action` -/
 @[macro_inline] def NotificationEvent.action (self : NotificationEvent) : IO String := Internal.api "Lasm.JS.Web.NotificationEvent.action" do
   self.val.get "action" String
+
+/-- `readonly attribute DOMString action` where the platform has it (`'action' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def NotificationEvent.action? (self' : NotificationEvent) : IO (Option String) := Internal.api "Lasm.JS.Web.NotificationEvent.action?" do
+  let self := self'
+  if !(← Internal.has self.val "action") then return none
+  let lasmGuarded ← do
+    self.val.get "action" String
+  return some lasmGuarded
 
 /-- `attribute EventHandler onnotificationclick` -/
 @[macro_inline] def ServiceWorkerGlobalScope.onnotificationclick (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onnotificationclick" do

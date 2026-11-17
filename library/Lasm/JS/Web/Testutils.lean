@@ -18,4 +18,12 @@ set_option compiler.extract_closed false
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.TestUtils.gc", module := "globalThis", path := "TestUtils.gc", construct := false, arity := 0 }
     (Internal.args #[])
 
+/-- `Promise<undefined> gc()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def TestUtils.gc? : Async (Option Unit) := Internal.api "Lasm.JS.Web.TestUtils.gc?" do
+  if !(← Internal.hasGlobal ["TestUtils", "gc"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.TestUtils.gc?", module := "globalThis", path := "TestUtils.gc", construct := false, arity := 0 }
+      (Internal.args #[])
+  return some lasmGuarded
+
 end Lasm.JS.Web

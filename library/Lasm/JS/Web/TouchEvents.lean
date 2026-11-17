@@ -153,6 +153,14 @@ instance : ToJS TouchEventInit := ⟨fun d => Internal.fields #[("bubbles", Inte
   Lasm.JS.Binding.invoke Touch { name := "Lasm.JS.Web.Touch.new", module := "globalThis", path := "Touch", construct := true, arity := 1 }
     (Internal.args #[toJS touchInitDict]) (await := false)
 
+/-- `constructor(TouchInit touchInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Touch.new? (touchInitDict : TouchInit) : IO (Option Touch) := Internal.api "Lasm.JS.Web.Touch.new?" do
+  if !(← Internal.hasGlobal ["Touch"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Touch { name := "Lasm.JS.Web.Touch.new?", module := "globalThis", path := "Touch", construct := true, arity := 1 }
+      (Internal.args #[toJS touchInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute long identifier` -/
 @[macro_inline] def Touch.identifier (self : Touch) : IO Int := Internal.api "Lasm.JS.Web.Touch.identifier" do
   self.val.get "identifier" Int
@@ -222,6 +230,14 @@ instance : ToJS TouchEventInit := ⟨fun d => Internal.fields #[("bubbles", Inte
 @[macro_inline] def TouchEvent.new (type : String) (eventInitDict : Option TouchEventInit := none) : IO TouchEvent := Internal.api "Lasm.JS.Web.TouchEvent.new" do
   Lasm.JS.Binding.invoke TouchEvent { name := "Lasm.JS.Web.TouchEvent.new", module := "globalThis", path := "TouchEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, optional TouchEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def TouchEvent.new? (type : String) (eventInitDict : Option TouchEventInit := none) : IO (Option TouchEvent) := Internal.api "Lasm.JS.Web.TouchEvent.new?" do
+  if !(← Internal.hasGlobal ["TouchEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke TouchEvent { name := "Lasm.JS.Web.TouchEvent.new?", module := "globalThis", path := "TouchEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute TouchList touches` -/
 @[macro_inline] def TouchEvent.touches (self : TouchEvent) : IO TouchList := Internal.api "Lasm.JS.Web.TouchEvent.touches" do
@@ -434,16 +450,44 @@ instance : ToJS TouchEventInit := ⟨fun d => Internal.fields #[("bubbles", Inte
 @[macro_inline] def ontouchstart : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ontouchstart" do
   Internal.getGlobal ["ontouchstart"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler ontouchstart` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ontouchstart? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ontouchstart?" do
+  if !(← Internal.hasGlobal ["ontouchstart"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ontouchstart"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler ontouchend` (Touch Events - Level 2 (https://w3c.github.io/touch-events/)) -/
 @[macro_inline] def ontouchend : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ontouchend" do
   Internal.getGlobal ["ontouchend"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler ontouchend` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ontouchend? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ontouchend?" do
+  if !(← Internal.hasGlobal ["ontouchend"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ontouchend"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler ontouchmove` (Touch Events - Level 2 (https://w3c.github.io/touch-events/)) -/
 @[macro_inline] def ontouchmove : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ontouchmove" do
   Internal.getGlobal ["ontouchmove"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler ontouchmove` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ontouchmove? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ontouchmove?" do
+  if !(← Internal.hasGlobal ["ontouchmove"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ontouchmove"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler ontouchcancel` (Touch Events - Level 2 (https://w3c.github.io/touch-events/)) -/
 @[macro_inline] def ontouchcancel : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ontouchcancel" do
   Internal.getGlobal ["ontouchcancel"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler ontouchcancel` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ontouchcancel? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ontouchcancel?" do
+  if !(← Internal.hasGlobal ["ontouchcancel"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ontouchcancel"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 end Lasm.JS.Web

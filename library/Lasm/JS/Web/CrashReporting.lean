@@ -54,9 +54,26 @@ instance : ToJS CrashReportBody := ⟨fun d => Internal.fields #[("reason", Inte
   let r ← self.val.get "crashReport" Value
   pure { val := r }
 
+/-- `readonly attribute CrashReportContext crashReport` where the platform has it (`'crashReport' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.crashReport? (self' : Window) : IO (Option CrashReportContext) := Internal.api "Lasm.JS.Web.Window.crashReport?" do
+  let self := self'
+  if !(← Internal.has self.val "crashReport") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "crashReport" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute CrashReportContext crashReport` (Crash Reporting (https://wicg.github.io/crash-reporting/)) -/
 @[macro_inline] def crashReport : IO CrashReportContext := Internal.api "Lasm.JS.Web.crashReport" do
   let r ← Internal.getGlobal ["crashReport"] Value
   pure { val := r }
+
+/-- `readonly attribute CrashReportContext crashReport` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def crashReport? : IO (Option CrashReportContext) := Internal.api "Lasm.JS.Web.crashReport?" do
+  if !(← Internal.hasGlobal ["crashReport"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["crashReport"] Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

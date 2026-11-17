@@ -1555,6 +1555,14 @@ instance : ToJS ImageBitmapRenderingContextSettings := ⟨fun d => Internal.fiel
 @[macro_inline] def BeforeUnloadEvent.returnValue (self : BeforeUnloadEvent) : IO String := Internal.api "Lasm.JS.Web.BeforeUnloadEvent.returnValue" do
   self.val.get "returnValue" String
 
+/-- `attribute DOMString returnValue` where the platform has it (`'returnValue' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def BeforeUnloadEvent.returnValue? (self' : BeforeUnloadEvent) : IO (Option String) := Internal.api "Lasm.JS.Web.BeforeUnloadEvent.returnValue?" do
+  let self := self'
+  if !(← Internal.has self.val "returnValue") then return none
+  let lasmGuarded ← do
+    self.val.get "returnValue" String
+  return some lasmGuarded
+
 /-- Sets `returnValue`: `attribute DOMString returnValue` -/
 @[macro_inline] def BeforeUnloadEvent.setReturnValue (self : BeforeUnloadEvent) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.BeforeUnloadEvent.setReturnValue" do
   self.val.set "returnValue" (toJS value)
@@ -1567,6 +1575,14 @@ instance : ToJS ImageBitmapRenderingContextSettings := ⟨fun d => Internal.fiel
 @[macro_inline] def BroadcastChannel.new (name : String) : IO BroadcastChannel := Internal.api "Lasm.JS.Web.BroadcastChannel.new" do
   Lasm.JS.Binding.invoke BroadcastChannel { name := "Lasm.JS.Web.BroadcastChannel.new", module := "globalThis", path := "BroadcastChannel", construct := true, arity := 1 }
     (Internal.args #[toJS name]) (await := false)
+
+/-- `constructor(DOMString name)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def BroadcastChannel.new? (name : String) : IO (Option BroadcastChannel) := Internal.api "Lasm.JS.Web.BroadcastChannel.new?" do
+  if !(← Internal.hasGlobal ["BroadcastChannel"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke BroadcastChannel { name := "Lasm.JS.Web.BroadcastChannel.new?", module := "globalThis", path := "BroadcastChannel", construct := true, arity := 1 }
+      (Internal.args #[toJS name]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString name` -/
 @[macro_inline] def BroadcastChannel.name (self : BroadcastChannel) : IO String := Internal.api "Lasm.JS.Web.BroadcastChannel.name" do
@@ -1649,6 +1665,14 @@ instance : ToJS ImageBitmapRenderingContextSettings := ⟨fun d => Internal.fiel
 @[macro_inline] def CanvasRenderingContext2D.imageSmoothingQuality (self : CanvasRenderingContext2D) : IO ImageSmoothingQuality := Internal.api "Lasm.JS.Web.CanvasRenderingContext2D.imageSmoothingQuality" do
   self.val.get "imageSmoothingQuality" ImageSmoothingQuality
 
+/-- `attribute ImageSmoothingQuality imageSmoothingQuality` where the platform has it (`'imageSmoothingQuality' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CanvasRenderingContext2D.imageSmoothingQuality? (self' : CanvasRenderingContext2D) : IO (Option ImageSmoothingQuality) := Internal.api "Lasm.JS.Web.CanvasRenderingContext2D.imageSmoothingQuality?" do
+  let self := self'
+  if !(← Internal.has self.val "imageSmoothingQuality") then return none
+  let lasmGuarded ← do
+    self.val.get "imageSmoothingQuality" ImageSmoothingQuality
+  return some lasmGuarded
+
 /-- Sets `imageSmoothingQuality`: `attribute ImageSmoothingQuality imageSmoothingQuality` -/
 @[macro_inline] def CanvasRenderingContext2D.setImageSmoothingQuality (self : CanvasRenderingContext2D) (value : ImageSmoothingQuality) : IO Unit := Internal.api "Lasm.JS.Web.CanvasRenderingContext2D.setImageSmoothingQuality" do
   self.val.set "imageSmoothingQuality" (toJS value)
@@ -1705,6 +1729,14 @@ instance : ToJS ImageBitmapRenderingContextSettings := ⟨fun d => Internal.fiel
 @[macro_inline] def CanvasRenderingContext2D.filter (self : CanvasRenderingContext2D) : IO String := Internal.api "Lasm.JS.Web.CanvasRenderingContext2D.filter" do
   self.val.get "filter" String
 
+/-- `attribute DOMString filter` where the platform has it (`'filter' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CanvasRenderingContext2D.filter? (self' : CanvasRenderingContext2D) : IO (Option String) := Internal.api "Lasm.JS.Web.CanvasRenderingContext2D.filter?" do
+  let self := self'
+  if !(← Internal.has self.val "filter") then return none
+  let lasmGuarded ← do
+    self.val.get "filter" String
+  return some lasmGuarded
+
 /-- Sets `filter`: `attribute DOMString filter` -/
 @[macro_inline] def CanvasRenderingContext2D.setFilter (self : CanvasRenderingContext2D) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CanvasRenderingContext2D.setFilter" do
   self.val.set "filter" (toJS value)
@@ -1752,6 +1784,14 @@ instance : ToJS ImageBitmapRenderingContextSettings := ⟨fun d => Internal.fiel
 /-- `attribute DOMString lang` -/
 @[macro_inline] def CanvasRenderingContext2D.lang (self : CanvasRenderingContext2D) : IO String := Internal.api "Lasm.JS.Web.CanvasRenderingContext2D.lang" do
   self.val.get "lang" String
+
+/-- `attribute DOMString lang` where the platform has it (`'lang' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CanvasRenderingContext2D.lang? (self' : CanvasRenderingContext2D) : IO (Option String) := Internal.api "Lasm.JS.Web.CanvasRenderingContext2D.lang?" do
+  let self := self'
+  if !(← Internal.has self.val "lang") then return none
+  let lasmGuarded ← do
+    self.val.get "lang" String
+  return some lasmGuarded
 
 /-- Sets `lang`: `attribute DOMString lang` -/
 @[macro_inline] def CanvasRenderingContext2D.setLang (self : CanvasRenderingContext2D) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.CanvasRenderingContext2D.setLang" do
@@ -1801,6 +1841,14 @@ instance : ToJS ImageBitmapRenderingContextSettings := ⟨fun d => Internal.fiel
 @[macro_inline] def CanvasRenderingContext2D.fontKerning (self : CanvasRenderingContext2D) : IO CanvasFontKerning := Internal.api "Lasm.JS.Web.CanvasRenderingContext2D.fontKerning" do
   self.val.get "fontKerning" CanvasFontKerning
 
+/-- `attribute CanvasFontKerning fontKerning` where the platform has it (`'fontKerning' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CanvasRenderingContext2D.fontKerning? (self' : CanvasRenderingContext2D) : IO (Option CanvasFontKerning) := Internal.api "Lasm.JS.Web.CanvasRenderingContext2D.fontKerning?" do
+  let self := self'
+  if !(← Internal.has self.val "fontKerning") then return none
+  let lasmGuarded ← do
+    self.val.get "fontKerning" CanvasFontKerning
+  return some lasmGuarded
+
 /-- Sets `fontKerning`: `attribute CanvasFontKerning fontKerning` -/
 @[macro_inline] def CanvasRenderingContext2D.setFontKerning (self : CanvasRenderingContext2D) (value : CanvasFontKerning) : IO Unit := Internal.api "Lasm.JS.Web.CanvasRenderingContext2D.setFontKerning" do
   self.val.set "fontKerning" (toJS value)
@@ -1808,6 +1856,14 @@ instance : ToJS ImageBitmapRenderingContextSettings := ⟨fun d => Internal.fiel
 /-- `attribute CanvasFontStretch fontStretch` -/
 @[macro_inline] def CanvasRenderingContext2D.fontStretch (self : CanvasRenderingContext2D) : IO CanvasFontStretch := Internal.api "Lasm.JS.Web.CanvasRenderingContext2D.fontStretch" do
   self.val.get "fontStretch" CanvasFontStretch
+
+/-- `attribute CanvasFontStretch fontStretch` where the platform has it (`'fontStretch' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CanvasRenderingContext2D.fontStretch? (self' : CanvasRenderingContext2D) : IO (Option CanvasFontStretch) := Internal.api "Lasm.JS.Web.CanvasRenderingContext2D.fontStretch?" do
+  let self := self'
+  if !(← Internal.has self.val "fontStretch") then return none
+  let lasmGuarded ← do
+    self.val.get "fontStretch" CanvasFontStretch
+  return some lasmGuarded
 
 /-- Sets `fontStretch`: `attribute CanvasFontStretch fontStretch` -/
 @[macro_inline] def CanvasRenderingContext2D.setFontStretch (self : CanvasRenderingContext2D) (value : CanvasFontStretch) : IO Unit := Internal.api "Lasm.JS.Web.CanvasRenderingContext2D.setFontStretch" do
@@ -1817,6 +1873,14 @@ instance : ToJS ImageBitmapRenderingContextSettings := ⟨fun d => Internal.fiel
 @[macro_inline] def CanvasRenderingContext2D.fontVariantCaps (self : CanvasRenderingContext2D) : IO CanvasFontVariantCaps := Internal.api "Lasm.JS.Web.CanvasRenderingContext2D.fontVariantCaps" do
   self.val.get "fontVariantCaps" CanvasFontVariantCaps
 
+/-- `attribute CanvasFontVariantCaps fontVariantCaps` where the platform has it (`'fontVariantCaps' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CanvasRenderingContext2D.fontVariantCaps? (self' : CanvasRenderingContext2D) : IO (Option CanvasFontVariantCaps) := Internal.api "Lasm.JS.Web.CanvasRenderingContext2D.fontVariantCaps?" do
+  let self := self'
+  if !(← Internal.has self.val "fontVariantCaps") then return none
+  let lasmGuarded ← do
+    self.val.get "fontVariantCaps" CanvasFontVariantCaps
+  return some lasmGuarded
+
 /-- Sets `fontVariantCaps`: `attribute CanvasFontVariantCaps fontVariantCaps` -/
 @[macro_inline] def CanvasRenderingContext2D.setFontVariantCaps (self : CanvasRenderingContext2D) (value : CanvasFontVariantCaps) : IO Unit := Internal.api "Lasm.JS.Web.CanvasRenderingContext2D.setFontVariantCaps" do
   self.val.set "fontVariantCaps" (toJS value)
@@ -1824,6 +1888,14 @@ instance : ToJS ImageBitmapRenderingContextSettings := ⟨fun d => Internal.fiel
 /-- `attribute CanvasTextRendering textRendering` -/
 @[macro_inline] def CanvasRenderingContext2D.textRendering (self : CanvasRenderingContext2D) : IO CanvasTextRendering := Internal.api "Lasm.JS.Web.CanvasRenderingContext2D.textRendering" do
   self.val.get "textRendering" CanvasTextRendering
+
+/-- `attribute CanvasTextRendering textRendering` where the platform has it (`'textRendering' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CanvasRenderingContext2D.textRendering? (self' : CanvasRenderingContext2D) : IO (Option CanvasTextRendering) := Internal.api "Lasm.JS.Web.CanvasRenderingContext2D.textRendering?" do
+  let self := self'
+  if !(← Internal.has self.val "textRendering") then return none
+  let lasmGuarded ← do
+    self.val.get "textRendering" CanvasTextRendering
+  return some lasmGuarded
 
 /-- Sets `textRendering`: `attribute CanvasTextRendering textRendering` -/
 @[macro_inline] def CanvasRenderingContext2D.setTextRendering (self : CanvasRenderingContext2D) (value : CanvasTextRendering) : IO Unit := Internal.api "Lasm.JS.Web.CanvasRenderingContext2D.setTextRendering" do
@@ -1856,6 +1928,14 @@ instance : ToJS ImageBitmapRenderingContextSettings := ⟨fun d => Internal.fiel
 /-- `boolean isContextLost()` -/
 @[macro_inline] def CanvasRenderingContext2D.isContextLost (self : CanvasRenderingContext2D) : IO Bool := Internal.api "Lasm.JS.Web.CanvasRenderingContext2D.isContextLost" do
   self.val.callMethod "isContextLost" (Internal.args #[]) Bool
+
+/-- `boolean isContextLost()` where the platform has it (`'isContextLost' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CanvasRenderingContext2D.isContextLost? (self' : CanvasRenderingContext2D) : IO (Option Bool) := Internal.api "Lasm.JS.Web.CanvasRenderingContext2D.isContextLost?" do
+  let self := self'
+  if !(← Internal.has self.val "isContextLost") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "isContextLost" (Internal.args #[]) Bool
+  return some lasmGuarded
 
 /-- `undefined scale(unrestricted double x, unrestricted double y)` -/
 @[macro_inline] def CanvasRenderingContext2D.scale (self : CanvasRenderingContext2D) (x : Float) (y : Float) : IO Unit := Internal.api "Lasm.JS.Web.CanvasRenderingContext2D.scale" do
@@ -2078,6 +2158,14 @@ instance : ToJS ImageBitmapRenderingContextSettings := ⟨fun d => Internal.fiel
   Lasm.JS.Binding.invoke CloseWatcher { name := "Lasm.JS.Web.CloseWatcher.new", module := "globalThis", path := "CloseWatcher", construct := true, arity := 1 }
     (Internal.args #[Internal.optional options]) (await := false)
 
+/-- `constructor(optional CloseWatcherOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CloseWatcher.new? (options : Option CloseWatcherOptions := none) : IO (Option CloseWatcher) := Internal.api "Lasm.JS.Web.CloseWatcher.new?" do
+  if !(← Internal.hasGlobal ["CloseWatcher"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CloseWatcher { name := "Lasm.JS.Web.CloseWatcher.new?", module := "globalThis", path := "CloseWatcher", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `attribute EventHandler oncancel` -/
 @[macro_inline] def CloseWatcher.oncancel (self : CloseWatcher) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.CloseWatcher.oncancel" do
   self.val.get "oncancel" (Option EventHandlerNonNull)
@@ -2115,6 +2203,14 @@ instance : ToJS ImageBitmapRenderingContextSettings := ⟨fun d => Internal.fiel
   Lasm.JS.Binding.invoke CommandEvent { name := "Lasm.JS.Web.CommandEvent.new", module := "globalThis", path := "CommandEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional CommandEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CommandEvent.new? (type : String) (eventInitDict : Option CommandEventInit := none) : IO (Option CommandEvent) := Internal.api "Lasm.JS.Web.CommandEvent.new?" do
+  if !(← Internal.hasGlobal ["CommandEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CommandEvent { name := "Lasm.JS.Web.CommandEvent.new?", module := "globalThis", path := "CommandEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute Element? source` -/
 @[macro_inline] def CommandEvent.source (self : CommandEvent) : IO (Option Element) := Internal.api "Lasm.JS.Web.CommandEvent.source" do
   self.val.get "source" (Option Element)
@@ -2131,6 +2227,14 @@ instance : ToJS ImageBitmapRenderingContextSettings := ⟨fun d => Internal.fiel
 @[macro_inline] def CustomElementRegistry.new : IO CustomElementRegistry := Internal.api "Lasm.JS.Web.CustomElementRegistry.new" do
   Lasm.JS.Binding.invoke CustomElementRegistry { name := "Lasm.JS.Web.CustomElementRegistry.new", module := "globalThis", path := "CustomElementRegistry", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
+
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CustomElementRegistry.new? : IO (Option CustomElementRegistry) := Internal.api "Lasm.JS.Web.CustomElementRegistry.new?" do
+  if !(← Internal.hasGlobal ["CustomElementRegistry"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CustomElementRegistry { name := "Lasm.JS.Web.CustomElementRegistry.new?", module := "globalThis", path := "CustomElementRegistry", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
 
 /-- `undefined define(DOMString name, CustomElementConstructor constructor, optional ElementDefinitionOptions options)` -/
 @[macro_inline] def CustomElementRegistry.define (self : CustomElementRegistry) (name : String) (constructor : CustomElementConstructor) (options : Option ElementDefinitionOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.CustomElementRegistry.define" do
@@ -2156,6 +2260,14 @@ instance : ToJS ImageBitmapRenderingContextSettings := ⟨fun d => Internal.fiel
 @[macro_inline] def CustomElementRegistry.«initialize» (self : CustomElementRegistry) (root : Node) : IO Unit := Internal.api "Lasm.JS.Web.CustomElementRegistry.initialize" do
   self.val.callMethod "initialize" (Internal.args #[toJS root]) Unit
 
+/-- `undefined initialize(Node root)` where the platform has it (`'initialize' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CustomElementRegistry.«initialize?» (self' : CustomElementRegistry) (root : Node) : IO (Option Unit) := Internal.api "Lasm.JS.Web.CustomElementRegistry.initialize?" do
+  let self := self'
+  if !(← Internal.has self.val "initialize") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "initialize" (Internal.args #[toJS root]) Unit
+  return some lasmGuarded
+
 /-- `v instanceof CustomStateSet`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CustomStateSet`). -/
 @[macro_inline] def CustomStateSet.cast? (v : Value) : IO (Option CustomStateSet) := Internal.api "Lasm.JS.Web.CustomStateSet.cast?" do
   Internal.cast (Internal.getGlobal ["CustomStateSet"] Value) (fun x => { val := x }) v
@@ -2168,6 +2280,14 @@ instance : ToJS ImageBitmapRenderingContextSettings := ⟨fun d => Internal.fiel
 @[macro_inline] def DOMParser.new : IO DOMParser := Internal.api "Lasm.JS.Web.DOMParser.new" do
   Lasm.JS.Binding.invoke DOMParser { name := "Lasm.JS.Web.DOMParser.new", module := "globalThis", path := "DOMParser", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
+
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DOMParser.new? : IO (Option DOMParser) := Internal.api "Lasm.JS.Web.DOMParser.new?" do
+  if !(← Internal.hasGlobal ["DOMParser"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke DOMParser { name := "Lasm.JS.Web.DOMParser.new?", module := "globalThis", path := "DOMParser", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
 
 /-- `Document parseFromString((TrustedHTML or DOMString) string, DOMParserSupportedType type)` -/
 @[macro_inline] def DOMParser.parseFromString (self : DOMParser) (string : TrustedHTMLOrDOMString) (type : DOMParserSupportedType) : IO Document := Internal.api "Lasm.JS.Web.DOMParser.parseFromString" do
@@ -2202,6 +2322,14 @@ instance : ToJS ImageBitmapRenderingContextSettings := ⟨fun d => Internal.fiel
 @[macro_inline] def DataTransfer.new : IO DataTransfer := Internal.api "Lasm.JS.Web.DataTransfer.new" do
   Lasm.JS.Binding.invoke DataTransfer { name := "Lasm.JS.Web.DataTransfer.new", module := "globalThis", path := "DataTransfer", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
+
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DataTransfer.new? : IO (Option DataTransfer) := Internal.api "Lasm.JS.Web.DataTransfer.new?" do
+  if !(← Internal.hasGlobal ["DataTransfer"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke DataTransfer { name := "Lasm.JS.Web.DataTransfer.new?", module := "globalThis", path := "DataTransfer", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute DOMString dropEffect` -/
 @[macro_inline] def DataTransfer.dropEffect (self : DataTransfer) : IO String := Internal.api "Lasm.JS.Web.DataTransfer.dropEffect" do
@@ -2301,6 +2429,14 @@ instance : ToJS ImageBitmapRenderingContextSettings := ⟨fun d => Internal.fiel
 @[macro_inline] def DragEvent.new (type : String) (eventInitDict : Option DragEventInit := none) : IO DragEvent := Internal.api "Lasm.JS.Web.DragEvent.new" do
   Lasm.JS.Binding.invoke DragEvent { name := "Lasm.JS.Web.DragEvent.new", module := "globalThis", path := "DragEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, optional DragEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DragEvent.new? (type : String) (eventInitDict : Option DragEventInit := none) : IO (Option DragEvent) := Internal.api "Lasm.JS.Web.DragEvent.new?" do
+  if !(← Internal.hasGlobal ["DragEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke DragEvent { name := "Lasm.JS.Web.DragEvent.new?", module := "globalThis", path := "DragEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute DataTransfer? dataTransfer` -/
 @[macro_inline] def DragEvent.dataTransfer (self : DragEvent) : IO (Option DataTransfer) := Internal.api "Lasm.JS.Web.DragEvent.dataTransfer" do
@@ -2425,6 +2561,14 @@ instance : ToJS ImageBitmapRenderingContextSettings := ⟨fun d => Internal.fiel
 @[macro_inline] def ElementInternals.ariaColIndexText (self : ElementInternals) : IO (Option String) := Internal.api "Lasm.JS.Web.ElementInternals.ariaColIndexText" do
   self.val.get "ariaColIndexText" (Option String)
 
+/-- `attribute DOMString? ariaColIndexText` where the platform has it (`'ariaColIndexText' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ElementInternals.ariaColIndexText? (self' : ElementInternals) : IO (Option (Option String)) := Internal.api "Lasm.JS.Web.ElementInternals.ariaColIndexText?" do
+  let self := self'
+  if !(← Internal.has self.val "ariaColIndexText") then return none
+  let lasmGuarded ← do
+    self.val.get "ariaColIndexText" (Option String)
+  return some lasmGuarded
+
 /-- Sets `ariaColIndexText`: `attribute DOMString? ariaColIndexText` -/
 @[macro_inline] def ElementInternals.setAriaColIndexText (self : ElementInternals) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.ElementInternals.setAriaColIndexText" do
   self.val.set "ariaColIndexText" (toJS value)
@@ -2464,6 +2608,14 @@ instance : ToJS ImageBitmapRenderingContextSettings := ⟨fun d => Internal.fiel
 /-- `attribute DOMString? ariaDescription` -/
 @[macro_inline] def ElementInternals.ariaDescription (self : ElementInternals) : IO (Option String) := Internal.api "Lasm.JS.Web.ElementInternals.ariaDescription" do
   self.val.get "ariaDescription" (Option String)
+
+/-- `attribute DOMString? ariaDescription` where the platform has it (`'ariaDescription' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ElementInternals.ariaDescription? (self' : ElementInternals) : IO (Option (Option String)) := Internal.api "Lasm.JS.Web.ElementInternals.ariaDescription?" do
+  let self := self'
+  if !(← Internal.has self.val "ariaDescription") then return none
+  let lasmGuarded ← do
+    self.val.get "ariaDescription" (Option String)
+  return some lasmGuarded
 
 /-- Sets `ariaDescription`: `attribute DOMString? ariaDescription` -/
 @[macro_inline] def ElementInternals.setAriaDescription (self : ElementInternals) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.ElementInternals.setAriaDescription" do
@@ -2609,6 +2761,14 @@ instance : ToJS ImageBitmapRenderingContextSettings := ⟨fun d => Internal.fiel
 @[macro_inline] def ElementInternals.ariaOwnsElements (self : ElementInternals) : IO (Option (Array Element)) := Internal.api "Lasm.JS.Web.ElementInternals.ariaOwnsElements" do
   self.val.get "ariaOwnsElements" (Option (Array Element))
 
+/-- `attribute FrozenArray<Element>? ariaOwnsElements` where the platform has it (`'ariaOwnsElements' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ElementInternals.ariaOwnsElements? (self' : ElementInternals) : IO (Option (Option (Array Element))) := Internal.api "Lasm.JS.Web.ElementInternals.ariaOwnsElements?" do
+  let self := self'
+  if !(← Internal.has self.val "ariaOwnsElements") then return none
+  let lasmGuarded ← do
+    self.val.get "ariaOwnsElements" (Option (Array Element))
+  return some lasmGuarded
+
 /-- Sets `ariaOwnsElements`: `attribute FrozenArray<Element>? ariaOwnsElements` -/
 @[macro_inline] def ElementInternals.setAriaOwnsElements (self : ElementInternals) (value : Option (Array Element)) : IO Unit := Internal.api "Lasm.JS.Web.ElementInternals.setAriaOwnsElements" do
   self.val.set "ariaOwnsElements" (toJS value)
@@ -2688,6 +2848,14 @@ instance : ToJS ImageBitmapRenderingContextSettings := ⟨fun d => Internal.fiel
 /-- `attribute DOMString? ariaRowIndexText` -/
 @[macro_inline] def ElementInternals.ariaRowIndexText (self : ElementInternals) : IO (Option String) := Internal.api "Lasm.JS.Web.ElementInternals.ariaRowIndexText" do
   self.val.get "ariaRowIndexText" (Option String)
+
+/-- `attribute DOMString? ariaRowIndexText` where the platform has it (`'ariaRowIndexText' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ElementInternals.ariaRowIndexText? (self' : ElementInternals) : IO (Option (Option String)) := Internal.api "Lasm.JS.Web.ElementInternals.ariaRowIndexText?" do
+  let self := self'
+  if !(← Internal.has self.val "ariaRowIndexText") then return none
+  let lasmGuarded ← do
+    self.val.get "ariaRowIndexText" (Option String)
+  return some lasmGuarded
 
 /-- Sets `ariaRowIndexText`: `attribute DOMString? ariaRowIndexText` -/
 @[macro_inline] def ElementInternals.setAriaRowIndexText (self : ElementInternals) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.ElementInternals.setAriaRowIndexText" do
@@ -2782,6 +2950,14 @@ instance : ToJS ImageBitmapRenderingContextSettings := ⟨fun d => Internal.fiel
   Lasm.JS.Binding.invoke ErrorEvent { name := "Lasm.JS.Web.ErrorEvent.new", module := "globalThis", path := "ErrorEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional ErrorEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ErrorEvent.new? (type : String) (eventInitDict : Option ErrorEventInit := none) : IO (Option ErrorEvent) := Internal.api "Lasm.JS.Web.ErrorEvent.new?" do
+  if !(← Internal.hasGlobal ["ErrorEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ErrorEvent { name := "Lasm.JS.Web.ErrorEvent.new?", module := "globalThis", path := "ErrorEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString message` -/
 @[macro_inline] def ErrorEvent.message (self : ErrorEvent) : IO String := Internal.api "Lasm.JS.Web.ErrorEvent.message" do
   self.val.get "message" String
@@ -2810,6 +2986,14 @@ instance : ToJS ImageBitmapRenderingContextSettings := ⟨fun d => Internal.fiel
 @[macro_inline] def EventSource.new (url : String) (eventSourceInitDict : Option EventSourceInit := none) : IO EventSource := Internal.api "Lasm.JS.Web.EventSource.new" do
   Lasm.JS.Binding.invoke EventSource { name := "Lasm.JS.Web.EventSource.new", module := "globalThis", path := "EventSource", construct := true, arity := 2 }
     (Internal.args #[toJS url, Internal.optional eventSourceInitDict]) (await := false)
+
+/-- `constructor(USVString url, optional EventSourceInit eventSourceInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def EventSource.new? (url : String) (eventSourceInitDict : Option EventSourceInit := none) : IO (Option EventSource) := Internal.api "Lasm.JS.Web.EventSource.new?" do
+  if !(← Internal.hasGlobal ["EventSource"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke EventSource { name := "Lasm.JS.Web.EventSource.new?", module := "globalThis", path := "EventSource", construct := true, arity := 2 }
+      (Internal.args #[toJS url, Internal.optional eventSourceInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `const unsigned short CONNECTING = 0` -/
 def EventSource.CONNECTING : Nat := 0
@@ -2880,6 +3064,14 @@ def EventSource.CLOSED : Nat := 2
 @[macro_inline] def FormDataEvent.new (type : String) (eventInitDict : FormDataEventInit) : IO FormDataEvent := Internal.api "Lasm.JS.Web.FormDataEvent.new" do
   Lasm.JS.Binding.invoke FormDataEvent { name := "Lasm.JS.Web.FormDataEvent.new", module := "globalThis", path := "FormDataEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, FormDataEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def FormDataEvent.new? (type : String) (eventInitDict : FormDataEventInit) : IO (Option FormDataEvent) := Internal.api "Lasm.JS.Web.FormDataEvent.new?" do
+  if !(← Internal.hasGlobal ["FormDataEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke FormDataEvent { name := "Lasm.JS.Web.FormDataEvent.new?", module := "globalThis", path := "FormDataEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute FormData formData` -/
 @[macro_inline] def FormDataEvent.formData (self : FormDataEvent) : IO FormData := Internal.api "Lasm.JS.Web.FormDataEvent.formData" do
@@ -2968,6 +3160,14 @@ def EventSource.CLOSED : Nat := 2
 @[macro_inline] def HTMLElement.accessKeyLabel (self : HTMLElement) : IO String := Internal.api "Lasm.JS.Web.HTMLElement.accessKeyLabel" do
   self.val.get "accessKeyLabel" String
 
+/-- `readonly attribute DOMString accessKeyLabel` where the platform has it (`'accessKeyLabel' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLElement.accessKeyLabel? (self' : HTMLElement) : IO (Option String) := Internal.api "Lasm.JS.Web.HTMLElement.accessKeyLabel?" do
+  let self := self'
+  if !(← Internal.has self.val "accessKeyLabel") then return none
+  let lasmGuarded ← do
+    self.val.get "accessKeyLabel" String
+  return some lasmGuarded
+
 /-- `attribute boolean draggable` -/
 @[macro_inline] def HTMLElement.draggable (self : HTMLElement) : IO Bool := Internal.api "Lasm.JS.Web.HTMLElement.draggable" do
   self.val.get "draggable" Bool
@@ -2988,6 +3188,14 @@ def EventSource.CLOSED : Nat := 2
 @[macro_inline] def HTMLElement.writingSuggestions (self : HTMLElement) : IO String := Internal.api "Lasm.JS.Web.HTMLElement.writingSuggestions" do
   self.val.get "writingSuggestions" String
 
+/-- `attribute DOMString writingSuggestions` where the platform has it (`'writingSuggestions' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLElement.writingSuggestions? (self' : HTMLElement) : IO (Option String) := Internal.api "Lasm.JS.Web.HTMLElement.writingSuggestions?" do
+  let self := self'
+  if !(← Internal.has self.val "writingSuggestions") then return none
+  let lasmGuarded ← do
+    self.val.get "writingSuggestions" String
+  return some lasmGuarded
+
 /-- Sets `writingSuggestions`: `attribute DOMString writingSuggestions` -/
 @[macro_inline] def HTMLElement.setWritingSuggestions (self : HTMLElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setWritingSuggestions" do
   self.val.set "writingSuggestions" (toJS value)
@@ -2995,6 +3203,14 @@ def EventSource.CLOSED : Nat := 2
 /-- `attribute DOMString autocapitalize` -/
 @[macro_inline] def HTMLElement.autocapitalize (self : HTMLElement) : IO String := Internal.api "Lasm.JS.Web.HTMLElement.autocapitalize" do
   self.val.get "autocapitalize" String
+
+/-- `attribute DOMString autocapitalize` where the platform has it (`'autocapitalize' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLElement.autocapitalize? (self' : HTMLElement) : IO (Option String) := Internal.api "Lasm.JS.Web.HTMLElement.autocapitalize?" do
+  let self := self'
+  if !(← Internal.has self.val "autocapitalize") then return none
+  let lasmGuarded ← do
+    self.val.get "autocapitalize" String
+  return some lasmGuarded
 
 /-- Sets `autocapitalize`: `attribute DOMString autocapitalize` -/
 @[macro_inline] def HTMLElement.setAutocapitalize (self : HTMLElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setAutocapitalize" do
@@ -3036,6 +3252,14 @@ def EventSource.CLOSED : Nat := 2
 @[macro_inline] def HTMLElement.headingOffset (self : HTMLElement) : IO Nat := Internal.api "Lasm.JS.Web.HTMLElement.headingOffset" do
   self.val.get "headingOffset" Nat
 
+/-- `attribute unsigned long headingOffset` where the platform has it (`'headingOffset' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLElement.headingOffset? (self' : HTMLElement) : IO (Option Nat) := Internal.api "Lasm.JS.Web.HTMLElement.headingOffset?" do
+  let self := self'
+  if !(← Internal.has self.val "headingOffset") then return none
+  let lasmGuarded ← do
+    self.val.get "headingOffset" Nat
+  return some lasmGuarded
+
 /-- Sets `headingOffset`: `attribute unsigned long headingOffset` -/
 @[macro_inline] def HTMLElement.setHeadingOffset (self : HTMLElement) (value : Nat) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setHeadingOffset" do
   self.val.set "headingOffset" (toJS value)
@@ -3043,6 +3267,14 @@ def EventSource.CLOSED : Nat := 2
 /-- `attribute boolean headingReset` -/
 @[macro_inline] def HTMLElement.headingReset (self : HTMLElement) : IO Bool := Internal.api "Lasm.JS.Web.HTMLElement.headingReset" do
   self.val.get "headingReset" Bool
+
+/-- `attribute boolean headingReset` where the platform has it (`'headingReset' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLElement.headingReset? (self' : HTMLElement) : IO (Option Bool) := Internal.api "Lasm.JS.Web.HTMLElement.headingReset?" do
+  let self := self'
+  if !(← Internal.has self.val "headingReset") then return none
+  let lasmGuarded ← do
+    self.val.get "headingReset" Bool
+  return some lasmGuarded
 
 /-- Sets `headingReset`: `attribute boolean headingReset` -/
 @[macro_inline] def HTMLElement.setHeadingReset (self : HTMLElement) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setHeadingReset" do
@@ -3788,6 +4020,14 @@ def EventSource.CLOSED : Nat := 2
   Lasm.JS.Binding.invoke HashChangeEvent { name := "Lasm.JS.Web.HashChangeEvent.new", module := "globalThis", path := "HashChangeEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional HashChangeEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def HashChangeEvent.new? (type : String) (eventInitDict : Option HashChangeEventInit := none) : IO (Option HashChangeEvent) := Internal.api "Lasm.JS.Web.HashChangeEvent.new?" do
+  if !(← Internal.hasGlobal ["HashChangeEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke HashChangeEvent { name := "Lasm.JS.Web.HashChangeEvent.new?", module := "globalThis", path := "HashChangeEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute USVString oldURL` -/
 @[macro_inline] def HashChangeEvent.oldURL (self : HashChangeEvent) : IO String := Internal.api "Lasm.JS.Web.HashChangeEvent.oldURL" do
   self.val.get "oldURL" String
@@ -3873,11 +4113,28 @@ def EventSource.CLOSED : Nat := 2
   Lasm.JS.Binding.invoke ImageData { name := "Lasm.JS.Web.ImageData.new", module := "globalThis", path := "ImageData", construct := true, arity := 3 }
     (Internal.args #[toJS sw, toJS sh, Internal.optional settings]) (await := false)
 
+/-- `constructor(unsigned long sw, unsigned long sh, optional ImageDataSettings settings)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ImageData.new? (sw : Nat) (sh : Nat) (settings : Option ImageDataSettings := none) : IO (Option ImageData) := Internal.api "Lasm.JS.Web.ImageData.new?" do
+  if !(← Internal.hasGlobal ["ImageData"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ImageData { name := "Lasm.JS.Web.ImageData.new?", module := "globalThis", path := "ImageData", construct := true, arity := 3 }
+      (Internal.args #[toJS sw, toJS sh, Internal.optional settings]) (await := false)
+  return some lasmGuarded
+
 /-- `constructor(ImageDataArray data, unsigned long sw, optional unsigned long sh, optional ImageDataSettings settings)` -/
 @[macro_inline] def ImageData.newWithData (data : ByteArray) (sw : Nat) (sh : Option Nat := none) (settings : Option ImageDataSettings := none) : IO ImageData := Internal.api "Lasm.JS.Web.ImageData.newWithData" do
   let dataView ← Internal.typedArray "Uint8ClampedArray" data
   Lasm.JS.Binding.invoke ImageData { name := "Lasm.JS.Web.ImageData.newWithData", module := "globalThis", path := "ImageData", construct := true, arity := 4 }
     (Internal.args #[.ref dataView "", toJS sw, Internal.optional sh, Internal.optional settings]) (await := false)
+
+/-- `constructor(ImageDataArray data, unsigned long sw, optional unsigned long sh, optional ImageDataSettings settings)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ImageData.newWithData? (data : ByteArray) (sw : Nat) (sh : Option Nat := none) (settings : Option ImageDataSettings := none) : IO (Option ImageData) := Internal.api "Lasm.JS.Web.ImageData.newWithData?" do
+  if !(← Internal.hasGlobal ["ImageData"]) then return none
+  let lasmGuarded ← do
+    let dataView ← Internal.typedArray "Uint8ClampedArray" data
+    Lasm.JS.Binding.invoke ImageData { name := "Lasm.JS.Web.ImageData.newWithData?", module := "globalThis", path := "ImageData", construct := true, arity := 4 }
+      (Internal.args #[.ref dataView "", toJS sw, Internal.optional sh, Internal.optional settings]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute unsigned long width` -/
 @[macro_inline] def ImageData.width (self : ImageData) : IO Nat := Internal.api "Lasm.JS.Web.ImageData.width" do
@@ -3896,9 +4153,25 @@ def EventSource.CLOSED : Nat := 2
 @[macro_inline] def ImageData.pixelFormat (self : ImageData) : IO ImageDataPixelFormat := Internal.api "Lasm.JS.Web.ImageData.pixelFormat" do
   self.val.get "pixelFormat" ImageDataPixelFormat
 
+/-- `readonly attribute ImageDataPixelFormat pixelFormat` where the platform has it (`'pixelFormat' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ImageData.pixelFormat? (self' : ImageData) : IO (Option ImageDataPixelFormat) := Internal.api "Lasm.JS.Web.ImageData.pixelFormat?" do
+  let self := self'
+  if !(← Internal.has self.val "pixelFormat") then return none
+  let lasmGuarded ← do
+    self.val.get "pixelFormat" ImageDataPixelFormat
+  return some lasmGuarded
+
 /-- `readonly attribute PredefinedColorSpace colorSpace` -/
 @[macro_inline] def ImageData.colorSpace (self : ImageData) : IO PredefinedColorSpace := Internal.api "Lasm.JS.Web.ImageData.colorSpace" do
   self.val.get "colorSpace" PredefinedColorSpace
+
+/-- `readonly attribute PredefinedColorSpace colorSpace` where the platform has it (`'colorSpace' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ImageData.colorSpace? (self' : ImageData) : IO (Option PredefinedColorSpace) := Internal.api "Lasm.JS.Web.ImageData.colorSpace?" do
+  let self := self'
+  if !(← Internal.has self.val "colorSpace") then return none
+  let lasmGuarded ← do
+    self.val.get "colorSpace" PredefinedColorSpace
+  return some lasmGuarded
 
 /-- `v instanceof Location`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Location`). -/
 @[macro_inline] def Location.cast? (v : Value) : IO (Option Location) := Internal.api "Lasm.JS.Web.Location.cast?" do
@@ -4026,6 +4299,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
   Lasm.JS.Binding.invoke MessageChannel { name := "Lasm.JS.Web.MessageChannel.new", module := "globalThis", path := "MessageChannel", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MessageChannel.new? : IO (Option MessageChannel) := Internal.api "Lasm.JS.Web.MessageChannel.new?" do
+  if !(← Internal.hasGlobal ["MessageChannel"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke MessageChannel { name := "Lasm.JS.Web.MessageChannel.new?", module := "globalThis", path := "MessageChannel", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute MessagePort port1` -/
 @[macro_inline] def MessageChannel.port1 (self : MessageChannel) : IO MessagePort := Internal.api "Lasm.JS.Web.MessageChannel.port1" do
   let r ← self.val.get "port1" Value
@@ -4044,6 +4325,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def MessageEvent.new (type : String) (eventInitDict : Option MessageEventInit := none) : IO MessageEvent := Internal.api "Lasm.JS.Web.MessageEvent.new" do
   Lasm.JS.Binding.invoke MessageEvent { name := "Lasm.JS.Web.MessageEvent.new", module := "globalThis", path := "MessageEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, optional MessageEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MessageEvent.new? (type : String) (eventInitDict : Option MessageEventInit := none) : IO (Option MessageEvent) := Internal.api "Lasm.JS.Web.MessageEvent.new?" do
+  if !(← Internal.hasGlobal ["MessageEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke MessageEvent { name := "Lasm.JS.Web.MessageEvent.new?", module := "globalThis", path := "MessageEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute any data` -/
 @[macro_inline] def MessageEvent.data (self : MessageEvent) : IO Data := Internal.api "Lasm.JS.Web.MessageEvent.data" do
@@ -4069,6 +4358,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `undefined initMessageEvent(DOMString type, optional boolean bubbles, optional boolean cancelable, optional any data, optional USVString origin, optional DOMString lastEventId, optional MessageEventSource? source, optional sequence<MessagePort> ports)` -/
 @[macro_inline] def MessageEvent.initMessageEvent (self : MessageEvent) (type : String) (bubbles : Option Bool := none) (cancelable : Option Bool := none) (data : Data := .undefined) (origin : Option String := none) (lastEventId : Option String := none) (source : Option MessageEventSource := none) (ports : Option (Array MessagePort) := none) : IO Unit := Internal.api "Lasm.JS.Web.MessageEvent.initMessageEvent" do
   self.val.callMethod "initMessageEvent" (Internal.args #[toJS type, Internal.optional bubbles, Internal.optional cancelable, data, Internal.optional origin, Internal.optional lastEventId, Internal.optional source, Internal.optional ports]) Unit
+
+/-- `undefined initMessageEvent(DOMString type, optional boolean bubbles, optional boolean cancelable, optional any data, optional USVString origin, optional DOMString lastEventId, optional MessageEventSource? source, optional sequence<MessagePort> ports)` where the platform has it (`'initMessageEvent' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def MessageEvent.initMessageEvent? (self' : MessageEvent) (type : String) (bubbles : Option Bool := none) (cancelable : Option Bool := none) (data : Data := .undefined) (origin : Option String := none) (lastEventId : Option String := none) (source : Option MessageEventSource := none) (ports : Option (Array MessagePort) := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.MessageEvent.initMessageEvent?" do
+  let self := self'
+  if !(← Internal.has self.val "initMessageEvent") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "initMessageEvent" (Internal.args #[toJS type, Internal.optional bubbles, Internal.optional cancelable, data, Internal.optional origin, Internal.optional lastEventId, Internal.optional source, Internal.optional ports]) Unit
+  return some lasmGuarded
 
 /-- `v instanceof MessagePort`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MessagePort`). -/
 @[macro_inline] def MessagePort.cast? (v : Value) : IO (Option MessagePort) := Internal.api "Lasm.JS.Web.MessagePort.cast?" do
@@ -4151,6 +4448,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def NavigateEvent.new (type : String) (eventInitDict : NavigateEventInit) : IO NavigateEvent := Internal.api "Lasm.JS.Web.NavigateEvent.new" do
   Lasm.JS.Binding.invoke NavigateEvent { name := "Lasm.JS.Web.NavigateEvent.new", module := "globalThis", path := "NavigateEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, NavigateEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def NavigateEvent.new? (type : String) (eventInitDict : NavigateEventInit) : IO (Option NavigateEvent) := Internal.api "Lasm.JS.Web.NavigateEvent.new?" do
+  if !(← Internal.hasGlobal ["NavigateEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke NavigateEvent { name := "Lasm.JS.Web.NavigateEvent.new?", module := "globalThis", path := "NavigateEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute NavigationType navigationType` -/
 @[macro_inline] def NavigateEvent.navigationType (self : NavigateEvent) : IO NavigationType := Internal.api "Lasm.JS.Web.NavigateEvent.navigationType" do
@@ -4316,6 +4621,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
   Lasm.JS.Binding.invoke NavigationCurrentEntryChangeEvent { name := "Lasm.JS.Web.NavigationCurrentEntryChangeEvent.new", module := "globalThis", path := "NavigationCurrentEntryChangeEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, NavigationCurrentEntryChangeEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def NavigationCurrentEntryChangeEvent.new? (type : String) (eventInitDict : NavigationCurrentEntryChangeEventInit) : IO (Option NavigationCurrentEntryChangeEvent) := Internal.api "Lasm.JS.Web.NavigationCurrentEntryChangeEvent.new?" do
+  if !(← Internal.hasGlobal ["NavigationCurrentEntryChangeEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke NavigationCurrentEntryChangeEvent { name := "Lasm.JS.Web.NavigationCurrentEntryChangeEvent.new?", module := "globalThis", path := "NavigationCurrentEntryChangeEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute NavigationType? navigationType` -/
 @[macro_inline] def NavigationCurrentEntryChangeEvent.navigationType (self : NavigationCurrentEntryChangeEvent) : IO (Option NavigationType) := Internal.api "Lasm.JS.Web.NavigationCurrentEntryChangeEvent.navigationType" do
   self.val.get "navigationType" (Option NavigationType)
@@ -4419,10 +4732,28 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
   let r ← self.val.get "to" Value
   pure { val := r }
 
+/-- `readonly attribute NavigationDestination to` where the platform has it (`'to' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def NavigationTransition.to? (self' : NavigationTransition) : IO (Option NavigationDestination) := Internal.api "Lasm.JS.Web.NavigationTransition.to?" do
+  let self := self'
+  if !(← Internal.has self.val "to") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "to" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute Promise<undefined> committed` -/
 @[macro_inline] def NavigationTransition.committed (self : NavigationTransition) : Async Unit := Internal.api "Lasm.JS.Web.NavigationTransition.committed" do
   let p ← self.val.get "committed" Value
   p.await Unit
+
+/-- `readonly attribute Promise<undefined> committed` where the platform has it (`'committed' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def NavigationTransition.committed? (self' : NavigationTransition) : Async (Option Unit) := Internal.api "Lasm.JS.Web.NavigationTransition.committed?" do
+  let self := self'
+  if !(← Internal.has self.val "committed") then return none
+  let lasmGuarded ← do
+    let p ← self.val.get "committed" Value
+    p.await Unit
+  return some lasmGuarded
 
 /-- `readonly attribute Promise<undefined> finished` -/
 @[macro_inline] def NavigationTransition.finished (self : NavigationTransition) : Async Unit := Internal.api "Lasm.JS.Web.NavigationTransition.finished" do
@@ -4438,29 +4769,86 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
   let r ← self.val.get "userActivation" Value
   pure { val := r }
 
+/-- `readonly attribute UserActivation userActivation` where the platform has it (`'userActivation' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.userActivation? (self' : Navigator) : IO (Option UserActivation) := Internal.api "Lasm.JS.Web.Navigator.userActivation?" do
+  let self := self'
+  if !(← Internal.has self.val "userActivation") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "userActivation" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString appCodeName` -/
 @[macro_inline] def Navigator.appCodeName (self : Navigator) : IO String := Internal.api "Lasm.JS.Web.Navigator.appCodeName" do
   self.val.get "appCodeName" String
+
+/-- `readonly attribute DOMString appCodeName` where the platform has it (`'appCodeName' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.appCodeName? (self' : Navigator) : IO (Option String) := Internal.api "Lasm.JS.Web.Navigator.appCodeName?" do
+  let self := self'
+  if !(← Internal.has self.val "appCodeName") then return none
+  let lasmGuarded ← do
+    self.val.get "appCodeName" String
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString appName` -/
 @[macro_inline] def Navigator.appName (self : Navigator) : IO String := Internal.api "Lasm.JS.Web.Navigator.appName" do
   self.val.get "appName" String
 
+/-- `readonly attribute DOMString appName` where the platform has it (`'appName' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.appName? (self' : Navigator) : IO (Option String) := Internal.api "Lasm.JS.Web.Navigator.appName?" do
+  let self := self'
+  if !(← Internal.has self.val "appName") then return none
+  let lasmGuarded ← do
+    self.val.get "appName" String
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString appVersion` -/
 @[macro_inline] def Navigator.appVersion (self : Navigator) : IO String := Internal.api "Lasm.JS.Web.Navigator.appVersion" do
   self.val.get "appVersion" String
+
+/-- `readonly attribute DOMString appVersion` where the platform has it (`'appVersion' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.appVersion? (self' : Navigator) : IO (Option String) := Internal.api "Lasm.JS.Web.Navigator.appVersion?" do
+  let self := self'
+  if !(← Internal.has self.val "appVersion") then return none
+  let lasmGuarded ← do
+    self.val.get "appVersion" String
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString platform` -/
 @[macro_inline] def Navigator.platform (self : Navigator) : IO String := Internal.api "Lasm.JS.Web.Navigator.platform" do
   self.val.get "platform" String
 
+/-- `readonly attribute DOMString platform` where the platform has it (`'platform' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.platform? (self' : Navigator) : IO (Option String) := Internal.api "Lasm.JS.Web.Navigator.platform?" do
+  let self := self'
+  if !(← Internal.has self.val "platform") then return none
+  let lasmGuarded ← do
+    self.val.get "platform" String
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString product` -/
 @[macro_inline] def Navigator.product (self : Navigator) : IO String := Internal.api "Lasm.JS.Web.Navigator.product" do
   self.val.get "product" String
 
+/-- `readonly attribute DOMString product` where the platform has it (`'product' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.product? (self' : Navigator) : IO (Option String) := Internal.api "Lasm.JS.Web.Navigator.product?" do
+  let self := self'
+  if !(← Internal.has self.val "product") then return none
+  let lasmGuarded ← do
+    self.val.get "product" String
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString productSub` -/
 @[macro_inline] def Navigator.productSub (self : Navigator) : IO String := Internal.api "Lasm.JS.Web.Navigator.productSub" do
   self.val.get "productSub" String
+
+/-- `readonly attribute DOMString productSub` where the platform has it (`'productSub' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.productSub? (self' : Navigator) : IO (Option String) := Internal.api "Lasm.JS.Web.Navigator.productSub?" do
+  let self := self'
+  if !(← Internal.has self.val "productSub") then return none
+  let lasmGuarded ← do
+    self.val.get "productSub" String
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString userAgent` -/
 @[macro_inline] def Navigator.userAgent (self : Navigator) : IO String := Internal.api "Lasm.JS.Web.Navigator.userAgent" do
@@ -4470,43 +4858,125 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def Navigator.vendor (self : Navigator) : IO String := Internal.api "Lasm.JS.Web.Navigator.vendor" do
   self.val.get "vendor" String
 
+/-- `readonly attribute DOMString vendor` where the platform has it (`'vendor' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.vendor? (self' : Navigator) : IO (Option String) := Internal.api "Lasm.JS.Web.Navigator.vendor?" do
+  let self := self'
+  if !(← Internal.has self.val "vendor") then return none
+  let lasmGuarded ← do
+    self.val.get "vendor" String
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString vendorSub` -/
 @[macro_inline] def Navigator.vendorSub (self : Navigator) : IO String := Internal.api "Lasm.JS.Web.Navigator.vendorSub" do
   self.val.get "vendorSub" String
+
+/-- `readonly attribute DOMString vendorSub` where the platform has it (`'vendorSub' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.vendorSub? (self' : Navigator) : IO (Option String) := Internal.api "Lasm.JS.Web.Navigator.vendorSub?" do
+  let self := self'
+  if !(← Internal.has self.val "vendorSub") then return none
+  let lasmGuarded ← do
+    self.val.get "vendorSub" String
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString oscpu` -/
 @[macro_inline] def Navigator.oscpu (self : Navigator) : IO String := Internal.api "Lasm.JS.Web.Navigator.oscpu" do
   self.val.get "oscpu" String
 
+/-- `readonly attribute DOMString oscpu` where the platform has it (`'oscpu' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.oscpu? (self' : Navigator) : IO (Option String) := Internal.api "Lasm.JS.Web.Navigator.oscpu?" do
+  let self := self'
+  if !(← Internal.has self.val "oscpu") then return none
+  let lasmGuarded ← do
+    self.val.get "oscpu" String
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString language` -/
 @[macro_inline] def Navigator.language (self : Navigator) : IO String := Internal.api "Lasm.JS.Web.Navigator.language" do
   self.val.get "language" String
+
+/-- `readonly attribute DOMString language` where the platform has it (`'language' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.language? (self' : Navigator) : IO (Option String) := Internal.api "Lasm.JS.Web.Navigator.language?" do
+  let self := self'
+  if !(← Internal.has self.val "language") then return none
+  let lasmGuarded ← do
+    self.val.get "language" String
+  return some lasmGuarded
 
 /-- `readonly attribute FrozenArray<DOMString> languages` -/
 @[macro_inline] def Navigator.languages (self : Navigator) : IO (Array String) := Internal.api "Lasm.JS.Web.Navigator.languages" do
   self.val.get "languages" (Array String)
 
+/-- `readonly attribute FrozenArray<DOMString> languages` where the platform has it (`'languages' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.languages? (self' : Navigator) : IO (Option (Array String)) := Internal.api "Lasm.JS.Web.Navigator.languages?" do
+  let self := self'
+  if !(← Internal.has self.val "languages") then return none
+  let lasmGuarded ← do
+    self.val.get "languages" (Array String)
+  return some lasmGuarded
+
 /-- `readonly attribute boolean onLine` -/
 @[macro_inline] def Navigator.onLine (self : Navigator) : IO Bool := Internal.api "Lasm.JS.Web.Navigator.onLine" do
   self.val.get "onLine" Bool
 
+/-- `readonly attribute boolean onLine` where the platform has it (`'onLine' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.onLine? (self' : Navigator) : IO (Option Bool) := Internal.api "Lasm.JS.Web.Navigator.onLine?" do
+  let self := self'
+  if !(← Internal.has self.val "onLine") then return none
+  let lasmGuarded ← do
+    self.val.get "onLine" Bool
+  return some lasmGuarded
+
 /-- `readonly attribute boolean cookieEnabled` -/
 @[macro_inline] def Navigator.cookieEnabled (self : Navigator) : IO Bool := Internal.api "Lasm.JS.Web.Navigator.cookieEnabled" do
   self.val.get "cookieEnabled" Bool
+
+/-- `readonly attribute boolean cookieEnabled` where the platform has it (`'cookieEnabled' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.cookieEnabled? (self' : Navigator) : IO (Option Bool) := Internal.api "Lasm.JS.Web.Navigator.cookieEnabled?" do
+  let self := self'
+  if !(← Internal.has self.val "cookieEnabled") then return none
+  let lasmGuarded ← do
+    self.val.get "cookieEnabled" Bool
+  return some lasmGuarded
 
 /-- `readonly attribute PluginArray plugins` -/
 @[macro_inline] def Navigator.plugins (self : Navigator) : IO PluginArray := Internal.api "Lasm.JS.Web.Navigator.plugins" do
   let r ← self.val.get "plugins" Value
   pure { val := r }
 
+/-- `readonly attribute PluginArray plugins` where the platform has it (`'plugins' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.plugins? (self' : Navigator) : IO (Option PluginArray) := Internal.api "Lasm.JS.Web.Navigator.plugins?" do
+  let self := self'
+  if !(← Internal.has self.val "plugins") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "plugins" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute MimeTypeArray mimeTypes` -/
 @[macro_inline] def Navigator.mimeTypes (self : Navigator) : IO MimeTypeArray := Internal.api "Lasm.JS.Web.Navigator.mimeTypes" do
   let r ← self.val.get "mimeTypes" Value
   pure { val := r }
 
+/-- `readonly attribute MimeTypeArray mimeTypes` where the platform has it (`'mimeTypes' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.mimeTypes? (self' : Navigator) : IO (Option MimeTypeArray) := Internal.api "Lasm.JS.Web.Navigator.mimeTypes?" do
+  let self := self'
+  if !(← Internal.has self.val "mimeTypes") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "mimeTypes" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute boolean pdfViewerEnabled` -/
 @[macro_inline] def Navigator.pdfViewerEnabled (self : Navigator) : IO Bool := Internal.api "Lasm.JS.Web.Navigator.pdfViewerEnabled" do
   self.val.get "pdfViewerEnabled" Bool
+
+/-- `readonly attribute boolean pdfViewerEnabled` where the platform has it (`'pdfViewerEnabled' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.pdfViewerEnabled? (self' : Navigator) : IO (Option Bool) := Internal.api "Lasm.JS.Web.Navigator.pdfViewerEnabled?" do
+  let self := self'
+  if !(← Internal.has self.val "pdfViewerEnabled") then return none
+  let lasmGuarded ← do
+    self.val.get "pdfViewerEnabled" Bool
+  return some lasmGuarded
 
 /-- `readonly attribute unsigned long long hardwareConcurrency` -/
 @[macro_inline] def Navigator.hardwareConcurrency (self : Navigator) : IO Nat := Internal.api "Lasm.JS.Web.Navigator.hardwareConcurrency" do
@@ -4516,17 +4986,49 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def Navigator.taintEnabled (self : Navigator) : IO Bool := Internal.api "Lasm.JS.Web.Navigator.taintEnabled" do
   self.val.callMethod "taintEnabled" (Internal.args #[]) Bool
 
+/-- `boolean taintEnabled()` where the platform has it (`'taintEnabled' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.taintEnabled? (self' : Navigator) : IO (Option Bool) := Internal.api "Lasm.JS.Web.Navigator.taintEnabled?" do
+  let self := self'
+  if !(← Internal.has self.val "taintEnabled") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "taintEnabled" (Internal.args #[]) Bool
+  return some lasmGuarded
+
 /-- `undefined registerProtocolHandler(DOMString scheme, USVString url)` -/
 @[macro_inline] def Navigator.registerProtocolHandler (self : Navigator) (scheme : String) (url : String) : IO Unit := Internal.api "Lasm.JS.Web.Navigator.registerProtocolHandler" do
   self.val.callMethod "registerProtocolHandler" (Internal.args #[toJS scheme, toJS url]) Unit
+
+/-- `undefined registerProtocolHandler(DOMString scheme, USVString url)` where the platform has it (`'registerProtocolHandler' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.registerProtocolHandler? (self' : Navigator) (scheme : String) (url : String) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Navigator.registerProtocolHandler?" do
+  let self := self'
+  if !(← Internal.has self.val "registerProtocolHandler") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "registerProtocolHandler" (Internal.args #[toJS scheme, toJS url]) Unit
+  return some lasmGuarded
 
 /-- `undefined unregisterProtocolHandler(DOMString scheme, USVString url)` -/
 @[macro_inline] def Navigator.unregisterProtocolHandler (self : Navigator) (scheme : String) (url : String) : IO Unit := Internal.api "Lasm.JS.Web.Navigator.unregisterProtocolHandler" do
   self.val.callMethod "unregisterProtocolHandler" (Internal.args #[toJS scheme, toJS url]) Unit
 
+/-- `undefined unregisterProtocolHandler(DOMString scheme, USVString url)` where the platform has it (`'unregisterProtocolHandler' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.unregisterProtocolHandler? (self' : Navigator) (scheme : String) (url : String) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Navigator.unregisterProtocolHandler?" do
+  let self := self'
+  if !(← Internal.has self.val "unregisterProtocolHandler") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "unregisterProtocolHandler" (Internal.args #[toJS scheme, toJS url]) Unit
+  return some lasmGuarded
+
 /-- `boolean javaEnabled()` -/
 @[macro_inline] def Navigator.javaEnabled (self : Navigator) : IO Bool := Internal.api "Lasm.JS.Web.Navigator.javaEnabled" do
   self.val.callMethod "javaEnabled" (Internal.args #[]) Bool
+
+/-- `boolean javaEnabled()` where the platform has it (`'javaEnabled' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.javaEnabled? (self' : Navigator) : IO (Option Bool) := Internal.api "Lasm.JS.Web.Navigator.javaEnabled?" do
+  let self := self'
+  if !(← Internal.has self.val "javaEnabled") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "javaEnabled" (Internal.args #[]) Bool
+  return some lasmGuarded
 
 /-- `v instanceof NotRestoredReasonDetails`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `NotRestoredReasonDetails`). -/
 @[macro_inline] def NotRestoredReasonDetails.cast? (v : Value) : IO (Option NotRestoredReasonDetails) := Internal.api "Lasm.JS.Web.NotRestoredReasonDetails.cast?" do
@@ -4581,6 +5083,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
   Lasm.JS.Binding.invoke OffscreenCanvas { name := "Lasm.JS.Web.OffscreenCanvas.new", module := "globalThis", path := "OffscreenCanvas", construct := true, arity := 2 }
     (Internal.args #[toJS width, toJS height]) (await := false)
 
+/-- `constructor(unsigned long long width, unsigned long long height)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def OffscreenCanvas.new? (width : Nat) (height : Nat) : IO (Option OffscreenCanvas) := Internal.api "Lasm.JS.Web.OffscreenCanvas.new?" do
+  if !(← Internal.hasGlobal ["OffscreenCanvas"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke OffscreenCanvas { name := "Lasm.JS.Web.OffscreenCanvas.new?", module := "globalThis", path := "OffscreenCanvas", construct := true, arity := 2 }
+      (Internal.args #[toJS width, toJS height]) (await := false)
+  return some lasmGuarded
+
 /-- `attribute unsigned long long width` -/
 @[macro_inline] def OffscreenCanvas.width (self : OffscreenCanvas) : IO Nat := Internal.api "Lasm.JS.Web.OffscreenCanvas.width" do
   self.val.get "width" Nat
@@ -4601,6 +5111,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def OffscreenCanvas.oncontextlost (self : OffscreenCanvas) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.OffscreenCanvas.oncontextlost" do
   self.val.get "oncontextlost" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler oncontextlost` where the platform has it (`'oncontextlost' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def OffscreenCanvas.oncontextlost? (self' : OffscreenCanvas) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.OffscreenCanvas.oncontextlost?" do
+  let self := self'
+  if !(← Internal.has self.val "oncontextlost") then return none
+  let lasmGuarded ← do
+    self.val.get "oncontextlost" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `oncontextlost`: `attribute EventHandler oncontextlost` -/
 @[macro_inline] def OffscreenCanvas.setOncontextlost (self : OffscreenCanvas) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.OffscreenCanvas.setOncontextlost" do
   self.val.set "oncontextlost" (toJS value)
@@ -4608,6 +5126,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `attribute EventHandler oncontextrestored` -/
 @[macro_inline] def OffscreenCanvas.oncontextrestored (self : OffscreenCanvas) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.OffscreenCanvas.oncontextrestored" do
   self.val.get "oncontextrestored" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler oncontextrestored` where the platform has it (`'oncontextrestored' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def OffscreenCanvas.oncontextrestored? (self' : OffscreenCanvas) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.OffscreenCanvas.oncontextrestored?" do
+  let self := self'
+  if !(← Internal.has self.val "oncontextrestored") then return none
+  let lasmGuarded ← do
+    self.val.get "oncontextrestored" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `oncontextrestored`: `attribute EventHandler oncontextrestored` -/
 @[macro_inline] def OffscreenCanvas.setOncontextrestored (self : OffscreenCanvas) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.OffscreenCanvas.setOncontextrestored" do
@@ -4665,6 +5191,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def OffscreenCanvasRenderingContext2D.imageSmoothingQuality (self : OffscreenCanvasRenderingContext2D) : IO ImageSmoothingQuality := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.imageSmoothingQuality" do
   self.val.get "imageSmoothingQuality" ImageSmoothingQuality
 
+/-- `attribute ImageSmoothingQuality imageSmoothingQuality` where the platform has it (`'imageSmoothingQuality' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def OffscreenCanvasRenderingContext2D.imageSmoothingQuality? (self' : OffscreenCanvasRenderingContext2D) : IO (Option ImageSmoothingQuality) := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.imageSmoothingQuality?" do
+  let self := self'
+  if !(← Internal.has self.val "imageSmoothingQuality") then return none
+  let lasmGuarded ← do
+    self.val.get "imageSmoothingQuality" ImageSmoothingQuality
+  return some lasmGuarded
+
 /-- Sets `imageSmoothingQuality`: `attribute ImageSmoothingQuality imageSmoothingQuality` -/
 @[macro_inline] def OffscreenCanvasRenderingContext2D.setImageSmoothingQuality (self : OffscreenCanvasRenderingContext2D) (value : ImageSmoothingQuality) : IO Unit := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.setImageSmoothingQuality" do
   self.val.set "imageSmoothingQuality" (toJS value)
@@ -4721,6 +5255,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def OffscreenCanvasRenderingContext2D.filter (self : OffscreenCanvasRenderingContext2D) : IO String := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.filter" do
   self.val.get "filter" String
 
+/-- `attribute DOMString filter` where the platform has it (`'filter' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def OffscreenCanvasRenderingContext2D.filter? (self' : OffscreenCanvasRenderingContext2D) : IO (Option String) := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.filter?" do
+  let self := self'
+  if !(← Internal.has self.val "filter") then return none
+  let lasmGuarded ← do
+    self.val.get "filter" String
+  return some lasmGuarded
+
 /-- Sets `filter`: `attribute DOMString filter` -/
 @[macro_inline] def OffscreenCanvasRenderingContext2D.setFilter (self : OffscreenCanvasRenderingContext2D) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.setFilter" do
   self.val.set "filter" (toJS value)
@@ -4768,6 +5310,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `attribute DOMString lang` -/
 @[macro_inline] def OffscreenCanvasRenderingContext2D.lang (self : OffscreenCanvasRenderingContext2D) : IO String := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.lang" do
   self.val.get "lang" String
+
+/-- `attribute DOMString lang` where the platform has it (`'lang' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def OffscreenCanvasRenderingContext2D.lang? (self' : OffscreenCanvasRenderingContext2D) : IO (Option String) := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.lang?" do
+  let self := self'
+  if !(← Internal.has self.val "lang") then return none
+  let lasmGuarded ← do
+    self.val.get "lang" String
+  return some lasmGuarded
 
 /-- Sets `lang`: `attribute DOMString lang` -/
 @[macro_inline] def OffscreenCanvasRenderingContext2D.setLang (self : OffscreenCanvasRenderingContext2D) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.setLang" do
@@ -4817,6 +5367,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def OffscreenCanvasRenderingContext2D.fontKerning (self : OffscreenCanvasRenderingContext2D) : IO CanvasFontKerning := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.fontKerning" do
   self.val.get "fontKerning" CanvasFontKerning
 
+/-- `attribute CanvasFontKerning fontKerning` where the platform has it (`'fontKerning' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def OffscreenCanvasRenderingContext2D.fontKerning? (self' : OffscreenCanvasRenderingContext2D) : IO (Option CanvasFontKerning) := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.fontKerning?" do
+  let self := self'
+  if !(← Internal.has self.val "fontKerning") then return none
+  let lasmGuarded ← do
+    self.val.get "fontKerning" CanvasFontKerning
+  return some lasmGuarded
+
 /-- Sets `fontKerning`: `attribute CanvasFontKerning fontKerning` -/
 @[macro_inline] def OffscreenCanvasRenderingContext2D.setFontKerning (self : OffscreenCanvasRenderingContext2D) (value : CanvasFontKerning) : IO Unit := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.setFontKerning" do
   self.val.set "fontKerning" (toJS value)
@@ -4824,6 +5382,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `attribute CanvasFontStretch fontStretch` -/
 @[macro_inline] def OffscreenCanvasRenderingContext2D.fontStretch (self : OffscreenCanvasRenderingContext2D) : IO CanvasFontStretch := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.fontStretch" do
   self.val.get "fontStretch" CanvasFontStretch
+
+/-- `attribute CanvasFontStretch fontStretch` where the platform has it (`'fontStretch' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def OffscreenCanvasRenderingContext2D.fontStretch? (self' : OffscreenCanvasRenderingContext2D) : IO (Option CanvasFontStretch) := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.fontStretch?" do
+  let self := self'
+  if !(← Internal.has self.val "fontStretch") then return none
+  let lasmGuarded ← do
+    self.val.get "fontStretch" CanvasFontStretch
+  return some lasmGuarded
 
 /-- Sets `fontStretch`: `attribute CanvasFontStretch fontStretch` -/
 @[macro_inline] def OffscreenCanvasRenderingContext2D.setFontStretch (self : OffscreenCanvasRenderingContext2D) (value : CanvasFontStretch) : IO Unit := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.setFontStretch" do
@@ -4833,6 +5399,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def OffscreenCanvasRenderingContext2D.fontVariantCaps (self : OffscreenCanvasRenderingContext2D) : IO CanvasFontVariantCaps := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.fontVariantCaps" do
   self.val.get "fontVariantCaps" CanvasFontVariantCaps
 
+/-- `attribute CanvasFontVariantCaps fontVariantCaps` where the platform has it (`'fontVariantCaps' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def OffscreenCanvasRenderingContext2D.fontVariantCaps? (self' : OffscreenCanvasRenderingContext2D) : IO (Option CanvasFontVariantCaps) := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.fontVariantCaps?" do
+  let self := self'
+  if !(← Internal.has self.val "fontVariantCaps") then return none
+  let lasmGuarded ← do
+    self.val.get "fontVariantCaps" CanvasFontVariantCaps
+  return some lasmGuarded
+
 /-- Sets `fontVariantCaps`: `attribute CanvasFontVariantCaps fontVariantCaps` -/
 @[macro_inline] def OffscreenCanvasRenderingContext2D.setFontVariantCaps (self : OffscreenCanvasRenderingContext2D) (value : CanvasFontVariantCaps) : IO Unit := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.setFontVariantCaps" do
   self.val.set "fontVariantCaps" (toJS value)
@@ -4840,6 +5414,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `attribute CanvasTextRendering textRendering` -/
 @[macro_inline] def OffscreenCanvasRenderingContext2D.textRendering (self : OffscreenCanvasRenderingContext2D) : IO CanvasTextRendering := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.textRendering" do
   self.val.get "textRendering" CanvasTextRendering
+
+/-- `attribute CanvasTextRendering textRendering` where the platform has it (`'textRendering' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def OffscreenCanvasRenderingContext2D.textRendering? (self' : OffscreenCanvasRenderingContext2D) : IO (Option CanvasTextRendering) := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.textRendering?" do
+  let self := self'
+  if !(← Internal.has self.val "textRendering") then return none
+  let lasmGuarded ← do
+    self.val.get "textRendering" CanvasTextRendering
+  return some lasmGuarded
 
 /-- Sets `textRendering`: `attribute CanvasTextRendering textRendering` -/
 @[macro_inline] def OffscreenCanvasRenderingContext2D.setTextRendering (self : OffscreenCanvasRenderingContext2D) (value : CanvasTextRendering) : IO Unit := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.setTextRendering" do
@@ -4857,6 +5439,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def OffscreenCanvasRenderingContext2D.getContextAttributes (self : OffscreenCanvasRenderingContext2D) : IO CanvasRenderingContext2DSettings := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.getContextAttributes" do
   self.val.callMethod "getContextAttributes" (Internal.args #[]) CanvasRenderingContext2DSettings
 
+/-- `CanvasRenderingContext2DSettings getContextAttributes()` where the platform has it (`'getContextAttributes' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def OffscreenCanvasRenderingContext2D.getContextAttributes? (self' : OffscreenCanvasRenderingContext2D) : IO (Option CanvasRenderingContext2DSettings) := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.getContextAttributes?" do
+  let self := self'
+  if !(← Internal.has self.val "getContextAttributes") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getContextAttributes" (Internal.args #[]) CanvasRenderingContext2DSettings
+  return some lasmGuarded
+
 /-- `undefined save()` -/
 @[macro_inline] def OffscreenCanvasRenderingContext2D.save (self : OffscreenCanvasRenderingContext2D) : IO Unit := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.save" do
   self.val.callMethod "save" (Internal.args #[]) Unit
@@ -4872,6 +5462,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `boolean isContextLost()` -/
 @[macro_inline] def OffscreenCanvasRenderingContext2D.isContextLost (self : OffscreenCanvasRenderingContext2D) : IO Bool := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.isContextLost" do
   self.val.callMethod "isContextLost" (Internal.args #[]) Bool
+
+/-- `boolean isContextLost()` where the platform has it (`'isContextLost' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def OffscreenCanvasRenderingContext2D.isContextLost? (self' : OffscreenCanvasRenderingContext2D) : IO (Option Bool) := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.isContextLost?" do
+  let self := self'
+  if !(← Internal.has self.val "isContextLost") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "isContextLost" (Internal.args #[]) Bool
+  return some lasmGuarded
 
 /-- `undefined scale(unrestricted double x, unrestricted double y)` -/
 @[macro_inline] def OffscreenCanvasRenderingContext2D.scale (self : OffscreenCanvasRenderingContext2D) (x : Float) (y : Float) : IO Unit := Internal.api "Lasm.JS.Web.OffscreenCanvasRenderingContext2D.scale" do
@@ -5086,6 +5684,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
   Lasm.JS.Binding.invoke Origin { name := "Lasm.JS.Web.Origin.new", module := "globalThis", path := "Origin", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Origin.new? : IO (Option Origin) := Internal.api "Lasm.JS.Web.Origin.new?" do
+  if !(← Internal.hasGlobal ["Origin"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Origin { name := "Lasm.JS.Web.Origin.new?", module := "globalThis", path := "Origin", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute boolean opaque` -/
 @[macro_inline] def Origin.«opaque» (self : Origin) : IO Bool := Internal.api "Lasm.JS.Web.Origin.opaque" do
   self.val.get "opaque" Bool
@@ -5095,6 +5701,15 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.Origin.from", module := "globalThis", path := "Origin.from", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `static Origin from(any value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Origin.«from?» (value : Data) : IO (Option Origin) := Internal.api "Lasm.JS.Web.Origin.from?" do
+  if !(← Internal.hasGlobal ["Origin", "from"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.Origin.from?", module := "globalThis", path := "Origin.from", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `boolean isSameOrigin(Origin other)` -/
 @[macro_inline] def Origin.isSameOrigin (self : Origin) (other : Origin) : IO Bool := Internal.api "Lasm.JS.Web.Origin.isSameOrigin" do
@@ -5113,6 +5728,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
   Lasm.JS.Binding.invoke PageRevealEvent { name := "Lasm.JS.Web.PageRevealEvent.new", module := "globalThis", path := "PageRevealEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional PageRevealEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PageRevealEvent.new? (type : String) (eventInitDict : Option PageRevealEventInit := none) : IO (Option PageRevealEvent) := Internal.api "Lasm.JS.Web.PageRevealEvent.new?" do
+  if !(← Internal.hasGlobal ["PageRevealEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PageRevealEvent { name := "Lasm.JS.Web.PageRevealEvent.new?", module := "globalThis", path := "PageRevealEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute ViewTransition? viewTransition` -/
 @[macro_inline] def PageRevealEvent.viewTransition (self : PageRevealEvent) : IO (Option ViewTransition) := Internal.api "Lasm.JS.Web.PageRevealEvent.viewTransition" do
   self.val.get "viewTransition" (Option ViewTransition)
@@ -5125,6 +5748,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def PageSwapEvent.new (type : String) (eventInitDict : Option PageSwapEventInit := none) : IO PageSwapEvent := Internal.api "Lasm.JS.Web.PageSwapEvent.new" do
   Lasm.JS.Binding.invoke PageSwapEvent { name := "Lasm.JS.Web.PageSwapEvent.new", module := "globalThis", path := "PageSwapEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, optional PageSwapEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PageSwapEvent.new? (type : String) (eventInitDict : Option PageSwapEventInit := none) : IO (Option PageSwapEvent) := Internal.api "Lasm.JS.Web.PageSwapEvent.new?" do
+  if !(← Internal.hasGlobal ["PageSwapEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PageSwapEvent { name := "Lasm.JS.Web.PageSwapEvent.new?", module := "globalThis", path := "PageSwapEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute NavigationActivation? activation` -/
 @[macro_inline] def PageSwapEvent.activation (self : PageSwapEvent) : IO (Option NavigationActivation) := Internal.api "Lasm.JS.Web.PageSwapEvent.activation" do
@@ -5143,6 +5774,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
   Lasm.JS.Binding.invoke PageTransitionEvent { name := "Lasm.JS.Web.PageTransitionEvent.new", module := "globalThis", path := "PageTransitionEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional PageTransitionEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PageTransitionEvent.new? (type : String) (eventInitDict : Option PageTransitionEventInit := none) : IO (Option PageTransitionEvent) := Internal.api "Lasm.JS.Web.PageTransitionEvent.new?" do
+  if !(← Internal.hasGlobal ["PageTransitionEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PageTransitionEvent { name := "Lasm.JS.Web.PageTransitionEvent.new?", module := "globalThis", path := "PageTransitionEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute boolean persisted` -/
 @[macro_inline] def PageTransitionEvent.persisted (self : PageTransitionEvent) : IO Bool := Internal.api "Lasm.JS.Web.PageTransitionEvent.persisted" do
   self.val.get "persisted" Bool
@@ -5155,6 +5794,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def Path2D.new (path : Option Path2DOrDOMString := none) : IO Path2D := Internal.api "Lasm.JS.Web.Path2D.new" do
   Lasm.JS.Binding.invoke Path2D { name := "Lasm.JS.Web.Path2D.new", module := "globalThis", path := "Path2D", construct := true, arity := 1 }
     (Internal.args #[Internal.optional path]) (await := false)
+
+/-- `constructor(optional (Path2D or DOMString) path)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Path2D.new? (path : Option Path2DOrDOMString := none) : IO (Option Path2D) := Internal.api "Lasm.JS.Web.Path2D.new?" do
+  if !(← Internal.hasGlobal ["Path2D"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Path2D { name := "Lasm.JS.Web.Path2D.new?", module := "globalThis", path := "Path2D", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional path]) (await := false)
+  return some lasmGuarded
 
 /-- `undefined addPath(Path2D path, optional DOMMatrix2DInit transform)` -/
 @[macro_inline] def Path2D.addPath (self : Path2D) (path : Path2D) (transform : Option DOMMatrix2DInit := none) : IO Unit := Internal.api "Lasm.JS.Web.Path2D.addPath" do
@@ -5257,6 +5904,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
   Lasm.JS.Binding.invoke PopStateEvent { name := "Lasm.JS.Web.PopStateEvent.new", module := "globalThis", path := "PopStateEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional PopStateEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PopStateEvent.new? (type : String) (eventInitDict : Option PopStateEventInit := none) : IO (Option PopStateEvent) := Internal.api "Lasm.JS.Web.PopStateEvent.new?" do
+  if !(← Internal.hasGlobal ["PopStateEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PopStateEvent { name := "Lasm.JS.Web.PopStateEvent.new?", module := "globalThis", path := "PopStateEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute any state` -/
 @[macro_inline] def PopStateEvent.state (self : PopStateEvent) : IO Data := Internal.api "Lasm.JS.Web.PopStateEvent.state" do
   self.val.get "state" Data
@@ -5274,13 +5929,37 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
   Lasm.JS.Binding.invoke PromiseRejectionEvent { name := "Lasm.JS.Web.PromiseRejectionEvent.new", module := "globalThis", path := "PromiseRejectionEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, PromiseRejectionEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PromiseRejectionEvent.new? (type : String) (eventInitDict : PromiseRejectionEventInit) : IO (Option PromiseRejectionEvent) := Internal.api "Lasm.JS.Web.PromiseRejectionEvent.new?" do
+  if !(← Internal.hasGlobal ["PromiseRejectionEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PromiseRejectionEvent { name := "Lasm.JS.Web.PromiseRejectionEvent.new?", module := "globalThis", path := "PromiseRejectionEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute object promise` -/
 @[macro_inline] def PromiseRejectionEvent.promise (self : PromiseRejectionEvent) : IO Data := Internal.api "Lasm.JS.Web.PromiseRejectionEvent.promise" do
   self.val.get "promise" Data
 
+/-- `readonly attribute object promise` where the platform has it (`'promise' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PromiseRejectionEvent.promise? (self' : PromiseRejectionEvent) : IO (Option Data) := Internal.api "Lasm.JS.Web.PromiseRejectionEvent.promise?" do
+  let self := self'
+  if !(← Internal.has self.val "promise") then return none
+  let lasmGuarded ← do
+    self.val.get "promise" Data
+  return some lasmGuarded
+
 /-- `readonly attribute any reason` -/
 @[macro_inline] def PromiseRejectionEvent.reason (self : PromiseRejectionEvent) : IO Data := Internal.api "Lasm.JS.Web.PromiseRejectionEvent.reason" do
   self.val.get "reason" Data
+
+/-- `readonly attribute any reason` where the platform has it (`'reason' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PromiseRejectionEvent.reason? (self' : PromiseRejectionEvent) : IO (Option Data) := Internal.api "Lasm.JS.Web.PromiseRejectionEvent.reason?" do
+  let self := self'
+  if !(← Internal.has self.val "reason") then return none
+  let lasmGuarded ← do
+    self.val.get "reason" Data
+  return some lasmGuarded
 
 /-- `v instanceof RadioNodeList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RadioNodeList`). -/
 @[macro_inline] def RadioNodeList.cast? (v : Value) : IO (Option RadioNodeList) := Internal.api "Lasm.JS.Web.RadioNodeList.cast?" do
@@ -5302,6 +5981,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def Sanitizer.new (configuration : Option SanitizerConfigOrSanitizerPresets := none) : IO Sanitizer := Internal.api "Lasm.JS.Web.Sanitizer.new" do
   Lasm.JS.Binding.invoke Sanitizer { name := "Lasm.JS.Web.Sanitizer.new", module := "globalThis", path := "Sanitizer", construct := true, arity := 1 }
     (Internal.args #[Internal.optional configuration]) (await := false)
+
+/-- `constructor(optional (SanitizerConfig or SanitizerPresets) configuration)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Sanitizer.new? (configuration : Option SanitizerConfigOrSanitizerPresets := none) : IO (Option Sanitizer) := Internal.api "Lasm.JS.Web.Sanitizer.new?" do
+  if !(← Internal.hasGlobal ["Sanitizer"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Sanitizer { name := "Lasm.JS.Web.Sanitizer.new?", module := "globalThis", path := "Sanitizer", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional configuration]) (await := false)
+  return some lasmGuarded
 
 /-- `SanitizerConfig get()` -/
 @[macro_inline] def Sanitizer.get (self : Sanitizer) : IO SanitizerConfig := Internal.api "Lasm.JS.Web.Sanitizer.get" do
@@ -5360,6 +6047,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
   Lasm.JS.Binding.invoke SharedWorker { name := "Lasm.JS.Web.SharedWorker.new", module := "globalThis", path := "SharedWorker", construct := true, arity := 2 }
     (Internal.args #[toJS scriptURL, Internal.optional options]) (await := false)
 
+/-- `constructor((TrustedScriptURL or USVString) scriptURL, optional (DOMString or SharedWorkerOptions) options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def SharedWorker.new? (scriptURL : TrustedScriptURLOrUSVString) (options : Option DOMStringOrSharedWorkerOptions := none) : IO (Option SharedWorker) := Internal.api "Lasm.JS.Web.SharedWorker.new?" do
+  if !(← Internal.hasGlobal ["SharedWorker"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke SharedWorker { name := "Lasm.JS.Web.SharedWorker.new?", module := "globalThis", path := "SharedWorker", construct := true, arity := 2 }
+      (Internal.args #[toJS scriptURL, Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute MessagePort port` -/
 @[macro_inline] def SharedWorker.port (self : SharedWorker) : IO MessagePort := Internal.api "Lasm.JS.Web.SharedWorker.port" do
   let r ← self.val.get "port" Value
@@ -5410,6 +6105,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
   Lasm.JS.Binding.invoke StorageEvent { name := "Lasm.JS.Web.StorageEvent.new", module := "globalThis", path := "StorageEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional StorageEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def StorageEvent.new? (type : String) (eventInitDict : Option StorageEventInit := none) : IO (Option StorageEvent) := Internal.api "Lasm.JS.Web.StorageEvent.new?" do
+  if !(← Internal.hasGlobal ["StorageEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke StorageEvent { name := "Lasm.JS.Web.StorageEvent.new?", module := "globalThis", path := "StorageEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString? key` -/
 @[macro_inline] def StorageEvent.key (self : StorageEvent) : IO (Option String) := Internal.api "Lasm.JS.Web.StorageEvent.key" do
   self.val.get "key" (Option String)
@@ -5442,6 +6145,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def SubmitEvent.new (type : String) (eventInitDict : Option SubmitEventInit := none) : IO SubmitEvent := Internal.api "Lasm.JS.Web.SubmitEvent.new" do
   Lasm.JS.Binding.invoke SubmitEvent { name := "Lasm.JS.Web.SubmitEvent.new", module := "globalThis", path := "SubmitEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, optional SubmitEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def SubmitEvent.new? (type : String) (eventInitDict : Option SubmitEventInit := none) : IO (Option SubmitEvent) := Internal.api "Lasm.JS.Web.SubmitEvent.new?" do
+  if !(← Internal.hasGlobal ["SubmitEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke SubmitEvent { name := "Lasm.JS.Web.SubmitEvent.new?", module := "globalThis", path := "SubmitEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute HTMLElement? submitter` -/
 @[macro_inline] def SubmitEvent.submitter (self : SubmitEvent) : IO (Option HTMLElement) := Internal.api "Lasm.JS.Web.SubmitEvent.submitter" do
@@ -5483,9 +6194,25 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def TextMetrics.emHeightAscent (self : TextMetrics) : IO Float := Internal.api "Lasm.JS.Web.TextMetrics.emHeightAscent" do
   self.val.get "emHeightAscent" Float
 
+/-- `readonly attribute double emHeightAscent` where the platform has it (`'emHeightAscent' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def TextMetrics.emHeightAscent? (self' : TextMetrics) : IO (Option Float) := Internal.api "Lasm.JS.Web.TextMetrics.emHeightAscent?" do
+  let self := self'
+  if !(← Internal.has self.val "emHeightAscent") then return none
+  let lasmGuarded ← do
+    self.val.get "emHeightAscent" Float
+  return some lasmGuarded
+
 /-- `readonly attribute double emHeightDescent` -/
 @[macro_inline] def TextMetrics.emHeightDescent (self : TextMetrics) : IO Float := Internal.api "Lasm.JS.Web.TextMetrics.emHeightDescent" do
   self.val.get "emHeightDescent" Float
+
+/-- `readonly attribute double emHeightDescent` where the platform has it (`'emHeightDescent' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def TextMetrics.emHeightDescent? (self' : TextMetrics) : IO (Option Float) := Internal.api "Lasm.JS.Web.TextMetrics.emHeightDescent?" do
+  let self := self'
+  if !(← Internal.has self.val "emHeightDescent") then return none
+  let lasmGuarded ← do
+    self.val.get "emHeightDescent" Float
+  return some lasmGuarded
 
 /-- `readonly attribute double hangingBaseline` -/
 @[macro_inline] def TextMetrics.hangingBaseline (self : TextMetrics) : IO Float := Internal.api "Lasm.JS.Web.TextMetrics.hangingBaseline" do
@@ -5522,6 +6249,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `readonly attribute DOMString inBandMetadataTrackDispatchType` -/
 @[macro_inline] def TextTrack.inBandMetadataTrackDispatchType (self : TextTrack) : IO String := Internal.api "Lasm.JS.Web.TextTrack.inBandMetadataTrackDispatchType" do
   self.val.get "inBandMetadataTrackDispatchType" String
+
+/-- `readonly attribute DOMString inBandMetadataTrackDispatchType` where the platform has it (`'inBandMetadataTrackDispatchType' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def TextTrack.inBandMetadataTrackDispatchType? (self' : TextTrack) : IO (Option String) := Internal.api "Lasm.JS.Web.TextTrack.inBandMetadataTrackDispatchType?" do
+  let self := self'
+  if !(← Internal.has self.val "inBandMetadataTrackDispatchType") then return none
+  let lasmGuarded ← do
+    self.val.get "inBandMetadataTrackDispatchType" String
+  return some lasmGuarded
 
 /-- `attribute TextTrackMode mode` -/
 @[macro_inline] def TextTrack.mode (self : TextTrack) : IO TextTrackMode := Internal.api "Lasm.JS.Web.TextTrack.mode" do
@@ -5684,6 +6419,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
   Lasm.JS.Binding.invoke ToggleEvent { name := "Lasm.JS.Web.ToggleEvent.new", module := "globalThis", path := "ToggleEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional ToggleEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ToggleEvent.new? (type : String) (eventInitDict : Option ToggleEventInit := none) : IO (Option ToggleEvent) := Internal.api "Lasm.JS.Web.ToggleEvent.new?" do
+  if !(← Internal.hasGlobal ["ToggleEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ToggleEvent { name := "Lasm.JS.Web.ToggleEvent.new?", module := "globalThis", path := "ToggleEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString oldState` -/
 @[macro_inline] def ToggleEvent.oldState (self : ToggleEvent) : IO String := Internal.api "Lasm.JS.Web.ToggleEvent.oldState" do
   self.val.get "oldState" String
@@ -5704,6 +6447,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def TrackEvent.new (type : String) (eventInitDict : Option TrackEventInit := none) : IO TrackEvent := Internal.api "Lasm.JS.Web.TrackEvent.new" do
   Lasm.JS.Binding.invoke TrackEvent { name := "Lasm.JS.Web.TrackEvent.new", module := "globalThis", path := "TrackEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, optional TrackEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def TrackEvent.new? (type : String) (eventInitDict : Option TrackEventInit := none) : IO (Option TrackEvent) := Internal.api "Lasm.JS.Web.TrackEvent.new?" do
+  if !(← Internal.hasGlobal ["TrackEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke TrackEvent { name := "Lasm.JS.Web.TrackEvent.new?", module := "globalThis", path := "TrackEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute (VideoTrack or AudioTrack or TextTrack)? track` -/
 @[macro_inline] def TrackEvent.track (self : TrackEvent) : IO (Option Value) := Internal.api "Lasm.JS.Web.TrackEvent.track" do
@@ -5867,19 +6618,54 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
   let r ← self.val.get "window" Value
   pure { val := r }
 
+/-- `readonly attribute WindowProxy window` where the platform has it (`'window' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.window? (self' : Window) : IO (Option Window) := Internal.api "Lasm.JS.Web.Window.window?" do
+  let self := self'
+  if !(← Internal.has self.val "window") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "window" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute WindowProxy self` -/
 @[macro_inline] def Window.self (self : Window) : IO Window := Internal.api "Lasm.JS.Web.Window.self" do
   let r ← self.val.get "self" Value
   pure { val := r }
+
+/-- `readonly attribute WindowProxy self` where the platform has it (`'self' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.self? (self' : Window) : IO (Option Window) := Internal.api "Lasm.JS.Web.Window.self?" do
+  let self := self'
+  if !(← Internal.has self.val "self") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "self" Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `readonly attribute Document document` -/
 @[macro_inline] def Window.document (self : Window) : IO Document := Internal.api "Lasm.JS.Web.Window.document" do
   let r ← self.val.get "document" Value
   pure { val := r }
 
+/-- `readonly attribute Document document` where the platform has it (`'document' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.document? (self' : Window) : IO (Option Document) := Internal.api "Lasm.JS.Web.Window.document?" do
+  let self := self'
+  if !(← Internal.has self.val "document") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "document" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `attribute DOMString name` -/
 @[macro_inline] def Window.name (self : Window) : IO String := Internal.api "Lasm.JS.Web.Window.name" do
   self.val.get "name" String
+
+/-- `attribute DOMString name` where the platform has it (`'name' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.name? (self' : Window) : IO (Option String) := Internal.api "Lasm.JS.Web.Window.name?" do
+  let self := self'
+  if !(← Internal.has self.val "name") then return none
+  let lasmGuarded ← do
+    self.val.get "name" String
+  return some lasmGuarded
 
 /-- Sets `name`: `attribute DOMString name` -/
 @[macro_inline] def Window.setName (self : Window) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.Window.setName" do
@@ -5890,54 +6676,152 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
   let r ← self.val.get "location" Value
   pure { val := r }
 
+/-- `readonly attribute Location location` where the platform has it (`'location' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.location? (self' : Window) : IO (Option Location) := Internal.api "Lasm.JS.Web.Window.location?" do
+  let self := self'
+  if !(← Internal.has self.val "location") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "location" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute History history` -/
 @[macro_inline] def Window.history (self : Window) : IO History := Internal.api "Lasm.JS.Web.Window.history" do
   let r ← self.val.get "history" Value
   pure { val := r }
+
+/-- `readonly attribute History history` where the platform has it (`'history' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.history? (self' : Window) : IO (Option History) := Internal.api "Lasm.JS.Web.Window.history?" do
+  let self := self'
+  if !(← Internal.has self.val "history") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "history" Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `readonly attribute Navigation navigation` -/
 @[macro_inline] def Window.navigation (self : Window) : IO Navigation := Internal.api "Lasm.JS.Web.Window.navigation" do
   let r ← self.val.get "navigation" Value
   pure { val := r }
 
+/-- `readonly attribute Navigation navigation` where the platform has it (`'navigation' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.navigation? (self' : Window) : IO (Option Navigation) := Internal.api "Lasm.JS.Web.Window.navigation?" do
+  let self := self'
+  if !(← Internal.has self.val "navigation") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "navigation" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute CustomElementRegistry customElements` -/
 @[macro_inline] def Window.customElements (self : Window) : IO CustomElementRegistry := Internal.api "Lasm.JS.Web.Window.customElements" do
   let r ← self.val.get "customElements" Value
   pure { val := r }
+
+/-- `readonly attribute CustomElementRegistry customElements` where the platform has it (`'customElements' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.customElements? (self' : Window) : IO (Option CustomElementRegistry) := Internal.api "Lasm.JS.Web.Window.customElements?" do
+  let self := self'
+  if !(← Internal.has self.val "customElements") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "customElements" Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `readonly attribute BarProp locationbar` -/
 @[macro_inline] def Window.locationbar (self : Window) : IO BarProp := Internal.api "Lasm.JS.Web.Window.locationbar" do
   let r ← self.val.get "locationbar" Value
   pure { val := r }
 
+/-- `readonly attribute BarProp locationbar` where the platform has it (`'locationbar' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.locationbar? (self' : Window) : IO (Option BarProp) := Internal.api "Lasm.JS.Web.Window.locationbar?" do
+  let self := self'
+  if !(← Internal.has self.val "locationbar") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "locationbar" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute BarProp menubar` -/
 @[macro_inline] def Window.menubar (self : Window) : IO BarProp := Internal.api "Lasm.JS.Web.Window.menubar" do
   let r ← self.val.get "menubar" Value
   pure { val := r }
+
+/-- `readonly attribute BarProp menubar` where the platform has it (`'menubar' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.menubar? (self' : Window) : IO (Option BarProp) := Internal.api "Lasm.JS.Web.Window.menubar?" do
+  let self := self'
+  if !(← Internal.has self.val "menubar") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "menubar" Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `readonly attribute BarProp personalbar` -/
 @[macro_inline] def Window.personalbar (self : Window) : IO BarProp := Internal.api "Lasm.JS.Web.Window.personalbar" do
   let r ← self.val.get "personalbar" Value
   pure { val := r }
 
+/-- `readonly attribute BarProp personalbar` where the platform has it (`'personalbar' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.personalbar? (self' : Window) : IO (Option BarProp) := Internal.api "Lasm.JS.Web.Window.personalbar?" do
+  let self := self'
+  if !(← Internal.has self.val "personalbar") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "personalbar" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute BarProp scrollbars` -/
 @[macro_inline] def Window.scrollbars (self : Window) : IO BarProp := Internal.api "Lasm.JS.Web.Window.scrollbars" do
   let r ← self.val.get "scrollbars" Value
   pure { val := r }
+
+/-- `readonly attribute BarProp scrollbars` where the platform has it (`'scrollbars' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.scrollbars? (self' : Window) : IO (Option BarProp) := Internal.api "Lasm.JS.Web.Window.scrollbars?" do
+  let self := self'
+  if !(← Internal.has self.val "scrollbars") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "scrollbars" Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `readonly attribute BarProp statusbar` -/
 @[macro_inline] def Window.statusbar (self : Window) : IO BarProp := Internal.api "Lasm.JS.Web.Window.statusbar" do
   let r ← self.val.get "statusbar" Value
   pure { val := r }
 
+/-- `readonly attribute BarProp statusbar` where the platform has it (`'statusbar' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.statusbar? (self' : Window) : IO (Option BarProp) := Internal.api "Lasm.JS.Web.Window.statusbar?" do
+  let self := self'
+  if !(← Internal.has self.val "statusbar") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "statusbar" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute BarProp toolbar` -/
 @[macro_inline] def Window.toolbar (self : Window) : IO BarProp := Internal.api "Lasm.JS.Web.Window.toolbar" do
   let r ← self.val.get "toolbar" Value
   pure { val := r }
 
+/-- `readonly attribute BarProp toolbar` where the platform has it (`'toolbar' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.toolbar? (self' : Window) : IO (Option BarProp) := Internal.api "Lasm.JS.Web.Window.toolbar?" do
+  let self := self'
+  if !(← Internal.has self.val "toolbar") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "toolbar" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `attribute DOMString status` -/
 @[macro_inline] def Window.status (self : Window) : IO String := Internal.api "Lasm.JS.Web.Window.status" do
   self.val.get "status" String
+
+/-- `attribute DOMString status` where the platform has it (`'status' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.status? (self' : Window) : IO (Option String) := Internal.api "Lasm.JS.Web.Window.status?" do
+  let self := self'
+  if !(← Internal.has self.val "status") then return none
+  let lasmGuarded ← do
+    self.val.get "status" String
+  return some lasmGuarded
 
 /-- Sets `status`: `attribute DOMString status` -/
 @[macro_inline] def Window.setStatus (self : Window) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.Window.setStatus" do
@@ -5947,22 +6831,63 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def Window.closed (self : Window) : IO Bool := Internal.api "Lasm.JS.Web.Window.closed" do
   self.val.get "closed" Bool
 
+/-- `readonly attribute boolean closed` where the platform has it (`'closed' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.closed? (self' : Window) : IO (Option Bool) := Internal.api "Lasm.JS.Web.Window.closed?" do
+  let self := self'
+  if !(← Internal.has self.val "closed") then return none
+  let lasmGuarded ← do
+    self.val.get "closed" Bool
+  return some lasmGuarded
+
 /-- `readonly attribute WindowProxy frames` -/
 @[macro_inline] def Window.frames (self : Window) : IO Window := Internal.api "Lasm.JS.Web.Window.frames" do
   let r ← self.val.get "frames" Value
   pure { val := r }
 
+/-- `readonly attribute WindowProxy frames` where the platform has it (`'frames' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.frames? (self' : Window) : IO (Option Window) := Internal.api "Lasm.JS.Web.Window.frames?" do
+  let self := self'
+  if !(← Internal.has self.val "frames") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "frames" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute unsigned long length` -/
 @[macro_inline] def Window.length (self : Window) : IO Nat := Internal.api "Lasm.JS.Web.Window.length" do
   self.val.get "length" Nat
+
+/-- `readonly attribute unsigned long length` where the platform has it (`'length' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.length? (self' : Window) : IO (Option Nat) := Internal.api "Lasm.JS.Web.Window.length?" do
+  let self := self'
+  if !(← Internal.has self.val "length") then return none
+  let lasmGuarded ← do
+    self.val.get "length" Nat
+  return some lasmGuarded
 
 /-- `readonly attribute WindowProxy? top` -/
 @[macro_inline] def Window.top (self : Window) : IO (Option Window) := Internal.api "Lasm.JS.Web.Window.top" do
   self.val.get "top" (Option Window)
 
+/-- `readonly attribute WindowProxy? top` where the platform has it (`'top' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.top? (self' : Window) : IO (Option (Option Window)) := Internal.api "Lasm.JS.Web.Window.top?" do
+  let self := self'
+  if !(← Internal.has self.val "top") then return none
+  let lasmGuarded ← do
+    self.val.get "top" (Option Window)
+  return some lasmGuarded
+
 /-- `attribute any opener` -/
 @[macro_inline] def Window.opener (self : Window) : IO Data := Internal.api "Lasm.JS.Web.Window.opener" do
   self.val.get "opener" Data
+
+/-- `attribute any opener` where the platform has it (`'opener' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.opener? (self' : Window) : IO (Option Data) := Internal.api "Lasm.JS.Web.Window.opener?" do
+  let self := self'
+  if !(← Internal.has self.val "opener") then return none
+  let lasmGuarded ← do
+    self.val.get "opener" Data
+  return some lasmGuarded
 
 /-- Sets `opener`: `attribute any opener` -/
 @[macro_inline] def Window.setOpener (self : Window) (value : Data) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOpener" do
@@ -5972,9 +6897,25 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def Window.parent (self : Window) : IO (Option Window) := Internal.api "Lasm.JS.Web.Window.parent" do
   self.val.get "parent" (Option Window)
 
+/-- `readonly attribute WindowProxy? parent` where the platform has it (`'parent' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.parent? (self' : Window) : IO (Option (Option Window)) := Internal.api "Lasm.JS.Web.Window.parent?" do
+  let self := self'
+  if !(← Internal.has self.val "parent") then return none
+  let lasmGuarded ← do
+    self.val.get "parent" (Option Window)
+  return some lasmGuarded
+
 /-- `readonly attribute Element? frameElement` -/
 @[macro_inline] def Window.frameElement (self : Window) : IO (Option Element) := Internal.api "Lasm.JS.Web.Window.frameElement" do
   self.val.get "frameElement" (Option Element)
+
+/-- `readonly attribute Element? frameElement` where the platform has it (`'frameElement' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.frameElement? (self' : Window) : IO (Option (Option Element)) := Internal.api "Lasm.JS.Web.Window.frameElement?" do
+  let self := self'
+  if !(← Internal.has self.val "frameElement") then return none
+  let lasmGuarded ← do
+    self.val.get "frameElement" (Option Element)
+  return some lasmGuarded
 
 /-- `readonly attribute Navigator navigator` -/
 @[macro_inline] def Window.navigator (self : Window) : IO Navigator := Internal.api "Lasm.JS.Web.Window.navigator" do
@@ -5990,10 +6931,27 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def Window.originAgentCluster (self : Window) : IO Bool := Internal.api "Lasm.JS.Web.Window.originAgentCluster" do
   self.val.get "originAgentCluster" Bool
 
+/-- `readonly attribute boolean originAgentCluster` where the platform has it (`'originAgentCluster' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.originAgentCluster? (self' : Window) : IO (Option Bool) := Internal.api "Lasm.JS.Web.Window.originAgentCluster?" do
+  let self := self'
+  if !(← Internal.has self.val "originAgentCluster") then return none
+  let lasmGuarded ← do
+    self.val.get "originAgentCluster" Bool
+  return some lasmGuarded
+
 /-- `readonly attribute External external` -/
 @[macro_inline] def Window.external (self : Window) : IO External := Internal.api "Lasm.JS.Web.Window.external" do
   let r ← self.val.get "external" Value
   pure { val := r }
+
+/-- `readonly attribute External external` where the platform has it (`'external' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.external? (self' : Window) : IO (Option External) := Internal.api "Lasm.JS.Web.Window.external?" do
+  let self := self'
+  if !(← Internal.has self.val "external") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "external" Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `attribute EventHandler onabort` -/
 @[macro_inline] def Window.onabort (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onabort" do
@@ -6038,6 +6996,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `attribute EventHandler onblur` -/
 @[macro_inline] def Window.onblur (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onblur" do
   self.val.get "onblur" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onblur` where the platform has it (`'onblur' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onblur? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onblur?" do
+  let self := self'
+  if !(← Internal.has self.val "onblur") then return none
+  let lasmGuarded ← do
+    self.val.get "onblur" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onblur`: `attribute EventHandler onblur` -/
 @[macro_inline] def Window.setOnblur (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnblur" do
@@ -6239,6 +7205,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def Window.onerror (self : Window) : IO (Option OnErrorEventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onerror" do
   self.val.get "onerror" (Option OnErrorEventHandlerNonNull)
 
+/-- `attribute OnErrorEventHandler onerror` where the platform has it (`'onerror' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onerror? (self' : Window) : IO (Option (Option OnErrorEventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onerror?" do
+  let self := self'
+  if !(← Internal.has self.val "onerror") then return none
+  let lasmGuarded ← do
+    self.val.get "onerror" (Option OnErrorEventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `onerror`: `attribute OnErrorEventHandler onerror` -/
 @[macro_inline] def Window.setOnerror (self : Window) (value : Option OnErrorEventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnerror" do
   self.val.set "onerror" (toJS value)
@@ -6246,6 +7220,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `attribute EventHandler onfocus` -/
 @[macro_inline] def Window.onfocus (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onfocus" do
   self.val.get "onfocus" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onfocus` where the platform has it (`'onfocus' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onfocus? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onfocus?" do
+  let self := self'
+  if !(← Internal.has self.val "onfocus") then return none
+  let lasmGuarded ← do
+    self.val.get "onfocus" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onfocus`: `attribute EventHandler onfocus` -/
 @[macro_inline] def Window.setOnfocus (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnfocus" do
@@ -6302,6 +7284,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `attribute EventHandler onload` -/
 @[macro_inline] def Window.onload (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onload" do
   self.val.get "onload" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onload` where the platform has it (`'onload' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onload? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onload?" do
+  let self := self'
+  if !(← Internal.has self.val "onload") then return none
+  let lasmGuarded ← do
+    self.val.get "onload" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onload`: `attribute EventHandler onload` -/
 @[macro_inline] def Window.setOnload (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnload" do
@@ -6446,6 +7436,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `attribute EventHandler onresize` -/
 @[macro_inline] def Window.onresize (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onresize" do
   self.val.get "onresize" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onresize` where the platform has it (`'onresize' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onresize? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onresize?" do
+  let self := self'
+  if !(← Internal.has self.val "onresize") then return none
+  let lasmGuarded ← do
+    self.val.get "onresize" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onresize`: `attribute EventHandler onresize` -/
 @[macro_inline] def Window.setOnresize (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnresize" do
@@ -6607,6 +7605,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def Window.onafterprint (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onafterprint" do
   self.val.get "onafterprint" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onafterprint` where the platform has it (`'onafterprint' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onafterprint? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onafterprint?" do
+  let self := self'
+  if !(← Internal.has self.val "onafterprint") then return none
+  let lasmGuarded ← do
+    self.val.get "onafterprint" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `onafterprint`: `attribute EventHandler onafterprint` -/
 @[macro_inline] def Window.setOnafterprint (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnafterprint" do
   self.val.set "onafterprint" (toJS value)
@@ -6614,6 +7620,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `attribute EventHandler onbeforeprint` -/
 @[macro_inline] def Window.onbeforeprint (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onbeforeprint" do
   self.val.get "onbeforeprint" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onbeforeprint` where the platform has it (`'onbeforeprint' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onbeforeprint? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onbeforeprint?" do
+  let self := self'
+  if !(← Internal.has self.val "onbeforeprint") then return none
+  let lasmGuarded ← do
+    self.val.get "onbeforeprint" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onbeforeprint`: `attribute EventHandler onbeforeprint` -/
 @[macro_inline] def Window.setOnbeforeprint (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnbeforeprint" do
@@ -6623,6 +7637,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def Window.onbeforeunload (self : Window) : IO (Option OnBeforeUnloadEventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onbeforeunload" do
   self.val.get "onbeforeunload" (Option OnBeforeUnloadEventHandlerNonNull)
 
+/-- `attribute OnBeforeUnloadEventHandler onbeforeunload` where the platform has it (`'onbeforeunload' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onbeforeunload? (self' : Window) : IO (Option (Option OnBeforeUnloadEventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onbeforeunload?" do
+  let self := self'
+  if !(← Internal.has self.val "onbeforeunload") then return none
+  let lasmGuarded ← do
+    self.val.get "onbeforeunload" (Option OnBeforeUnloadEventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `onbeforeunload`: `attribute OnBeforeUnloadEventHandler onbeforeunload` -/
 @[macro_inline] def Window.setOnbeforeunload (self : Window) (value : Option OnBeforeUnloadEventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnbeforeunload" do
   self.val.set "onbeforeunload" (toJS value)
@@ -6630,6 +7652,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `attribute EventHandler onhashchange` -/
 @[macro_inline] def Window.onhashchange (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onhashchange" do
   self.val.get "onhashchange" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onhashchange` where the platform has it (`'onhashchange' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onhashchange? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onhashchange?" do
+  let self := self'
+  if !(← Internal.has self.val "onhashchange") then return none
+  let lasmGuarded ← do
+    self.val.get "onhashchange" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onhashchange`: `attribute EventHandler onhashchange` -/
 @[macro_inline] def Window.setOnhashchange (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnhashchange" do
@@ -6639,6 +7669,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def Window.onlanguagechange (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onlanguagechange" do
   self.val.get "onlanguagechange" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onlanguagechange` where the platform has it (`'onlanguagechange' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onlanguagechange? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onlanguagechange?" do
+  let self := self'
+  if !(← Internal.has self.val "onlanguagechange") then return none
+  let lasmGuarded ← do
+    self.val.get "onlanguagechange" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `onlanguagechange`: `attribute EventHandler onlanguagechange` -/
 @[macro_inline] def Window.setOnlanguagechange (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnlanguagechange" do
   self.val.set "onlanguagechange" (toJS value)
@@ -6646,6 +7684,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `attribute EventHandler onmessage` -/
 @[macro_inline] def Window.onmessage (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onmessage" do
   self.val.get "onmessage" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onmessage` where the platform has it (`'onmessage' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onmessage? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onmessage?" do
+  let self := self'
+  if !(← Internal.has self.val "onmessage") then return none
+  let lasmGuarded ← do
+    self.val.get "onmessage" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onmessage`: `attribute EventHandler onmessage` -/
 @[macro_inline] def Window.setOnmessage (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnmessage" do
@@ -6655,6 +7701,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def Window.onmessageerror (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onmessageerror" do
   self.val.get "onmessageerror" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onmessageerror` where the platform has it (`'onmessageerror' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onmessageerror? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onmessageerror?" do
+  let self := self'
+  if !(← Internal.has self.val "onmessageerror") then return none
+  let lasmGuarded ← do
+    self.val.get "onmessageerror" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `onmessageerror`: `attribute EventHandler onmessageerror` -/
 @[macro_inline] def Window.setOnmessageerror (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnmessageerror" do
   self.val.set "onmessageerror" (toJS value)
@@ -6662,6 +7716,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `attribute EventHandler onoffline` -/
 @[macro_inline] def Window.onoffline (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onoffline" do
   self.val.get "onoffline" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onoffline` where the platform has it (`'onoffline' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onoffline? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onoffline?" do
+  let self := self'
+  if !(← Internal.has self.val "onoffline") then return none
+  let lasmGuarded ← do
+    self.val.get "onoffline" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onoffline`: `attribute EventHandler onoffline` -/
 @[macro_inline] def Window.setOnoffline (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnoffline" do
@@ -6671,6 +7733,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def Window.ononline (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.ononline" do
   self.val.get "ononline" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler ononline` where the platform has it (`'ononline' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.ononline? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.ononline?" do
+  let self := self'
+  if !(← Internal.has self.val "ononline") then return none
+  let lasmGuarded ← do
+    self.val.get "ononline" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `ononline`: `attribute EventHandler ononline` -/
 @[macro_inline] def Window.setOnonline (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnonline" do
   self.val.set "ononline" (toJS value)
@@ -6678,6 +7748,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `attribute EventHandler onpagehide` -/
 @[macro_inline] def Window.onpagehide (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onpagehide" do
   self.val.get "onpagehide" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onpagehide` where the platform has it (`'onpagehide' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onpagehide? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onpagehide?" do
+  let self := self'
+  if !(← Internal.has self.val "onpagehide") then return none
+  let lasmGuarded ← do
+    self.val.get "onpagehide" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onpagehide`: `attribute EventHandler onpagehide` -/
 @[macro_inline] def Window.setOnpagehide (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnpagehide" do
@@ -6687,6 +7765,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def Window.onpagereveal (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onpagereveal" do
   self.val.get "onpagereveal" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onpagereveal` where the platform has it (`'onpagereveal' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onpagereveal? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onpagereveal?" do
+  let self := self'
+  if !(← Internal.has self.val "onpagereveal") then return none
+  let lasmGuarded ← do
+    self.val.get "onpagereveal" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `onpagereveal`: `attribute EventHandler onpagereveal` -/
 @[macro_inline] def Window.setOnpagereveal (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnpagereveal" do
   self.val.set "onpagereveal" (toJS value)
@@ -6694,6 +7780,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `attribute EventHandler onpageshow` -/
 @[macro_inline] def Window.onpageshow (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onpageshow" do
   self.val.get "onpageshow" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onpageshow` where the platform has it (`'onpageshow' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onpageshow? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onpageshow?" do
+  let self := self'
+  if !(← Internal.has self.val "onpageshow") then return none
+  let lasmGuarded ← do
+    self.val.get "onpageshow" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onpageshow`: `attribute EventHandler onpageshow` -/
 @[macro_inline] def Window.setOnpageshow (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnpageshow" do
@@ -6703,6 +7797,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def Window.onpageswap (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onpageswap" do
   self.val.get "onpageswap" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onpageswap` where the platform has it (`'onpageswap' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onpageswap? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onpageswap?" do
+  let self := self'
+  if !(← Internal.has self.val "onpageswap") then return none
+  let lasmGuarded ← do
+    self.val.get "onpageswap" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `onpageswap`: `attribute EventHandler onpageswap` -/
 @[macro_inline] def Window.setOnpageswap (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnpageswap" do
   self.val.set "onpageswap" (toJS value)
@@ -6710,6 +7812,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `attribute EventHandler onpopstate` -/
 @[macro_inline] def Window.onpopstate (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onpopstate" do
   self.val.get "onpopstate" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onpopstate` where the platform has it (`'onpopstate' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onpopstate? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onpopstate?" do
+  let self := self'
+  if !(← Internal.has self.val "onpopstate") then return none
+  let lasmGuarded ← do
+    self.val.get "onpopstate" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onpopstate`: `attribute EventHandler onpopstate` -/
 @[macro_inline] def Window.setOnpopstate (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnpopstate" do
@@ -6719,6 +7829,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def Window.onrejectionhandled (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onrejectionhandled" do
   self.val.get "onrejectionhandled" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onrejectionhandled` where the platform has it (`'onrejectionhandled' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onrejectionhandled? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onrejectionhandled?" do
+  let self := self'
+  if !(← Internal.has self.val "onrejectionhandled") then return none
+  let lasmGuarded ← do
+    self.val.get "onrejectionhandled" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `onrejectionhandled`: `attribute EventHandler onrejectionhandled` -/
 @[macro_inline] def Window.setOnrejectionhandled (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnrejectionhandled" do
   self.val.set "onrejectionhandled" (toJS value)
@@ -6726,6 +7844,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `attribute EventHandler onstorage` -/
 @[macro_inline] def Window.onstorage (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onstorage" do
   self.val.get "onstorage" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onstorage` where the platform has it (`'onstorage' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onstorage? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onstorage?" do
+  let self := self'
+  if !(← Internal.has self.val "onstorage") then return none
+  let lasmGuarded ← do
+    self.val.get "onstorage" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onstorage`: `attribute EventHandler onstorage` -/
 @[macro_inline] def Window.setOnstorage (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnstorage" do
@@ -6735,6 +7861,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def Window.onunhandledrejection (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onunhandledrejection" do
   self.val.get "onunhandledrejection" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onunhandledrejection` where the platform has it (`'onunhandledrejection' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onunhandledrejection? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onunhandledrejection?" do
+  let self := self'
+  if !(← Internal.has self.val "onunhandledrejection") then return none
+  let lasmGuarded ← do
+    self.val.get "onunhandledrejection" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `onunhandledrejection`: `attribute EventHandler onunhandledrejection` -/
 @[macro_inline] def Window.setOnunhandledrejection (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnunhandledrejection" do
   self.val.set "onunhandledrejection" (toJS value)
@@ -6742,6 +7876,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `attribute EventHandler onunload` -/
 @[macro_inline] def Window.onunload (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.onunload" do
   self.val.get "onunload" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onunload` where the platform has it (`'onunload' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.onunload? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.onunload?" do
+  let self := self'
+  if !(← Internal.has self.val "onunload") then return none
+  let lasmGuarded ← do
+    self.val.get "onunload" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onunload`: `attribute EventHandler onunload` -/
 @[macro_inline] def Window.setOnunload (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOnunload" do
@@ -6764,66 +7906,196 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
   let r ← self.val.get "sessionStorage" Value
   pure { val := r }
 
+/-- `readonly attribute Storage sessionStorage` where the platform has it (`'sessionStorage' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.sessionStorage? (self' : Window) : IO (Option Storage) := Internal.api "Lasm.JS.Web.Window.sessionStorage?" do
+  let self := self'
+  if !(← Internal.has self.val "sessionStorage") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "sessionStorage" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute Storage localStorage` -/
 @[macro_inline] def Window.localStorage (self : Window) : IO Storage := Internal.api "Lasm.JS.Web.Window.localStorage" do
   let r ← self.val.get "localStorage" Value
   pure { val := r }
 
+/-- `readonly attribute Storage localStorage` where the platform has it (`'localStorage' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.localStorage? (self' : Window) : IO (Option Storage) := Internal.api "Lasm.JS.Web.Window.localStorage?" do
+  let self := self'
+  if !(← Internal.has self.val "localStorage") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "localStorage" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `undefined close()` -/
 @[macro_inline] def Window.close (self : Window) : IO Unit := Internal.api "Lasm.JS.Web.Window.close" do
   self.val.callMethod "close" (Internal.args #[]) Unit
+
+/-- `undefined close()` where the platform has it (`'close' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.close? (self' : Window) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Window.close?" do
+  let self := self'
+  if !(← Internal.has self.val "close") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "close" (Internal.args #[]) Unit
+  return some lasmGuarded
 
 /-- `undefined stop()` -/
 @[macro_inline] def Window.stop (self : Window) : IO Unit := Internal.api "Lasm.JS.Web.Window.stop" do
   self.val.callMethod "stop" (Internal.args #[]) Unit
 
+/-- `undefined stop()` where the platform has it (`'stop' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.stop? (self' : Window) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Window.stop?" do
+  let self := self'
+  if !(← Internal.has self.val "stop") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "stop" (Internal.args #[]) Unit
+  return some lasmGuarded
+
 /-- `undefined focus()` -/
 @[macro_inline] def Window.focus (self : Window) : IO Unit := Internal.api "Lasm.JS.Web.Window.focus" do
   self.val.callMethod "focus" (Internal.args #[]) Unit
+
+/-- `undefined focus()` where the platform has it (`'focus' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.focus? (self' : Window) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Window.focus?" do
+  let self := self'
+  if !(← Internal.has self.val "focus") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "focus" (Internal.args #[]) Unit
+  return some lasmGuarded
 
 /-- `undefined blur()` -/
 @[macro_inline] def Window.blur (self : Window) : IO Unit := Internal.api "Lasm.JS.Web.Window.blur" do
   self.val.callMethod "blur" (Internal.args #[]) Unit
 
+/-- `undefined blur()` where the platform has it (`'blur' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.blur? (self' : Window) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Window.blur?" do
+  let self := self'
+  if !(← Internal.has self.val "blur") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "blur" (Internal.args #[]) Unit
+  return some lasmGuarded
+
 /-- `WindowProxy? open(optional USVString url, optional DOMString target, optional DOMString features)` -/
 @[macro_inline] def Window.«open» (self : Window) (url : Option String := none) (target : Option String := none) (features : Option String := none) : IO (Option Window) := Internal.api "Lasm.JS.Web.Window.open" do
   self.val.callMethod "open" (Internal.args #[Internal.optional url, Internal.optional target, Internal.optional features]) (Option Window)
+
+/-- `WindowProxy? open(optional USVString url, optional DOMString target, optional DOMString features)` where the platform has it (`'open' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.«open?» (self' : Window) (url : Option String := none) (target : Option String := none) (features : Option String := none) : IO (Option (Option Window)) := Internal.api "Lasm.JS.Web.Window.open?" do
+  let self := self'
+  if !(← Internal.has self.val "open") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "open" (Internal.args #[Internal.optional url, Internal.optional target, Internal.optional features]) (Option Window)
+  return some lasmGuarded
 
 /-- `undefined alert()` -/
 @[macro_inline] def Window.alert (self : Window) : IO Unit := Internal.api "Lasm.JS.Web.Window.alert" do
   self.val.callMethod "alert" (Internal.args #[]) Unit
 
+/-- `undefined alert()` where the platform has it (`'alert' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.alert? (self' : Window) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Window.alert?" do
+  let self := self'
+  if !(← Internal.has self.val "alert") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "alert" (Internal.args #[]) Unit
+  return some lasmGuarded
+
 /-- `undefined alert(DOMString message)` -/
 @[macro_inline] def Window.alertWithMessage (self : Window) (message : String) : IO Unit := Internal.api "Lasm.JS.Web.Window.alertWithMessage" do
   self.val.callMethod "alert" (Internal.args #[toJS message]) Unit
+
+/-- `undefined alert(DOMString message)` where the platform has it (`'alert' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.alertWithMessage? (self' : Window) (message : String) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Window.alertWithMessage?" do
+  let self := self'
+  if !(← Internal.has self.val "alert") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "alert" (Internal.args #[toJS message]) Unit
+  return some lasmGuarded
 
 /-- `boolean confirm(optional DOMString message)` -/
 @[macro_inline] def Window.confirm (self : Window) (message : Option String := none) : IO Bool := Internal.api "Lasm.JS.Web.Window.confirm" do
   self.val.callMethod "confirm" (Internal.args #[Internal.optional message]) Bool
 
+/-- `boolean confirm(optional DOMString message)` where the platform has it (`'confirm' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.confirm? (self' : Window) (message : Option String := none) : IO (Option Bool) := Internal.api "Lasm.JS.Web.Window.confirm?" do
+  let self := self'
+  if !(← Internal.has self.val "confirm") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "confirm" (Internal.args #[Internal.optional message]) Bool
+  return some lasmGuarded
+
 /-- `DOMString? prompt(optional DOMString message, optional DOMString default)` -/
 @[macro_inline] def Window.prompt (self : Window) (message : Option String := none) (default : Option String := none) : IO (Option String) := Internal.api "Lasm.JS.Web.Window.prompt" do
   self.val.callMethod "prompt" (Internal.args #[Internal.optional message, Internal.optional default]) (Option String)
+
+/-- `DOMString? prompt(optional DOMString message, optional DOMString default)` where the platform has it (`'prompt' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.prompt? (self' : Window) (message : Option String := none) (default : Option String := none) : IO (Option (Option String)) := Internal.api "Lasm.JS.Web.Window.prompt?" do
+  let self := self'
+  if !(← Internal.has self.val "prompt") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "prompt" (Internal.args #[Internal.optional message, Internal.optional default]) (Option String)
+  return some lasmGuarded
 
 /-- `undefined print()` -/
 @[macro_inline] def Window.print (self : Window) : IO Unit := Internal.api "Lasm.JS.Web.Window.print" do
   self.val.callMethod "print" (Internal.args #[]) Unit
 
+/-- `undefined print()` where the platform has it (`'print' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.print? (self' : Window) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Window.print?" do
+  let self := self'
+  if !(← Internal.has self.val "print") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "print" (Internal.args #[]) Unit
+  return some lasmGuarded
+
 /-- `undefined postMessage(any message, USVString targetOrigin, optional sequence<object> transfer)` -/
 @[macro_inline] def Window.postMessage (self : Window) (message : Data) (targetOrigin : String) (transfer : Option (Array Data) := none) : IO Unit := Internal.api "Lasm.JS.Web.Window.postMessage" do
   self.val.callMethod "postMessage" (Internal.args #[toJS message, toJS targetOrigin, Internal.optional transfer]) Unit
+
+/-- `undefined postMessage(any message, USVString targetOrigin, optional sequence<object> transfer)` where the platform has it (`'postMessage' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.postMessage? (self' : Window) (message : Data) (targetOrigin : String) (transfer : Option (Array Data) := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Window.postMessage?" do
+  let self := self'
+  if !(← Internal.has self.val "postMessage") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "postMessage" (Internal.args #[toJS message, toJS targetOrigin, Internal.optional transfer]) Unit
+  return some lasmGuarded
 
 /-- `undefined postMessage(any message, optional WindowPostMessageOptions options)` -/
 @[macro_inline] def Window.postMessageWithOptions (self : Window) (message : Data) (options : Option WindowPostMessageOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.Window.postMessageWithOptions" do
   self.val.callMethod "postMessage" (Internal.args #[toJS message, Internal.optional options]) Unit
 
+/-- `undefined postMessage(any message, optional WindowPostMessageOptions options)` where the platform has it (`'postMessage' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.postMessageWithOptions? (self' : Window) (message : Data) (options : Option WindowPostMessageOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Window.postMessageWithOptions?" do
+  let self := self'
+  if !(← Internal.has self.val "postMessage") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "postMessage" (Internal.args #[toJS message, Internal.optional options]) Unit
+  return some lasmGuarded
+
 /-- `undefined captureEvents()` -/
 @[macro_inline] def Window.captureEvents (self : Window) : IO Unit := Internal.api "Lasm.JS.Web.Window.captureEvents" do
   self.val.callMethod "captureEvents" (Internal.args #[]) Unit
 
+/-- `undefined captureEvents()` where the platform has it (`'captureEvents' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.captureEvents? (self' : Window) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Window.captureEvents?" do
+  let self := self'
+  if !(← Internal.has self.val "captureEvents") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "captureEvents" (Internal.args #[]) Unit
+  return some lasmGuarded
+
 /-- `undefined releaseEvents()` -/
 @[macro_inline] def Window.releaseEvents (self : Window) : IO Unit := Internal.api "Lasm.JS.Web.Window.releaseEvents" do
   self.val.callMethod "releaseEvents" (Internal.args #[]) Unit
+
+/-- `undefined releaseEvents()` where the platform has it (`'releaseEvents' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.releaseEvents? (self' : Window) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Window.releaseEvents?" do
+  let self := self'
+  if !(← Internal.has self.val "releaseEvents") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "releaseEvents" (Internal.args #[]) Unit
+  return some lasmGuarded
 
 /-- `undefined reportError(any e)` -/
 @[macro_inline] def Window.reportError (self : Window) (e : Data) : IO Unit := Internal.api "Lasm.JS.Web.Window.reportError" do
@@ -6875,9 +8147,25 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def Window.requestAnimationFrame (self : Window) (callback : FrameRequestCallback) : IO Nat := Internal.api "Lasm.JS.Web.Window.requestAnimationFrame" do
   self.val.callMethod "requestAnimationFrame" (Internal.args #[toJS callback]) Nat
 
+/-- `unsigned long requestAnimationFrame(FrameRequestCallback callback)` where the platform has it (`'requestAnimationFrame' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.requestAnimationFrame? (self' : Window) (callback : FrameRequestCallback) : IO (Option Nat) := Internal.api "Lasm.JS.Web.Window.requestAnimationFrame?" do
+  let self := self'
+  if !(← Internal.has self.val "requestAnimationFrame") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "requestAnimationFrame" (Internal.args #[toJS callback]) Nat
+  return some lasmGuarded
+
 /-- `undefined cancelAnimationFrame(unsigned long handle)` -/
 @[macro_inline] def Window.cancelAnimationFrame (self : Window) (handle : Nat) : IO Unit := Internal.api "Lasm.JS.Web.Window.cancelAnimationFrame" do
   self.val.callMethod "cancelAnimationFrame" (Internal.args #[toJS handle]) Unit
+
+/-- `undefined cancelAnimationFrame(unsigned long handle)` where the platform has it (`'cancelAnimationFrame' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.cancelAnimationFrame? (self' : Window) (handle : Nat) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Window.cancelAnimationFrame?" do
+  let self := self'
+  if !(← Internal.has self.val "cancelAnimationFrame") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "cancelAnimationFrame" (Internal.args #[toJS handle]) Unit
+  return some lasmGuarded
 
 /-- `v instanceof Worker`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Worker`). -/
 @[macro_inline] def Worker.cast? (v : Value) : IO (Option Worker) := Internal.api "Lasm.JS.Web.Worker.cast?" do
@@ -6888,9 +8176,25 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
   Lasm.JS.Binding.invoke Worker { name := "Lasm.JS.Web.Worker.new", module := "globalThis", path := "Worker", construct := true, arity := 2 }
     (Internal.args #[toJS scriptURL, Internal.optional options]) (await := false)
 
+/-- `constructor((TrustedScriptURL or USVString) scriptURL, optional WorkerOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Worker.new? (scriptURL : TrustedScriptURLOrUSVString) (options : Option WorkerOptions := none) : IO (Option Worker) := Internal.api "Lasm.JS.Web.Worker.new?" do
+  if !(← Internal.hasGlobal ["Worker"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Worker { name := "Lasm.JS.Web.Worker.new?", module := "globalThis", path := "Worker", construct := true, arity := 2 }
+      (Internal.args #[toJS scriptURL, Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onerror` -/
 @[macro_inline] def Worker.onerror (self : Worker) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Worker.onerror" do
   self.val.get "onerror" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onerror` where the platform has it (`'onerror' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Worker.onerror? (self' : Worker) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Worker.onerror?" do
+  let self := self'
+  if !(← Internal.has self.val "onerror") then return none
+  let lasmGuarded ← do
+    self.val.get "onerror" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onerror`: `attribute EventHandler onerror` -/
 @[macro_inline] def Worker.setOnerror (self : Worker) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Worker.setOnerror" do
@@ -6907,6 +8211,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `attribute EventHandler onmessageerror` -/
 @[macro_inline] def Worker.onmessageerror (self : Worker) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Worker.onmessageerror" do
   self.val.get "onmessageerror" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onmessageerror` where the platform has it (`'onmessageerror' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Worker.onmessageerror? (self' : Worker) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Worker.onmessageerror?" do
+  let self := self'
+  if !(← Internal.has self.val "onmessageerror") then return none
+  let lasmGuarded ← do
+    self.val.get "onmessageerror" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onmessageerror`: `attribute EventHandler onmessageerror` -/
 @[macro_inline] def Worker.setOnmessageerror (self : Worker) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Worker.setOnmessageerror" do
@@ -6955,6 +8267,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def WorkerGlobalScope.onlanguagechange (self : WorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.WorkerGlobalScope.onlanguagechange" do
   self.val.get "onlanguagechange" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onlanguagechange` where the platform has it (`'onlanguagechange' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerGlobalScope.onlanguagechange? (self' : WorkerGlobalScope) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.WorkerGlobalScope.onlanguagechange?" do
+  let self := self'
+  if !(← Internal.has self.val "onlanguagechange") then return none
+  let lasmGuarded ← do
+    self.val.get "onlanguagechange" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `onlanguagechange`: `attribute EventHandler onlanguagechange` -/
 @[macro_inline] def WorkerGlobalScope.setOnlanguagechange (self : WorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.WorkerGlobalScope.setOnlanguagechange" do
   self.val.set "onlanguagechange" (toJS value)
@@ -6962,6 +8282,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `attribute EventHandler onoffline` -/
 @[macro_inline] def WorkerGlobalScope.onoffline (self : WorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.WorkerGlobalScope.onoffline" do
   self.val.get "onoffline" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onoffline` where the platform has it (`'onoffline' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerGlobalScope.onoffline? (self' : WorkerGlobalScope) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.WorkerGlobalScope.onoffline?" do
+  let self := self'
+  if !(← Internal.has self.val "onoffline") then return none
+  let lasmGuarded ← do
+    self.val.get "onoffline" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onoffline`: `attribute EventHandler onoffline` -/
 @[macro_inline] def WorkerGlobalScope.setOnoffline (self : WorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.WorkerGlobalScope.setOnoffline" do
@@ -6971,6 +8299,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def WorkerGlobalScope.ononline (self : WorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.WorkerGlobalScope.ononline" do
   self.val.get "ononline" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler ononline` where the platform has it (`'ononline' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerGlobalScope.ononline? (self' : WorkerGlobalScope) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.WorkerGlobalScope.ononline?" do
+  let self := self'
+  if !(← Internal.has self.val "ononline") then return none
+  let lasmGuarded ← do
+    self.val.get "ononline" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `ononline`: `attribute EventHandler ononline` -/
 @[macro_inline] def WorkerGlobalScope.setOnonline (self : WorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.WorkerGlobalScope.setOnonline" do
   self.val.set "ononline" (toJS value)
@@ -6979,6 +8315,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def WorkerGlobalScope.onrejectionhandled (self : WorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.WorkerGlobalScope.onrejectionhandled" do
   self.val.get "onrejectionhandled" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onrejectionhandled` where the platform has it (`'onrejectionhandled' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerGlobalScope.onrejectionhandled? (self' : WorkerGlobalScope) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.WorkerGlobalScope.onrejectionhandled?" do
+  let self := self'
+  if !(← Internal.has self.val "onrejectionhandled") then return none
+  let lasmGuarded ← do
+    self.val.get "onrejectionhandled" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `onrejectionhandled`: `attribute EventHandler onrejectionhandled` -/
 @[macro_inline] def WorkerGlobalScope.setOnrejectionhandled (self : WorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.WorkerGlobalScope.setOnrejectionhandled" do
   self.val.set "onrejectionhandled" (toJS value)
@@ -6986,6 +8330,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `attribute EventHandler onunhandledrejection` -/
 @[macro_inline] def WorkerGlobalScope.onunhandledrejection (self : WorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.WorkerGlobalScope.onunhandledrejection" do
   self.val.get "onunhandledrejection" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onunhandledrejection` where the platform has it (`'onunhandledrejection' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerGlobalScope.onunhandledrejection? (self' : WorkerGlobalScope) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.WorkerGlobalScope.onunhandledrejection?" do
+  let self := self'
+  if !(← Internal.has self.val "onunhandledrejection") then return none
+  let lasmGuarded ← do
+    self.val.get "onunhandledrejection" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onunhandledrejection`: `attribute EventHandler onunhandledrejection` -/
 @[macro_inline] def WorkerGlobalScope.setOnunhandledrejection (self : WorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.WorkerGlobalScope.setOnunhandledrejection" do
@@ -7006,6 +8358,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `undefined importScripts((TrustedScriptURL or USVString)... urls)` -/
 @[macro_inline] def WorkerGlobalScope.importScripts (self : WorkerGlobalScope) (urls : Array TrustedScriptURLOrUSVString := #[]) : IO Unit := Internal.api "Lasm.JS.Web.WorkerGlobalScope.importScripts" do
   self.val.callMethod "importScripts" (Internal.argsWith #[] (urls.map toJS)) Unit
+
+/-- `undefined importScripts((TrustedScriptURL or USVString)... urls)` where the platform has it (`'importScripts' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerGlobalScope.importScripts? (self' : WorkerGlobalScope) (urls : Array TrustedScriptURLOrUSVString := #[]) : IO (Option Unit) := Internal.api "Lasm.JS.Web.WorkerGlobalScope.importScripts?" do
+  let self := self'
+  if !(← Internal.has self.val "importScripts") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "importScripts" (Internal.argsWith #[] (urls.map toJS)) Unit
+  return some lasmGuarded
 
 /-- `undefined reportError(any e)` -/
 @[macro_inline] def WorkerGlobalScope.reportError (self : WorkerGlobalScope) (e : Data) : IO Unit := Internal.api "Lasm.JS.Web.WorkerGlobalScope.reportError" do
@@ -7105,13 +8465,37 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def WorkerNavigator.appCodeName (self : WorkerNavigator) : IO String := Internal.api "Lasm.JS.Web.WorkerNavigator.appCodeName" do
   self.val.get "appCodeName" String
 
+/-- `readonly attribute DOMString appCodeName` where the platform has it (`'appCodeName' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerNavigator.appCodeName? (self' : WorkerNavigator) : IO (Option String) := Internal.api "Lasm.JS.Web.WorkerNavigator.appCodeName?" do
+  let self := self'
+  if !(← Internal.has self.val "appCodeName") then return none
+  let lasmGuarded ← do
+    self.val.get "appCodeName" String
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString appName` -/
 @[macro_inline] def WorkerNavigator.appName (self : WorkerNavigator) : IO String := Internal.api "Lasm.JS.Web.WorkerNavigator.appName" do
   self.val.get "appName" String
 
+/-- `readonly attribute DOMString appName` where the platform has it (`'appName' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerNavigator.appName? (self' : WorkerNavigator) : IO (Option String) := Internal.api "Lasm.JS.Web.WorkerNavigator.appName?" do
+  let self := self'
+  if !(← Internal.has self.val "appName") then return none
+  let lasmGuarded ← do
+    self.val.get "appName" String
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString appVersion` -/
 @[macro_inline] def WorkerNavigator.appVersion (self : WorkerNavigator) : IO String := Internal.api "Lasm.JS.Web.WorkerNavigator.appVersion" do
   self.val.get "appVersion" String
+
+/-- `readonly attribute DOMString appVersion` where the platform has it (`'appVersion' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerNavigator.appVersion? (self' : WorkerNavigator) : IO (Option String) := Internal.api "Lasm.JS.Web.WorkerNavigator.appVersion?" do
+  let self := self'
+  if !(← Internal.has self.val "appVersion") then return none
+  let lasmGuarded ← do
+    self.val.get "appVersion" String
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString platform` -/
 @[macro_inline] def WorkerNavigator.platform (self : WorkerNavigator) : IO String := Internal.api "Lasm.JS.Web.WorkerNavigator.platform" do
@@ -7121,6 +8505,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def WorkerNavigator.product (self : WorkerNavigator) : IO String := Internal.api "Lasm.JS.Web.WorkerNavigator.product" do
   self.val.get "product" String
 
+/-- `readonly attribute DOMString product` where the platform has it (`'product' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerNavigator.product? (self' : WorkerNavigator) : IO (Option String) := Internal.api "Lasm.JS.Web.WorkerNavigator.product?" do
+  let self := self'
+  if !(← Internal.has self.val "product") then return none
+  let lasmGuarded ← do
+    self.val.get "product" String
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString productSub` -/
 @[macro_inline] def WorkerNavigator.productSub (self : WorkerNavigator) : IO String := Internal.api "Lasm.JS.Web.WorkerNavigator.productSub" do
   self.val.get "productSub" String
@@ -7128,6 +8520,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `readonly attribute DOMString userAgent` -/
 @[macro_inline] def WorkerNavigator.userAgent (self : WorkerNavigator) : IO String := Internal.api "Lasm.JS.Web.WorkerNavigator.userAgent" do
   self.val.get "userAgent" String
+
+/-- `readonly attribute DOMString userAgent` where the platform has it (`'userAgent' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerNavigator.userAgent? (self' : WorkerNavigator) : IO (Option String) := Internal.api "Lasm.JS.Web.WorkerNavigator.userAgent?" do
+  let self := self'
+  if !(← Internal.has self.val "userAgent") then return none
+  let lasmGuarded ← do
+    self.val.get "userAgent" String
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString vendor` -/
 @[macro_inline] def WorkerNavigator.vendor (self : WorkerNavigator) : IO String := Internal.api "Lasm.JS.Web.WorkerNavigator.vendor" do
@@ -7145,13 +8545,37 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def WorkerNavigator.language (self : WorkerNavigator) : IO String := Internal.api "Lasm.JS.Web.WorkerNavigator.language" do
   self.val.get "language" String
 
+/-- `readonly attribute DOMString language` where the platform has it (`'language' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerNavigator.language? (self' : WorkerNavigator) : IO (Option String) := Internal.api "Lasm.JS.Web.WorkerNavigator.language?" do
+  let self := self'
+  if !(← Internal.has self.val "language") then return none
+  let lasmGuarded ← do
+    self.val.get "language" String
+  return some lasmGuarded
+
 /-- `readonly attribute FrozenArray<DOMString> languages` -/
 @[macro_inline] def WorkerNavigator.languages (self : WorkerNavigator) : IO (Array String) := Internal.api "Lasm.JS.Web.WorkerNavigator.languages" do
   self.val.get "languages" (Array String)
 
+/-- `readonly attribute FrozenArray<DOMString> languages` where the platform has it (`'languages' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerNavigator.languages? (self' : WorkerNavigator) : IO (Option (Array String)) := Internal.api "Lasm.JS.Web.WorkerNavigator.languages?" do
+  let self := self'
+  if !(← Internal.has self.val "languages") then return none
+  let lasmGuarded ← do
+    self.val.get "languages" (Array String)
+  return some lasmGuarded
+
 /-- `readonly attribute boolean onLine` -/
 @[macro_inline] def WorkerNavigator.onLine (self : WorkerNavigator) : IO Bool := Internal.api "Lasm.JS.Web.WorkerNavigator.onLine" do
   self.val.get "onLine" Bool
+
+/-- `readonly attribute boolean onLine` where the platform has it (`'onLine' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerNavigator.onLine? (self' : WorkerNavigator) : IO (Option Bool) := Internal.api "Lasm.JS.Web.WorkerNavigator.onLine?" do
+  let self := self'
+  if !(← Internal.has self.val "onLine") then return none
+  let lasmGuarded ← do
+    self.val.get "onLine" Bool
+  return some lasmGuarded
 
 /-- `readonly attribute unsigned long long hardwareConcurrency` -/
 @[macro_inline] def WorkerNavigator.hardwareConcurrency (self : WorkerNavigator) : IO Nat := Internal.api "Lasm.JS.Web.WorkerNavigator.hardwareConcurrency" do
@@ -7181,6 +8605,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def XMLSerializer.new : IO XMLSerializer := Internal.api "Lasm.JS.Web.XMLSerializer.new" do
   Lasm.JS.Binding.invoke XMLSerializer { name := "Lasm.JS.Web.XMLSerializer.new", module := "globalThis", path := "XMLSerializer", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
+
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def XMLSerializer.new? : IO (Option XMLSerializer) := Internal.api "Lasm.JS.Web.XMLSerializer.new?" do
+  if !(← Internal.hasGlobal ["XMLSerializer"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke XMLSerializer { name := "Lasm.JS.Web.XMLSerializer.new?", module := "globalThis", path := "XMLSerializer", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
 
 /-- `DOMString serializeToString(Node root)` -/
 @[macro_inline] def XMLSerializer.serializeToString (self : XMLSerializer) (root : Node) : IO String := Internal.api "Lasm.JS.Web.XMLSerializer.serializeToString" do
@@ -7226,9 +8658,25 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def DedicatedWorkerGlobalScope.requestAnimationFrame (self : DedicatedWorkerGlobalScope) (callback : FrameRequestCallback) : IO Nat := Internal.api "Lasm.JS.Web.DedicatedWorkerGlobalScope.requestAnimationFrame" do
   self.val.callMethod "requestAnimationFrame" (Internal.args #[toJS callback]) Nat
 
+/-- `unsigned long requestAnimationFrame(FrameRequestCallback callback)` where the platform has it (`'requestAnimationFrame' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def DedicatedWorkerGlobalScope.requestAnimationFrame? (self' : DedicatedWorkerGlobalScope) (callback : FrameRequestCallback) : IO (Option Nat) := Internal.api "Lasm.JS.Web.DedicatedWorkerGlobalScope.requestAnimationFrame?" do
+  let self := self'
+  if !(← Internal.has self.val "requestAnimationFrame") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "requestAnimationFrame" (Internal.args #[toJS callback]) Nat
+  return some lasmGuarded
+
 /-- `undefined cancelAnimationFrame(unsigned long handle)` -/
 @[macro_inline] def DedicatedWorkerGlobalScope.cancelAnimationFrame (self : DedicatedWorkerGlobalScope) (handle : Nat) : IO Unit := Internal.api "Lasm.JS.Web.DedicatedWorkerGlobalScope.cancelAnimationFrame" do
   self.val.callMethod "cancelAnimationFrame" (Internal.args #[toJS handle]) Unit
+
+/-- `undefined cancelAnimationFrame(unsigned long handle)` where the platform has it (`'cancelAnimationFrame' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def DedicatedWorkerGlobalScope.cancelAnimationFrame? (self' : DedicatedWorkerGlobalScope) (handle : Nat) : IO (Option Unit) := Internal.api "Lasm.JS.Web.DedicatedWorkerGlobalScope.cancelAnimationFrame?" do
+  let self := self'
+  if !(← Internal.has self.val "cancelAnimationFrame") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "cancelAnimationFrame" (Internal.args #[toJS handle]) Unit
+  return some lasmGuarded
 
 /-- `v instanceof HTMLAnchorElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLAnchorElement`). -/
 @[macro_inline] def HTMLAnchorElement.cast? (v : Value) : IO (Option HTMLAnchorElement) := Internal.api "Lasm.JS.Web.HTMLAnchorElement.cast?" do
@@ -7584,6 +9032,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def HTMLAreaElement.hreflang (self : HTMLAreaElement) : IO String := Internal.api "Lasm.JS.Web.HTMLAreaElement.hreflang" do
   self.val.get "hreflang" String
 
+/-- `attribute DOMString hreflang` where the platform has it (`'hreflang' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLAreaElement.hreflang? (self' : HTMLAreaElement) : IO (Option String) := Internal.api "Lasm.JS.Web.HTMLAreaElement.hreflang?" do
+  let self := self'
+  if !(← Internal.has self.val "hreflang") then return none
+  let lasmGuarded ← do
+    self.val.get "hreflang" String
+  return some lasmGuarded
+
 /-- Sets `hreflang`: `attribute DOMString hreflang` -/
 @[macro_inline] def HTMLAreaElement.setHreflang (self : HTMLAreaElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLAreaElement.setHreflang" do
   self.val.set "hreflang" (toJS value)
@@ -7591,6 +9047,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `attribute DOMString type` -/
 @[macro_inline] def HTMLAreaElement.type (self : HTMLAreaElement) : IO String := Internal.api "Lasm.JS.Web.HTMLAreaElement.type" do
   self.val.get "type" String
+
+/-- `attribute DOMString type` where the platform has it (`'type' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLAreaElement.type? (self' : HTMLAreaElement) : IO (Option String) := Internal.api "Lasm.JS.Web.HTMLAreaElement.type?" do
+  let self := self'
+  if !(← Internal.has self.val "type") then return none
+  let lasmGuarded ← do
+    self.val.get "type" String
+  return some lasmGuarded
 
 /-- Sets `type`: `attribute DOMString type` -/
 @[macro_inline] def HTMLAreaElement.setType (self : HTMLAreaElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLAreaElement.setType" do
@@ -8100,6 +9564,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `attribute DOMString closedBy` -/
 @[macro_inline] def HTMLDialogElement.closedBy (self : HTMLDialogElement) : IO String := Internal.api "Lasm.JS.Web.HTMLDialogElement.closedBy" do
   self.val.get "closedBy" String
+
+/-- `attribute DOMString closedBy` where the platform has it (`'closedBy' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLDialogElement.closedBy? (self' : HTMLDialogElement) : IO (Option String) := Internal.api "Lasm.JS.Web.HTMLDialogElement.closedBy?" do
+  let self := self'
+  if !(← Internal.has self.val "closedBy") then return none
+  let lasmGuarded ← do
+    self.val.get "closedBy" String
+  return some lasmGuarded
 
 /-- Sets `closedBy`: `attribute DOMString closedBy` -/
 @[macro_inline] def HTMLDialogElement.setClosedBy (self : HTMLDialogElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLDialogElement.setClosedBy" do
@@ -9066,6 +10538,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 @[macro_inline] def HTMLInputElement.alpha (self : HTMLInputElement) : IO Bool := Internal.api "Lasm.JS.Web.HTMLInputElement.alpha" do
   self.val.get "alpha" Bool
 
+/-- `attribute boolean alpha` where the platform has it (`'alpha' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLInputElement.alpha? (self' : HTMLInputElement) : IO (Option Bool) := Internal.api "Lasm.JS.Web.HTMLInputElement.alpha?" do
+  let self := self'
+  if !(← Internal.has self.val "alpha") then return none
+  let lasmGuarded ← do
+    self.val.get "alpha" Bool
+  return some lasmGuarded
+
 /-- Sets `alpha`: `attribute boolean alpha` -/
 @[macro_inline] def HTMLInputElement.setAlpha (self : HTMLInputElement) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.HTMLInputElement.setAlpha" do
   self.val.set "alpha" (toJS value)
@@ -9105,6 +10585,14 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
 /-- `attribute DOMString colorSpace` -/
 @[macro_inline] def HTMLInputElement.colorSpace (self : HTMLInputElement) : IO String := Internal.api "Lasm.JS.Web.HTMLInputElement.colorSpace" do
   self.val.get "colorSpace" String
+
+/-- `attribute DOMString colorSpace` where the platform has it (`'colorSpace' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLInputElement.colorSpace? (self' : HTMLInputElement) : IO (Option String) := Internal.api "Lasm.JS.Web.HTMLInputElement.colorSpace?" do
+  let self := self'
+  if !(← Internal.has self.val "colorSpace") then return none
+  let lasmGuarded ← do
+    self.val.get "colorSpace" String
+  return some lasmGuarded
 
 /-- Sets `colorSpace`: `attribute DOMString colorSpace` -/
 @[macro_inline] def HTMLInputElement.setColorSpace (self : HTMLInputElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLInputElement.setColorSpace" do
@@ -9642,6 +11130,15 @@ def MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED : Nat := 4
   let r ← self.val.get "blocking" Value
   pure { val := r }
 
+/-- `readonly attribute DOMTokenList blocking` where the platform has it (`'blocking' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLLinkElement.blocking? (self' : HTMLLinkElement) : IO (Option DOMTokenList) := Internal.api "Lasm.JS.Web.HTMLLinkElement.blocking?" do
+  let self := self'
+  if !(← Internal.has self.val "blocking") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "blocking" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `attribute boolean disabled` -/
 @[macro_inline] def HTMLLinkElement.disabled (self : HTMLLinkElement) : IO Bool := Internal.api "Lasm.JS.Web.HTMLLinkElement.disabled" do
   self.val.get "disabled" Bool
@@ -9998,6 +11495,14 @@ def HTMLMediaElement.HAVE_ENOUGH_DATA : Nat := 4
 @[macro_inline] def HTMLMediaElement.loading (self : HTMLMediaElement) : IO String := Internal.api "Lasm.JS.Web.HTMLMediaElement.loading" do
   self.val.get "loading" String
 
+/-- `attribute DOMString loading` where the platform has it (`'loading' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLMediaElement.loading? (self' : HTMLMediaElement) : IO (Option String) := Internal.api "Lasm.JS.Web.HTMLMediaElement.loading?" do
+  let self := self'
+  if !(← Internal.has self.val "loading") then return none
+  let lasmGuarded ← do
+    self.val.get "loading" String
+  return some lasmGuarded
+
 /-- Sets `loading`: `attribute DOMString loading` -/
 @[macro_inline] def HTMLMediaElement.setLoading (self : HTMLMediaElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLMediaElement.setLoading" do
   self.val.set "loading" (toJS value)
@@ -10007,10 +11512,28 @@ def HTMLMediaElement.HAVE_ENOUGH_DATA : Nat := 4
   let r ← self.val.get "audioTracks" Value
   pure { val := r }
 
+/-- `readonly attribute AudioTrackList audioTracks` where the platform has it (`'audioTracks' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLMediaElement.audioTracks? (self' : HTMLMediaElement) : IO (Option AudioTrackList) := Internal.api "Lasm.JS.Web.HTMLMediaElement.audioTracks?" do
+  let self := self'
+  if !(← Internal.has self.val "audioTracks") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "audioTracks" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute VideoTrackList videoTracks` -/
 @[macro_inline] def HTMLMediaElement.videoTracks (self : HTMLMediaElement) : IO VideoTrackList := Internal.api "Lasm.JS.Web.HTMLMediaElement.videoTracks" do
   let r ← self.val.get "videoTracks" Value
   pure { val := r }
+
+/-- `readonly attribute VideoTrackList videoTracks` where the platform has it (`'videoTracks' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLMediaElement.videoTracks? (self' : HTMLMediaElement) : IO (Option VideoTrackList) := Internal.api "Lasm.JS.Web.HTMLMediaElement.videoTracks?" do
+  let self := self'
+  if !(← Internal.has self.val "videoTracks") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "videoTracks" Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `readonly attribute TextTrackList textTracks` -/
 @[macro_inline] def HTMLMediaElement.textTracks (self : HTMLMediaElement) : IO TextTrackList := Internal.api "Lasm.JS.Web.HTMLMediaElement.textTracks" do
@@ -10029,9 +11552,25 @@ def HTMLMediaElement.HAVE_ENOUGH_DATA : Nat := 4
 @[macro_inline] def HTMLMediaElement.fastSeek (self : HTMLMediaElement) (time : Float) : IO Unit := Internal.api "Lasm.JS.Web.HTMLMediaElement.fastSeek" do
   self.val.callMethod "fastSeek" (Internal.args #[toJS time]) Unit
 
+/-- `undefined fastSeek(double time)` where the platform has it (`'fastSeek' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLMediaElement.fastSeek? (self' : HTMLMediaElement) (time : Float) : IO (Option Unit) := Internal.api "Lasm.JS.Web.HTMLMediaElement.fastSeek?" do
+  let self := self'
+  if !(← Internal.has self.val "fastSeek") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "fastSeek" (Internal.args #[toJS time]) Unit
+  return some lasmGuarded
+
 /-- `object getStartDate()` -/
 @[macro_inline] def HTMLMediaElement.getStartDate (self : HTMLMediaElement) : IO Data := Internal.api "Lasm.JS.Web.HTMLMediaElement.getStartDate" do
   self.val.callMethod "getStartDate" (Internal.args #[]) Data
+
+/-- `object getStartDate()` where the platform has it (`'getStartDate' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLMediaElement.getStartDate? (self' : HTMLMediaElement) : IO (Option Data) := Internal.api "Lasm.JS.Web.HTMLMediaElement.getStartDate?" do
+  let self := self'
+  if !(← Internal.has self.val "getStartDate") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getStartDate" (Internal.args #[]) Data
+  return some lasmGuarded
 
 /-- `Promise<undefined> play()` -/
 @[macro_inline] def HTMLMediaElement.play (self : HTMLMediaElement) : Async Unit := Internal.api "Lasm.JS.Web.HTMLMediaElement.play" do
@@ -10693,6 +12232,15 @@ def HTMLMediaElement.HAVE_ENOUGH_DATA : Nat := 4
   let r ← self.val.get "blocking" Value
   pure { val := r }
 
+/-- `readonly attribute DOMTokenList blocking` where the platform has it (`'blocking' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLScriptElement.blocking? (self' : HTMLScriptElement) : IO (Option DOMTokenList) := Internal.api "Lasm.JS.Web.HTMLScriptElement.blocking?" do
+  let self := self'
+  if !(← Internal.has self.val "blocking") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "blocking" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `attribute DOMString? crossOrigin` -/
 @[macro_inline] def HTMLScriptElement.crossOrigin (self : HTMLScriptElement) : IO (Option String) := Internal.api "Lasm.JS.Web.HTMLScriptElement.crossOrigin" do
   self.val.get "crossOrigin" (Option String)
@@ -10777,6 +12325,14 @@ def HTMLMediaElement.HAVE_ENOUGH_DATA : Nat := 4
 @[macro_inline] def HTMLScriptElement.supports (type : String) : IO Bool := Internal.api "Lasm.JS.Web.HTMLScriptElement.supports" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.HTMLScriptElement.supports", module := "globalThis", path := "HTMLScriptElement.supports", construct := false, arity := 1 }
     (Internal.args #[toJS type]) (await := false)
+
+/-- `static boolean supports(DOMString type)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLScriptElement.supports? (type : String) : IO (Option Bool) := Internal.api "Lasm.JS.Web.HTMLScriptElement.supports?" do
+  if !(← Internal.hasGlobal ["HTMLScriptElement", "supports"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.HTMLScriptElement.supports?", module := "globalThis", path := "HTMLScriptElement.supports", construct := false, arity := 1 }
+      (Internal.args #[toJS type]) (await := false)
+  return some lasmGuarded
 
 /-- `v instanceof HTMLSelectElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLSelectElement`). -/
 @[macro_inline] def HTMLSelectElement.cast? (v : Value) : IO (Option HTMLSelectElement) := Internal.api "Lasm.JS.Web.HTMLSelectElement.cast?" do
@@ -10926,6 +12482,14 @@ def HTMLMediaElement.HAVE_ENOUGH_DATA : Nat := 4
 @[macro_inline] def HTMLSelectElement.showPicker (self : HTMLSelectElement) : IO Unit := Internal.api "Lasm.JS.Web.HTMLSelectElement.showPicker" do
   self.val.callMethod "showPicker" (Internal.args #[]) Unit
 
+/-- `undefined showPicker()` where the platform has it (`'showPicker' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLSelectElement.showPicker? (self' : HTMLSelectElement) : IO (Option Unit) := Internal.api "Lasm.JS.Web.HTMLSelectElement.showPicker?" do
+  let self := self'
+  if !(← Internal.has self.val "showPicker") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "showPicker" (Internal.args #[]) Unit
+  return some lasmGuarded
+
 /-- `v instanceof HTMLSelectedContentElement`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HTMLSelectedContentElement`). -/
 @[macro_inline] def HTMLSelectedContentElement.cast? (v : Value) : IO (Option HTMLSelectedContentElement) := Internal.api "Lasm.JS.Web.HTMLSelectedContentElement.cast?" do
   Internal.cast (Internal.getGlobal ["HTMLSelectedContentElement"] Value) (fun x => { val := x }) v
@@ -11042,6 +12606,15 @@ def HTMLMediaElement.HAVE_ENOUGH_DATA : Nat := 4
 @[macro_inline] def HTMLStyleElement.blocking (self : HTMLStyleElement) : IO DOMTokenList := Internal.api "Lasm.JS.Web.HTMLStyleElement.blocking" do
   let r ← self.val.get "blocking" Value
   pure { val := r }
+
+/-- `readonly attribute DOMTokenList blocking` where the platform has it (`'blocking' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLStyleElement.blocking? (self' : HTMLStyleElement) : IO (Option DOMTokenList) := Internal.api "Lasm.JS.Web.HTMLStyleElement.blocking?" do
+  let self := self'
+  if !(← Internal.has self.val "blocking") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "blocking" Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `attribute DOMString type` -/
 @[macro_inline] def HTMLStyleElement.type (self : HTMLStyleElement) : IO String := Internal.api "Lasm.JS.Web.HTMLStyleElement.type" do
@@ -11519,6 +13092,14 @@ def HTMLMediaElement.HAVE_ENOUGH_DATA : Nat := 4
 @[macro_inline] def HTMLTemplateElement.htmlFor (self : HTMLTemplateElement) : IO String := Internal.api "Lasm.JS.Web.HTMLTemplateElement.htmlFor" do
   self.val.get "htmlFor" String
 
+/-- `attribute DOMString htmlFor` where the platform has it (`'htmlFor' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLTemplateElement.htmlFor? (self' : HTMLTemplateElement) : IO (Option String) := Internal.api "Lasm.JS.Web.HTMLTemplateElement.htmlFor?" do
+  let self := self'
+  if !(← Internal.has self.val "htmlFor") then return none
+  let lasmGuarded ← do
+    self.val.get "htmlFor" String
+  return some lasmGuarded
+
 /-- Sets `htmlFor`: `attribute DOMString htmlFor` -/
 @[macro_inline] def HTMLTemplateElement.setHtmlFor (self : HTMLTemplateElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLTemplateElement.setHtmlFor" do
   self.val.set "htmlFor" (toJS value)
@@ -11551,6 +13132,14 @@ def HTMLMediaElement.HAVE_ENOUGH_DATA : Nat := 4
 @[macro_inline] def HTMLTemplateElement.shadowRootSlotAssignment (self : HTMLTemplateElement) : IO String := Internal.api "Lasm.JS.Web.HTMLTemplateElement.shadowRootSlotAssignment" do
   self.val.get "shadowRootSlotAssignment" String
 
+/-- `attribute DOMString shadowRootSlotAssignment` where the platform has it (`'shadowRootSlotAssignment' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLTemplateElement.shadowRootSlotAssignment? (self' : HTMLTemplateElement) : IO (Option String) := Internal.api "Lasm.JS.Web.HTMLTemplateElement.shadowRootSlotAssignment?" do
+  let self := self'
+  if !(← Internal.has self.val "shadowRootSlotAssignment") then return none
+  let lasmGuarded ← do
+    self.val.get "shadowRootSlotAssignment" String
+  return some lasmGuarded
+
 /-- Sets `shadowRootSlotAssignment`: `attribute DOMString shadowRootSlotAssignment` -/
 @[macro_inline] def HTMLTemplateElement.setShadowRootSlotAssignment (self : HTMLTemplateElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLTemplateElement.setShadowRootSlotAssignment" do
   self.val.set "shadowRootSlotAssignment" (toJS value)
@@ -11566,6 +13155,14 @@ def HTMLMediaElement.HAVE_ENOUGH_DATA : Nat := 4
 /-- `attribute DOMString shadowRootCustomElementRegistry` -/
 @[macro_inline] def HTMLTemplateElement.shadowRootCustomElementRegistry (self : HTMLTemplateElement) : IO String := Internal.api "Lasm.JS.Web.HTMLTemplateElement.shadowRootCustomElementRegistry" do
   self.val.get "shadowRootCustomElementRegistry" String
+
+/-- `attribute DOMString shadowRootCustomElementRegistry` where the platform has it (`'shadowRootCustomElementRegistry' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLTemplateElement.shadowRootCustomElementRegistry? (self' : HTMLTemplateElement) : IO (Option String) := Internal.api "Lasm.JS.Web.HTMLTemplateElement.shadowRootCustomElementRegistry?" do
+  let self := self'
+  if !(← Internal.has self.val "shadowRootCustomElementRegistry") then return none
+  let lasmGuarded ← do
+    self.val.get "shadowRootCustomElementRegistry" String
+  return some lasmGuarded
 
 /-- Sets `shadowRootCustomElementRegistry`: `attribute DOMString shadowRootCustomElementRegistry` -/
 @[macro_inline] def HTMLTemplateElement.setShadowRootCustomElementRegistry (self : HTMLTemplateElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLTemplateElement.setShadowRootCustomElementRegistry" do
@@ -11946,6 +13543,14 @@ def HTMLTrackElement.ERROR : Nat := 3
 @[macro_inline] def HTMLVideoElement.playsInline (self : HTMLVideoElement) : IO Bool := Internal.api "Lasm.JS.Web.HTMLVideoElement.playsInline" do
   self.val.get "playsInline" Bool
 
+/-- `attribute boolean playsInline` where the platform has it (`'playsInline' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLVideoElement.playsInline? (self' : HTMLVideoElement) : IO (Option Bool) := Internal.api "Lasm.JS.Web.HTMLVideoElement.playsInline?" do
+  let self := self'
+  if !(← Internal.has self.val "playsInline") then return none
+  let lasmGuarded ← do
+    self.val.get "playsInline" Bool
+  return some lasmGuarded
+
 /-- Sets `playsInline`: `attribute boolean playsInline` -/
 @[macro_inline] def HTMLVideoElement.setPlaysInline (self : HTMLVideoElement) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Web.HTMLVideoElement.setPlaysInline" do
   self.val.set "playsInline" (toJS value)
@@ -11954,25 +13559,73 @@ def HTMLTrackElement.ERROR : Nat := 3
 @[macro_inline] def CharacterData.beforeHTML (self : CharacterData) (html : String) (options : Option SetHTMLOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.CharacterData.beforeHTML" do
   self.val.callMethod "beforeHTML" (Internal.args #[toJS html, Internal.optional options]) Unit
 
+/-- `undefined beforeHTML(DOMString html, optional SetHTMLOptions options)` where the platform has it (`'beforeHTML' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CharacterData.beforeHTML? (self' : CharacterData) (html : String) (options : Option SetHTMLOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.CharacterData.beforeHTML?" do
+  let self := self'
+  if !(← Internal.has self.val "beforeHTML") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "beforeHTML" (Internal.args #[toJS html, Internal.optional options]) Unit
+  return some lasmGuarded
+
 /-- `undefined afterHTML(DOMString html, optional SetHTMLOptions options)` -/
 @[macro_inline] def CharacterData.afterHTML (self : CharacterData) (html : String) (options : Option SetHTMLOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.CharacterData.afterHTML" do
   self.val.callMethod "afterHTML" (Internal.args #[toJS html, Internal.optional options]) Unit
+
+/-- `undefined afterHTML(DOMString html, optional SetHTMLOptions options)` where the platform has it (`'afterHTML' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CharacterData.afterHTML? (self' : CharacterData) (html : String) (options : Option SetHTMLOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.CharacterData.afterHTML?" do
+  let self := self'
+  if !(← Internal.has self.val "afterHTML") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "afterHTML" (Internal.args #[toJS html, Internal.optional options]) Unit
+  return some lasmGuarded
 
 /-- `undefined replaceWithHTML(DOMString html, optional SetHTMLOptions options)` -/
 @[macro_inline] def CharacterData.replaceWithHTML (self : CharacterData) (html : String) (options : Option SetHTMLOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.CharacterData.replaceWithHTML" do
   self.val.callMethod "replaceWithHTML" (Internal.args #[toJS html, Internal.optional options]) Unit
 
+/-- `undefined replaceWithHTML(DOMString html, optional SetHTMLOptions options)` where the platform has it (`'replaceWithHTML' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CharacterData.replaceWithHTML? (self' : CharacterData) (html : String) (options : Option SetHTMLOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.CharacterData.replaceWithHTML?" do
+  let self := self'
+  if !(← Internal.has self.val "replaceWithHTML") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "replaceWithHTML" (Internal.args #[toJS html, Internal.optional options]) Unit
+  return some lasmGuarded
+
 /-- `undefined beforeHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` -/
 @[macro_inline] def CharacterData.beforeHTMLUnsafe (self : CharacterData) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.CharacterData.beforeHTMLUnsafe" do
   self.val.callMethod "beforeHTMLUnsafe" (Internal.args #[toJS html, Internal.optional options]) Unit
+
+/-- `undefined beforeHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` where the platform has it (`'beforeHTMLUnsafe' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CharacterData.beforeHTMLUnsafe? (self' : CharacterData) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.CharacterData.beforeHTMLUnsafe?" do
+  let self := self'
+  if !(← Internal.has self.val "beforeHTMLUnsafe") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "beforeHTMLUnsafe" (Internal.args #[toJS html, Internal.optional options]) Unit
+  return some lasmGuarded
 
 /-- `undefined afterHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` -/
 @[macro_inline] def CharacterData.afterHTMLUnsafe (self : CharacterData) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.CharacterData.afterHTMLUnsafe" do
   self.val.callMethod "afterHTMLUnsafe" (Internal.args #[toJS html, Internal.optional options]) Unit
 
+/-- `undefined afterHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` where the platform has it (`'afterHTMLUnsafe' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CharacterData.afterHTMLUnsafe? (self' : CharacterData) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.CharacterData.afterHTMLUnsafe?" do
+  let self := self'
+  if !(← Internal.has self.val "afterHTMLUnsafe") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "afterHTMLUnsafe" (Internal.args #[toJS html, Internal.optional options]) Unit
+  return some lasmGuarded
+
 /-- `undefined replaceWithHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` -/
 @[macro_inline] def CharacterData.replaceWithHTMLUnsafe (self : CharacterData) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.CharacterData.replaceWithHTMLUnsafe" do
   self.val.callMethod "replaceWithHTMLUnsafe" (Internal.args #[toJS html, Internal.optional options]) Unit
+
+/-- `undefined replaceWithHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` where the platform has it (`'replaceWithHTMLUnsafe' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CharacterData.replaceWithHTMLUnsafe? (self' : CharacterData) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.CharacterData.replaceWithHTMLUnsafe?" do
+  let self := self'
+  if !(← Internal.has self.val "replaceWithHTMLUnsafe") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "replaceWithHTMLUnsafe" (Internal.args #[toJS html, Internal.optional options]) Unit
+  return some lasmGuarded
 
 /-- `readonly attribute Location? location` -/
 @[macro_inline] def Document.location (self : Document) : IO (Option Location) := Internal.api "Lasm.JS.Web.Document.location" do
@@ -12778,11 +14431,29 @@ def HTMLTrackElement.ERROR : Nat := 3
     (Internal.args #[toJS html, Internal.optional options]) (await := false)
   pure { val := r }
 
+/-- `static Document parseHTMLUnsafe((TrustedHTML or DOMString) html, optional (ParseHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Document.parseHTMLUnsafe? (html : TrustedHTMLOrDOMString) (options : Option ParseHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO (Option Document) := Internal.api "Lasm.JS.Web.Document.parseHTMLUnsafe?" do
+  if !(← Internal.hasGlobal ["Document", "parseHTMLUnsafe"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.Document.parseHTMLUnsafe?", module := "globalThis", path := "Document.parseHTMLUnsafe", construct := false, arity := 2 }
+      (Internal.args #[toJS html, Internal.optional options]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `static Document parseHTML(DOMString html, optional SetHTMLOptions options)` -/
 @[macro_inline] def Document.parseHTML (html : String) (options : Option SetHTMLOptions := none) : IO Document := Internal.api "Lasm.JS.Web.Document.parseHTML" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.Document.parseHTML", module := "globalThis", path := "Document.parseHTML", construct := false, arity := 2 }
     (Internal.args #[toJS html, Internal.optional options]) (await := false)
   pure { val := r }
+
+/-- `static Document parseHTML(DOMString html, optional SetHTMLOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Document.parseHTML? (html : String) (options : Option SetHTMLOptions := none) : IO (Option Document) := Internal.api "Lasm.JS.Web.Document.parseHTML?" do
+  if !(← Internal.hasGlobal ["Document", "parseHTML"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.Document.parseHTML?", module := "globalThis", path := "Document.parseHTML", construct := false, arity := 2 }
+      (Internal.args #[toJS html, Internal.optional options]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `NodeList getElementsByName(DOMString elementName)` -/
 @[macro_inline] def Document.getElementsByName (self : Document) (elementName : String) : IO NodeList := Internal.api "Lasm.JS.Web.Document.getElementsByName" do
@@ -12870,13 +14541,37 @@ def HTMLTrackElement.ERROR : Nat := 3
 @[macro_inline] def Element.setHTML (self : Element) (html : String) (options : Option SetHTMLOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.Element.setHTML" do
   self.val.callMethod "setHTML" (Internal.args #[toJS html, Internal.optional options]) Unit
 
+/-- `undefined setHTML(DOMString html, optional SetHTMLOptions options)` where the platform has it (`'setHTML' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Element.setHTML? (self' : Element) (html : String) (options : Option SetHTMLOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Element.setHTML?" do
+  let self := self'
+  if !(← Internal.has self.val "setHTML") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "setHTML" (Internal.args #[toJS html, Internal.optional options]) Unit
+  return some lasmGuarded
+
 /-- `undefined appendHTML(DOMString html, optional SetHTMLOptions options)` -/
 @[macro_inline] def Element.appendHTML (self : Element) (html : String) (options : Option SetHTMLOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.Element.appendHTML" do
   self.val.callMethod "appendHTML" (Internal.args #[toJS html, Internal.optional options]) Unit
 
+/-- `undefined appendHTML(DOMString html, optional SetHTMLOptions options)` where the platform has it (`'appendHTML' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Element.appendHTML? (self' : Element) (html : String) (options : Option SetHTMLOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Element.appendHTML?" do
+  let self := self'
+  if !(← Internal.has self.val "appendHTML") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "appendHTML" (Internal.args #[toJS html, Internal.optional options]) Unit
+  return some lasmGuarded
+
 /-- `undefined prependHTML(DOMString html, optional SetHTMLOptions options)` -/
 @[macro_inline] def Element.prependHTML (self : Element) (html : String) (options : Option SetHTMLOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.Element.prependHTML" do
   self.val.callMethod "prependHTML" (Internal.args #[toJS html, Internal.optional options]) Unit
+
+/-- `undefined prependHTML(DOMString html, optional SetHTMLOptions options)` where the platform has it (`'prependHTML' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Element.prependHTML? (self' : Element) (html : String) (options : Option SetHTMLOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Element.prependHTML?" do
+  let self := self'
+  if !(← Internal.has self.val "prependHTML") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "prependHTML" (Internal.args #[toJS html, Internal.optional options]) Unit
+  return some lasmGuarded
 
 /-- `undefined setHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` -/
 @[macro_inline] def Element.setHTMLUnsafe (self : Element) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.Element.setHTMLUnsafe" do
@@ -12886,9 +14581,25 @@ def HTMLTrackElement.ERROR : Nat := 3
 @[macro_inline] def Element.appendHTMLUnsafe (self : Element) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.Element.appendHTMLUnsafe" do
   self.val.callMethod "appendHTMLUnsafe" (Internal.args #[toJS html, Internal.optional options]) Unit
 
+/-- `undefined appendHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` where the platform has it (`'appendHTMLUnsafe' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Element.appendHTMLUnsafe? (self' : Element) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Element.appendHTMLUnsafe?" do
+  let self := self'
+  if !(← Internal.has self.val "appendHTMLUnsafe") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "appendHTMLUnsafe" (Internal.args #[toJS html, Internal.optional options]) Unit
+  return some lasmGuarded
+
 /-- `undefined prependHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` -/
 @[macro_inline] def Element.prependHTMLUnsafe (self : Element) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.Element.prependHTMLUnsafe" do
   self.val.callMethod "prependHTMLUnsafe" (Internal.args #[toJS html, Internal.optional options]) Unit
+
+/-- `undefined prependHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` where the platform has it (`'prependHTMLUnsafe' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Element.prependHTMLUnsafe? (self' : Element) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Element.prependHTMLUnsafe?" do
+  let self := self'
+  if !(← Internal.has self.val "prependHTMLUnsafe") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "prependHTMLUnsafe" (Internal.args #[toJS html, Internal.optional options]) Unit
+  return some lasmGuarded
 
 /-- `DOMString getHTML(optional GetHTMLOptions options)` -/
 @[macro_inline] def Element.getHTML (self : Element) (options : Option GetHTMLOptions := none) : IO String := Internal.api "Lasm.JS.Web.Element.getHTML" do
@@ -12902,25 +14613,73 @@ def HTMLTrackElement.ERROR : Nat := 3
 @[macro_inline] def Element.beforeHTML (self : Element) (html : String) (options : Option SetHTMLOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.Element.beforeHTML" do
   self.val.callMethod "beforeHTML" (Internal.args #[toJS html, Internal.optional options]) Unit
 
+/-- `undefined beforeHTML(DOMString html, optional SetHTMLOptions options)` where the platform has it (`'beforeHTML' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Element.beforeHTML? (self' : Element) (html : String) (options : Option SetHTMLOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Element.beforeHTML?" do
+  let self := self'
+  if !(← Internal.has self.val "beforeHTML") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "beforeHTML" (Internal.args #[toJS html, Internal.optional options]) Unit
+  return some lasmGuarded
+
 /-- `undefined afterHTML(DOMString html, optional SetHTMLOptions options)` -/
 @[macro_inline] def Element.afterHTML (self : Element) (html : String) (options : Option SetHTMLOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.Element.afterHTML" do
   self.val.callMethod "afterHTML" (Internal.args #[toJS html, Internal.optional options]) Unit
+
+/-- `undefined afterHTML(DOMString html, optional SetHTMLOptions options)` where the platform has it (`'afterHTML' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Element.afterHTML? (self' : Element) (html : String) (options : Option SetHTMLOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Element.afterHTML?" do
+  let self := self'
+  if !(← Internal.has self.val "afterHTML") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "afterHTML" (Internal.args #[toJS html, Internal.optional options]) Unit
+  return some lasmGuarded
 
 /-- `undefined replaceWithHTML(DOMString html, optional SetHTMLOptions options)` -/
 @[macro_inline] def Element.replaceWithHTML (self : Element) (html : String) (options : Option SetHTMLOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.Element.replaceWithHTML" do
   self.val.callMethod "replaceWithHTML" (Internal.args #[toJS html, Internal.optional options]) Unit
 
+/-- `undefined replaceWithHTML(DOMString html, optional SetHTMLOptions options)` where the platform has it (`'replaceWithHTML' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Element.replaceWithHTML? (self' : Element) (html : String) (options : Option SetHTMLOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Element.replaceWithHTML?" do
+  let self := self'
+  if !(← Internal.has self.val "replaceWithHTML") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "replaceWithHTML" (Internal.args #[toJS html, Internal.optional options]) Unit
+  return some lasmGuarded
+
 /-- `undefined beforeHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` -/
 @[macro_inline] def Element.beforeHTMLUnsafe (self : Element) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.Element.beforeHTMLUnsafe" do
   self.val.callMethod "beforeHTMLUnsafe" (Internal.args #[toJS html, Internal.optional options]) Unit
+
+/-- `undefined beforeHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` where the platform has it (`'beforeHTMLUnsafe' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Element.beforeHTMLUnsafe? (self' : Element) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Element.beforeHTMLUnsafe?" do
+  let self := self'
+  if !(← Internal.has self.val "beforeHTMLUnsafe") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "beforeHTMLUnsafe" (Internal.args #[toJS html, Internal.optional options]) Unit
+  return some lasmGuarded
 
 /-- `undefined afterHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` -/
 @[macro_inline] def Element.afterHTMLUnsafe (self : Element) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.Element.afterHTMLUnsafe" do
   self.val.callMethod "afterHTMLUnsafe" (Internal.args #[toJS html, Internal.optional options]) Unit
 
+/-- `undefined afterHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` where the platform has it (`'afterHTMLUnsafe' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Element.afterHTMLUnsafe? (self' : Element) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Element.afterHTMLUnsafe?" do
+  let self := self'
+  if !(← Internal.has self.val "afterHTMLUnsafe") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "afterHTMLUnsafe" (Internal.args #[toJS html, Internal.optional options]) Unit
+  return some lasmGuarded
+
 /-- `undefined replaceWithHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` -/
 @[macro_inline] def Element.replaceWithHTMLUnsafe (self : Element) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.Element.replaceWithHTMLUnsafe" do
   self.val.callMethod "replaceWithHTMLUnsafe" (Internal.args #[toJS html, Internal.optional options]) Unit
+
+/-- `undefined replaceWithHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` where the platform has it (`'replaceWithHTMLUnsafe' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Element.replaceWithHTMLUnsafe? (self' : Element) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Element.replaceWithHTMLUnsafe?" do
+  let self := self'
+  if !(← Internal.has self.val "replaceWithHTMLUnsafe") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "replaceWithHTMLUnsafe" (Internal.args #[toJS html, Internal.optional options]) Unit
+  return some lasmGuarded
 
 /-- `DocumentFragment createContextualFragment((TrustedHTML or DOMString) string)` -/
 @[macro_inline] def Range.createContextualFragment (self : Range) (string : TrustedHTMLOrDOMString) : IO DocumentFragment := Internal.api "Lasm.JS.Web.Range.createContextualFragment" do
@@ -12943,13 +14702,37 @@ def HTMLTrackElement.ERROR : Nat := 3
 @[macro_inline] def ShadowRoot.setHTML (self : ShadowRoot) (html : String) (options : Option SetHTMLOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.ShadowRoot.setHTML" do
   self.val.callMethod "setHTML" (Internal.args #[toJS html, Internal.optional options]) Unit
 
+/-- `undefined setHTML(DOMString html, optional SetHTMLOptions options)` where the platform has it (`'setHTML' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ShadowRoot.setHTML? (self' : ShadowRoot) (html : String) (options : Option SetHTMLOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.ShadowRoot.setHTML?" do
+  let self := self'
+  if !(← Internal.has self.val "setHTML") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "setHTML" (Internal.args #[toJS html, Internal.optional options]) Unit
+  return some lasmGuarded
+
 /-- `undefined appendHTML(DOMString html, optional SetHTMLOptions options)` -/
 @[macro_inline] def ShadowRoot.appendHTML (self : ShadowRoot) (html : String) (options : Option SetHTMLOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.ShadowRoot.appendHTML" do
   self.val.callMethod "appendHTML" (Internal.args #[toJS html, Internal.optional options]) Unit
 
+/-- `undefined appendHTML(DOMString html, optional SetHTMLOptions options)` where the platform has it (`'appendHTML' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ShadowRoot.appendHTML? (self' : ShadowRoot) (html : String) (options : Option SetHTMLOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.ShadowRoot.appendHTML?" do
+  let self := self'
+  if !(← Internal.has self.val "appendHTML") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "appendHTML" (Internal.args #[toJS html, Internal.optional options]) Unit
+  return some lasmGuarded
+
 /-- `undefined prependHTML(DOMString html, optional SetHTMLOptions options)` -/
 @[macro_inline] def ShadowRoot.prependHTML (self : ShadowRoot) (html : String) (options : Option SetHTMLOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.ShadowRoot.prependHTML" do
   self.val.callMethod "prependHTML" (Internal.args #[toJS html, Internal.optional options]) Unit
+
+/-- `undefined prependHTML(DOMString html, optional SetHTMLOptions options)` where the platform has it (`'prependHTML' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ShadowRoot.prependHTML? (self' : ShadowRoot) (html : String) (options : Option SetHTMLOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.ShadowRoot.prependHTML?" do
+  let self := self'
+  if !(← Internal.has self.val "prependHTML") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "prependHTML" (Internal.args #[toJS html, Internal.optional options]) Unit
+  return some lasmGuarded
 
 /-- `undefined setHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` -/
 @[macro_inline] def ShadowRoot.setHTMLUnsafe (self : ShadowRoot) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.ShadowRoot.setHTMLUnsafe" do
@@ -12959,9 +14742,25 @@ def HTMLTrackElement.ERROR : Nat := 3
 @[macro_inline] def ShadowRoot.appendHTMLUnsafe (self : ShadowRoot) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.ShadowRoot.appendHTMLUnsafe" do
   self.val.callMethod "appendHTMLUnsafe" (Internal.args #[toJS html, Internal.optional options]) Unit
 
+/-- `undefined appendHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` where the platform has it (`'appendHTMLUnsafe' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ShadowRoot.appendHTMLUnsafe? (self' : ShadowRoot) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.ShadowRoot.appendHTMLUnsafe?" do
+  let self := self'
+  if !(← Internal.has self.val "appendHTMLUnsafe") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "appendHTMLUnsafe" (Internal.args #[toJS html, Internal.optional options]) Unit
+  return some lasmGuarded
+
 /-- `undefined prependHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` -/
 @[macro_inline] def ShadowRoot.prependHTMLUnsafe (self : ShadowRoot) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.ShadowRoot.prependHTMLUnsafe" do
   self.val.callMethod "prependHTMLUnsafe" (Internal.args #[toJS html, Internal.optional options]) Unit
+
+/-- `undefined prependHTMLUnsafe((TrustedHTML or DOMString) html, optional (SetHTMLUnsafeOptions or TrustedHTMLParserOptions) options)` where the platform has it (`'prependHTMLUnsafe' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ShadowRoot.prependHTMLUnsafe? (self' : ShadowRoot) (html : TrustedHTMLOrDOMString) (options : Option SetHTMLUnsafeOptionsOrTrustedHTMLParserOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.ShadowRoot.prependHTMLUnsafe?" do
+  let self := self'
+  if !(← Internal.has self.val "prependHTMLUnsafe") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "prependHTMLUnsafe" (Internal.args #[toJS html, Internal.optional options]) Unit
+  return some lasmGuarded
 
 /-- `DOMString getHTML(optional GetHTMLOptions options)` -/
 @[macro_inline] def ShadowRoot.getHTML (self : ShadowRoot) (options : Option GetHTMLOptions := none) : IO String := Internal.api "Lasm.JS.Web.ShadowRoot.getHTML" do
@@ -12972,594 +14771,1608 @@ def HTMLTrackElement.ERROR : Nat := 3
   let r ← Internal.getGlobal ["window"] Value
   pure { val := r }
 
+/-- `readonly attribute WindowProxy window` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def window? : IO (Option Window) := Internal.api "Lasm.JS.Web.window?" do
+  if !(← Internal.hasGlobal ["window"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["window"] Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute WindowProxy self` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def self : IO Window := Internal.api "Lasm.JS.Web.self" do
   let r ← Internal.getGlobal ["self"] Value
   pure { val := r }
+
+/-- `readonly attribute WindowProxy self` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def self? : IO (Option Window) := Internal.api "Lasm.JS.Web.self?" do
+  if !(← Internal.hasGlobal ["self"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["self"] Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `readonly attribute Document document` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def document : IO Document := Internal.api "Lasm.JS.Web.document" do
   let r ← Internal.getGlobal ["document"] Value
   pure { val := r }
 
+/-- `readonly attribute Document document` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def document? : IO (Option Document) := Internal.api "Lasm.JS.Web.document?" do
+  if !(← Internal.hasGlobal ["document"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["document"] Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `attribute DOMString name` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def name : IO String := Internal.api "Lasm.JS.Web.name" do
   Internal.getGlobal ["name"] String
+
+/-- `attribute DOMString name` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def name? : IO (Option String) := Internal.api "Lasm.JS.Web.name?" do
+  if !(← Internal.hasGlobal ["name"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["name"] String
+  return some lasmGuarded
 
 /-- `readonly attribute Location location` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def location : IO Location := Internal.api "Lasm.JS.Web.location" do
   let r ← Internal.getGlobal ["location"] Value
   pure { val := r }
 
+/-- `readonly attribute Location location` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def location? : IO (Option Location) := Internal.api "Lasm.JS.Web.location?" do
+  if !(← Internal.hasGlobal ["location"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["location"] Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute History history` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def history : IO History := Internal.api "Lasm.JS.Web.history" do
   let r ← Internal.getGlobal ["history"] Value
   pure { val := r }
+
+/-- `readonly attribute History history` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def history? : IO (Option History) := Internal.api "Lasm.JS.Web.history?" do
+  if !(← Internal.hasGlobal ["history"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["history"] Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `readonly attribute Navigation navigation` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def navigation : IO Navigation := Internal.api "Lasm.JS.Web.navigation" do
   let r ← Internal.getGlobal ["navigation"] Value
   pure { val := r }
 
+/-- `readonly attribute Navigation navigation` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def navigation? : IO (Option Navigation) := Internal.api "Lasm.JS.Web.navigation?" do
+  if !(← Internal.hasGlobal ["navigation"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["navigation"] Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute CustomElementRegistry customElements` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def customElements : IO CustomElementRegistry := Internal.api "Lasm.JS.Web.customElements" do
   let r ← Internal.getGlobal ["customElements"] Value
   pure { val := r }
+
+/-- `readonly attribute CustomElementRegistry customElements` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def customElements? : IO (Option CustomElementRegistry) := Internal.api "Lasm.JS.Web.customElements?" do
+  if !(← Internal.hasGlobal ["customElements"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["customElements"] Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `readonly attribute BarProp locationbar` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def locationbar : IO BarProp := Internal.api "Lasm.JS.Web.locationbar" do
   let r ← Internal.getGlobal ["locationbar"] Value
   pure { val := r }
 
+/-- `readonly attribute BarProp locationbar` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def locationbar? : IO (Option BarProp) := Internal.api "Lasm.JS.Web.locationbar?" do
+  if !(← Internal.hasGlobal ["locationbar"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["locationbar"] Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute BarProp menubar` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def menubar : IO BarProp := Internal.api "Lasm.JS.Web.menubar" do
   let r ← Internal.getGlobal ["menubar"] Value
   pure { val := r }
+
+/-- `readonly attribute BarProp menubar` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def menubar? : IO (Option BarProp) := Internal.api "Lasm.JS.Web.menubar?" do
+  if !(← Internal.hasGlobal ["menubar"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["menubar"] Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `readonly attribute BarProp personalbar` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def personalbar : IO BarProp := Internal.api "Lasm.JS.Web.personalbar" do
   let r ← Internal.getGlobal ["personalbar"] Value
   pure { val := r }
 
+/-- `readonly attribute BarProp personalbar` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def personalbar? : IO (Option BarProp) := Internal.api "Lasm.JS.Web.personalbar?" do
+  if !(← Internal.hasGlobal ["personalbar"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["personalbar"] Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute BarProp scrollbars` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def scrollbars : IO BarProp := Internal.api "Lasm.JS.Web.scrollbars" do
   let r ← Internal.getGlobal ["scrollbars"] Value
   pure { val := r }
+
+/-- `readonly attribute BarProp scrollbars` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def scrollbars? : IO (Option BarProp) := Internal.api "Lasm.JS.Web.scrollbars?" do
+  if !(← Internal.hasGlobal ["scrollbars"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["scrollbars"] Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `readonly attribute BarProp statusbar` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def statusbar : IO BarProp := Internal.api "Lasm.JS.Web.statusbar" do
   let r ← Internal.getGlobal ["statusbar"] Value
   pure { val := r }
 
+/-- `readonly attribute BarProp statusbar` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def statusbar? : IO (Option BarProp) := Internal.api "Lasm.JS.Web.statusbar?" do
+  if !(← Internal.hasGlobal ["statusbar"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["statusbar"] Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute BarProp toolbar` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def toolbar : IO BarProp := Internal.api "Lasm.JS.Web.toolbar" do
   let r ← Internal.getGlobal ["toolbar"] Value
   pure { val := r }
 
+/-- `readonly attribute BarProp toolbar` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def toolbar? : IO (Option BarProp) := Internal.api "Lasm.JS.Web.toolbar?" do
+  if !(← Internal.hasGlobal ["toolbar"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["toolbar"] Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `attribute DOMString status` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def status : IO String := Internal.api "Lasm.JS.Web.status" do
   Internal.getGlobal ["status"] String
 
+/-- `attribute DOMString status` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def status? : IO (Option String) := Internal.api "Lasm.JS.Web.status?" do
+  if !(← Internal.hasGlobal ["status"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["status"] String
+  return some lasmGuarded
+
 /-- `readonly attribute boolean closed` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def closed : IO Bool := Internal.api "Lasm.JS.Web.closed" do
   Internal.getGlobal ["closed"] Bool
+
+/-- `readonly attribute boolean closed` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def closed? : IO (Option Bool) := Internal.api "Lasm.JS.Web.closed?" do
+  if !(← Internal.hasGlobal ["closed"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["closed"] Bool
+  return some lasmGuarded
 
 /-- `readonly attribute WindowProxy frames` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def frames : IO Window := Internal.api "Lasm.JS.Web.frames" do
   let r ← Internal.getGlobal ["frames"] Value
   pure { val := r }
 
+/-- `readonly attribute WindowProxy frames` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def frames? : IO (Option Window) := Internal.api "Lasm.JS.Web.frames?" do
+  if !(← Internal.hasGlobal ["frames"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["frames"] Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute unsigned long length` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def length : IO Nat := Internal.api "Lasm.JS.Web.length" do
   Internal.getGlobal ["length"] Nat
+
+/-- `readonly attribute unsigned long length` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def length? : IO (Option Nat) := Internal.api "Lasm.JS.Web.length?" do
+  if !(← Internal.hasGlobal ["length"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["length"] Nat
+  return some lasmGuarded
 
 /-- `readonly attribute WindowProxy? top` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def top : IO (Option Window) := Internal.api "Lasm.JS.Web.top" do
   Internal.getGlobal ["top"] (Option Window)
 
+/-- `readonly attribute WindowProxy? top` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def top? : IO (Option (Option Window)) := Internal.api "Lasm.JS.Web.top?" do
+  if !(← Internal.hasGlobal ["top"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["top"] (Option Window)
+  return some lasmGuarded
+
 /-- `attribute any opener` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def opener : IO Data := Internal.api "Lasm.JS.Web.opener" do
   Internal.getGlobal ["opener"] Data
+
+/-- `attribute any opener` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def opener? : IO (Option Data) := Internal.api "Lasm.JS.Web.opener?" do
+  if !(← Internal.hasGlobal ["opener"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["opener"] Data
+  return some lasmGuarded
 
 /-- `readonly attribute WindowProxy? parent` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def parent : IO (Option Window) := Internal.api "Lasm.JS.Web.parent" do
   Internal.getGlobal ["parent"] (Option Window)
 
+/-- `readonly attribute WindowProxy? parent` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def parent? : IO (Option (Option Window)) := Internal.api "Lasm.JS.Web.parent?" do
+  if !(← Internal.hasGlobal ["parent"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["parent"] (Option Window)
+  return some lasmGuarded
+
 /-- `readonly attribute Element? frameElement` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def frameElement : IO (Option Element) := Internal.api "Lasm.JS.Web.frameElement" do
   Internal.getGlobal ["frameElement"] (Option Element)
+
+/-- `readonly attribute Element? frameElement` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def frameElement? : IO (Option (Option Element)) := Internal.api "Lasm.JS.Web.frameElement?" do
+  if !(← Internal.hasGlobal ["frameElement"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["frameElement"] (Option Element)
+  return some lasmGuarded
 
 /-- `readonly attribute Navigator navigator` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def navigator : IO Navigator := Internal.api "Lasm.JS.Web.navigator" do
   let r ← Internal.getGlobal ["navigator"] Value
   pure { val := r }
 
+/-- `readonly attribute Navigator navigator` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def navigator? : IO (Option Navigator) := Internal.api "Lasm.JS.Web.navigator?" do
+  if !(← Internal.hasGlobal ["navigator"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["navigator"] Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute Navigator clientInformation` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def clientInformation : IO Navigator := Internal.api "Lasm.JS.Web.clientInformation" do
   let r ← Internal.getGlobal ["clientInformation"] Value
   pure { val := r }
 
+/-- `readonly attribute Navigator clientInformation` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def clientInformation? : IO (Option Navigator) := Internal.api "Lasm.JS.Web.clientInformation?" do
+  if !(← Internal.hasGlobal ["clientInformation"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["clientInformation"] Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute boolean originAgentCluster` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def originAgentCluster : IO Bool := Internal.api "Lasm.JS.Web.originAgentCluster" do
   Internal.getGlobal ["originAgentCluster"] Bool
+
+/-- `readonly attribute boolean originAgentCluster` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def originAgentCluster? : IO (Option Bool) := Internal.api "Lasm.JS.Web.originAgentCluster?" do
+  if !(← Internal.hasGlobal ["originAgentCluster"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["originAgentCluster"] Bool
+  return some lasmGuarded
 
 /-- `readonly attribute External external` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def external : IO External := Internal.api "Lasm.JS.Web.external" do
   let r ← Internal.getGlobal ["external"] Value
   pure { val := r }
 
+/-- `readonly attribute External external` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def external? : IO (Option External) := Internal.api "Lasm.JS.Web.external?" do
+  if !(← Internal.hasGlobal ["external"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["external"] Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `attribute EventHandler onabort` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onabort : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onabort" do
   Internal.getGlobal ["onabort"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onabort` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onabort? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onabort?" do
+  if !(← Internal.hasGlobal ["onabort"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onabort"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onauxclick` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onauxclick : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onauxclick" do
   Internal.getGlobal ["onauxclick"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onauxclick` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onauxclick? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onauxclick?" do
+  if !(← Internal.hasGlobal ["onauxclick"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onauxclick"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onbeforeinput` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onbeforeinput : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onbeforeinput" do
   Internal.getGlobal ["onbeforeinput"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onbeforeinput` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onbeforeinput? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onbeforeinput?" do
+  if !(← Internal.hasGlobal ["onbeforeinput"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onbeforeinput"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onbeforematch` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onbeforematch : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onbeforematch" do
   Internal.getGlobal ["onbeforematch"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onbeforematch` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onbeforematch? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onbeforematch?" do
+  if !(← Internal.hasGlobal ["onbeforematch"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onbeforematch"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onbeforetoggle` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onbeforetoggle : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onbeforetoggle" do
   Internal.getGlobal ["onbeforetoggle"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onbeforetoggle` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onbeforetoggle? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onbeforetoggle?" do
+  if !(← Internal.hasGlobal ["onbeforetoggle"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onbeforetoggle"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onblur` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onblur : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onblur" do
   Internal.getGlobal ["onblur"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onblur` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onblur? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onblur?" do
+  if !(← Internal.hasGlobal ["onblur"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onblur"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler oncancel` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def oncancel : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.oncancel" do
   Internal.getGlobal ["oncancel"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler oncancel` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def oncancel? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.oncancel?" do
+  if !(← Internal.hasGlobal ["oncancel"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["oncancel"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler oncanplay` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def oncanplay : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.oncanplay" do
   Internal.getGlobal ["oncanplay"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler oncanplay` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def oncanplay? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.oncanplay?" do
+  if !(← Internal.hasGlobal ["oncanplay"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["oncanplay"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler oncanplaythrough` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def oncanplaythrough : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.oncanplaythrough" do
   Internal.getGlobal ["oncanplaythrough"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler oncanplaythrough` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def oncanplaythrough? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.oncanplaythrough?" do
+  if !(← Internal.hasGlobal ["oncanplaythrough"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["oncanplaythrough"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onchange` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onchange : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onchange" do
   Internal.getGlobal ["onchange"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onchange` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onchange? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onchange?" do
+  if !(← Internal.hasGlobal ["onchange"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onchange"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onclick` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onclick : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onclick" do
   Internal.getGlobal ["onclick"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onclick` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onclick? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onclick?" do
+  if !(← Internal.hasGlobal ["onclick"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onclick"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onclose` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onclose : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onclose" do
   Internal.getGlobal ["onclose"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onclose` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onclose? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onclose?" do
+  if !(← Internal.hasGlobal ["onclose"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onclose"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler oncommand` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def oncommand : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.oncommand" do
   Internal.getGlobal ["oncommand"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler oncommand` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def oncommand? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.oncommand?" do
+  if !(← Internal.hasGlobal ["oncommand"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["oncommand"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler oncontextlost` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def oncontextlost : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.oncontextlost" do
   Internal.getGlobal ["oncontextlost"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler oncontextlost` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def oncontextlost? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.oncontextlost?" do
+  if !(← Internal.hasGlobal ["oncontextlost"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["oncontextlost"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler oncontextmenu` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def oncontextmenu : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.oncontextmenu" do
   Internal.getGlobal ["oncontextmenu"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler oncontextmenu` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def oncontextmenu? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.oncontextmenu?" do
+  if !(← Internal.hasGlobal ["oncontextmenu"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["oncontextmenu"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler oncontextrestored` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def oncontextrestored : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.oncontextrestored" do
   Internal.getGlobal ["oncontextrestored"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler oncontextrestored` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def oncontextrestored? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.oncontextrestored?" do
+  if !(← Internal.hasGlobal ["oncontextrestored"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["oncontextrestored"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler oncopy` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def oncopy : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.oncopy" do
   Internal.getGlobal ["oncopy"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler oncopy` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def oncopy? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.oncopy?" do
+  if !(← Internal.hasGlobal ["oncopy"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["oncopy"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler oncuechange` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def oncuechange : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.oncuechange" do
   Internal.getGlobal ["oncuechange"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler oncuechange` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def oncuechange? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.oncuechange?" do
+  if !(← Internal.hasGlobal ["oncuechange"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["oncuechange"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler oncut` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def oncut : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.oncut" do
   Internal.getGlobal ["oncut"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler oncut` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def oncut? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.oncut?" do
+  if !(← Internal.hasGlobal ["oncut"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["oncut"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler ondblclick` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def ondblclick : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ondblclick" do
   Internal.getGlobal ["ondblclick"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler ondblclick` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ondblclick? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ondblclick?" do
+  if !(← Internal.hasGlobal ["ondblclick"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ondblclick"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler ondrag` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def ondrag : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ondrag" do
   Internal.getGlobal ["ondrag"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler ondrag` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ondrag? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ondrag?" do
+  if !(← Internal.hasGlobal ["ondrag"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ondrag"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler ondragend` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def ondragend : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ondragend" do
   Internal.getGlobal ["ondragend"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler ondragend` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ondragend? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ondragend?" do
+  if !(← Internal.hasGlobal ["ondragend"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ondragend"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler ondragenter` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def ondragenter : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ondragenter" do
   Internal.getGlobal ["ondragenter"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler ondragenter` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ondragenter? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ondragenter?" do
+  if !(← Internal.hasGlobal ["ondragenter"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ondragenter"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler ondragleave` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def ondragleave : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ondragleave" do
   Internal.getGlobal ["ondragleave"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler ondragleave` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ondragleave? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ondragleave?" do
+  if !(← Internal.hasGlobal ["ondragleave"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ondragleave"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler ondragover` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def ondragover : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ondragover" do
   Internal.getGlobal ["ondragover"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler ondragover` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ondragover? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ondragover?" do
+  if !(← Internal.hasGlobal ["ondragover"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ondragover"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler ondragstart` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def ondragstart : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ondragstart" do
   Internal.getGlobal ["ondragstart"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler ondragstart` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ondragstart? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ondragstart?" do
+  if !(← Internal.hasGlobal ["ondragstart"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ondragstart"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler ondrop` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def ondrop : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ondrop" do
   Internal.getGlobal ["ondrop"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler ondrop` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ondrop? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ondrop?" do
+  if !(← Internal.hasGlobal ["ondrop"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ondrop"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler ondurationchange` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def ondurationchange : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ondurationchange" do
   Internal.getGlobal ["ondurationchange"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler ondurationchange` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ondurationchange? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ondurationchange?" do
+  if !(← Internal.hasGlobal ["ondurationchange"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ondurationchange"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onemptied` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onemptied : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onemptied" do
   Internal.getGlobal ["onemptied"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onemptied` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onemptied? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onemptied?" do
+  if !(← Internal.hasGlobal ["onemptied"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onemptied"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onended` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onended : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onended" do
   Internal.getGlobal ["onended"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onended` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onended? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onended?" do
+  if !(← Internal.hasGlobal ["onended"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onended"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute OnErrorEventHandler onerror` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onerror : IO (Option OnErrorEventHandlerNonNull) := Internal.api "Lasm.JS.Web.onerror" do
   Internal.getGlobal ["onerror"] (Option OnErrorEventHandlerNonNull)
+
+/-- `attribute OnErrorEventHandler onerror` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onerror? : IO (Option (Option OnErrorEventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onerror?" do
+  if !(← Internal.hasGlobal ["onerror"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onerror"] (Option OnErrorEventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onfocus` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onfocus : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onfocus" do
   Internal.getGlobal ["onfocus"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onfocus` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onfocus? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onfocus?" do
+  if !(← Internal.hasGlobal ["onfocus"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onfocus"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onformdata` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onformdata : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onformdata" do
   Internal.getGlobal ["onformdata"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onformdata` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onformdata? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onformdata?" do
+  if !(← Internal.hasGlobal ["onformdata"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onformdata"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler oninput` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def oninput : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.oninput" do
   Internal.getGlobal ["oninput"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler oninput` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def oninput? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.oninput?" do
+  if !(← Internal.hasGlobal ["oninput"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["oninput"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler oninvalid` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def oninvalid : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.oninvalid" do
   Internal.getGlobal ["oninvalid"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler oninvalid` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def oninvalid? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.oninvalid?" do
+  if !(← Internal.hasGlobal ["oninvalid"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["oninvalid"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onkeydown` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onkeydown : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onkeydown" do
   Internal.getGlobal ["onkeydown"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onkeydown` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onkeydown? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onkeydown?" do
+  if !(← Internal.hasGlobal ["onkeydown"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onkeydown"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onkeypress` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onkeypress : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onkeypress" do
   Internal.getGlobal ["onkeypress"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onkeypress` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onkeypress? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onkeypress?" do
+  if !(← Internal.hasGlobal ["onkeypress"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onkeypress"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onkeyup` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onkeyup : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onkeyup" do
   Internal.getGlobal ["onkeyup"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onkeyup` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onkeyup? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onkeyup?" do
+  if !(← Internal.hasGlobal ["onkeyup"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onkeyup"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onload` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onload : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onload" do
   Internal.getGlobal ["onload"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onload` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onload? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onload?" do
+  if !(← Internal.hasGlobal ["onload"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onload"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onloadeddata` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onloadeddata : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onloadeddata" do
   Internal.getGlobal ["onloadeddata"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onloadeddata` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onloadeddata? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onloadeddata?" do
+  if !(← Internal.hasGlobal ["onloadeddata"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onloadeddata"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onloadedmetadata` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onloadedmetadata : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onloadedmetadata" do
   Internal.getGlobal ["onloadedmetadata"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onloadedmetadata` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onloadedmetadata? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onloadedmetadata?" do
+  if !(← Internal.hasGlobal ["onloadedmetadata"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onloadedmetadata"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onloadstart` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onloadstart : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onloadstart" do
   Internal.getGlobal ["onloadstart"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onloadstart` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onloadstart? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onloadstart?" do
+  if !(← Internal.hasGlobal ["onloadstart"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onloadstart"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onmousedown` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onmousedown : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onmousedown" do
   Internal.getGlobal ["onmousedown"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onmousedown` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onmousedown? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onmousedown?" do
+  if !(← Internal.hasGlobal ["onmousedown"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onmousedown"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onmouseenter` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onmouseenter : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onmouseenter" do
   Internal.getGlobal ["onmouseenter"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onmouseenter` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onmouseenter? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onmouseenter?" do
+  if !(← Internal.hasGlobal ["onmouseenter"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onmouseenter"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onmouseleave` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onmouseleave : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onmouseleave" do
   Internal.getGlobal ["onmouseleave"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onmouseleave` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onmouseleave? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onmouseleave?" do
+  if !(← Internal.hasGlobal ["onmouseleave"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onmouseleave"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onmousemove` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onmousemove : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onmousemove" do
   Internal.getGlobal ["onmousemove"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onmousemove` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onmousemove? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onmousemove?" do
+  if !(← Internal.hasGlobal ["onmousemove"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onmousemove"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onmouseout` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onmouseout : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onmouseout" do
   Internal.getGlobal ["onmouseout"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onmouseout` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onmouseout? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onmouseout?" do
+  if !(← Internal.hasGlobal ["onmouseout"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onmouseout"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onmouseover` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onmouseover : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onmouseover" do
   Internal.getGlobal ["onmouseover"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onmouseover` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onmouseover? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onmouseover?" do
+  if !(← Internal.hasGlobal ["onmouseover"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onmouseover"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onmouseup` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onmouseup : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onmouseup" do
   Internal.getGlobal ["onmouseup"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onmouseup` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onmouseup? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onmouseup?" do
+  if !(← Internal.hasGlobal ["onmouseup"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onmouseup"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onpaste` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onpaste : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpaste" do
   Internal.getGlobal ["onpaste"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onpaste` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onpaste? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onpaste?" do
+  if !(← Internal.hasGlobal ["onpaste"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onpaste"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onpause` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onpause : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpause" do
   Internal.getGlobal ["onpause"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onpause` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onpause? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onpause?" do
+  if !(← Internal.hasGlobal ["onpause"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onpause"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onplay` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onplay : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onplay" do
   Internal.getGlobal ["onplay"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onplay` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onplay? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onplay?" do
+  if !(← Internal.hasGlobal ["onplay"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onplay"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onplaying` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onplaying : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onplaying" do
   Internal.getGlobal ["onplaying"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onplaying` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onplaying? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onplaying?" do
+  if !(← Internal.hasGlobal ["onplaying"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onplaying"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onprogress` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onprogress : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onprogress" do
   Internal.getGlobal ["onprogress"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onprogress` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onprogress? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onprogress?" do
+  if !(← Internal.hasGlobal ["onprogress"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onprogress"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onratechange` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onratechange : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onratechange" do
   Internal.getGlobal ["onratechange"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onratechange` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onratechange? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onratechange?" do
+  if !(← Internal.hasGlobal ["onratechange"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onratechange"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onreset` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onreset : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onreset" do
   Internal.getGlobal ["onreset"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onreset` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onreset? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onreset?" do
+  if !(← Internal.hasGlobal ["onreset"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onreset"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onresize` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onresize : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onresize" do
   Internal.getGlobal ["onresize"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onresize` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onresize? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onresize?" do
+  if !(← Internal.hasGlobal ["onresize"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onresize"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onscroll` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onscroll : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onscroll" do
   Internal.getGlobal ["onscroll"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onscroll` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onscroll? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onscroll?" do
+  if !(← Internal.hasGlobal ["onscroll"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onscroll"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onscrollend` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onscrollend : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onscrollend" do
   Internal.getGlobal ["onscrollend"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onscrollend` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onscrollend? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onscrollend?" do
+  if !(← Internal.hasGlobal ["onscrollend"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onscrollend"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onsecuritypolicyviolation` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onsecuritypolicyviolation : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onsecuritypolicyviolation" do
   Internal.getGlobal ["onsecuritypolicyviolation"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onsecuritypolicyviolation` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onsecuritypolicyviolation? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onsecuritypolicyviolation?" do
+  if !(← Internal.hasGlobal ["onsecuritypolicyviolation"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onsecuritypolicyviolation"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onseeked` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onseeked : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onseeked" do
   Internal.getGlobal ["onseeked"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onseeked` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onseeked? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onseeked?" do
+  if !(← Internal.hasGlobal ["onseeked"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onseeked"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onseeking` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onseeking : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onseeking" do
   Internal.getGlobal ["onseeking"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onseeking` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onseeking? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onseeking?" do
+  if !(← Internal.hasGlobal ["onseeking"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onseeking"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onselect` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onselect : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onselect" do
   Internal.getGlobal ["onselect"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onselect` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onselect? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onselect?" do
+  if !(← Internal.hasGlobal ["onselect"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onselect"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onslotchange` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onslotchange : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onslotchange" do
   Internal.getGlobal ["onslotchange"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onslotchange` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onslotchange? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onslotchange?" do
+  if !(← Internal.hasGlobal ["onslotchange"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onslotchange"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onstalled` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onstalled : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onstalled" do
   Internal.getGlobal ["onstalled"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onstalled` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onstalled? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onstalled?" do
+  if !(← Internal.hasGlobal ["onstalled"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onstalled"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onsubmit` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onsubmit : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onsubmit" do
   Internal.getGlobal ["onsubmit"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onsubmit` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onsubmit? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onsubmit?" do
+  if !(← Internal.hasGlobal ["onsubmit"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onsubmit"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onsuspend` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onsuspend : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onsuspend" do
   Internal.getGlobal ["onsuspend"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onsuspend` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onsuspend? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onsuspend?" do
+  if !(← Internal.hasGlobal ["onsuspend"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onsuspend"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler ontimeupdate` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def ontimeupdate : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ontimeupdate" do
   Internal.getGlobal ["ontimeupdate"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler ontimeupdate` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ontimeupdate? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ontimeupdate?" do
+  if !(← Internal.hasGlobal ["ontimeupdate"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ontimeupdate"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler ontoggle` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def ontoggle : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ontoggle" do
   Internal.getGlobal ["ontoggle"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler ontoggle` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ontoggle? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ontoggle?" do
+  if !(← Internal.hasGlobal ["ontoggle"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ontoggle"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onvolumechange` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onvolumechange : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onvolumechange" do
   Internal.getGlobal ["onvolumechange"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onvolumechange` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onvolumechange? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onvolumechange?" do
+  if !(← Internal.hasGlobal ["onvolumechange"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onvolumechange"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onwaiting` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onwaiting : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onwaiting" do
   Internal.getGlobal ["onwaiting"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onwaiting` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onwaiting? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onwaiting?" do
+  if !(← Internal.hasGlobal ["onwaiting"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onwaiting"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onwebkitanimationend` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onwebkitanimationend : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onwebkitanimationend" do
   Internal.getGlobal ["onwebkitanimationend"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onwebkitanimationend` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onwebkitanimationend? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onwebkitanimationend?" do
+  if !(← Internal.hasGlobal ["onwebkitanimationend"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onwebkitanimationend"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onwebkitanimationiteration` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onwebkitanimationiteration : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onwebkitanimationiteration" do
   Internal.getGlobal ["onwebkitanimationiteration"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onwebkitanimationiteration` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onwebkitanimationiteration? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onwebkitanimationiteration?" do
+  if !(← Internal.hasGlobal ["onwebkitanimationiteration"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onwebkitanimationiteration"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onwebkitanimationstart` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onwebkitanimationstart : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onwebkitanimationstart" do
   Internal.getGlobal ["onwebkitanimationstart"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onwebkitanimationstart` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onwebkitanimationstart? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onwebkitanimationstart?" do
+  if !(← Internal.hasGlobal ["onwebkitanimationstart"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onwebkitanimationstart"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onwebkittransitionend` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onwebkittransitionend : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onwebkittransitionend" do
   Internal.getGlobal ["onwebkittransitionend"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onwebkittransitionend` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onwebkittransitionend? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onwebkittransitionend?" do
+  if !(← Internal.hasGlobal ["onwebkittransitionend"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onwebkittransitionend"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onwheel` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onwheel : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onwheel" do
   Internal.getGlobal ["onwheel"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onwheel` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onwheel? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onwheel?" do
+  if !(← Internal.hasGlobal ["onwheel"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onwheel"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onafterprint` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onafterprint : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onafterprint" do
   Internal.getGlobal ["onafterprint"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onafterprint` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onafterprint? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onafterprint?" do
+  if !(← Internal.hasGlobal ["onafterprint"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onafterprint"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onbeforeprint` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onbeforeprint : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onbeforeprint" do
   Internal.getGlobal ["onbeforeprint"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onbeforeprint` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onbeforeprint? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onbeforeprint?" do
+  if !(← Internal.hasGlobal ["onbeforeprint"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onbeforeprint"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute OnBeforeUnloadEventHandler onbeforeunload` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onbeforeunload : IO (Option OnBeforeUnloadEventHandlerNonNull) := Internal.api "Lasm.JS.Web.onbeforeunload" do
   Internal.getGlobal ["onbeforeunload"] (Option OnBeforeUnloadEventHandlerNonNull)
+
+/-- `attribute OnBeforeUnloadEventHandler onbeforeunload` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onbeforeunload? : IO (Option (Option OnBeforeUnloadEventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onbeforeunload?" do
+  if !(← Internal.hasGlobal ["onbeforeunload"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onbeforeunload"] (Option OnBeforeUnloadEventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onhashchange` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onhashchange : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onhashchange" do
   Internal.getGlobal ["onhashchange"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onhashchange` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onhashchange? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onhashchange?" do
+  if !(← Internal.hasGlobal ["onhashchange"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onhashchange"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onlanguagechange` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onlanguagechange : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onlanguagechange" do
   Internal.getGlobal ["onlanguagechange"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onlanguagechange` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onlanguagechange? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onlanguagechange?" do
+  if !(← Internal.hasGlobal ["onlanguagechange"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onlanguagechange"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onmessage` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onmessage : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onmessage" do
   Internal.getGlobal ["onmessage"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onmessage` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onmessage? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onmessage?" do
+  if !(← Internal.hasGlobal ["onmessage"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onmessage"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onmessageerror` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onmessageerror : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onmessageerror" do
   Internal.getGlobal ["onmessageerror"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onmessageerror` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onmessageerror? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onmessageerror?" do
+  if !(← Internal.hasGlobal ["onmessageerror"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onmessageerror"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onoffline` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onoffline : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onoffline" do
   Internal.getGlobal ["onoffline"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onoffline` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onoffline? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onoffline?" do
+  if !(← Internal.hasGlobal ["onoffline"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onoffline"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler ononline` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def ononline : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ononline" do
   Internal.getGlobal ["ononline"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler ononline` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ononline? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ononline?" do
+  if !(← Internal.hasGlobal ["ononline"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ononline"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onpagehide` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onpagehide : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpagehide" do
   Internal.getGlobal ["onpagehide"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onpagehide` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onpagehide? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onpagehide?" do
+  if !(← Internal.hasGlobal ["onpagehide"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onpagehide"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onpagereveal` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onpagereveal : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpagereveal" do
   Internal.getGlobal ["onpagereveal"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onpagereveal` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onpagereveal? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onpagereveal?" do
+  if !(← Internal.hasGlobal ["onpagereveal"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onpagereveal"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onpageshow` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onpageshow : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpageshow" do
   Internal.getGlobal ["onpageshow"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onpageshow` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onpageshow? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onpageshow?" do
+  if !(← Internal.hasGlobal ["onpageshow"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onpageshow"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onpageswap` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onpageswap : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpageswap" do
   Internal.getGlobal ["onpageswap"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onpageswap` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onpageswap? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onpageswap?" do
+  if !(← Internal.hasGlobal ["onpageswap"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onpageswap"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onpopstate` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onpopstate : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onpopstate" do
   Internal.getGlobal ["onpopstate"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onpopstate` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onpopstate? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onpopstate?" do
+  if !(← Internal.hasGlobal ["onpopstate"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onpopstate"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onrejectionhandled` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onrejectionhandled : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onrejectionhandled" do
   Internal.getGlobal ["onrejectionhandled"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onrejectionhandled` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onrejectionhandled? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onrejectionhandled?" do
+  if !(← Internal.hasGlobal ["onrejectionhandled"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onrejectionhandled"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onstorage` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onstorage : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onstorage" do
   Internal.getGlobal ["onstorage"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onstorage` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onstorage? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onstorage?" do
+  if !(← Internal.hasGlobal ["onstorage"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onstorage"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onunhandledrejection` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onunhandledrejection : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onunhandledrejection" do
   Internal.getGlobal ["onunhandledrejection"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onunhandledrejection` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onunhandledrejection? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onunhandledrejection?" do
+  if !(← Internal.hasGlobal ["onunhandledrejection"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onunhandledrejection"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onunload` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def onunload : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onunload" do
   Internal.getGlobal ["onunload"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onunload` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onunload? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onunload?" do
+  if !(← Internal.hasGlobal ["onunload"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onunload"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `readonly attribute USVString origin` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def origin : IO String := Internal.api "Lasm.JS.Web.origin" do
   Internal.getGlobal ["origin"] String
+
+/-- `readonly attribute USVString origin` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def origin? : IO (Option String) := Internal.api "Lasm.JS.Web.origin?" do
+  if !(← Internal.hasGlobal ["origin"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["origin"] String
+  return some lasmGuarded
 
 /-- `readonly attribute boolean isSecureContext` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def isSecureContext : IO Bool := Internal.api "Lasm.JS.Web.isSecureContext" do
   Internal.getGlobal ["isSecureContext"] Bool
 
+/-- `readonly attribute boolean isSecureContext` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def isSecureContext? : IO (Option Bool) := Internal.api "Lasm.JS.Web.isSecureContext?" do
+  if !(← Internal.hasGlobal ["isSecureContext"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["isSecureContext"] Bool
+  return some lasmGuarded
+
 /-- `readonly attribute boolean crossOriginIsolated` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def crossOriginIsolated : IO Bool := Internal.api "Lasm.JS.Web.crossOriginIsolated" do
   Internal.getGlobal ["crossOriginIsolated"] Bool
+
+/-- `readonly attribute boolean crossOriginIsolated` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def crossOriginIsolated? : IO (Option Bool) := Internal.api "Lasm.JS.Web.crossOriginIsolated?" do
+  if !(← Internal.hasGlobal ["crossOriginIsolated"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["crossOriginIsolated"] Bool
+  return some lasmGuarded
 
 /-- `readonly attribute Storage sessionStorage` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def sessionStorage : IO Storage := Internal.api "Lasm.JS.Web.sessionStorage" do
   let r ← Internal.getGlobal ["sessionStorage"] Value
   pure { val := r }
 
+/-- `readonly attribute Storage sessionStorage` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def sessionStorage? : IO (Option Storage) := Internal.api "Lasm.JS.Web.sessionStorage?" do
+  if !(← Internal.hasGlobal ["sessionStorage"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["sessionStorage"] Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute Storage localStorage` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def localStorage : IO Storage := Internal.api "Lasm.JS.Web.localStorage" do
   let r ← Internal.getGlobal ["localStorage"] Value
   pure { val := r }
+
+/-- `readonly attribute Storage localStorage` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def localStorage? : IO (Option Storage) := Internal.api "Lasm.JS.Web.localStorage?" do
+  if !(← Internal.hasGlobal ["localStorage"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["localStorage"] Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `undefined close()` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def close : IO Unit := Internal.api "Lasm.JS.Web.close" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.close", module := "globalThis", path := "close", construct := false, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `undefined close()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def close? : IO (Option Unit) := Internal.api "Lasm.JS.Web.close?" do
+  if !(← Internal.hasGlobal ["close"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.close?", module := "globalThis", path := "close", construct := false, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `undefined stop()` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def stop : IO Unit := Internal.api "Lasm.JS.Web.stop" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.stop", module := "globalThis", path := "stop", construct := false, arity := 0 }
     (Internal.args #[]) (await := false)
+
+/-- `undefined stop()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def stop? : IO (Option Unit) := Internal.api "Lasm.JS.Web.stop?" do
+  if !(← Internal.hasGlobal ["stop"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.stop?", module := "globalThis", path := "stop", construct := false, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
 
 /-- `undefined focus()` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def focus : IO Unit := Internal.api "Lasm.JS.Web.focus" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.focus", module := "globalThis", path := "focus", construct := false, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `undefined focus()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def focus? : IO (Option Unit) := Internal.api "Lasm.JS.Web.focus?" do
+  if !(← Internal.hasGlobal ["focus"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.focus?", module := "globalThis", path := "focus", construct := false, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `undefined blur()` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def blur : IO Unit := Internal.api "Lasm.JS.Web.blur" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.blur", module := "globalThis", path := "blur", construct := false, arity := 0 }
     (Internal.args #[]) (await := false)
+
+/-- `undefined blur()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def blur? : IO (Option Unit) := Internal.api "Lasm.JS.Web.blur?" do
+  if !(← Internal.hasGlobal ["blur"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.blur?", module := "globalThis", path := "blur", construct := false, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
 
 /-- `WindowProxy? open(optional USVString url, optional DOMString target, optional DOMString features)` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def «open» (url : Option String := none) (target : Option String := none) (features : Option String := none) : IO (Option Window) := Internal.api "Lasm.JS.Web.open" do
   Lasm.JS.Binding.invoke (Option Window) { name := "Lasm.JS.Web.open", module := "globalThis", path := "open", construct := false, arity := 3 }
     (Internal.args #[Internal.optional url, Internal.optional target, Internal.optional features]) (await := false)
 
+/-- `WindowProxy? open(optional USVString url, optional DOMString target, optional DOMString features)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def «open?» (url : Option String := none) (target : Option String := none) (features : Option String := none) : IO (Option (Option Window)) := Internal.api "Lasm.JS.Web.open?" do
+  if !(← Internal.hasGlobal ["open"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke (Option Window) { name := "Lasm.JS.Web.open?", module := "globalThis", path := "open", construct := false, arity := 3 }
+      (Internal.args #[Internal.optional url, Internal.optional target, Internal.optional features]) (await := false)
+  return some lasmGuarded
+
 /-- `undefined alert()` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def alert : IO Unit := Internal.api "Lasm.JS.Web.alert" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.alert", module := "globalThis", path := "alert", construct := false, arity := 0 }
     (Internal.args #[]) (await := false)
+
+/-- `undefined alert()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def alert? : IO (Option Unit) := Internal.api "Lasm.JS.Web.alert?" do
+  if !(← Internal.hasGlobal ["alert"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.alert?", module := "globalThis", path := "alert", construct := false, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
 
 /-- `undefined alert(DOMString message)` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def alertWithMessage (message : String) : IO Unit := Internal.api "Lasm.JS.Web.alertWithMessage" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.alertWithMessage", module := "globalThis", path := "alert", construct := false, arity := 1 }
     (Internal.args #[toJS message]) (await := false)
 
+/-- `undefined alert(DOMString message)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def alertWithMessage? (message : String) : IO (Option Unit) := Internal.api "Lasm.JS.Web.alertWithMessage?" do
+  if !(← Internal.hasGlobal ["alert"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.alertWithMessage?", module := "globalThis", path := "alert", construct := false, arity := 1 }
+      (Internal.args #[toJS message]) (await := false)
+  return some lasmGuarded
+
 /-- `boolean confirm(optional DOMString message)` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def confirm (message : Option String := none) : IO Bool := Internal.api "Lasm.JS.Web.confirm" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.confirm", module := "globalThis", path := "confirm", construct := false, arity := 1 }
     (Internal.args #[Internal.optional message]) (await := false)
+
+/-- `boolean confirm(optional DOMString message)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def confirm? (message : Option String := none) : IO (Option Bool) := Internal.api "Lasm.JS.Web.confirm?" do
+  if !(← Internal.hasGlobal ["confirm"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.confirm?", module := "globalThis", path := "confirm", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional message]) (await := false)
+  return some lasmGuarded
 
 /-- `DOMString? prompt(optional DOMString message, optional DOMString default)` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def prompt (message : Option String := none) (default : Option String := none) : IO (Option String) := Internal.api "Lasm.JS.Web.prompt" do
   Lasm.JS.Binding.invoke (Option String) { name := "Lasm.JS.Web.prompt", module := "globalThis", path := "prompt", construct := false, arity := 2 }
     (Internal.args #[Internal.optional message, Internal.optional default]) (await := false)
 
+/-- `DOMString? prompt(optional DOMString message, optional DOMString default)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def prompt? (message : Option String := none) (default : Option String := none) : IO (Option (Option String)) := Internal.api "Lasm.JS.Web.prompt?" do
+  if !(← Internal.hasGlobal ["prompt"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke (Option String) { name := "Lasm.JS.Web.prompt?", module := "globalThis", path := "prompt", construct := false, arity := 2 }
+      (Internal.args #[Internal.optional message, Internal.optional default]) (await := false)
+  return some lasmGuarded
+
 /-- `undefined print()` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def print : IO Unit := Internal.api "Lasm.JS.Web.print" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.print", module := "globalThis", path := "print", construct := false, arity := 0 }
     (Internal.args #[]) (await := false)
+
+/-- `undefined print()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def print? : IO (Option Unit) := Internal.api "Lasm.JS.Web.print?" do
+  if !(← Internal.hasGlobal ["print"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.print?", module := "globalThis", path := "print", construct := false, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
 
 /-- `undefined postMessage(any message, USVString targetOrigin, optional sequence<object> transfer)` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def postMessage (message : Data) (targetOrigin : String) (transfer : Option (Array Data) := none) : IO Unit := Internal.api "Lasm.JS.Web.postMessage" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.postMessage", module := "globalThis", path := "postMessage", construct := false, arity := 3 }
     (Internal.args #[toJS message, toJS targetOrigin, Internal.optional transfer]) (await := false)
 
+/-- `undefined postMessage(any message, USVString targetOrigin, optional sequence<object> transfer)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def postMessage? (message : Data) (targetOrigin : String) (transfer : Option (Array Data) := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.postMessage?" do
+  if !(← Internal.hasGlobal ["postMessage"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.postMessage?", module := "globalThis", path := "postMessage", construct := false, arity := 3 }
+      (Internal.args #[toJS message, toJS targetOrigin, Internal.optional transfer]) (await := false)
+  return some lasmGuarded
+
 /-- `undefined postMessage(any message, optional WindowPostMessageOptions options)` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def postMessageWithOptions (message : Data) (options : Option WindowPostMessageOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.postMessageWithOptions" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.postMessageWithOptions", module := "globalThis", path := "postMessage", construct := false, arity := 2 }
     (Internal.args #[toJS message, Internal.optional options]) (await := false)
+
+/-- `undefined postMessage(any message, optional WindowPostMessageOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def postMessageWithOptions? (message : Data) (options : Option WindowPostMessageOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.postMessageWithOptions?" do
+  if !(← Internal.hasGlobal ["postMessage"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.postMessageWithOptions?", module := "globalThis", path := "postMessage", construct := false, arity := 2 }
+      (Internal.args #[toJS message, Internal.optional options]) (await := false)
+  return some lasmGuarded
 
 /-- `undefined captureEvents()` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def captureEvents : IO Unit := Internal.api "Lasm.JS.Web.captureEvents" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.captureEvents", module := "globalThis", path := "captureEvents", construct := false, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `undefined captureEvents()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def captureEvents? : IO (Option Unit) := Internal.api "Lasm.JS.Web.captureEvents?" do
+  if !(← Internal.hasGlobal ["captureEvents"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.captureEvents?", module := "globalThis", path := "captureEvents", construct := false, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `undefined releaseEvents()` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def releaseEvents : IO Unit := Internal.api "Lasm.JS.Web.releaseEvents" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.releaseEvents", module := "globalThis", path := "releaseEvents", construct := false, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `undefined releaseEvents()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def releaseEvents? : IO (Option Unit) := Internal.api "Lasm.JS.Web.releaseEvents?" do
+  if !(← Internal.hasGlobal ["releaseEvents"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.releaseEvents?", module := "globalThis", path := "releaseEvents", construct := false, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `undefined reportError(any e)` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def reportError (e : Data) : IO Unit := Internal.api "Lasm.JS.Web.reportError" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.reportError", module := "globalThis", path := "reportError", construct := false, arity := 1 }
     (Internal.args #[toJS e]) (await := false)
+
+/-- `undefined reportError(any e)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def reportError? (e : Data) : IO (Option Unit) := Internal.api "Lasm.JS.Web.reportError?" do
+  if !(← Internal.hasGlobal ["reportError"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.reportError?", module := "globalThis", path := "reportError", construct := false, arity := 1 }
+      (Internal.args #[toJS e]) (await := false)
+  return some lasmGuarded
 
 /-- `DOMString btoa(DOMString data)` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def btoa (data : String) : IO String := Internal.api "Lasm.JS.Web.btoa" do
@@ -13604,11 +16417,29 @@ def HTMLTrackElement.ERROR : Nat := 3
     (Internal.args #[toJS image, Internal.optional options])
   pure { val := r }
 
+/-- `Promise<ImageBitmap> createImageBitmap(ImageBitmapSource image, optional ImageBitmapOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def createImageBitmap? (image : ImageBitmapSource) (options : Option ImageBitmapOptions := none) : Async (Option ImageBitmap) := Internal.api "Lasm.JS.Web.createImageBitmap?" do
+  if !(← Internal.hasGlobal ["createImageBitmap"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.createImageBitmap?", module := "globalThis", path := "createImageBitmap", construct := false, arity := 2 }
+      (Internal.args #[toJS image, Internal.optional options])
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `Promise<ImageBitmap> createImageBitmap(ImageBitmapSource image, long sx, long sy, long sw, long sh, optional ImageBitmapOptions options)` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def createImageBitmapWithSx (image : ImageBitmapSource) (sx : Int) (sy : Int) (sw : Int) (sh : Int) (options : Option ImageBitmapOptions := none) : Async ImageBitmap := Internal.api "Lasm.JS.Web.createImageBitmapWithSx" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.createImageBitmapWithSx", module := "globalThis", path := "createImageBitmap", construct := false, arity := 6 }
     (Internal.args #[toJS image, toJS sx, toJS sy, toJS sw, toJS sh, Internal.optional options])
   pure { val := r }
+
+/-- `Promise<ImageBitmap> createImageBitmap(ImageBitmapSource image, long sx, long sy, long sw, long sh, optional ImageBitmapOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def createImageBitmapWithSx? (image : ImageBitmapSource) (sx : Int) (sy : Int) (sw : Int) (sh : Int) (options : Option ImageBitmapOptions := none) : Async (Option ImageBitmap) := Internal.api "Lasm.JS.Web.createImageBitmapWithSx?" do
+  if !(← Internal.hasGlobal ["createImageBitmap"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.createImageBitmapWithSx?", module := "globalThis", path := "createImageBitmap", construct := false, arity := 6 }
+      (Internal.args #[toJS image, toJS sx, toJS sy, toJS sw, toJS sh, Internal.optional options])
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `any structuredClone(any value, optional StructuredSerializeOptions options)` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def structuredClone (value : Data) (options : Option StructuredSerializeOptions := none) : IO Data := Internal.api "Lasm.JS.Web.structuredClone" do
@@ -13620,9 +16451,25 @@ def HTMLTrackElement.ERROR : Nat := 3
   Lasm.JS.Binding.invoke Nat { name := "Lasm.JS.Web.requestAnimationFrame", module := "globalThis", path := "requestAnimationFrame", construct := false, arity := 1 }
     (Internal.args #[toJS callback]) (await := false)
 
+/-- `unsigned long requestAnimationFrame(FrameRequestCallback callback)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def requestAnimationFrame? (callback : FrameRequestCallback) : IO (Option Nat) := Internal.api "Lasm.JS.Web.requestAnimationFrame?" do
+  if !(← Internal.hasGlobal ["requestAnimationFrame"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Nat { name := "Lasm.JS.Web.requestAnimationFrame?", module := "globalThis", path := "requestAnimationFrame", construct := false, arity := 1 }
+      (Internal.args #[toJS callback]) (await := false)
+  return some lasmGuarded
+
 /-- `undefined cancelAnimationFrame(unsigned long handle)` (HTML Standard (https://html.spec.whatwg.org/multipage/)) -/
 @[macro_inline] def cancelAnimationFrame (handle : Nat) : IO Unit := Internal.api "Lasm.JS.Web.cancelAnimationFrame" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.cancelAnimationFrame", module := "globalThis", path := "cancelAnimationFrame", construct := false, arity := 1 }
     (Internal.args #[toJS handle]) (await := false)
+
+/-- `undefined cancelAnimationFrame(unsigned long handle)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def cancelAnimationFrame? (handle : Nat) : IO (Option Unit) := Internal.api "Lasm.JS.Web.cancelAnimationFrame?" do
+  if !(← Internal.hasGlobal ["cancelAnimationFrame"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.cancelAnimationFrame?", module := "globalThis", path := "cancelAnimationFrame", construct := false, arity := 1 }
+      (Internal.args #[toJS handle]) (await := false)
+  return some lasmGuarded
 
 end Lasm.JS.Web

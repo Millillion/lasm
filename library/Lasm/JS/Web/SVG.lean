@@ -1405,6 +1405,14 @@ def SVGUnitTypes.SVG_UNIT_TYPE_OBJECTBOUNDINGBOX : Nat := 2
   Lasm.JS.Binding.invoke ShadowAnimation { name := "Lasm.JS.Web.ShadowAnimation.new", module := "globalThis", path := "ShadowAnimation", construct := true, arity := 2 }
     (Internal.args #[toJS source, toJS newTarget]) (await := false)
 
+/-- `constructor(Animation source, (Element or CSSPseudoElement) newTarget)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ShadowAnimation.new? (source : Animation) (newTarget : ElementOrCSSPseudoElement) : IO (Option ShadowAnimation) := Internal.api "Lasm.JS.Web.ShadowAnimation.new?" do
+  if !(← Internal.hasGlobal ["ShadowAnimation"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ShadowAnimation { name := "Lasm.JS.Web.ShadowAnimation.new?", module := "globalThis", path := "ShadowAnimation", construct := true, arity := 2 }
+      (Internal.args #[toJS source, toJS newTarget]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute Animation sourceAnimation` -/
 @[macro_inline] def ShadowAnimation.sourceAnimation (self : ShadowAnimation) : IO Animation := Internal.api "Lasm.JS.Web.ShadowAnimation.sourceAnimation" do
   let r ← self.val.get "sourceAnimation" Value
@@ -1545,6 +1553,14 @@ def SVGMarkerElement.SVG_MARKER_ORIENT_AUTO_START_REVERSE : Nat := 3
 @[macro_inline] def SVGMarkerElement.orient (self : SVGMarkerElement) : IO String := Internal.api "Lasm.JS.Web.SVGMarkerElement.orient" do
   self.val.get "orient" String
 
+/-- `attribute DOMString orient` where the platform has it (`'orient' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGMarkerElement.orient? (self' : SVGMarkerElement) : IO (Option String) := Internal.api "Lasm.JS.Web.SVGMarkerElement.orient?" do
+  let self := self'
+  if !(← Internal.has self.val "orient") then return none
+  let lasmGuarded ← do
+    self.val.get "orient" String
+  return some lasmGuarded
+
 /-- Sets `orient`: `attribute DOMString orient` -/
 @[macro_inline] def SVGMarkerElement.setOrient (self : SVGMarkerElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGMarkerElement.setOrient" do
   self.val.set "orient" (toJS value)
@@ -1640,6 +1656,14 @@ def SVGMarkerElement.SVG_MARKER_ORIENT_AUTO_START_REVERSE : Nat := 3
 /-- `attribute DOMString? crossOrigin` -/
 @[macro_inline] def SVGScriptElement.crossOrigin (self : SVGScriptElement) : IO (Option String) := Internal.api "Lasm.JS.Web.SVGScriptElement.crossOrigin" do
   self.val.get "crossOrigin" (Option String)
+
+/-- `attribute DOMString? crossOrigin` where the platform has it (`'crossOrigin' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGScriptElement.crossOrigin? (self' : SVGScriptElement) : IO (Option (Option String)) := Internal.api "Lasm.JS.Web.SVGScriptElement.crossOrigin?" do
+  let self := self'
+  if !(← Internal.has self.val "crossOrigin") then return none
+  let lasmGuarded ← do
+    self.val.get "crossOrigin" (Option String)
+  return some lasmGuarded
 
 /-- Sets `crossOrigin`: `attribute DOMString? crossOrigin` -/
 @[macro_inline] def SVGScriptElement.setCrossOrigin (self : SVGScriptElement) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Web.SVGScriptElement.setCrossOrigin" do
@@ -1738,6 +1762,14 @@ def SVGMarkerElement.SVG_MARKER_ORIENT_AUTO_START_REVERSE : Nat := 3
 @[macro_inline] def SVGAElement.download (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.download" do
   self.val.get "download" String
 
+/-- `attribute DOMString download` where the platform has it (`'download' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGAElement.download? (self' : SVGAElement) : IO (Option String) := Internal.api "Lasm.JS.Web.SVGAElement.download?" do
+  let self := self'
+  if !(← Internal.has self.val "download") then return none
+  let lasmGuarded ← do
+    self.val.get "download" String
+  return some lasmGuarded
+
 /-- Sets `download`: `attribute DOMString download` -/
 @[macro_inline] def SVGAElement.setDownload (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setDownload" do
   self.val.set "download" (toJS value)
@@ -1745,6 +1777,14 @@ def SVGMarkerElement.SVG_MARKER_ORIENT_AUTO_START_REVERSE : Nat := 3
 /-- `attribute USVString ping` -/
 @[macro_inline] def SVGAElement.ping (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.ping" do
   self.val.get "ping" String
+
+/-- `attribute USVString ping` where the platform has it (`'ping' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGAElement.ping? (self' : SVGAElement) : IO (Option String) := Internal.api "Lasm.JS.Web.SVGAElement.ping?" do
+  let self := self'
+  if !(← Internal.has self.val "ping") then return none
+  let lasmGuarded ← do
+    self.val.get "ping" String
+  return some lasmGuarded
 
 /-- Sets `ping`: `attribute USVString ping` -/
 @[macro_inline] def SVGAElement.setPing (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setPing" do
@@ -1767,6 +1807,14 @@ def SVGMarkerElement.SVG_MARKER_ORIENT_AUTO_START_REVERSE : Nat := 3
 @[macro_inline] def SVGAElement.referrerPolicy (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.referrerPolicy" do
   self.val.get "referrerPolicy" String
 
+/-- `attribute DOMString referrerPolicy` where the platform has it (`'referrerPolicy' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGAElement.referrerPolicy? (self' : SVGAElement) : IO (Option String) := Internal.api "Lasm.JS.Web.SVGAElement.referrerPolicy?" do
+  let self := self'
+  if !(← Internal.has self.val "referrerPolicy") then return none
+  let lasmGuarded ← do
+    self.val.get "referrerPolicy" String
+  return some lasmGuarded
+
 /-- Sets `referrerPolicy`: `attribute DOMString referrerPolicy` -/
 @[macro_inline] def SVGAElement.setReferrerPolicy (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setReferrerPolicy" do
   self.val.set "referrerPolicy" (toJS value)
@@ -1780,9 +1828,25 @@ def SVGMarkerElement.SVG_MARKER_ORIENT_AUTO_START_REVERSE : Nat := 3
 @[macro_inline] def SVGAElement.origin (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.origin" do
   self.val.get "origin" String
 
+/-- `readonly attribute USVString origin` where the platform has it (`'origin' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGAElement.origin? (self' : SVGAElement) : IO (Option String) := Internal.api "Lasm.JS.Web.SVGAElement.origin?" do
+  let self := self'
+  if !(← Internal.has self.val "origin") then return none
+  let lasmGuarded ← do
+    self.val.get "origin" String
+  return some lasmGuarded
+
 /-- `attribute USVString protocol` -/
 @[macro_inline] def SVGAElement.protocol (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.protocol" do
   self.val.get "protocol" String
+
+/-- `attribute USVString protocol` where the platform has it (`'protocol' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGAElement.protocol? (self' : SVGAElement) : IO (Option String) := Internal.api "Lasm.JS.Web.SVGAElement.protocol?" do
+  let self := self'
+  if !(← Internal.has self.val "protocol") then return none
+  let lasmGuarded ← do
+    self.val.get "protocol" String
+  return some lasmGuarded
 
 /-- Sets `protocol`: `attribute USVString protocol` -/
 @[macro_inline] def SVGAElement.setProtocol (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setProtocol" do
@@ -1792,6 +1856,14 @@ def SVGMarkerElement.SVG_MARKER_ORIENT_AUTO_START_REVERSE : Nat := 3
 @[macro_inline] def SVGAElement.username (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.username" do
   self.val.get "username" String
 
+/-- `attribute USVString username` where the platform has it (`'username' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGAElement.username? (self' : SVGAElement) : IO (Option String) := Internal.api "Lasm.JS.Web.SVGAElement.username?" do
+  let self := self'
+  if !(← Internal.has self.val "username") then return none
+  let lasmGuarded ← do
+    self.val.get "username" String
+  return some lasmGuarded
+
 /-- Sets `username`: `attribute USVString username` -/
 @[macro_inline] def SVGAElement.setUsername (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setUsername" do
   self.val.set "username" (toJS value)
@@ -1799,6 +1871,14 @@ def SVGMarkerElement.SVG_MARKER_ORIENT_AUTO_START_REVERSE : Nat := 3
 /-- `attribute USVString password` -/
 @[macro_inline] def SVGAElement.password (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.password" do
   self.val.get "password" String
+
+/-- `attribute USVString password` where the platform has it (`'password' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGAElement.password? (self' : SVGAElement) : IO (Option String) := Internal.api "Lasm.JS.Web.SVGAElement.password?" do
+  let self := self'
+  if !(← Internal.has self.val "password") then return none
+  let lasmGuarded ← do
+    self.val.get "password" String
+  return some lasmGuarded
 
 /-- Sets `password`: `attribute USVString password` -/
 @[macro_inline] def SVGAElement.setPassword (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setPassword" do
@@ -1808,6 +1888,14 @@ def SVGMarkerElement.SVG_MARKER_ORIENT_AUTO_START_REVERSE : Nat := 3
 @[macro_inline] def SVGAElement.host (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.host" do
   self.val.get "host" String
 
+/-- `attribute USVString host` where the platform has it (`'host' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGAElement.host? (self' : SVGAElement) : IO (Option String) := Internal.api "Lasm.JS.Web.SVGAElement.host?" do
+  let self := self'
+  if !(← Internal.has self.val "host") then return none
+  let lasmGuarded ← do
+    self.val.get "host" String
+  return some lasmGuarded
+
 /-- Sets `host`: `attribute USVString host` -/
 @[macro_inline] def SVGAElement.setHost (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setHost" do
   self.val.set "host" (toJS value)
@@ -1815,6 +1903,14 @@ def SVGMarkerElement.SVG_MARKER_ORIENT_AUTO_START_REVERSE : Nat := 3
 /-- `attribute USVString hostname` -/
 @[macro_inline] def SVGAElement.hostname (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.hostname" do
   self.val.get "hostname" String
+
+/-- `attribute USVString hostname` where the platform has it (`'hostname' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGAElement.hostname? (self' : SVGAElement) : IO (Option String) := Internal.api "Lasm.JS.Web.SVGAElement.hostname?" do
+  let self := self'
+  if !(← Internal.has self.val "hostname") then return none
+  let lasmGuarded ← do
+    self.val.get "hostname" String
+  return some lasmGuarded
 
 /-- Sets `hostname`: `attribute USVString hostname` -/
 @[macro_inline] def SVGAElement.setHostname (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setHostname" do
@@ -1824,6 +1920,14 @@ def SVGMarkerElement.SVG_MARKER_ORIENT_AUTO_START_REVERSE : Nat := 3
 @[macro_inline] def SVGAElement.port (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.port" do
   self.val.get "port" String
 
+/-- `attribute USVString port` where the platform has it (`'port' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGAElement.port? (self' : SVGAElement) : IO (Option String) := Internal.api "Lasm.JS.Web.SVGAElement.port?" do
+  let self := self'
+  if !(← Internal.has self.val "port") then return none
+  let lasmGuarded ← do
+    self.val.get "port" String
+  return some lasmGuarded
+
 /-- Sets `port`: `attribute USVString port` -/
 @[macro_inline] def SVGAElement.setPort (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setPort" do
   self.val.set "port" (toJS value)
@@ -1831,6 +1935,14 @@ def SVGMarkerElement.SVG_MARKER_ORIENT_AUTO_START_REVERSE : Nat := 3
 /-- `attribute USVString pathname` -/
 @[macro_inline] def SVGAElement.pathname (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.pathname" do
   self.val.get "pathname" String
+
+/-- `attribute USVString pathname` where the platform has it (`'pathname' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGAElement.pathname? (self' : SVGAElement) : IO (Option String) := Internal.api "Lasm.JS.Web.SVGAElement.pathname?" do
+  let self := self'
+  if !(← Internal.has self.val "pathname") then return none
+  let lasmGuarded ← do
+    self.val.get "pathname" String
+  return some lasmGuarded
 
 /-- Sets `pathname`: `attribute USVString pathname` -/
 @[macro_inline] def SVGAElement.setPathname (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setPathname" do
@@ -1840,6 +1952,14 @@ def SVGMarkerElement.SVG_MARKER_ORIENT_AUTO_START_REVERSE : Nat := 3
 @[macro_inline] def SVGAElement.search (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.search" do
   self.val.get "search" String
 
+/-- `attribute USVString search` where the platform has it (`'search' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGAElement.search? (self' : SVGAElement) : IO (Option String) := Internal.api "Lasm.JS.Web.SVGAElement.search?" do
+  let self := self'
+  if !(← Internal.has self.val "search") then return none
+  let lasmGuarded ← do
+    self.val.get "search" String
+  return some lasmGuarded
+
 /-- Sets `search`: `attribute USVString search` -/
 @[macro_inline] def SVGAElement.setSearch (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setSearch" do
   self.val.set "search" (toJS value)
@@ -1847,6 +1967,14 @@ def SVGMarkerElement.SVG_MARKER_ORIENT_AUTO_START_REVERSE : Nat := 3
 /-- `attribute USVString hash` -/
 @[macro_inline] def SVGAElement.hash (self : SVGAElement) : IO String := Internal.api "Lasm.JS.Web.SVGAElement.hash" do
   self.val.get "hash" String
+
+/-- `attribute USVString hash` where the platform has it (`'hash' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGAElement.hash? (self' : SVGAElement) : IO (Option String) := Internal.api "Lasm.JS.Web.SVGAElement.hash?" do
+  let self := self'
+  if !(← Internal.has self.val "hash") then return none
+  let lasmGuarded ← do
+    self.val.get "hash" String
+  return some lasmGuarded
 
 /-- Sets `hash`: `attribute USVString hash` -/
 @[macro_inline] def SVGAElement.setHash (self : SVGAElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.SVGAElement.setHash" do
@@ -2228,18 +2356,52 @@ def SVGMarkerElement.SVG_MARKER_ORIENT_AUTO_START_REVERSE : Nat := 3
   let r ← self.val.callMethod "getIntersectionList" (Internal.args #[toJS rect, toJS referenceElement]) Value
   pure { val := r }
 
+/-- `NodeList getIntersectionList(SVGRect rect, SVGElement? referenceElement)` where the platform has it (`'getIntersectionList' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGSVGElement.getIntersectionList? (self' : SVGSVGElement) (rect : Value) (referenceElement : Option SVGElement) : IO (Option NodeList) := Internal.api "Lasm.JS.Web.SVGSVGElement.getIntersectionList?" do
+  let self := self'
+  if !(← Internal.has self.val "getIntersectionList") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethod "getIntersectionList" (Internal.args #[toJS rect, toJS referenceElement]) Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `NodeList getEnclosureList(SVGRect rect, SVGElement? referenceElement)` -/
 @[macro_inline] def SVGSVGElement.getEnclosureList (self : SVGSVGElement) (rect : Value) (referenceElement : Option SVGElement) : IO NodeList := Internal.api "Lasm.JS.Web.SVGSVGElement.getEnclosureList" do
   let r ← self.val.callMethod "getEnclosureList" (Internal.args #[toJS rect, toJS referenceElement]) Value
   pure { val := r }
 
+/-- `NodeList getEnclosureList(SVGRect rect, SVGElement? referenceElement)` where the platform has it (`'getEnclosureList' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGSVGElement.getEnclosureList? (self' : SVGSVGElement) (rect : Value) (referenceElement : Option SVGElement) : IO (Option NodeList) := Internal.api "Lasm.JS.Web.SVGSVGElement.getEnclosureList?" do
+  let self := self'
+  if !(← Internal.has self.val "getEnclosureList") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethod "getEnclosureList" (Internal.args #[toJS rect, toJS referenceElement]) Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `boolean checkIntersection(SVGElement element, SVGRect rect)` -/
 @[macro_inline] def SVGSVGElement.checkIntersection (self : SVGSVGElement) (element : SVGElement) (rect : Value) : IO Bool := Internal.api "Lasm.JS.Web.SVGSVGElement.checkIntersection" do
   self.val.callMethod "checkIntersection" (Internal.args #[toJS element, toJS rect]) Bool
 
+/-- `boolean checkIntersection(SVGElement element, SVGRect rect)` where the platform has it (`'checkIntersection' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGSVGElement.checkIntersection? (self' : SVGSVGElement) (element : SVGElement) (rect : Value) : IO (Option Bool) := Internal.api "Lasm.JS.Web.SVGSVGElement.checkIntersection?" do
+  let self := self'
+  if !(← Internal.has self.val "checkIntersection") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "checkIntersection" (Internal.args #[toJS element, toJS rect]) Bool
+  return some lasmGuarded
+
 /-- `boolean checkEnclosure(SVGElement element, SVGRect rect)` -/
 @[macro_inline] def SVGSVGElement.checkEnclosure (self : SVGSVGElement) (element : SVGElement) (rect : Value) : IO Bool := Internal.api "Lasm.JS.Web.SVGSVGElement.checkEnclosure" do
   self.val.callMethod "checkEnclosure" (Internal.args #[toJS element, toJS rect]) Bool
+
+/-- `boolean checkEnclosure(SVGElement element, SVGRect rect)` where the platform has it (`'checkEnclosure' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGSVGElement.checkEnclosure? (self' : SVGSVGElement) (element : SVGElement) (rect : Value) : IO (Option Bool) := Internal.api "Lasm.JS.Web.SVGSVGElement.checkEnclosure?" do
+  let self := self'
+  if !(← Internal.has self.val "checkEnclosure") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "checkEnclosure" (Internal.args #[toJS element, toJS rect]) Bool
+  return some lasmGuarded
 
 /-- `undefined deselectAll()` -/
 @[macro_inline] def SVGSVGElement.deselectAll (self : SVGSVGElement) : IO Unit := Internal.api "Lasm.JS.Web.SVGSVGElement.deselectAll" do
@@ -2587,6 +2749,15 @@ def SVGTextPathElement.TEXTPATH_SIDETYPE_RIGHT : Nat := 2
 @[macro_inline] def SVGTextPathElement.side (self : SVGTextPathElement) : IO SVGAnimatedEnumeration := Internal.api "Lasm.JS.Web.SVGTextPathElement.side" do
   let r ← self.val.get "side" Value
   pure { val := r }
+
+/-- `readonly attribute SVGAnimatedEnumeration side` where the platform has it (`'side' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGTextPathElement.side? (self' : SVGTextPathElement) : IO (Option SVGAnimatedEnumeration) := Internal.api "Lasm.JS.Web.SVGTextPathElement.side?" do
+  let self := self'
+  if !(← Internal.has self.val "side") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "side" Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `readonly attribute SVGAnimatedString href` -/
 @[macro_inline] def SVGTextPathElement.href (self : SVGTextPathElement) : IO SVGAnimatedString := Internal.api "Lasm.JS.Web.SVGTextPathElement.href" do

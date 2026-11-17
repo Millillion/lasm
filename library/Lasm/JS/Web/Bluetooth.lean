@@ -338,6 +338,14 @@ instance : ToJS BluetoothPermissionStorage := ⟨fun d => Internal.fields #[("al
   Lasm.JS.Binding.invoke BluetoothAdvertisingEvent { name := "Lasm.JS.Web.BluetoothAdvertisingEvent.new", module := "globalThis", path := "BluetoothAdvertisingEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS init]) (await := false)
 
+/-- `constructor(DOMString type, BluetoothAdvertisingEventInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def BluetoothAdvertisingEvent.new? (type : String) (init : BluetoothAdvertisingEventInit) : IO (Option BluetoothAdvertisingEvent) := Internal.api "Lasm.JS.Web.BluetoothAdvertisingEvent.new?" do
+  if !(← Internal.hasGlobal ["BluetoothAdvertisingEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke BluetoothAdvertisingEvent { name := "Lasm.JS.Web.BluetoothAdvertisingEvent.new?", module := "globalThis", path := "BluetoothAdvertisingEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS init]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute BluetoothDevice device` -/
 @[macro_inline] def BluetoothAdvertisingEvent.device (self : BluetoothAdvertisingEvent) : IO BluetoothDevice := Internal.api "Lasm.JS.Web.BluetoothAdvertisingEvent.device" do
   let r ← self.val.get "device" Value
@@ -710,20 +718,52 @@ instance : ToJS BluetoothPermissionStorage := ⟨fun d => Internal.fields #[("al
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Web.BluetoothUUID.getService", module := "globalThis", path := "BluetoothUUID.getService", construct := false, arity := 1 }
     (Internal.args #[toJS name]) (await := false)
 
+/-- `static UUID getService((DOMString or unsigned long) name)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def BluetoothUUID.getService? (name : DOMStringOrUnsignedLong) : IO (Option String) := Internal.api "Lasm.JS.Web.BluetoothUUID.getService?" do
+  if !(← Internal.hasGlobal ["BluetoothUUID", "getService"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke String { name := "Lasm.JS.Web.BluetoothUUID.getService?", module := "globalThis", path := "BluetoothUUID.getService", construct := false, arity := 1 }
+      (Internal.args #[toJS name]) (await := false)
+  return some lasmGuarded
+
 /-- `static UUID getCharacteristic((DOMString or unsigned long) name)` -/
 @[macro_inline] def BluetoothUUID.getCharacteristic (name : DOMStringOrUnsignedLong) : IO String := Internal.api "Lasm.JS.Web.BluetoothUUID.getCharacteristic" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Web.BluetoothUUID.getCharacteristic", module := "globalThis", path := "BluetoothUUID.getCharacteristic", construct := false, arity := 1 }
     (Internal.args #[toJS name]) (await := false)
+
+/-- `static UUID getCharacteristic((DOMString or unsigned long) name)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def BluetoothUUID.getCharacteristic? (name : DOMStringOrUnsignedLong) : IO (Option String) := Internal.api "Lasm.JS.Web.BluetoothUUID.getCharacteristic?" do
+  if !(← Internal.hasGlobal ["BluetoothUUID", "getCharacteristic"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke String { name := "Lasm.JS.Web.BluetoothUUID.getCharacteristic?", module := "globalThis", path := "BluetoothUUID.getCharacteristic", construct := false, arity := 1 }
+      (Internal.args #[toJS name]) (await := false)
+  return some lasmGuarded
 
 /-- `static UUID getDescriptor((DOMString or unsigned long) name)` -/
 @[macro_inline] def BluetoothUUID.getDescriptor (name : DOMStringOrUnsignedLong) : IO String := Internal.api "Lasm.JS.Web.BluetoothUUID.getDescriptor" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Web.BluetoothUUID.getDescriptor", module := "globalThis", path := "BluetoothUUID.getDescriptor", construct := false, arity := 1 }
     (Internal.args #[toJS name]) (await := false)
 
+/-- `static UUID getDescriptor((DOMString or unsigned long) name)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def BluetoothUUID.getDescriptor? (name : DOMStringOrUnsignedLong) : IO (Option String) := Internal.api "Lasm.JS.Web.BluetoothUUID.getDescriptor?" do
+  if !(← Internal.hasGlobal ["BluetoothUUID", "getDescriptor"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke String { name := "Lasm.JS.Web.BluetoothUUID.getDescriptor?", module := "globalThis", path := "BluetoothUUID.getDescriptor", construct := false, arity := 1 }
+      (Internal.args #[toJS name]) (await := false)
+  return some lasmGuarded
+
 /-- `static UUID canonicalUUID(unsigned long alias)` -/
 @[macro_inline] def BluetoothUUID.canonicalUUID (alias : Nat) : IO String := Internal.api "Lasm.JS.Web.BluetoothUUID.canonicalUUID" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Web.BluetoothUUID.canonicalUUID", module := "globalThis", path := "BluetoothUUID.canonicalUUID", construct := false, arity := 1 }
     (Internal.args #[toJS alias]) (await := false)
+
+/-- `static UUID canonicalUUID(unsigned long alias)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def BluetoothUUID.canonicalUUID? (alias : Nat) : IO (Option String) := Internal.api "Lasm.JS.Web.BluetoothUUID.canonicalUUID?" do
+  if !(← Internal.hasGlobal ["BluetoothUUID", "canonicalUUID"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke String { name := "Lasm.JS.Web.BluetoothUUID.canonicalUUID?", module := "globalThis", path := "BluetoothUUID.canonicalUUID", construct := false, arity := 1 }
+      (Internal.args #[toJS alias]) (await := false)
+  return some lasmGuarded
 
 /-- `v instanceof ValueEvent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ValueEvent`). -/
 @[macro_inline] def ValueEvent.cast? (v : Value) : IO (Option ValueEvent) := Internal.api "Lasm.JS.Web.ValueEvent.cast?" do
@@ -734,6 +774,14 @@ instance : ToJS BluetoothPermissionStorage := ⟨fun d => Internal.fields #[("al
   Lasm.JS.Binding.invoke ValueEvent { name := "Lasm.JS.Web.ValueEvent.new", module := "globalThis", path := "ValueEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional initDict]) (await := false)
 
+/-- `constructor(DOMString type, optional ValueEventInit initDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ValueEvent.new? (type : String) (initDict : Option ValueEventInit := none) : IO (Option ValueEvent) := Internal.api "Lasm.JS.Web.ValueEvent.new?" do
+  if !(← Internal.hasGlobal ["ValueEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ValueEvent { name := "Lasm.JS.Web.ValueEvent.new?", module := "globalThis", path := "ValueEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional initDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute any value` -/
 @[macro_inline] def ValueEvent.value (self : ValueEvent) : IO Data := Internal.api "Lasm.JS.Web.ValueEvent.value" do
   self.val.get "value" Data
@@ -742,5 +790,14 @@ instance : ToJS BluetoothPermissionStorage := ⟨fun d => Internal.fields #[("al
 @[macro_inline] def Navigator.bluetooth (self : Navigator) : IO Bluetooth := Internal.api "Lasm.JS.Web.Navigator.bluetooth" do
   let r ← self.val.get "bluetooth" Value
   pure { val := r }
+
+/-- `readonly attribute Bluetooth bluetooth` where the platform has it (`'bluetooth' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.bluetooth? (self' : Navigator) : IO (Option Bluetooth) := Internal.api "Lasm.JS.Web.Navigator.bluetooth?" do
+  let self := self'
+  if !(← Internal.has self.val "bluetooth") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "bluetooth" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

@@ -19,4 +19,12 @@ set_option compiler.extract_closed false
 @[macro_inline] def RTCDataChannel.priority (self : RTCDataChannel) : IO RTCPriorityType := Internal.api "Lasm.JS.Web.RTCDataChannel.priority" do
   self.val.get "priority" RTCPriorityType
 
+/-- `readonly attribute RTCPriorityType priority` where the platform has it (`'priority' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCDataChannel.priority? (self' : RTCDataChannel) : IO (Option RTCPriorityType) := Internal.api "Lasm.JS.Web.RTCDataChannel.priority?" do
+  let self := self'
+  if !(← Internal.has self.val "priority") then return none
+  let lasmGuarded ← do
+    self.val.get "priority" RTCPriorityType
+  return some lasmGuarded
+
 end Lasm.JS.Web

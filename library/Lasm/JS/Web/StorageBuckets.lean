@@ -96,9 +96,27 @@ instance : ToJS StorageBucketOptions := ⟨fun d => Internal.fields #[("persiste
   let r ← self.val.get "storageBuckets" Value
   pure { val := r }
 
+/-- `readonly attribute StorageBucketManager storageBuckets` where the platform has it (`'storageBuckets' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.storageBuckets? (self' : Navigator) : IO (Option StorageBucketManager) := Internal.api "Lasm.JS.Web.Navigator.storageBuckets?" do
+  let self := self'
+  if !(← Internal.has self.val "storageBuckets") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "storageBuckets" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute StorageBucketManager storageBuckets` -/
 @[macro_inline] def WorkerNavigator.storageBuckets (self : WorkerNavigator) : IO StorageBucketManager := Internal.api "Lasm.JS.Web.WorkerNavigator.storageBuckets" do
   let r ← self.val.get "storageBuckets" Value
   pure { val := r }
+
+/-- `readonly attribute StorageBucketManager storageBuckets` where the platform has it (`'storageBuckets' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerNavigator.storageBuckets? (self' : WorkerNavigator) : IO (Option StorageBucketManager) := Internal.api "Lasm.JS.Web.WorkerNavigator.storageBuckets?" do
+  let self := self'
+  if !(← Internal.has self.val "storageBuckets") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "storageBuckets" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

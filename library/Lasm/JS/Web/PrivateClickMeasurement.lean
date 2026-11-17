@@ -18,6 +18,14 @@ set_option compiler.extract_closed false
 @[macro_inline] def HTMLAnchorElement.attributionSourceId (self : HTMLAnchorElement) : IO Nat := Internal.api "Lasm.JS.Web.HTMLAnchorElement.attributionSourceId" do
   self.val.get "attributionSourceId" Nat
 
+/-- `attribute unsigned long attributionSourceId` where the platform has it (`'attributionSourceId' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLAnchorElement.attributionSourceId? (self' : HTMLAnchorElement) : IO (Option Nat) := Internal.api "Lasm.JS.Web.HTMLAnchorElement.attributionSourceId?" do
+  let self := self'
+  if !(← Internal.has self.val "attributionSourceId") then return none
+  let lasmGuarded ← do
+    self.val.get "attributionSourceId" Nat
+  return some lasmGuarded
+
 /-- Sets `attributionSourceId`: `attribute unsigned long attributionSourceId` -/
 @[macro_inline] def HTMLAnchorElement.setAttributionSourceId (self : HTMLAnchorElement) (value : Nat) : IO Unit := Internal.api "Lasm.JS.Web.HTMLAnchorElement.setAttributionSourceId" do
   self.val.set "attributionSourceId" (toJS value)

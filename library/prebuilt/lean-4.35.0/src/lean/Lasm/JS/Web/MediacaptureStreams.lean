@@ -1284,6 +1284,14 @@ instance : ToJS CameraDevicePermissionDescriptor := ⟨fun d => Internal.fields 
   Lasm.JS.Binding.invoke DeviceChangeEvent { name := "Lasm.JS.Web.DeviceChangeEvent.new", module := "globalThis", path := "DeviceChangeEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional DeviceChangeEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DeviceChangeEvent.new? (type : String) (eventInitDict : Option DeviceChangeEventInit := none) : IO (Option DeviceChangeEvent) := Internal.api "Lasm.JS.Web.DeviceChangeEvent.new?" do
+  if !(← Internal.hasGlobal ["DeviceChangeEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke DeviceChangeEvent { name := "Lasm.JS.Web.DeviceChangeEvent.new?", module := "globalThis", path := "DeviceChangeEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute FrozenArray<MediaDeviceInfo> devices` -/
 @[macro_inline] def DeviceChangeEvent.devices (self : DeviceChangeEvent) : IO (Array MediaDeviceInfo) := Internal.api "Lasm.JS.Web.DeviceChangeEvent.devices" do
   self.val.get "devices" (Array MediaDeviceInfo)
@@ -1350,15 +1358,39 @@ instance : ToJS CameraDevicePermissionDescriptor := ⟨fun d => Internal.fields 
   Lasm.JS.Binding.invoke MediaStream { name := "Lasm.JS.Web.MediaStream.new", module := "globalThis", path := "MediaStream", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaStream.new? : IO (Option MediaStream) := Internal.api "Lasm.JS.Web.MediaStream.new?" do
+  if !(← Internal.hasGlobal ["MediaStream"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke MediaStream { name := "Lasm.JS.Web.MediaStream.new?", module := "globalThis", path := "MediaStream", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `constructor(MediaStream stream)` -/
 @[macro_inline] def MediaStream.newWithStream (stream : MediaStream) : IO MediaStream := Internal.api "Lasm.JS.Web.MediaStream.newWithStream" do
   Lasm.JS.Binding.invoke MediaStream { name := "Lasm.JS.Web.MediaStream.newWithStream", module := "globalThis", path := "MediaStream", construct := true, arity := 1 }
     (Internal.args #[toJS stream]) (await := false)
 
+/-- `constructor(MediaStream stream)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaStream.newWithStream? (stream : MediaStream) : IO (Option MediaStream) := Internal.api "Lasm.JS.Web.MediaStream.newWithStream?" do
+  if !(← Internal.hasGlobal ["MediaStream"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke MediaStream { name := "Lasm.JS.Web.MediaStream.newWithStream?", module := "globalThis", path := "MediaStream", construct := true, arity := 1 }
+      (Internal.args #[toJS stream]) (await := false)
+  return some lasmGuarded
+
 /-- `constructor(sequence<MediaStreamTrack> tracks)` -/
 @[macro_inline] def MediaStream.newWithTracks (tracks : Array MediaStreamTrack) : IO MediaStream := Internal.api "Lasm.JS.Web.MediaStream.newWithTracks" do
   Lasm.JS.Binding.invoke MediaStream { name := "Lasm.JS.Web.MediaStream.newWithTracks", module := "globalThis", path := "MediaStream", construct := true, arity := 1 }
     (Internal.args #[toJS tracks]) (await := false)
+
+/-- `constructor(sequence<MediaStreamTrack> tracks)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaStream.newWithTracks? (tracks : Array MediaStreamTrack) : IO (Option MediaStream) := Internal.api "Lasm.JS.Web.MediaStream.newWithTracks?" do
+  if !(← Internal.hasGlobal ["MediaStream"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke MediaStream { name := "Lasm.JS.Web.MediaStream.newWithTracks?", module := "globalThis", path := "MediaStream", construct := true, arity := 1 }
+      (Internal.args #[toJS tracks]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString id` -/
 @[macro_inline] def MediaStream.id (self : MediaStream) : IO String := Internal.api "Lasm.JS.Web.MediaStream.id" do
@@ -1503,6 +1535,14 @@ instance : ToJS CameraDevicePermissionDescriptor := ⟨fun d => Internal.fields 
   Lasm.JS.Binding.invoke MediaStreamTrackEvent { name := "Lasm.JS.Web.MediaStreamTrackEvent.new", module := "globalThis", path := "MediaStreamTrackEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, MediaStreamTrackEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaStreamTrackEvent.new? (type : String) (eventInitDict : MediaStreamTrackEventInit) : IO (Option MediaStreamTrackEvent) := Internal.api "Lasm.JS.Web.MediaStreamTrackEvent.new?" do
+  if !(← Internal.hasGlobal ["MediaStreamTrackEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke MediaStreamTrackEvent { name := "Lasm.JS.Web.MediaStreamTrackEvent.new?", module := "globalThis", path := "MediaStreamTrackEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute MediaStreamTrack track` -/
 @[macro_inline] def MediaStreamTrackEvent.track (self : MediaStreamTrackEvent) : IO MediaStreamTrack := Internal.api "Lasm.JS.Web.MediaStreamTrackEvent.track" do
   let r ← self.val.get "track" Value
@@ -1516,6 +1556,14 @@ instance : ToJS CameraDevicePermissionDescriptor := ⟨fun d => Internal.fields 
 @[macro_inline] def OverconstrainedError.new (constraint : String) (message : Option String := none) : IO OverconstrainedError := Internal.api "Lasm.JS.Web.OverconstrainedError.new" do
   Lasm.JS.Binding.invoke OverconstrainedError { name := "Lasm.JS.Web.OverconstrainedError.new", module := "globalThis", path := "OverconstrainedError", construct := true, arity := 2 }
     (Internal.args #[toJS constraint, Internal.optional message]) (await := false)
+
+/-- `constructor(DOMString constraint, optional DOMString message)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def OverconstrainedError.new? (constraint : String) (message : Option String := none) : IO (Option OverconstrainedError) := Internal.api "Lasm.JS.Web.OverconstrainedError.new?" do
+  if !(← Internal.hasGlobal ["OverconstrainedError"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke OverconstrainedError { name := "Lasm.JS.Web.OverconstrainedError.new?", module := "globalThis", path := "OverconstrainedError", construct := true, arity := 2 }
+      (Internal.args #[toJS constraint, Internal.optional message]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString constraint` -/
 @[macro_inline] def OverconstrainedError.constraint (self : OverconstrainedError) : IO String := Internal.api "Lasm.JS.Web.OverconstrainedError.constraint" do
@@ -1533,5 +1581,14 @@ instance : ToJS CameraDevicePermissionDescriptor := ⟨fun d => Internal.fields 
 @[macro_inline] def Navigator.mediaDevices (self : Navigator) : IO MediaDevices := Internal.api "Lasm.JS.Web.Navigator.mediaDevices" do
   let r ← self.val.get "mediaDevices" Value
   pure { val := r }
+
+/-- `readonly attribute MediaDevices mediaDevices` where the platform has it (`'mediaDevices' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.mediaDevices? (self' : Navigator) : IO (Option MediaDevices) := Internal.api "Lasm.JS.Web.Navigator.mediaDevices?" do
+  let self := self'
+  if !(← Internal.has self.val "mediaDevices") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "mediaDevices" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

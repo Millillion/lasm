@@ -35,6 +35,14 @@ set_option compiler.extract_closed false
 @[macro_inline] def VideoPlaybackQuality.corruptedVideoFrames (self : VideoPlaybackQuality) : IO Nat := Internal.api "Lasm.JS.Web.VideoPlaybackQuality.corruptedVideoFrames" do
   self.val.get "corruptedVideoFrames" Nat
 
+/-- `readonly attribute unsigned long corruptedVideoFrames` where the platform has it (`'corruptedVideoFrames' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def VideoPlaybackQuality.corruptedVideoFrames? (self' : VideoPlaybackQuality) : IO (Option Nat) := Internal.api "Lasm.JS.Web.VideoPlaybackQuality.corruptedVideoFrames?" do
+  let self := self'
+  if !(← Internal.has self.val "corruptedVideoFrames") then return none
+  let lasmGuarded ← do
+    self.val.get "corruptedVideoFrames" Nat
+  return some lasmGuarded
+
 /-- `VideoPlaybackQuality getVideoPlaybackQuality()` -/
 @[macro_inline] def HTMLVideoElement.getVideoPlaybackQuality (self : HTMLVideoElement) : IO VideoPlaybackQuality := Internal.api "Lasm.JS.Web.HTMLVideoElement.getVideoPlaybackQuality" do
   let r ← self.val.callMethod "getVideoPlaybackQuality" (Internal.args #[]) Value

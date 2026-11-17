@@ -95,6 +95,14 @@ instance : ToJS SensorOptions := ⟨fun d => Internal.fields #[("frequency", Int
   Lasm.JS.Binding.invoke SensorErrorEvent { name := "Lasm.JS.Web.SensorErrorEvent.new", module := "globalThis", path := "SensorErrorEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS errorEventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, SensorErrorEventInit errorEventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def SensorErrorEvent.new? (type : String) (errorEventInitDict : SensorErrorEventInit) : IO (Option SensorErrorEvent) := Internal.api "Lasm.JS.Web.SensorErrorEvent.new?" do
+  if !(← Internal.hasGlobal ["SensorErrorEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke SensorErrorEvent { name := "Lasm.JS.Web.SensorErrorEvent.new?", module := "globalThis", path := "SensorErrorEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS errorEventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMException error` -/
 @[macro_inline] def SensorErrorEvent.error (self : SensorErrorEvent) : IO DOMException := Internal.api "Lasm.JS.Web.SensorErrorEvent.error" do
   let r ← self.val.get "error" Value

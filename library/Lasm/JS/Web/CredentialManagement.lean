@@ -154,6 +154,14 @@ instance : ToJS CredentialData := ⟨fun d => Internal.fields #[("id", toJS d.id
   Lasm.JS.Binding.invokeAsync Bool { name := "Lasm.JS.Web.Credential.isConditionalMediationAvailable", module := "globalThis", path := "Credential.isConditionalMediationAvailable", construct := false, arity := 0 }
     (Internal.args #[])
 
+/-- `static Promise<boolean> isConditionalMediationAvailable()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Credential.isConditionalMediationAvailable? : Async (Option Bool) := Internal.api "Lasm.JS.Web.Credential.isConditionalMediationAvailable?" do
+  if !(← Internal.hasGlobal ["Credential", "isConditionalMediationAvailable"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Bool { name := "Lasm.JS.Web.Credential.isConditionalMediationAvailable?", module := "globalThis", path := "Credential.isConditionalMediationAvailable", construct := false, arity := 0 }
+      (Internal.args #[])
+  return some lasmGuarded
+
 /-- `v instanceof CredentialsContainer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CredentialsContainer`). -/
 @[macro_inline] def CredentialsContainer.cast? (v : Value) : IO (Option CredentialsContainer) := Internal.api "Lasm.JS.Web.CredentialsContainer.cast?" do
   Internal.cast (Internal.getGlobal ["CredentialsContainer"] Value) (fun x => { val := x }) v
@@ -183,6 +191,14 @@ instance : ToJS CredentialData := ⟨fun d => Internal.fields #[("id", toJS d.id
   Lasm.JS.Binding.invoke FederatedCredential { name := "Lasm.JS.Web.FederatedCredential.new", module := "globalThis", path := "FederatedCredential", construct := true, arity := 1 }
     (Internal.args #[toJS data]) (await := false)
 
+/-- `constructor(FederatedCredentialInit data)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def FederatedCredential.new? (data : FederatedCredentialInit) : IO (Option FederatedCredential) := Internal.api "Lasm.JS.Web.FederatedCredential.new?" do
+  if !(← Internal.hasGlobal ["FederatedCredential"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke FederatedCredential { name := "Lasm.JS.Web.FederatedCredential.new?", module := "globalThis", path := "FederatedCredential", construct := true, arity := 1 }
+      (Internal.args #[toJS data]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute USVString provider` -/
 @[macro_inline] def FederatedCredential.provider (self : FederatedCredential) : IO String := Internal.api "Lasm.JS.Web.FederatedCredential.provider" do
   self.val.get "provider" String
@@ -208,10 +224,26 @@ instance : ToJS CredentialData := ⟨fun d => Internal.fields #[("id", toJS d.id
   Lasm.JS.Binding.invoke PasswordCredential { name := "Lasm.JS.Web.PasswordCredential.new", module := "globalThis", path := "PasswordCredential", construct := true, arity := 1 }
     (Internal.args #[toJS form]) (await := false)
 
+/-- `constructor(HTMLFormElement form)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PasswordCredential.new? (form : HTMLFormElement) : IO (Option PasswordCredential) := Internal.api "Lasm.JS.Web.PasswordCredential.new?" do
+  if !(← Internal.hasGlobal ["PasswordCredential"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PasswordCredential { name := "Lasm.JS.Web.PasswordCredential.new?", module := "globalThis", path := "PasswordCredential", construct := true, arity := 1 }
+      (Internal.args #[toJS form]) (await := false)
+  return some lasmGuarded
+
 /-- `constructor(PasswordCredentialData data)` -/
 @[macro_inline] def PasswordCredential.newWithData (data : PasswordCredentialData) : IO PasswordCredential := Internal.api "Lasm.JS.Web.PasswordCredential.newWithData" do
   Lasm.JS.Binding.invoke PasswordCredential { name := "Lasm.JS.Web.PasswordCredential.newWithData", module := "globalThis", path := "PasswordCredential", construct := true, arity := 1 }
     (Internal.args #[toJS data]) (await := false)
+
+/-- `constructor(PasswordCredentialData data)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PasswordCredential.newWithData? (data : PasswordCredentialData) : IO (Option PasswordCredential) := Internal.api "Lasm.JS.Web.PasswordCredential.newWithData?" do
+  if !(← Internal.hasGlobal ["PasswordCredential"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PasswordCredential { name := "Lasm.JS.Web.PasswordCredential.newWithData?", module := "globalThis", path := "PasswordCredential", construct := true, arity := 1 }
+      (Internal.args #[toJS data]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute USVString password` -/
 @[macro_inline] def PasswordCredential.password (self : PasswordCredential) : IO String := Internal.api "Lasm.JS.Web.PasswordCredential.password" do
@@ -229,5 +261,14 @@ instance : ToJS CredentialData := ⟨fun d => Internal.fields #[("id", toJS d.id
 @[macro_inline] def Navigator.credentials (self : Navigator) : IO CredentialsContainer := Internal.api "Lasm.JS.Web.Navigator.credentials" do
   let r ← self.val.get "credentials" Value
   pure { val := r }
+
+/-- `readonly attribute CredentialsContainer credentials` where the platform has it (`'credentials' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.credentials? (self' : Navigator) : IO (Option CredentialsContainer) := Internal.api "Lasm.JS.Web.Navigator.credentials?" do
+  let self := self'
+  if !(← Internal.has self.val "credentials") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "credentials" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

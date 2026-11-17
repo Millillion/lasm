@@ -54,6 +54,14 @@ instance : ToJS AnimationEventInit := ⟨fun d => Internal.fields #[("bubbles", 
   Lasm.JS.Binding.invoke AnimationEvent { name := "Lasm.JS.Web.AnimationEvent.new", module := "globalThis", path := "AnimationEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional animationEventInitDict]) (await := false)
 
+/-- `constructor(CSSOMString type, optional AnimationEventInit animationEventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def AnimationEvent.new? (type : String) (animationEventInitDict : Option AnimationEventInit := none) : IO (Option AnimationEvent) := Internal.api "Lasm.JS.Web.AnimationEvent.new?" do
+  if !(← Internal.hasGlobal ["AnimationEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke AnimationEvent { name := "Lasm.JS.Web.AnimationEvent.new?", module := "globalThis", path := "AnimationEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional animationEventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute CSSOMString animationName` -/
 @[macro_inline] def AnimationEvent.animationName (self : AnimationEvent) : IO String := Internal.api "Lasm.JS.Web.AnimationEvent.animationName" do
   self.val.get "animationName" String
@@ -286,16 +294,44 @@ def CSSRule.KEYFRAME_RULE : Nat := 8
 @[macro_inline] def onanimationstart : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onanimationstart" do
   Internal.getGlobal ["onanimationstart"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onanimationstart` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onanimationstart? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onanimationstart?" do
+  if !(← Internal.hasGlobal ["onanimationstart"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onanimationstart"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onanimationiteration` (CSS Animations Module Level 1 (https://drafts.csswg.org/css-animations-1/)) -/
 @[macro_inline] def onanimationiteration : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onanimationiteration" do
   Internal.getGlobal ["onanimationiteration"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onanimationiteration` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onanimationiteration? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onanimationiteration?" do
+  if !(← Internal.hasGlobal ["onanimationiteration"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onanimationiteration"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onanimationend` (CSS Animations Module Level 1 (https://drafts.csswg.org/css-animations-1/)) -/
 @[macro_inline] def onanimationend : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onanimationend" do
   Internal.getGlobal ["onanimationend"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onanimationend` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onanimationend? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onanimationend?" do
+  if !(← Internal.hasGlobal ["onanimationend"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onanimationend"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onanimationcancel` (CSS Animations Module Level 1 (https://drafts.csswg.org/css-animations-1/)) -/
 @[macro_inline] def onanimationcancel : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onanimationcancel" do
   Internal.getGlobal ["onanimationcancel"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onanimationcancel` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onanimationcancel? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onanimationcancel?" do
+  if !(← Internal.hasGlobal ["onanimationcancel"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onanimationcancel"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 end Lasm.JS.Web

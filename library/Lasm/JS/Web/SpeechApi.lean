@@ -152,6 +152,14 @@ instance : ToJS SpeechSynthesisErrorEventInit := ⟨fun d => Internal.fields #[(
   Lasm.JS.Binding.invoke SpeechGrammarList { name := "Lasm.JS.Web.SpeechGrammarList.new", module := "globalThis", path := "SpeechGrammarList", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def SpeechGrammarList.new? : IO (Option SpeechGrammarList) := Internal.api "Lasm.JS.Web.SpeechGrammarList.new?" do
+  if !(← Internal.hasGlobal ["SpeechGrammarList"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke SpeechGrammarList { name := "Lasm.JS.Web.SpeechGrammarList.new?", module := "globalThis", path := "SpeechGrammarList", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute unsigned long length` -/
 @[macro_inline] def SpeechGrammarList.length (self : SpeechGrammarList) : IO Nat := Internal.api "Lasm.JS.Web.SpeechGrammarList.length" do
   self.val.get "length" Nat
@@ -176,6 +184,14 @@ instance : ToJS SpeechSynthesisErrorEventInit := ⟨fun d => Internal.fields #[(
 @[macro_inline] def SpeechRecognition.new : IO SpeechRecognition := Internal.api "Lasm.JS.Web.SpeechRecognition.new" do
   Lasm.JS.Binding.invoke SpeechRecognition { name := "Lasm.JS.Web.SpeechRecognition.new", module := "globalThis", path := "SpeechRecognition", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
+
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def SpeechRecognition.new? : IO (Option SpeechRecognition) := Internal.api "Lasm.JS.Web.SpeechRecognition.new?" do
+  if !(← Internal.hasGlobal ["SpeechRecognition"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke SpeechRecognition { name := "Lasm.JS.Web.SpeechRecognition.new?", module := "globalThis", path := "SpeechRecognition", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute SpeechGrammarList grammars` -/
 @[macro_inline] def SpeechRecognition.grammars (self : SpeechRecognition) : IO SpeechGrammarList := Internal.api "Lasm.JS.Web.SpeechRecognition.grammars" do
@@ -351,10 +367,26 @@ instance : ToJS SpeechSynthesisErrorEventInit := ⟨fun d => Internal.fields #[(
   Lasm.JS.Binding.invokeAsync SpeechRecognitionAvailabilityStatus { name := "Lasm.JS.Web.SpeechRecognition.available", module := "globalThis", path := "SpeechRecognition.available", construct := false, arity := 1 }
     (Internal.args #[toJS options])
 
+/-- `static Promise<SpeechRecognitionAvailabilityStatus> available(SpeechRecognitionOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def SpeechRecognition.available? (options : SpeechRecognitionOptions) : Async (Option SpeechRecognitionAvailabilityStatus) := Internal.api "Lasm.JS.Web.SpeechRecognition.available?" do
+  if !(← Internal.hasGlobal ["SpeechRecognition", "available"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync SpeechRecognitionAvailabilityStatus { name := "Lasm.JS.Web.SpeechRecognition.available?", module := "globalThis", path := "SpeechRecognition.available", construct := false, arity := 1 }
+      (Internal.args #[toJS options])
+  return some lasmGuarded
+
 /-- `static Promise<boolean> install(SpeechRecognitionOptions options)` -/
 @[macro_inline] def SpeechRecognition.install (options : SpeechRecognitionOptions) : Async Bool := Internal.api "Lasm.JS.Web.SpeechRecognition.install" do
   Lasm.JS.Binding.invokeAsync Bool { name := "Lasm.JS.Web.SpeechRecognition.install", module := "globalThis", path := "SpeechRecognition.install", construct := false, arity := 1 }
     (Internal.args #[toJS options])
+
+/-- `static Promise<boolean> install(SpeechRecognitionOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def SpeechRecognition.install? (options : SpeechRecognitionOptions) : Async (Option Bool) := Internal.api "Lasm.JS.Web.SpeechRecognition.install?" do
+  if !(← Internal.hasGlobal ["SpeechRecognition", "install"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Bool { name := "Lasm.JS.Web.SpeechRecognition.install?", module := "globalThis", path := "SpeechRecognition.install", construct := false, arity := 1 }
+      (Internal.args #[toJS options])
+  return some lasmGuarded
 
 /-- `v instanceof SpeechRecognitionAlternative`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SpeechRecognitionAlternative`). -/
 @[macro_inline] def SpeechRecognitionAlternative.cast? (v : Value) : IO (Option SpeechRecognitionAlternative) := Internal.api "Lasm.JS.Web.SpeechRecognitionAlternative.cast?" do
@@ -377,6 +409,14 @@ instance : ToJS SpeechSynthesisErrorEventInit := ⟨fun d => Internal.fields #[(
   Lasm.JS.Binding.invoke SpeechRecognitionErrorEvent { name := "Lasm.JS.Web.SpeechRecognitionErrorEvent.new", module := "globalThis", path := "SpeechRecognitionErrorEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, SpeechRecognitionErrorEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def SpeechRecognitionErrorEvent.new? (type : String) (eventInitDict : SpeechRecognitionErrorEventInit) : IO (Option SpeechRecognitionErrorEvent) := Internal.api "Lasm.JS.Web.SpeechRecognitionErrorEvent.new?" do
+  if !(← Internal.hasGlobal ["SpeechRecognitionErrorEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke SpeechRecognitionErrorEvent { name := "Lasm.JS.Web.SpeechRecognitionErrorEvent.new?", module := "globalThis", path := "SpeechRecognitionErrorEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute SpeechRecognitionErrorCode error` -/
 @[macro_inline] def SpeechRecognitionErrorEvent.error (self : SpeechRecognitionErrorEvent) : IO SpeechRecognitionErrorCode := Internal.api "Lasm.JS.Web.SpeechRecognitionErrorEvent.error" do
   self.val.get "error" SpeechRecognitionErrorCode
@@ -393,6 +433,14 @@ instance : ToJS SpeechSynthesisErrorEventInit := ⟨fun d => Internal.fields #[(
 @[macro_inline] def SpeechRecognitionEvent.new (type : String) (eventInitDict : SpeechRecognitionEventInit) : IO SpeechRecognitionEvent := Internal.api "Lasm.JS.Web.SpeechRecognitionEvent.new" do
   Lasm.JS.Binding.invoke SpeechRecognitionEvent { name := "Lasm.JS.Web.SpeechRecognitionEvent.new", module := "globalThis", path := "SpeechRecognitionEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, SpeechRecognitionEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def SpeechRecognitionEvent.new? (type : String) (eventInitDict : SpeechRecognitionEventInit) : IO (Option SpeechRecognitionEvent) := Internal.api "Lasm.JS.Web.SpeechRecognitionEvent.new?" do
+  if !(← Internal.hasGlobal ["SpeechRecognitionEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke SpeechRecognitionEvent { name := "Lasm.JS.Web.SpeechRecognitionEvent.new?", module := "globalThis", path := "SpeechRecognitionEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute unsigned long resultIndex` -/
 @[macro_inline] def SpeechRecognitionEvent.resultIndex (self : SpeechRecognitionEvent) : IO Nat := Internal.api "Lasm.JS.Web.SpeechRecognitionEvent.resultIndex" do
@@ -411,6 +459,14 @@ instance : ToJS SpeechSynthesisErrorEventInit := ⟨fun d => Internal.fields #[(
 @[macro_inline] def SpeechRecognitionPhrase.new (phrase : String) (boost : Option Float := none) : IO SpeechRecognitionPhrase := Internal.api "Lasm.JS.Web.SpeechRecognitionPhrase.new" do
   Lasm.JS.Binding.invoke SpeechRecognitionPhrase { name := "Lasm.JS.Web.SpeechRecognitionPhrase.new", module := "globalThis", path := "SpeechRecognitionPhrase", construct := true, arity := 2 }
     (Internal.args #[toJS phrase, Internal.optional boost]) (await := false)
+
+/-- `constructor(DOMString phrase, optional float boost)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def SpeechRecognitionPhrase.new? (phrase : String) (boost : Option Float := none) : IO (Option SpeechRecognitionPhrase) := Internal.api "Lasm.JS.Web.SpeechRecognitionPhrase.new?" do
+  if !(← Internal.hasGlobal ["SpeechRecognitionPhrase"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke SpeechRecognitionPhrase { name := "Lasm.JS.Web.SpeechRecognitionPhrase.new?", module := "globalThis", path := "SpeechRecognitionPhrase", construct := true, arity := 2 }
+      (Internal.args #[toJS phrase, Internal.optional boost]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString phrase` -/
 @[macro_inline] def SpeechRecognitionPhrase.phrase (self : SpeechRecognitionPhrase) : IO String := Internal.api "Lasm.JS.Web.SpeechRecognitionPhrase.phrase" do
@@ -509,6 +565,14 @@ instance : ToJS SpeechSynthesisErrorEventInit := ⟨fun d => Internal.fields #[(
   Lasm.JS.Binding.invoke SpeechSynthesisEvent { name := "Lasm.JS.Web.SpeechSynthesisEvent.new", module := "globalThis", path := "SpeechSynthesisEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, SpeechSynthesisEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def SpeechSynthesisEvent.new? (type : String) (eventInitDict : SpeechSynthesisEventInit) : IO (Option SpeechSynthesisEvent) := Internal.api "Lasm.JS.Web.SpeechSynthesisEvent.new?" do
+  if !(← Internal.hasGlobal ["SpeechSynthesisEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke SpeechSynthesisEvent { name := "Lasm.JS.Web.SpeechSynthesisEvent.new?", module := "globalThis", path := "SpeechSynthesisEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute SpeechSynthesisUtterance utterance` -/
 @[macro_inline] def SpeechSynthesisEvent.utterance (self : SpeechSynthesisEvent) : IO SpeechSynthesisUtterance := Internal.api "Lasm.JS.Web.SpeechSynthesisEvent.utterance" do
   let r ← self.val.get "utterance" Value
@@ -538,6 +602,14 @@ instance : ToJS SpeechSynthesisErrorEventInit := ⟨fun d => Internal.fields #[(
 @[macro_inline] def SpeechSynthesisUtterance.new (text : Option String := none) : IO SpeechSynthesisUtterance := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.new" do
   Lasm.JS.Binding.invoke SpeechSynthesisUtterance { name := "Lasm.JS.Web.SpeechSynthesisUtterance.new", module := "globalThis", path := "SpeechSynthesisUtterance", construct := true, arity := 1 }
     (Internal.args #[Internal.optional text]) (await := false)
+
+/-- `constructor(optional DOMString text)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def SpeechSynthesisUtterance.new? (text : Option String := none) : IO (Option SpeechSynthesisUtterance) := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.new?" do
+  if !(← Internal.hasGlobal ["SpeechSynthesisUtterance"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke SpeechSynthesisUtterance { name := "Lasm.JS.Web.SpeechSynthesisUtterance.new?", module := "globalThis", path := "SpeechSynthesisUtterance", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional text]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute DOMString text` -/
 @[macro_inline] def SpeechSynthesisUtterance.text (self : SpeechSynthesisUtterance) : IO String := Internal.api "Lasm.JS.Web.SpeechSynthesisUtterance.text" do
@@ -676,6 +748,14 @@ instance : ToJS SpeechSynthesisErrorEventInit := ⟨fun d => Internal.fields #[(
   Lasm.JS.Binding.invoke SpeechSynthesisErrorEvent { name := "Lasm.JS.Web.SpeechSynthesisErrorEvent.new", module := "globalThis", path := "SpeechSynthesisErrorEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, SpeechSynthesisErrorEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def SpeechSynthesisErrorEvent.new? (type : String) (eventInitDict : SpeechSynthesisErrorEventInit) : IO (Option SpeechSynthesisErrorEvent) := Internal.api "Lasm.JS.Web.SpeechSynthesisErrorEvent.new?" do
+  if !(← Internal.hasGlobal ["SpeechSynthesisErrorEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke SpeechSynthesisErrorEvent { name := "Lasm.JS.Web.SpeechSynthesisErrorEvent.new?", module := "globalThis", path := "SpeechSynthesisErrorEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute SpeechSynthesisErrorCode error` -/
 @[macro_inline] def SpeechSynthesisErrorEvent.error (self : SpeechSynthesisErrorEvent) : IO SpeechSynthesisErrorCode := Internal.api "Lasm.JS.Web.SpeechSynthesisErrorEvent.error" do
   self.val.get "error" SpeechSynthesisErrorCode
@@ -685,9 +765,26 @@ instance : ToJS SpeechSynthesisErrorEventInit := ⟨fun d => Internal.fields #[(
   let r ← self.val.get "speechSynthesis" Value
   pure { val := r }
 
+/-- `readonly attribute SpeechSynthesis speechSynthesis` where the platform has it (`'speechSynthesis' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.speechSynthesis? (self' : Window) : IO (Option SpeechSynthesis) := Internal.api "Lasm.JS.Web.Window.speechSynthesis?" do
+  let self := self'
+  if !(← Internal.has self.val "speechSynthesis") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "speechSynthesis" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute SpeechSynthesis speechSynthesis` (Web Speech API (https://webaudio.github.io/web-speech-api/)) -/
 @[macro_inline] def speechSynthesis : IO SpeechSynthesis := Internal.api "Lasm.JS.Web.speechSynthesis" do
   let r ← Internal.getGlobal ["speechSynthesis"] Value
   pure { val := r }
+
+/-- `readonly attribute SpeechSynthesis speechSynthesis` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def speechSynthesis? : IO (Option SpeechSynthesis) := Internal.api "Lasm.JS.Web.speechSynthesis?" do
+  if !(← Internal.hasGlobal ["speechSynthesis"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["speechSynthesis"] Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

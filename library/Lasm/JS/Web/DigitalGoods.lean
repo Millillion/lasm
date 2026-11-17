@@ -105,10 +105,28 @@ instance : FromJS PurchaseDetails where
   let r ← self.val.callMethodAwait "getDigitalGoodsService" (Internal.args #[toJS serviceProvider]) Value
   pure { val := r }
 
+/-- `Promise<DigitalGoodsService> getDigitalGoodsService(DOMString serviceProvider)` where the platform has it (`'getDigitalGoodsService' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.getDigitalGoodsService? (self' : Window) (serviceProvider : String) : Async (Option DigitalGoodsService) := Internal.api "Lasm.JS.Web.Window.getDigitalGoodsService?" do
+  let self := self'
+  if !(← Internal.has self.val "getDigitalGoodsService") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethodAwait "getDigitalGoodsService" (Internal.args #[toJS serviceProvider]) Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `Promise<DigitalGoodsService> getDigitalGoodsService(DOMString serviceProvider)` (Digital Goods API (https://wicg.github.io/digital-goods/)) -/
 @[macro_inline] def getDigitalGoodsService (serviceProvider : String) : Async DigitalGoodsService := Internal.api "Lasm.JS.Web.getDigitalGoodsService" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.getDigitalGoodsService", module := "globalThis", path := "getDigitalGoodsService", construct := false, arity := 1 }
     (Internal.args #[toJS serviceProvider])
   pure { val := r }
+
+/-- `Promise<DigitalGoodsService> getDigitalGoodsService(DOMString serviceProvider)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def getDigitalGoodsService? (serviceProvider : String) : Async (Option DigitalGoodsService) := Internal.api "Lasm.JS.Web.getDigitalGoodsService?" do
+  if !(← Internal.hasGlobal ["getDigitalGoodsService"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.getDigitalGoodsService?", module := "globalThis", path := "getDigitalGoodsService", construct := false, arity := 1 }
+      (Internal.args #[toJS serviceProvider])
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web
