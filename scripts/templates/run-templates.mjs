@@ -189,7 +189,9 @@ try {
       child.stdout.on('data', b => { output.text += b; }); child.stderr.on('data', b => { output.text += b; });
       const exited = new Promise(done => child.once('exit', (code, signal) => done({ code, signal })));
       try {
-        await waitForLine(child, /Listening on http:\/\/127\.0\.0\.1:\d+/, 120_000, output);
+        // The startup line names the server's URL: 127.0.0.1 from the framework templates, localhost from Node.serve
+        // (the fetch template); the port is the one given.
+        await waitForLine(child, new RegExp(`Listening on http://(?:127\\.0\\.0\\.1|localhost|\\[::1\\]):${port}\\b`), 120_000, output);
         entry.readyMs = Math.round(performance.now() - started);
         entry.requests = await checkServer(`http://127.0.0.1:${port}`, framework[base]);
         if (guide) {
