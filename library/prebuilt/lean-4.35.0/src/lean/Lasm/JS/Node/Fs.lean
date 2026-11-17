@@ -2228,10 +2228,6 @@ instance instCoeFsRealpathSyncNativeOptionsFsRealpathSyncDOMStringOrNativeOption
 @[macro_inline] def fs.Dirent.isSymbolicLink (self : fs.Dirent) : IO Bool := Internal.api "Lasm.JS.Node.fs.Dirent.isSymbolicLink" do
   self.val.callMethod "isSymbolicLink" (Internal.args #[]) Bool
 
-/-- `v instanceof FSWatcher`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FSWatcher`). -/
-@[macro_inline] def fs.FSWatcher.cast? (v : Value) : IO (Option fs.FSWatcher) := Internal.api "Lasm.JS.Node.fs.FSWatcher.cast?" do
-  Internal.cast (Support.getExport "node:fs" ["FSWatcher"] Value) (fun x => { val := x }) v
-
 /-- `Event: 'change'` (added in Node.js v0.5.8): `fs.FSWatcher onChange(fs.FSWatcher.ChangeListener listener)`: calls `on("change", listener)` -/
 @[macro_inline] def fs.FSWatcher.onChange (self : fs.FSWatcher) (listener : fs.FSWatcher.ChangeListener) : IO fs.FSWatcher := Internal.api "Lasm.JS.Node.fs.FSWatcher.onChange" do
   let r ← self.val.callMethod "on" (Internal.args #[toJS "change", toJS listener]) Value
@@ -2275,10 +2271,6 @@ instance instCoeFsRealpathSyncNativeOptionsFsRealpathSyncDOMStringOrNativeOption
 @[macro_inline] def fs.FSWatcher.unref (self : fs.FSWatcher) : IO fs.FSWatcher := Internal.api "Lasm.JS.Node.fs.FSWatcher.unref" do
   let r ← self.val.callMethod "unref" (Internal.args #[]) Value
   pure { val := r }
-
-/-- `v instanceof StatWatcher`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `StatWatcher`). -/
-@[macro_inline] def fs.StatWatcher.cast? (v : Value) : IO (Option fs.StatWatcher) := Internal.api "Lasm.JS.Node.fs.StatWatcher.cast?" do
-  Internal.cast (Support.getExport "node:fs" ["StatWatcher"] Value) (fun x => { val := x }) v
 
 /-- `watcher.ref()` (added in Node.js v14.3.0, v12.20.0): `fs.StatWatcher ref()` -/
 @[macro_inline] def fs.StatWatcher.ref (self : fs.StatWatcher) : IO fs.StatWatcher := Internal.api "Lasm.JS.Node.fs.StatWatcher.ref" do
@@ -2456,10 +2448,6 @@ instance instCoeFsRealpathSyncNativeOptionsFsRealpathSyncDOMStringOrNativeOption
 @[macro_inline] def fs.Stats.isSymbolicLink (self : fs.Stats) : IO Bool := Internal.api "Lasm.JS.Node.fs.Stats.isSymbolicLink" do
   self.val.callMethod "isSymbolicLink" (Internal.args #[]) Bool
 
-/-- `v instanceof StatFs`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `StatFs`). -/
-@[macro_inline] def fs.StatFs.cast? (v : Value) : IO (Option fs.StatFs) := Internal.api "Lasm.JS.Node.fs.StatFs.cast?" do
-  Internal.cast (Support.getExport "node:fs" ["StatFs"] Value) (fun x => { val := x }) v
-
 /-- `bavail` (added in Node.js v19.6.0, v18.15.0): `readonly attribute (double or bigint) bavail` -/
 @[macro_inline] def fs.StatFs.bavail (self : fs.StatFs) : IO DoubleOrBigint := Internal.api "Lasm.JS.Node.fs.StatFs.bavail" do
   self.val.get "bavail" DoubleOrBigint
@@ -2496,51 +2484,51 @@ instance instCoeFsRealpathSyncNativeOptionsFsRealpathSyncDOMStringOrNativeOption
 @[macro_inline] def fs.Utf8Stream.cast? (v : Value) : IO (Option fs.Utf8Stream) := Internal.api "Lasm.JS.Node.fs.Utf8Stream.cast?" do
   Internal.cast (Support.getExport "node:fs" ["Utf8Stream"] Value) (fun x => { val := x }) v
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.append`: `readonly attribute boolean append` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.append`: `readonly attribute boolean append` -/
 @[macro_inline] def fs.Utf8Stream.append (self : fs.Utf8Stream) : IO Bool := Internal.api "Lasm.JS.Node.fs.Utf8Stream.append" do
   self.val.get "append" Bool
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.contentMode`: `readonly attribute DOMString contentMode` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.contentMode`: `readonly attribute DOMString contentMode` -/
 @[macro_inline] def fs.Utf8Stream.contentMode (self : fs.Utf8Stream) : IO String := Internal.api "Lasm.JS.Node.fs.Utf8Stream.contentMode" do
   self.val.get "contentMode" String
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.fd`: `readonly attribute double /* integer: Nat */ fd` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.fd`: `readonly attribute double /* integer: Nat */ fd` -/
 @[macro_inline] def fs.Utf8Stream.fd (self : fs.Utf8Stream) : IO Nat := Internal.api "Lasm.JS.Node.fs.Utf8Stream.fd" do
   self.val.get "fd" Nat
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.file`: `readonly attribute DOMString file` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.file`: `readonly attribute DOMString file` -/
 @[macro_inline] def fs.Utf8Stream.file (self : fs.Utf8Stream) : IO String := Internal.api "Lasm.JS.Node.fs.Utf8Stream.file" do
   self.val.get "file" String
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.fsync`: `readonly attribute boolean fsync` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.fsync`: `readonly attribute boolean fsync` -/
 @[macro_inline] def fs.Utf8Stream.fsync (self : fs.Utf8Stream) : IO Bool := Internal.api "Lasm.JS.Node.fs.Utf8Stream.fsync" do
   self.val.get "fsync" Bool
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.maxLength`: `readonly attribute double maxLength` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.maxLength`: `readonly attribute double maxLength` -/
 @[macro_inline] def fs.Utf8Stream.maxLength (self : fs.Utf8Stream) : IO Float := Internal.api "Lasm.JS.Node.fs.Utf8Stream.maxLength" do
   self.val.get "maxLength" Float
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.minLength`: `readonly attribute double minLength` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.minLength`: `readonly attribute double minLength` -/
 @[macro_inline] def fs.Utf8Stream.minLength (self : fs.Utf8Stream) : IO Float := Internal.api "Lasm.JS.Node.fs.Utf8Stream.minLength" do
   self.val.get "minLength" Float
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.mkdir`: `readonly attribute boolean mkdir` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.mkdir`: `readonly attribute boolean mkdir` -/
 @[macro_inline] def fs.Utf8Stream.mkdir (self : fs.Utf8Stream) : IO Bool := Internal.api "Lasm.JS.Node.fs.Utf8Stream.mkdir" do
   self.val.get "mkdir" Bool
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.mode`: `readonly attribute (double or DOMString) mode` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.mode`: `readonly attribute (double or DOMString) mode` -/
 @[macro_inline] def fs.Utf8Stream.mode (self : fs.Utf8Stream) : IO DoubleOrDOMString := Internal.api "Lasm.JS.Node.fs.Utf8Stream.mode" do
   self.val.get "mode" DoubleOrDOMString
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.periodicFlush`: `readonly attribute double periodicFlush` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.periodicFlush`: `readonly attribute double periodicFlush` -/
 @[macro_inline] def fs.Utf8Stream.periodicFlush (self : fs.Utf8Stream) : IO Float := Internal.api "Lasm.JS.Node.fs.Utf8Stream.periodicFlush" do
   self.val.get "periodicFlush" Float
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.sync`: `readonly attribute boolean sync` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.sync`: `readonly attribute boolean sync` -/
 @[macro_inline] def fs.Utf8Stream.sync (self : fs.Utf8Stream) : IO Bool := Internal.api "Lasm.JS.Node.fs.Utf8Stream.sync" do
   self.val.get "sync" Bool
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.writing`: `readonly attribute boolean writing` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.writing`: `readonly attribute boolean writing` -/
 @[macro_inline] def fs.Utf8Stream.writing (self : fs.Utf8Stream) : IO Bool := Internal.api "Lasm.JS.Node.fs.Utf8Stream.writing" do
   self.val.get "writing" Bool
 
