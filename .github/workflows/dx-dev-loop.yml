@@ -8,14 +8,16 @@ on:
   workflow_dispatch:
   # release-checks.yml gates releases on it.
   workflow_call:
-  # A pull request that changes the editor's setup (Lasm's Lake package, lasm editor, lasm init) runs the
-  # editor job alone (with the candidate it needs): Train B's CI never ran it, and #332 broke it (2026-11-17).
+  # A pull request that changes the editor's setup (Lasm's Lake package, lasm editor, lasm init), the
+  # library compiled on first import or a template runs the editor job and the fetch template built and served
+  # on Node (with the candidate they need): Train B's CI never ran them, and #332 and #331 broke them (2026-11-17).
   pull_request:
     paths:
       - 'src/lake-library.mjs'
       - 'src/editor.mjs'
       - 'src/init.mjs'
       - 'src/lazy-library.mjs'
+      - 'templates/**'
       - 'scripts/templates/editor-templates.mjs'
       - 'scripts/templates/editor-check.mjs'
       - '.github/workflows/dx-dev-loop.yml'
@@ -61,7 +63,6 @@ jobs:
           if-no-files-found: error
   templates:
     needs: pack
-    if: github.event_name != 'pull_request'
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
@@ -79,7 +80,11 @@ jobs:
           name: dx-packed-candidate
           path: .work/node-candidate
       - name: Templates and the lasm dev loop
+        if: github.event_name != 'pull_request'
         run: node scripts/templates/run-templates.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm templates" .work/templates.json --dev-loop
+      - name: The fetch template on Node (a pull request's check)
+        if: github.event_name == 'pull_request'
+        run: node scripts/templates/run-templates.mjs ".work/node-candidate/lasm-compiler-$LASM_CANDIDATE_VERSION.tgz" "$RUNNER_TEMP/lasm templates" .work/templates.json --templates fetch
       - name: Preserve the result
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
