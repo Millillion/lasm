@@ -30,6 +30,9 @@ Files:
 `App.lean` is pure Lean: `lake build App` checks it natively. `Main.lean` imports
 `Lasm.UI`, which ships with Lasm: `npx lasm editor` (also run by `npm run dev`) makes the Lean
 editor resolve it ([editor setup](https://github.com/Millillion/lasm/blob/main/docs/GETTING_STARTED.md#editor)).
+`lakefile.toml` requires Lasm's library as a Lake package at `.lake/lasm-library`, a link every lasm
+command makes: on a fresh clone, run any lasm command once (`npm run dev`, `npx lasm editor`); a plain
+`lake build` needs it.
 
 ## Deploy
 

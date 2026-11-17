@@ -13,7 +13,10 @@ Output: a line `FAIL <check>: <detail>` per failed check, a line
 `section <name>: <passed> passed, <failed> failed` per section, and `summary <passed> <failed>`.
 -/
 import Lasm.JS
-import Lasm.JS.Web
+import Lasm.JS.Web.FileAPI
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Html
+import Lasm.JS.Web.Websockets
 import Lasm.JS.Bun.Core
 import Lasm.JS.Bun.Redis
 import Lasm.JS.Bun.S3
@@ -21,7 +24,6 @@ import Lasm.JS.Bun.Serve
 import Lasm.JS.Bun.Shell
 import Lasm.JS.Bun.Sql
 import Lasm.JS.Bun.Sqlite
-import Lasm.JS.Web.WebSocket
 import Surface
 open Lasm.JS Lasm.JS.Web
 

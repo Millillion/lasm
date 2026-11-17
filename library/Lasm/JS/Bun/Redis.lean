@@ -8,11 +8,14 @@ docs/JS_BINDINGS.md ("Lasm.JS.Deno and Lasm.JS.Bun"). The doc comments quote eac
 declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.File
+import Lasm.JS.Web.Types.FileAPI
 import Lasm.JS.Bun.Core
 
 namespace Lasm.JS.Bun
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface Bun.RedisClient` (Bun 1.4.4 type declarations, redis.d.ts): a handle to the JavaScript object. -/
 structure RedisClient where
@@ -23,1957 +26,2253 @@ instance : ToJS RedisClient := ⟨fun x => .ref x.val ""⟩
 instance : FromJS RedisClient := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.RedisClient", .data⟩
 
 /-- `enum RedisClientSet` (Bun 1.4.4 type declarations): "OK". -/
-inductive RedisClientSet where
-  /-- "OK" -/
-  | ok
+structure RedisClientSet where
+  /-- A value from its string, unchecked: the generated values (`.ok`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientSet := ⟨fun
-  | .ok => .string "OK"⟩
+/-- "OK" -/
+@[match_pattern] abbrev RedisClientSet.ok : RedisClientSet := .unsafeOfString "OK"
+instance : ToJS RedisClientSet := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientSet where
   fromJS
-    | .string "OK" => .ok .ok
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientSet"
 
 /-- `enum RedisClientSetWithExEx` (Bun 1.4.4 type declarations): "EX". -/
-inductive RedisClientSetWithExEx where
-  /-- "EX" -/
-  | ex
+structure RedisClientSetWithExEx where
+  /-- A value from its string, unchecked: the generated values (`.ex`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientSetWithExEx := ⟨fun
-  | .ex => .string "EX"⟩
+/-- "EX" -/
+@[match_pattern] abbrev RedisClientSetWithExEx.ex : RedisClientSetWithExEx := .unsafeOfString "EX"
+instance : ToJS RedisClientSetWithExEx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientSetWithExEx where
   fromJS
-    | .string "EX" => .ok .ex
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientSetWithExEx"
 
 /-- `enum RedisClientSetWithPxPx` (Bun 1.4.4 type declarations): "PX". -/
-inductive RedisClientSetWithPxPx where
-  /-- "PX" -/
-  | px
+structure RedisClientSetWithPxPx where
+  /-- A value from its string, unchecked: the generated values (`.px`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientSetWithPxPx := ⟨fun
-  | .px => .string "PX"⟩
+/-- "PX" -/
+@[match_pattern] abbrev RedisClientSetWithPxPx.px : RedisClientSetWithPxPx := .unsafeOfString "PX"
+instance : ToJS RedisClientSetWithPxPx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientSetWithPxPx where
   fromJS
-    | .string "PX" => .ok .px
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientSetWithPxPx"
 
 /-- `enum RedisClientSetWithExatExat` (Bun 1.4.4 type declarations): "EXAT". -/
-inductive RedisClientSetWithExatExat where
-  /-- "EXAT" -/
-  | exat
+structure RedisClientSetWithExatExat where
+  /-- A value from its string, unchecked: the generated values (`.exat`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientSetWithExatExat := ⟨fun
-  | .exat => .string "EXAT"⟩
+/-- "EXAT" -/
+@[match_pattern] abbrev RedisClientSetWithExatExat.exat : RedisClientSetWithExatExat := .unsafeOfString "EXAT"
+instance : ToJS RedisClientSetWithExatExat := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientSetWithExatExat where
   fromJS
-    | .string "EXAT" => .ok .exat
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientSetWithExatExat"
 
 /-- `enum RedisClientSetWithPxatPxat` (Bun 1.4.4 type declarations): "PXAT". -/
-inductive RedisClientSetWithPxatPxat where
-  /-- "PXAT" -/
-  | pxat
+structure RedisClientSetWithPxatPxat where
+  /-- A value from its string, unchecked: the generated values (`.pxat`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientSetWithPxatPxat := ⟨fun
-  | .pxat => .string "PXAT"⟩
+/-- "PXAT" -/
+@[match_pattern] abbrev RedisClientSetWithPxatPxat.pxat : RedisClientSetWithPxatPxat := .unsafeOfString "PXAT"
+instance : ToJS RedisClientSetWithPxatPxat := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientSetWithPxatPxat where
   fromJS
-    | .string "PXAT" => .ok .pxat
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientSetWithPxatPxat"
 
 /-- `enum RedisClientSetWithNxNx` (Bun 1.4.4 type declarations): "NX". -/
-inductive RedisClientSetWithNxNx where
-  /-- "NX" -/
-  | nx
+structure RedisClientSetWithNxNx where
+  /-- A value from its string, unchecked: the generated values (`.nx`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientSetWithNxNx := ⟨fun
-  | .nx => .string "NX"⟩
+/-- "NX" -/
+@[match_pattern] abbrev RedisClientSetWithNxNx.nx : RedisClientSetWithNxNx := .unsafeOfString "NX"
+instance : ToJS RedisClientSetWithNxNx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientSetWithNxNx where
   fromJS
-    | .string "NX" => .ok .nx
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientSetWithNxNx"
 
 /-- `enum RedisClientSetWithXxXx` (Bun 1.4.4 type declarations): "XX". -/
-inductive RedisClientSetWithXxXx where
-  /-- "XX" -/
-  | xx
+structure RedisClientSetWithXxXx where
+  /-- A value from its string, unchecked: the generated values (`.xx`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientSetWithXxXx := ⟨fun
-  | .xx => .string "XX"⟩
+/-- "XX" -/
+@[match_pattern] abbrev RedisClientSetWithXxXx.xx : RedisClientSetWithXxXx := .unsafeOfString "XX"
+instance : ToJS RedisClientSetWithXxXx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientSetWithXxXx where
   fromJS
-    | .string "XX" => .ok .xx
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientSetWithXxXx"
 
 /-- `enum RedisClientSetWithGetGet` (Bun 1.4.4 type declarations): "GET". -/
-inductive RedisClientSetWithGetGet where
-  /-- "GET" -/
-  | get
+structure RedisClientSetWithGetGet where
+  /-- A value from its string, unchecked: the generated values (`.get`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientSetWithGetGet := ⟨fun
-  | .get => .string "GET"⟩
+/-- "GET" -/
+@[match_pattern] abbrev RedisClientSetWithGetGet.get : RedisClientSetWithGetGet := .unsafeOfString "GET"
+instance : ToJS RedisClientSetWithGetGet := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientSetWithGetGet where
   fromJS
-    | .string "GET" => .ok .get
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientSetWithGetGet"
 
 /-- `enum RedisClientSetWithKeepttlKeepttl` (Bun 1.4.4 type declarations): "KEEPTTL". -/
-inductive RedisClientSetWithKeepttlKeepttl where
-  /-- "KEEPTTL" -/
-  | keepttl
+structure RedisClientSetWithKeepttlKeepttl where
+  /-- A value from its string, unchecked: the generated values (`.keepttl`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientSetWithKeepttlKeepttl := ⟨fun
-  | .keepttl => .string "KEEPTTL"⟩
+/-- "KEEPTTL" -/
+@[match_pattern] abbrev RedisClientSetWithKeepttlKeepttl.keepttl : RedisClientSetWithKeepttlKeepttl := .unsafeOfString "KEEPTTL"
+instance : ToJS RedisClientSetWithKeepttlKeepttl := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientSetWithKeepttlKeepttl where
   fromJS
-    | .string "KEEPTTL" => .ok .keepttl
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientSetWithKeepttlKeepttl"
 
 /-- `enum RedisClientHgetdelFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHgetdelFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHgetdelFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHgetdelFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHgetdelFieldsKeyword.fields : RedisClientHgetdelFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHgetdelFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHgetdelFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHgetdelFieldsKeyword"
 
 /-- `enum RedisClientHgetexFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHgetexFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHgetexFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHgetexFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHgetexFieldsKeyword.fields : RedisClientHgetexFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHgetexFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHgetexFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHgetexFieldsKeyword"
 
 /-- `enum RedisClientHgetexWithExEx` (Bun 1.4.4 type declarations): "EX". -/
-inductive RedisClientHgetexWithExEx where
-  /-- "EX" -/
-  | ex
+structure RedisClientHgetexWithExEx where
+  /-- A value from its string, unchecked: the generated values (`.ex`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHgetexWithExEx := ⟨fun
-  | .ex => .string "EX"⟩
+/-- "EX" -/
+@[match_pattern] abbrev RedisClientHgetexWithExEx.ex : RedisClientHgetexWithExEx := .unsafeOfString "EX"
+instance : ToJS RedisClientHgetexWithExEx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHgetexWithExEx where
   fromJS
-    | .string "EX" => .ok .ex
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHgetexWithExEx"
 
 /-- `enum RedisClientHgetexWithExFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHgetexWithExFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHgetexWithExFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHgetexWithExFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHgetexWithExFieldsKeyword.fields : RedisClientHgetexWithExFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHgetexWithExFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHgetexWithExFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHgetexWithExFieldsKeyword"
 
 /-- `enum RedisClientHgetexWithPxPx` (Bun 1.4.4 type declarations): "PX". -/
-inductive RedisClientHgetexWithPxPx where
-  /-- "PX" -/
-  | px
+structure RedisClientHgetexWithPxPx where
+  /-- A value from its string, unchecked: the generated values (`.px`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHgetexWithPxPx := ⟨fun
-  | .px => .string "PX"⟩
+/-- "PX" -/
+@[match_pattern] abbrev RedisClientHgetexWithPxPx.px : RedisClientHgetexWithPxPx := .unsafeOfString "PX"
+instance : ToJS RedisClientHgetexWithPxPx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHgetexWithPxPx where
   fromJS
-    | .string "PX" => .ok .px
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHgetexWithPxPx"
 
 /-- `enum RedisClientHgetexWithPxFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHgetexWithPxFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHgetexWithPxFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHgetexWithPxFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHgetexWithPxFieldsKeyword.fields : RedisClientHgetexWithPxFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHgetexWithPxFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHgetexWithPxFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHgetexWithPxFieldsKeyword"
 
 /-- `enum RedisClientHgetexWithExatExat` (Bun 1.4.4 type declarations): "EXAT". -/
-inductive RedisClientHgetexWithExatExat where
-  /-- "EXAT" -/
-  | exat
+structure RedisClientHgetexWithExatExat where
+  /-- A value from its string, unchecked: the generated values (`.exat`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHgetexWithExatExat := ⟨fun
-  | .exat => .string "EXAT"⟩
+/-- "EXAT" -/
+@[match_pattern] abbrev RedisClientHgetexWithExatExat.exat : RedisClientHgetexWithExatExat := .unsafeOfString "EXAT"
+instance : ToJS RedisClientHgetexWithExatExat := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHgetexWithExatExat where
   fromJS
-    | .string "EXAT" => .ok .exat
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHgetexWithExatExat"
 
 /-- `enum RedisClientHgetexWithExatFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHgetexWithExatFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHgetexWithExatFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHgetexWithExatFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHgetexWithExatFieldsKeyword.fields : RedisClientHgetexWithExatFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHgetexWithExatFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHgetexWithExatFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHgetexWithExatFieldsKeyword"
 
 /-- `enum RedisClientHgetexWithPxatPxat` (Bun 1.4.4 type declarations): "PXAT". -/
-inductive RedisClientHgetexWithPxatPxat where
-  /-- "PXAT" -/
-  | pxat
+structure RedisClientHgetexWithPxatPxat where
+  /-- A value from its string, unchecked: the generated values (`.pxat`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHgetexWithPxatPxat := ⟨fun
-  | .pxat => .string "PXAT"⟩
+/-- "PXAT" -/
+@[match_pattern] abbrev RedisClientHgetexWithPxatPxat.pxat : RedisClientHgetexWithPxatPxat := .unsafeOfString "PXAT"
+instance : ToJS RedisClientHgetexWithPxatPxat := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHgetexWithPxatPxat where
   fromJS
-    | .string "PXAT" => .ok .pxat
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHgetexWithPxatPxat"
 
 /-- `enum RedisClientHgetexWithPxatFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHgetexWithPxatFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHgetexWithPxatFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHgetexWithPxatFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHgetexWithPxatFieldsKeyword.fields : RedisClientHgetexWithPxatFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHgetexWithPxatFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHgetexWithPxatFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHgetexWithPxatFieldsKeyword"
 
 /-- `enum RedisClientHgetexWithPersistPersist` (Bun 1.4.4 type declarations): "PERSIST". -/
-inductive RedisClientHgetexWithPersistPersist where
-  /-- "PERSIST" -/
-  | persist
+structure RedisClientHgetexWithPersistPersist where
+  /-- A value from its string, unchecked: the generated values (`.persist`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHgetexWithPersistPersist := ⟨fun
-  | .persist => .string "PERSIST"⟩
+/-- "PERSIST" -/
+@[match_pattern] abbrev RedisClientHgetexWithPersistPersist.persist : RedisClientHgetexWithPersistPersist := .unsafeOfString "PERSIST"
+instance : ToJS RedisClientHgetexWithPersistPersist := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHgetexWithPersistPersist where
   fromJS
-    | .string "PERSIST" => .ok .persist
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHgetexWithPersistPersist"
 
 /-- `enum RedisClientHgetexWithPersistFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHgetexWithPersistFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHgetexWithPersistFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHgetexWithPersistFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHgetexWithPersistFieldsKeyword.fields : RedisClientHgetexWithPersistFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHgetexWithPersistFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHgetexWithPersistFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHgetexWithPersistFieldsKeyword"
 
 /-- `enum RedisClientHsetexFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHsetexFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHsetexFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHsetexFieldsKeyword.fields : RedisClientHsetexFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHsetexFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFieldsKeyword"
 
 /-- `enum RedisClientHsetexFnxFnx` (Bun 1.4.4 type declarations): "FNX". -/
-inductive RedisClientHsetexFnxFnx where
-  /-- "FNX" -/
-  | fnx
+structure RedisClientHsetexFnxFnx where
+  /-- A value from its string, unchecked: the generated values (`.fnx`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFnxFnx := ⟨fun
-  | .fnx => .string "FNX"⟩
+/-- "FNX" -/
+@[match_pattern] abbrev RedisClientHsetexFnxFnx.fnx : RedisClientHsetexFnxFnx := .unsafeOfString "FNX"
+instance : ToJS RedisClientHsetexFnxFnx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFnxFnx where
   fromJS
-    | .string "FNX" => .ok .fnx
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFnxFnx"
 
 /-- `enum RedisClientHsetexFnxFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHsetexFnxFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHsetexFnxFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFnxFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHsetexFnxFieldsKeyword.fields : RedisClientHsetexFnxFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHsetexFnxFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFnxFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFnxFieldsKeyword"
 
 /-- `enum RedisClientHsetexFxxFxx` (Bun 1.4.4 type declarations): "FXX". -/
-inductive RedisClientHsetexFxxFxx where
-  /-- "FXX" -/
-  | fxx
+structure RedisClientHsetexFxxFxx where
+  /-- A value from its string, unchecked: the generated values (`.fxx`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFxxFxx := ⟨fun
-  | .fxx => .string "FXX"⟩
+/-- "FXX" -/
+@[match_pattern] abbrev RedisClientHsetexFxxFxx.fxx : RedisClientHsetexFxxFxx := .unsafeOfString "FXX"
+instance : ToJS RedisClientHsetexFxxFxx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFxxFxx where
   fromJS
-    | .string "FXX" => .ok .fxx
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFxxFxx"
 
 /-- `enum RedisClientHsetexFxxFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHsetexFxxFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHsetexFxxFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFxxFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHsetexFxxFieldsKeyword.fields : RedisClientHsetexFxxFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHsetexFxxFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFxxFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFxxFieldsKeyword"
 
 /-- `enum RedisClientHsetexWithExEx` (Bun 1.4.4 type declarations): "EX". -/
-inductive RedisClientHsetexWithExEx where
-  /-- "EX" -/
-  | ex
+structure RedisClientHsetexWithExEx where
+  /-- A value from its string, unchecked: the generated values (`.ex`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexWithExEx := ⟨fun
-  | .ex => .string "EX"⟩
+/-- "EX" -/
+@[match_pattern] abbrev RedisClientHsetexWithExEx.ex : RedisClientHsetexWithExEx := .unsafeOfString "EX"
+instance : ToJS RedisClientHsetexWithExEx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexWithExEx where
   fromJS
-    | .string "EX" => .ok .ex
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexWithExEx"
 
 /-- `enum RedisClientHsetexWithExFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHsetexWithExFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHsetexWithExFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexWithExFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHsetexWithExFieldsKeyword.fields : RedisClientHsetexWithExFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHsetexWithExFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexWithExFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexWithExFieldsKeyword"
 
 /-- `enum RedisClientHsetexWithPxPx` (Bun 1.4.4 type declarations): "PX". -/
-inductive RedisClientHsetexWithPxPx where
-  /-- "PX" -/
-  | px
+structure RedisClientHsetexWithPxPx where
+  /-- A value from its string, unchecked: the generated values (`.px`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexWithPxPx := ⟨fun
-  | .px => .string "PX"⟩
+/-- "PX" -/
+@[match_pattern] abbrev RedisClientHsetexWithPxPx.px : RedisClientHsetexWithPxPx := .unsafeOfString "PX"
+instance : ToJS RedisClientHsetexWithPxPx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexWithPxPx where
   fromJS
-    | .string "PX" => .ok .px
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexWithPxPx"
 
 /-- `enum RedisClientHsetexWithPxFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHsetexWithPxFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHsetexWithPxFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexWithPxFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHsetexWithPxFieldsKeyword.fields : RedisClientHsetexWithPxFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHsetexWithPxFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexWithPxFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexWithPxFieldsKeyword"
 
 /-- `enum RedisClientHsetexWithExatExat` (Bun 1.4.4 type declarations): "EXAT". -/
-inductive RedisClientHsetexWithExatExat where
-  /-- "EXAT" -/
-  | exat
+structure RedisClientHsetexWithExatExat where
+  /-- A value from its string, unchecked: the generated values (`.exat`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexWithExatExat := ⟨fun
-  | .exat => .string "EXAT"⟩
+/-- "EXAT" -/
+@[match_pattern] abbrev RedisClientHsetexWithExatExat.exat : RedisClientHsetexWithExatExat := .unsafeOfString "EXAT"
+instance : ToJS RedisClientHsetexWithExatExat := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexWithExatExat where
   fromJS
-    | .string "EXAT" => .ok .exat
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexWithExatExat"
 
 /-- `enum RedisClientHsetexWithExatFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHsetexWithExatFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHsetexWithExatFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexWithExatFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHsetexWithExatFieldsKeyword.fields : RedisClientHsetexWithExatFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHsetexWithExatFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexWithExatFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexWithExatFieldsKeyword"
 
 /-- `enum RedisClientHsetexWithPxatPxat` (Bun 1.4.4 type declarations): "PXAT". -/
-inductive RedisClientHsetexWithPxatPxat where
-  /-- "PXAT" -/
-  | pxat
+structure RedisClientHsetexWithPxatPxat where
+  /-- A value from its string, unchecked: the generated values (`.pxat`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexWithPxatPxat := ⟨fun
-  | .pxat => .string "PXAT"⟩
+/-- "PXAT" -/
+@[match_pattern] abbrev RedisClientHsetexWithPxatPxat.pxat : RedisClientHsetexWithPxatPxat := .unsafeOfString "PXAT"
+instance : ToJS RedisClientHsetexWithPxatPxat := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexWithPxatPxat where
   fromJS
-    | .string "PXAT" => .ok .pxat
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexWithPxatPxat"
 
 /-- `enum RedisClientHsetexWithPxatFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHsetexWithPxatFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHsetexWithPxatFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexWithPxatFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHsetexWithPxatFieldsKeyword.fields : RedisClientHsetexWithPxatFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHsetexWithPxatFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexWithPxatFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexWithPxatFieldsKeyword"
 
 /-- `enum RedisClientHsetexWithKeepttlKeepttl` (Bun 1.4.4 type declarations): "KEEPTTL". -/
-inductive RedisClientHsetexWithKeepttlKeepttl where
-  /-- "KEEPTTL" -/
-  | keepttl
+structure RedisClientHsetexWithKeepttlKeepttl where
+  /-- A value from its string, unchecked: the generated values (`.keepttl`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexWithKeepttlKeepttl := ⟨fun
-  | .keepttl => .string "KEEPTTL"⟩
+/-- "KEEPTTL" -/
+@[match_pattern] abbrev RedisClientHsetexWithKeepttlKeepttl.keepttl : RedisClientHsetexWithKeepttlKeepttl := .unsafeOfString "KEEPTTL"
+instance : ToJS RedisClientHsetexWithKeepttlKeepttl := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexWithKeepttlKeepttl where
   fromJS
-    | .string "KEEPTTL" => .ok .keepttl
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexWithKeepttlKeepttl"
 
 /-- `enum RedisClientHsetexWithKeepttlFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHsetexWithKeepttlFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHsetexWithKeepttlFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexWithKeepttlFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHsetexWithKeepttlFieldsKeyword.fields : RedisClientHsetexWithKeepttlFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHsetexWithKeepttlFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexWithKeepttlFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexWithKeepttlFieldsKeyword"
 
 /-- `enum RedisClientHsetexFnxExFnx` (Bun 1.4.4 type declarations): "FNX". -/
-inductive RedisClientHsetexFnxExFnx where
-  /-- "FNX" -/
-  | fnx
+structure RedisClientHsetexFnxExFnx where
+  /-- A value from its string, unchecked: the generated values (`.fnx`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFnxExFnx := ⟨fun
-  | .fnx => .string "FNX"⟩
+/-- "FNX" -/
+@[match_pattern] abbrev RedisClientHsetexFnxExFnx.fnx : RedisClientHsetexFnxExFnx := .unsafeOfString "FNX"
+instance : ToJS RedisClientHsetexFnxExFnx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFnxExFnx where
   fromJS
-    | .string "FNX" => .ok .fnx
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFnxExFnx"
 
 /-- `enum RedisClientHsetexFnxExEx` (Bun 1.4.4 type declarations): "EX". -/
-inductive RedisClientHsetexFnxExEx where
-  /-- "EX" -/
-  | ex
+structure RedisClientHsetexFnxExEx where
+  /-- A value from its string, unchecked: the generated values (`.ex`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFnxExEx := ⟨fun
-  | .ex => .string "EX"⟩
+/-- "EX" -/
+@[match_pattern] abbrev RedisClientHsetexFnxExEx.ex : RedisClientHsetexFnxExEx := .unsafeOfString "EX"
+instance : ToJS RedisClientHsetexFnxExEx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFnxExEx where
   fromJS
-    | .string "EX" => .ok .ex
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFnxExEx"
 
 /-- `enum RedisClientHsetexFnxExFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHsetexFnxExFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHsetexFnxExFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFnxExFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHsetexFnxExFieldsKeyword.fields : RedisClientHsetexFnxExFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHsetexFnxExFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFnxExFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFnxExFieldsKeyword"
 
 /-- `enum RedisClientHsetexFnxPxFnx` (Bun 1.4.4 type declarations): "FNX". -/
-inductive RedisClientHsetexFnxPxFnx where
-  /-- "FNX" -/
-  | fnx
+structure RedisClientHsetexFnxPxFnx where
+  /-- A value from its string, unchecked: the generated values (`.fnx`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFnxPxFnx := ⟨fun
-  | .fnx => .string "FNX"⟩
+/-- "FNX" -/
+@[match_pattern] abbrev RedisClientHsetexFnxPxFnx.fnx : RedisClientHsetexFnxPxFnx := .unsafeOfString "FNX"
+instance : ToJS RedisClientHsetexFnxPxFnx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFnxPxFnx where
   fromJS
-    | .string "FNX" => .ok .fnx
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFnxPxFnx"
 
 /-- `enum RedisClientHsetexFnxPxPx` (Bun 1.4.4 type declarations): "PX". -/
-inductive RedisClientHsetexFnxPxPx where
-  /-- "PX" -/
-  | px
+structure RedisClientHsetexFnxPxPx where
+  /-- A value from its string, unchecked: the generated values (`.px`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFnxPxPx := ⟨fun
-  | .px => .string "PX"⟩
+/-- "PX" -/
+@[match_pattern] abbrev RedisClientHsetexFnxPxPx.px : RedisClientHsetexFnxPxPx := .unsafeOfString "PX"
+instance : ToJS RedisClientHsetexFnxPxPx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFnxPxPx where
   fromJS
-    | .string "PX" => .ok .px
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFnxPxPx"
 
 /-- `enum RedisClientHsetexFnxPxFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHsetexFnxPxFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHsetexFnxPxFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFnxPxFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHsetexFnxPxFieldsKeyword.fields : RedisClientHsetexFnxPxFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHsetexFnxPxFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFnxPxFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFnxPxFieldsKeyword"
 
 /-- `enum RedisClientHsetexFnxExatFnx` (Bun 1.4.4 type declarations): "FNX". -/
-inductive RedisClientHsetexFnxExatFnx where
-  /-- "FNX" -/
-  | fnx
+structure RedisClientHsetexFnxExatFnx where
+  /-- A value from its string, unchecked: the generated values (`.fnx`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFnxExatFnx := ⟨fun
-  | .fnx => .string "FNX"⟩
+/-- "FNX" -/
+@[match_pattern] abbrev RedisClientHsetexFnxExatFnx.fnx : RedisClientHsetexFnxExatFnx := .unsafeOfString "FNX"
+instance : ToJS RedisClientHsetexFnxExatFnx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFnxExatFnx where
   fromJS
-    | .string "FNX" => .ok .fnx
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFnxExatFnx"
 
 /-- `enum RedisClientHsetexFnxExatExat` (Bun 1.4.4 type declarations): "EXAT". -/
-inductive RedisClientHsetexFnxExatExat where
-  /-- "EXAT" -/
-  | exat
+structure RedisClientHsetexFnxExatExat where
+  /-- A value from its string, unchecked: the generated values (`.exat`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFnxExatExat := ⟨fun
-  | .exat => .string "EXAT"⟩
+/-- "EXAT" -/
+@[match_pattern] abbrev RedisClientHsetexFnxExatExat.exat : RedisClientHsetexFnxExatExat := .unsafeOfString "EXAT"
+instance : ToJS RedisClientHsetexFnxExatExat := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFnxExatExat where
   fromJS
-    | .string "EXAT" => .ok .exat
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFnxExatExat"
 
 /-- `enum RedisClientHsetexFnxExatFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHsetexFnxExatFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHsetexFnxExatFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFnxExatFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHsetexFnxExatFieldsKeyword.fields : RedisClientHsetexFnxExatFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHsetexFnxExatFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFnxExatFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFnxExatFieldsKeyword"
 
 /-- `enum RedisClientHsetexFnxPxatFnx` (Bun 1.4.4 type declarations): "FNX". -/
-inductive RedisClientHsetexFnxPxatFnx where
-  /-- "FNX" -/
-  | fnx
+structure RedisClientHsetexFnxPxatFnx where
+  /-- A value from its string, unchecked: the generated values (`.fnx`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFnxPxatFnx := ⟨fun
-  | .fnx => .string "FNX"⟩
+/-- "FNX" -/
+@[match_pattern] abbrev RedisClientHsetexFnxPxatFnx.fnx : RedisClientHsetexFnxPxatFnx := .unsafeOfString "FNX"
+instance : ToJS RedisClientHsetexFnxPxatFnx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFnxPxatFnx where
   fromJS
-    | .string "FNX" => .ok .fnx
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFnxPxatFnx"
 
 /-- `enum RedisClientHsetexFnxPxatPxat` (Bun 1.4.4 type declarations): "PXAT". -/
-inductive RedisClientHsetexFnxPxatPxat where
-  /-- "PXAT" -/
-  | pxat
+structure RedisClientHsetexFnxPxatPxat where
+  /-- A value from its string, unchecked: the generated values (`.pxat`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFnxPxatPxat := ⟨fun
-  | .pxat => .string "PXAT"⟩
+/-- "PXAT" -/
+@[match_pattern] abbrev RedisClientHsetexFnxPxatPxat.pxat : RedisClientHsetexFnxPxatPxat := .unsafeOfString "PXAT"
+instance : ToJS RedisClientHsetexFnxPxatPxat := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFnxPxatPxat where
   fromJS
-    | .string "PXAT" => .ok .pxat
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFnxPxatPxat"
 
 /-- `enum RedisClientHsetexFnxPxatFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHsetexFnxPxatFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHsetexFnxPxatFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFnxPxatFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHsetexFnxPxatFieldsKeyword.fields : RedisClientHsetexFnxPxatFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHsetexFnxPxatFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFnxPxatFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFnxPxatFieldsKeyword"
 
 /-- `enum RedisClientHsetexWithFnxFnx` (Bun 1.4.4 type declarations): "FNX". -/
-inductive RedisClientHsetexWithFnxFnx where
-  /-- "FNX" -/
-  | fnx
+structure RedisClientHsetexWithFnxFnx where
+  /-- A value from its string, unchecked: the generated values (`.fnx`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexWithFnxFnx := ⟨fun
-  | .fnx => .string "FNX"⟩
+/-- "FNX" -/
+@[match_pattern] abbrev RedisClientHsetexWithFnxFnx.fnx : RedisClientHsetexWithFnxFnx := .unsafeOfString "FNX"
+instance : ToJS RedisClientHsetexWithFnxFnx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexWithFnxFnx where
   fromJS
-    | .string "FNX" => .ok .fnx
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexWithFnxFnx"
 
 /-- `enum RedisClientHsetexWithFnxKeepttl` (Bun 1.4.4 type declarations): "KEEPTTL". -/
-inductive RedisClientHsetexWithFnxKeepttl where
-  /-- "KEEPTTL" -/
-  | keepttl
+structure RedisClientHsetexWithFnxKeepttl where
+  /-- A value from its string, unchecked: the generated values (`.keepttl`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexWithFnxKeepttl := ⟨fun
-  | .keepttl => .string "KEEPTTL"⟩
+/-- "KEEPTTL" -/
+@[match_pattern] abbrev RedisClientHsetexWithFnxKeepttl.keepttl : RedisClientHsetexWithFnxKeepttl := .unsafeOfString "KEEPTTL"
+instance : ToJS RedisClientHsetexWithFnxKeepttl := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexWithFnxKeepttl where
   fromJS
-    | .string "KEEPTTL" => .ok .keepttl
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexWithFnxKeepttl"
 
 /-- `enum RedisClientHsetexWithFnxFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHsetexWithFnxFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHsetexWithFnxFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexWithFnxFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHsetexWithFnxFieldsKeyword.fields : RedisClientHsetexWithFnxFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHsetexWithFnxFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexWithFnxFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexWithFnxFieldsKeyword"
 
 /-- `enum RedisClientHsetexFxxExFxx` (Bun 1.4.4 type declarations): "FXX". -/
-inductive RedisClientHsetexFxxExFxx where
-  /-- "FXX" -/
-  | fxx
+structure RedisClientHsetexFxxExFxx where
+  /-- A value from its string, unchecked: the generated values (`.fxx`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFxxExFxx := ⟨fun
-  | .fxx => .string "FXX"⟩
+/-- "FXX" -/
+@[match_pattern] abbrev RedisClientHsetexFxxExFxx.fxx : RedisClientHsetexFxxExFxx := .unsafeOfString "FXX"
+instance : ToJS RedisClientHsetexFxxExFxx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFxxExFxx where
   fromJS
-    | .string "FXX" => .ok .fxx
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFxxExFxx"
 
 /-- `enum RedisClientHsetexFxxExEx` (Bun 1.4.4 type declarations): "EX". -/
-inductive RedisClientHsetexFxxExEx where
-  /-- "EX" -/
-  | ex
+structure RedisClientHsetexFxxExEx where
+  /-- A value from its string, unchecked: the generated values (`.ex`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFxxExEx := ⟨fun
-  | .ex => .string "EX"⟩
+/-- "EX" -/
+@[match_pattern] abbrev RedisClientHsetexFxxExEx.ex : RedisClientHsetexFxxExEx := .unsafeOfString "EX"
+instance : ToJS RedisClientHsetexFxxExEx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFxxExEx where
   fromJS
-    | .string "EX" => .ok .ex
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFxxExEx"
 
 /-- `enum RedisClientHsetexFxxExFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHsetexFxxExFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHsetexFxxExFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFxxExFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHsetexFxxExFieldsKeyword.fields : RedisClientHsetexFxxExFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHsetexFxxExFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFxxExFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFxxExFieldsKeyword"
 
 /-- `enum RedisClientHsetexFxxPxFxx` (Bun 1.4.4 type declarations): "FXX". -/
-inductive RedisClientHsetexFxxPxFxx where
-  /-- "FXX" -/
-  | fxx
+structure RedisClientHsetexFxxPxFxx where
+  /-- A value from its string, unchecked: the generated values (`.fxx`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFxxPxFxx := ⟨fun
-  | .fxx => .string "FXX"⟩
+/-- "FXX" -/
+@[match_pattern] abbrev RedisClientHsetexFxxPxFxx.fxx : RedisClientHsetexFxxPxFxx := .unsafeOfString "FXX"
+instance : ToJS RedisClientHsetexFxxPxFxx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFxxPxFxx where
   fromJS
-    | .string "FXX" => .ok .fxx
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFxxPxFxx"
 
 /-- `enum RedisClientHsetexFxxPxPx` (Bun 1.4.4 type declarations): "PX". -/
-inductive RedisClientHsetexFxxPxPx where
-  /-- "PX" -/
-  | px
+structure RedisClientHsetexFxxPxPx where
+  /-- A value from its string, unchecked: the generated values (`.px`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFxxPxPx := ⟨fun
-  | .px => .string "PX"⟩
+/-- "PX" -/
+@[match_pattern] abbrev RedisClientHsetexFxxPxPx.px : RedisClientHsetexFxxPxPx := .unsafeOfString "PX"
+instance : ToJS RedisClientHsetexFxxPxPx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFxxPxPx where
   fromJS
-    | .string "PX" => .ok .px
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFxxPxPx"
 
 /-- `enum RedisClientHsetexFxxPxFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHsetexFxxPxFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHsetexFxxPxFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFxxPxFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHsetexFxxPxFieldsKeyword.fields : RedisClientHsetexFxxPxFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHsetexFxxPxFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFxxPxFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFxxPxFieldsKeyword"
 
 /-- `enum RedisClientHsetexFxxExatFxx` (Bun 1.4.4 type declarations): "FXX". -/
-inductive RedisClientHsetexFxxExatFxx where
-  /-- "FXX" -/
-  | fxx
+structure RedisClientHsetexFxxExatFxx where
+  /-- A value from its string, unchecked: the generated values (`.fxx`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFxxExatFxx := ⟨fun
-  | .fxx => .string "FXX"⟩
+/-- "FXX" -/
+@[match_pattern] abbrev RedisClientHsetexFxxExatFxx.fxx : RedisClientHsetexFxxExatFxx := .unsafeOfString "FXX"
+instance : ToJS RedisClientHsetexFxxExatFxx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFxxExatFxx where
   fromJS
-    | .string "FXX" => .ok .fxx
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFxxExatFxx"
 
 /-- `enum RedisClientHsetexFxxExatExat` (Bun 1.4.4 type declarations): "EXAT". -/
-inductive RedisClientHsetexFxxExatExat where
-  /-- "EXAT" -/
-  | exat
+structure RedisClientHsetexFxxExatExat where
+  /-- A value from its string, unchecked: the generated values (`.exat`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFxxExatExat := ⟨fun
-  | .exat => .string "EXAT"⟩
+/-- "EXAT" -/
+@[match_pattern] abbrev RedisClientHsetexFxxExatExat.exat : RedisClientHsetexFxxExatExat := .unsafeOfString "EXAT"
+instance : ToJS RedisClientHsetexFxxExatExat := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFxxExatExat where
   fromJS
-    | .string "EXAT" => .ok .exat
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFxxExatExat"
 
 /-- `enum RedisClientHsetexFxxExatFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHsetexFxxExatFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHsetexFxxExatFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFxxExatFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHsetexFxxExatFieldsKeyword.fields : RedisClientHsetexFxxExatFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHsetexFxxExatFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFxxExatFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFxxExatFieldsKeyword"
 
 /-- `enum RedisClientHsetexFxxPxatFxx` (Bun 1.4.4 type declarations): "FXX". -/
-inductive RedisClientHsetexFxxPxatFxx where
-  /-- "FXX" -/
-  | fxx
+structure RedisClientHsetexFxxPxatFxx where
+  /-- A value from its string, unchecked: the generated values (`.fxx`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFxxPxatFxx := ⟨fun
-  | .fxx => .string "FXX"⟩
+/-- "FXX" -/
+@[match_pattern] abbrev RedisClientHsetexFxxPxatFxx.fxx : RedisClientHsetexFxxPxatFxx := .unsafeOfString "FXX"
+instance : ToJS RedisClientHsetexFxxPxatFxx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFxxPxatFxx where
   fromJS
-    | .string "FXX" => .ok .fxx
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFxxPxatFxx"
 
 /-- `enum RedisClientHsetexFxxPxatPxat` (Bun 1.4.4 type declarations): "PXAT". -/
-inductive RedisClientHsetexFxxPxatPxat where
-  /-- "PXAT" -/
-  | pxat
+structure RedisClientHsetexFxxPxatPxat where
+  /-- A value from its string, unchecked: the generated values (`.pxat`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFxxPxatPxat := ⟨fun
-  | .pxat => .string "PXAT"⟩
+/-- "PXAT" -/
+@[match_pattern] abbrev RedisClientHsetexFxxPxatPxat.pxat : RedisClientHsetexFxxPxatPxat := .unsafeOfString "PXAT"
+instance : ToJS RedisClientHsetexFxxPxatPxat := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFxxPxatPxat where
   fromJS
-    | .string "PXAT" => .ok .pxat
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFxxPxatPxat"
 
 /-- `enum RedisClientHsetexFxxPxatFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHsetexFxxPxatFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHsetexFxxPxatFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexFxxPxatFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHsetexFxxPxatFieldsKeyword.fields : RedisClientHsetexFxxPxatFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHsetexFxxPxatFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexFxxPxatFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexFxxPxatFieldsKeyword"
 
 /-- `enum RedisClientHsetexWithFxxFxx` (Bun 1.4.4 type declarations): "FXX". -/
-inductive RedisClientHsetexWithFxxFxx where
-  /-- "FXX" -/
-  | fxx
+structure RedisClientHsetexWithFxxFxx where
+  /-- A value from its string, unchecked: the generated values (`.fxx`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexWithFxxFxx := ⟨fun
-  | .fxx => .string "FXX"⟩
+/-- "FXX" -/
+@[match_pattern] abbrev RedisClientHsetexWithFxxFxx.fxx : RedisClientHsetexWithFxxFxx := .unsafeOfString "FXX"
+instance : ToJS RedisClientHsetexWithFxxFxx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexWithFxxFxx where
   fromJS
-    | .string "FXX" => .ok .fxx
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexWithFxxFxx"
 
 /-- `enum RedisClientHsetexWithFxxKeepttl` (Bun 1.4.4 type declarations): "KEEPTTL". -/
-inductive RedisClientHsetexWithFxxKeepttl where
-  /-- "KEEPTTL" -/
-  | keepttl
+structure RedisClientHsetexWithFxxKeepttl where
+  /-- A value from its string, unchecked: the generated values (`.keepttl`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexWithFxxKeepttl := ⟨fun
-  | .keepttl => .string "KEEPTTL"⟩
+/-- "KEEPTTL" -/
+@[match_pattern] abbrev RedisClientHsetexWithFxxKeepttl.keepttl : RedisClientHsetexWithFxxKeepttl := .unsafeOfString "KEEPTTL"
+instance : ToJS RedisClientHsetexWithFxxKeepttl := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexWithFxxKeepttl where
   fromJS
-    | .string "KEEPTTL" => .ok .keepttl
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexWithFxxKeepttl"
 
 /-- `enum RedisClientHsetexWithFxxFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHsetexWithFxxFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHsetexWithFxxFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHsetexWithFxxFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHsetexWithFxxFieldsKeyword.fields : RedisClientHsetexWithFxxFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHsetexWithFxxFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHsetexWithFxxFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHsetexWithFxxFieldsKeyword"
 
 /-- `enum RedisClientHexpireFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHexpireFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHexpireFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHexpireFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHexpireFieldsKeyword.fields : RedisClientHexpireFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHexpireFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHexpireFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHexpireFieldsKeyword"
 
 /-- `enum RedisClientHexpireWithConditionCondition` (Bun 1.4.4 type declarations): "NX", "XX", "GT", "LT". -/
-inductive RedisClientHexpireWithConditionCondition where
-  /-- "NX" -/
-  | nx
-  /-- "XX" -/
-  | xx
-  /-- "GT" -/
-  | gt
-  /-- "LT" -/
-  | lt
+structure RedisClientHexpireWithConditionCondition where
+  /-- A value from its string, unchecked: the generated values (`.nx`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHexpireWithConditionCondition := ⟨fun
-  | .nx => .string "NX"
-  | .xx => .string "XX"
-  | .gt => .string "GT"
-  | .lt => .string "LT"⟩
+/-- "NX" -/
+@[match_pattern] abbrev RedisClientHexpireWithConditionCondition.nx : RedisClientHexpireWithConditionCondition := .unsafeOfString "NX"
+/-- "XX" -/
+@[match_pattern] abbrev RedisClientHexpireWithConditionCondition.xx : RedisClientHexpireWithConditionCondition := .unsafeOfString "XX"
+/-- "GT" -/
+@[match_pattern] abbrev RedisClientHexpireWithConditionCondition.gt : RedisClientHexpireWithConditionCondition := .unsafeOfString "GT"
+/-- "LT" -/
+@[match_pattern] abbrev RedisClientHexpireWithConditionCondition.lt : RedisClientHexpireWithConditionCondition := .unsafeOfString "LT"
+instance : ToJS RedisClientHexpireWithConditionCondition := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHexpireWithConditionCondition where
   fromJS
-    | .string "NX" => .ok .nx
-    | .string "XX" => .ok .xx
-    | .string "GT" => .ok .gt
-    | .string "LT" => .ok .lt
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHexpireWithConditionCondition"
 
 /-- `enum RedisClientHexpireWithConditionFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHexpireWithConditionFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHexpireWithConditionFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHexpireWithConditionFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHexpireWithConditionFieldsKeyword.fields : RedisClientHexpireWithConditionFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHexpireWithConditionFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHexpireWithConditionFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHexpireWithConditionFieldsKeyword"
 
 /-- `enum RedisClientHexpireatFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHexpireatFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHexpireatFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHexpireatFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHexpireatFieldsKeyword.fields : RedisClientHexpireatFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHexpireatFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHexpireatFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHexpireatFieldsKeyword"
 
 /-- `enum RedisClientHexpireatWithConditionCondition` (Bun 1.4.4 type declarations): "NX", "XX", "GT", "LT". -/
-inductive RedisClientHexpireatWithConditionCondition where
-  /-- "NX" -/
-  | nx
-  /-- "XX" -/
-  | xx
-  /-- "GT" -/
-  | gt
-  /-- "LT" -/
-  | lt
+structure RedisClientHexpireatWithConditionCondition where
+  /-- A value from its string, unchecked: the generated values (`.nx`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHexpireatWithConditionCondition := ⟨fun
-  | .nx => .string "NX"
-  | .xx => .string "XX"
-  | .gt => .string "GT"
-  | .lt => .string "LT"⟩
+/-- "NX" -/
+@[match_pattern] abbrev RedisClientHexpireatWithConditionCondition.nx : RedisClientHexpireatWithConditionCondition := .unsafeOfString "NX"
+/-- "XX" -/
+@[match_pattern] abbrev RedisClientHexpireatWithConditionCondition.xx : RedisClientHexpireatWithConditionCondition := .unsafeOfString "XX"
+/-- "GT" -/
+@[match_pattern] abbrev RedisClientHexpireatWithConditionCondition.gt : RedisClientHexpireatWithConditionCondition := .unsafeOfString "GT"
+/-- "LT" -/
+@[match_pattern] abbrev RedisClientHexpireatWithConditionCondition.lt : RedisClientHexpireatWithConditionCondition := .unsafeOfString "LT"
+instance : ToJS RedisClientHexpireatWithConditionCondition := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHexpireatWithConditionCondition where
   fromJS
-    | .string "NX" => .ok .nx
-    | .string "XX" => .ok .xx
-    | .string "GT" => .ok .gt
-    | .string "LT" => .ok .lt
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHexpireatWithConditionCondition"
 
 /-- `enum RedisClientHexpireatWithConditionFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHexpireatWithConditionFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHexpireatWithConditionFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHexpireatWithConditionFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHexpireatWithConditionFieldsKeyword.fields : RedisClientHexpireatWithConditionFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHexpireatWithConditionFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHexpireatWithConditionFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHexpireatWithConditionFieldsKeyword"
 
 /-- `enum RedisClientHexpiretimeFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHexpiretimeFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHexpiretimeFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHexpiretimeFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHexpiretimeFieldsKeyword.fields : RedisClientHexpiretimeFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHexpiretimeFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHexpiretimeFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHexpiretimeFieldsKeyword"
 
 /-- `enum RedisClientHpersistFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHpersistFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHpersistFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHpersistFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHpersistFieldsKeyword.fields : RedisClientHpersistFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHpersistFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHpersistFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHpersistFieldsKeyword"
 
 /-- `enum RedisClientHpexpireFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHpexpireFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHpexpireFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHpexpireFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHpexpireFieldsKeyword.fields : RedisClientHpexpireFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHpexpireFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHpexpireFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHpexpireFieldsKeyword"
 
 /-- `enum RedisClientHpexpireWithConditionCondition` (Bun 1.4.4 type declarations): "NX", "XX", "GT", "LT". -/
-inductive RedisClientHpexpireWithConditionCondition where
-  /-- "NX" -/
-  | nx
-  /-- "XX" -/
-  | xx
-  /-- "GT" -/
-  | gt
-  /-- "LT" -/
-  | lt
+structure RedisClientHpexpireWithConditionCondition where
+  /-- A value from its string, unchecked: the generated values (`.nx`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHpexpireWithConditionCondition := ⟨fun
-  | .nx => .string "NX"
-  | .xx => .string "XX"
-  | .gt => .string "GT"
-  | .lt => .string "LT"⟩
+/-- "NX" -/
+@[match_pattern] abbrev RedisClientHpexpireWithConditionCondition.nx : RedisClientHpexpireWithConditionCondition := .unsafeOfString "NX"
+/-- "XX" -/
+@[match_pattern] abbrev RedisClientHpexpireWithConditionCondition.xx : RedisClientHpexpireWithConditionCondition := .unsafeOfString "XX"
+/-- "GT" -/
+@[match_pattern] abbrev RedisClientHpexpireWithConditionCondition.gt : RedisClientHpexpireWithConditionCondition := .unsafeOfString "GT"
+/-- "LT" -/
+@[match_pattern] abbrev RedisClientHpexpireWithConditionCondition.lt : RedisClientHpexpireWithConditionCondition := .unsafeOfString "LT"
+instance : ToJS RedisClientHpexpireWithConditionCondition := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHpexpireWithConditionCondition where
   fromJS
-    | .string "NX" => .ok .nx
-    | .string "XX" => .ok .xx
-    | .string "GT" => .ok .gt
-    | .string "LT" => .ok .lt
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHpexpireWithConditionCondition"
 
 /-- `enum RedisClientHpexpireWithConditionFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHpexpireWithConditionFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHpexpireWithConditionFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHpexpireWithConditionFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHpexpireWithConditionFieldsKeyword.fields : RedisClientHpexpireWithConditionFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHpexpireWithConditionFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHpexpireWithConditionFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHpexpireWithConditionFieldsKeyword"
 
 /-- `enum RedisClientHpexpireatFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHpexpireatFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHpexpireatFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHpexpireatFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHpexpireatFieldsKeyword.fields : RedisClientHpexpireatFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHpexpireatFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHpexpireatFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHpexpireatFieldsKeyword"
 
 /-- `enum RedisClientHpexpireatWithConditionCondition` (Bun 1.4.4 type declarations): "NX", "XX", "GT", "LT". -/
-inductive RedisClientHpexpireatWithConditionCondition where
-  /-- "NX" -/
-  | nx
-  /-- "XX" -/
-  | xx
-  /-- "GT" -/
-  | gt
-  /-- "LT" -/
-  | lt
+structure RedisClientHpexpireatWithConditionCondition where
+  /-- A value from its string, unchecked: the generated values (`.nx`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHpexpireatWithConditionCondition := ⟨fun
-  | .nx => .string "NX"
-  | .xx => .string "XX"
-  | .gt => .string "GT"
-  | .lt => .string "LT"⟩
+/-- "NX" -/
+@[match_pattern] abbrev RedisClientHpexpireatWithConditionCondition.nx : RedisClientHpexpireatWithConditionCondition := .unsafeOfString "NX"
+/-- "XX" -/
+@[match_pattern] abbrev RedisClientHpexpireatWithConditionCondition.xx : RedisClientHpexpireatWithConditionCondition := .unsafeOfString "XX"
+/-- "GT" -/
+@[match_pattern] abbrev RedisClientHpexpireatWithConditionCondition.gt : RedisClientHpexpireatWithConditionCondition := .unsafeOfString "GT"
+/-- "LT" -/
+@[match_pattern] abbrev RedisClientHpexpireatWithConditionCondition.lt : RedisClientHpexpireatWithConditionCondition := .unsafeOfString "LT"
+instance : ToJS RedisClientHpexpireatWithConditionCondition := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHpexpireatWithConditionCondition where
   fromJS
-    | .string "NX" => .ok .nx
-    | .string "XX" => .ok .xx
-    | .string "GT" => .ok .gt
-    | .string "LT" => .ok .lt
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHpexpireatWithConditionCondition"
 
 /-- `enum RedisClientHpexpireatWithConditionFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHpexpireatWithConditionFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHpexpireatWithConditionFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHpexpireatWithConditionFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHpexpireatWithConditionFieldsKeyword.fields : RedisClientHpexpireatWithConditionFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHpexpireatWithConditionFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHpexpireatWithConditionFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHpexpireatWithConditionFieldsKeyword"
 
 /-- `enum RedisClientHpexpiretimeFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHpexpiretimeFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHpexpiretimeFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHpexpiretimeFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHpexpiretimeFieldsKeyword.fields : RedisClientHpexpiretimeFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHpexpiretimeFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHpexpiretimeFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHpexpiretimeFieldsKeyword"
 
 /-- `enum RedisClientHpttlFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHpttlFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHpttlFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHpttlFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHpttlFieldsKeyword.fields : RedisClientHpttlFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHpttlFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHpttlFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHpttlFieldsKeyword"
 
 /-- `enum RedisClientHttlFieldsKeyword` (Bun 1.4.4 type declarations): "FIELDS". -/
-inductive RedisClientHttlFieldsKeyword where
-  /-- "FIELDS" -/
-  | fields
+structure RedisClientHttlFieldsKeyword where
+  /-- A value from its string, unchecked: the generated values (`.fields`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHttlFieldsKeyword := ⟨fun
-  | .fields => .string "FIELDS"⟩
+/-- "FIELDS" -/
+@[match_pattern] abbrev RedisClientHttlFieldsKeyword.fields : RedisClientHttlFieldsKeyword := .unsafeOfString "FIELDS"
+instance : ToJS RedisClientHttlFieldsKeyword := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHttlFieldsKeyword where
   fromJS
-    | .string "FIELDS" => .ok .fields
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHttlFieldsKeyword"
 
 /-- `enum RedisClientHrandfieldWithvaluesWithValues` (Bun 1.4.4 type declarations): "WITHVALUES". -/
-inductive RedisClientHrandfieldWithvaluesWithValues where
-  /-- "WITHVALUES" -/
-  | withvalues
+structure RedisClientHrandfieldWithvaluesWithValues where
+  /-- A value from its string, unchecked: the generated values (`.withvalues`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHrandfieldWithvaluesWithValues := ⟨fun
-  | .withvalues => .string "WITHVALUES"⟩
+/-- "WITHVALUES" -/
+@[match_pattern] abbrev RedisClientHrandfieldWithvaluesWithValues.withvalues : RedisClientHrandfieldWithvaluesWithValues := .unsafeOfString "WITHVALUES"
+instance : ToJS RedisClientHrandfieldWithvaluesWithValues := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHrandfieldWithvaluesWithValues where
   fromJS
-    | .string "WITHVALUES" => .ok .withvalues
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHrandfieldWithvaluesWithValues"
 
 /-- `enum RedisClientHscanMatchMatch` (Bun 1.4.4 type declarations): "MATCH". -/
-inductive RedisClientHscanMatchMatch where
-  /-- "MATCH" -/
-  | «match»
+structure RedisClientHscanMatchMatch where
+  /-- A value from its string, unchecked: the generated values (`.«match»`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHscanMatchMatch := ⟨fun
-  | .«match» => .string "MATCH"⟩
+/-- "MATCH" -/
+@[match_pattern] abbrev RedisClientHscanMatchMatch.«match» : RedisClientHscanMatchMatch := .unsafeOfString "MATCH"
+instance : ToJS RedisClientHscanMatchMatch := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHscanMatchMatch where
   fromJS
-    | .string "MATCH" => .ok .«match»
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHscanMatchMatch"
 
 /-- `enum RedisClientHscanWithCountCount` (Bun 1.4.4 type declarations): "COUNT". -/
-inductive RedisClientHscanWithCountCount where
-  /-- "COUNT" -/
-  | count
+structure RedisClientHscanWithCountCount where
+  /-- A value from its string, unchecked: the generated values (`.count`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHscanWithCountCount := ⟨fun
-  | .count => .string "COUNT"⟩
+/-- "COUNT" -/
+@[match_pattern] abbrev RedisClientHscanWithCountCount.count : RedisClientHscanWithCountCount := .unsafeOfString "COUNT"
+instance : ToJS RedisClientHscanWithCountCount := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHscanWithCountCount where
   fromJS
-    | .string "COUNT" => .ok .count
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHscanWithCountCount"
 
 /-- `enum RedisClientHscanWithMatchMatch` (Bun 1.4.4 type declarations): "MATCH". -/
-inductive RedisClientHscanWithMatchMatch where
-  /-- "MATCH" -/
-  | «match»
+structure RedisClientHscanWithMatchMatch where
+  /-- A value from its string, unchecked: the generated values (`.«match»`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHscanWithMatchMatch := ⟨fun
-  | .«match» => .string "MATCH"⟩
+/-- "MATCH" -/
+@[match_pattern] abbrev RedisClientHscanWithMatchMatch.«match» : RedisClientHscanWithMatchMatch := .unsafeOfString "MATCH"
+instance : ToJS RedisClientHscanWithMatchMatch := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHscanWithMatchMatch where
   fromJS
-    | .string "MATCH" => .ok .«match»
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHscanWithMatchMatch"
 
 /-- `enum RedisClientHscanWithMatchCount` (Bun 1.4.4 type declarations): "COUNT". -/
-inductive RedisClientHscanWithMatchCount where
-  /-- "COUNT" -/
-  | count
+structure RedisClientHscanWithMatchCount where
+  /-- A value from its string, unchecked: the generated values (`.count`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientHscanWithMatchCount := ⟨fun
-  | .count => .string "COUNT"⟩
+/-- "COUNT" -/
+@[match_pattern] abbrev RedisClientHscanWithMatchCount.count : RedisClientHscanWithMatchCount := .unsafeOfString "COUNT"
+instance : ToJS RedisClientHscanWithMatchCount := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientHscanWithMatchCount where
   fromJS
-    | .string "COUNT" => .ok .count
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientHscanWithMatchCount"
 
 /-- `enum RedisClientBlmoveFrom` (Bun 1.4.4 type declarations): "LEFT", "RIGHT". -/
-inductive RedisClientBlmoveFrom where
-  /-- "LEFT" -/
-  | left
-  /-- "RIGHT" -/
-  | right
+structure RedisClientBlmoveFrom where
+  /-- A value from its string, unchecked: the generated values (`.left`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientBlmoveFrom := ⟨fun
-  | .left => .string "LEFT"
-  | .right => .string "RIGHT"⟩
+/-- "LEFT" -/
+@[match_pattern] abbrev RedisClientBlmoveFrom.left : RedisClientBlmoveFrom := .unsafeOfString "LEFT"
+/-- "RIGHT" -/
+@[match_pattern] abbrev RedisClientBlmoveFrom.right : RedisClientBlmoveFrom := .unsafeOfString "RIGHT"
+instance : ToJS RedisClientBlmoveFrom := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientBlmoveFrom where
   fromJS
-    | .string "LEFT" => .ok .left
-    | .string "RIGHT" => .ok .right
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientBlmoveFrom"
 
 /-- `enum RedisClientBlmoveTo` (Bun 1.4.4 type declarations): "LEFT", "RIGHT". -/
-inductive RedisClientBlmoveTo where
-  /-- "LEFT" -/
-  | left
-  /-- "RIGHT" -/
-  | right
+structure RedisClientBlmoveTo where
+  /-- A value from its string, unchecked: the generated values (`.left`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientBlmoveTo := ⟨fun
-  | .left => .string "LEFT"
-  | .right => .string "RIGHT"⟩
+/-- "LEFT" -/
+@[match_pattern] abbrev RedisClientBlmoveTo.left : RedisClientBlmoveTo := .unsafeOfString "LEFT"
+/-- "RIGHT" -/
+@[match_pattern] abbrev RedisClientBlmoveTo.right : RedisClientBlmoveTo := .unsafeOfString "RIGHT"
+instance : ToJS RedisClientBlmoveTo := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientBlmoveTo where
   fromJS
-    | .string "LEFT" => .ok .left
-    | .string "RIGHT" => .ok .right
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientBlmoveTo"
 
 /-- `enum RedisClientLmoveFrom` (Bun 1.4.4 type declarations): "LEFT", "RIGHT". -/
-inductive RedisClientLmoveFrom where
-  /-- "LEFT" -/
-  | left
-  /-- "RIGHT" -/
-  | right
+structure RedisClientLmoveFrom where
+  /-- A value from its string, unchecked: the generated values (`.left`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientLmoveFrom := ⟨fun
-  | .left => .string "LEFT"
-  | .right => .string "RIGHT"⟩
+/-- "LEFT" -/
+@[match_pattern] abbrev RedisClientLmoveFrom.left : RedisClientLmoveFrom := .unsafeOfString "LEFT"
+/-- "RIGHT" -/
+@[match_pattern] abbrev RedisClientLmoveFrom.right : RedisClientLmoveFrom := .unsafeOfString "RIGHT"
+instance : ToJS RedisClientLmoveFrom := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientLmoveFrom where
   fromJS
-    | .string "LEFT" => .ok .left
-    | .string "RIGHT" => .ok .right
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientLmoveFrom"
 
 /-- `enum RedisClientLmoveTo` (Bun 1.4.4 type declarations): "LEFT", "RIGHT". -/
-inductive RedisClientLmoveTo where
-  /-- "LEFT" -/
-  | left
-  /-- "RIGHT" -/
-  | right
+structure RedisClientLmoveTo where
+  /-- A value from its string, unchecked: the generated values (`.left`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientLmoveTo := ⟨fun
-  | .left => .string "LEFT"
-  | .right => .string "RIGHT"⟩
+/-- "LEFT" -/
+@[match_pattern] abbrev RedisClientLmoveTo.left : RedisClientLmoveTo := .unsafeOfString "LEFT"
+/-- "RIGHT" -/
+@[match_pattern] abbrev RedisClientLmoveTo.right : RedisClientLmoveTo := .unsafeOfString "RIGHT"
+instance : ToJS RedisClientLmoveTo := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientLmoveTo where
   fromJS
-    | .string "LEFT" => .ok .left
-    | .string "RIGHT" => .ok .right
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientLmoveTo"
 
 /-- `enum RedisClientScanMatchMatch` (Bun 1.4.4 type declarations): "MATCH". -/
-inductive RedisClientScanMatchMatch where
-  /-- "MATCH" -/
-  | «match»
+structure RedisClientScanMatchMatch where
+  /-- A value from its string, unchecked: the generated values (`.«match»`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientScanMatchMatch := ⟨fun
-  | .«match» => .string "MATCH"⟩
+/-- "MATCH" -/
+@[match_pattern] abbrev RedisClientScanMatchMatch.«match» : RedisClientScanMatchMatch := .unsafeOfString "MATCH"
+instance : ToJS RedisClientScanMatchMatch := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientScanMatchMatch where
   fromJS
-    | .string "MATCH" => .ok .«match»
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientScanMatchMatch"
 
 /-- `enum RedisClientScanWithCountCount` (Bun 1.4.4 type declarations): "COUNT". -/
-inductive RedisClientScanWithCountCount where
-  /-- "COUNT" -/
-  | count
+structure RedisClientScanWithCountCount where
+  /-- A value from its string, unchecked: the generated values (`.count`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientScanWithCountCount := ⟨fun
-  | .count => .string "COUNT"⟩
+/-- "COUNT" -/
+@[match_pattern] abbrev RedisClientScanWithCountCount.count : RedisClientScanWithCountCount := .unsafeOfString "COUNT"
+instance : ToJS RedisClientScanWithCountCount := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientScanWithCountCount where
   fromJS
-    | .string "COUNT" => .ok .count
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientScanWithCountCount"
 
 /-- `enum RedisClientScanWithMatchMatch` (Bun 1.4.4 type declarations): "MATCH". -/
-inductive RedisClientScanWithMatchMatch where
-  /-- "MATCH" -/
-  | «match»
+structure RedisClientScanWithMatchMatch where
+  /-- A value from its string, unchecked: the generated values (`.«match»`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientScanWithMatchMatch := ⟨fun
-  | .«match» => .string "MATCH"⟩
+/-- "MATCH" -/
+@[match_pattern] abbrev RedisClientScanWithMatchMatch.«match» : RedisClientScanWithMatchMatch := .unsafeOfString "MATCH"
+instance : ToJS RedisClientScanWithMatchMatch := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientScanWithMatchMatch where
   fromJS
-    | .string "MATCH" => .ok .«match»
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientScanWithMatchMatch"
 
 /-- `enum RedisClientScanWithMatchCount` (Bun 1.4.4 type declarations): "COUNT". -/
-inductive RedisClientScanWithMatchCount where
-  /-- "COUNT" -/
-  | count
+structure RedisClientScanWithMatchCount where
+  /-- A value from its string, unchecked: the generated values (`.count`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientScanWithMatchCount := ⟨fun
-  | .count => .string "COUNT"⟩
+/-- "COUNT" -/
+@[match_pattern] abbrev RedisClientScanWithMatchCount.count : RedisClientScanWithMatchCount := .unsafeOfString "COUNT"
+instance : ToJS RedisClientScanWithMatchCount := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientScanWithMatchCount where
   fromJS
-    | .string "COUNT" => .ok .count
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientScanWithMatchCount"
 
 /-- `enum RedisClientType` (Bun 1.4.4 type declarations): "none", "string", "list", "set", "zset", "hash", "stream". -/
-inductive RedisClientType where
-  /-- "none" -/
-  | none
-  /-- "string" -/
-  | string
-  /-- "list" -/
-  | list
-  /-- "set" -/
-  | set
-  /-- "zset" -/
-  | zset
-  /-- "hash" -/
-  | hash
-  /-- "stream" -/
-  | stream
+structure RedisClientType where
+  /-- A value from its string, unchecked: the generated values (`.none`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientType := ⟨fun
-  | .none => .string "none"
-  | .string => .string "string"
-  | .list => .string "list"
-  | .set => .string "set"
-  | .zset => .string "zset"
-  | .hash => .string "hash"
-  | .stream => .string "stream"⟩
+/-- "none" -/
+@[match_pattern] abbrev RedisClientType.none : RedisClientType := .unsafeOfString "none"
+/-- "string" -/
+@[match_pattern] abbrev RedisClientType.string : RedisClientType := .unsafeOfString "string"
+/-- "list" -/
+@[match_pattern] abbrev RedisClientType.list : RedisClientType := .unsafeOfString "list"
+/-- "set" -/
+@[match_pattern] abbrev RedisClientType.set : RedisClientType := .unsafeOfString "set"
+/-- "zset" -/
+@[match_pattern] abbrev RedisClientType.zset : RedisClientType := .unsafeOfString "zset"
+/-- "hash" -/
+@[match_pattern] abbrev RedisClientType.hash : RedisClientType := .unsafeOfString "hash"
+/-- "stream" -/
+@[match_pattern] abbrev RedisClientType.stream : RedisClientType := .unsafeOfString "stream"
+instance : ToJS RedisClientType := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientType where
   fromJS
-    | .string "none" => .ok .none
-    | .string "string" => .ok .string
-    | .string "list" => .ok .list
-    | .string "set" => .ok .set
-    | .string "zset" => .ok .zset
-    | .string "hash" => .ok .hash
-    | .string "stream" => .ok .stream
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientType"
 
 /-- `enum RedisClientZrandmemberWithscoresWithscores` (Bun 1.4.4 type declarations): "WITHSCORES". -/
-inductive RedisClientZrandmemberWithscoresWithscores where
-  /-- "WITHSCORES" -/
-  | withscores
+structure RedisClientZrandmemberWithscoresWithscores where
+  /-- A value from its string, unchecked: the generated values (`.withscores`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientZrandmemberWithscoresWithscores := ⟨fun
-  | .withscores => .string "WITHSCORES"⟩
+/-- "WITHSCORES" -/
+@[match_pattern] abbrev RedisClientZrandmemberWithscoresWithscores.withscores : RedisClientZrandmemberWithscoresWithscores := .unsafeOfString "WITHSCORES"
+instance : ToJS RedisClientZrandmemberWithscoresWithscores := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientZrandmemberWithscoresWithscores where
   fromJS
-    | .string "WITHSCORES" => .ok .withscores
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientZrandmemberWithscoresWithscores"
 
 /-- `enum RedisClientZrangeWithscores` (Bun 1.4.4 type declarations): "WITHSCORES". -/
-inductive RedisClientZrangeWithscores where
-  /-- "WITHSCORES" -/
-  | withscores
+structure RedisClientZrangeWithscores where
+  /-- A value from its string, unchecked: the generated values (`.withscores`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientZrangeWithscores := ⟨fun
-  | .withscores => .string "WITHSCORES"⟩
+/-- "WITHSCORES" -/
+@[match_pattern] abbrev RedisClientZrangeWithscores.withscores : RedisClientZrangeWithscores := .unsafeOfString "WITHSCORES"
+instance : ToJS RedisClientZrangeWithscores := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientZrangeWithscores where
   fromJS
-    | .string "WITHSCORES" => .ok .withscores
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientZrangeWithscores"
 
 /-- `enum RedisClientZrangeWithByscoreByscore` (Bun 1.4.4 type declarations): "BYSCORE". -/
-inductive RedisClientZrangeWithByscoreByscore where
-  /-- "BYSCORE" -/
-  | byscore
+structure RedisClientZrangeWithByscoreByscore where
+  /-- A value from its string, unchecked: the generated values (`.byscore`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientZrangeWithByscoreByscore := ⟨fun
-  | .byscore => .string "BYSCORE"⟩
+/-- "BYSCORE" -/
+@[match_pattern] abbrev RedisClientZrangeWithByscoreByscore.byscore : RedisClientZrangeWithByscoreByscore := .unsafeOfString "BYSCORE"
+instance : ToJS RedisClientZrangeWithByscoreByscore := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientZrangeWithByscoreByscore where
   fromJS
-    | .string "BYSCORE" => .ok .byscore
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientZrangeWithByscoreByscore"
 
 /-- `enum RedisClientZrangeWithBylexBylex` (Bun 1.4.4 type declarations): "BYLEX". -/
-inductive RedisClientZrangeWithBylexBylex where
-  /-- "BYLEX" -/
-  | bylex
+structure RedisClientZrangeWithBylexBylex where
+  /-- A value from its string, unchecked: the generated values (`.bylex`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientZrangeWithBylexBylex := ⟨fun
-  | .bylex => .string "BYLEX"⟩
+/-- "BYLEX" -/
+@[match_pattern] abbrev RedisClientZrangeWithBylexBylex.bylex : RedisClientZrangeWithBylexBylex := .unsafeOfString "BYLEX"
+instance : ToJS RedisClientZrangeWithBylexBylex := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientZrangeWithBylexBylex where
   fromJS
-    | .string "BYLEX" => .ok .bylex
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientZrangeWithBylexBylex"
 
 /-- `enum RedisClientZrevrangeWithWithscoresWithscores` (Bun 1.4.4 type declarations): "WITHSCORES". -/
-inductive RedisClientZrevrangeWithWithscoresWithscores where
-  /-- "WITHSCORES" -/
-  | withscores
+structure RedisClientZrevrangeWithWithscoresWithscores where
+  /-- A value from its string, unchecked: the generated values (`.withscores`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientZrevrangeWithWithscoresWithscores := ⟨fun
-  | .withscores => .string "WITHSCORES"⟩
+/-- "WITHSCORES" -/
+@[match_pattern] abbrev RedisClientZrevrangeWithWithscoresWithscores.withscores : RedisClientZrevrangeWithWithscoresWithscores := .unsafeOfString "WITHSCORES"
+instance : ToJS RedisClientZrevrangeWithWithscoresWithscores := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientZrevrangeWithWithscoresWithscores where
   fromJS
-    | .string "WITHSCORES" => .ok .withscores
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientZrevrangeWithWithscoresWithscores"
 
 /-- `enum RedisClientLinsertPosition` (Bun 1.4.4 type declarations): "BEFORE", "AFTER". -/
-inductive RedisClientLinsertPosition where
-  /-- "BEFORE" -/
-  | before
-  /-- "AFTER" -/
-  | after
+structure RedisClientLinsertPosition where
+  /-- A value from its string, unchecked: the generated values (`.before`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientLinsertPosition := ⟨fun
-  | .before => .string "BEFORE"
-  | .after => .string "AFTER"⟩
+/-- "BEFORE" -/
+@[match_pattern] abbrev RedisClientLinsertPosition.before : RedisClientLinsertPosition := .unsafeOfString "BEFORE"
+/-- "AFTER" -/
+@[match_pattern] abbrev RedisClientLinsertPosition.after : RedisClientLinsertPosition := .unsafeOfString "AFTER"
+instance : ToJS RedisClientLinsertPosition := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientLinsertPosition where
   fromJS
-    | .string "BEFORE" => .ok .before
-    | .string "AFTER" => .ok .after
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientLinsertPosition"
 
 /-- `enum RedisClientSetex` (Bun 1.4.4 type declarations): "OK". -/
-inductive RedisClientSetex where
-  /-- "OK" -/
-  | ok
+structure RedisClientSetex where
+  /-- A value from its string, unchecked: the generated values (`.ok`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientSetex := ⟨fun
-  | .ok => .string "OK"⟩
+/-- "OK" -/
+@[match_pattern] abbrev RedisClientSetex.ok : RedisClientSetex := .unsafeOfString "OK"
+instance : ToJS RedisClientSetex := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientSetex where
   fromJS
-    | .string "OK" => .ok .ok
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientSetex"
 
 /-- `enum RedisClientPsetex` (Bun 1.4.4 type declarations): "OK". -/
-inductive RedisClientPsetex where
-  /-- "OK" -/
-  | ok
+structure RedisClientPsetex where
+  /-- A value from its string, unchecked: the generated values (`.ok`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientPsetex := ⟨fun
-  | .ok => .string "OK"⟩
+/-- "OK" -/
+@[match_pattern] abbrev RedisClientPsetex.ok : RedisClientPsetex := .unsafeOfString "OK"
+instance : ToJS RedisClientPsetex := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientPsetex where
   fromJS
-    | .string "OK" => .ok .ok
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientPsetex"
 
 /-- `enum RedisClientZrangebylexWithLimitLimit` (Bun 1.4.4 type declarations): "LIMIT". -/
-inductive RedisClientZrangebylexWithLimitLimit where
-  /-- "LIMIT" -/
-  | limit
+structure RedisClientZrangebylexWithLimitLimit where
+  /-- A value from its string, unchecked: the generated values (`.limit`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientZrangebylexWithLimitLimit := ⟨fun
-  | .limit => .string "LIMIT"⟩
+/-- "LIMIT" -/
+@[match_pattern] abbrev RedisClientZrangebylexWithLimitLimit.limit : RedisClientZrangebylexWithLimitLimit := .unsafeOfString "LIMIT"
+instance : ToJS RedisClientZrangebylexWithLimitLimit := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientZrangebylexWithLimitLimit where
   fromJS
-    | .string "LIMIT" => .ok .limit
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientZrangebylexWithLimitLimit"
 
 /-- `enum RedisClientZrangebyscoreWithscoresWithscores` (Bun 1.4.4 type declarations): "WITHSCORES". -/
-inductive RedisClientZrangebyscoreWithscoresWithscores where
-  /-- "WITHSCORES" -/
-  | withscores
+structure RedisClientZrangebyscoreWithscoresWithscores where
+  /-- A value from its string, unchecked: the generated values (`.withscores`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientZrangebyscoreWithscoresWithscores := ⟨fun
-  | .withscores => .string "WITHSCORES"⟩
+/-- "WITHSCORES" -/
+@[match_pattern] abbrev RedisClientZrangebyscoreWithscoresWithscores.withscores : RedisClientZrangebyscoreWithscoresWithscores := .unsafeOfString "WITHSCORES"
+instance : ToJS RedisClientZrangebyscoreWithscoresWithscores := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientZrangebyscoreWithscoresWithscores where
   fromJS
-    | .string "WITHSCORES" => .ok .withscores
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientZrangebyscoreWithscoresWithscores"
 
 /-- `enum RedisClientZrangebyscoreWithLimitLimit` (Bun 1.4.4 type declarations): "LIMIT". -/
-inductive RedisClientZrangebyscoreWithLimitLimit where
-  /-- "LIMIT" -/
-  | limit
+structure RedisClientZrangebyscoreWithLimitLimit where
+  /-- A value from its string, unchecked: the generated values (`.limit`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientZrangebyscoreWithLimitLimit := ⟨fun
-  | .limit => .string "LIMIT"⟩
+/-- "LIMIT" -/
+@[match_pattern] abbrev RedisClientZrangebyscoreWithLimitLimit.limit : RedisClientZrangebyscoreWithLimitLimit := .unsafeOfString "LIMIT"
+instance : ToJS RedisClientZrangebyscoreWithLimitLimit := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientZrangebyscoreWithLimitLimit where
   fromJS
-    | .string "LIMIT" => .ok .limit
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientZrangebyscoreWithLimitLimit"
 
 /-- `enum RedisClientZrangebyscoreWithscoresOptionsWithscores` (Bun 1.4.4 type declarations): "WITHSCORES". -/
-inductive RedisClientZrangebyscoreWithscoresOptionsWithscores where
-  /-- "WITHSCORES" -/
-  | withscores
+structure RedisClientZrangebyscoreWithscoresOptionsWithscores where
+  /-- A value from its string, unchecked: the generated values (`.withscores`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientZrangebyscoreWithscoresOptionsWithscores := ⟨fun
-  | .withscores => .string "WITHSCORES"⟩
+/-- "WITHSCORES" -/
+@[match_pattern] abbrev RedisClientZrangebyscoreWithscoresOptionsWithscores.withscores : RedisClientZrangebyscoreWithscoresOptionsWithscores := .unsafeOfString "WITHSCORES"
+instance : ToJS RedisClientZrangebyscoreWithscoresOptionsWithscores := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientZrangebyscoreWithscoresOptionsWithscores where
   fromJS
-    | .string "WITHSCORES" => .ok .withscores
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientZrangebyscoreWithscoresOptionsWithscores"
 
 /-- `enum RedisClientZrangebyscoreWithWithscoresWithscores` (Bun 1.4.4 type declarations): "WITHSCORES". -/
-inductive RedisClientZrangebyscoreWithWithscoresWithscores where
-  /-- "WITHSCORES" -/
-  | withscores
+structure RedisClientZrangebyscoreWithWithscoresWithscores where
+  /-- A value from its string, unchecked: the generated values (`.withscores`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientZrangebyscoreWithWithscoresWithscores := ⟨fun
-  | .withscores => .string "WITHSCORES"⟩
+/-- "WITHSCORES" -/
+@[match_pattern] abbrev RedisClientZrangebyscoreWithWithscoresWithscores.withscores : RedisClientZrangebyscoreWithWithscoresWithscores := .unsafeOfString "WITHSCORES"
+instance : ToJS RedisClientZrangebyscoreWithWithscoresWithscores := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientZrangebyscoreWithWithscoresWithscores where
   fromJS
-    | .string "WITHSCORES" => .ok .withscores
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientZrangebyscoreWithWithscoresWithscores"
 
 /-- `enum RedisClientZrangebyscoreWithWithscoresLimit` (Bun 1.4.4 type declarations): "LIMIT". -/
-inductive RedisClientZrangebyscoreWithWithscoresLimit where
-  /-- "LIMIT" -/
-  | limit
+structure RedisClientZrangebyscoreWithWithscoresLimit where
+  /-- A value from its string, unchecked: the generated values (`.limit`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientZrangebyscoreWithWithscoresLimit := ⟨fun
-  | .limit => .string "LIMIT"⟩
+/-- "LIMIT" -/
+@[match_pattern] abbrev RedisClientZrangebyscoreWithWithscoresLimit.limit : RedisClientZrangebyscoreWithWithscoresLimit := .unsafeOfString "LIMIT"
+instance : ToJS RedisClientZrangebyscoreWithWithscoresLimit := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientZrangebyscoreWithWithscoresLimit where
   fromJS
-    | .string "LIMIT" => .ok .limit
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientZrangebyscoreWithWithscoresLimit"
 
 /-- `enum RedisClientZrevrangebyscoreWithWithscoresWithscores` (Bun 1.4.4 type declarations): "WITHSCORES". -/
-inductive RedisClientZrevrangebyscoreWithWithscoresWithscores where
-  /-- "WITHSCORES" -/
-  | withscores
+structure RedisClientZrevrangebyscoreWithWithscoresWithscores where
+  /-- A value from its string, unchecked: the generated values (`.withscores`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientZrevrangebyscoreWithWithscoresWithscores := ⟨fun
-  | .withscores => .string "WITHSCORES"⟩
+/-- "WITHSCORES" -/
+@[match_pattern] abbrev RedisClientZrevrangebyscoreWithWithscoresWithscores.withscores : RedisClientZrevrangebyscoreWithWithscoresWithscores := .unsafeOfString "WITHSCORES"
+instance : ToJS RedisClientZrevrangebyscoreWithWithscoresWithscores := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientZrevrangebyscoreWithWithscoresWithscores where
   fromJS
-    | .string "WITHSCORES" => .ok .withscores
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientZrevrangebyscoreWithWithscoresWithscores"
 
 /-- `enum RedisClientZrevrangebyscoreWithLimitLimit` (Bun 1.4.4 type declarations): "LIMIT". -/
-inductive RedisClientZrevrangebyscoreWithLimitLimit where
-  /-- "LIMIT" -/
-  | limit
+structure RedisClientZrevrangebyscoreWithLimitLimit where
+  /-- A value from its string, unchecked: the generated values (`.limit`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientZrevrangebyscoreWithLimitLimit := ⟨fun
-  | .limit => .string "LIMIT"⟩
+/-- "LIMIT" -/
+@[match_pattern] abbrev RedisClientZrevrangebyscoreWithLimitLimit.limit : RedisClientZrevrangebyscoreWithLimitLimit := .unsafeOfString "LIMIT"
+instance : ToJS RedisClientZrevrangebyscoreWithLimitLimit := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientZrevrangebyscoreWithLimitLimit where
   fromJS
-    | .string "LIMIT" => .ok .limit
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientZrevrangebyscoreWithLimitLimit"
 
 /-- `enum RedisClientZrankWithWithscoreWithscore` (Bun 1.4.4 type declarations): "WITHSCORE". -/
-inductive RedisClientZrankWithWithscoreWithscore where
-  /-- "WITHSCORE" -/
-  | withscore
+structure RedisClientZrankWithWithscoreWithscore where
+  /-- A value from its string, unchecked: the generated values (`.withscore`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientZrankWithWithscoreWithscore := ⟨fun
-  | .withscore => .string "WITHSCORE"⟩
+/-- "WITHSCORE" -/
+@[match_pattern] abbrev RedisClientZrankWithWithscoreWithscore.withscore : RedisClientZrankWithWithscoreWithscore := .unsafeOfString "WITHSCORE"
+instance : ToJS RedisClientZrankWithWithscoreWithscore := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientZrankWithWithscoreWithscore where
   fromJS
-    | .string "WITHSCORE" => .ok .withscore
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientZrankWithWithscoreWithscore"
 
 /-- `enum RedisClientZrevrankWithWithscoreWithscore` (Bun 1.4.4 type declarations): "WITHSCORE". -/
-inductive RedisClientZrevrankWithWithscoreWithscore where
-  /-- "WITHSCORE" -/
-  | withscore
+structure RedisClientZrevrankWithWithscoreWithscore where
+  /-- A value from its string, unchecked: the generated values (`.withscore`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientZrevrankWithWithscoreWithscore := ⟨fun
-  | .withscore => .string "WITHSCORE"⟩
+/-- "WITHSCORE" -/
+@[match_pattern] abbrev RedisClientZrevrankWithWithscoreWithscore.withscore : RedisClientZrevrankWithWithscoreWithscore := .unsafeOfString "WITHSCORE"
+instance : ToJS RedisClientZrevrankWithWithscoreWithscore := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientZrevrankWithWithscoreWithscore where
   fromJS
-    | .string "WITHSCORE" => .ok .withscore
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientZrevrankWithWithscoreWithscore"
 
 /-- `enum RedisClientMset` (Bun 1.4.4 type declarations): "OK". -/
-inductive RedisClientMset where
-  /-- "OK" -/
-  | ok
+structure RedisClientMset where
+  /-- A value from its string, unchecked: the generated values (`.ok`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientMset := ⟨fun
-  | .ok => .string "OK"⟩
+/-- "OK" -/
+@[match_pattern] abbrev RedisClientMset.ok : RedisClientMset := .unsafeOfString "OK"
+instance : ToJS RedisClientMset := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientMset where
   fromJS
-    | .string "OK" => .ok .ok
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientMset"
 
 /-- `enum RedisClientGetexWithExEx` (Bun 1.4.4 type declarations): "EX". -/
-inductive RedisClientGetexWithExEx where
-  /-- "EX" -/
-  | ex
+structure RedisClientGetexWithExEx where
+  /-- A value from its string, unchecked: the generated values (`.ex`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientGetexWithExEx := ⟨fun
-  | .ex => .string "EX"⟩
+/-- "EX" -/
+@[match_pattern] abbrev RedisClientGetexWithExEx.ex : RedisClientGetexWithExEx := .unsafeOfString "EX"
+instance : ToJS RedisClientGetexWithExEx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientGetexWithExEx where
   fromJS
-    | .string "EX" => .ok .ex
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientGetexWithExEx"
 
 /-- `enum RedisClientGetexWithPxPx` (Bun 1.4.4 type declarations): "PX". -/
-inductive RedisClientGetexWithPxPx where
-  /-- "PX" -/
-  | px
+structure RedisClientGetexWithPxPx where
+  /-- A value from its string, unchecked: the generated values (`.px`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientGetexWithPxPx := ⟨fun
-  | .px => .string "PX"⟩
+/-- "PX" -/
+@[match_pattern] abbrev RedisClientGetexWithPxPx.px : RedisClientGetexWithPxPx := .unsafeOfString "PX"
+instance : ToJS RedisClientGetexWithPxPx := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientGetexWithPxPx where
   fromJS
-    | .string "PX" => .ok .px
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientGetexWithPxPx"
 
 /-- `enum RedisClientGetexWithExatExat` (Bun 1.4.4 type declarations): "EXAT". -/
-inductive RedisClientGetexWithExatExat where
-  /-- "EXAT" -/
-  | exat
+structure RedisClientGetexWithExatExat where
+  /-- A value from its string, unchecked: the generated values (`.exat`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientGetexWithExatExat := ⟨fun
-  | .exat => .string "EXAT"⟩
+/-- "EXAT" -/
+@[match_pattern] abbrev RedisClientGetexWithExatExat.exat : RedisClientGetexWithExatExat := .unsafeOfString "EXAT"
+instance : ToJS RedisClientGetexWithExatExat := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientGetexWithExatExat where
   fromJS
-    | .string "EXAT" => .ok .exat
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientGetexWithExatExat"
 
 /-- `enum RedisClientGetexWithPxatPxat` (Bun 1.4.4 type declarations): "PXAT". -/
-inductive RedisClientGetexWithPxatPxat where
-  /-- "PXAT" -/
-  | pxat
+structure RedisClientGetexWithPxatPxat where
+  /-- A value from its string, unchecked: the generated values (`.pxat`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientGetexWithPxatPxat := ⟨fun
-  | .pxat => .string "PXAT"⟩
+/-- "PXAT" -/
+@[match_pattern] abbrev RedisClientGetexWithPxatPxat.pxat : RedisClientGetexWithPxatPxat := .unsafeOfString "PXAT"
+instance : ToJS RedisClientGetexWithPxatPxat := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientGetexWithPxatPxat where
   fromJS
-    | .string "PXAT" => .ok .pxat
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientGetexWithPxatPxat"
 
 /-- `enum RedisClientGetexWithPersistPersist` (Bun 1.4.4 type declarations): "PERSIST". -/
-inductive RedisClientGetexWithPersistPersist where
-  /-- "PERSIST" -/
-  | persist
+structure RedisClientGetexWithPersistPersist where
+  /-- A value from its string, unchecked: the generated values (`.persist`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientGetexWithPersistPersist := ⟨fun
-  | .persist => .string "PERSIST"⟩
+/-- "PERSIST" -/
+@[match_pattern] abbrev RedisClientGetexWithPersistPersist.persist : RedisClientGetexWithPersistPersist := .unsafeOfString "PERSIST"
+instance : ToJS RedisClientGetexWithPersistPersist := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientGetexWithPersistPersist where
   fromJS
-    | .string "PERSIST" => .ok .persist
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientGetexWithPersistPersist"
 
 /-- `enum RedisClientPing` (Bun 1.4.4 type declarations): "PONG". -/
-inductive RedisClientPing where
-  /-- "PONG" -/
-  | pong
+structure RedisClientPing where
+  /-- A value from its string, unchecked: the generated values (`.pong`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientPing := ⟨fun
-  | .pong => .string "PONG"⟩
+/-- "PONG" -/
+@[match_pattern] abbrev RedisClientPing.pong : RedisClientPing := .unsafeOfString "PONG"
+instance : ToJS RedisClientPing := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientPing where
   fromJS
-    | .string "PONG" => .ok .pong
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientPing"
 
 /-- `enum RedisClientCopyWithReplaceReplace` (Bun 1.4.4 type declarations): "REPLACE". -/
-inductive RedisClientCopyWithReplaceReplace where
-  /-- "REPLACE" -/
-  | replace
+structure RedisClientCopyWithReplaceReplace where
+  /-- A value from its string, unchecked: the generated values (`.replace`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientCopyWithReplaceReplace := ⟨fun
-  | .replace => .string "REPLACE"⟩
+/-- "REPLACE" -/
+@[match_pattern] abbrev RedisClientCopyWithReplaceReplace.replace : RedisClientCopyWithReplaceReplace := .unsafeOfString "REPLACE"
+instance : ToJS RedisClientCopyWithReplaceReplace := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientCopyWithReplaceReplace where
   fromJS
-    | .string "REPLACE" => .ok .replace
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientCopyWithReplaceReplace"
 
 /-- `enum RedisClientRename` (Bun 1.4.4 type declarations): "OK". -/
-inductive RedisClientRename where
-  /-- "OK" -/
-  | ok
+structure RedisClientRename where
+  /-- A value from its string, unchecked: the generated values (`.ok`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientRename := ⟨fun
-  | .ok => .string "OK"⟩
+/-- "OK" -/
+@[match_pattern] abbrev RedisClientRename.ok : RedisClientRename := .unsafeOfString "OK"
+instance : ToJS RedisClientRename := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientRename where
   fromJS
-    | .string "OK" => .ok .ok
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientRename"
 
 /-- `enum RedisClientBitopOperation` (Bun 1.4.4 type declarations): "NOT", "not". -/
-inductive RedisClientBitopOperation where
-  /-- "NOT" -/
-  | nOT
-  /-- "not" -/
-  | not
+structure RedisClientBitopOperation where
+  /-- A value from its string, unchecked: the generated values (`.nOT`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientBitopOperation := ⟨fun
-  | .nOT => .string "NOT"
-  | .not => .string "not"⟩
+/-- "NOT" -/
+@[match_pattern] abbrev RedisClientBitopOperation.nOT : RedisClientBitopOperation := .unsafeOfString "NOT"
+/-- "not" -/
+@[match_pattern] abbrev RedisClientBitopOperation.not : RedisClientBitopOperation := .unsafeOfString "not"
+instance : ToJS RedisClientBitopOperation := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientBitopOperation where
   fromJS
-    | .string "NOT" => .ok .nOT
-    | .string "not" => .ok .not
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientBitopOperation"
 
 /-- `enum RedisClientBitopWithMoreKeysOperation` (Bun 1.4.4 type declarations): "AND", "OR", "XOR", "DIFF", "DIFF1", "ANDOR", "ONE", "and", "or", "xor", "diff", "diff1", "andor", "one". -/
-inductive RedisClientBitopWithMoreKeysOperation where
-  /-- "AND" -/
-  | aND
-  /-- "OR" -/
-  | oR
-  /-- "XOR" -/
-  | xOR
-  /-- "DIFF" -/
-  | dIFF
-  /-- "DIFF1" -/
-  | dIFF1
-  /-- "ANDOR" -/
-  | aNDOR
-  /-- "ONE" -/
-  | oNE
-  /-- "and" -/
-  | and
-  /-- "or" -/
-  | or
-  /-- "xor" -/
-  | xor
-  /-- "diff" -/
-  | diff
-  /-- "diff1" -/
-  | diff1
-  /-- "andor" -/
-  | andor
-  /-- "one" -/
-  | one
+structure RedisClientBitopWithMoreKeysOperation where
+  /-- A value from its string, unchecked: the generated values (`.aND`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientBitopWithMoreKeysOperation := ⟨fun
-  | .aND => .string "AND"
-  | .oR => .string "OR"
-  | .xOR => .string "XOR"
-  | .dIFF => .string "DIFF"
-  | .dIFF1 => .string "DIFF1"
-  | .aNDOR => .string "ANDOR"
-  | .oNE => .string "ONE"
-  | .and => .string "and"
-  | .or => .string "or"
-  | .xor => .string "xor"
-  | .diff => .string "diff"
-  | .diff1 => .string "diff1"
-  | .andor => .string "andor"
-  | .one => .string "one"⟩
+/-- "AND" -/
+@[match_pattern] abbrev RedisClientBitopWithMoreKeysOperation.aND : RedisClientBitopWithMoreKeysOperation := .unsafeOfString "AND"
+/-- "OR" -/
+@[match_pattern] abbrev RedisClientBitopWithMoreKeysOperation.oR : RedisClientBitopWithMoreKeysOperation := .unsafeOfString "OR"
+/-- "XOR" -/
+@[match_pattern] abbrev RedisClientBitopWithMoreKeysOperation.xOR : RedisClientBitopWithMoreKeysOperation := .unsafeOfString "XOR"
+/-- "DIFF" -/
+@[match_pattern] abbrev RedisClientBitopWithMoreKeysOperation.dIFF : RedisClientBitopWithMoreKeysOperation := .unsafeOfString "DIFF"
+/-- "DIFF1" -/
+@[match_pattern] abbrev RedisClientBitopWithMoreKeysOperation.dIFF1 : RedisClientBitopWithMoreKeysOperation := .unsafeOfString "DIFF1"
+/-- "ANDOR" -/
+@[match_pattern] abbrev RedisClientBitopWithMoreKeysOperation.aNDOR : RedisClientBitopWithMoreKeysOperation := .unsafeOfString "ANDOR"
+/-- "ONE" -/
+@[match_pattern] abbrev RedisClientBitopWithMoreKeysOperation.oNE : RedisClientBitopWithMoreKeysOperation := .unsafeOfString "ONE"
+/-- "and" -/
+@[match_pattern] abbrev RedisClientBitopWithMoreKeysOperation.and : RedisClientBitopWithMoreKeysOperation := .unsafeOfString "and"
+/-- "or" -/
+@[match_pattern] abbrev RedisClientBitopWithMoreKeysOperation.or : RedisClientBitopWithMoreKeysOperation := .unsafeOfString "or"
+/-- "xor" -/
+@[match_pattern] abbrev RedisClientBitopWithMoreKeysOperation.xor : RedisClientBitopWithMoreKeysOperation := .unsafeOfString "xor"
+/-- "diff" -/
+@[match_pattern] abbrev RedisClientBitopWithMoreKeysOperation.diff : RedisClientBitopWithMoreKeysOperation := .unsafeOfString "diff"
+/-- "diff1" -/
+@[match_pattern] abbrev RedisClientBitopWithMoreKeysOperation.diff1 : RedisClientBitopWithMoreKeysOperation := .unsafeOfString "diff1"
+/-- "andor" -/
+@[match_pattern] abbrev RedisClientBitopWithMoreKeysOperation.andor : RedisClientBitopWithMoreKeysOperation := .unsafeOfString "andor"
+/-- "one" -/
+@[match_pattern] abbrev RedisClientBitopWithMoreKeysOperation.one : RedisClientBitopWithMoreKeysOperation := .unsafeOfString "one"
+instance : ToJS RedisClientBitopWithMoreKeysOperation := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientBitopWithMoreKeysOperation where
   fromJS
-    | .string "AND" => .ok .aND
-    | .string "OR" => .ok .oR
-    | .string "XOR" => .ok .xOR
-    | .string "DIFF" => .ok .dIFF
-    | .string "DIFF1" => .ok .dIFF1
-    | .string "ANDOR" => .ok .aNDOR
-    | .string "ONE" => .ok .oNE
-    | .string "and" => .ok .and
-    | .string "or" => .ok .or
-    | .string "xor" => .ok .xor
-    | .string "diff" => .ok .diff
-    | .string "diff1" => .ok .diff1
-    | .string "andor" => .ok .andor
-    | .string "one" => .ok .one
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientBitopWithMoreKeysOperation"
 
 /-- `enum RedisClientPfmerge` (Bun 1.4.4 type declarations): "OK". -/
-inductive RedisClientPfmerge where
-  /-- "OK" -/
-  | ok
+structure RedisClientPfmerge where
+  /-- A value from its string, unchecked: the generated values (`.ok`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientPfmerge := ⟨fun
-  | .ok => .string "OK"⟩
+/-- "OK" -/
+@[match_pattern] abbrev RedisClientPfmerge.ok : RedisClientPfmerge := .unsafeOfString "OK"
+instance : ToJS RedisClientPfmerge := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientPfmerge where
   fromJS
-    | .string "OK" => .ok .ok
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientPfmerge"
 
 /-- `enum RedisClientGeodistWithUnitUnit` (Bun 1.4.4 type declarations): "m", "km", "mi", "ft", "M", "KM", "MI", "FT". -/
-inductive RedisClientGeodistWithUnitUnit where
-  /-- "m" -/
-  | m
-  /-- "km" -/
-  | km
-  /-- "mi" -/
-  | mi
-  /-- "ft" -/
-  | ft
-  /-- "M" -/
-  | upperM
-  /-- "KM" -/
-  | kM
-  /-- "MI" -/
-  | mI
-  /-- "FT" -/
-  | fT
+structure RedisClientGeodistWithUnitUnit where
+  /-- A value from its string, unchecked: the generated values (`.m`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientGeodistWithUnitUnit := ⟨fun
-  | .m => .string "m"
-  | .km => .string "km"
-  | .mi => .string "mi"
-  | .ft => .string "ft"
-  | .upperM => .string "M"
-  | .kM => .string "KM"
-  | .mI => .string "MI"
-  | .fT => .string "FT"⟩
+/-- "m" -/
+@[match_pattern] abbrev RedisClientGeodistWithUnitUnit.m : RedisClientGeodistWithUnitUnit := .unsafeOfString "m"
+/-- "km" -/
+@[match_pattern] abbrev RedisClientGeodistWithUnitUnit.km : RedisClientGeodistWithUnitUnit := .unsafeOfString "km"
+/-- "mi" -/
+@[match_pattern] abbrev RedisClientGeodistWithUnitUnit.mi : RedisClientGeodistWithUnitUnit := .unsafeOfString "mi"
+/-- "ft" -/
+@[match_pattern] abbrev RedisClientGeodistWithUnitUnit.ft : RedisClientGeodistWithUnitUnit := .unsafeOfString "ft"
+/-- "M" -/
+@[match_pattern] abbrev RedisClientGeodistWithUnitUnit.upperM : RedisClientGeodistWithUnitUnit := .unsafeOfString "M"
+/-- "KM" -/
+@[match_pattern] abbrev RedisClientGeodistWithUnitUnit.kM : RedisClientGeodistWithUnitUnit := .unsafeOfString "KM"
+/-- "MI" -/
+@[match_pattern] abbrev RedisClientGeodistWithUnitUnit.mI : RedisClientGeodistWithUnitUnit := .unsafeOfString "MI"
+/-- "FT" -/
+@[match_pattern] abbrev RedisClientGeodistWithUnitUnit.fT : RedisClientGeodistWithUnitUnit := .unsafeOfString "FT"
+instance : ToJS RedisClientGeodistWithUnitUnit := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientGeodistWithUnitUnit where
   fromJS
-    | .string "m" => .ok .m
-    | .string "km" => .ok .km
-    | .string "mi" => .ok .mi
-    | .string "ft" => .ok .ft
-    | .string "M" => .ok .upperM
-    | .string "KM" => .ok .kM
-    | .string "MI" => .ok .mI
-    | .string "FT" => .ok .fT
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientGeodistWithUnitUnit"
 
 /-- `enum RedisClientFlushdb` (Bun 1.4.4 type declarations): "OK". -/
-inductive RedisClientFlushdb where
-  /-- "OK" -/
-  | ok
+structure RedisClientFlushdb where
+  /-- A value from its string, unchecked: the generated values (`.ok`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientFlushdb := ⟨fun
-  | .ok => .string "OK"⟩
+/-- "OK" -/
+@[match_pattern] abbrev RedisClientFlushdb.ok : RedisClientFlushdb := .unsafeOfString "OK"
+instance : ToJS RedisClientFlushdb := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientFlushdb where
   fromJS
-    | .string "OK" => .ok .ok
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientFlushdb"
 
 /-- `enum RedisClientFlushdbWithModeMode` (Bun 1.4.4 type declarations): "ASYNC", "SYNC", "async", "sync". -/
-inductive RedisClientFlushdbWithModeMode where
-  /-- "ASYNC" -/
-  | aSYNC
-  /-- "SYNC" -/
-  | sYNC
-  /-- "async" -/
-  | async
-  /-- "sync" -/
-  | sync
+structure RedisClientFlushdbWithModeMode where
+  /-- A value from its string, unchecked: the generated values (`.aSYNC`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientFlushdbWithModeMode := ⟨fun
-  | .aSYNC => .string "ASYNC"
-  | .sYNC => .string "SYNC"
-  | .async => .string "async"
-  | .sync => .string "sync"⟩
+/-- "ASYNC" -/
+@[match_pattern] abbrev RedisClientFlushdbWithModeMode.aSYNC : RedisClientFlushdbWithModeMode := .unsafeOfString "ASYNC"
+/-- "SYNC" -/
+@[match_pattern] abbrev RedisClientFlushdbWithModeMode.sYNC : RedisClientFlushdbWithModeMode := .unsafeOfString "SYNC"
+/-- "async" -/
+@[match_pattern] abbrev RedisClientFlushdbWithModeMode.async : RedisClientFlushdbWithModeMode := .unsafeOfString "async"
+/-- "sync" -/
+@[match_pattern] abbrev RedisClientFlushdbWithModeMode.sync : RedisClientFlushdbWithModeMode := .unsafeOfString "sync"
+instance : ToJS RedisClientFlushdbWithModeMode := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientFlushdbWithModeMode where
   fromJS
-    | .string "ASYNC" => .ok .aSYNC
-    | .string "SYNC" => .ok .sYNC
-    | .string "async" => .ok .async
-    | .string "sync" => .ok .sync
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientFlushdbWithModeMode"
 
 /-- `enum RedisClientFlushall` (Bun 1.4.4 type declarations): "OK". -/
-inductive RedisClientFlushall where
-  /-- "OK" -/
-  | ok
+structure RedisClientFlushall where
+  /-- A value from its string, unchecked: the generated values (`.ok`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientFlushall := ⟨fun
-  | .ok => .string "OK"⟩
+/-- "OK" -/
+@[match_pattern] abbrev RedisClientFlushall.ok : RedisClientFlushall := .unsafeOfString "OK"
+instance : ToJS RedisClientFlushall := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientFlushall where
   fromJS
-    | .string "OK" => .ok .ok
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientFlushall"
 
 /-- `enum RedisClientFlushallWithModeMode` (Bun 1.4.4 type declarations): "ASYNC", "SYNC", "async", "sync". -/
-inductive RedisClientFlushallWithModeMode where
-  /-- "ASYNC" -/
-  | aSYNC
-  /-- "SYNC" -/
-  | sYNC
-  /-- "async" -/
-  | async
-  /-- "sync" -/
-  | sync
+structure RedisClientFlushallWithModeMode where
+  /-- A value from its string, unchecked: the generated values (`.aSYNC`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientFlushallWithModeMode := ⟨fun
-  | .aSYNC => .string "ASYNC"
-  | .sYNC => .string "SYNC"
-  | .async => .string "async"
-  | .sync => .string "sync"⟩
+/-- "ASYNC" -/
+@[match_pattern] abbrev RedisClientFlushallWithModeMode.aSYNC : RedisClientFlushallWithModeMode := .unsafeOfString "ASYNC"
+/-- "SYNC" -/
+@[match_pattern] abbrev RedisClientFlushallWithModeMode.sYNC : RedisClientFlushallWithModeMode := .unsafeOfString "SYNC"
+/-- "async" -/
+@[match_pattern] abbrev RedisClientFlushallWithModeMode.async : RedisClientFlushallWithModeMode := .unsafeOfString "async"
+/-- "sync" -/
+@[match_pattern] abbrev RedisClientFlushallWithModeMode.sync : RedisClientFlushallWithModeMode := .unsafeOfString "sync"
+instance : ToJS RedisClientFlushallWithModeMode := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientFlushallWithModeMode where
   fromJS
-    | .string "ASYNC" => .ok .aSYNC
-    | .string "SYNC" => .ok .sYNC
-    | .string "async" => .ok .async
-    | .string "sync" => .ok .sync
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientFlushallWithModeMode"
 
 /-- `enum RedisClientXtrimStrategy` (Bun 1.4.4 type declarations): "MAXLEN", "MINID", "maxlen", "minid". -/
-inductive RedisClientXtrimStrategy where
-  /-- "MAXLEN" -/
-  | mAXLEN
-  /-- "MINID" -/
-  | mINID
-  /-- "maxlen" -/
-  | maxlen
-  /-- "minid" -/
-  | minid
+structure RedisClientXtrimStrategy where
+  /-- A value from its string, unchecked: the generated values (`.mAXLEN`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientXtrimStrategy := ⟨fun
-  | .mAXLEN => .string "MAXLEN"
-  | .mINID => .string "MINID"
-  | .maxlen => .string "maxlen"
-  | .minid => .string "minid"⟩
+/-- "MAXLEN" -/
+@[match_pattern] abbrev RedisClientXtrimStrategy.mAXLEN : RedisClientXtrimStrategy := .unsafeOfString "MAXLEN"
+/-- "MINID" -/
+@[match_pattern] abbrev RedisClientXtrimStrategy.mINID : RedisClientXtrimStrategy := .unsafeOfString "MINID"
+/-- "maxlen" -/
+@[match_pattern] abbrev RedisClientXtrimStrategy.maxlen : RedisClientXtrimStrategy := .unsafeOfString "maxlen"
+/-- "minid" -/
+@[match_pattern] abbrev RedisClientXtrimStrategy.minid : RedisClientXtrimStrategy := .unsafeOfString "minid"
+instance : ToJS RedisClientXtrimStrategy := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientXtrimStrategy where
   fromJS
-    | .string "MAXLEN" => .ok .mAXLEN
-    | .string "MINID" => .ok .mINID
-    | .string "maxlen" => .ok .maxlen
-    | .string "minid" => .ok .minid
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientXtrimStrategy"
 
 /-- `enum RedisClientXsetid` (Bun 1.4.4 type declarations): "OK". -/
-inductive RedisClientXsetid where
-  /-- "OK" -/
-  | ok
+structure RedisClientXsetid where
+  /-- A value from its string, unchecked: the generated values (`.ok`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RedisClientXsetid := ⟨fun
-  | .ok => .string "OK"⟩
+/-- "OK" -/
+@[match_pattern] abbrev RedisClientXsetid.ok : RedisClientXsetid := .unsafeOfString "OK"
+instance : ToJS RedisClientXsetid := ⟨fun x => .string x.val⟩
 instance : FromJS RedisClientXsetid where
   fromJS
-    | .string "OK" => .ok .ok
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RedisClientXsetid"
 
 /-- `typedef boolean or TLSOptions BooleanOrTLSOptions`: one constructor per member type. -/
@@ -2004,13 +2303,13 @@ structure RedisOptions where
   tls : Option BooleanOrTLSOptions := none
   /-- `boolean enableAutoPipelining` -/
   enableAutoPipelining : Option Bool := none
-instance : ToJS RedisOptions := ⟨fun d => Support.fields #[("connectionTimeout", Support.optional d.connectionTimeout),
-    ("idleTimeout", Support.optional d.idleTimeout),
-    ("autoReconnect", Support.optional d.autoReconnect),
-    ("maxRetries", Support.optional d.maxRetries),
-    ("enableOfflineQueue", Support.optional d.enableOfflineQueue),
-    ("tls", Support.optional d.tls),
-    ("enableAutoPipelining", Support.optional d.enableAutoPipelining)]⟩
+instance : ToJS RedisOptions := ⟨fun d => Internal.fields #[("connectionTimeout", Internal.optional d.connectionTimeout),
+    ("idleTimeout", Internal.optional d.idleTimeout),
+    ("autoReconnect", Internal.optional d.autoReconnect),
+    ("maxRetries", Internal.optional d.maxRetries),
+    ("enableOfflineQueue", Internal.optional d.enableOfflineQueue),
+    ("tls", Internal.optional d.tls),
+    ("enableAutoPipelining", Internal.optional d.enableAutoPipelining)]⟩
 
 /-- `callback RedisClientOnconnect = undefined ()` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure RedisClientOnconnect where
@@ -2041,13 +2340,13 @@ instance : ToJS RedisClientOnclose := ⟨fun x => .ref x.val ""⟩
 instance : FromJS RedisClientOnclose := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.RedisClientOnclose", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def RedisClientOnclose.ofFn (f : Data → Async Unit) : IO RedisClientOnclose := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def RedisClientOnclose.ofSyncFn (f : Data → IO Unit) : IO RedisClientOnclose := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -2132,13 +2431,13 @@ instance : ToJS RedisClientStringPubSubListener := ⟨fun x => .ref x.val ""⟩
 instance : FromJS RedisClientStringPubSubListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.RedisClientStringPubSubListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def RedisClientStringPubSubListener.ofFn (f : String → String → Async Unit) : IO RedisClientStringPubSubListener := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg String args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg String args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def RedisClientStringPubSubListener.ofSyncFn (f : String → String → IO Unit) : IO RedisClientStringPubSubListener := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg String args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg String args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -2157,1206 +2456,1210 @@ instance : FromJS SequenceOfDOMStringOrDouble where
   typeName := "Lasm.JS.Bun.SequenceOfDOMStringOrDouble"
 
 /-- `constructor(url?: string, options?: RedisOptions)`: `constructor(optional DOMString url, optional RedisOptions options)` -/
-def RedisClient.new (url : Option String := none) (options : Option RedisOptions := none) : IO RedisClient :=
+@[macro_inline] def RedisClient.new (url : Option String := none) (options : Option RedisOptions := none) : IO RedisClient := Internal.api "Lasm.JS.Bun.RedisClient.new" do
   Lasm.JS.Binding.invoke RedisClient { name := "Lasm.JS.Bun.RedisClient.new", module := "globalThis", path := "Bun.RedisClient", construct := true, arity := 2 }
-    (Support.args #[Support.optional url, Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional url, Internal.optional options]) (await := false)
 
 /-- `readonly connected: boolean`: `readonly attribute boolean connected` -/
-def RedisClient.connected (self : RedisClient) : IO Bool := self.val.get "connected" Bool
+@[macro_inline] def RedisClient.connected (self : RedisClient) : IO Bool := Internal.api "Lasm.JS.Bun.RedisClient.connected" do
+  self.val.get "connected" Bool
 
 /-- `readonly bufferedAmount: number`: `readonly attribute double bufferedAmount` -/
-def RedisClient.bufferedAmount (self : RedisClient) : IO Float := self.val.get "bufferedAmount" Float
+@[macro_inline] def RedisClient.bufferedAmount (self : RedisClient) : IO Float := Internal.api "Lasm.JS.Bun.RedisClient.bufferedAmount" do
+  self.val.get "bufferedAmount" Float
 
 /-- `onconnect: ((this: RedisClient) => void) | null`: `attribute RedisClientOnconnect? onconnect` -/
-def RedisClient.onconnect (self : RedisClient) : IO (Option RedisClientOnconnect) := self.val.get "onconnect" (Option RedisClientOnconnect)
+@[macro_inline] def RedisClient.onconnect (self : RedisClient) : IO (Option RedisClientOnconnect) := Internal.api "Lasm.JS.Bun.RedisClient.onconnect" do
+  self.val.get "onconnect" (Option RedisClientOnconnect)
 
 /-- Sets `onconnect`: `attribute RedisClientOnconnect? onconnect` -/
-def RedisClient.setOnconnect (self : RedisClient) (value : Option RedisClientOnconnect) : IO Unit :=
+@[macro_inline] def RedisClient.setOnconnect (self : RedisClient) (value : Option RedisClientOnconnect) : IO Unit := Internal.api "Lasm.JS.Bun.RedisClient.setOnconnect" do
   self.val.set "onconnect" (toJS value)
 
 /-- `onclose: ((this: RedisClient, error: Error) => void) | null`: `attribute RedisClientOnclose? onclose` -/
-def RedisClient.onclose (self : RedisClient) : IO (Option RedisClientOnclose) := self.val.get "onclose" (Option RedisClientOnclose)
+@[macro_inline] def RedisClient.onclose (self : RedisClient) : IO (Option RedisClientOnclose) := Internal.api "Lasm.JS.Bun.RedisClient.onclose" do
+  self.val.get "onclose" (Option RedisClientOnclose)
 
 /-- Sets `onclose`: `attribute RedisClientOnclose? onclose` -/
-def RedisClient.setOnclose (self : RedisClient) (value : Option RedisClientOnclose) : IO Unit :=
+@[macro_inline] def RedisClient.setOnclose (self : RedisClient) (value : Option RedisClientOnclose) : IO Unit := Internal.api "Lasm.JS.Bun.RedisClient.setOnclose" do
   self.val.set "onclose" (toJS value)
 
 /-- `connect(): Promise<void>`: `Promise<undefined> connect()` -/
-def RedisClient.connect (self : RedisClient) : Async Unit :=
-  self.val.callMethodAwait "connect" (Support.args #[]) Unit
+@[macro_inline] def RedisClient.connect (self : RedisClient) : Async Unit := Internal.api "Lasm.JS.Bun.RedisClient.connect" do
+  self.val.callMethodAwait "connect" (Internal.args #[]) Unit
 
 /-- `close(): void`: `undefined close()` -/
-def RedisClient.close (self : RedisClient) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def RedisClient.close (self : RedisClient) : IO Unit := Internal.api "Lasm.JS.Bun.RedisClient.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `send(command: string, args: string[]): Promise<any>`: `Promise<any> send(DOMString command, sequence<DOMString> args)` -/
-def RedisClient.send (self : RedisClient) (command : String) (args : Array String) : Async Data :=
-  self.val.callMethodAwait "send" (Support.args #[toJS command, toJS args]) Data
+@[macro_inline] def RedisClient.send (self : RedisClient) (command : String) (args : Array String) : Async Data := Internal.api "Lasm.JS.Bun.RedisClient.send" do
+  self.val.callMethodAwait "send" (Internal.args #[toJS command, toJS args]) Data
 
 /-- `get(key: RedisClient.KeyLike): Promise<string | null>`: `Promise<DOMString?> get(RedisClientKeyLike key)` -/
-def RedisClient.get (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) :=
-  self.val.callMethodAwait "get" (Support.args #[toJS key]) (Option String)
+@[macro_inline] def RedisClient.get (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.get" do
+  self.val.callMethodAwait "get" (Internal.args #[toJS key]) (Option String)
 
 /-- `getBuffer(key: RedisClient.KeyLike): Promise<Uint8Array<ArrayBuffer> | null>`: `Promise<Uint8Array?> getBuffer(RedisClientKeyLike key)` -/
-def RedisClient.getBuffer (self : RedisClient) (key : RedisClientKeyLike) : Async (Option ByteArray) :=
-  self.val.callMethodAwait "getBuffer" (Support.args #[toJS key]) (Option ByteArray)
+@[macro_inline] def RedisClient.getBuffer (self : RedisClient) (key : RedisClientKeyLike) : Async (Option ByteArray) := Internal.api "Lasm.JS.Bun.RedisClient.getBuffer" do
+  self.val.callMethodAwait "getBuffer" (Internal.args #[toJS key]) (Option ByteArray)
 
 /-- `set(key: RedisClient.KeyLike, value: RedisClient.KeyLike): Promise<'OK'>`: `Promise<RedisClientSet> set(RedisClientKeyLike key, RedisClientKeyLike value)` -/
-def RedisClient.set (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) : Async RedisClientSet :=
-  self.val.callMethodAwait "set" (Support.args #[toJS key, toJS value]) RedisClientSet
+@[macro_inline] def RedisClient.set (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) : Async RedisClientSet := Internal.api "Lasm.JS.Bun.RedisClient.set" do
+  self.val.callMethodAwait "set" (Internal.args #[toJS key, toJS value]) RedisClientSet
 
 /-- `set(key: RedisClient.KeyLike, value: RedisClient.KeyLike, ex: 'EX', seconds: number): Promise<'OK'>`: `Promise<RedisClientSet> set(RedisClientKeyLike key, RedisClientKeyLike value, RedisClientSetWithExEx ex, double seconds)` -/
-def RedisClient.setWithEx (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) (ex : RedisClientSetWithExEx) (seconds : Float) : Async RedisClientSet :=
-  self.val.callMethodAwait "set" (Support.args #[toJS key, toJS value, toJS ex, toJS seconds]) RedisClientSet
+@[macro_inline] def RedisClient.setWithEx (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) (ex : RedisClientSetWithExEx) (seconds : Float) : Async RedisClientSet := Internal.api "Lasm.JS.Bun.RedisClient.setWithEx" do
+  self.val.callMethodAwait "set" (Internal.args #[toJS key, toJS value, toJS ex, toJS seconds]) RedisClientSet
 
 /-- `set(key: RedisClient.KeyLike, value: RedisClient.KeyLike, px: 'PX', milliseconds: number): Promise<'OK'>`: `Promise<RedisClientSet> set(RedisClientKeyLike key, RedisClientKeyLike value, RedisClientSetWithPxPx px, double milliseconds)` -/
-def RedisClient.setWithPx (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) (px : RedisClientSetWithPxPx) (milliseconds : Float) : Async RedisClientSet :=
-  self.val.callMethodAwait "set" (Support.args #[toJS key, toJS value, toJS px, toJS milliseconds]) RedisClientSet
+@[macro_inline] def RedisClient.setWithPx (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) (px : RedisClientSetWithPxPx) (milliseconds : Float) : Async RedisClientSet := Internal.api "Lasm.JS.Bun.RedisClient.setWithPx" do
+  self.val.callMethodAwait "set" (Internal.args #[toJS key, toJS value, toJS px, toJS milliseconds]) RedisClientSet
 
 /-- `set(key: RedisClient.KeyLike, value: RedisClient.KeyLike, exat: 'EXAT', timestampSeconds: number): Promise<'OK'>`: `Promise<RedisClientSet> set(RedisClientKeyLike key, RedisClientKeyLike value, RedisClientSetWithExatExat exat, double timestampSeconds)` -/
-def RedisClient.setWithExat (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) (exat : RedisClientSetWithExatExat) (timestampSeconds : Float) : Async RedisClientSet :=
-  self.val.callMethodAwait "set" (Support.args #[toJS key, toJS value, toJS exat, toJS timestampSeconds]) RedisClientSet
+@[macro_inline] def RedisClient.setWithExat (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) (exat : RedisClientSetWithExatExat) (timestampSeconds : Float) : Async RedisClientSet := Internal.api "Lasm.JS.Bun.RedisClient.setWithExat" do
+  self.val.callMethodAwait "set" (Internal.args #[toJS key, toJS value, toJS exat, toJS timestampSeconds]) RedisClientSet
 
 /-- `set(key: RedisClient.KeyLike, value: RedisClient.KeyLike, pxat: 'PXAT', timestampMilliseconds: number): Promise<'OK'>`: `Promise<RedisClientSet> set(RedisClientKeyLike key, RedisClientKeyLike value, RedisClientSetWithPxatPxat pxat, double timestampMilliseconds)` -/
-def RedisClient.setWithPxat (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) (pxat : RedisClientSetWithPxatPxat) (timestampMilliseconds : Float) : Async RedisClientSet :=
-  self.val.callMethodAwait "set" (Support.args #[toJS key, toJS value, toJS pxat, toJS timestampMilliseconds]) RedisClientSet
+@[macro_inline] def RedisClient.setWithPxat (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) (pxat : RedisClientSetWithPxatPxat) (timestampMilliseconds : Float) : Async RedisClientSet := Internal.api "Lasm.JS.Bun.RedisClient.setWithPxat" do
+  self.val.callMethodAwait "set" (Internal.args #[toJS key, toJS value, toJS pxat, toJS timestampMilliseconds]) RedisClientSet
 
 /-- `set(key: RedisClient.KeyLike, value: RedisClient.KeyLike, nx: 'NX'): Promise<'OK' | null>`: `Promise<RedisClientSet?> set(RedisClientKeyLike key, RedisClientKeyLike value, RedisClientSetWithNxNx nx)` -/
-def RedisClient.setWithNx (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) (nx : RedisClientSetWithNxNx) : Async (Option RedisClientSet) :=
-  self.val.callMethodAwait "set" (Support.args #[toJS key, toJS value, toJS nx]) (Option RedisClientSet)
+@[macro_inline] def RedisClient.setWithNx (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) (nx : RedisClientSetWithNxNx) : Async (Option RedisClientSet) := Internal.api "Lasm.JS.Bun.RedisClient.setWithNx" do
+  self.val.callMethodAwait "set" (Internal.args #[toJS key, toJS value, toJS nx]) (Option RedisClientSet)
 
 /-- `set(key: RedisClient.KeyLike, value: RedisClient.KeyLike, xx: 'XX'): Promise<'OK' | null>`: `Promise<RedisClientSet?> set(RedisClientKeyLike key, RedisClientKeyLike value, RedisClientSetWithXxXx xx)` -/
-def RedisClient.setWithXx (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) (xx : RedisClientSetWithXxXx) : Async (Option RedisClientSet) :=
-  self.val.callMethodAwait "set" (Support.args #[toJS key, toJS value, toJS xx]) (Option RedisClientSet)
+@[macro_inline] def RedisClient.setWithXx (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) (xx : RedisClientSetWithXxXx) : Async (Option RedisClientSet) := Internal.api "Lasm.JS.Bun.RedisClient.setWithXx" do
+  self.val.callMethodAwait "set" (Internal.args #[toJS key, toJS value, toJS xx]) (Option RedisClientSet)
 
 /-- `set(key: RedisClient.KeyLike, value: RedisClient.KeyLike, get: 'GET'): Promise<string | null>`: `Promise<DOMString?> set(RedisClientKeyLike key, RedisClientKeyLike value, RedisClientSetWithGetGet get)` -/
-def RedisClient.setWithGet (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) (get : RedisClientSetWithGetGet) : Async (Option String) :=
-  self.val.callMethodAwait "set" (Support.args #[toJS key, toJS value, toJS get]) (Option String)
+@[macro_inline] def RedisClient.setWithGet (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) (get : RedisClientSetWithGetGet) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.setWithGet" do
+  self.val.callMethodAwait "set" (Internal.args #[toJS key, toJS value, toJS get]) (Option String)
 
 /-- `set(key: RedisClient.KeyLike, value: RedisClient.KeyLike, keepttl: 'KEEPTTL'): Promise<'OK'>`: `Promise<RedisClientSet> set(RedisClientKeyLike key, RedisClientKeyLike value, RedisClientSetWithKeepttlKeepttl keepttl)` -/
-def RedisClient.setWithKeepttl (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) (keepttl : RedisClientSetWithKeepttlKeepttl) : Async RedisClientSet :=
-  self.val.callMethodAwait "set" (Support.args #[toJS key, toJS value, toJS keepttl]) RedisClientSet
+@[macro_inline] def RedisClient.setWithKeepttl (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) (keepttl : RedisClientSetWithKeepttlKeepttl) : Async RedisClientSet := Internal.api "Lasm.JS.Bun.RedisClient.setWithKeepttl" do
+  self.val.callMethodAwait "set" (Internal.args #[toJS key, toJS value, toJS keepttl]) RedisClientSet
 
 /-- `set(key: RedisClient.KeyLike, value: RedisClient.KeyLike, ...options: string[]): Promise<'OK' | string | null>`: `Promise<DOMString?> set(RedisClientKeyLike key, RedisClientKeyLike value, DOMString... options)` -/
-def RedisClient.setWithOptions (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) (options : Array String := #[]) : Async (Option String) :=
-  self.val.callMethodAwait "set" (Support.argsWith #[toJS key, toJS value] (options.map toJS)) (Option String)
+@[macro_inline] def RedisClient.setWithOptions (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) (options : Array String := #[]) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.setWithOptions" do
+  self.val.callMethodAwait "set" (Internal.argsWith #[toJS key, toJS value] (options.map toJS)) (Option String)
 
 /-- `del(...keys: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> del(RedisClientKeyLike... keys)` -/
-def RedisClient.del (self : RedisClient) (keys : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "del" (Support.argsWith #[] (keys.map toJS)) Float
+@[macro_inline] def RedisClient.del (self : RedisClient) (keys : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.del" do
+  self.val.callMethodAwait "del" (Internal.argsWith #[] (keys.map toJS)) Float
 
 /-- `incr(key: RedisClient.KeyLike): Promise<number>`: `Promise<double> incr(RedisClientKeyLike key)` -/
-def RedisClient.incr (self : RedisClient) (key : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "incr" (Support.args #[toJS key]) Float
+@[macro_inline] def RedisClient.incr (self : RedisClient) (key : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.incr" do
+  self.val.callMethodAwait "incr" (Internal.args #[toJS key]) Float
 
 /-- `incrby(key: RedisClient.KeyLike, increment: number): Promise<number>`: `Promise<double> incrby(RedisClientKeyLike key, double increment)` -/
-def RedisClient.incrby (self : RedisClient) (key : RedisClientKeyLike) (increment : Float) : Async Float :=
-  self.val.callMethodAwait "incrby" (Support.args #[toJS key, toJS increment]) Float
+@[macro_inline] def RedisClient.incrby (self : RedisClient) (key : RedisClientKeyLike) (increment : Float) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.incrby" do
+  self.val.callMethodAwait "incrby" (Internal.args #[toJS key, toJS increment]) Float
 
 /-- `incrbyfloat(key: RedisClient.KeyLike, increment: number | string): Promise<string>`: `Promise<DOMString> incrbyfloat(RedisClientKeyLike key, DoubleOrDOMString increment)` -/
-def RedisClient.incrbyfloat (self : RedisClient) (key : RedisClientKeyLike) (increment : DoubleOrDOMString) : Async String :=
-  self.val.callMethodAwait "incrbyfloat" (Support.args #[toJS key, toJS increment]) String
+@[macro_inline] def RedisClient.incrbyfloat (self : RedisClient) (key : RedisClientKeyLike) (increment : DoubleOrDOMString) : Async String := Internal.api "Lasm.JS.Bun.RedisClient.incrbyfloat" do
+  self.val.callMethodAwait "incrbyfloat" (Internal.args #[toJS key, toJS increment]) String
 
 /-- `decr(key: RedisClient.KeyLike): Promise<number>`: `Promise<double> decr(RedisClientKeyLike key)` -/
-def RedisClient.decr (self : RedisClient) (key : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "decr" (Support.args #[toJS key]) Float
+@[macro_inline] def RedisClient.decr (self : RedisClient) (key : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.decr" do
+  self.val.callMethodAwait "decr" (Internal.args #[toJS key]) Float
 
 /-- `decrby(key: RedisClient.KeyLike, decrement: number): Promise<number>`: `Promise<double> decrby(RedisClientKeyLike key, double decrement)` -/
-def RedisClient.decrby (self : RedisClient) (key : RedisClientKeyLike) (decrement : Float) : Async Float :=
-  self.val.callMethodAwait "decrby" (Support.args #[toJS key, toJS decrement]) Float
+@[macro_inline] def RedisClient.decrby (self : RedisClient) (key : RedisClientKeyLike) (decrement : Float) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.decrby" do
+  self.val.callMethodAwait "decrby" (Internal.args #[toJS key, toJS decrement]) Float
 
 /-- `exists(key: RedisClient.KeyLike): Promise<boolean>`: `Promise<boolean> exists(RedisClientKeyLike key)` -/
-def RedisClient.«exists» (self : RedisClient) (key : RedisClientKeyLike) : Async Bool :=
-  self.val.callMethodAwait "exists" (Support.args #[toJS key]) Bool
+@[macro_inline] def RedisClient.«exists» (self : RedisClient) (key : RedisClientKeyLike) : Async Bool := Internal.api "Lasm.JS.Bun.RedisClient.exists" do
+  self.val.callMethodAwait "exists" (Internal.args #[toJS key]) Bool
 
 /-- `expire(key: RedisClient.KeyLike, seconds: number): Promise<number>`: `Promise<double> expire(RedisClientKeyLike key, double seconds)` -/
-def RedisClient.expire (self : RedisClient) (key : RedisClientKeyLike) (seconds : Float) : Async Float :=
-  self.val.callMethodAwait "expire" (Support.args #[toJS key, toJS seconds]) Float
+@[macro_inline] def RedisClient.expire (self : RedisClient) (key : RedisClientKeyLike) (seconds : Float) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.expire" do
+  self.val.callMethodAwait "expire" (Internal.args #[toJS key, toJS seconds]) Float
 
 /-- `expireat(key: RedisClient.KeyLike, timestamp: number): Promise<number>`: `Promise<double> expireat(RedisClientKeyLike key, double timestamp)` -/
-def RedisClient.expireat (self : RedisClient) (key : RedisClientKeyLike) (timestamp : Float) : Async Float :=
-  self.val.callMethodAwait "expireat" (Support.args #[toJS key, toJS timestamp]) Float
+@[macro_inline] def RedisClient.expireat (self : RedisClient) (key : RedisClientKeyLike) (timestamp : Float) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.expireat" do
+  self.val.callMethodAwait "expireat" (Internal.args #[toJS key, toJS timestamp]) Float
 
 /-- `pexpire(key: RedisClient.KeyLike, milliseconds: number): Promise<number>`: `Promise<double> pexpire(RedisClientKeyLike key, double milliseconds)` -/
-def RedisClient.pexpire (self : RedisClient) (key : RedisClientKeyLike) (milliseconds : Float) : Async Float :=
-  self.val.callMethodAwait "pexpire" (Support.args #[toJS key, toJS milliseconds]) Float
+@[macro_inline] def RedisClient.pexpire (self : RedisClient) (key : RedisClientKeyLike) (milliseconds : Float) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.pexpire" do
+  self.val.callMethodAwait "pexpire" (Internal.args #[toJS key, toJS milliseconds]) Float
 
 /-- `ttl(key: RedisClient.KeyLike): Promise<number>`: `Promise<double> ttl(RedisClientKeyLike key)` -/
-def RedisClient.ttl (self : RedisClient) (key : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "ttl" (Support.args #[toJS key]) Float
+@[macro_inline] def RedisClient.ttl (self : RedisClient) (key : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.ttl" do
+  self.val.callMethodAwait "ttl" (Internal.args #[toJS key]) Float
 
 /-- `hset(key: RedisClient.KeyLike, fields: Record<string | number, RedisClient.KeyLike | number>): Promise<number>`: `Promise<double> hset(RedisClientKeyLike key, record<DOMString, RedisClientKeyLikeOrDouble> fields)` -/
-def RedisClient.hset (self : RedisClient) (key : RedisClientKeyLike) (fields : Record RedisClientKeyLikeOrDouble) : Async Float :=
-  self.val.callMethodAwait "hset" (Support.args #[toJS key, toJS fields]) Float
+@[macro_inline] def RedisClient.hset (self : RedisClient) (key : RedisClientKeyLike) (fields : Record RedisClientKeyLikeOrDouble) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.hset" do
+  self.val.callMethodAwait "hset" (Internal.args #[toJS key, toJS fields]) Float
 
 /-- `hset(key: RedisClient.KeyLike, field: RedisClient.KeyLike, value: RedisClient.KeyLike, ...rest: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> hset(RedisClientKeyLike key, RedisClientKeyLike field, RedisClientKeyLike value, RedisClientKeyLike... rest)` -/
-def RedisClient.hsetWithField (self : RedisClient) (key : RedisClientKeyLike) (field : RedisClientKeyLike) (value : RedisClientKeyLike) (rest : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "hset" (Support.argsWith #[toJS key, toJS field, toJS value] (rest.map toJS)) Float
+@[macro_inline] def RedisClient.hsetWithField (self : RedisClient) (key : RedisClientKeyLike) (field : RedisClientKeyLike) (value : RedisClientKeyLike) (rest : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.hsetWithField" do
+  self.val.callMethodAwait "hset" (Internal.argsWith #[toJS key, toJS field, toJS value] (rest.map toJS)) Float
 
 /-- `hsetnx(key: RedisClient.KeyLike, field: RedisClient.KeyLike, value: RedisClient.KeyLike): Promise<boolean>`: `Promise<boolean> hsetnx(RedisClientKeyLike key, RedisClientKeyLike field, RedisClientKeyLike value)` -/
-def RedisClient.hsetnx (self : RedisClient) (key : RedisClientKeyLike) (field : RedisClientKeyLike) (value : RedisClientKeyLike) : Async Bool :=
-  self.val.callMethodAwait "hsetnx" (Support.args #[toJS key, toJS field, toJS value]) Bool
+@[macro_inline] def RedisClient.hsetnx (self : RedisClient) (key : RedisClientKeyLike) (field : RedisClientKeyLike) (value : RedisClientKeyLike) : Async Bool := Internal.api "Lasm.JS.Bun.RedisClient.hsetnx" do
+  self.val.callMethodAwait "hsetnx" (Internal.args #[toJS key, toJS field, toJS value]) Bool
 
 /-- `hgetdel(key: RedisClient.KeyLike, fieldsKeyword: 'FIELDS', numfields: number, ...fields: RedisClient.KeyLike[]): Promise<Array<string | null>>`: `Promise<sequence<DOMString?>> hgetdel(RedisClientKeyLike key, RedisClientHgetdelFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fields)` -/
-def RedisClient.hgetdel (self : RedisClient) (key : RedisClientKeyLike) (fieldsKeyword : RedisClientHgetdelFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array (Option String)) :=
-  self.val.callMethodAwait "hgetdel" (Support.argsWith #[toJS key, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array (Option String))
+@[macro_inline] def RedisClient.hgetdel (self : RedisClient) (key : RedisClientKeyLike) (fieldsKeyword : RedisClientHgetdelFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array (Option String)) := Internal.api "Lasm.JS.Bun.RedisClient.hgetdel" do
+  self.val.callMethodAwait "hgetdel" (Internal.argsWith #[toJS key, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array (Option String))
 
 /-- `hgetex(key: RedisClient.KeyLike, fieldsKeyword: 'FIELDS', numfields: number, ...fields: RedisClient.KeyLike[]): Promise<Array<string | null>>`: `Promise<sequence<DOMString?>> hgetex(RedisClientKeyLike key, RedisClientHgetexFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fields)` -/
-def RedisClient.hgetex (self : RedisClient) (key : RedisClientKeyLike) (fieldsKeyword : RedisClientHgetexFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array (Option String)) :=
-  self.val.callMethodAwait "hgetex" (Support.argsWith #[toJS key, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array (Option String))
+@[macro_inline] def RedisClient.hgetex (self : RedisClient) (key : RedisClientKeyLike) (fieldsKeyword : RedisClientHgetexFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array (Option String)) := Internal.api "Lasm.JS.Bun.RedisClient.hgetex" do
+  self.val.callMethodAwait "hgetex" (Internal.argsWith #[toJS key, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array (Option String))
 
 /-- `hgetex(key: RedisClient.KeyLike, ex: 'EX', seconds: number, fieldsKeyword: 'FIELDS', numfields: number, ...fields: RedisClient.KeyLike[]): Promise<Array<string | null>>`: `Promise<sequence<DOMString?>> hgetex(RedisClientKeyLike key, RedisClientHgetexWithExEx ex, double seconds, RedisClientHgetexWithExFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fields)` -/
-def RedisClient.hgetexWithEx (self : RedisClient) (key : RedisClientKeyLike) (ex : RedisClientHgetexWithExEx) (seconds : Float) (fieldsKeyword : RedisClientHgetexWithExFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array (Option String)) :=
-  self.val.callMethodAwait "hgetex" (Support.argsWith #[toJS key, toJS ex, toJS seconds, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array (Option String))
+@[macro_inline] def RedisClient.hgetexWithEx (self : RedisClient) (key : RedisClientKeyLike) (ex : RedisClientHgetexWithExEx) (seconds : Float) (fieldsKeyword : RedisClientHgetexWithExFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array (Option String)) := Internal.api "Lasm.JS.Bun.RedisClient.hgetexWithEx" do
+  self.val.callMethodAwait "hgetex" (Internal.argsWith #[toJS key, toJS ex, toJS seconds, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array (Option String))
 
 /-- `hgetex(key: RedisClient.KeyLike, px: 'PX', milliseconds: number, fieldsKeyword: 'FIELDS', numfields: number, ...fields: RedisClient.KeyLike[]): Promise<Array<string | null>>`: `Promise<sequence<DOMString?>> hgetex(RedisClientKeyLike key, RedisClientHgetexWithPxPx px, double milliseconds, RedisClientHgetexWithPxFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fields)` -/
-def RedisClient.hgetexWithPx (self : RedisClient) (key : RedisClientKeyLike) (px : RedisClientHgetexWithPxPx) (milliseconds : Float) (fieldsKeyword : RedisClientHgetexWithPxFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array (Option String)) :=
-  self.val.callMethodAwait "hgetex" (Support.argsWith #[toJS key, toJS px, toJS milliseconds, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array (Option String))
+@[macro_inline] def RedisClient.hgetexWithPx (self : RedisClient) (key : RedisClientKeyLike) (px : RedisClientHgetexWithPxPx) (milliseconds : Float) (fieldsKeyword : RedisClientHgetexWithPxFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array (Option String)) := Internal.api "Lasm.JS.Bun.RedisClient.hgetexWithPx" do
+  self.val.callMethodAwait "hgetex" (Internal.argsWith #[toJS key, toJS px, toJS milliseconds, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array (Option String))
 
 /-- `hgetex(key: RedisClient.KeyLike, exat: 'EXAT', unixTimeSeconds: number, fieldsKeyword: 'FIELDS', numfields: number, ...fields: RedisClient.KeyLike[]): Promise<Array<string | null>>`: `Promise<sequence<DOMString?>> hgetex(RedisClientKeyLike key, RedisClientHgetexWithExatExat exat, double unixTimeSeconds, RedisClientHgetexWithExatFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fields)` -/
-def RedisClient.hgetexWithExat (self : RedisClient) (key : RedisClientKeyLike) (exat : RedisClientHgetexWithExatExat) (unixTimeSeconds : Float) (fieldsKeyword : RedisClientHgetexWithExatFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array (Option String)) :=
-  self.val.callMethodAwait "hgetex" (Support.argsWith #[toJS key, toJS exat, toJS unixTimeSeconds, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array (Option String))
+@[macro_inline] def RedisClient.hgetexWithExat (self : RedisClient) (key : RedisClientKeyLike) (exat : RedisClientHgetexWithExatExat) (unixTimeSeconds : Float) (fieldsKeyword : RedisClientHgetexWithExatFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array (Option String)) := Internal.api "Lasm.JS.Bun.RedisClient.hgetexWithExat" do
+  self.val.callMethodAwait "hgetex" (Internal.argsWith #[toJS key, toJS exat, toJS unixTimeSeconds, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array (Option String))
 
 /-- `hgetex(key: RedisClient.KeyLike, pxat: 'PXAT', unixTimeMilliseconds: number, fieldsKeyword: 'FIELDS', numfields: number, ...fields: RedisClient.KeyLike[]): Promise<Array<string | null>>`: `Promise<sequence<DOMString?>> hgetex(RedisClientKeyLike key, RedisClientHgetexWithPxatPxat pxat, double unixTimeMilliseconds, RedisClientHgetexWithPxatFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fields)` -/
-def RedisClient.hgetexWithPxat (self : RedisClient) (key : RedisClientKeyLike) (pxat : RedisClientHgetexWithPxatPxat) (unixTimeMilliseconds : Float) (fieldsKeyword : RedisClientHgetexWithPxatFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array (Option String)) :=
-  self.val.callMethodAwait "hgetex" (Support.argsWith #[toJS key, toJS pxat, toJS unixTimeMilliseconds, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array (Option String))
+@[macro_inline] def RedisClient.hgetexWithPxat (self : RedisClient) (key : RedisClientKeyLike) (pxat : RedisClientHgetexWithPxatPxat) (unixTimeMilliseconds : Float) (fieldsKeyword : RedisClientHgetexWithPxatFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array (Option String)) := Internal.api "Lasm.JS.Bun.RedisClient.hgetexWithPxat" do
+  self.val.callMethodAwait "hgetex" (Internal.argsWith #[toJS key, toJS pxat, toJS unixTimeMilliseconds, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array (Option String))
 
 /-- `hgetex(key: RedisClient.KeyLike, persist: 'PERSIST', fieldsKeyword: 'FIELDS', numfields: number, ...fields: RedisClient.KeyLike[]): Promise<Array<string | null>>`: `Promise<sequence<DOMString?>> hgetex(RedisClientKeyLike key, RedisClientHgetexWithPersistPersist persist, RedisClientHgetexWithPersistFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fields)` -/
-def RedisClient.hgetexWithPersist (self : RedisClient) (key : RedisClientKeyLike) (persist : RedisClientHgetexWithPersistPersist) (fieldsKeyword : RedisClientHgetexWithPersistFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array (Option String)) :=
-  self.val.callMethodAwait "hgetex" (Support.argsWith #[toJS key, toJS persist, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array (Option String))
+@[macro_inline] def RedisClient.hgetexWithPersist (self : RedisClient) (key : RedisClientKeyLike) (persist : RedisClientHgetexWithPersistPersist) (fieldsKeyword : RedisClientHgetexWithPersistFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array (Option String)) := Internal.api "Lasm.JS.Bun.RedisClient.hgetexWithPersist" do
+  self.val.callMethodAwait "hgetex" (Internal.argsWith #[toJS key, toJS persist, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array (Option String))
 
 /-- `hsetex(key: RedisClient.KeyLike, fieldsKeyword: 'FIELDS', numfields: number, ...fieldValues: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> hsetex(RedisClientKeyLike key, RedisClientHsetexFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fieldValues)` -/
-def RedisClient.hsetex (self : RedisClient) (key : RedisClientKeyLike) (fieldsKeyword : RedisClientHsetexFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "hsetex" (Support.argsWith #[toJS key, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
+@[macro_inline] def RedisClient.hsetex (self : RedisClient) (key : RedisClientKeyLike) (fieldsKeyword : RedisClientHsetexFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.hsetex" do
+  self.val.callMethodAwait "hsetex" (Internal.argsWith #[toJS key, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
 
 /-- `hsetex(key: RedisClient.KeyLike, fnx: 'FNX', fieldsKeyword: 'FIELDS', numfields: number, ...fieldValues: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> hsetex(RedisClientKeyLike key, RedisClientHsetexFnxFnx fnx, RedisClientHsetexFnxFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fieldValues)` -/
-def RedisClient.hsetexFnx (self : RedisClient) (key : RedisClientKeyLike) (fnx : RedisClientHsetexFnxFnx) (fieldsKeyword : RedisClientHsetexFnxFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "hsetex" (Support.argsWith #[toJS key, toJS fnx, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
+@[macro_inline] def RedisClient.hsetexFnx (self : RedisClient) (key : RedisClientKeyLike) (fnx : RedisClientHsetexFnxFnx) (fieldsKeyword : RedisClientHsetexFnxFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.hsetexFnx" do
+  self.val.callMethodAwait "hsetex" (Internal.argsWith #[toJS key, toJS fnx, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
 
 /-- `hsetex(key: RedisClient.KeyLike, fxx: 'FXX', fieldsKeyword: 'FIELDS', numfields: number, ...fieldValues: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> hsetex(RedisClientKeyLike key, RedisClientHsetexFxxFxx fxx, RedisClientHsetexFxxFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fieldValues)` -/
-def RedisClient.hsetexFxx (self : RedisClient) (key : RedisClientKeyLike) (fxx : RedisClientHsetexFxxFxx) (fieldsKeyword : RedisClientHsetexFxxFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "hsetex" (Support.argsWith #[toJS key, toJS fxx, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
+@[macro_inline] def RedisClient.hsetexFxx (self : RedisClient) (key : RedisClientKeyLike) (fxx : RedisClientHsetexFxxFxx) (fieldsKeyword : RedisClientHsetexFxxFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.hsetexFxx" do
+  self.val.callMethodAwait "hsetex" (Internal.argsWith #[toJS key, toJS fxx, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
 
 /-- `hsetex(key: RedisClient.KeyLike, ex: 'EX', seconds: number, fieldsKeyword: 'FIELDS', numfields: number, ...fieldValues: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> hsetex(RedisClientKeyLike key, RedisClientHsetexWithExEx ex, double seconds, RedisClientHsetexWithExFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fieldValues)` -/
-def RedisClient.hsetexWithEx (self : RedisClient) (key : RedisClientKeyLike) (ex : RedisClientHsetexWithExEx) (seconds : Float) (fieldsKeyword : RedisClientHsetexWithExFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "hsetex" (Support.argsWith #[toJS key, toJS ex, toJS seconds, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
+@[macro_inline] def RedisClient.hsetexWithEx (self : RedisClient) (key : RedisClientKeyLike) (ex : RedisClientHsetexWithExEx) (seconds : Float) (fieldsKeyword : RedisClientHsetexWithExFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.hsetexWithEx" do
+  self.val.callMethodAwait "hsetex" (Internal.argsWith #[toJS key, toJS ex, toJS seconds, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
 
 /-- `hsetex(key: RedisClient.KeyLike, px: 'PX', milliseconds: number, fieldsKeyword: 'FIELDS', numfields: number, ...fieldValues: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> hsetex(RedisClientKeyLike key, RedisClientHsetexWithPxPx px, double milliseconds, RedisClientHsetexWithPxFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fieldValues)` -/
-def RedisClient.hsetexWithPx (self : RedisClient) (key : RedisClientKeyLike) (px : RedisClientHsetexWithPxPx) (milliseconds : Float) (fieldsKeyword : RedisClientHsetexWithPxFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "hsetex" (Support.argsWith #[toJS key, toJS px, toJS milliseconds, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
+@[macro_inline] def RedisClient.hsetexWithPx (self : RedisClient) (key : RedisClientKeyLike) (px : RedisClientHsetexWithPxPx) (milliseconds : Float) (fieldsKeyword : RedisClientHsetexWithPxFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.hsetexWithPx" do
+  self.val.callMethodAwait "hsetex" (Internal.argsWith #[toJS key, toJS px, toJS milliseconds, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
 
 /-- `hsetex(key: RedisClient.KeyLike, exat: 'EXAT', unixTimeSeconds: number, fieldsKeyword: 'FIELDS', numfields: number, ...fieldValues: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> hsetex(RedisClientKeyLike key, RedisClientHsetexWithExatExat exat, double unixTimeSeconds, RedisClientHsetexWithExatFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fieldValues)` -/
-def RedisClient.hsetexWithExat (self : RedisClient) (key : RedisClientKeyLike) (exat : RedisClientHsetexWithExatExat) (unixTimeSeconds : Float) (fieldsKeyword : RedisClientHsetexWithExatFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "hsetex" (Support.argsWith #[toJS key, toJS exat, toJS unixTimeSeconds, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
+@[macro_inline] def RedisClient.hsetexWithExat (self : RedisClient) (key : RedisClientKeyLike) (exat : RedisClientHsetexWithExatExat) (unixTimeSeconds : Float) (fieldsKeyword : RedisClientHsetexWithExatFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.hsetexWithExat" do
+  self.val.callMethodAwait "hsetex" (Internal.argsWith #[toJS key, toJS exat, toJS unixTimeSeconds, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
 
 /-- `hsetex(key: RedisClient.KeyLike, pxat: 'PXAT', unixTimeMilliseconds: number, fieldsKeyword: 'FIELDS', numfields: number, ...fieldValues: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> hsetex(RedisClientKeyLike key, RedisClientHsetexWithPxatPxat pxat, double unixTimeMilliseconds, RedisClientHsetexWithPxatFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fieldValues)` -/
-def RedisClient.hsetexWithPxat (self : RedisClient) (key : RedisClientKeyLike) (pxat : RedisClientHsetexWithPxatPxat) (unixTimeMilliseconds : Float) (fieldsKeyword : RedisClientHsetexWithPxatFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "hsetex" (Support.argsWith #[toJS key, toJS pxat, toJS unixTimeMilliseconds, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
+@[macro_inline] def RedisClient.hsetexWithPxat (self : RedisClient) (key : RedisClientKeyLike) (pxat : RedisClientHsetexWithPxatPxat) (unixTimeMilliseconds : Float) (fieldsKeyword : RedisClientHsetexWithPxatFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.hsetexWithPxat" do
+  self.val.callMethodAwait "hsetex" (Internal.argsWith #[toJS key, toJS pxat, toJS unixTimeMilliseconds, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
 
 /-- `hsetex(key: RedisClient.KeyLike, keepttl: 'KEEPTTL', fieldsKeyword: 'FIELDS', numfields: number, ...fieldValues: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> hsetex(RedisClientKeyLike key, RedisClientHsetexWithKeepttlKeepttl keepttl, RedisClientHsetexWithKeepttlFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fieldValues)` -/
-def RedisClient.hsetexWithKeepttl (self : RedisClient) (key : RedisClientKeyLike) (keepttl : RedisClientHsetexWithKeepttlKeepttl) (fieldsKeyword : RedisClientHsetexWithKeepttlFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "hsetex" (Support.argsWith #[toJS key, toJS keepttl, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
+@[macro_inline] def RedisClient.hsetexWithKeepttl (self : RedisClient) (key : RedisClientKeyLike) (keepttl : RedisClientHsetexWithKeepttlKeepttl) (fieldsKeyword : RedisClientHsetexWithKeepttlFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.hsetexWithKeepttl" do
+  self.val.callMethodAwait "hsetex" (Internal.argsWith #[toJS key, toJS keepttl, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
 
 /-- `hsetex(key: RedisClient.KeyLike, fnx: 'FNX', ex: 'EX', seconds: number, fieldsKeyword: 'FIELDS', numfields: number, ...fieldValues: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> hsetex(RedisClientKeyLike key, RedisClientHsetexFnxExFnx fnx, RedisClientHsetexFnxExEx ex, double seconds, RedisClientHsetexFnxExFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fieldValues)` -/
-def RedisClient.hsetexFnxEx (self : RedisClient) (key : RedisClientKeyLike) (fnx : RedisClientHsetexFnxExFnx) (ex : RedisClientHsetexFnxExEx) (seconds : Float) (fieldsKeyword : RedisClientHsetexFnxExFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "hsetex" (Support.argsWith #[toJS key, toJS fnx, toJS ex, toJS seconds, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
+@[macro_inline] def RedisClient.hsetexFnxEx (self : RedisClient) (key : RedisClientKeyLike) (fnx : RedisClientHsetexFnxExFnx) (ex : RedisClientHsetexFnxExEx) (seconds : Float) (fieldsKeyword : RedisClientHsetexFnxExFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.hsetexFnxEx" do
+  self.val.callMethodAwait "hsetex" (Internal.argsWith #[toJS key, toJS fnx, toJS ex, toJS seconds, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
 
 /-- `hsetex(key: RedisClient.KeyLike, fnx: 'FNX', px: 'PX', milliseconds: number, fieldsKeyword: 'FIELDS', numfields: number, ...fieldValues: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> hsetex(RedisClientKeyLike key, RedisClientHsetexFnxPxFnx fnx, RedisClientHsetexFnxPxPx px, double milliseconds, RedisClientHsetexFnxPxFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fieldValues)` -/
-def RedisClient.hsetexFnxPx (self : RedisClient) (key : RedisClientKeyLike) (fnx : RedisClientHsetexFnxPxFnx) (px : RedisClientHsetexFnxPxPx) (milliseconds : Float) (fieldsKeyword : RedisClientHsetexFnxPxFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "hsetex" (Support.argsWith #[toJS key, toJS fnx, toJS px, toJS milliseconds, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
+@[macro_inline] def RedisClient.hsetexFnxPx (self : RedisClient) (key : RedisClientKeyLike) (fnx : RedisClientHsetexFnxPxFnx) (px : RedisClientHsetexFnxPxPx) (milliseconds : Float) (fieldsKeyword : RedisClientHsetexFnxPxFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.hsetexFnxPx" do
+  self.val.callMethodAwait "hsetex" (Internal.argsWith #[toJS key, toJS fnx, toJS px, toJS milliseconds, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
 
 /-- `hsetex(key: RedisClient.KeyLike, fnx: 'FNX', exat: 'EXAT', unixTimeSeconds: number, fieldsKeyword: 'FIELDS', numfields: number, ...fieldValues: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> hsetex(RedisClientKeyLike key, RedisClientHsetexFnxExatFnx fnx, RedisClientHsetexFnxExatExat exat, double unixTimeSeconds, RedisClientHsetexFnxExatFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fieldValues)` -/
-def RedisClient.hsetexFnxExat (self : RedisClient) (key : RedisClientKeyLike) (fnx : RedisClientHsetexFnxExatFnx) (exat : RedisClientHsetexFnxExatExat) (unixTimeSeconds : Float) (fieldsKeyword : RedisClientHsetexFnxExatFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "hsetex" (Support.argsWith #[toJS key, toJS fnx, toJS exat, toJS unixTimeSeconds, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
+@[macro_inline] def RedisClient.hsetexFnxExat (self : RedisClient) (key : RedisClientKeyLike) (fnx : RedisClientHsetexFnxExatFnx) (exat : RedisClientHsetexFnxExatExat) (unixTimeSeconds : Float) (fieldsKeyword : RedisClientHsetexFnxExatFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.hsetexFnxExat" do
+  self.val.callMethodAwait "hsetex" (Internal.argsWith #[toJS key, toJS fnx, toJS exat, toJS unixTimeSeconds, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
 
 /-- `hsetex(key: RedisClient.KeyLike, fnx: 'FNX', pxat: 'PXAT', unixTimeMilliseconds: number, fieldsKeyword: 'FIELDS', numfields: number, ...fieldValues: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> hsetex(RedisClientKeyLike key, RedisClientHsetexFnxPxatFnx fnx, RedisClientHsetexFnxPxatPxat pxat, double unixTimeMilliseconds, RedisClientHsetexFnxPxatFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fieldValues)` -/
-def RedisClient.hsetexFnxPxat (self : RedisClient) (key : RedisClientKeyLike) (fnx : RedisClientHsetexFnxPxatFnx) (pxat : RedisClientHsetexFnxPxatPxat) (unixTimeMilliseconds : Float) (fieldsKeyword : RedisClientHsetexFnxPxatFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "hsetex" (Support.argsWith #[toJS key, toJS fnx, toJS pxat, toJS unixTimeMilliseconds, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
+@[macro_inline] def RedisClient.hsetexFnxPxat (self : RedisClient) (key : RedisClientKeyLike) (fnx : RedisClientHsetexFnxPxatFnx) (pxat : RedisClientHsetexFnxPxatPxat) (unixTimeMilliseconds : Float) (fieldsKeyword : RedisClientHsetexFnxPxatFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.hsetexFnxPxat" do
+  self.val.callMethodAwait "hsetex" (Internal.argsWith #[toJS key, toJS fnx, toJS pxat, toJS unixTimeMilliseconds, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
 
 /-- `hsetex(key: RedisClient.KeyLike, fnx: 'FNX', keepttl: 'KEEPTTL', fieldsKeyword: 'FIELDS', numfields: number, ...fieldValues: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> hsetex(RedisClientKeyLike key, RedisClientHsetexWithFnxFnx fnx, RedisClientHsetexWithFnxKeepttl keepttl, RedisClientHsetexWithFnxFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fieldValues)` -/
-def RedisClient.hsetexWithFnx (self : RedisClient) (key : RedisClientKeyLike) (fnx : RedisClientHsetexWithFnxFnx) (keepttl : RedisClientHsetexWithFnxKeepttl) (fieldsKeyword : RedisClientHsetexWithFnxFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "hsetex" (Support.argsWith #[toJS key, toJS fnx, toJS keepttl, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
+@[macro_inline] def RedisClient.hsetexWithFnx (self : RedisClient) (key : RedisClientKeyLike) (fnx : RedisClientHsetexWithFnxFnx) (keepttl : RedisClientHsetexWithFnxKeepttl) (fieldsKeyword : RedisClientHsetexWithFnxFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.hsetexWithFnx" do
+  self.val.callMethodAwait "hsetex" (Internal.argsWith #[toJS key, toJS fnx, toJS keepttl, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
 
 /-- `hsetex(key: RedisClient.KeyLike, fxx: 'FXX', ex: 'EX', seconds: number, fieldsKeyword: 'FIELDS', numfields: number, ...fieldValues: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> hsetex(RedisClientKeyLike key, RedisClientHsetexFxxExFxx fxx, RedisClientHsetexFxxExEx ex, double seconds, RedisClientHsetexFxxExFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fieldValues)` -/
-def RedisClient.hsetexFxxEx (self : RedisClient) (key : RedisClientKeyLike) (fxx : RedisClientHsetexFxxExFxx) (ex : RedisClientHsetexFxxExEx) (seconds : Float) (fieldsKeyword : RedisClientHsetexFxxExFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "hsetex" (Support.argsWith #[toJS key, toJS fxx, toJS ex, toJS seconds, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
+@[macro_inline] def RedisClient.hsetexFxxEx (self : RedisClient) (key : RedisClientKeyLike) (fxx : RedisClientHsetexFxxExFxx) (ex : RedisClientHsetexFxxExEx) (seconds : Float) (fieldsKeyword : RedisClientHsetexFxxExFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.hsetexFxxEx" do
+  self.val.callMethodAwait "hsetex" (Internal.argsWith #[toJS key, toJS fxx, toJS ex, toJS seconds, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
 
 /-- `hsetex(key: RedisClient.KeyLike, fxx: 'FXX', px: 'PX', milliseconds: number, fieldsKeyword: 'FIELDS', numfields: number, ...fieldValues: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> hsetex(RedisClientKeyLike key, RedisClientHsetexFxxPxFxx fxx, RedisClientHsetexFxxPxPx px, double milliseconds, RedisClientHsetexFxxPxFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fieldValues)` -/
-def RedisClient.hsetexFxxPx (self : RedisClient) (key : RedisClientKeyLike) (fxx : RedisClientHsetexFxxPxFxx) (px : RedisClientHsetexFxxPxPx) (milliseconds : Float) (fieldsKeyword : RedisClientHsetexFxxPxFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "hsetex" (Support.argsWith #[toJS key, toJS fxx, toJS px, toJS milliseconds, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
+@[macro_inline] def RedisClient.hsetexFxxPx (self : RedisClient) (key : RedisClientKeyLike) (fxx : RedisClientHsetexFxxPxFxx) (px : RedisClientHsetexFxxPxPx) (milliseconds : Float) (fieldsKeyword : RedisClientHsetexFxxPxFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.hsetexFxxPx" do
+  self.val.callMethodAwait "hsetex" (Internal.argsWith #[toJS key, toJS fxx, toJS px, toJS milliseconds, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
 
 /-- `hsetex(key: RedisClient.KeyLike, fxx: 'FXX', exat: 'EXAT', unixTimeSeconds: number, fieldsKeyword: 'FIELDS', numfields: number, ...fieldValues: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> hsetex(RedisClientKeyLike key, RedisClientHsetexFxxExatFxx fxx, RedisClientHsetexFxxExatExat exat, double unixTimeSeconds, RedisClientHsetexFxxExatFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fieldValues)` -/
-def RedisClient.hsetexFxxExat (self : RedisClient) (key : RedisClientKeyLike) (fxx : RedisClientHsetexFxxExatFxx) (exat : RedisClientHsetexFxxExatExat) (unixTimeSeconds : Float) (fieldsKeyword : RedisClientHsetexFxxExatFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "hsetex" (Support.argsWith #[toJS key, toJS fxx, toJS exat, toJS unixTimeSeconds, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
+@[macro_inline] def RedisClient.hsetexFxxExat (self : RedisClient) (key : RedisClientKeyLike) (fxx : RedisClientHsetexFxxExatFxx) (exat : RedisClientHsetexFxxExatExat) (unixTimeSeconds : Float) (fieldsKeyword : RedisClientHsetexFxxExatFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.hsetexFxxExat" do
+  self.val.callMethodAwait "hsetex" (Internal.argsWith #[toJS key, toJS fxx, toJS exat, toJS unixTimeSeconds, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
 
 /-- `hsetex(key: RedisClient.KeyLike, fxx: 'FXX', pxat: 'PXAT', unixTimeMilliseconds: number, fieldsKeyword: 'FIELDS', numfields: number, ...fieldValues: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> hsetex(RedisClientKeyLike key, RedisClientHsetexFxxPxatFxx fxx, RedisClientHsetexFxxPxatPxat pxat, double unixTimeMilliseconds, RedisClientHsetexFxxPxatFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fieldValues)` -/
-def RedisClient.hsetexFxxPxat (self : RedisClient) (key : RedisClientKeyLike) (fxx : RedisClientHsetexFxxPxatFxx) (pxat : RedisClientHsetexFxxPxatPxat) (unixTimeMilliseconds : Float) (fieldsKeyword : RedisClientHsetexFxxPxatFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "hsetex" (Support.argsWith #[toJS key, toJS fxx, toJS pxat, toJS unixTimeMilliseconds, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
+@[macro_inline] def RedisClient.hsetexFxxPxat (self : RedisClient) (key : RedisClientKeyLike) (fxx : RedisClientHsetexFxxPxatFxx) (pxat : RedisClientHsetexFxxPxatPxat) (unixTimeMilliseconds : Float) (fieldsKeyword : RedisClientHsetexFxxPxatFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.hsetexFxxPxat" do
+  self.val.callMethodAwait "hsetex" (Internal.argsWith #[toJS key, toJS fxx, toJS pxat, toJS unixTimeMilliseconds, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
 
 /-- `hsetex(key: RedisClient.KeyLike, fxx: 'FXX', keepttl: 'KEEPTTL', fieldsKeyword: 'FIELDS', numfields: number, ...fieldValues: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> hsetex(RedisClientKeyLike key, RedisClientHsetexWithFxxFxx fxx, RedisClientHsetexWithFxxKeepttl keepttl, RedisClientHsetexWithFxxFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fieldValues)` -/
-def RedisClient.hsetexWithFxx (self : RedisClient) (key : RedisClientKeyLike) (fxx : RedisClientHsetexWithFxxFxx) (keepttl : RedisClientHsetexWithFxxKeepttl) (fieldsKeyword : RedisClientHsetexWithFxxFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "hsetex" (Support.argsWith #[toJS key, toJS fxx, toJS keepttl, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
+@[macro_inline] def RedisClient.hsetexWithFxx (self : RedisClient) (key : RedisClientKeyLike) (fxx : RedisClientHsetexWithFxxFxx) (keepttl : RedisClientHsetexWithFxxKeepttl) (fieldsKeyword : RedisClientHsetexWithFxxFieldsKeyword) (numfields : Float) (fieldValues : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.hsetexWithFxx" do
+  self.val.callMethodAwait "hsetex" (Internal.argsWith #[toJS key, toJS fxx, toJS keepttl, toJS fieldsKeyword, toJS numfields] (fieldValues.map toJS)) Float
 
 /-- `hexpire(key: RedisClient.KeyLike, seconds: number, fieldsKeyword: 'FIELDS', numfields: number, ...fields: RedisClient.KeyLike[]): Promise<number[]>`: `Promise<sequence<double>> hexpire(RedisClientKeyLike key, double seconds, RedisClientHexpireFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fields)` -/
-def RedisClient.hexpire (self : RedisClient) (key : RedisClientKeyLike) (seconds : Float) (fieldsKeyword : RedisClientHexpireFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) :=
-  self.val.callMethodAwait "hexpire" (Support.argsWith #[toJS key, toJS seconds, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
+@[macro_inline] def RedisClient.hexpire (self : RedisClient) (key : RedisClientKeyLike) (seconds : Float) (fieldsKeyword : RedisClientHexpireFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) := Internal.api "Lasm.JS.Bun.RedisClient.hexpire" do
+  self.val.callMethodAwait "hexpire" (Internal.argsWith #[toJS key, toJS seconds, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
 
 /-- `hexpire(key: RedisClient.KeyLike, seconds: number, condition: 'NX' | 'XX' | 'GT' | 'LT', fieldsKeyword: 'FIELDS', numfields: number, ...fields: RedisClient.KeyLike[]): Promise<number[]>`: `Promise<sequence<double>> hexpire(RedisClientKeyLike key, double seconds, RedisClientHexpireWithConditionCondition condition, RedisClientHexpireWithConditionFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fields)` -/
-def RedisClient.hexpireWithCondition (self : RedisClient) (key : RedisClientKeyLike) (seconds : Float) (condition : RedisClientHexpireWithConditionCondition) (fieldsKeyword : RedisClientHexpireWithConditionFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) :=
-  self.val.callMethodAwait "hexpire" (Support.argsWith #[toJS key, toJS seconds, toJS condition, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
+@[macro_inline] def RedisClient.hexpireWithCondition (self : RedisClient) (key : RedisClientKeyLike) (seconds : Float) (condition : RedisClientHexpireWithConditionCondition) (fieldsKeyword : RedisClientHexpireWithConditionFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) := Internal.api "Lasm.JS.Bun.RedisClient.hexpireWithCondition" do
+  self.val.callMethodAwait "hexpire" (Internal.argsWith #[toJS key, toJS seconds, toJS condition, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
 
 /-- `hexpireat(key: RedisClient.KeyLike, unixTimeSeconds: number, fieldsKeyword: 'FIELDS', numfields: number, ...fields: RedisClient.KeyLike[]): Promise<number[]>`: `Promise<sequence<double>> hexpireat(RedisClientKeyLike key, double unixTimeSeconds, RedisClientHexpireatFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fields)` -/
-def RedisClient.hexpireat (self : RedisClient) (key : RedisClientKeyLike) (unixTimeSeconds : Float) (fieldsKeyword : RedisClientHexpireatFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) :=
-  self.val.callMethodAwait "hexpireat" (Support.argsWith #[toJS key, toJS unixTimeSeconds, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
+@[macro_inline] def RedisClient.hexpireat (self : RedisClient) (key : RedisClientKeyLike) (unixTimeSeconds : Float) (fieldsKeyword : RedisClientHexpireatFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) := Internal.api "Lasm.JS.Bun.RedisClient.hexpireat" do
+  self.val.callMethodAwait "hexpireat" (Internal.argsWith #[toJS key, toJS unixTimeSeconds, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
 
 /-- `hexpireat(key: RedisClient.KeyLike, unixTimeSeconds: number, condition: 'NX' | 'XX' | 'GT' | 'LT', fieldsKeyword: 'FIELDS', numfields: number, ...fields: RedisClient.KeyLike[]): Promise<number[]>`: `Promise<sequence<double>> hexpireat(RedisClientKeyLike key, double unixTimeSeconds, RedisClientHexpireatWithConditionCondition condition, RedisClientHexpireatWithConditionFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fields)` -/
-def RedisClient.hexpireatWithCondition (self : RedisClient) (key : RedisClientKeyLike) (unixTimeSeconds : Float) (condition : RedisClientHexpireatWithConditionCondition) (fieldsKeyword : RedisClientHexpireatWithConditionFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) :=
-  self.val.callMethodAwait "hexpireat" (Support.argsWith #[toJS key, toJS unixTimeSeconds, toJS condition, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
+@[macro_inline] def RedisClient.hexpireatWithCondition (self : RedisClient) (key : RedisClientKeyLike) (unixTimeSeconds : Float) (condition : RedisClientHexpireatWithConditionCondition) (fieldsKeyword : RedisClientHexpireatWithConditionFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) := Internal.api "Lasm.JS.Bun.RedisClient.hexpireatWithCondition" do
+  self.val.callMethodAwait "hexpireat" (Internal.argsWith #[toJS key, toJS unixTimeSeconds, toJS condition, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
 
 /-- `hexpiretime(key: RedisClient.KeyLike, fieldsKeyword: 'FIELDS', numfields: number, ...fields: RedisClient.KeyLike[]): Promise<number[]>`: `Promise<sequence<double>> hexpiretime(RedisClientKeyLike key, RedisClientHexpiretimeFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fields)` -/
-def RedisClient.hexpiretime (self : RedisClient) (key : RedisClientKeyLike) (fieldsKeyword : RedisClientHexpiretimeFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) :=
-  self.val.callMethodAwait "hexpiretime" (Support.argsWith #[toJS key, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
+@[macro_inline] def RedisClient.hexpiretime (self : RedisClient) (key : RedisClientKeyLike) (fieldsKeyword : RedisClientHexpiretimeFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) := Internal.api "Lasm.JS.Bun.RedisClient.hexpiretime" do
+  self.val.callMethodAwait "hexpiretime" (Internal.argsWith #[toJS key, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
 
 /-- `hpersist(key: RedisClient.KeyLike, fieldsKeyword: 'FIELDS', numfields: number, ...fields: RedisClient.KeyLike[]): Promise<number[]>`: `Promise<sequence<double>> hpersist(RedisClientKeyLike key, RedisClientHpersistFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fields)` -/
-def RedisClient.hpersist (self : RedisClient) (key : RedisClientKeyLike) (fieldsKeyword : RedisClientHpersistFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) :=
-  self.val.callMethodAwait "hpersist" (Support.argsWith #[toJS key, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
+@[macro_inline] def RedisClient.hpersist (self : RedisClient) (key : RedisClientKeyLike) (fieldsKeyword : RedisClientHpersistFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) := Internal.api "Lasm.JS.Bun.RedisClient.hpersist" do
+  self.val.callMethodAwait "hpersist" (Internal.argsWith #[toJS key, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
 
 /-- `hpexpire(key: RedisClient.KeyLike, milliseconds: number, fieldsKeyword: 'FIELDS', numfields: number, ...fields: RedisClient.KeyLike[]): Promise<number[]>`: `Promise<sequence<double>> hpexpire(RedisClientKeyLike key, double milliseconds, RedisClientHpexpireFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fields)` -/
-def RedisClient.hpexpire (self : RedisClient) (key : RedisClientKeyLike) (milliseconds : Float) (fieldsKeyword : RedisClientHpexpireFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) :=
-  self.val.callMethodAwait "hpexpire" (Support.argsWith #[toJS key, toJS milliseconds, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
+@[macro_inline] def RedisClient.hpexpire (self : RedisClient) (key : RedisClientKeyLike) (milliseconds : Float) (fieldsKeyword : RedisClientHpexpireFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) := Internal.api "Lasm.JS.Bun.RedisClient.hpexpire" do
+  self.val.callMethodAwait "hpexpire" (Internal.argsWith #[toJS key, toJS milliseconds, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
 
 /-- `hpexpire(key: RedisClient.KeyLike, milliseconds: number, condition: 'NX' | 'XX' | 'GT' | 'LT', fieldsKeyword: 'FIELDS', numfields: number, ...fields: RedisClient.KeyLike[]): Promise<number[]>`: `Promise<sequence<double>> hpexpire(RedisClientKeyLike key, double milliseconds, RedisClientHpexpireWithConditionCondition condition, RedisClientHpexpireWithConditionFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fields)` -/
-def RedisClient.hpexpireWithCondition (self : RedisClient) (key : RedisClientKeyLike) (milliseconds : Float) (condition : RedisClientHpexpireWithConditionCondition) (fieldsKeyword : RedisClientHpexpireWithConditionFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) :=
-  self.val.callMethodAwait "hpexpire" (Support.argsWith #[toJS key, toJS milliseconds, toJS condition, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
+@[macro_inline] def RedisClient.hpexpireWithCondition (self : RedisClient) (key : RedisClientKeyLike) (milliseconds : Float) (condition : RedisClientHpexpireWithConditionCondition) (fieldsKeyword : RedisClientHpexpireWithConditionFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) := Internal.api "Lasm.JS.Bun.RedisClient.hpexpireWithCondition" do
+  self.val.callMethodAwait "hpexpire" (Internal.argsWith #[toJS key, toJS milliseconds, toJS condition, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
 
 /-- `hpexpireat(key: RedisClient.KeyLike, unixTimeMilliseconds: number, fieldsKeyword: 'FIELDS', numfields: number, ...fields: RedisClient.KeyLike[]): Promise<number[]>`: `Promise<sequence<double>> hpexpireat(RedisClientKeyLike key, double unixTimeMilliseconds, RedisClientHpexpireatFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fields)` -/
-def RedisClient.hpexpireat (self : RedisClient) (key : RedisClientKeyLike) (unixTimeMilliseconds : Float) (fieldsKeyword : RedisClientHpexpireatFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) :=
-  self.val.callMethodAwait "hpexpireat" (Support.argsWith #[toJS key, toJS unixTimeMilliseconds, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
+@[macro_inline] def RedisClient.hpexpireat (self : RedisClient) (key : RedisClientKeyLike) (unixTimeMilliseconds : Float) (fieldsKeyword : RedisClientHpexpireatFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) := Internal.api "Lasm.JS.Bun.RedisClient.hpexpireat" do
+  self.val.callMethodAwait "hpexpireat" (Internal.argsWith #[toJS key, toJS unixTimeMilliseconds, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
 
 /-- `hpexpireat(key: RedisClient.KeyLike, unixTimeMilliseconds: number, condition: 'NX' | 'XX' | 'GT' | 'LT', fieldsKeyword: 'FIELDS', numfields: number, ...fields: RedisClient.KeyLike[]): Promise<number[]>`: `Promise<sequence<double>> hpexpireat(RedisClientKeyLike key, double unixTimeMilliseconds, RedisClientHpexpireatWithConditionCondition condition, RedisClientHpexpireatWithConditionFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fields)` -/
-def RedisClient.hpexpireatWithCondition (self : RedisClient) (key : RedisClientKeyLike) (unixTimeMilliseconds : Float) (condition : RedisClientHpexpireatWithConditionCondition) (fieldsKeyword : RedisClientHpexpireatWithConditionFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) :=
-  self.val.callMethodAwait "hpexpireat" (Support.argsWith #[toJS key, toJS unixTimeMilliseconds, toJS condition, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
+@[macro_inline] def RedisClient.hpexpireatWithCondition (self : RedisClient) (key : RedisClientKeyLike) (unixTimeMilliseconds : Float) (condition : RedisClientHpexpireatWithConditionCondition) (fieldsKeyword : RedisClientHpexpireatWithConditionFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) := Internal.api "Lasm.JS.Bun.RedisClient.hpexpireatWithCondition" do
+  self.val.callMethodAwait "hpexpireat" (Internal.argsWith #[toJS key, toJS unixTimeMilliseconds, toJS condition, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
 
 /-- `hpexpiretime(key: RedisClient.KeyLike, fieldsKeyword: 'FIELDS', numfields: number, ...fields: RedisClient.KeyLike[]): Promise<number[]>`: `Promise<sequence<double>> hpexpiretime(RedisClientKeyLike key, RedisClientHpexpiretimeFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fields)` -/
-def RedisClient.hpexpiretime (self : RedisClient) (key : RedisClientKeyLike) (fieldsKeyword : RedisClientHpexpiretimeFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) :=
-  self.val.callMethodAwait "hpexpiretime" (Support.argsWith #[toJS key, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
+@[macro_inline] def RedisClient.hpexpiretime (self : RedisClient) (key : RedisClientKeyLike) (fieldsKeyword : RedisClientHpexpiretimeFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) := Internal.api "Lasm.JS.Bun.RedisClient.hpexpiretime" do
+  self.val.callMethodAwait "hpexpiretime" (Internal.argsWith #[toJS key, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
 
 /-- `hpttl(key: RedisClient.KeyLike, fieldsKeyword: 'FIELDS', numfields: number, ...fields: RedisClient.KeyLike[]): Promise<number[]>`: `Promise<sequence<double>> hpttl(RedisClientKeyLike key, RedisClientHpttlFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fields)` -/
-def RedisClient.hpttl (self : RedisClient) (key : RedisClientKeyLike) (fieldsKeyword : RedisClientHpttlFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) :=
-  self.val.callMethodAwait "hpttl" (Support.argsWith #[toJS key, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
+@[macro_inline] def RedisClient.hpttl (self : RedisClient) (key : RedisClientKeyLike) (fieldsKeyword : RedisClientHpttlFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) := Internal.api "Lasm.JS.Bun.RedisClient.hpttl" do
+  self.val.callMethodAwait "hpttl" (Internal.argsWith #[toJS key, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
 
 /-- `httl(key: RedisClient.KeyLike, fieldsKeyword: 'FIELDS', numfields: number, ...fields: RedisClient.KeyLike[]): Promise<number[]>`: `Promise<sequence<double>> httl(RedisClientKeyLike key, RedisClientHttlFieldsKeyword fieldsKeyword, double numfields, RedisClientKeyLike... fields)` -/
-def RedisClient.httl (self : RedisClient) (key : RedisClientKeyLike) (fieldsKeyword : RedisClientHttlFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) :=
-  self.val.callMethodAwait "httl" (Support.argsWith #[toJS key, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
+@[macro_inline] def RedisClient.httl (self : RedisClient) (key : RedisClientKeyLike) (fieldsKeyword : RedisClientHttlFieldsKeyword) (numfields : Float) (fields : Array RedisClientKeyLike := #[]) : Async (Array Float) := Internal.api "Lasm.JS.Bun.RedisClient.httl" do
+  self.val.callMethodAwait "httl" (Internal.argsWith #[toJS key, toJS fieldsKeyword, toJS numfields] (fields.map toJS)) (Array Float)
 
 /-- `hget(key: RedisClient.KeyLike, field: RedisClient.KeyLike): Promise<string | null>`: `Promise<DOMString?> hget(RedisClientKeyLike key, RedisClientKeyLike field)` -/
-def RedisClient.hget (self : RedisClient) (key : RedisClientKeyLike) (field : RedisClientKeyLike) : Async (Option String) :=
-  self.val.callMethodAwait "hget" (Support.args #[toJS key, toJS field]) (Option String)
+@[macro_inline] def RedisClient.hget (self : RedisClient) (key : RedisClientKeyLike) (field : RedisClientKeyLike) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.hget" do
+  self.val.callMethodAwait "hget" (Internal.args #[toJS key, toJS field]) (Option String)
 
 /-- `hmget(key: RedisClient.KeyLike, ...fields: string[]): Promise<Array<string | null>>`: `Promise<sequence<DOMString?>> hmget(RedisClientKeyLike key, DOMString... fields)` -/
-def RedisClient.hmget (self : RedisClient) (key : RedisClientKeyLike) (fields : Array String := #[]) : Async (Array (Option String)) :=
-  self.val.callMethodAwait "hmget" (Support.argsWith #[toJS key] (fields.map toJS)) (Array (Option String))
+@[macro_inline] def RedisClient.hmget (self : RedisClient) (key : RedisClientKeyLike) (fields : Array String := #[]) : Async (Array (Option String)) := Internal.api "Lasm.JS.Bun.RedisClient.hmget" do
+  self.val.callMethodAwait "hmget" (Internal.argsWith #[toJS key] (fields.map toJS)) (Array (Option String))
 
 /-- `hmget(key: RedisClient.KeyLike, fields: string[]): Promise<Array<string | null>>`: `Promise<sequence<DOMString?>> hmget(RedisClientKeyLike key, sequence<DOMString> fields)` -/
-def RedisClient.hmget2 (self : RedisClient) (key : RedisClientKeyLike) (fields : Array String) : Async (Array (Option String)) :=
-  self.val.callMethodAwait "hmget" (Support.args #[toJS key, toJS fields]) (Array (Option String))
+@[macro_inline] def RedisClient.hmget2 (self : RedisClient) (key : RedisClientKeyLike) (fields : Array String) : Async (Array (Option String)) := Internal.api "Lasm.JS.Bun.RedisClient.hmget2" do
+  self.val.callMethodAwait "hmget" (Internal.args #[toJS key, toJS fields]) (Array (Option String))
 
 /-- `hdel(key: RedisClient.KeyLike, field: RedisClient.KeyLike, ...rest: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> hdel(RedisClientKeyLike key, RedisClientKeyLike field, RedisClientKeyLike... rest)` -/
-def RedisClient.hdel (self : RedisClient) (key : RedisClientKeyLike) (field : RedisClientKeyLike) (rest : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "hdel" (Support.argsWith #[toJS key, toJS field] (rest.map toJS)) Float
+@[macro_inline] def RedisClient.hdel (self : RedisClient) (key : RedisClientKeyLike) (field : RedisClientKeyLike) (rest : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.hdel" do
+  self.val.callMethodAwait "hdel" (Internal.argsWith #[toJS key, toJS field] (rest.map toJS)) Float
 
 /-- `hexists(key: RedisClient.KeyLike, field: RedisClient.KeyLike): Promise<boolean>`: `Promise<boolean> hexists(RedisClientKeyLike key, RedisClientKeyLike field)` -/
-def RedisClient.hexists (self : RedisClient) (key : RedisClientKeyLike) (field : RedisClientKeyLike) : Async Bool :=
-  self.val.callMethodAwait "hexists" (Support.args #[toJS key, toJS field]) Bool
+@[macro_inline] def RedisClient.hexists (self : RedisClient) (key : RedisClientKeyLike) (field : RedisClientKeyLike) : Async Bool := Internal.api "Lasm.JS.Bun.RedisClient.hexists" do
+  self.val.callMethodAwait "hexists" (Internal.args #[toJS key, toJS field]) Bool
 
 /-- `hrandfield(key: RedisClient.KeyLike): Promise<string | null>`: `Promise<DOMString?> hrandfield(RedisClientKeyLike key)` -/
-def RedisClient.hrandfield (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) :=
-  self.val.callMethodAwait "hrandfield" (Support.args #[toJS key]) (Option String)
+@[macro_inline] def RedisClient.hrandfield (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.hrandfield" do
+  self.val.callMethodAwait "hrandfield" (Internal.args #[toJS key]) (Option String)
 
 /-- `hrandfield(key: RedisClient.KeyLike, count: number): Promise<string[]>`: `Promise<sequence<DOMString>> hrandfield(RedisClientKeyLike key, double /* integer: Nat */ count)` -/
-def RedisClient.hrandfieldWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) : Async (Array String) :=
-  self.val.callMethodAwait "hrandfield" (Support.args #[toJS key, toJS count]) (Array String)
+@[macro_inline] def RedisClient.hrandfieldWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.hrandfieldWithCount" do
+  self.val.callMethodAwait "hrandfield" (Internal.args #[toJS key, toJS count]) (Array String)
 
 /-- `hrandfield(key: RedisClient.KeyLike, count: number, withValues: 'WITHVALUES'): Promise<[string, string][]>`: `Promise<sequence<sequence<DOMString>>> hrandfield(RedisClientKeyLike key, double /* integer: Nat */ count, RedisClientHrandfieldWithvaluesWithValues withValues)` -/
-def RedisClient.hrandfieldWithvalues (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) (withValues : RedisClientHrandfieldWithvaluesWithValues) : Async (Array (Array String)) :=
-  self.val.callMethodAwait "hrandfield" (Support.args #[toJS key, toJS count, toJS withValues]) (Array (Array String))
+@[macro_inline] def RedisClient.hrandfieldWithvalues (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) (withValues : RedisClientHrandfieldWithvaluesWithValues) : Async (Array (Array String)) := Internal.api "Lasm.JS.Bun.RedisClient.hrandfieldWithvalues" do
+  self.val.callMethodAwait "hrandfield" (Internal.args #[toJS key, toJS count, toJS withValues]) (Array (Array String))
 
 /-- `hscan(key: RedisClient.KeyLike, cursor: number | string): Promise<[string, string[]]>`: `Promise<sequence<any>> hscan(RedisClientKeyLike key, DoubleOrDOMString cursor)` -/
-def RedisClient.hscan (self : RedisClient) (key : RedisClientKeyLike) (cursor : DoubleOrDOMString) : Async (Array Data) :=
-  self.val.callMethodAwait "hscan" (Support.args #[toJS key, toJS cursor]) (Array Data)
+@[macro_inline] def RedisClient.hscan (self : RedisClient) (key : RedisClientKeyLike) (cursor : DoubleOrDOMString) : Async (Array Data) := Internal.api "Lasm.JS.Bun.RedisClient.hscan" do
+  self.val.callMethodAwait "hscan" (Internal.args #[toJS key, toJS cursor]) (Array Data)
 
 /-- `hscan(key: RedisClient.KeyLike, cursor: number | string, match: 'MATCH', pattern: string): Promise<[string, string[]]>`: `Promise<sequence<any>> hscan(RedisClientKeyLike key, DoubleOrDOMString cursor, RedisClientHscanMatchMatch match, DOMString pattern)` -/
-def RedisClient.hscanMatch (self : RedisClient) (key : RedisClientKeyLike) (cursor : DoubleOrDOMString) («match» : RedisClientHscanMatchMatch) (pattern : String) : Async (Array Data) :=
-  self.val.callMethodAwait "hscan" (Support.args #[toJS key, toJS cursor, toJS «match», toJS pattern]) (Array Data)
+@[macro_inline] def RedisClient.hscanMatch (self : RedisClient) (key : RedisClientKeyLike) (cursor : DoubleOrDOMString) («match» : RedisClientHscanMatchMatch) (pattern : String) : Async (Array Data) := Internal.api "Lasm.JS.Bun.RedisClient.hscanMatch" do
+  self.val.callMethodAwait "hscan" (Internal.args #[toJS key, toJS cursor, toJS «match», toJS pattern]) (Array Data)
 
 /-- `hscan(key: RedisClient.KeyLike, cursor: number | string, count: 'COUNT', limit: number): Promise<[string, string[]]>`: `Promise<sequence<any>> hscan(RedisClientKeyLike key, DoubleOrDOMString cursor, RedisClientHscanWithCountCount count, double /* integer: Nat */ limit)` -/
-def RedisClient.hscanWithCount (self : RedisClient) (key : RedisClientKeyLike) (cursor : DoubleOrDOMString) (count : RedisClientHscanWithCountCount) (limit : Nat) : Async (Array Data) :=
-  self.val.callMethodAwait "hscan" (Support.args #[toJS key, toJS cursor, toJS count, toJS limit]) (Array Data)
+@[macro_inline] def RedisClient.hscanWithCount (self : RedisClient) (key : RedisClientKeyLike) (cursor : DoubleOrDOMString) (count : RedisClientHscanWithCountCount) (limit : Nat) : Async (Array Data) := Internal.api "Lasm.JS.Bun.RedisClient.hscanWithCount" do
+  self.val.callMethodAwait "hscan" (Internal.args #[toJS key, toJS cursor, toJS count, toJS limit]) (Array Data)
 
 /-- `hscan(key: RedisClient.KeyLike, cursor: number | string, match: 'MATCH', pattern: string, count: 'COUNT', limit: number): Promise<[string, string[]]>`: `Promise<sequence<any>> hscan(RedisClientKeyLike key, DoubleOrDOMString cursor, RedisClientHscanWithMatchMatch match, DOMString pattern, RedisClientHscanWithMatchCount count, double /* integer: Nat */ limit)` -/
-def RedisClient.hscanWithMatch (self : RedisClient) (key : RedisClientKeyLike) (cursor : DoubleOrDOMString) («match» : RedisClientHscanWithMatchMatch) (pattern : String) (count : RedisClientHscanWithMatchCount) (limit : Nat) : Async (Array Data) :=
-  self.val.callMethodAwait "hscan" (Support.args #[toJS key, toJS cursor, toJS «match», toJS pattern, toJS count, toJS limit]) (Array Data)
+@[macro_inline] def RedisClient.hscanWithMatch (self : RedisClient) (key : RedisClientKeyLike) (cursor : DoubleOrDOMString) («match» : RedisClientHscanWithMatchMatch) (pattern : String) (count : RedisClientHscanWithMatchCount) (limit : Nat) : Async (Array Data) := Internal.api "Lasm.JS.Bun.RedisClient.hscanWithMatch" do
+  self.val.callMethodAwait "hscan" (Internal.args #[toJS key, toJS cursor, toJS «match», toJS pattern, toJS count, toJS limit]) (Array Data)
 
 /-- `sismember(key: RedisClient.KeyLike, member: string): Promise<boolean>`: `Promise<boolean> sismember(RedisClientKeyLike key, DOMString member)` -/
-def RedisClient.sismember (self : RedisClient) (key : RedisClientKeyLike) (member : String) : Async Bool :=
-  self.val.callMethodAwait "sismember" (Support.args #[toJS key, toJS member]) Bool
+@[macro_inline] def RedisClient.sismember (self : RedisClient) (key : RedisClientKeyLike) (member : String) : Async Bool := Internal.api "Lasm.JS.Bun.RedisClient.sismember" do
+  self.val.callMethodAwait "sismember" (Internal.args #[toJS key, toJS member]) Bool
 
 /-- `sadd(key: RedisClient.KeyLike, ...members: string[]): Promise<number>`: `Promise<double> sadd(RedisClientKeyLike key, DOMString... members)` -/
-def RedisClient.sadd (self : RedisClient) (key : RedisClientKeyLike) (members : Array String := #[]) : Async Float :=
-  self.val.callMethodAwait "sadd" (Support.argsWith #[toJS key] (members.map toJS)) Float
+@[macro_inline] def RedisClient.sadd (self : RedisClient) (key : RedisClientKeyLike) (members : Array String := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.sadd" do
+  self.val.callMethodAwait "sadd" (Internal.argsWith #[toJS key] (members.map toJS)) Float
 
 /-- `srem(key: RedisClient.KeyLike, ...members: string[]): Promise<number>`: `Promise<double> srem(RedisClientKeyLike key, DOMString... members)` -/
-def RedisClient.srem (self : RedisClient) (key : RedisClientKeyLike) (members : Array String := #[]) : Async Float :=
-  self.val.callMethodAwait "srem" (Support.argsWith #[toJS key] (members.map toJS)) Float
+@[macro_inline] def RedisClient.srem (self : RedisClient) (key : RedisClientKeyLike) (members : Array String := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.srem" do
+  self.val.callMethodAwait "srem" (Internal.argsWith #[toJS key] (members.map toJS)) Float
 
 /-- `smove(source: RedisClient.KeyLike, destination: RedisClient.KeyLike, member: string): Promise<boolean>`: `Promise<boolean> smove(RedisClientKeyLike source, RedisClientKeyLike destination, DOMString member)` -/
-def RedisClient.smove (self : RedisClient) (source : RedisClientKeyLike) (destination : RedisClientKeyLike) (member : String) : Async Bool :=
-  self.val.callMethodAwait "smove" (Support.args #[toJS source, toJS destination, toJS member]) Bool
+@[macro_inline] def RedisClient.smove (self : RedisClient) (source : RedisClientKeyLike) (destination : RedisClientKeyLike) (member : String) : Async Bool := Internal.api "Lasm.JS.Bun.RedisClient.smove" do
+  self.val.callMethodAwait "smove" (Internal.args #[toJS source, toJS destination, toJS member]) Bool
 
 /-- `smembers(key: RedisClient.KeyLike): Promise<string[]>`: `Promise<sequence<DOMString>> smembers(RedisClientKeyLike key)` -/
-def RedisClient.smembers (self : RedisClient) (key : RedisClientKeyLike) : Async (Array String) :=
-  self.val.callMethodAwait "smembers" (Support.args #[toJS key]) (Array String)
+@[macro_inline] def RedisClient.smembers (self : RedisClient) (key : RedisClientKeyLike) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.smembers" do
+  self.val.callMethodAwait "smembers" (Internal.args #[toJS key]) (Array String)
 
 /-- `srandmember(key: RedisClient.KeyLike): Promise<string | null>`: `Promise<DOMString?> srandmember(RedisClientKeyLike key)` -/
-def RedisClient.srandmember (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) :=
-  self.val.callMethodAwait "srandmember" (Support.args #[toJS key]) (Option String)
+@[macro_inline] def RedisClient.srandmember (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.srandmember" do
+  self.val.callMethodAwait "srandmember" (Internal.args #[toJS key]) (Option String)
 
 /-- `srandmember(key: RedisClient.KeyLike, count: number): Promise<string[] | null>`: `Promise<sequence<DOMString>?> srandmember(RedisClientKeyLike key, double /* integer: Nat */ count)` -/
-def RedisClient.srandmemberWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) : Async (Option (Array String)) :=
-  self.val.callMethodAwait "srandmember" (Support.args #[toJS key, toJS count]) (Option (Array String))
+@[macro_inline] def RedisClient.srandmemberWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) : Async (Option (Array String)) := Internal.api "Lasm.JS.Bun.RedisClient.srandmemberWithCount" do
+  self.val.callMethodAwait "srandmember" (Internal.args #[toJS key, toJS count]) (Option (Array String))
 
 /-- `spop(key: RedisClient.KeyLike): Promise<string | null>`: `Promise<DOMString?> spop(RedisClientKeyLike key)` -/
-def RedisClient.spop (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) :=
-  self.val.callMethodAwait "spop" (Support.args #[toJS key]) (Option String)
+@[macro_inline] def RedisClient.spop (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.spop" do
+  self.val.callMethodAwait "spop" (Internal.args #[toJS key]) (Option String)
 
 /-- `spop(key: RedisClient.KeyLike, count: number): Promise<string[] | null>`: `Promise<sequence<DOMString>?> spop(RedisClientKeyLike key, double /* integer: Nat */ count)` -/
-def RedisClient.spopWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) : Async (Option (Array String)) :=
-  self.val.callMethodAwait "spop" (Support.args #[toJS key, toJS count]) (Option (Array String))
+@[macro_inline] def RedisClient.spopWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) : Async (Option (Array String)) := Internal.api "Lasm.JS.Bun.RedisClient.spopWithCount" do
+  self.val.callMethodAwait "spop" (Internal.args #[toJS key, toJS count]) (Option (Array String))
 
 /-- `spublish(channel: RedisClient.KeyLike, message: string): Promise<number>`: `Promise<double> spublish(RedisClientKeyLike channel, DOMString message)` -/
-def RedisClient.spublish (self : RedisClient) (channel : RedisClientKeyLike) (message : String) : Async Float :=
-  self.val.callMethodAwait "spublish" (Support.args #[toJS channel, toJS message]) Float
+@[macro_inline] def RedisClient.spublish (self : RedisClient) (channel : RedisClientKeyLike) (message : String) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.spublish" do
+  self.val.callMethodAwait "spublish" (Internal.args #[toJS channel, toJS message]) Float
 
 /-- `sdiffstore(destination: RedisClient.KeyLike, key: RedisClient.KeyLike, ...keys: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> sdiffstore(RedisClientKeyLike destination, RedisClientKeyLike key, RedisClientKeyLike... keys)` -/
-def RedisClient.sdiffstore (self : RedisClient) (destination : RedisClientKeyLike) (key : RedisClientKeyLike) (keys : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "sdiffstore" (Support.argsWith #[toJS destination, toJS key] (keys.map toJS)) Float
+@[macro_inline] def RedisClient.sdiffstore (self : RedisClient) (destination : RedisClientKeyLike) (key : RedisClientKeyLike) (keys : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.sdiffstore" do
+  self.val.callMethodAwait "sdiffstore" (Internal.argsWith #[toJS destination, toJS key] (keys.map toJS)) Float
 
 /-- `smismember(key: RedisClient.KeyLike, member: RedisClient.KeyLike, ...members: RedisClient.KeyLike[]): Promise<number[]>`: `Promise<sequence<double>> smismember(RedisClientKeyLike key, RedisClientKeyLike member, RedisClientKeyLike... members)` -/
-def RedisClient.smismember (self : RedisClient) (key : RedisClientKeyLike) (member : RedisClientKeyLike) (members : Array RedisClientKeyLike := #[]) : Async (Array Float) :=
-  self.val.callMethodAwait "smismember" (Support.argsWith #[toJS key, toJS member] (members.map toJS)) (Array Float)
+@[macro_inline] def RedisClient.smismember (self : RedisClient) (key : RedisClientKeyLike) (member : RedisClientKeyLike) (members : Array RedisClientKeyLike := #[]) : Async (Array Float) := Internal.api "Lasm.JS.Bun.RedisClient.smismember" do
+  self.val.callMethodAwait "smismember" (Internal.argsWith #[toJS key, toJS member] (members.map toJS)) (Array Float)
 
 /-- `sscan(key: RedisClient.KeyLike, cursor: number | string, ...args: (string | number)[]): Promise<[string, string[]]>`: `Promise<sequence<any>> sscan(RedisClientKeyLike key, DoubleOrDOMString cursor, DOMStringOrDouble... args)` -/
-def RedisClient.sscan (self : RedisClient) (key : RedisClientKeyLike) (cursor : DoubleOrDOMString) (args : Array DOMStringOrDouble := #[]) : Async (Array Data) :=
-  self.val.callMethodAwait "sscan" (Support.argsWith #[toJS key, toJS cursor] (args.map toJS)) (Array Data)
+@[macro_inline] def RedisClient.sscan (self : RedisClient) (key : RedisClientKeyLike) (cursor : DoubleOrDOMString) (args : Array DOMStringOrDouble := #[]) : Async (Array Data) := Internal.api "Lasm.JS.Bun.RedisClient.sscan" do
+  self.val.callMethodAwait "sscan" (Internal.argsWith #[toJS key, toJS cursor] (args.map toJS)) (Array Data)
 
 /-- `hincrby(key: RedisClient.KeyLike, field: string, increment: string | number): Promise<number>`: `Promise<double> hincrby(RedisClientKeyLike key, DOMString field, DOMStringOrDouble increment)` -/
-def RedisClient.hincrby (self : RedisClient) (key : RedisClientKeyLike) (field : String) (increment : DOMStringOrDouble) : Async Float :=
-  self.val.callMethodAwait "hincrby" (Support.args #[toJS key, toJS field, toJS increment]) Float
+@[macro_inline] def RedisClient.hincrby (self : RedisClient) (key : RedisClientKeyLike) (field : String) (increment : DOMStringOrDouble) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.hincrby" do
+  self.val.callMethodAwait "hincrby" (Internal.args #[toJS key, toJS field, toJS increment]) Float
 
 /-- `hincrbyfloat(key: RedisClient.KeyLike, field: string, increment: string | number): Promise<string>`: `Promise<DOMString> hincrbyfloat(RedisClientKeyLike key, DOMString field, DOMStringOrDouble increment)` -/
-def RedisClient.hincrbyfloat (self : RedisClient) (key : RedisClientKeyLike) (field : String) (increment : DOMStringOrDouble) : Async String :=
-  self.val.callMethodAwait "hincrbyfloat" (Support.args #[toJS key, toJS field, toJS increment]) String
+@[macro_inline] def RedisClient.hincrbyfloat (self : RedisClient) (key : RedisClientKeyLike) (field : String) (increment : DOMStringOrDouble) : Async String := Internal.api "Lasm.JS.Bun.RedisClient.hincrbyfloat" do
+  self.val.callMethodAwait "hincrbyfloat" (Internal.args #[toJS key, toJS field, toJS increment]) String
 
 /-- `hgetall(key: RedisClient.KeyLike): Promise<Record<string, string>>`: `Promise<record<DOMString, DOMString>> hgetall(RedisClientKeyLike key)` -/
-def RedisClient.hgetall (self : RedisClient) (key : RedisClientKeyLike) : Async (Record String) :=
-  self.val.callMethodAwait "hgetall" (Support.args #[toJS key]) (Record String)
+@[macro_inline] def RedisClient.hgetall (self : RedisClient) (key : RedisClientKeyLike) : Async (Record String) := Internal.api "Lasm.JS.Bun.RedisClient.hgetall" do
+  self.val.callMethodAwait "hgetall" (Internal.args #[toJS key]) (Record String)
 
 /-- `hkeys(key: RedisClient.KeyLike): Promise<string[]>`: `Promise<sequence<DOMString>> hkeys(RedisClientKeyLike key)` -/
-def RedisClient.hkeys (self : RedisClient) (key : RedisClientKeyLike) : Async (Array String) :=
-  self.val.callMethodAwait "hkeys" (Support.args #[toJS key]) (Array String)
+@[macro_inline] def RedisClient.hkeys (self : RedisClient) (key : RedisClientKeyLike) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.hkeys" do
+  self.val.callMethodAwait "hkeys" (Internal.args #[toJS key]) (Array String)
 
 /-- `hlen(key: RedisClient.KeyLike): Promise<number>`: `Promise<double> hlen(RedisClientKeyLike key)` -/
-def RedisClient.hlen (self : RedisClient) (key : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "hlen" (Support.args #[toJS key]) Float
+@[macro_inline] def RedisClient.hlen (self : RedisClient) (key : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.hlen" do
+  self.val.callMethodAwait "hlen" (Internal.args #[toJS key]) Float
 
 /-- `hstrlen(key: RedisClient.KeyLike, field: string): Promise<number>`: `Promise<double> hstrlen(RedisClientKeyLike key, DOMString field)` -/
-def RedisClient.hstrlen (self : RedisClient) (key : RedisClientKeyLike) (field : String) : Async Float :=
-  self.val.callMethodAwait "hstrlen" (Support.args #[toJS key, toJS field]) Float
+@[macro_inline] def RedisClient.hstrlen (self : RedisClient) (key : RedisClientKeyLike) (field : String) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.hstrlen" do
+  self.val.callMethodAwait "hstrlen" (Internal.args #[toJS key, toJS field]) Float
 
 /-- `hvals(key: RedisClient.KeyLike): Promise<string[]>`: `Promise<sequence<DOMString>> hvals(RedisClientKeyLike key)` -/
-def RedisClient.hvals (self : RedisClient) (key : RedisClientKeyLike) : Async (Array String) :=
-  self.val.callMethodAwait "hvals" (Support.args #[toJS key]) (Array String)
+@[macro_inline] def RedisClient.hvals (self : RedisClient) (key : RedisClientKeyLike) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.hvals" do
+  self.val.callMethodAwait "hvals" (Internal.args #[toJS key]) (Array String)
 
 /-- `keys(pattern: string): Promise<string[]>`: `Promise<sequence<DOMString>> keys(DOMString pattern)` -/
-def RedisClient.keys (self : RedisClient) (pattern : String) : Async (Array String) :=
-  self.val.callMethodAwait "keys" (Support.args #[toJS pattern]) (Array String)
+@[macro_inline] def RedisClient.keys (self : RedisClient) (pattern : String) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.keys" do
+  self.val.callMethodAwait "keys" (Internal.args #[toJS pattern]) (Array String)
 
 /-- `blpop(...args: (RedisClient.KeyLike | number)[]): Promise<[string, string] | null>`: `Promise<sequence<DOMString>?> blpop(RedisClientKeyLikeOrDouble... args)` -/
-def RedisClient.blpop (self : RedisClient) (args : Array RedisClientKeyLikeOrDouble := #[]) : Async (Option (Array String)) :=
-  self.val.callMethodAwait "blpop" (Support.argsWith #[] (args.map toJS)) (Option (Array String))
+@[macro_inline] def RedisClient.blpop (self : RedisClient) (args : Array RedisClientKeyLikeOrDouble := #[]) : Async (Option (Array String)) := Internal.api "Lasm.JS.Bun.RedisClient.blpop" do
+  self.val.callMethodAwait "blpop" (Internal.argsWith #[] (args.map toJS)) (Option (Array String))
 
 /-- `brpop(...args: (RedisClient.KeyLike | number)[]): Promise<[string, string] | null>`: `Promise<sequence<DOMString>?> brpop(RedisClientKeyLikeOrDouble... args)` -/
-def RedisClient.brpop (self : RedisClient) (args : Array RedisClientKeyLikeOrDouble := #[]) : Async (Option (Array String)) :=
-  self.val.callMethodAwait "brpop" (Support.argsWith #[] (args.map toJS)) (Option (Array String))
+@[macro_inline] def RedisClient.brpop (self : RedisClient) (args : Array RedisClientKeyLikeOrDouble := #[]) : Async (Option (Array String)) := Internal.api "Lasm.JS.Bun.RedisClient.brpop" do
+  self.val.callMethodAwait "brpop" (Internal.argsWith #[] (args.map toJS)) (Option (Array String))
 
 /-- `blmove(source: RedisClient.KeyLike, destination: RedisClient.KeyLike, from: 'LEFT' | 'RIGHT', to: 'LEFT' | 'RIGHT', timeout: number): Promise<string | null>`: `Promise<DOMString?> blmove(RedisClientKeyLike source, RedisClientKeyLike destination, RedisClientBlmoveFrom from, RedisClientBlmoveTo to, double /* integer: Nat */ timeout)` -/
-def RedisClient.blmove (self : RedisClient) (source : RedisClientKeyLike) (destination : RedisClientKeyLike) («from» : RedisClientBlmoveFrom) (to : RedisClientBlmoveTo) (timeout : Nat) : Async (Option String) :=
-  self.val.callMethodAwait "blmove" (Support.args #[toJS source, toJS destination, toJS «from», toJS to, toJS timeout]) (Option String)
+@[macro_inline] def RedisClient.blmove (self : RedisClient) (source : RedisClientKeyLike) (destination : RedisClientKeyLike) («from» : RedisClientBlmoveFrom) (to : RedisClientBlmoveTo) (timeout : Nat) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.blmove" do
+  self.val.callMethodAwait "blmove" (Internal.args #[toJS source, toJS destination, toJS «from», toJS to, toJS timeout]) (Option String)
 
 /-- `blmpop(timeout: number, numkeys: number, ...args: (string | number)[]): Promise<[string, string[]] | null>`: `Promise<sequence<any>?> blmpop(double /* integer: Nat */ timeout, double numkeys, DOMStringOrDouble... args)` -/
-def RedisClient.blmpop (self : RedisClient) (timeout : Nat) (numkeys : Float) (args : Array DOMStringOrDouble := #[]) : Async (Option (Array Data)) :=
-  self.val.callMethodAwait "blmpop" (Support.argsWith #[toJS timeout, toJS numkeys] (args.map toJS)) (Option (Array Data))
+@[macro_inline] def RedisClient.blmpop (self : RedisClient) (timeout : Nat) (numkeys : Float) (args : Array DOMStringOrDouble := #[]) : Async (Option (Array Data)) := Internal.api "Lasm.JS.Bun.RedisClient.blmpop" do
+  self.val.callMethodAwait "blmpop" (Internal.argsWith #[toJS timeout, toJS numkeys] (args.map toJS)) (Option (Array Data))
 
 /-- `brpoplpush(source: RedisClient.KeyLike, destination: RedisClient.KeyLike, timeout: number): Promise<string | null>`: `Promise<DOMString?> brpoplpush(RedisClientKeyLike source, RedisClientKeyLike destination, double /* integer: Nat */ timeout)` -/
-def RedisClient.brpoplpush (self : RedisClient) (source : RedisClientKeyLike) (destination : RedisClientKeyLike) (timeout : Nat) : Async (Option String) :=
-  self.val.callMethodAwait "brpoplpush" (Support.args #[toJS source, toJS destination, toJS timeout]) (Option String)
+@[macro_inline] def RedisClient.brpoplpush (self : RedisClient) (source : RedisClientKeyLike) (destination : RedisClientKeyLike) (timeout : Nat) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.brpoplpush" do
+  self.val.callMethodAwait "brpoplpush" (Internal.args #[toJS source, toJS destination, toJS timeout]) (Option String)
 
 /-- `lindex(key: RedisClient.KeyLike, index: number): Promise<string | null>`: `Promise<DOMString?> lindex(RedisClientKeyLike key, double index)` -/
-def RedisClient.lindex (self : RedisClient) (key : RedisClientKeyLike) (index : Float) : Async (Option String) :=
-  self.val.callMethodAwait "lindex" (Support.args #[toJS key, toJS index]) (Option String)
+@[macro_inline] def RedisClient.lindex (self : RedisClient) (key : RedisClientKeyLike) (index : Float) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.lindex" do
+  self.val.callMethodAwait "lindex" (Internal.args #[toJS key, toJS index]) (Option String)
 
 /-- `llen(key: RedisClient.KeyLike): Promise<number>`: `Promise<double> llen(RedisClientKeyLike key)` -/
-def RedisClient.llen (self : RedisClient) (key : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "llen" (Support.args #[toJS key]) Float
+@[macro_inline] def RedisClient.llen (self : RedisClient) (key : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.llen" do
+  self.val.callMethodAwait "llen" (Internal.args #[toJS key]) Float
 
 /-- `lmove(source: RedisClient.KeyLike, destination: RedisClient.KeyLike, from: 'LEFT' | 'RIGHT', to: 'LEFT' | 'RIGHT'): Promise<string | null>`: `Promise<DOMString?> lmove(RedisClientKeyLike source, RedisClientKeyLike destination, RedisClientLmoveFrom from, RedisClientLmoveTo to)` -/
-def RedisClient.lmove (self : RedisClient) (source : RedisClientKeyLike) (destination : RedisClientKeyLike) («from» : RedisClientLmoveFrom) (to : RedisClientLmoveTo) : Async (Option String) :=
-  self.val.callMethodAwait "lmove" (Support.args #[toJS source, toJS destination, toJS «from», toJS to]) (Option String)
+@[macro_inline] def RedisClient.lmove (self : RedisClient) (source : RedisClientKeyLike) (destination : RedisClientKeyLike) («from» : RedisClientLmoveFrom) (to : RedisClientLmoveTo) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.lmove" do
+  self.val.callMethodAwait "lmove" (Internal.args #[toJS source, toJS destination, toJS «from», toJS to]) (Option String)
 
 /-- `lpop(key: RedisClient.KeyLike): Promise<string | null>`: `Promise<DOMString?> lpop(RedisClientKeyLike key)` -/
-def RedisClient.lpop (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) :=
-  self.val.callMethodAwait "lpop" (Support.args #[toJS key]) (Option String)
+@[macro_inline] def RedisClient.lpop (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.lpop" do
+  self.val.callMethodAwait "lpop" (Internal.args #[toJS key]) (Option String)
 
 /-- `lpop(key: RedisClient.KeyLike, count: number): Promise<string[] | null>`: `Promise<sequence<DOMString>?> lpop(RedisClientKeyLike key, double /* integer: Nat */ count)` -/
-def RedisClient.lpopWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) : Async (Option (Array String)) :=
-  self.val.callMethodAwait "lpop" (Support.args #[toJS key, toJS count]) (Option (Array String))
+@[macro_inline] def RedisClient.lpopWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) : Async (Option (Array String)) := Internal.api "Lasm.JS.Bun.RedisClient.lpopWithCount" do
+  self.val.callMethodAwait "lpop" (Internal.args #[toJS key, toJS count]) (Option (Array String))
 
 /-- `lpos(key: RedisClient.KeyLike, element: RedisClient.KeyLike, ...options: (string | number)[]): Promise<number | number[] | null>`: `Promise<DoubleOrSequenceOfDouble?> lpos(RedisClientKeyLike key, RedisClientKeyLike element, DOMStringOrDouble... options)` -/
-def RedisClient.lpos (self : RedisClient) (key : RedisClientKeyLike) (element : RedisClientKeyLike) (options : Array DOMStringOrDouble := #[]) : Async (Option DoubleOrSequenceOfDouble) :=
-  self.val.callMethodAwait "lpos" (Support.argsWith #[toJS key, toJS element] (options.map toJS)) (Option DoubleOrSequenceOfDouble)
+@[macro_inline] def RedisClient.lpos (self : RedisClient) (key : RedisClientKeyLike) (element : RedisClientKeyLike) (options : Array DOMStringOrDouble := #[]) : Async (Option DoubleOrSequenceOfDouble) := Internal.api "Lasm.JS.Bun.RedisClient.lpos" do
+  self.val.callMethodAwait "lpos" (Internal.argsWith #[toJS key, toJS element] (options.map toJS)) (Option DoubleOrSequenceOfDouble)
 
 /-- `lmpop(numkeys: number, ...args: (string | number)[]): Promise<[string, string[]] | null>`: `Promise<sequence<any>?> lmpop(double numkeys, DOMStringOrDouble... args)` -/
-def RedisClient.lmpop (self : RedisClient) (numkeys : Float) (args : Array DOMStringOrDouble := #[]) : Async (Option (Array Data)) :=
-  self.val.callMethodAwait "lmpop" (Support.argsWith #[toJS numkeys] (args.map toJS)) (Option (Array Data))
+@[macro_inline] def RedisClient.lmpop (self : RedisClient) (numkeys : Float) (args : Array DOMStringOrDouble := #[]) : Async (Option (Array Data)) := Internal.api "Lasm.JS.Bun.RedisClient.lmpop" do
+  self.val.callMethodAwait "lmpop" (Internal.argsWith #[toJS numkeys] (args.map toJS)) (Option (Array Data))
 
 /-- `lrange(key: RedisClient.KeyLike, start: number, stop: number): Promise<string[]>`: `Promise<sequence<DOMString>> lrange(RedisClientKeyLike key, double start, double stop)` -/
-def RedisClient.lrange (self : RedisClient) (key : RedisClientKeyLike) (start : Float) (stop : Float) : Async (Array String) :=
-  self.val.callMethodAwait "lrange" (Support.args #[toJS key, toJS start, toJS stop]) (Array String)
+@[macro_inline] def RedisClient.lrange (self : RedisClient) (key : RedisClientKeyLike) (start : Float) (stop : Float) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.lrange" do
+  self.val.callMethodAwait "lrange" (Internal.args #[toJS key, toJS start, toJS stop]) (Array String)
 
 /-- `lset(key: RedisClient.KeyLike, index: number, element: RedisClient.KeyLike): Promise<string>`: `Promise<DOMString> lset(RedisClientKeyLike key, double index, RedisClientKeyLike element)` -/
-def RedisClient.lset (self : RedisClient) (key : RedisClientKeyLike) (index : Float) (element : RedisClientKeyLike) : Async String :=
-  self.val.callMethodAwait "lset" (Support.args #[toJS key, toJS index, toJS element]) String
+@[macro_inline] def RedisClient.lset (self : RedisClient) (key : RedisClientKeyLike) (index : Float) (element : RedisClientKeyLike) : Async String := Internal.api "Lasm.JS.Bun.RedisClient.lset" do
+  self.val.callMethodAwait "lset" (Internal.args #[toJS key, toJS index, toJS element]) String
 
 /-- `persist(key: RedisClient.KeyLike): Promise<number>`: `Promise<double> persist(RedisClientKeyLike key)` -/
-def RedisClient.persist (self : RedisClient) (key : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "persist" (Support.args #[toJS key]) Float
+@[macro_inline] def RedisClient.persist (self : RedisClient) (key : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.persist" do
+  self.val.callMethodAwait "persist" (Internal.args #[toJS key]) Float
 
 /-- `pexpireat(key: RedisClient.KeyLike, millisecondsTimestamp: number): Promise<number>`: `Promise<double> pexpireat(RedisClientKeyLike key, double millisecondsTimestamp)` -/
-def RedisClient.pexpireat (self : RedisClient) (key : RedisClientKeyLike) (millisecondsTimestamp : Float) : Async Float :=
-  self.val.callMethodAwait "pexpireat" (Support.args #[toJS key, toJS millisecondsTimestamp]) Float
+@[macro_inline] def RedisClient.pexpireat (self : RedisClient) (key : RedisClientKeyLike) (millisecondsTimestamp : Float) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.pexpireat" do
+  self.val.callMethodAwait "pexpireat" (Internal.args #[toJS key, toJS millisecondsTimestamp]) Float
 
 /-- `pexpiretime(key: RedisClient.KeyLike): Promise<number>`: `Promise<double> pexpiretime(RedisClientKeyLike key)` -/
-def RedisClient.pexpiretime (self : RedisClient) (key : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "pexpiretime" (Support.args #[toJS key]) Float
+@[macro_inline] def RedisClient.pexpiretime (self : RedisClient) (key : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.pexpiretime" do
+  self.val.callMethodAwait "pexpiretime" (Internal.args #[toJS key]) Float
 
 /-- `pttl(key: RedisClient.KeyLike): Promise<number>`: `Promise<double> pttl(RedisClientKeyLike key)` -/
-def RedisClient.pttl (self : RedisClient) (key : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "pttl" (Support.args #[toJS key]) Float
+@[macro_inline] def RedisClient.pttl (self : RedisClient) (key : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.pttl" do
+  self.val.callMethodAwait "pttl" (Internal.args #[toJS key]) Float
 
 /-- `randomkey(): Promise<string | null>`: `Promise<DOMString?> randomkey()` -/
-def RedisClient.randomkey (self : RedisClient) : Async (Option String) :=
-  self.val.callMethodAwait "randomkey" (Support.args #[]) (Option String)
+@[macro_inline] def RedisClient.randomkey (self : RedisClient) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.randomkey" do
+  self.val.callMethodAwait "randomkey" (Internal.args #[]) (Option String)
 
 /-- `rpop(key: RedisClient.KeyLike): Promise<string | null>`: `Promise<DOMString?> rpop(RedisClientKeyLike key)` -/
-def RedisClient.rpop (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) :=
-  self.val.callMethodAwait "rpop" (Support.args #[toJS key]) (Option String)
+@[macro_inline] def RedisClient.rpop (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.rpop" do
+  self.val.callMethodAwait "rpop" (Internal.args #[toJS key]) (Option String)
 
 /-- `rpop(key: RedisClient.KeyLike, count: number): Promise<string[]>`: `Promise<sequence<DOMString>> rpop(RedisClientKeyLike key, double /* integer: Nat */ count)` -/
-def RedisClient.rpopWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) : Async (Array String) :=
-  self.val.callMethodAwait "rpop" (Support.args #[toJS key, toJS count]) (Array String)
+@[macro_inline] def RedisClient.rpopWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.rpopWithCount" do
+  self.val.callMethodAwait "rpop" (Internal.args #[toJS key, toJS count]) (Array String)
 
 /-- `rpoplpush(source: RedisClient.KeyLike, destination: RedisClient.KeyLike): Promise<string | null>`: `Promise<DOMString?> rpoplpush(RedisClientKeyLike source, RedisClientKeyLike destination)` -/
-def RedisClient.rpoplpush (self : RedisClient) (source : RedisClientKeyLike) (destination : RedisClientKeyLike) : Async (Option String) :=
-  self.val.callMethodAwait "rpoplpush" (Support.args #[toJS source, toJS destination]) (Option String)
+@[macro_inline] def RedisClient.rpoplpush (self : RedisClient) (source : RedisClientKeyLike) (destination : RedisClientKeyLike) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.rpoplpush" do
+  self.val.callMethodAwait "rpoplpush" (Internal.args #[toJS source, toJS destination]) (Option String)
 
 /-- `scan(cursor: string | number): Promise<[string, string[]]>`: `Promise<sequence<any>> scan(DOMStringOrDouble cursor)` -/
-def RedisClient.scan (self : RedisClient) (cursor : DOMStringOrDouble) : Async (Array Data) :=
-  self.val.callMethodAwait "scan" (Support.args #[toJS cursor]) (Array Data)
+@[macro_inline] def RedisClient.scan (self : RedisClient) (cursor : DOMStringOrDouble) : Async (Array Data) := Internal.api "Lasm.JS.Bun.RedisClient.scan" do
+  self.val.callMethodAwait "scan" (Internal.args #[toJS cursor]) (Array Data)
 
 /-- `scan(cursor: string | number, match: 'MATCH', pattern: string): Promise<[string, string[]]>`: `Promise<sequence<any>> scan(DOMStringOrDouble cursor, RedisClientScanMatchMatch match, DOMString pattern)` -/
-def RedisClient.scanMatch (self : RedisClient) (cursor : DOMStringOrDouble) («match» : RedisClientScanMatchMatch) (pattern : String) : Async (Array Data) :=
-  self.val.callMethodAwait "scan" (Support.args #[toJS cursor, toJS «match», toJS pattern]) (Array Data)
+@[macro_inline] def RedisClient.scanMatch (self : RedisClient) (cursor : DOMStringOrDouble) («match» : RedisClientScanMatchMatch) (pattern : String) : Async (Array Data) := Internal.api "Lasm.JS.Bun.RedisClient.scanMatch" do
+  self.val.callMethodAwait "scan" (Internal.args #[toJS cursor, toJS «match», toJS pattern]) (Array Data)
 
 /-- `scan(cursor: string | number, count: 'COUNT', hint: number): Promise<[string, string[]]>`: `Promise<sequence<any>> scan(DOMStringOrDouble cursor, RedisClientScanWithCountCount count, double hint)` -/
-def RedisClient.scanWithCount (self : RedisClient) (cursor : DOMStringOrDouble) (count : RedisClientScanWithCountCount) (hint : Float) : Async (Array Data) :=
-  self.val.callMethodAwait "scan" (Support.args #[toJS cursor, toJS count, toJS hint]) (Array Data)
+@[macro_inline] def RedisClient.scanWithCount (self : RedisClient) (cursor : DOMStringOrDouble) (count : RedisClientScanWithCountCount) (hint : Float) : Async (Array Data) := Internal.api "Lasm.JS.Bun.RedisClient.scanWithCount" do
+  self.val.callMethodAwait "scan" (Internal.args #[toJS cursor, toJS count, toJS hint]) (Array Data)
 
 /-- `scan(cursor: string | number, match: 'MATCH', pattern: string, count: 'COUNT', hint: number): Promise<[string, string[]]>`: `Promise<sequence<any>> scan(DOMStringOrDouble cursor, RedisClientScanWithMatchMatch match, DOMString pattern, RedisClientScanWithMatchCount count, double hint)` -/
-def RedisClient.scanWithMatch (self : RedisClient) (cursor : DOMStringOrDouble) («match» : RedisClientScanWithMatchMatch) (pattern : String) (count : RedisClientScanWithMatchCount) (hint : Float) : Async (Array Data) :=
-  self.val.callMethodAwait "scan" (Support.args #[toJS cursor, toJS «match», toJS pattern, toJS count, toJS hint]) (Array Data)
+@[macro_inline] def RedisClient.scanWithMatch (self : RedisClient) (cursor : DOMStringOrDouble) («match» : RedisClientScanWithMatchMatch) (pattern : String) (count : RedisClientScanWithMatchCount) (hint : Float) : Async (Array Data) := Internal.api "Lasm.JS.Bun.RedisClient.scanWithMatch" do
+  self.val.callMethodAwait "scan" (Internal.args #[toJS cursor, toJS «match», toJS pattern, toJS count, toJS hint]) (Array Data)
 
 /-- `scan(cursor: string | number, ...options: (string | number)[]): Promise<[string, string[]]>`: `Promise<sequence<any>> scan(DOMStringOrDouble cursor, DOMStringOrDouble... options)` -/
-def RedisClient.scanWithOptions (self : RedisClient) (cursor : DOMStringOrDouble) (options : Array DOMStringOrDouble := #[]) : Async (Array Data) :=
-  self.val.callMethodAwait "scan" (Support.argsWith #[toJS cursor] (options.map toJS)) (Array Data)
+@[macro_inline] def RedisClient.scanWithOptions (self : RedisClient) (cursor : DOMStringOrDouble) (options : Array DOMStringOrDouble := #[]) : Async (Array Data) := Internal.api "Lasm.JS.Bun.RedisClient.scanWithOptions" do
+  self.val.callMethodAwait "scan" (Internal.argsWith #[toJS cursor] (options.map toJS)) (Array Data)
 
 /-- `scard(key: RedisClient.KeyLike): Promise<number>`: `Promise<double> scard(RedisClientKeyLike key)` -/
-def RedisClient.scard (self : RedisClient) (key : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "scard" (Support.args #[toJS key]) Float
+@[macro_inline] def RedisClient.scard (self : RedisClient) (key : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.scard" do
+  self.val.callMethodAwait "scard" (Internal.args #[toJS key]) Float
 
 /-- `sdiff(key: RedisClient.KeyLike, ...keys: RedisClient.KeyLike[]): Promise<string[]>`: `Promise<sequence<DOMString>> sdiff(RedisClientKeyLike key, RedisClientKeyLike... keys)` -/
-def RedisClient.sdiff (self : RedisClient) (key : RedisClientKeyLike) (keys : Array RedisClientKeyLike := #[]) : Async (Array String) :=
-  self.val.callMethodAwait "sdiff" (Support.argsWith #[toJS key] (keys.map toJS)) (Array String)
+@[macro_inline] def RedisClient.sdiff (self : RedisClient) (key : RedisClientKeyLike) (keys : Array RedisClientKeyLike := #[]) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.sdiff" do
+  self.val.callMethodAwait "sdiff" (Internal.argsWith #[toJS key] (keys.map toJS)) (Array String)
 
 /-- `sinter(key: RedisClient.KeyLike, ...keys: RedisClient.KeyLike[]): Promise<string[]>`: `Promise<sequence<DOMString>> sinter(RedisClientKeyLike key, RedisClientKeyLike... keys)` -/
-def RedisClient.sinter (self : RedisClient) (key : RedisClientKeyLike) (keys : Array RedisClientKeyLike := #[]) : Async (Array String) :=
-  self.val.callMethodAwait "sinter" (Support.argsWith #[toJS key] (keys.map toJS)) (Array String)
+@[macro_inline] def RedisClient.sinter (self : RedisClient) (key : RedisClientKeyLike) (keys : Array RedisClientKeyLike := #[]) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.sinter" do
+  self.val.callMethodAwait "sinter" (Internal.argsWith #[toJS key] (keys.map toJS)) (Array String)
 
 /-- `sinterstore(destination: RedisClient.KeyLike, key: RedisClient.KeyLike, ...keys: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> sinterstore(RedisClientKeyLike destination, RedisClientKeyLike key, RedisClientKeyLike... keys)` -/
-def RedisClient.sinterstore (self : RedisClient) (destination : RedisClientKeyLike) (key : RedisClientKeyLike) (keys : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "sinterstore" (Support.argsWith #[toJS destination, toJS key] (keys.map toJS)) Float
+@[macro_inline] def RedisClient.sinterstore (self : RedisClient) (destination : RedisClientKeyLike) (key : RedisClientKeyLike) (keys : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.sinterstore" do
+  self.val.callMethodAwait "sinterstore" (Internal.argsWith #[toJS destination, toJS key] (keys.map toJS)) Float
 
 /-- `sintercard(numkeys: number, key: RedisClient.KeyLike, ...args: (RedisClient.KeyLike | 'LIMIT' | number)[]): Promise<number>`: `Promise<double> sintercard(double numkeys, RedisClientKeyLike key, DOMStringOrRedisClientKeyLikeOrDouble... args)` -/
-def RedisClient.sintercard (self : RedisClient) (numkeys : Float) (key : RedisClientKeyLike) (args : Array DOMStringOrRedisClientKeyLikeOrDouble := #[]) : Async Float :=
-  self.val.callMethodAwait "sintercard" (Support.argsWith #[toJS numkeys, toJS key] (args.map toJS)) Float
+@[macro_inline] def RedisClient.sintercard (self : RedisClient) (numkeys : Float) (key : RedisClientKeyLike) (args : Array DOMStringOrRedisClientKeyLikeOrDouble := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.sintercard" do
+  self.val.callMethodAwait "sintercard" (Internal.argsWith #[toJS numkeys, toJS key] (args.map toJS)) Float
 
 /-- `strlen(key: RedisClient.KeyLike): Promise<number>`: `Promise<double> strlen(RedisClientKeyLike key)` -/
-def RedisClient.strlen (self : RedisClient) (key : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "strlen" (Support.args #[toJS key]) Float
+@[macro_inline] def RedisClient.strlen (self : RedisClient) (key : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.strlen" do
+  self.val.callMethodAwait "strlen" (Internal.args #[toJS key]) Float
 
 /-- `sunion(key: RedisClient.KeyLike, ...keys: RedisClient.KeyLike[]): Promise<string[]>`: `Promise<sequence<DOMString>> sunion(RedisClientKeyLike key, RedisClientKeyLike... keys)` -/
-def RedisClient.sunion (self : RedisClient) (key : RedisClientKeyLike) (keys : Array RedisClientKeyLike := #[]) : Async (Array String) :=
-  self.val.callMethodAwait "sunion" (Support.argsWith #[toJS key] (keys.map toJS)) (Array String)
+@[macro_inline] def RedisClient.sunion (self : RedisClient) (key : RedisClientKeyLike) (keys : Array RedisClientKeyLike := #[]) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.sunion" do
+  self.val.callMethodAwait "sunion" (Internal.argsWith #[toJS key] (keys.map toJS)) (Array String)
 
 /-- `sunionstore(destination: RedisClient.KeyLike, key: RedisClient.KeyLike, ...keys: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> sunionstore(RedisClientKeyLike destination, RedisClientKeyLike key, RedisClientKeyLike... keys)` -/
-def RedisClient.sunionstore (self : RedisClient) (destination : RedisClientKeyLike) (key : RedisClientKeyLike) (keys : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "sunionstore" (Support.argsWith #[toJS destination, toJS key] (keys.map toJS)) Float
+@[macro_inline] def RedisClient.sunionstore (self : RedisClient) (destination : RedisClientKeyLike) (key : RedisClientKeyLike) (keys : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.sunionstore" do
+  self.val.callMethodAwait "sunionstore" (Internal.argsWith #[toJS destination, toJS key] (keys.map toJS)) Float
 
 /-- `type(key: RedisClient.KeyLike): Promise<'none' | 'string' | 'list' | 'set' | 'zset' | 'hash' | 'stream'>`: `Promise<RedisClientType> type(RedisClientKeyLike key)` -/
-def RedisClient.type (self : RedisClient) (key : RedisClientKeyLike) : Async RedisClientType :=
-  self.val.callMethodAwait "type" (Support.args #[toJS key]) RedisClientType
+@[macro_inline] def RedisClient.type (self : RedisClient) (key : RedisClientKeyLike) : Async RedisClientType := Internal.api "Lasm.JS.Bun.RedisClient.type" do
+  self.val.callMethodAwait "type" (Internal.args #[toJS key]) RedisClientType
 
 /-- `zcard(key: RedisClient.KeyLike): Promise<number>`: `Promise<double> zcard(RedisClientKeyLike key)` -/
-def RedisClient.zcard (self : RedisClient) (key : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "zcard" (Support.args #[toJS key]) Float
+@[macro_inline] def RedisClient.zcard (self : RedisClient) (key : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.zcard" do
+  self.val.callMethodAwait "zcard" (Internal.args #[toJS key]) Float
 
 /-- `zcount(key: RedisClient.KeyLike, min: string | number, max: string | number): Promise<number>`: `Promise<double> zcount(RedisClientKeyLike key, DOMStringOrDouble min, DOMStringOrDouble max)` -/
-def RedisClient.zcount (self : RedisClient) (key : RedisClientKeyLike) (min : DOMStringOrDouble) (max : DOMStringOrDouble) : Async Float :=
-  self.val.callMethodAwait "zcount" (Support.args #[toJS key, toJS min, toJS max]) Float
+@[macro_inline] def RedisClient.zcount (self : RedisClient) (key : RedisClientKeyLike) (min : DOMStringOrDouble) (max : DOMStringOrDouble) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.zcount" do
+  self.val.callMethodAwait "zcount" (Internal.args #[toJS key, toJS min, toJS max]) Float
 
 /-- `zlexcount(key: RedisClient.KeyLike, min: string, max: string): Promise<number>`: `Promise<double> zlexcount(RedisClientKeyLike key, DOMString min, DOMString max)` -/
-def RedisClient.zlexcount (self : RedisClient) (key : RedisClientKeyLike) (min : String) (max : String) : Async Float :=
-  self.val.callMethodAwait "zlexcount" (Support.args #[toJS key, toJS min, toJS max]) Float
+@[macro_inline] def RedisClient.zlexcount (self : RedisClient) (key : RedisClientKeyLike) (min : String) (max : String) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.zlexcount" do
+  self.val.callMethodAwait "zlexcount" (Internal.args #[toJS key, toJS min, toJS max]) Float
 
 /-- `zpopmax(key: RedisClient.KeyLike): Promise<[string, number] | []>`: `Promise<sequence<any>> zpopmax(RedisClientKeyLike key)` -/
-def RedisClient.zpopmax (self : RedisClient) (key : RedisClientKeyLike) : Async (Array Data) :=
-  self.val.callMethodAwait "zpopmax" (Support.args #[toJS key]) (Array Data)
+@[macro_inline] def RedisClient.zpopmax (self : RedisClient) (key : RedisClientKeyLike) : Async (Array Data) := Internal.api "Lasm.JS.Bun.RedisClient.zpopmax" do
+  self.val.callMethodAwait "zpopmax" (Internal.args #[toJS key]) (Array Data)
 
 /-- `zpopmax(key: RedisClient.KeyLike, count: number): Promise<Array<[string, number]>>`: `Promise<sequence<sequence<any>>> zpopmax(RedisClientKeyLike key, double /* integer: Nat */ count)` -/
-def RedisClient.zpopmaxWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) : Async (Array (Array Data)) :=
-  self.val.callMethodAwait "zpopmax" (Support.args #[toJS key, toJS count]) (Array (Array Data))
+@[macro_inline] def RedisClient.zpopmaxWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) : Async (Array (Array Data)) := Internal.api "Lasm.JS.Bun.RedisClient.zpopmaxWithCount" do
+  self.val.callMethodAwait "zpopmax" (Internal.args #[toJS key, toJS count]) (Array (Array Data))
 
 /-- `zpopmin(key: RedisClient.KeyLike): Promise<[string, number] | []>`: `Promise<sequence<any>> zpopmin(RedisClientKeyLike key)` -/
-def RedisClient.zpopmin (self : RedisClient) (key : RedisClientKeyLike) : Async (Array Data) :=
-  self.val.callMethodAwait "zpopmin" (Support.args #[toJS key]) (Array Data)
+@[macro_inline] def RedisClient.zpopmin (self : RedisClient) (key : RedisClientKeyLike) : Async (Array Data) := Internal.api "Lasm.JS.Bun.RedisClient.zpopmin" do
+  self.val.callMethodAwait "zpopmin" (Internal.args #[toJS key]) (Array Data)
 
 /-- `zpopmin(key: RedisClient.KeyLike, count: number): Promise<[string, number][]>`: `Promise<sequence<sequence<any>>> zpopmin(RedisClientKeyLike key, double /* integer: Nat */ count)` -/
-def RedisClient.zpopminWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) : Async (Array (Array Data)) :=
-  self.val.callMethodAwait "zpopmin" (Support.args #[toJS key, toJS count]) (Array (Array Data))
+@[macro_inline] def RedisClient.zpopminWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) : Async (Array (Array Data)) := Internal.api "Lasm.JS.Bun.RedisClient.zpopminWithCount" do
+  self.val.callMethodAwait "zpopmin" (Internal.args #[toJS key, toJS count]) (Array (Array Data))
 
 /-- `bzpopmin(...args: (RedisClient.KeyLike | number)[]): Promise<[string, string, number] | null>`: `Promise<sequence<any>?> bzpopmin(RedisClientKeyLikeOrDouble... args)` -/
-def RedisClient.bzpopmin (self : RedisClient) (args : Array RedisClientKeyLikeOrDouble := #[]) : Async (Option (Array Data)) :=
-  self.val.callMethodAwait "bzpopmin" (Support.argsWith #[] (args.map toJS)) (Option (Array Data))
+@[macro_inline] def RedisClient.bzpopmin (self : RedisClient) (args : Array RedisClientKeyLikeOrDouble := #[]) : Async (Option (Array Data)) := Internal.api "Lasm.JS.Bun.RedisClient.bzpopmin" do
+  self.val.callMethodAwait "bzpopmin" (Internal.argsWith #[] (args.map toJS)) (Option (Array Data))
 
 /-- `bzpopmax(...args: (RedisClient.KeyLike | number)[]): Promise<[string, string, number] | null>`: `Promise<sequence<any>?> bzpopmax(RedisClientKeyLikeOrDouble... args)` -/
-def RedisClient.bzpopmax (self : RedisClient) (args : Array RedisClientKeyLikeOrDouble := #[]) : Async (Option (Array Data)) :=
-  self.val.callMethodAwait "bzpopmax" (Support.argsWith #[] (args.map toJS)) (Option (Array Data))
+@[macro_inline] def RedisClient.bzpopmax (self : RedisClient) (args : Array RedisClientKeyLikeOrDouble := #[]) : Async (Option (Array Data)) := Internal.api "Lasm.JS.Bun.RedisClient.bzpopmax" do
+  self.val.callMethodAwait "bzpopmax" (Internal.argsWith #[] (args.map toJS)) (Option (Array Data))
 
 /-- `zrandmember(key: RedisClient.KeyLike): Promise<string | null>`: `Promise<DOMString?> zrandmember(RedisClientKeyLike key)` -/
-def RedisClient.zrandmember (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) :=
-  self.val.callMethodAwait "zrandmember" (Support.args #[toJS key]) (Option String)
+@[macro_inline] def RedisClient.zrandmember (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.zrandmember" do
+  self.val.callMethodAwait "zrandmember" (Internal.args #[toJS key]) (Option String)
 
 /-- `zrandmember(key: RedisClient.KeyLike, count: number): Promise<string[] | null>`: `Promise<sequence<DOMString>?> zrandmember(RedisClientKeyLike key, double /* integer: Nat */ count)` -/
-def RedisClient.zrandmemberWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) : Async (Option (Array String)) :=
-  self.val.callMethodAwait "zrandmember" (Support.args #[toJS key, toJS count]) (Option (Array String))
+@[macro_inline] def RedisClient.zrandmemberWithCount (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) : Async (Option (Array String)) := Internal.api "Lasm.JS.Bun.RedisClient.zrandmemberWithCount" do
+  self.val.callMethodAwait "zrandmember" (Internal.args #[toJS key, toJS count]) (Option (Array String))
 
 /-- `zrandmember(key: RedisClient.KeyLike, count: number, withscores: 'WITHSCORES'): Promise<[string, number][] | null>`: `Promise<sequence<sequence<any>>?> zrandmember(RedisClientKeyLike key, double /* integer: Nat */ count, RedisClientZrandmemberWithscoresWithscores withscores)` -/
-def RedisClient.zrandmemberWithscores (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) (withscores : RedisClientZrandmemberWithscoresWithscores) : Async (Option (Array (Array Data))) :=
-  self.val.callMethodAwait "zrandmember" (Support.args #[toJS key, toJS count, toJS withscores]) (Option (Array (Array Data)))
+@[macro_inline] def RedisClient.zrandmemberWithscores (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) (withscores : RedisClientZrandmemberWithscoresWithscores) : Async (Option (Array (Array Data))) := Internal.api "Lasm.JS.Bun.RedisClient.zrandmemberWithscores" do
+  self.val.callMethodAwait "zrandmember" (Internal.args #[toJS key, toJS count, toJS withscores]) (Option (Array (Array Data)))
 
 /-- `zrange(key: RedisClient.KeyLike, start: string | number, stop: string | number, withscores: 'WITHSCORES'): Promise<[string, number][]>`: `Promise<sequence<sequence<any>>> zrange(RedisClientKeyLike key, DOMStringOrDouble start, DOMStringOrDouble stop, RedisClientZrangeWithscores withscores)` -/
-def RedisClient.zrange (self : RedisClient) (key : RedisClientKeyLike) (start : DOMStringOrDouble) (stop : DOMStringOrDouble) (withscores : RedisClientZrangeWithscores) : Async (Array (Array Data)) :=
-  self.val.callMethodAwait "zrange" (Support.args #[toJS key, toJS start, toJS stop, toJS withscores]) (Array (Array Data))
+@[macro_inline] def RedisClient.zrange (self : RedisClient) (key : RedisClientKeyLike) (start : DOMStringOrDouble) (stop : DOMStringOrDouble) (withscores : RedisClientZrangeWithscores) : Async (Array (Array Data)) := Internal.api "Lasm.JS.Bun.RedisClient.zrange" do
+  self.val.callMethodAwait "zrange" (Internal.args #[toJS key, toJS start, toJS stop, toJS withscores]) (Array (Array Data))
 
 /-- `zrange(key: RedisClient.KeyLike, start: string | number, stop: string | number, byscore: 'BYSCORE'): Promise<string[]>`: `Promise<sequence<DOMString>> zrange(RedisClientKeyLike key, DOMStringOrDouble start, DOMStringOrDouble stop, RedisClientZrangeWithByscoreByscore byscore)` -/
-def RedisClient.zrangeWithByscore (self : RedisClient) (key : RedisClientKeyLike) (start : DOMStringOrDouble) (stop : DOMStringOrDouble) (byscore : RedisClientZrangeWithByscoreByscore) : Async (Array String) :=
-  self.val.callMethodAwait "zrange" (Support.args #[toJS key, toJS start, toJS stop, toJS byscore]) (Array String)
+@[macro_inline] def RedisClient.zrangeWithByscore (self : RedisClient) (key : RedisClientKeyLike) (start : DOMStringOrDouble) (stop : DOMStringOrDouble) (byscore : RedisClientZrangeWithByscoreByscore) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.zrangeWithByscore" do
+  self.val.callMethodAwait "zrange" (Internal.args #[toJS key, toJS start, toJS stop, toJS byscore]) (Array String)
 
 /-- `zrange(key: RedisClient.KeyLike, start: string, stop: string, bylex: 'BYLEX'): Promise<string[]>`: `Promise<sequence<DOMString>> zrange(RedisClientKeyLike key, DOMString start, DOMString stop, RedisClientZrangeWithBylexBylex bylex)` -/
-def RedisClient.zrangeWithBylex (self : RedisClient) (key : RedisClientKeyLike) (start : String) (stop : String) (bylex : RedisClientZrangeWithBylexBylex) : Async (Array String) :=
-  self.val.callMethodAwait "zrange" (Support.args #[toJS key, toJS start, toJS stop, toJS bylex]) (Array String)
+@[macro_inline] def RedisClient.zrangeWithBylex (self : RedisClient) (key : RedisClientKeyLike) (start : String) (stop : String) (bylex : RedisClientZrangeWithBylexBylex) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.zrangeWithBylex" do
+  self.val.callMethodAwait "zrange" (Internal.args #[toJS key, toJS start, toJS stop, toJS bylex]) (Array String)
 
 /-- `zrange(key: RedisClient.KeyLike, start: string | number, stop: string | number, ...options: string[]): Promise<string[]>`: `Promise<sequence<DOMString>> zrange(RedisClientKeyLike key, DOMStringOrDouble start, DOMStringOrDouble stop, DOMString... options)` -/
-def RedisClient.zrangeWithOptions (self : RedisClient) (key : RedisClientKeyLike) (start : DOMStringOrDouble) (stop : DOMStringOrDouble) (options : Array String := #[]) : Async (Array String) :=
-  self.val.callMethodAwait "zrange" (Support.argsWith #[toJS key, toJS start, toJS stop] (options.map toJS)) (Array String)
+@[macro_inline] def RedisClient.zrangeWithOptions (self : RedisClient) (key : RedisClientKeyLike) (start : DOMStringOrDouble) (stop : DOMStringOrDouble) (options : Array String := #[]) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.zrangeWithOptions" do
+  self.val.callMethodAwait "zrange" (Internal.argsWith #[toJS key, toJS start, toJS stop] (options.map toJS)) (Array String)
 
 /-- `zrange(key: RedisClient.KeyLike, start: string | number, stop: string | number): Promise<string[]>`: `Promise<sequence<DOMString>> zrange(RedisClientKeyLike key, DOMStringOrDouble start, DOMStringOrDouble stop)` -/
-def RedisClient.zrange3 (self : RedisClient) (key : RedisClientKeyLike) (start : DOMStringOrDouble) (stop : DOMStringOrDouble) : Async (Array String) :=
-  self.val.callMethodAwait "zrange" (Support.args #[toJS key, toJS start, toJS stop]) (Array String)
+@[macro_inline] def RedisClient.zrange3 (self : RedisClient) (key : RedisClientKeyLike) (start : DOMStringOrDouble) (stop : DOMStringOrDouble) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.zrange3" do
+  self.val.callMethodAwait "zrange" (Internal.args #[toJS key, toJS start, toJS stop]) (Array String)
 
 /-- `zrevrange(key: RedisClient.KeyLike, start: number, stop: number): Promise<string[]>`: `Promise<sequence<DOMString>> zrevrange(RedisClientKeyLike key, double start, double stop)` -/
-def RedisClient.zrevrange (self : RedisClient) (key : RedisClientKeyLike) (start : Float) (stop : Float) : Async (Array String) :=
-  self.val.callMethodAwait "zrevrange" (Support.args #[toJS key, toJS start, toJS stop]) (Array String)
+@[macro_inline] def RedisClient.zrevrange (self : RedisClient) (key : RedisClientKeyLike) (start : Float) (stop : Float) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.zrevrange" do
+  self.val.callMethodAwait "zrevrange" (Internal.args #[toJS key, toJS start, toJS stop]) (Array String)
 
 /-- `zrevrange(key: RedisClient.KeyLike, start: number, stop: number, withscores: 'WITHSCORES'): Promise<[string, number][]>`: `Promise<sequence<sequence<any>>> zrevrange(RedisClientKeyLike key, double start, double stop, RedisClientZrevrangeWithWithscoresWithscores withscores)` -/
-def RedisClient.zrevrangeWithWithscores (self : RedisClient) (key : RedisClientKeyLike) (start : Float) (stop : Float) (withscores : RedisClientZrevrangeWithWithscoresWithscores) : Async (Array (Array Data)) :=
-  self.val.callMethodAwait "zrevrange" (Support.args #[toJS key, toJS start, toJS stop, toJS withscores]) (Array (Array Data))
+@[macro_inline] def RedisClient.zrevrangeWithWithscores (self : RedisClient) (key : RedisClientKeyLike) (start : Float) (stop : Float) (withscores : RedisClientZrevrangeWithWithscoresWithscores) : Async (Array (Array Data)) := Internal.api "Lasm.JS.Bun.RedisClient.zrevrangeWithWithscores" do
+  self.val.callMethodAwait "zrevrange" (Internal.args #[toJS key, toJS start, toJS stop, toJS withscores]) (Array (Array Data))
 
 /-- `zrevrange(key: RedisClient.KeyLike, start: number, stop: number, ...options: string[]): Promise<string[]>`: `Promise<sequence<DOMString>> zrevrange(RedisClientKeyLike key, double start, double stop, DOMString... options)` -/
-def RedisClient.zrevrangeWithOptions (self : RedisClient) (key : RedisClientKeyLike) (start : Float) (stop : Float) (options : Array String := #[]) : Async (Array String) :=
-  self.val.callMethodAwait "zrevrange" (Support.argsWith #[toJS key, toJS start, toJS stop] (options.map toJS)) (Array String)
+@[macro_inline] def RedisClient.zrevrangeWithOptions (self : RedisClient) (key : RedisClientKeyLike) (start : Float) (stop : Float) (options : Array String := #[]) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.zrevrangeWithOptions" do
+  self.val.callMethodAwait "zrevrange" (Internal.argsWith #[toJS key, toJS start, toJS stop] (options.map toJS)) (Array String)
 
 /-- `append(key: RedisClient.KeyLike, value: RedisClient.KeyLike): Promise<number>`: `Promise<double> append(RedisClientKeyLike key, RedisClientKeyLike value)` -/
-def RedisClient.append (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "append" (Support.args #[toJS key, toJS value]) Float
+@[macro_inline] def RedisClient.append (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.append" do
+  self.val.callMethodAwait "append" (Internal.args #[toJS key, toJS value]) Float
 
 /-- `getset(key: RedisClient.KeyLike, value: RedisClient.KeyLike): Promise<string | null>`: `Promise<DOMString?> getset(RedisClientKeyLike key, RedisClientKeyLike value)` -/
-def RedisClient.getset (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) : Async (Option String) :=
-  self.val.callMethodAwait "getset" (Support.args #[toJS key, toJS value]) (Option String)
+@[macro_inline] def RedisClient.getset (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.getset" do
+  self.val.callMethodAwait "getset" (Internal.args #[toJS key, toJS value]) (Option String)
 
 /-- `linsert(key: RedisClient.KeyLike, position: 'BEFORE' | 'AFTER', pivot: RedisClient.KeyLike, element: RedisClient.KeyLike): Promise<number>`: `Promise<double> linsert(RedisClientKeyLike key, RedisClientLinsertPosition position, RedisClientKeyLike pivot, RedisClientKeyLike element)` -/
-def RedisClient.linsert (self : RedisClient) (key : RedisClientKeyLike) (position : RedisClientLinsertPosition) (pivot : RedisClientKeyLike) (element : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "linsert" (Support.args #[toJS key, toJS position, toJS pivot, toJS element]) Float
+@[macro_inline] def RedisClient.linsert (self : RedisClient) (key : RedisClientKeyLike) (position : RedisClientLinsertPosition) (pivot : RedisClientKeyLike) (element : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.linsert" do
+  self.val.callMethodAwait "linsert" (Internal.args #[toJS key, toJS position, toJS pivot, toJS element]) Float
 
 /-- `lpush(key: RedisClient.KeyLike, value: RedisClient.KeyLike, ...rest: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> lpush(RedisClientKeyLike key, RedisClientKeyLike value, RedisClientKeyLike... rest)` -/
-def RedisClient.lpush (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) (rest : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "lpush" (Support.argsWith #[toJS key, toJS value] (rest.map toJS)) Float
+@[macro_inline] def RedisClient.lpush (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) (rest : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.lpush" do
+  self.val.callMethodAwait "lpush" (Internal.argsWith #[toJS key, toJS value] (rest.map toJS)) Float
 
 /-- `lpushx(key: RedisClient.KeyLike, value: RedisClient.KeyLike): Promise<number>`: `Promise<double> lpushx(RedisClientKeyLike key, RedisClientKeyLike value)` -/
-def RedisClient.lpushx (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "lpushx" (Support.args #[toJS key, toJS value]) Float
+@[macro_inline] def RedisClient.lpushx (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.lpushx" do
+  self.val.callMethodAwait "lpushx" (Internal.args #[toJS key, toJS value]) Float
 
 /-- `lrem(key: RedisClient.KeyLike, count: number, element: RedisClient.KeyLike): Promise<number>`: `Promise<double> lrem(RedisClientKeyLike key, double /* integer: Nat */ count, RedisClientKeyLike element)` -/
-def RedisClient.lrem (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) (element : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "lrem" (Support.args #[toJS key, toJS count, toJS element]) Float
+@[macro_inline] def RedisClient.lrem (self : RedisClient) (key : RedisClientKeyLike) (count : Nat) (element : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.lrem" do
+  self.val.callMethodAwait "lrem" (Internal.args #[toJS key, toJS count, toJS element]) Float
 
 /-- `ltrim(key: RedisClient.KeyLike, start: number, stop: number): Promise<string>`: `Promise<DOMString> ltrim(RedisClientKeyLike key, double start, double stop)` -/
-def RedisClient.ltrim (self : RedisClient) (key : RedisClientKeyLike) (start : Float) (stop : Float) : Async String :=
-  self.val.callMethodAwait "ltrim" (Support.args #[toJS key, toJS start, toJS stop]) String
+@[macro_inline] def RedisClient.ltrim (self : RedisClient) (key : RedisClientKeyLike) (start : Float) (stop : Float) : Async String := Internal.api "Lasm.JS.Bun.RedisClient.ltrim" do
+  self.val.callMethodAwait "ltrim" (Internal.args #[toJS key, toJS start, toJS stop]) String
 
 /-- `pfadd(key: RedisClient.KeyLike, element: string): Promise<number>`: `Promise<double> pfadd(RedisClientKeyLike key, DOMString element)` -/
-def RedisClient.pfadd (self : RedisClient) (key : RedisClientKeyLike) (element : String) : Async Float :=
-  self.val.callMethodAwait "pfadd" (Support.args #[toJS key, toJS element]) Float
+@[macro_inline] def RedisClient.pfadd (self : RedisClient) (key : RedisClientKeyLike) (element : String) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.pfadd" do
+  self.val.callMethodAwait "pfadd" (Internal.args #[toJS key, toJS element]) Float
 
 /-- `rpush(key: RedisClient.KeyLike, value: RedisClient.KeyLike, ...rest: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> rpush(RedisClientKeyLike key, RedisClientKeyLike value, RedisClientKeyLike... rest)` -/
-def RedisClient.rpush (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) (rest : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "rpush" (Support.argsWith #[toJS key, toJS value] (rest.map toJS)) Float
+@[macro_inline] def RedisClient.rpush (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) (rest : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.rpush" do
+  self.val.callMethodAwait "rpush" (Internal.argsWith #[toJS key, toJS value] (rest.map toJS)) Float
 
 /-- `rpushx(key: RedisClient.KeyLike, value: RedisClient.KeyLike): Promise<number>`: `Promise<double> rpushx(RedisClientKeyLike key, RedisClientKeyLike value)` -/
-def RedisClient.rpushx (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "rpushx" (Support.args #[toJS key, toJS value]) Float
+@[macro_inline] def RedisClient.rpushx (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.rpushx" do
+  self.val.callMethodAwait "rpushx" (Internal.args #[toJS key, toJS value]) Float
 
 /-- `setnx(key: RedisClient.KeyLike, value: RedisClient.KeyLike): Promise<number>`: `Promise<double> setnx(RedisClientKeyLike key, RedisClientKeyLike value)` -/
-def RedisClient.setnx (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "setnx" (Support.args #[toJS key, toJS value]) Float
+@[macro_inline] def RedisClient.setnx (self : RedisClient) (key : RedisClientKeyLike) (value : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.setnx" do
+  self.val.callMethodAwait "setnx" (Internal.args #[toJS key, toJS value]) Float
 
 /-- `setex(key: RedisClient.KeyLike, seconds: number, value: RedisClient.KeyLike): Promise<'OK'>`: `Promise<RedisClientSetex> setex(RedisClientKeyLike key, double seconds, RedisClientKeyLike value)` -/
-def RedisClient.setex (self : RedisClient) (key : RedisClientKeyLike) (seconds : Float) (value : RedisClientKeyLike) : Async RedisClientSetex :=
-  self.val.callMethodAwait "setex" (Support.args #[toJS key, toJS seconds, toJS value]) RedisClientSetex
+@[macro_inline] def RedisClient.setex (self : RedisClient) (key : RedisClientKeyLike) (seconds : Float) (value : RedisClientKeyLike) : Async RedisClientSetex := Internal.api "Lasm.JS.Bun.RedisClient.setex" do
+  self.val.callMethodAwait "setex" (Internal.args #[toJS key, toJS seconds, toJS value]) RedisClientSetex
 
 /-- `psetex(key: RedisClient.KeyLike, milliseconds: number, value: RedisClient.KeyLike): Promise<'OK'>`: `Promise<RedisClientPsetex> psetex(RedisClientKeyLike key, double milliseconds, RedisClientKeyLike value)` -/
-def RedisClient.psetex (self : RedisClient) (key : RedisClientKeyLike) (milliseconds : Float) (value : RedisClientKeyLike) : Async RedisClientPsetex :=
-  self.val.callMethodAwait "psetex" (Support.args #[toJS key, toJS milliseconds, toJS value]) RedisClientPsetex
+@[macro_inline] def RedisClient.psetex (self : RedisClient) (key : RedisClientKeyLike) (milliseconds : Float) (value : RedisClientKeyLike) : Async RedisClientPsetex := Internal.api "Lasm.JS.Bun.RedisClient.psetex" do
+  self.val.callMethodAwait "psetex" (Internal.args #[toJS key, toJS milliseconds, toJS value]) RedisClientPsetex
 
 /-- `zscore(key: RedisClient.KeyLike, member: string): Promise<number | null>`: `Promise<double?> zscore(RedisClientKeyLike key, DOMString member)` -/
-def RedisClient.zscore (self : RedisClient) (key : RedisClientKeyLike) (member : String) : Async (Option Float) :=
-  self.val.callMethodAwait "zscore" (Support.args #[toJS key, toJS member]) (Option Float)
+@[macro_inline] def RedisClient.zscore (self : RedisClient) (key : RedisClientKeyLike) (member : String) : Async (Option Float) := Internal.api "Lasm.JS.Bun.RedisClient.zscore" do
+  self.val.callMethodAwait "zscore" (Internal.args #[toJS key, toJS member]) (Option Float)
 
 /-- `zincrby(key: RedisClient.KeyLike, increment: number, member: RedisClient.KeyLike): Promise<number>`: `Promise<double> zincrby(RedisClientKeyLike key, double increment, RedisClientKeyLike member)` -/
-def RedisClient.zincrby (self : RedisClient) (key : RedisClientKeyLike) (increment : Float) (member : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "zincrby" (Support.args #[toJS key, toJS increment, toJS member]) Float
+@[macro_inline] def RedisClient.zincrby (self : RedisClient) (key : RedisClientKeyLike) (increment : Float) (member : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.zincrby" do
+  self.val.callMethodAwait "zincrby" (Internal.args #[toJS key, toJS increment, toJS member]) Float
 
 /-- `zmscore(key: RedisClient.KeyLike, member: RedisClient.KeyLike, ...members: RedisClient.KeyLike[]): Promise<(number | null)[]>`: `Promise<sequence<double?>> zmscore(RedisClientKeyLike key, RedisClientKeyLike member, RedisClientKeyLike... members)` -/
-def RedisClient.zmscore (self : RedisClient) (key : RedisClientKeyLike) (member : RedisClientKeyLike) (members : Array RedisClientKeyLike := #[]) : Async (Array (Option Float)) :=
-  self.val.callMethodAwait "zmscore" (Support.argsWith #[toJS key, toJS member] (members.map toJS)) (Array (Option Float))
+@[macro_inline] def RedisClient.zmscore (self : RedisClient) (key : RedisClientKeyLike) (member : RedisClientKeyLike) (members : Array RedisClientKeyLike := #[]) : Async (Array (Option Float)) := Internal.api "Lasm.JS.Bun.RedisClient.zmscore" do
+  self.val.callMethodAwait "zmscore" (Internal.argsWith #[toJS key, toJS member] (members.map toJS)) (Array (Option Float))
 
 /-- `zadd(key: RedisClient.KeyLike, ...args: (string | number)[]): Promise<number>`: `Promise<double> zadd(RedisClientKeyLike key, DOMStringOrDouble... args)` -/
-def RedisClient.zadd (self : RedisClient) (key : RedisClientKeyLike) (args : Array DOMStringOrDouble := #[]) : Async Float :=
-  self.val.callMethodAwait "zadd" (Support.argsWith #[toJS key] (args.map toJS)) Float
+@[macro_inline] def RedisClient.zadd (self : RedisClient) (key : RedisClientKeyLike) (args : Array DOMStringOrDouble := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.zadd" do
+  self.val.callMethodAwait "zadd" (Internal.argsWith #[toJS key] (args.map toJS)) Float
 
 /-- `zscan(key: RedisClient.KeyLike, cursor: string | number, ...options: string[]): Promise<[string, string[]]>`: `Promise<sequence<any>> zscan(RedisClientKeyLike key, DOMStringOrDouble cursor, DOMString... options)` -/
-def RedisClient.zscan (self : RedisClient) (key : RedisClientKeyLike) (cursor : DOMStringOrDouble) (options : Array String := #[]) : Async (Array Data) :=
-  self.val.callMethodAwait "zscan" (Support.argsWith #[toJS key, toJS cursor] (options.map toJS)) (Array Data)
+@[macro_inline] def RedisClient.zscan (self : RedisClient) (key : RedisClientKeyLike) (cursor : DOMStringOrDouble) (options : Array String := #[]) : Async (Array Data) := Internal.api "Lasm.JS.Bun.RedisClient.zscan" do
+  self.val.callMethodAwait "zscan" (Internal.argsWith #[toJS key, toJS cursor] (options.map toJS)) (Array Data)
 
 /-- `zrem(key: RedisClient.KeyLike, member: RedisClient.KeyLike, ...members: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> zrem(RedisClientKeyLike key, RedisClientKeyLike member, RedisClientKeyLike... members)` -/
-def RedisClient.zrem (self : RedisClient) (key : RedisClientKeyLike) (member : RedisClientKeyLike) (members : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "zrem" (Support.argsWith #[toJS key, toJS member] (members.map toJS)) Float
+@[macro_inline] def RedisClient.zrem (self : RedisClient) (key : RedisClientKeyLike) (member : RedisClientKeyLike) (members : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.zrem" do
+  self.val.callMethodAwait "zrem" (Internal.argsWith #[toJS key, toJS member] (members.map toJS)) Float
 
 /-- `zremrangebylex(key: RedisClient.KeyLike, min: string, max: string): Promise<number>`: `Promise<double> zremrangebylex(RedisClientKeyLike key, DOMString min, DOMString max)` -/
-def RedisClient.zremrangebylex (self : RedisClient) (key : RedisClientKeyLike) (min : String) (max : String) : Async Float :=
-  self.val.callMethodAwait "zremrangebylex" (Support.args #[toJS key, toJS min, toJS max]) Float
+@[macro_inline] def RedisClient.zremrangebylex (self : RedisClient) (key : RedisClientKeyLike) (min : String) (max : String) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.zremrangebylex" do
+  self.val.callMethodAwait "zremrangebylex" (Internal.args #[toJS key, toJS min, toJS max]) Float
 
 /-- `zremrangebyrank(key: RedisClient.KeyLike, start: number, stop: number): Promise<number>`: `Promise<double> zremrangebyrank(RedisClientKeyLike key, double start, double stop)` -/
-def RedisClient.zremrangebyrank (self : RedisClient) (key : RedisClientKeyLike) (start : Float) (stop : Float) : Async Float :=
-  self.val.callMethodAwait "zremrangebyrank" (Support.args #[toJS key, toJS start, toJS stop]) Float
+@[macro_inline] def RedisClient.zremrangebyrank (self : RedisClient) (key : RedisClientKeyLike) (start : Float) (stop : Float) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.zremrangebyrank" do
+  self.val.callMethodAwait "zremrangebyrank" (Internal.args #[toJS key, toJS start, toJS stop]) Float
 
 /-- `zremrangebyscore(key: RedisClient.KeyLike, min: string | number, max: string | number): Promise<number>`: `Promise<double> zremrangebyscore(RedisClientKeyLike key, DOMStringOrDouble min, DOMStringOrDouble max)` -/
-def RedisClient.zremrangebyscore (self : RedisClient) (key : RedisClientKeyLike) (min : DOMStringOrDouble) (max : DOMStringOrDouble) : Async Float :=
-  self.val.callMethodAwait "zremrangebyscore" (Support.args #[toJS key, toJS min, toJS max]) Float
+@[macro_inline] def RedisClient.zremrangebyscore (self : RedisClient) (key : RedisClientKeyLike) (min : DOMStringOrDouble) (max : DOMStringOrDouble) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.zremrangebyscore" do
+  self.val.callMethodAwait "zremrangebyscore" (Internal.args #[toJS key, toJS min, toJS max]) Float
 
 /-- `zrangebylex(key: RedisClient.KeyLike, min: string, max: string): Promise<string[]>`: `Promise<sequence<DOMString>> zrangebylex(RedisClientKeyLike key, DOMString min, DOMString max)` -/
-def RedisClient.zrangebylex (self : RedisClient) (key : RedisClientKeyLike) (min : String) (max : String) : Async (Array String) :=
-  self.val.callMethodAwait "zrangebylex" (Support.args #[toJS key, toJS min, toJS max]) (Array String)
+@[macro_inline] def RedisClient.zrangebylex (self : RedisClient) (key : RedisClientKeyLike) (min : String) (max : String) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.zrangebylex" do
+  self.val.callMethodAwait "zrangebylex" (Internal.args #[toJS key, toJS min, toJS max]) (Array String)
 
 /-- `zrangebylex(key: RedisClient.KeyLike, min: string, max: string, limit: 'LIMIT', offset: number, count: number): Promise<string[]>`: `Promise<sequence<DOMString>> zrangebylex(RedisClientKeyLike key, DOMString min, DOMString max, RedisClientZrangebylexWithLimitLimit limit, double offset, double /* integer: Nat */ count)` -/
-def RedisClient.zrangebylexWithLimit (self : RedisClient) (key : RedisClientKeyLike) (min : String) (max : String) (limit : RedisClientZrangebylexWithLimitLimit) (offset : Float) (count : Nat) : Async (Array String) :=
-  self.val.callMethodAwait "zrangebylex" (Support.args #[toJS key, toJS min, toJS max, toJS limit, toJS offset, toJS count]) (Array String)
+@[macro_inline] def RedisClient.zrangebylexWithLimit (self : RedisClient) (key : RedisClientKeyLike) (min : String) (max : String) (limit : RedisClientZrangebylexWithLimitLimit) (offset : Float) (count : Nat) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.zrangebylexWithLimit" do
+  self.val.callMethodAwait "zrangebylex" (Internal.args #[toJS key, toJS min, toJS max, toJS limit, toJS offset, toJS count]) (Array String)
 
 /-- `zrangebylex(key: RedisClient.KeyLike, min: string, max: string, ...options: (string | number)[]): Promise<string[]>`: `Promise<sequence<DOMString>> zrangebylex(RedisClientKeyLike key, DOMString min, DOMString max, DOMStringOrDouble... options)` -/
-def RedisClient.zrangebylexWithOptions (self : RedisClient) (key : RedisClientKeyLike) (min : String) (max : String) (options : Array DOMStringOrDouble := #[]) : Async (Array String) :=
-  self.val.callMethodAwait "zrangebylex" (Support.argsWith #[toJS key, toJS min, toJS max] (options.map toJS)) (Array String)
+@[macro_inline] def RedisClient.zrangebylexWithOptions (self : RedisClient) (key : RedisClientKeyLike) (min : String) (max : String) (options : Array DOMStringOrDouble := #[]) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.zrangebylexWithOptions" do
+  self.val.callMethodAwait "zrangebylex" (Internal.argsWith #[toJS key, toJS min, toJS max] (options.map toJS)) (Array String)
 
 /-- `zrangebyscore(key: RedisClient.KeyLike, min: string | number, max: string | number): Promise<string[]>`: `Promise<sequence<DOMString>> zrangebyscore(RedisClientKeyLike key, DOMStringOrDouble min, DOMStringOrDouble max)` -/
-def RedisClient.zrangebyscore (self : RedisClient) (key : RedisClientKeyLike) (min : DOMStringOrDouble) (max : DOMStringOrDouble) : Async (Array String) :=
-  self.val.callMethodAwait "zrangebyscore" (Support.args #[toJS key, toJS min, toJS max]) (Array String)
+@[macro_inline] def RedisClient.zrangebyscore (self : RedisClient) (key : RedisClientKeyLike) (min : DOMStringOrDouble) (max : DOMStringOrDouble) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.zrangebyscore" do
+  self.val.callMethodAwait "zrangebyscore" (Internal.args #[toJS key, toJS min, toJS max]) (Array String)
 
 /-- `zrangebyscore(key: RedisClient.KeyLike, min: string | number, max: string | number, withscores: 'WITHSCORES'): Promise<[string, number][]>`: `Promise<sequence<sequence<any>>> zrangebyscore(RedisClientKeyLike key, DOMStringOrDouble min, DOMStringOrDouble max, RedisClientZrangebyscoreWithscoresWithscores withscores)` -/
-def RedisClient.zrangebyscoreWithscores (self : RedisClient) (key : RedisClientKeyLike) (min : DOMStringOrDouble) (max : DOMStringOrDouble) (withscores : RedisClientZrangebyscoreWithscoresWithscores) : Async (Array (Array Data)) :=
-  self.val.callMethodAwait "zrangebyscore" (Support.args #[toJS key, toJS min, toJS max, toJS withscores]) (Array (Array Data))
+@[macro_inline] def RedisClient.zrangebyscoreWithscores (self : RedisClient) (key : RedisClientKeyLike) (min : DOMStringOrDouble) (max : DOMStringOrDouble) (withscores : RedisClientZrangebyscoreWithscoresWithscores) : Async (Array (Array Data)) := Internal.api "Lasm.JS.Bun.RedisClient.zrangebyscoreWithscores" do
+  self.val.callMethodAwait "zrangebyscore" (Internal.args #[toJS key, toJS min, toJS max, toJS withscores]) (Array (Array Data))
 
 /-- `zrangebyscore(key: RedisClient.KeyLike, min: string | number, max: string | number, limit: 'LIMIT', offset: number, count: number): Promise<string[]>`: `Promise<sequence<DOMString>> zrangebyscore(RedisClientKeyLike key, DOMStringOrDouble min, DOMStringOrDouble max, RedisClientZrangebyscoreWithLimitLimit limit, double offset, double /* integer: Nat */ count)` -/
-def RedisClient.zrangebyscoreWithLimit (self : RedisClient) (key : RedisClientKeyLike) (min : DOMStringOrDouble) (max : DOMStringOrDouble) (limit : RedisClientZrangebyscoreWithLimitLimit) (offset : Float) (count : Nat) : Async (Array String) :=
-  self.val.callMethodAwait "zrangebyscore" (Support.args #[toJS key, toJS min, toJS max, toJS limit, toJS offset, toJS count]) (Array String)
+@[macro_inline] def RedisClient.zrangebyscoreWithLimit (self : RedisClient) (key : RedisClientKeyLike) (min : DOMStringOrDouble) (max : DOMStringOrDouble) (limit : RedisClientZrangebyscoreWithLimitLimit) (offset : Float) (count : Nat) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.zrangebyscoreWithLimit" do
+  self.val.callMethodAwait "zrangebyscore" (Internal.args #[toJS key, toJS min, toJS max, toJS limit, toJS offset, toJS count]) (Array String)
 
 /-- `zrangebyscore(key: RedisClient.KeyLike, min: string | number, max: string | number, withscores: 'WITHSCORES', ...options: (string | number)[]): Promise<[string, number][]>`: `Promise<sequence<sequence<any>>> zrangebyscore(RedisClientKeyLike key, DOMStringOrDouble min, DOMStringOrDouble max, RedisClientZrangebyscoreWithscoresOptionsWithscores withscores, DOMStringOrDouble... options)` -/
-def RedisClient.zrangebyscoreWithscoresOptions (self : RedisClient) (key : RedisClientKeyLike) (min : DOMStringOrDouble) (max : DOMStringOrDouble) (withscores : RedisClientZrangebyscoreWithscoresOptionsWithscores) (options : Array DOMStringOrDouble := #[]) : Async (Array (Array Data)) :=
-  self.val.callMethodAwait "zrangebyscore" (Support.argsWith #[toJS key, toJS min, toJS max, toJS withscores] (options.map toJS)) (Array (Array Data))
+@[macro_inline] def RedisClient.zrangebyscoreWithscoresOptions (self : RedisClient) (key : RedisClientKeyLike) (min : DOMStringOrDouble) (max : DOMStringOrDouble) (withscores : RedisClientZrangebyscoreWithscoresOptionsWithscores) (options : Array DOMStringOrDouble := #[]) : Async (Array (Array Data)) := Internal.api "Lasm.JS.Bun.RedisClient.zrangebyscoreWithscoresOptions" do
+  self.val.callMethodAwait "zrangebyscore" (Internal.argsWith #[toJS key, toJS min, toJS max, toJS withscores] (options.map toJS)) (Array (Array Data))
 
 /-- `zrangebyscore(key: RedisClient.KeyLike, min: string | number, max: string | number, withscores: 'WITHSCORES', limit: 'LIMIT', offset: number, count: number, ...options: (string | number)[]): Promise<[string, number][]>`: `Promise<sequence<sequence<any>>> zrangebyscore(RedisClientKeyLike key, DOMStringOrDouble min, DOMStringOrDouble max, RedisClientZrangebyscoreWithWithscoresWithscores withscores, RedisClientZrangebyscoreWithWithscoresLimit limit, double offset, double /* integer: Nat */ count, DOMStringOrDouble... options)` -/
-def RedisClient.zrangebyscoreWithWithscores (self : RedisClient) (key : RedisClientKeyLike) (min : DOMStringOrDouble) (max : DOMStringOrDouble) (withscores : RedisClientZrangebyscoreWithWithscoresWithscores) (limit : RedisClientZrangebyscoreWithWithscoresLimit) (offset : Float) (count : Nat) (options : Array DOMStringOrDouble := #[]) : Async (Array (Array Data)) :=
-  self.val.callMethodAwait "zrangebyscore" (Support.argsWith #[toJS key, toJS min, toJS max, toJS withscores, toJS limit, toJS offset, toJS count] (options.map toJS)) (Array (Array Data))
+@[macro_inline] def RedisClient.zrangebyscoreWithWithscores (self : RedisClient) (key : RedisClientKeyLike) (min : DOMStringOrDouble) (max : DOMStringOrDouble) (withscores : RedisClientZrangebyscoreWithWithscoresWithscores) (limit : RedisClientZrangebyscoreWithWithscoresLimit) (offset : Float) (count : Nat) (options : Array DOMStringOrDouble := #[]) : Async (Array (Array Data)) := Internal.api "Lasm.JS.Bun.RedisClient.zrangebyscoreWithWithscores" do
+  self.val.callMethodAwait "zrangebyscore" (Internal.argsWith #[toJS key, toJS min, toJS max, toJS withscores, toJS limit, toJS offset, toJS count] (options.map toJS)) (Array (Array Data))
 
 /-- `zrangebyscore(key: RedisClient.KeyLike, min: string | number, max: string | number, ...options: (string | number)[]): Promise<string[]>`: `Promise<sequence<DOMString>> zrangebyscore(RedisClientKeyLike key, DOMStringOrDouble min, DOMStringOrDouble max, DOMStringOrDouble... options)` -/
-def RedisClient.zrangebyscoreWithOptions (self : RedisClient) (key : RedisClientKeyLike) (min : DOMStringOrDouble) (max : DOMStringOrDouble) (options : Array DOMStringOrDouble := #[]) : Async (Array String) :=
-  self.val.callMethodAwait "zrangebyscore" (Support.argsWith #[toJS key, toJS min, toJS max] (options.map toJS)) (Array String)
+@[macro_inline] def RedisClient.zrangebyscoreWithOptions (self : RedisClient) (key : RedisClientKeyLike) (min : DOMStringOrDouble) (max : DOMStringOrDouble) (options : Array DOMStringOrDouble := #[]) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.zrangebyscoreWithOptions" do
+  self.val.callMethodAwait "zrangebyscore" (Internal.argsWith #[toJS key, toJS min, toJS max] (options.map toJS)) (Array String)
 
 /-- `zrevrangebyscore(key: RedisClient.KeyLike, max: string | number, min: string | number): Promise<string[]>`: `Promise<sequence<DOMString>> zrevrangebyscore(RedisClientKeyLike key, DOMStringOrDouble max, DOMStringOrDouble min)` -/
-def RedisClient.zrevrangebyscore (self : RedisClient) (key : RedisClientKeyLike) (max : DOMStringOrDouble) (min : DOMStringOrDouble) : Async (Array String) :=
-  self.val.callMethodAwait "zrevrangebyscore" (Support.args #[toJS key, toJS max, toJS min]) (Array String)
+@[macro_inline] def RedisClient.zrevrangebyscore (self : RedisClient) (key : RedisClientKeyLike) (max : DOMStringOrDouble) (min : DOMStringOrDouble) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.zrevrangebyscore" do
+  self.val.callMethodAwait "zrevrangebyscore" (Internal.args #[toJS key, toJS max, toJS min]) (Array String)
 
 /-- `zrevrangebyscore(key: RedisClient.KeyLike, max: string | number, min: string | number, withscores: 'WITHSCORES'): Promise<[string, number][]>`: `Promise<sequence<sequence<any>>> zrevrangebyscore(RedisClientKeyLike key, DOMStringOrDouble max, DOMStringOrDouble min, RedisClientZrevrangebyscoreWithWithscoresWithscores withscores)` -/
-def RedisClient.zrevrangebyscoreWithWithscores (self : RedisClient) (key : RedisClientKeyLike) (max : DOMStringOrDouble) (min : DOMStringOrDouble) (withscores : RedisClientZrevrangebyscoreWithWithscoresWithscores) : Async (Array (Array Data)) :=
-  self.val.callMethodAwait "zrevrangebyscore" (Support.args #[toJS key, toJS max, toJS min, toJS withscores]) (Array (Array Data))
+@[macro_inline] def RedisClient.zrevrangebyscoreWithWithscores (self : RedisClient) (key : RedisClientKeyLike) (max : DOMStringOrDouble) (min : DOMStringOrDouble) (withscores : RedisClientZrevrangebyscoreWithWithscoresWithscores) : Async (Array (Array Data)) := Internal.api "Lasm.JS.Bun.RedisClient.zrevrangebyscoreWithWithscores" do
+  self.val.callMethodAwait "zrevrangebyscore" (Internal.args #[toJS key, toJS max, toJS min, toJS withscores]) (Array (Array Data))
 
 /-- `zrevrangebyscore(key: RedisClient.KeyLike, max: string | number, min: string | number, limit: 'LIMIT', offset: number, count: number): Promise<string[]>`: `Promise<sequence<DOMString>> zrevrangebyscore(RedisClientKeyLike key, DOMStringOrDouble max, DOMStringOrDouble min, RedisClientZrevrangebyscoreWithLimitLimit limit, double offset, double /* integer: Nat */ count)` -/
-def RedisClient.zrevrangebyscoreWithLimit (self : RedisClient) (key : RedisClientKeyLike) (max : DOMStringOrDouble) (min : DOMStringOrDouble) (limit : RedisClientZrevrangebyscoreWithLimitLimit) (offset : Float) (count : Nat) : Async (Array String) :=
-  self.val.callMethodAwait "zrevrangebyscore" (Support.args #[toJS key, toJS max, toJS min, toJS limit, toJS offset, toJS count]) (Array String)
+@[macro_inline] def RedisClient.zrevrangebyscoreWithLimit (self : RedisClient) (key : RedisClientKeyLike) (max : DOMStringOrDouble) (min : DOMStringOrDouble) (limit : RedisClientZrevrangebyscoreWithLimitLimit) (offset : Float) (count : Nat) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.zrevrangebyscoreWithLimit" do
+  self.val.callMethodAwait "zrevrangebyscore" (Internal.args #[toJS key, toJS max, toJS min, toJS limit, toJS offset, toJS count]) (Array String)
 
 /-- `zrevrangebyscore(key: RedisClient.KeyLike, max: string | number, min: string | number, ...options: (string | number)[]): Promise<string[]>`: `Promise<sequence<DOMString>> zrevrangebyscore(RedisClientKeyLike key, DOMStringOrDouble max, DOMStringOrDouble min, DOMStringOrDouble... options)` -/
-def RedisClient.zrevrangebyscoreWithOptions (self : RedisClient) (key : RedisClientKeyLike) (max : DOMStringOrDouble) (min : DOMStringOrDouble) (options : Array DOMStringOrDouble := #[]) : Async (Array String) :=
-  self.val.callMethodAwait "zrevrangebyscore" (Support.argsWith #[toJS key, toJS max, toJS min] (options.map toJS)) (Array String)
+@[macro_inline] def RedisClient.zrevrangebyscoreWithOptions (self : RedisClient) (key : RedisClientKeyLike) (max : DOMStringOrDouble) (min : DOMStringOrDouble) (options : Array DOMStringOrDouble := #[]) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.zrevrangebyscoreWithOptions" do
+  self.val.callMethodAwait "zrevrangebyscore" (Internal.argsWith #[toJS key, toJS max, toJS min] (options.map toJS)) (Array String)
 
 /-- `zrevrangebylex(key: RedisClient.KeyLike, max: string, min: string, ...options: string[]): Promise<string[]>`: `Promise<sequence<DOMString>> zrevrangebylex(RedisClientKeyLike key, DOMString max, DOMString min, DOMString... options)` -/
-def RedisClient.zrevrangebylex (self : RedisClient) (key : RedisClientKeyLike) (max : String) (min : String) (options : Array String := #[]) : Async (Array String) :=
-  self.val.callMethodAwait "zrevrangebylex" (Support.argsWith #[toJS key, toJS max, toJS min] (options.map toJS)) (Array String)
+@[macro_inline] def RedisClient.zrevrangebylex (self : RedisClient) (key : RedisClientKeyLike) (max : String) (min : String) (options : Array String := #[]) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.zrevrangebylex" do
+  self.val.callMethodAwait "zrevrangebylex" (Internal.argsWith #[toJS key, toJS max, toJS min] (options.map toJS)) (Array String)
 
 /-- `zrangestore(destination: RedisClient.KeyLike, source: RedisClient.KeyLike, start: string | number, stop: string | number, ...options: string[]): Promise<number>`: `Promise<double> zrangestore(RedisClientKeyLike destination, RedisClientKeyLike source, DOMStringOrDouble start, DOMStringOrDouble stop, DOMString... options)` -/
-def RedisClient.zrangestore (self : RedisClient) (destination : RedisClientKeyLike) (source : RedisClientKeyLike) (start : DOMStringOrDouble) (stop : DOMStringOrDouble) (options : Array String := #[]) : Async Float :=
-  self.val.callMethodAwait "zrangestore" (Support.argsWith #[toJS destination, toJS source, toJS start, toJS stop] (options.map toJS)) Float
+@[macro_inline] def RedisClient.zrangestore (self : RedisClient) (destination : RedisClientKeyLike) (source : RedisClientKeyLike) (start : DOMStringOrDouble) (stop : DOMStringOrDouble) (options : Array String := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.zrangestore" do
+  self.val.callMethodAwait "zrangestore" (Internal.argsWith #[toJS destination, toJS source, toJS start, toJS stop] (options.map toJS)) Float
 
 /-- `zrank(key: RedisClient.KeyLike, member: string): Promise<number | null>`: `Promise<double?> zrank(RedisClientKeyLike key, DOMString member)` -/
-def RedisClient.zrank (self : RedisClient) (key : RedisClientKeyLike) (member : String) : Async (Option Float) :=
-  self.val.callMethodAwait "zrank" (Support.args #[toJS key, toJS member]) (Option Float)
+@[macro_inline] def RedisClient.zrank (self : RedisClient) (key : RedisClientKeyLike) (member : String) : Async (Option Float) := Internal.api "Lasm.JS.Bun.RedisClient.zrank" do
+  self.val.callMethodAwait "zrank" (Internal.args #[toJS key, toJS member]) (Option Float)
 
 /-- `zrank(key: RedisClient.KeyLike, member: string, withscore: 'WITHSCORE'): Promise<[number, number] | null>`: `Promise<sequence<double>?> zrank(RedisClientKeyLike key, DOMString member, RedisClientZrankWithWithscoreWithscore withscore)` -/
-def RedisClient.zrankWithWithscore (self : RedisClient) (key : RedisClientKeyLike) (member : String) (withscore : RedisClientZrankWithWithscoreWithscore) : Async (Option (Array Float)) :=
-  self.val.callMethodAwait "zrank" (Support.args #[toJS key, toJS member, toJS withscore]) (Option (Array Float))
+@[macro_inline] def RedisClient.zrankWithWithscore (self : RedisClient) (key : RedisClientKeyLike) (member : String) (withscore : RedisClientZrankWithWithscoreWithscore) : Async (Option (Array Float)) := Internal.api "Lasm.JS.Bun.RedisClient.zrankWithWithscore" do
+  self.val.callMethodAwait "zrank" (Internal.args #[toJS key, toJS member, toJS withscore]) (Option (Array Float))
 
 /-- `zrevrank(key: RedisClient.KeyLike, member: string): Promise<number | null>`: `Promise<double?> zrevrank(RedisClientKeyLike key, DOMString member)` -/
-def RedisClient.zrevrank (self : RedisClient) (key : RedisClientKeyLike) (member : String) : Async (Option Float) :=
-  self.val.callMethodAwait "zrevrank" (Support.args #[toJS key, toJS member]) (Option Float)
+@[macro_inline] def RedisClient.zrevrank (self : RedisClient) (key : RedisClientKeyLike) (member : String) : Async (Option Float) := Internal.api "Lasm.JS.Bun.RedisClient.zrevrank" do
+  self.val.callMethodAwait "zrevrank" (Internal.args #[toJS key, toJS member]) (Option Float)
 
 /-- `zrevrank(key: RedisClient.KeyLike, member: string, withscore: 'WITHSCORE'): Promise<[number, number] | null>`: `Promise<sequence<double>?> zrevrank(RedisClientKeyLike key, DOMString member, RedisClientZrevrankWithWithscoreWithscore withscore)` -/
-def RedisClient.zrevrankWithWithscore (self : RedisClient) (key : RedisClientKeyLike) (member : String) (withscore : RedisClientZrevrankWithWithscoreWithscore) : Async (Option (Array Float)) :=
-  self.val.callMethodAwait "zrevrank" (Support.args #[toJS key, toJS member, toJS withscore]) (Option (Array Float))
+@[macro_inline] def RedisClient.zrevrankWithWithscore (self : RedisClient) (key : RedisClientKeyLike) (member : String) (withscore : RedisClientZrevrankWithWithscoreWithscore) : Async (Option (Array Float)) := Internal.api "Lasm.JS.Bun.RedisClient.zrevrankWithWithscore" do
+  self.val.callMethodAwait "zrevrank" (Internal.args #[toJS key, toJS member, toJS withscore]) (Option (Array Float))
 
 /-- `mget(...keys: RedisClient.KeyLike[]): Promise<(string | null)[]>`: `Promise<sequence<DOMString?>> mget(RedisClientKeyLike... keys)` -/
-def RedisClient.mget (self : RedisClient) (keys : Array RedisClientKeyLike := #[]) : Async (Array (Option String)) :=
-  self.val.callMethodAwait "mget" (Support.argsWith #[] (keys.map toJS)) (Array (Option String))
+@[macro_inline] def RedisClient.mget (self : RedisClient) (keys : Array RedisClientKeyLike := #[]) : Async (Array (Option String)) := Internal.api "Lasm.JS.Bun.RedisClient.mget" do
+  self.val.callMethodAwait "mget" (Internal.argsWith #[] (keys.map toJS)) (Array (Option String))
 
 /-- `mset(...keyValuePairs: RedisClient.KeyLike[]): Promise<'OK'>`: `Promise<RedisClientMset> mset(RedisClientKeyLike... keyValuePairs)` -/
-def RedisClient.mset (self : RedisClient) (keyValuePairs : Array RedisClientKeyLike := #[]) : Async RedisClientMset :=
-  self.val.callMethodAwait "mset" (Support.argsWith #[] (keyValuePairs.map toJS)) RedisClientMset
+@[macro_inline] def RedisClient.mset (self : RedisClient) (keyValuePairs : Array RedisClientKeyLike := #[]) : Async RedisClientMset := Internal.api "Lasm.JS.Bun.RedisClient.mset" do
+  self.val.callMethodAwait "mset" (Internal.argsWith #[] (keyValuePairs.map toJS)) RedisClientMset
 
 /-- `msetnx(...keyValuePairs: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> msetnx(RedisClientKeyLike... keyValuePairs)` -/
-def RedisClient.msetnx (self : RedisClient) (keyValuePairs : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "msetnx" (Support.argsWith #[] (keyValuePairs.map toJS)) Float
+@[macro_inline] def RedisClient.msetnx (self : RedisClient) (keyValuePairs : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.msetnx" do
+  self.val.callMethodAwait "msetnx" (Internal.argsWith #[] (keyValuePairs.map toJS)) Float
 
 /-- `bitcount(key: RedisClient.KeyLike): Promise<number>`: `Promise<double> bitcount(RedisClientKeyLike key)` -/
-def RedisClient.bitcount (self : RedisClient) (key : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "bitcount" (Support.args #[toJS key]) Float
+@[macro_inline] def RedisClient.bitcount (self : RedisClient) (key : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.bitcount" do
+  self.val.callMethodAwait "bitcount" (Internal.args #[toJS key]) Float
 
 /-- `getbit(key: RedisClient.KeyLike, offset: number): Promise<number>`: `Promise<double> getbit(RedisClientKeyLike key, double offset)` -/
-def RedisClient.getbit (self : RedisClient) (key : RedisClientKeyLike) (offset : Float) : Async Float :=
-  self.val.callMethodAwait "getbit" (Support.args #[toJS key, toJS offset]) Float
+@[macro_inline] def RedisClient.getbit (self : RedisClient) (key : RedisClientKeyLike) (offset : Float) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.getbit" do
+  self.val.callMethodAwait "getbit" (Internal.args #[toJS key, toJS offset]) Float
 
 /-- `setbit(key: RedisClient.KeyLike, offset: number, value: 0 | 1): Promise<number>`: `Promise<double> setbit(RedisClientKeyLike key, double offset, double value)` -/
-def RedisClient.setbit (self : RedisClient) (key : RedisClientKeyLike) (offset : Float) (value : Float) : Async Float :=
-  self.val.callMethodAwait "setbit" (Support.args #[toJS key, toJS offset, toJS value]) Float
+@[macro_inline] def RedisClient.setbit (self : RedisClient) (key : RedisClientKeyLike) (offset : Float) (value : Float) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.setbit" do
+  self.val.callMethodAwait "setbit" (Internal.args #[toJS key, toJS offset, toJS value]) Float
 
 /-- `getrange(key: RedisClient.KeyLike, start: number, end: number): Promise<string>`: `Promise<DOMString> getrange(RedisClientKeyLike key, double start, double end)` -/
-def RedisClient.getrange (self : RedisClient) (key : RedisClientKeyLike) (start : Float) («end» : Float) : Async String :=
-  self.val.callMethodAwait "getrange" (Support.args #[toJS key, toJS start, toJS «end»]) String
+@[macro_inline] def RedisClient.getrange (self : RedisClient) (key : RedisClientKeyLike) (start : Float) («end» : Float) : Async String := Internal.api "Lasm.JS.Bun.RedisClient.getrange" do
+  self.val.callMethodAwait "getrange" (Internal.args #[toJS key, toJS start, toJS «end»]) String
 
 /-- `setrange(key: RedisClient.KeyLike, offset: number, value: RedisClient.KeyLike): Promise<number>`: `Promise<double> setrange(RedisClientKeyLike key, double offset, RedisClientKeyLike value)` -/
-def RedisClient.setrange (self : RedisClient) (key : RedisClientKeyLike) (offset : Float) (value : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "setrange" (Support.args #[toJS key, toJS offset, toJS value]) Float
+@[macro_inline] def RedisClient.setrange (self : RedisClient) (key : RedisClientKeyLike) (offset : Float) (value : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.setrange" do
+  self.val.callMethodAwait "setrange" (Internal.args #[toJS key, toJS offset, toJS value]) Float
 
 /-- `dump(key: RedisClient.KeyLike): Promise<string | null>`: `Promise<DOMString?> dump(RedisClientKeyLike key)` -/
-def RedisClient.dump (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) :=
-  self.val.callMethodAwait "dump" (Support.args #[toJS key]) (Option String)
+@[macro_inline] def RedisClient.dump (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.dump" do
+  self.val.callMethodAwait "dump" (Internal.args #[toJS key]) (Option String)
 
 /-- `expiretime(key: RedisClient.KeyLike): Promise<number>`: `Promise<double> expiretime(RedisClientKeyLike key)` -/
-def RedisClient.expiretime (self : RedisClient) (key : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "expiretime" (Support.args #[toJS key]) Float
+@[macro_inline] def RedisClient.expiretime (self : RedisClient) (key : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.expiretime" do
+  self.val.callMethodAwait "expiretime" (Internal.args #[toJS key]) Float
 
 /-- `getdel(key: RedisClient.KeyLike): Promise<string | null>`: `Promise<DOMString?> getdel(RedisClientKeyLike key)` -/
-def RedisClient.getdel (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) :=
-  self.val.callMethodAwait "getdel" (Support.args #[toJS key]) (Option String)
+@[macro_inline] def RedisClient.getdel (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.getdel" do
+  self.val.callMethodAwait "getdel" (Internal.args #[toJS key]) (Option String)
 
 /-- `getex(key: RedisClient.KeyLike): Promise<string | null>`: `Promise<DOMString?> getex(RedisClientKeyLike key)` -/
-def RedisClient.getex (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) :=
-  self.val.callMethodAwait "getex" (Support.args #[toJS key]) (Option String)
+@[macro_inline] def RedisClient.getex (self : RedisClient) (key : RedisClientKeyLike) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.getex" do
+  self.val.callMethodAwait "getex" (Internal.args #[toJS key]) (Option String)
 
 /-- `getex(key: RedisClient.KeyLike, ex: 'EX', seconds: number): Promise<string | null>`: `Promise<DOMString?> getex(RedisClientKeyLike key, RedisClientGetexWithExEx ex, double seconds)` -/
-def RedisClient.getexWithEx (self : RedisClient) (key : RedisClientKeyLike) (ex : RedisClientGetexWithExEx) (seconds : Float) : Async (Option String) :=
-  self.val.callMethodAwait "getex" (Support.args #[toJS key, toJS ex, toJS seconds]) (Option String)
+@[macro_inline] def RedisClient.getexWithEx (self : RedisClient) (key : RedisClientKeyLike) (ex : RedisClientGetexWithExEx) (seconds : Float) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.getexWithEx" do
+  self.val.callMethodAwait "getex" (Internal.args #[toJS key, toJS ex, toJS seconds]) (Option String)
 
 /-- `getex(key: RedisClient.KeyLike, px: 'PX', milliseconds: number): Promise<string | null>`: `Promise<DOMString?> getex(RedisClientKeyLike key, RedisClientGetexWithPxPx px, double milliseconds)` -/
-def RedisClient.getexWithPx (self : RedisClient) (key : RedisClientKeyLike) (px : RedisClientGetexWithPxPx) (milliseconds : Float) : Async (Option String) :=
-  self.val.callMethodAwait "getex" (Support.args #[toJS key, toJS px, toJS milliseconds]) (Option String)
+@[macro_inline] def RedisClient.getexWithPx (self : RedisClient) (key : RedisClientKeyLike) (px : RedisClientGetexWithPxPx) (milliseconds : Float) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.getexWithPx" do
+  self.val.callMethodAwait "getex" (Internal.args #[toJS key, toJS px, toJS milliseconds]) (Option String)
 
 /-- `getex(key: RedisClient.KeyLike, exat: 'EXAT', timestampSeconds: number): Promise<string | null>`: `Promise<DOMString?> getex(RedisClientKeyLike key, RedisClientGetexWithExatExat exat, double timestampSeconds)` -/
-def RedisClient.getexWithExat (self : RedisClient) (key : RedisClientKeyLike) (exat : RedisClientGetexWithExatExat) (timestampSeconds : Float) : Async (Option String) :=
-  self.val.callMethodAwait "getex" (Support.args #[toJS key, toJS exat, toJS timestampSeconds]) (Option String)
+@[macro_inline] def RedisClient.getexWithExat (self : RedisClient) (key : RedisClientKeyLike) (exat : RedisClientGetexWithExatExat) (timestampSeconds : Float) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.getexWithExat" do
+  self.val.callMethodAwait "getex" (Internal.args #[toJS key, toJS exat, toJS timestampSeconds]) (Option String)
 
 /-- `getex(key: RedisClient.KeyLike, pxat: 'PXAT', timestampMilliseconds: number): Promise<string | null>`: `Promise<DOMString?> getex(RedisClientKeyLike key, RedisClientGetexWithPxatPxat pxat, double timestampMilliseconds)` -/
-def RedisClient.getexWithPxat (self : RedisClient) (key : RedisClientKeyLike) (pxat : RedisClientGetexWithPxatPxat) (timestampMilliseconds : Float) : Async (Option String) :=
-  self.val.callMethodAwait "getex" (Support.args #[toJS key, toJS pxat, toJS timestampMilliseconds]) (Option String)
+@[macro_inline] def RedisClient.getexWithPxat (self : RedisClient) (key : RedisClientKeyLike) (pxat : RedisClientGetexWithPxatPxat) (timestampMilliseconds : Float) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.getexWithPxat" do
+  self.val.callMethodAwait "getex" (Internal.args #[toJS key, toJS pxat, toJS timestampMilliseconds]) (Option String)
 
 /-- `getex(key: RedisClient.KeyLike, persist: 'PERSIST'): Promise<string | null>`: `Promise<DOMString?> getex(RedisClientKeyLike key, RedisClientGetexWithPersistPersist persist)` -/
-def RedisClient.getexWithPersist (self : RedisClient) (key : RedisClientKeyLike) (persist : RedisClientGetexWithPersistPersist) : Async (Option String) :=
-  self.val.callMethodAwait "getex" (Support.args #[toJS key, toJS persist]) (Option String)
+@[macro_inline] def RedisClient.getexWithPersist (self : RedisClient) (key : RedisClientKeyLike) (persist : RedisClientGetexWithPersistPersist) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.getexWithPersist" do
+  self.val.callMethodAwait "getex" (Internal.args #[toJS key, toJS persist]) (Option String)
 
 /-- `ping(): Promise<'PONG'>`: `Promise<RedisClientPing> ping()` -/
-def RedisClient.ping (self : RedisClient) : Async RedisClientPing :=
-  self.val.callMethodAwait "ping" (Support.args #[]) RedisClientPing
+@[macro_inline] def RedisClient.ping (self : RedisClient) : Async RedisClientPing := Internal.api "Lasm.JS.Bun.RedisClient.ping" do
+  self.val.callMethodAwait "ping" (Internal.args #[]) RedisClientPing
 
 /-- `ping(message: RedisClient.KeyLike): Promise<string>`: `Promise<DOMString> ping(RedisClientKeyLike message)` -/
-def RedisClient.pingWithMessage (self : RedisClient) (message : RedisClientKeyLike) : Async String :=
-  self.val.callMethodAwait "ping" (Support.args #[toJS message]) String
+@[macro_inline] def RedisClient.pingWithMessage (self : RedisClient) (message : RedisClientKeyLike) : Async String := Internal.api "Lasm.JS.Bun.RedisClient.pingWithMessage" do
+  self.val.callMethodAwait "ping" (Internal.args #[toJS message]) String
 
 /-- `publish(channel: string, message: string): Promise<number>`: `Promise<double> publish(DOMString channel, DOMString message)` -/
-def RedisClient.publish (self : RedisClient) (channel : String) (message : String) : Async Float :=
-  self.val.callMethodAwait "publish" (Support.args #[toJS channel, toJS message]) Float
+@[macro_inline] def RedisClient.publish (self : RedisClient) (channel : String) (message : String) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.publish" do
+  self.val.callMethodAwait "publish" (Internal.args #[toJS channel, toJS message]) Float
 
 /-- `subscribe(channel: string, listener: RedisClient.StringPubSubListener): Promise<number>`: `Promise<double> subscribe(DOMString channel, RedisClientStringPubSubListener listener)` -/
-def RedisClient.subscribe (self : RedisClient) (channel : String) (listener : RedisClientStringPubSubListener) : Async Float :=
-  self.val.callMethodAwait "subscribe" (Support.args #[toJS channel, toJS listener]) Float
+@[macro_inline] def RedisClient.subscribe (self : RedisClient) (channel : String) (listener : RedisClientStringPubSubListener) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.subscribe" do
+  self.val.callMethodAwait "subscribe" (Internal.args #[toJS channel, toJS listener]) Float
 
 /-- `subscribe(channels: string[], listener: RedisClient.StringPubSubListener): Promise<number>`: `Promise<double> subscribe(sequence<DOMString> channels, RedisClientStringPubSubListener listener)` -/
-def RedisClient.subscribeWithChannels (self : RedisClient) (channels : Array String) (listener : RedisClientStringPubSubListener) : Async Float :=
-  self.val.callMethodAwait "subscribe" (Support.args #[toJS channels, toJS listener]) Float
+@[macro_inline] def RedisClient.subscribeWithChannels (self : RedisClient) (channels : Array String) (listener : RedisClientStringPubSubListener) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.subscribeWithChannels" do
+  self.val.callMethodAwait "subscribe" (Internal.args #[toJS channels, toJS listener]) Float
 
 /-- `unsubscribe(channel: string): Promise<void>`: `Promise<undefined> unsubscribe(DOMString channel)` -/
-def RedisClient.unsubscribe (self : RedisClient) (channel : String) : Async Unit :=
-  self.val.callMethodAwait "unsubscribe" (Support.args #[toJS channel]) Unit
+@[macro_inline] def RedisClient.unsubscribe (self : RedisClient) (channel : String) : Async Unit := Internal.api "Lasm.JS.Bun.RedisClient.unsubscribe" do
+  self.val.callMethodAwait "unsubscribe" (Internal.args #[toJS channel]) Unit
 
 /-- `unsubscribe(channel: string, listener: RedisClient.StringPubSubListener): Promise<void>`: `Promise<undefined> unsubscribe(DOMString channel, RedisClientStringPubSubListener listener)` -/
-def RedisClient.unsubscribeWithListener (self : RedisClient) (channel : String) (listener : RedisClientStringPubSubListener) : Async Unit :=
-  self.val.callMethodAwait "unsubscribe" (Support.args #[toJS channel, toJS listener]) Unit
+@[macro_inline] def RedisClient.unsubscribeWithListener (self : RedisClient) (channel : String) (listener : RedisClientStringPubSubListener) : Async Unit := Internal.api "Lasm.JS.Bun.RedisClient.unsubscribeWithListener" do
+  self.val.callMethodAwait "unsubscribe" (Internal.args #[toJS channel, toJS listener]) Unit
 
 /-- `unsubscribe(): Promise<void>`: `Promise<undefined> unsubscribe()` -/
-def RedisClient.unsubscribe0 (self : RedisClient) : Async Unit :=
-  self.val.callMethodAwait "unsubscribe" (Support.args #[]) Unit
+@[macro_inline] def RedisClient.unsubscribe0 (self : RedisClient) : Async Unit := Internal.api "Lasm.JS.Bun.RedisClient.unsubscribe0" do
+  self.val.callMethodAwait "unsubscribe" (Internal.args #[]) Unit
 
 /-- `unsubscribe(channels: string[]): Promise<void>`: `Promise<undefined> unsubscribe(sequence<DOMString> channels)` -/
-def RedisClient.unsubscribeWithChannels (self : RedisClient) (channels : Array String) : Async Unit :=
-  self.val.callMethodAwait "unsubscribe" (Support.args #[toJS channels]) Unit
+@[macro_inline] def RedisClient.unsubscribeWithChannels (self : RedisClient) (channels : Array String) : Async Unit := Internal.api "Lasm.JS.Bun.RedisClient.unsubscribeWithChannels" do
+  self.val.callMethodAwait "unsubscribe" (Internal.args #[toJS channels]) Unit
 
 /-- `duplicate(): Promise<RedisClient>`: `Promise<RedisClient> duplicate()` -/
-def RedisClient.duplicate (self : RedisClient) : Async RedisClient := do
-  let r ← self.val.callMethodAwait "duplicate" (Support.args #[]) Value
+@[macro_inline] def RedisClient.duplicate (self : RedisClient) : Async RedisClient := Internal.api "Lasm.JS.Bun.RedisClient.duplicate" do
+  let r ← self.val.callMethodAwait "duplicate" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `copy(source: RedisClient.KeyLike, destination: RedisClient.KeyLike): Promise<number>`: `Promise<double> copy(RedisClientKeyLike source, RedisClientKeyLike destination)` -/
-def RedisClient.copy (self : RedisClient) (source : RedisClientKeyLike) (destination : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "copy" (Support.args #[toJS source, toJS destination]) Float
+@[macro_inline] def RedisClient.copy (self : RedisClient) (source : RedisClientKeyLike) (destination : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.copy" do
+  self.val.callMethodAwait "copy" (Internal.args #[toJS source, toJS destination]) Float
 
 /-- `copy(source: RedisClient.KeyLike, destination: RedisClient.KeyLike, replace: 'REPLACE'): Promise<number>`: `Promise<double> copy(RedisClientKeyLike source, RedisClientKeyLike destination, RedisClientCopyWithReplaceReplace replace)` -/
-def RedisClient.copyWithReplace (self : RedisClient) (source : RedisClientKeyLike) (destination : RedisClientKeyLike) (replace : RedisClientCopyWithReplaceReplace) : Async Float :=
-  self.val.callMethodAwait "copy" (Support.args #[toJS source, toJS destination, toJS replace]) Float
+@[macro_inline] def RedisClient.copyWithReplace (self : RedisClient) (source : RedisClientKeyLike) (destination : RedisClientKeyLike) (replace : RedisClientCopyWithReplaceReplace) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.copyWithReplace" do
+  self.val.callMethodAwait "copy" (Internal.args #[toJS source, toJS destination, toJS replace]) Float
 
 /-- `unlink(...keys: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> unlink(RedisClientKeyLike... keys)` -/
-def RedisClient.unlink (self : RedisClient) (keys : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "unlink" (Support.argsWith #[] (keys.map toJS)) Float
+@[macro_inline] def RedisClient.unlink (self : RedisClient) (keys : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.unlink" do
+  self.val.callMethodAwait "unlink" (Internal.argsWith #[] (keys.map toJS)) Float
 
 /-- `touch(...keys: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> touch(RedisClientKeyLike... keys)` -/
-def RedisClient.touch (self : RedisClient) (keys : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "touch" (Support.argsWith #[] (keys.map toJS)) Float
+@[macro_inline] def RedisClient.touch (self : RedisClient) (keys : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.touch" do
+  self.val.callMethodAwait "touch" (Internal.argsWith #[] (keys.map toJS)) Float
 
 /-- `rename(key: RedisClient.KeyLike, newkey: RedisClient.KeyLike): Promise<'OK'>`: `Promise<RedisClientRename> rename(RedisClientKeyLike key, RedisClientKeyLike newkey)` -/
-def RedisClient.rename (self : RedisClient) (key : RedisClientKeyLike) (newkey : RedisClientKeyLike) : Async RedisClientRename :=
-  self.val.callMethodAwait "rename" (Support.args #[toJS key, toJS newkey]) RedisClientRename
+@[macro_inline] def RedisClient.rename (self : RedisClient) (key : RedisClientKeyLike) (newkey : RedisClientKeyLike) : Async RedisClientRename := Internal.api "Lasm.JS.Bun.RedisClient.rename" do
+  self.val.callMethodAwait "rename" (Internal.args #[toJS key, toJS newkey]) RedisClientRename
 
 /-- `renamenx(key: RedisClient.KeyLike, newkey: RedisClient.KeyLike): Promise<number>`: `Promise<double> renamenx(RedisClientKeyLike key, RedisClientKeyLike newkey)` -/
-def RedisClient.renamenx (self : RedisClient) (key : RedisClientKeyLike) (newkey : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "renamenx" (Support.args #[toJS key, toJS newkey]) Float
+@[macro_inline] def RedisClient.renamenx (self : RedisClient) (key : RedisClientKeyLike) (newkey : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.renamenx" do
+  self.val.callMethodAwait "renamenx" (Internal.args #[toJS key, toJS newkey]) Float
 
 /-- `zdiff(numkeys: number, ...args: [...keys: RedisClient.KeyLike[], withscores: 'WITHSCORES']): Promise<[string, number][]>`: `Promise<sequence<sequence<any>>> zdiff(double numkeys, sequence<any>... args)` -/
-def RedisClient.zdiff (self : RedisClient) (numkeys : Float) (args : Array (Array Data) := #[]) : Async (Array (Array Data)) :=
-  self.val.callMethodAwait "zdiff" (Support.argsWith #[toJS numkeys] (args.map toJS)) (Array (Array Data))
+@[macro_inline] def RedisClient.zdiff (self : RedisClient) (numkeys : Float) (args : Array (Array Data) := #[]) : Async (Array (Array Data)) := Internal.api "Lasm.JS.Bun.RedisClient.zdiff" do
+  self.val.callMethodAwait "zdiff" (Internal.argsWith #[toJS numkeys] (args.map toJS)) (Array (Array Data))
 
 /-- `zdiff(numkeys: number, ...keys: RedisClient.KeyLike[]): Promise<string[]>`: `Promise<sequence<DOMString>> zdiff(double numkeys, RedisClientKeyLike... keys)` -/
-def RedisClient.zdiffWithKeys (self : RedisClient) (numkeys : Float) (keys : Array RedisClientKeyLike := #[]) : Async (Array String) :=
-  self.val.callMethodAwait "zdiff" (Support.argsWith #[toJS numkeys] (keys.map toJS)) (Array String)
+@[macro_inline] def RedisClient.zdiffWithKeys (self : RedisClient) (numkeys : Float) (keys : Array RedisClientKeyLike := #[]) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.zdiffWithKeys" do
+  self.val.callMethodAwait "zdiff" (Internal.argsWith #[toJS numkeys] (keys.map toJS)) (Array String)
 
 /-- `zdiffstore(destination: RedisClient.KeyLike, numkeys: number, ...keys: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> zdiffstore(RedisClientKeyLike destination, double numkeys, RedisClientKeyLike... keys)` -/
-def RedisClient.zdiffstore (self : RedisClient) (destination : RedisClientKeyLike) (numkeys : Float) (keys : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "zdiffstore" (Support.argsWith #[toJS destination, toJS numkeys] (keys.map toJS)) Float
+@[macro_inline] def RedisClient.zdiffstore (self : RedisClient) (destination : RedisClientKeyLike) (numkeys : Float) (keys : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.zdiffstore" do
+  self.val.callMethodAwait "zdiffstore" (Internal.argsWith #[toJS destination, toJS numkeys] (keys.map toJS)) Float
 
 /-- `zinter(numkeys: number, ...args: [...args: (string | number)[], withscores: 'WITHSCORES']): Promise<[string, number][]>`: `Promise<sequence<sequence<any>>> zinter(double numkeys, sequence<any>... args)` -/
-def RedisClient.zinter (self : RedisClient) (numkeys : Float) (args : Array (Array Data) := #[]) : Async (Array (Array Data)) :=
-  self.val.callMethodAwait "zinter" (Support.argsWith #[toJS numkeys] (args.map toJS)) (Array (Array Data))
+@[macro_inline] def RedisClient.zinter (self : RedisClient) (numkeys : Float) (args : Array (Array Data) := #[]) : Async (Array (Array Data)) := Internal.api "Lasm.JS.Bun.RedisClient.zinter" do
+  self.val.callMethodAwait "zinter" (Internal.argsWith #[toJS numkeys] (args.map toJS)) (Array (Array Data))
 
 /-- `zinter(numkeys: number, ...args: (string | number)[]): Promise<string[]>`: `Promise<sequence<DOMString>> zinter(double numkeys, DOMStringOrDouble... args)` -/
-def RedisClient.zinterWithStringNumber (self : RedisClient) (numkeys : Float) (args : Array DOMStringOrDouble := #[]) : Async (Array String) :=
-  self.val.callMethodAwait "zinter" (Support.argsWith #[toJS numkeys] (args.map toJS)) (Array String)
+@[macro_inline] def RedisClient.zinterWithStringNumber (self : RedisClient) (numkeys : Float) (args : Array DOMStringOrDouble := #[]) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.zinterWithStringNumber" do
+  self.val.callMethodAwait "zinter" (Internal.argsWith #[toJS numkeys] (args.map toJS)) (Array String)
 
 /-- `zintercard(numkeys: number, ...keys: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> zintercard(double numkeys, RedisClientKeyLike... keys)` -/
-def RedisClient.zintercard (self : RedisClient) (numkeys : Float) (keys : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "zintercard" (Support.argsWith #[toJS numkeys] (keys.map toJS)) Float
+@[macro_inline] def RedisClient.zintercard (self : RedisClient) (numkeys : Float) (keys : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.zintercard" do
+  self.val.callMethodAwait "zintercard" (Internal.argsWith #[toJS numkeys] (keys.map toJS)) Float
 
 /-- `zintercard(numkeys: number, ...args: (RedisClient.KeyLike | 'LIMIT' | number)[]): Promise<number>`: `Promise<double> zintercard(double numkeys, DOMStringOrRedisClientKeyLikeOrDouble... args)` -/
-def RedisClient.zintercardWithArgs (self : RedisClient) (numkeys : Float) (args : Array DOMStringOrRedisClientKeyLikeOrDouble := #[]) : Async Float :=
-  self.val.callMethodAwait "zintercard" (Support.argsWith #[toJS numkeys] (args.map toJS)) Float
+@[macro_inline] def RedisClient.zintercardWithArgs (self : RedisClient) (numkeys : Float) (args : Array DOMStringOrRedisClientKeyLikeOrDouble := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.zintercardWithArgs" do
+  self.val.callMethodAwait "zintercard" (Internal.argsWith #[toJS numkeys] (args.map toJS)) Float
 
 /-- `zinterstore(destination: RedisClient.KeyLike, numkeys: number, ...args: (string | number)[]): Promise<number>`: `Promise<double> zinterstore(RedisClientKeyLike destination, double numkeys, DOMStringOrDouble... args)` -/
-def RedisClient.zinterstore (self : RedisClient) (destination : RedisClientKeyLike) (numkeys : Float) (args : Array DOMStringOrDouble := #[]) : Async Float :=
-  self.val.callMethodAwait "zinterstore" (Support.argsWith #[toJS destination, toJS numkeys] (args.map toJS)) Float
+@[macro_inline] def RedisClient.zinterstore (self : RedisClient) (destination : RedisClientKeyLike) (numkeys : Float) (args : Array DOMStringOrDouble := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.zinterstore" do
+  self.val.callMethodAwait "zinterstore" (Internal.argsWith #[toJS destination, toJS numkeys] (args.map toJS)) Float
 
 /-- `zunion(numkeys: number, ...args: [...args: (string | number)[], withscores: 'WITHSCORES']): Promise<[string, number][]>`: `Promise<sequence<sequence<any>>> zunion(double numkeys, sequence<any>... args)` -/
-def RedisClient.zunion (self : RedisClient) (numkeys : Float) (args : Array (Array Data) := #[]) : Async (Array (Array Data)) :=
-  self.val.callMethodAwait "zunion" (Support.argsWith #[toJS numkeys] (args.map toJS)) (Array (Array Data))
+@[macro_inline] def RedisClient.zunion (self : RedisClient) (numkeys : Float) (args : Array (Array Data) := #[]) : Async (Array (Array Data)) := Internal.api "Lasm.JS.Bun.RedisClient.zunion" do
+  self.val.callMethodAwait "zunion" (Internal.argsWith #[toJS numkeys] (args.map toJS)) (Array (Array Data))
 
 /-- `zunion(numkeys: number, ...args: (string | number)[]): Promise<string[]>`: `Promise<sequence<DOMString>> zunion(double numkeys, DOMStringOrDouble... args)` -/
-def RedisClient.zunionWithStringNumber (self : RedisClient) (numkeys : Float) (args : Array DOMStringOrDouble := #[]) : Async (Array String) :=
-  self.val.callMethodAwait "zunion" (Support.argsWith #[toJS numkeys] (args.map toJS)) (Array String)
+@[macro_inline] def RedisClient.zunionWithStringNumber (self : RedisClient) (numkeys : Float) (args : Array DOMStringOrDouble := #[]) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.zunionWithStringNumber" do
+  self.val.callMethodAwait "zunion" (Internal.argsWith #[toJS numkeys] (args.map toJS)) (Array String)
 
 /-- `zunionstore(destination: RedisClient.KeyLike, numkeys: number, ...args: (string | number)[]): Promise<number>`: `Promise<double> zunionstore(RedisClientKeyLike destination, double numkeys, DOMStringOrDouble... args)` -/
-def RedisClient.zunionstore (self : RedisClient) (destination : RedisClientKeyLike) (numkeys : Float) (args : Array DOMStringOrDouble := #[]) : Async Float :=
-  self.val.callMethodAwait "zunionstore" (Support.argsWith #[toJS destination, toJS numkeys] (args.map toJS)) Float
+@[macro_inline] def RedisClient.zunionstore (self : RedisClient) (destination : RedisClientKeyLike) (numkeys : Float) (args : Array DOMStringOrDouble := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.zunionstore" do
+  self.val.callMethodAwait "zunionstore" (Internal.argsWith #[toJS destination, toJS numkeys] (args.map toJS)) Float
 
 /-- `zmpop(numkeys: number, ...args: (string | number)[]): Promise<[string, [string, number][]] | null>`: `Promise<sequence<any>?> zmpop(double numkeys, DOMStringOrDouble... args)` -/
-def RedisClient.zmpop (self : RedisClient) (numkeys : Float) (args : Array DOMStringOrDouble := #[]) : Async (Option (Array Data)) :=
-  self.val.callMethodAwait "zmpop" (Support.argsWith #[toJS numkeys] (args.map toJS)) (Option (Array Data))
+@[macro_inline] def RedisClient.zmpop (self : RedisClient) (numkeys : Float) (args : Array DOMStringOrDouble := #[]) : Async (Option (Array Data)) := Internal.api "Lasm.JS.Bun.RedisClient.zmpop" do
+  self.val.callMethodAwait "zmpop" (Internal.argsWith #[toJS numkeys] (args.map toJS)) (Option (Array Data))
 
 /-- `bzmpop(timeout: number, numkeys: number, ...args: (string | number)[]): Promise<[string, [string, number][]] | null>`: `Promise<sequence<any>?> bzmpop(double /* integer: Nat */ timeout, double numkeys, DOMStringOrDouble... args)` -/
-def RedisClient.bzmpop (self : RedisClient) (timeout : Nat) (numkeys : Float) (args : Array DOMStringOrDouble := #[]) : Async (Option (Array Data)) :=
-  self.val.callMethodAwait "bzmpop" (Support.argsWith #[toJS timeout, toJS numkeys] (args.map toJS)) (Option (Array Data))
+@[macro_inline] def RedisClient.bzmpop (self : RedisClient) (timeout : Nat) (numkeys : Float) (args : Array DOMStringOrDouble := #[]) : Async (Option (Array Data)) := Internal.api "Lasm.JS.Bun.RedisClient.bzmpop" do
+  self.val.callMethodAwait "bzmpop" (Internal.argsWith #[toJS timeout, toJS numkeys] (args.map toJS)) (Option (Array Data))
 
 /-- `bitop(operation: 'NOT' | 'not', destkey: RedisClient.KeyLike, key: RedisClient.KeyLike): Promise<number>`: `Promise<double> bitop(RedisClientBitopOperation operation, RedisClientKeyLike destkey, RedisClientKeyLike key)` -/
-def RedisClient.bitop (self : RedisClient) (operation : RedisClientBitopOperation) (destkey : RedisClientKeyLike) (key : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "bitop" (Support.args #[toJS operation, toJS destkey, toJS key]) Float
+@[macro_inline] def RedisClient.bitop (self : RedisClient) (operation : RedisClientBitopOperation) (destkey : RedisClientKeyLike) (key : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.bitop" do
+  self.val.callMethodAwait "bitop" (Internal.args #[toJS operation, toJS destkey, toJS key]) Float
 
 /-- `bitop(operation: | 'AND' | 'OR' | 'XOR' | 'DIFF' | 'DIFF1' | 'ANDOR' | 'ONE' | 'and' | 'or' | 'xor' | 'diff' | 'diff1' | 'andor' | 'one', destkey: RedisClient.KeyLike, key: RedisClient.KeyLike, ...moreKeys: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> bitop(RedisClientBitopWithMoreKeysOperation operation, RedisClientKeyLike destkey, RedisClientKeyLike key, RedisClientKeyLike... moreKeys)` -/
-def RedisClient.bitopWithMoreKeys (self : RedisClient) (operation : RedisClientBitopWithMoreKeysOperation) (destkey : RedisClientKeyLike) (key : RedisClientKeyLike) (moreKeys : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "bitop" (Support.argsWith #[toJS operation, toJS destkey, toJS key] (moreKeys.map toJS)) Float
+@[macro_inline] def RedisClient.bitopWithMoreKeys (self : RedisClient) (operation : RedisClientBitopWithMoreKeysOperation) (destkey : RedisClientKeyLike) (key : RedisClientKeyLike) (moreKeys : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.bitopWithMoreKeys" do
+  self.val.callMethodAwait "bitop" (Internal.argsWith #[toJS operation, toJS destkey, toJS key] (moreKeys.map toJS)) Float
 
 /-- `bitpos(key: RedisClient.KeyLike, bit: 0 | 1, ...options: (string | number)[]): Promise<number>`: `Promise<double> bitpos(RedisClientKeyLike key, double bit, DOMStringOrDouble... options)` -/
-def RedisClient.bitpos (self : RedisClient) (key : RedisClientKeyLike) (bit : Float) (options : Array DOMStringOrDouble := #[]) : Async Float :=
-  self.val.callMethodAwait "bitpos" (Support.argsWith #[toJS key, toJS bit] (options.map toJS)) Float
+@[macro_inline] def RedisClient.bitpos (self : RedisClient) (key : RedisClientKeyLike) (bit : Float) (options : Array DOMStringOrDouble := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.bitpos" do
+  self.val.callMethodAwait "bitpos" (Internal.argsWith #[toJS key, toJS bit] (options.map toJS)) Float
 
 /-- `bitfield(key: RedisClient.KeyLike, ...operations: (string | number)[]): Promise<(number | null)[]>`: `Promise<sequence<double?>> bitfield(RedisClientKeyLike key, DOMStringOrDouble... operations)` -/
-def RedisClient.bitfield (self : RedisClient) (key : RedisClientKeyLike) (operations : Array DOMStringOrDouble := #[]) : Async (Array (Option Float)) :=
-  self.val.callMethodAwait "bitfield" (Support.argsWith #[toJS key] (operations.map toJS)) (Array (Option Float))
+@[macro_inline] def RedisClient.bitfield (self : RedisClient) (key : RedisClientKeyLike) (operations : Array DOMStringOrDouble := #[]) : Async (Array (Option Float)) := Internal.api "Lasm.JS.Bun.RedisClient.bitfield" do
+  self.val.callMethodAwait "bitfield" (Internal.argsWith #[toJS key] (operations.map toJS)) (Array (Option Float))
 
 /-- `pfcount(key: RedisClient.KeyLike, ...moreKeys: RedisClient.KeyLike[]): Promise<number>`: `Promise<double> pfcount(RedisClientKeyLike key, RedisClientKeyLike... moreKeys)` -/
-def RedisClient.pfcount (self : RedisClient) (key : RedisClientKeyLike) (moreKeys : Array RedisClientKeyLike := #[]) : Async Float :=
-  self.val.callMethodAwait "pfcount" (Support.argsWith #[toJS key] (moreKeys.map toJS)) Float
+@[macro_inline] def RedisClient.pfcount (self : RedisClient) (key : RedisClientKeyLike) (moreKeys : Array RedisClientKeyLike := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.pfcount" do
+  self.val.callMethodAwait "pfcount" (Internal.argsWith #[toJS key] (moreKeys.map toJS)) Float
 
 /-- `pfmerge(destkey: RedisClient.KeyLike, ...sourcekeys: RedisClient.KeyLike[]): Promise<'OK'>`: `Promise<RedisClientPfmerge> pfmerge(RedisClientKeyLike destkey, RedisClientKeyLike... sourcekeys)` -/
-def RedisClient.pfmerge (self : RedisClient) (destkey : RedisClientKeyLike) (sourcekeys : Array RedisClientKeyLike := #[]) : Async RedisClientPfmerge :=
-  self.val.callMethodAwait "pfmerge" (Support.argsWith #[toJS destkey] (sourcekeys.map toJS)) RedisClientPfmerge
+@[macro_inline] def RedisClient.pfmerge (self : RedisClient) (destkey : RedisClientKeyLike) (sourcekeys : Array RedisClientKeyLike := #[]) : Async RedisClientPfmerge := Internal.api "Lasm.JS.Bun.RedisClient.pfmerge" do
+  self.val.callMethodAwait "pfmerge" (Internal.argsWith #[toJS destkey] (sourcekeys.map toJS)) RedisClientPfmerge
 
 /-- `geoadd(key: RedisClient.KeyLike, ...args: (string | number)[]): Promise<number>`: `Promise<double> geoadd(RedisClientKeyLike key, DOMStringOrDouble... args)` -/
-def RedisClient.geoadd (self : RedisClient) (key : RedisClientKeyLike) (args : Array DOMStringOrDouble := #[]) : Async Float :=
-  self.val.callMethodAwait "geoadd" (Support.argsWith #[toJS key] (args.map toJS)) Float
+@[macro_inline] def RedisClient.geoadd (self : RedisClient) (key : RedisClientKeyLike) (args : Array DOMStringOrDouble := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.geoadd" do
+  self.val.callMethodAwait "geoadd" (Internal.argsWith #[toJS key] (args.map toJS)) Float
 
 /-- `geodist(key: RedisClient.KeyLike, member1: string, member2: string): Promise<string | null>`: `Promise<DOMString?> geodist(RedisClientKeyLike key, DOMString member1, DOMString member2)` -/
-def RedisClient.geodist (self : RedisClient) (key : RedisClientKeyLike) (member1 : String) (member2 : String) : Async (Option String) :=
-  self.val.callMethodAwait "geodist" (Support.args #[toJS key, toJS member1, toJS member2]) (Option String)
+@[macro_inline] def RedisClient.geodist (self : RedisClient) (key : RedisClientKeyLike) (member1 : String) (member2 : String) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.geodist" do
+  self.val.callMethodAwait "geodist" (Internal.args #[toJS key, toJS member1, toJS member2]) (Option String)
 
 /-- `geodist(key: RedisClient.KeyLike, member1: string, member2: string, unit: 'm' | 'km' | 'mi' | 'ft' | 'M' | 'KM' | 'MI' | 'FT'): Promise<string | null>`: `Promise<DOMString?> geodist(RedisClientKeyLike key, DOMString member1, DOMString member2, RedisClientGeodistWithUnitUnit unit)` -/
-def RedisClient.geodistWithUnit (self : RedisClient) (key : RedisClientKeyLike) (member1 : String) (member2 : String) (unit : RedisClientGeodistWithUnitUnit) : Async (Option String) :=
-  self.val.callMethodAwait "geodist" (Support.args #[toJS key, toJS member1, toJS member2, toJS unit]) (Option String)
+@[macro_inline] def RedisClient.geodistWithUnit (self : RedisClient) (key : RedisClientKeyLike) (member1 : String) (member2 : String) (unit : RedisClientGeodistWithUnitUnit) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.geodistWithUnit" do
+  self.val.callMethodAwait "geodist" (Internal.args #[toJS key, toJS member1, toJS member2, toJS unit]) (Option String)
 
 /-- `geohash(key: RedisClient.KeyLike, ...members: string[]): Promise<(string | null)[]>`: `Promise<sequence<DOMString?>> geohash(RedisClientKeyLike key, DOMString... members)` -/
-def RedisClient.geohash (self : RedisClient) (key : RedisClientKeyLike) (members : Array String := #[]) : Async (Array (Option String)) :=
-  self.val.callMethodAwait "geohash" (Support.argsWith #[toJS key] (members.map toJS)) (Array (Option String))
+@[macro_inline] def RedisClient.geohash (self : RedisClient) (key : RedisClientKeyLike) (members : Array String := #[]) : Async (Array (Option String)) := Internal.api "Lasm.JS.Bun.RedisClient.geohash" do
+  self.val.callMethodAwait "geohash" (Internal.argsWith #[toJS key] (members.map toJS)) (Array (Option String))
 
 /-- `geopos(key: RedisClient.KeyLike, ...members: string[]): Promise<([number, number] | null)[]>`: `Promise<sequence<sequence<double>?>> geopos(RedisClientKeyLike key, DOMString... members)` -/
-def RedisClient.geopos (self : RedisClient) (key : RedisClientKeyLike) (members : Array String := #[]) : Async (Array (Option (Array Float))) :=
-  self.val.callMethodAwait "geopos" (Support.argsWith #[toJS key] (members.map toJS)) (Array (Option (Array Float)))
+@[macro_inline] def RedisClient.geopos (self : RedisClient) (key : RedisClientKeyLike) (members : Array String := #[]) : Async (Array (Option (Array Float))) := Internal.api "Lasm.JS.Bun.RedisClient.geopos" do
+  self.val.callMethodAwait "geopos" (Internal.argsWith #[toJS key] (members.map toJS)) (Array (Option (Array Float)))
 
 /-- `geosearch(key: RedisClient.KeyLike, ...args: (string | number)[]): Promise<unknown[]>`: `Promise<sequence<any>> geosearch(RedisClientKeyLike key, DOMStringOrDouble... args)` -/
-def RedisClient.geosearch (self : RedisClient) (key : RedisClientKeyLike) (args : Array DOMStringOrDouble := #[]) : Async (Array Data) :=
-  self.val.callMethodAwait "geosearch" (Support.argsWith #[toJS key] (args.map toJS)) (Array Data)
+@[macro_inline] def RedisClient.geosearch (self : RedisClient) (key : RedisClientKeyLike) (args : Array DOMStringOrDouble := #[]) : Async (Array Data) := Internal.api "Lasm.JS.Bun.RedisClient.geosearch" do
+  self.val.callMethodAwait "geosearch" (Internal.argsWith #[toJS key] (args.map toJS)) (Array Data)
 
 /-- `geosearchstore(destination: RedisClient.KeyLike, source: RedisClient.KeyLike, ...args: (string | number)[]): Promise<number>`: `Promise<double> geosearchstore(RedisClientKeyLike destination, RedisClientKeyLike source, DOMStringOrDouble... args)` -/
-def RedisClient.geosearchstore (self : RedisClient) (destination : RedisClientKeyLike) (source : RedisClientKeyLike) (args : Array DOMStringOrDouble := #[]) : Async Float :=
-  self.val.callMethodAwait "geosearchstore" (Support.argsWith #[toJS destination, toJS source] (args.map toJS)) Float
+@[macro_inline] def RedisClient.geosearchstore (self : RedisClient) (destination : RedisClientKeyLike) (source : RedisClientKeyLike) (args : Array DOMStringOrDouble := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.geosearchstore" do
+  self.val.callMethodAwait "geosearchstore" (Internal.argsWith #[toJS destination, toJS source] (args.map toJS)) Float
 
 /-- `eval(script: string, numkeys: number, ...keysAndArgs: (string | number)[]): Promise<any>`: `Promise<any> eval(DOMString script, double numkeys, DOMStringOrDouble... keysAndArgs)` -/
-def RedisClient.eval (self : RedisClient) (script : String) (numkeys : Float) (keysAndArgs : Array DOMStringOrDouble := #[]) : Async Data :=
-  self.val.callMethodAwait "eval" (Support.argsWith #[toJS script, toJS numkeys] (keysAndArgs.map toJS)) Data
+@[macro_inline] def RedisClient.eval (self : RedisClient) (script : String) (numkeys : Float) (keysAndArgs : Array DOMStringOrDouble := #[]) : Async Data := Internal.api "Lasm.JS.Bun.RedisClient.eval" do
+  self.val.callMethodAwait "eval" (Internal.argsWith #[toJS script, toJS numkeys] (keysAndArgs.map toJS)) Data
 
 /-- `evalsha(sha1: string, numkeys: number, ...keysAndArgs: (string | number)[]): Promise<any>`: `Promise<any> evalsha(DOMString sha1, double numkeys, DOMStringOrDouble... keysAndArgs)` -/
-def RedisClient.evalsha (self : RedisClient) (sha1 : String) (numkeys : Float) (keysAndArgs : Array DOMStringOrDouble := #[]) : Async Data :=
-  self.val.callMethodAwait "evalsha" (Support.argsWith #[toJS sha1, toJS numkeys] (keysAndArgs.map toJS)) Data
+@[macro_inline] def RedisClient.evalsha (self : RedisClient) (sha1 : String) (numkeys : Float) (keysAndArgs : Array DOMStringOrDouble := #[]) : Async Data := Internal.api "Lasm.JS.Bun.RedisClient.evalsha" do
+  self.val.callMethodAwait "evalsha" (Internal.argsWith #[toJS sha1, toJS numkeys] (keysAndArgs.map toJS)) Data
 
 /-- `script(...args: string[]): Promise<any>`: `Promise<any> script(DOMString... args)` -/
-def RedisClient.script (self : RedisClient) (args : Array String := #[]) : Async Data :=
-  self.val.callMethodAwait "script" (Support.argsWith #[] (args.map toJS)) Data
+@[macro_inline] def RedisClient.script (self : RedisClient) (args : Array String := #[]) : Async Data := Internal.api "Lasm.JS.Bun.RedisClient.script" do
+  self.val.callMethodAwait "script" (Internal.argsWith #[] (args.map toJS)) Data
 
 /-- `fcall(name: string, numkeys: number, ...keysAndArgs: (string | number)[]): Promise<any>`: `Promise<any> fcall(DOMString name, double numkeys, DOMStringOrDouble... keysAndArgs)` -/
-def RedisClient.fcall (self : RedisClient) (name : String) (numkeys : Float) (keysAndArgs : Array DOMStringOrDouble := #[]) : Async Data :=
-  self.val.callMethodAwait "fcall" (Support.argsWith #[toJS name, toJS numkeys] (keysAndArgs.map toJS)) Data
+@[macro_inline] def RedisClient.fcall (self : RedisClient) (name : String) (numkeys : Float) (keysAndArgs : Array DOMStringOrDouble := #[]) : Async Data := Internal.api "Lasm.JS.Bun.RedisClient.fcall" do
+  self.val.callMethodAwait "fcall" (Internal.argsWith #[toJS name, toJS numkeys] (keysAndArgs.map toJS)) Data
 
 /-- `function(...args: RedisClient.KeyLike[]): Promise<any>`: `Promise<any> function(RedisClientKeyLike... args)` -/
-def RedisClient.function (self : RedisClient) (args : Array RedisClientKeyLike := #[]) : Async Data :=
-  self.val.callMethodAwait "function" (Support.argsWith #[] (args.map toJS)) Data
+@[macro_inline] def RedisClient.function (self : RedisClient) (args : Array RedisClientKeyLike := #[]) : Async Data := Internal.api "Lasm.JS.Bun.RedisClient.function" do
+  self.val.callMethodAwait "function" (Internal.argsWith #[] (args.map toJS)) Data
 
 /-- `dbsize(): Promise<number>`: `Promise<double> dbsize()` -/
-def RedisClient.dbsize (self : RedisClient) : Async Float :=
-  self.val.callMethodAwait "dbsize" (Support.args #[]) Float
+@[macro_inline] def RedisClient.dbsize (self : RedisClient) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.dbsize" do
+  self.val.callMethodAwait "dbsize" (Internal.args #[]) Float
 
 /-- `flushdb(): Promise<'OK'>`: `Promise<RedisClientFlushdb> flushdb()` -/
-def RedisClient.flushdb (self : RedisClient) : Async RedisClientFlushdb :=
-  self.val.callMethodAwait "flushdb" (Support.args #[]) RedisClientFlushdb
+@[macro_inline] def RedisClient.flushdb (self : RedisClient) : Async RedisClientFlushdb := Internal.api "Lasm.JS.Bun.RedisClient.flushdb" do
+  self.val.callMethodAwait "flushdb" (Internal.args #[]) RedisClientFlushdb
 
 /-- `flushdb(mode: 'ASYNC' | 'SYNC' | 'async' | 'sync'): Promise<'OK'>`: `Promise<RedisClientFlushdb> flushdb(RedisClientFlushdbWithModeMode mode)` -/
-def RedisClient.flushdbWithMode (self : RedisClient) (mode : RedisClientFlushdbWithModeMode) : Async RedisClientFlushdb :=
-  self.val.callMethodAwait "flushdb" (Support.args #[toJS mode]) RedisClientFlushdb
+@[macro_inline] def RedisClient.flushdbWithMode (self : RedisClient) (mode : RedisClientFlushdbWithModeMode) : Async RedisClientFlushdb := Internal.api "Lasm.JS.Bun.RedisClient.flushdbWithMode" do
+  self.val.callMethodAwait "flushdb" (Internal.args #[toJS mode]) RedisClientFlushdb
 
 /-- `flushall(): Promise<'OK'>`: `Promise<RedisClientFlushall> flushall()` -/
-def RedisClient.flushall (self : RedisClient) : Async RedisClientFlushall :=
-  self.val.callMethodAwait "flushall" (Support.args #[]) RedisClientFlushall
+@[macro_inline] def RedisClient.flushall (self : RedisClient) : Async RedisClientFlushall := Internal.api "Lasm.JS.Bun.RedisClient.flushall" do
+  self.val.callMethodAwait "flushall" (Internal.args #[]) RedisClientFlushall
 
 /-- `flushall(mode: 'ASYNC' | 'SYNC' | 'async' | 'sync'): Promise<'OK'>`: `Promise<RedisClientFlushall> flushall(RedisClientFlushallWithModeMode mode)` -/
-def RedisClient.flushallWithMode (self : RedisClient) (mode : RedisClientFlushallWithModeMode) : Async RedisClientFlushall :=
-  self.val.callMethodAwait "flushall" (Support.args #[toJS mode]) RedisClientFlushall
+@[macro_inline] def RedisClient.flushallWithMode (self : RedisClient) (mode : RedisClientFlushallWithModeMode) : Async RedisClientFlushall := Internal.api "Lasm.JS.Bun.RedisClient.flushallWithMode" do
+  self.val.callMethodAwait "flushall" (Internal.args #[toJS mode]) RedisClientFlushall
 
 /-- `info(...sections: string[]): Promise<string>`: `Promise<DOMString> info(DOMString... sections)` -/
-def RedisClient.info (self : RedisClient) (sections : Array String := #[]) : Async String :=
-  self.val.callMethodAwait "info" (Support.argsWith #[] (sections.map toJS)) String
+@[macro_inline] def RedisClient.info (self : RedisClient) (sections : Array String := #[]) : Async String := Internal.api "Lasm.JS.Bun.RedisClient.info" do
+  self.val.callMethodAwait "info" (Internal.argsWith #[] (sections.map toJS)) String
 
 /-- `time(): Promise<[string, string]>`: `Promise<sequence<DOMString>> time()` -/
-def RedisClient.time (self : RedisClient) : Async (Array String) :=
-  self.val.callMethodAwait "time" (Support.args #[]) (Array String)
+@[macro_inline] def RedisClient.time (self : RedisClient) : Async (Array String) := Internal.api "Lasm.JS.Bun.RedisClient.time" do
+  self.val.callMethodAwait "time" (Internal.args #[]) (Array String)
 
 /-- `echo(message: string): Promise<string>`: `Promise<DOMString> echo(DOMString message)` -/
-def RedisClient.echo (self : RedisClient) (message : String) : Async String :=
-  self.val.callMethodAwait "echo" (Support.args #[toJS message]) String
+@[macro_inline] def RedisClient.echo (self : RedisClient) (message : String) : Async String := Internal.api "Lasm.JS.Bun.RedisClient.echo" do
+  self.val.callMethodAwait "echo" (Internal.args #[toJS message]) String
 
 /-- `lastsave(): Promise<number>`: `Promise<double> lastsave()` -/
-def RedisClient.lastsave (self : RedisClient) : Async Float :=
-  self.val.callMethodAwait "lastsave" (Support.args #[]) Float
+@[macro_inline] def RedisClient.lastsave (self : RedisClient) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.lastsave" do
+  self.val.callMethodAwait "lastsave" (Internal.args #[]) Float
 
 /-- `client(...args: (string | number)[]): Promise<any>`: `Promise<any> client(DOMStringOrDouble... args)` -/
-def RedisClient.client (self : RedisClient) (args : Array DOMStringOrDouble := #[]) : Async Data :=
-  self.val.callMethodAwait "client" (Support.argsWith #[] (args.map toJS)) Data
+@[macro_inline] def RedisClient.client (self : RedisClient) (args : Array DOMStringOrDouble := #[]) : Async Data := Internal.api "Lasm.JS.Bun.RedisClient.client" do
+  self.val.callMethodAwait "client" (Internal.argsWith #[] (args.map toJS)) Data
 
 /-- `config(...args: (string | number)[]): Promise<any>`: `Promise<any> config(DOMStringOrDouble... args)` -/
-def RedisClient.config (self : RedisClient) (args : Array DOMStringOrDouble := #[]) : Async Data :=
-  self.val.callMethodAwait "config" (Support.argsWith #[] (args.map toJS)) Data
+@[macro_inline] def RedisClient.config (self : RedisClient) (args : Array DOMStringOrDouble := #[]) : Async Data := Internal.api "Lasm.JS.Bun.RedisClient.config" do
+  self.val.callMethodAwait "config" (Internal.argsWith #[] (args.map toJS)) Data
 
 /-- `debug(...args: (string | number)[]): Promise<any>`: `Promise<any> debug(DOMStringOrDouble... args)` -/
-def RedisClient.debug (self : RedisClient) (args : Array DOMStringOrDouble := #[]) : Async Data :=
-  self.val.callMethodAwait "debug" (Support.argsWith #[] (args.map toJS)) Data
+@[macro_inline] def RedisClient.debug (self : RedisClient) (args : Array DOMStringOrDouble := #[]) : Async Data := Internal.api "Lasm.JS.Bun.RedisClient.debug" do
+  self.val.callMethodAwait "debug" (Internal.argsWith #[] (args.map toJS)) Data
 
 /-- `command(...args: (string | number)[]): Promise<any>`: `Promise<any> command(DOMStringOrDouble... args)` -/
-def RedisClient.command (self : RedisClient) (args : Array DOMStringOrDouble := #[]) : Async Data :=
-  self.val.callMethodAwait "command" (Support.argsWith #[] (args.map toJS)) Data
+@[macro_inline] def RedisClient.command (self : RedisClient) (args : Array DOMStringOrDouble := #[]) : Async Data := Internal.api "Lasm.JS.Bun.RedisClient.command" do
+  self.val.callMethodAwait "command" (Internal.argsWith #[] (args.map toJS)) Data
 
 /-- `object(subcommand: string, ...args: RedisClient.KeyLike[]): Promise<any>`: `Promise<any> object(DOMString subcommand, RedisClientKeyLike... args)` -/
-def RedisClient.object (self : RedisClient) (subcommand : String) (args : Array RedisClientKeyLike := #[]) : Async Data :=
-  self.val.callMethodAwait "object" (Support.argsWith #[toJS subcommand] (args.map toJS)) Data
+@[macro_inline] def RedisClient.object (self : RedisClient) (subcommand : String) (args : Array RedisClientKeyLike := #[]) : Async Data := Internal.api "Lasm.JS.Bun.RedisClient.object" do
+  self.val.callMethodAwait "object" (Internal.argsWith #[toJS subcommand] (args.map toJS)) Data
 
 /-- `sort(key: RedisClient.KeyLike, ...args: (string | number)[]): Promise<(string | null)[] | number>`: `Promise<SequenceOfDOMStringOrDouble> sort(RedisClientKeyLike key, DOMStringOrDouble... args)` -/
-def RedisClient.sort (self : RedisClient) (key : RedisClientKeyLike) (args : Array DOMStringOrDouble := #[]) : Async SequenceOfDOMStringOrDouble :=
-  self.val.callMethodAwait "sort" (Support.argsWith #[toJS key] (args.map toJS)) SequenceOfDOMStringOrDouble
+@[macro_inline] def RedisClient.sort (self : RedisClient) (key : RedisClientKeyLike) (args : Array DOMStringOrDouble := #[]) : Async SequenceOfDOMStringOrDouble := Internal.api "Lasm.JS.Bun.RedisClient.sort" do
+  self.val.callMethodAwait "sort" (Internal.argsWith #[toJS key] (args.map toJS)) SequenceOfDOMStringOrDouble
 
 /-- `wait(numreplicas: number, timeout: number): Promise<number>`: `Promise<double> wait(double numreplicas, double /* integer: Nat */ timeout)` -/
-def RedisClient.wait (self : RedisClient) (numreplicas : Float) (timeout : Nat) : Async Float :=
-  self.val.callMethodAwait "wait" (Support.args #[toJS numreplicas, toJS timeout]) Float
+@[macro_inline] def RedisClient.wait (self : RedisClient) (numreplicas : Float) (timeout : Nat) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.wait" do
+  self.val.callMethodAwait "wait" (Internal.args #[toJS numreplicas, toJS timeout]) Float
 
 /-- `lcs(key1: RedisClient.KeyLike, key2: RedisClient.KeyLike, ...options: (string | number)[]): Promise<any>`: `Promise<any> lcs(RedisClientKeyLike key1, RedisClientKeyLike key2, DOMStringOrDouble... options)` -/
-def RedisClient.lcs (self : RedisClient) (key1 : RedisClientKeyLike) (key2 : RedisClientKeyLike) (options : Array DOMStringOrDouble := #[]) : Async Data :=
-  self.val.callMethodAwait "lcs" (Support.argsWith #[toJS key1, toJS key2] (options.map toJS)) Data
+@[macro_inline] def RedisClient.lcs (self : RedisClient) (key1 : RedisClientKeyLike) (key2 : RedisClientKeyLike) (options : Array DOMStringOrDouble := #[]) : Async Data := Internal.api "Lasm.JS.Bun.RedisClient.lcs" do
+  self.val.callMethodAwait "lcs" (Internal.argsWith #[toJS key1, toJS key2] (options.map toJS)) Data
 
 /-- `xadd(key: RedisClient.KeyLike, ...args: (string | number)[]): Promise<string | null>`: `Promise<DOMString?> xadd(RedisClientKeyLike key, DOMStringOrDouble... args)` -/
-def RedisClient.xadd (self : RedisClient) (key : RedisClientKeyLike) (args : Array DOMStringOrDouble := #[]) : Async (Option String) :=
-  self.val.callMethodAwait "xadd" (Support.argsWith #[toJS key] (args.map toJS)) (Option String)
+@[macro_inline] def RedisClient.xadd (self : RedisClient) (key : RedisClientKeyLike) (args : Array DOMStringOrDouble := #[]) : Async (Option String) := Internal.api "Lasm.JS.Bun.RedisClient.xadd" do
+  self.val.callMethodAwait "xadd" (Internal.argsWith #[toJS key] (args.map toJS)) (Option String)
 
 /-- `xlen(key: RedisClient.KeyLike): Promise<number>`: `Promise<double> xlen(RedisClientKeyLike key)` -/
-def RedisClient.xlen (self : RedisClient) (key : RedisClientKeyLike) : Async Float :=
-  self.val.callMethodAwait "xlen" (Support.args #[toJS key]) Float
+@[macro_inline] def RedisClient.xlen (self : RedisClient) (key : RedisClientKeyLike) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.xlen" do
+  self.val.callMethodAwait "xlen" (Internal.args #[toJS key]) Float
 
 /-- `xrange(key: RedisClient.KeyLike, start: string, end: string, ...options: (string | number)[]): Promise<[string, string[]][]>`: `Promise<sequence<sequence<any>>> xrange(RedisClientKeyLike key, DOMString start, DOMString end, DOMStringOrDouble... options)` -/
-def RedisClient.xrange (self : RedisClient) (key : RedisClientKeyLike) (start : String) («end» : String) (options : Array DOMStringOrDouble := #[]) : Async (Array (Array Data)) :=
-  self.val.callMethodAwait "xrange" (Support.argsWith #[toJS key, toJS start, toJS «end»] (options.map toJS)) (Array (Array Data))
+@[macro_inline] def RedisClient.xrange (self : RedisClient) (key : RedisClientKeyLike) (start : String) («end» : String) (options : Array DOMStringOrDouble := #[]) : Async (Array (Array Data)) := Internal.api "Lasm.JS.Bun.RedisClient.xrange" do
+  self.val.callMethodAwait "xrange" (Internal.argsWith #[toJS key, toJS start, toJS «end»] (options.map toJS)) (Array (Array Data))
 
 /-- `xrevrange(key: RedisClient.KeyLike, end: string, start: string, ...options: (string | number)[]): Promise<[string, string[]][]>`: `Promise<sequence<sequence<any>>> xrevrange(RedisClientKeyLike key, DOMString end, DOMString start, DOMStringOrDouble... options)` -/
-def RedisClient.xrevrange (self : RedisClient) (key : RedisClientKeyLike) («end» : String) (start : String) (options : Array DOMStringOrDouble := #[]) : Async (Array (Array Data)) :=
-  self.val.callMethodAwait "xrevrange" (Support.argsWith #[toJS key, toJS «end», toJS start] (options.map toJS)) (Array (Array Data))
+@[macro_inline] def RedisClient.xrevrange (self : RedisClient) (key : RedisClientKeyLike) («end» : String) (start : String) (options : Array DOMStringOrDouble := #[]) : Async (Array (Array Data)) := Internal.api "Lasm.JS.Bun.RedisClient.xrevrange" do
+  self.val.callMethodAwait "xrevrange" (Internal.argsWith #[toJS key, toJS «end», toJS start] (options.map toJS)) (Array (Array Data))
 
 /-- `xread(...args: (string | number)[]): Promise<any>`: `Promise<any> xread(DOMStringOrDouble... args)` -/
-def RedisClient.xread (self : RedisClient) (args : Array DOMStringOrDouble := #[]) : Async Data :=
-  self.val.callMethodAwait "xread" (Support.argsWith #[] (args.map toJS)) Data
+@[macro_inline] def RedisClient.xread (self : RedisClient) (args : Array DOMStringOrDouble := #[]) : Async Data := Internal.api "Lasm.JS.Bun.RedisClient.xread" do
+  self.val.callMethodAwait "xread" (Internal.argsWith #[] (args.map toJS)) Data
 
 /-- `xreadgroup(...args: (string | number)[]): Promise<any>`: `Promise<any> xreadgroup(DOMStringOrDouble... args)` -/
-def RedisClient.xreadgroup (self : RedisClient) (args : Array DOMStringOrDouble := #[]) : Async Data :=
-  self.val.callMethodAwait "xreadgroup" (Support.argsWith #[] (args.map toJS)) Data
+@[macro_inline] def RedisClient.xreadgroup (self : RedisClient) (args : Array DOMStringOrDouble := #[]) : Async Data := Internal.api "Lasm.JS.Bun.RedisClient.xreadgroup" do
+  self.val.callMethodAwait "xreadgroup" (Internal.argsWith #[] (args.map toJS)) Data
 
 /-- `xdel(key: RedisClient.KeyLike, id: string, ...moreIds: string[]): Promise<number>`: `Promise<double> xdel(RedisClientKeyLike key, DOMString id, DOMString... moreIds)` -/
-def RedisClient.xdel (self : RedisClient) (key : RedisClientKeyLike) (id : String) (moreIds : Array String := #[]) : Async Float :=
-  self.val.callMethodAwait "xdel" (Support.argsWith #[toJS key, toJS id] (moreIds.map toJS)) Float
+@[macro_inline] def RedisClient.xdel (self : RedisClient) (key : RedisClientKeyLike) (id : String) (moreIds : Array String := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.xdel" do
+  self.val.callMethodAwait "xdel" (Internal.argsWith #[toJS key, toJS id] (moreIds.map toJS)) Float
 
 /-- `xtrim(key: RedisClient.KeyLike, strategy: 'MAXLEN' | 'MINID' | 'maxlen' | 'minid', threshold: string | number, ...options: (string | number)[]): Promise<number>`: `Promise<double> xtrim(RedisClientKeyLike key, RedisClientXtrimStrategy strategy, DOMStringOrDouble threshold, DOMStringOrDouble... options)` -/
-def RedisClient.xtrim (self : RedisClient) (key : RedisClientKeyLike) (strategy : RedisClientXtrimStrategy) (threshold : DOMStringOrDouble) (options : Array DOMStringOrDouble := #[]) : Async Float :=
-  self.val.callMethodAwait "xtrim" (Support.argsWith #[toJS key, toJS strategy, toJS threshold] (options.map toJS)) Float
+@[macro_inline] def RedisClient.xtrim (self : RedisClient) (key : RedisClientKeyLike) (strategy : RedisClientXtrimStrategy) (threshold : DOMStringOrDouble) (options : Array DOMStringOrDouble := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.xtrim" do
+  self.val.callMethodAwait "xtrim" (Internal.argsWith #[toJS key, toJS strategy, toJS threshold] (options.map toJS)) Float
 
 /-- `xack(key: RedisClient.KeyLike, group: string, id: string, ...moreIds: string[]): Promise<number>`: `Promise<double> xack(RedisClientKeyLike key, DOMString group, DOMString id, DOMString... moreIds)` -/
-def RedisClient.xack (self : RedisClient) (key : RedisClientKeyLike) (group : String) (id : String) (moreIds : Array String := #[]) : Async Float :=
-  self.val.callMethodAwait "xack" (Support.argsWith #[toJS key, toJS group, toJS id] (moreIds.map toJS)) Float
+@[macro_inline] def RedisClient.xack (self : RedisClient) (key : RedisClientKeyLike) (group : String) (id : String) (moreIds : Array String := #[]) : Async Float := Internal.api "Lasm.JS.Bun.RedisClient.xack" do
+  self.val.callMethodAwait "xack" (Internal.argsWith #[toJS key, toJS group, toJS id] (moreIds.map toJS)) Float
 
 /-- `xclaim(key: RedisClient.KeyLike, group: string, consumer: string, minIdleTime: number, id: string, ...rest: (string | number)[]): Promise<any>`: `Promise<any> xclaim(RedisClientKeyLike key, DOMString group, DOMString consumer, double minIdleTime, DOMString id, DOMStringOrDouble... rest)` -/
-def RedisClient.xclaim (self : RedisClient) (key : RedisClientKeyLike) (group : String) (consumer : String) (minIdleTime : Float) (id : String) (rest : Array DOMStringOrDouble := #[]) : Async Data :=
-  self.val.callMethodAwait "xclaim" (Support.argsWith #[toJS key, toJS group, toJS consumer, toJS minIdleTime, toJS id] (rest.map toJS)) Data
+@[macro_inline] def RedisClient.xclaim (self : RedisClient) (key : RedisClientKeyLike) (group : String) (consumer : String) (minIdleTime : Float) (id : String) (rest : Array DOMStringOrDouble := #[]) : Async Data := Internal.api "Lasm.JS.Bun.RedisClient.xclaim" do
+  self.val.callMethodAwait "xclaim" (Internal.argsWith #[toJS key, toJS group, toJS consumer, toJS minIdleTime, toJS id] (rest.map toJS)) Data
 
 /-- `xautoclaim(key: RedisClient.KeyLike, group: string, consumer: string, minIdleTime: number, start: string, ...options: (string | number)[]): Promise<any>`: `Promise<any> xautoclaim(RedisClientKeyLike key, DOMString group, DOMString consumer, double minIdleTime, DOMString start, DOMStringOrDouble... options)` -/
-def RedisClient.xautoclaim (self : RedisClient) (key : RedisClientKeyLike) (group : String) (consumer : String) (minIdleTime : Float) (start : String) (options : Array DOMStringOrDouble := #[]) : Async Data :=
-  self.val.callMethodAwait "xautoclaim" (Support.argsWith #[toJS key, toJS group, toJS consumer, toJS minIdleTime, toJS start] (options.map toJS)) Data
+@[macro_inline] def RedisClient.xautoclaim (self : RedisClient) (key : RedisClientKeyLike) (group : String) (consumer : String) (minIdleTime : Float) (start : String) (options : Array DOMStringOrDouble := #[]) : Async Data := Internal.api "Lasm.JS.Bun.RedisClient.xautoclaim" do
+  self.val.callMethodAwait "xautoclaim" (Internal.argsWith #[toJS key, toJS group, toJS consumer, toJS minIdleTime, toJS start] (options.map toJS)) Data
 
 /-- `xpending(key: RedisClient.KeyLike, group: string, ...args: (string | number)[]): Promise<any>`: `Promise<any> xpending(RedisClientKeyLike key, DOMString group, DOMStringOrDouble... args)` -/
-def RedisClient.xpending (self : RedisClient) (key : RedisClientKeyLike) (group : String) (args : Array DOMStringOrDouble := #[]) : Async Data :=
-  self.val.callMethodAwait "xpending" (Support.argsWith #[toJS key, toJS group] (args.map toJS)) Data
+@[macro_inline] def RedisClient.xpending (self : RedisClient) (key : RedisClientKeyLike) (group : String) (args : Array DOMStringOrDouble := #[]) : Async Data := Internal.api "Lasm.JS.Bun.RedisClient.xpending" do
+  self.val.callMethodAwait "xpending" (Internal.argsWith #[toJS key, toJS group] (args.map toJS)) Data
 
 /-- `xinfo(subcommand: string, ...args: (string | number)[]): Promise<any>`: `Promise<any> xinfo(DOMString subcommand, DOMStringOrDouble... args)` -/
-def RedisClient.xinfo (self : RedisClient) (subcommand : String) (args : Array DOMStringOrDouble := #[]) : Async Data :=
-  self.val.callMethodAwait "xinfo" (Support.argsWith #[toJS subcommand] (args.map toJS)) Data
+@[macro_inline] def RedisClient.xinfo (self : RedisClient) (subcommand : String) (args : Array DOMStringOrDouble := #[]) : Async Data := Internal.api "Lasm.JS.Bun.RedisClient.xinfo" do
+  self.val.callMethodAwait "xinfo" (Internal.argsWith #[toJS subcommand] (args.map toJS)) Data
 
 /-- `xgroup(subcommand: string, ...args: (string | number)[]): Promise<any>`: `Promise<any> xgroup(DOMString subcommand, DOMStringOrDouble... args)` -/
-def RedisClient.xgroup (self : RedisClient) (subcommand : String) (args : Array DOMStringOrDouble := #[]) : Async Data :=
-  self.val.callMethodAwait "xgroup" (Support.argsWith #[toJS subcommand] (args.map toJS)) Data
+@[macro_inline] def RedisClient.xgroup (self : RedisClient) (subcommand : String) (args : Array DOMStringOrDouble := #[]) : Async Data := Internal.api "Lasm.JS.Bun.RedisClient.xgroup" do
+  self.val.callMethodAwait "xgroup" (Internal.argsWith #[toJS subcommand] (args.map toJS)) Data
 
 /-- `xsetid(key: RedisClient.KeyLike, lastId: string, ...options: (string | number)[]): Promise<'OK'>`: `Promise<RedisClientXsetid> xsetid(RedisClientKeyLike key, DOMString lastId, DOMStringOrDouble... options)` -/
-def RedisClient.xsetid (self : RedisClient) (key : RedisClientKeyLike) (lastId : String) (options : Array DOMStringOrDouble := #[]) : Async RedisClientXsetid :=
-  self.val.callMethodAwait "xsetid" (Support.argsWith #[toJS key, toJS lastId] (options.map toJS)) RedisClientXsetid
+@[macro_inline] def RedisClient.xsetid (self : RedisClient) (key : RedisClientKeyLike) (lastId : String) (options : Array DOMStringOrDouble := #[]) : Async RedisClientXsetid := Internal.api "Lasm.JS.Bun.RedisClient.xsetid" do
+  self.val.callMethodAwait "xsetid" (Internal.argsWith #[toJS key, toJS lastId] (options.map toJS)) RedisClientXsetid
 
 /-- `const Bun.redis: RedisClient`: `readonly attribute RedisClient redis` (Bun 1.4.4 type declarations) -/
-def redis : IO RedisClient := do
-  let r ← Support.getGlobal ["Bun", "redis"] Value
+@[macro_inline] def redis : IO RedisClient := Internal.api "Lasm.JS.Bun.redis" do
+  let r ← Internal.getGlobal ["Bun", "redis"] Value
   pure { val := r }
 
 end Lasm.JS.Bun

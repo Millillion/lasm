@@ -3,7 +3,9 @@ The Lean examples of docs/UI.md, with the definitions around them, elaborated
 by scripts/ui/lean-tests.mjs so the guide stays correct.
 -/
 import Lasm.UI
-import Lasm.JS.Web.Browser
+import Lasm.JS.Web.Dom
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Html
 open Lasm.UI
 
 namespace Views

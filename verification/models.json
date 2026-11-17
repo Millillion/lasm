@@ -438,6 +438,10 @@
       "kind": "io",
       "reason": "detects the JavaScript runtime"
     },
+    "src/lake-library.mjs": {
+      "status": "pending",
+      "reason": "Lasm's library as a Lake package: the package's identity, what is linked and when it is stale, and the project link's states are pure decisions; model them (the file system writes are I/O)"
+    },
     "src/lasm-library.mjs": {
       "status": "exempt",
       "kind": "io",
@@ -1143,6 +1147,10 @@
     "src/wasm-objects.mjs": {
       "status": "pending",
       "reason": "a reader of relocatable Wasm objects: pure"
+    },
+    "src/web-availability.mjs": {
+      "status": "pending",
+      "reason": "lasm build --target's web API check: pure over the program's C texts and the generated availability table; model the lookup"
     },
     "src/windows-tool-paths.mjs": {
       "status": "exempt",

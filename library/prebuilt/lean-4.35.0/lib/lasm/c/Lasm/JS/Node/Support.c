@@ -28,9 +28,6 @@ lean_object* l_String_splitOnAux(lean_object*, lean_object*, lean_object*, lean_
 lean_object* l_Lasm_JS_require___redArg(lean_object*, lean_object*);
 lean_object* lean_string_append(lean_object*, lean_object*);
 lean_object* l_Lasm_JS_Value_call___redArg(lean_object*, lean_object*, lean_object*, lean_object*);
-extern lean_object* l_Lasm_JS_instFromJSString;
-lean_object* l_Lasm_JS_instFromJSProd___redArg(lean_object*, lean_object*);
-lean_object* l_Lasm_JS_instFromJSArray___redArg(lean_object*);
 static const lean_string_object l_Lasm_JS_Node_Support_getExport_go___redArg___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 29, .m_capacity = 29, .m_length = 28, .m_data = "Lasm.JS.Node: empty path in "};
 static const lean_object* l_Lasm_JS_Node_Support_getExport_go___redArg___closed__0 = (const lean_object*)&l_Lasm_JS_Node_Support_getExport_go___redArg___closed__0_value;
 static const lean_closure_object l_Lasm_JS_Node_Support_getExport_go___redArg___closed__1_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_closure_object) + sizeof(void*)*0, .m_other = 0, .m_tag = 245}, .m_fun = (void*)l_Lasm_JS_instToJSString___lam__0, .m_arity = 1, .m_num_fixed = 0, .m_objs = {} };
@@ -85,18 +82,6 @@ LEAN_EXPORT lean_object* l_Lasm_JS_Node_Support_callOnBytes___redArg(lean_object
 LEAN_EXPORT lean_object* l_Lasm_JS_Node_Support_callOnBytes___redArg___boxed(lean_object*, lean_object*, lean_object*, lean_object*, lean_object*, lean_object*);
 LEAN_EXPORT lean_object* l_Lasm_JS_Node_Support_callOnBytes(lean_object*, lean_object*, lean_object*, lean_object*, lean_object*, lean_object*);
 LEAN_EXPORT lean_object* l_Lasm_JS_Node_Support_callOnBytes___boxed(lean_object*, lean_object*, lean_object*, lean_object*, lean_object*, lean_object*, lean_object*);
-static const lean_string_object l_Lasm_JS_Node_Support_recordOf___redArg___closed__0_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 30, .m_capacity = 30, .m_length = 29, .m_data = "Lasm.JS.Node.Support.recordOf"};
-static const lean_object* l_Lasm_JS_Node_Support_recordOf___redArg___closed__0 = (const lean_object*)&l_Lasm_JS_Node_Support_recordOf___redArg___closed__0_value;
-static const lean_string_object l_Lasm_JS_Node_Support_recordOf___redArg___closed__1_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 11, .m_capacity = 11, .m_length = 10, .m_data = "globalThis"};
-static const lean_object* l_Lasm_JS_Node_Support_recordOf___redArg___closed__1 = (const lean_object*)&l_Lasm_JS_Node_Support_recordOf___redArg___closed__1_value;
-static const lean_string_object l_Lasm_JS_Node_Support_recordOf___redArg___closed__2_value = {.m_header = {.m_rc = 0, .m_cs_sz = 0, .m_other = 0, .m_tag = 249}, .m_size = 15, .m_capacity = 15, .m_length = 14, .m_data = "Object.entries"};
-static const lean_object* l_Lasm_JS_Node_Support_recordOf___redArg___closed__2 = (const lean_object*)&l_Lasm_JS_Node_Support_recordOf___redArg___closed__2_value;
-static const lean_ctor_object l_Lasm_JS_Node_Support_recordOf___redArg___closed__3_value = {.m_header = {.m_rc = 0, .m_cs_sz = sizeof(lean_ctor_object) + sizeof(void*)*4 + 8, .m_other = 4, .m_tag = 0}, .m_objs = {((lean_object*)&l_Lasm_JS_Node_Support_recordOf___redArg___closed__0_value),((lean_object*)&l_Lasm_JS_Node_Support_recordOf___redArg___closed__1_value),((lean_object*)&l_Lasm_JS_Node_Support_recordOf___redArg___closed__2_value),((lean_object*)(((size_t)(1) << 1) | 1)),LEAN_SCALAR_PTR_LITERAL(0, 0, 0, 0, 0, 0, 0, 0)}};
-static const lean_object* l_Lasm_JS_Node_Support_recordOf___redArg___closed__3 = (const lean_object*)&l_Lasm_JS_Node_Support_recordOf___redArg___closed__3_value;
-LEAN_EXPORT lean_object* l_Lasm_JS_Node_Support_recordOf___redArg(lean_object*, lean_object*);
-LEAN_EXPORT lean_object* l_Lasm_JS_Node_Support_recordOf___redArg___boxed(lean_object*, lean_object*, lean_object*);
-LEAN_EXPORT lean_object* l_Lasm_JS_Node_Support_recordOf(lean_object*, lean_object*, lean_object*);
-LEAN_EXPORT lean_object* l_Lasm_JS_Node_Support_recordOf___boxed(lean_object*, lean_object*, lean_object*, lean_object*);
 LEAN_EXPORT lean_object* l_Lasm_JS_Node_Support_getExport_go___redArg(lean_object* v_module_3_, lean_object* v_inst_4_, lean_object* v_o_5_, lean_object* v_a_6_){
 _start:
 {
@@ -1217,131 +1202,6 @@ lean_object* v_res_416_;
 v_res_416_ = l_Lasm_JS_Node_Support_callOnBytes(v_module_409_, v_path_410_, v_self_411_, v_args_412_, v_00_u03b1_413_, v_inst_414_);
 lean_dec_ref(v_path_410_);
 return v_res_416_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Node_Support_recordOf___redArg(lean_object* v_inst_426_, lean_object* v_v_427_){
-_start:
-{
-lean_object* v___x_429_; lean_object* v___x_430_; lean_object* v___x_431_; uint8_t v___x_432_; lean_object* v___x_433_; lean_object* v___x_434_; lean_object* v___x_435_; lean_object* v___x_436_; lean_object* v___x_437_; lean_object* v___x_438_; lean_object* v___x_439_; 
-v___x_429_ = l_Lasm_JS_instFromJSString;
-v___x_430_ = l_Lasm_JS_instFromJSProd___redArg(v___x_429_, v_inst_426_);
-v___x_431_ = l_Lasm_JS_instFromJSArray___redArg(v___x_430_);
-v___x_432_ = 0;
-v___x_433_ = lean_unsigned_to_nat(1u);
-v___x_434_ = ((lean_object*)(l_Lasm_JS_Node_Support_recordOf___redArg___closed__3));
-v___x_435_ = ((lean_object*)(l_Lasm_JS_Node_Support_promisified___redArg___lam__1___closed__4));
-v___x_436_ = lean_alloc_ctor(9, 2, 0);
-lean_ctor_set(v___x_436_, 0, v_v_427_);
-lean_ctor_set(v___x_436_, 1, v___x_435_);
-v___x_437_ = lean_mk_empty_array_with_capacity(v___x_433_);
-v___x_438_ = lean_array_push(v___x_437_, v___x_436_);
-v___x_439_ = l_Lasm_JS_Binding_invoke___redArg(v___x_431_, v___x_434_, v___x_438_, v___x_432_);
-if (lean_obj_tag(v___x_439_) == 0)
-{
-lean_object* v_a_440_; lean_object* v___x_442_; uint8_t v_isShared_443_; uint8_t v_isSharedCheck_447_; 
-v_a_440_ = lean_ctor_get(v___x_439_, 0);
-v_isSharedCheck_447_ = !lean_is_exclusive(v___x_439_);
-if (v_isSharedCheck_447_ == 0)
-{
-v___x_442_ = v___x_439_;
-v_isShared_443_ = v_isSharedCheck_447_;
-goto v_resetjp_441_;
-}
-else
-{
-lean_inc(v_a_440_);
-lean_dec(v___x_439_);
-v___x_442_ = lean_box(0);
-v_isShared_443_ = v_isSharedCheck_447_;
-goto v_resetjp_441_;
-}
-v_resetjp_441_:
-{
-lean_object* v___x_445_; 
-if (v_isShared_443_ == 0)
-{
-v___x_445_ = v___x_442_;
-goto v_reusejp_444_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_446_; 
-v_reuseFailAlloc_446_ = lean_alloc_ctor(0, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_446_, 0, v_a_440_);
-v___x_445_ = v_reuseFailAlloc_446_;
-goto v_reusejp_444_;
-}
-v_reusejp_444_:
-{
-return v___x_445_;
-}
-}
-}
-else
-{
-lean_object* v_a_448_; lean_object* v___x_450_; uint8_t v_isShared_451_; uint8_t v_isSharedCheck_455_; 
-v_a_448_ = lean_ctor_get(v___x_439_, 0);
-v_isSharedCheck_455_ = !lean_is_exclusive(v___x_439_);
-if (v_isSharedCheck_455_ == 0)
-{
-v___x_450_ = v___x_439_;
-v_isShared_451_ = v_isSharedCheck_455_;
-goto v_resetjp_449_;
-}
-else
-{
-lean_inc(v_a_448_);
-lean_dec(v___x_439_);
-v___x_450_ = lean_box(0);
-v_isShared_451_ = v_isSharedCheck_455_;
-goto v_resetjp_449_;
-}
-v_resetjp_449_:
-{
-lean_object* v___x_453_; 
-if (v_isShared_451_ == 0)
-{
-v___x_453_ = v___x_450_;
-goto v_reusejp_452_;
-}
-else
-{
-lean_object* v_reuseFailAlloc_454_; 
-v_reuseFailAlloc_454_ = lean_alloc_ctor(1, 1, 0);
-lean_ctor_set(v_reuseFailAlloc_454_, 0, v_a_448_);
-v___x_453_ = v_reuseFailAlloc_454_;
-goto v_reusejp_452_;
-}
-v_reusejp_452_:
-{
-return v___x_453_;
-}
-}
-}
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Node_Support_recordOf___redArg___boxed(lean_object* v_inst_456_, lean_object* v_v_457_, lean_object* v_a_458_){
-_start:
-{
-lean_object* v_res_459_; 
-v_res_459_ = l_Lasm_JS_Node_Support_recordOf___redArg(v_inst_456_, v_v_457_);
-return v_res_459_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Node_Support_recordOf(lean_object* v_00_u03b1_460_, lean_object* v_inst_461_, lean_object* v_v_462_){
-_start:
-{
-lean_object* v___x_464_; 
-v___x_464_ = l_Lasm_JS_Node_Support_recordOf___redArg(v_inst_461_, v_v_462_);
-return v___x_464_;
-}
-}
-LEAN_EXPORT lean_object* l_Lasm_JS_Node_Support_recordOf___boxed(lean_object* v_00_u03b1_465_, lean_object* v_inst_466_, lean_object* v_v_467_, lean_object* v_a_468_){
-_start:
-{
-lean_object* v_res_469_; 
-v_res_469_ = l_Lasm_JS_Node_Support_recordOf(v_00_u03b1_465_, v_inst_466_, v_v_467_);
-return v_res_469_;
 }
 }
 lean_object* initialize_Init(uint8_t builtin);

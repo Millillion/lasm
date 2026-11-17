@@ -1,12 +1,14 @@
 // Generates the standard bindings (docs/JS_BINDINGS.md, "Standard bindings"):
-//   - Lasm.JS.Web (library/Lasm/JS/Web/*.lean, library/Lasm/JS/Web.lean): the
-//     WinterTC Minimum Common Web API, from the WebIDL of the pinned @webref/idl
-//     (parsed by webidl2); the interface list is scripts/bindings/web-tier1.mjs;
-//   - Lasm.JS.Node (library/Lasm/JS/Node/*.lean, library/Lasm/JS/Node.lean): the
+//   - Lasm.JS.Web (library/Lasm/JS/Web/*.lean, library/Lasm/JS/Web.lean): the whole web platform, every spec of
+//     the pinned @webref/idl (parsed by webidl2) as it is, one module per spec; web-rules.mjs holds only what the
+//     IDL cannot say. It also writes library/Lasm/JS/Web/availability.json (web-availability.mjs) for
+//     `lasm build --target`'s check;
+//   - Lasm.JS.Node (library/Lasm/JS/Node/*.lean, no umbrella module): the
 //     Node.js modules of scripts/bindings/node-tier2.mjs, from Node's API docs
-//     lowered to WebIDL by scripts/bindings/node-api.mjs (scripts/bindings/node.idl).
-// One mapping from WebIDL to Lean serves both; Lasm.JS.Node uses Lasm.JS.Web's
-// types (URL, AbortSignal, ReadableStream).
+//     lowered to WebIDL by scripts/bindings/node-api.mjs (scripts/bindings/node.idl);
+//   - Lasm.JS.Deno and Lasm.JS.Bun, from serve-api.mjs's lowering of their declarations.
+// One mapping from WebIDL to Lean serves all (docs/BINDING_RULES.md); Lasm.JS.Node, Deno and Bun use
+// Lasm.JS.Web's types (URL, AbortSignal, ReadableStream).
 //
 //   node scripts/bindings/generate-web.mjs          # write the modules
 //   node scripts/bindings/generate-web.mjs --check  # exit 1 if a committed module differs
@@ -17,11 +19,11 @@ import { createRequire } from 'node:module';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import * as tier from './web-tier1.mjs';
+import * as rules from './web-rules.mjs';
+import * as compat from './web-availability.mjs';
 import * as nodeTier from './node-tier2.mjs';
 import * as serveTier from './serve-tier2.mjs';
 import * as cloudflareTier from './cloudflare-tier3.mjs';
-import * as browser from './web-browser.mjs';
 import * as overrides from './overrides.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
@@ -60,32 +62,23 @@ const ov = overrides.forNamespaces([NS, NODE_NS, ...hosts.map(h => `Lasm.JS.${h.
 const specTitles = {};
 const asts = [];
 const defs_reserved = new Set();
-// Tier 1's specs, then the browser tier's (scripts/bindings/web-browser.mjs).
-const fullSpecs = [...tier.specs, ...browser.specs];
-for (const spec of fullSpecs) {
-  const text = readFileSync(join(idlDir, spec + '.idl'), 'utf8');
-  const source = /^\/\/ Source: (.*)$/m.exec(text);
-  specTitles[spec] = source ? source[1] : spec;
-  for (const d of webidl2.parse(text)) { asts.push({ spec, d: JSON.parse(JSON.stringify(d)) }); if (d.name) defs_reserved.add(d.name); }
-}
-// Every other spec of webref is read for the enums, dictionaries, typedefs and
-// callbacks it defines (not its interfaces or partials), so that a type a tier-1
-// member names is generated wherever it is defined: ReferrerPolicy (Referrer
-// Policy), and Web Crypto's KeyFormat and KeyUsage, which webref moves to the
-// Modern Algorithms spec that extends them.
-/** Interfaces of the specs read only for their types (WebGLRenderingContext): known to be interfaces, not generated. */
+// Every spec of webref, read whole (web-rules.mjs excludes none).
+const webSpecs = new Set(readdirSync(idlDir).filter(f => f.endsWith('.idl')).map(f => f.slice(0, -4)).filter(s => !rules.excludedSpecs[s]).sort());
+for (const s of Object.keys(rules.excludedSpecs)) if (!existsSync(join(idlDir, s + '.idl'))) fail(`web-rules.mjs excludes ${s}, which webref does not have`);
+/** Interfaces of excluded specs: known to be interfaces, not generated. */
 const otherInterfaces = new Set();
-const typeSpecs = readdirSync(idlDir).filter(f => f.endsWith('.idl')).map(f => f.slice(0, -4)).filter(s => !fullSpecs.includes(s)).sort();
-for (const spec of typeSpecs) {
+for (const spec of readdirSync(idlDir).filter(f => f.endsWith('.idl')).map(f => f.slice(0, -4)).sort()) {
   const text = readFileSync(join(idlDir, spec + '.idl'), 'utf8');
   const source = /^\/\/ Source: (.*)$/m.exec(text);
   specTitles[spec] = source ? source[1] : spec;
   for (const d of webidl2.parse(text)) {
+    if (d.type === 'eof') continue;
+    if (webSpecs.has(spec)) { asts.push({ spec, d: JSON.parse(JSON.stringify(d)) }); if (d.name) defs_reserved.add(d.name); continue; }
     if (!d.partial && ['enum', 'dictionary', 'typedef', 'callback', 'callback interface'].includes(d.type)) asts.push({ spec, d: JSON.parse(JSON.stringify(d)) });
     if (!d.partial && d.type === 'interface') otherInterfaces.add(d.name);
   }
 }
-for (const d of webidl2.parse(tier.syntheticIdl)) asts.push({ spec: 'synthetic', d: JSON.parse(JSON.stringify(d)) });
+for (const d of webidl2.parse(rules.syntheticIdl)) asts.push({ spec: 'synthetic', d: JSON.parse(JSON.stringify(d)) });
 // Lasm.JS.Node: Node's documented API, lowered to WebIDL (node-api.mjs). Its
 // definitions carry their JavaScript module (LasmModule, LasmPath), Lean module
 // (LasmLeanModule) and Lean name (LasmNamespace, LasmName) as extended attributes.
@@ -120,8 +113,15 @@ const extValue = a => !a?.rhs ? undefined : Array.isArray(a.rhs.value) ? a.rhs.v
 /** Merged definitions by IDL name. */
 const defs = new Map();
 const includes = new Map();
+/** The spec of each `I includes M` statement: a mixin's own members belong to the spec that includes it. */
+const includesSpec = new Map();
 for (const { spec, d } of asts) {
-  if (d.type === 'includes') { if (!includes.has(d.target)) includes.set(d.target, []); includes.get(d.target).push(d.includes); continue; }
+  if (d.type === 'includes') {
+    if (!includes.has(d.target)) includes.set(d.target, []);
+    includes.get(d.target).push(d.includes);
+    includesSpec.set(`${d.target} includes ${d.includes}`, spec);
+    continue;
+  }
   if (d.type === 'eof') continue;
   const key = d.name;
   const existing = defs.get(key);
@@ -141,7 +141,7 @@ const def = name => defs.get(name);
 // docs, TypeScript declarations, lowered to WebIDL `double`) is an integer when its name is in
 // the integer table (overrides.json `integers`): `unsigned long long` (Nat) or `long long` (Int).
 // WebIDL from webref types its integers itself and is left as it is.
-const webrefSpecs = new Set([...fullSpecs, ...typeSpecs, 'synthetic']);
+const webrefSpecs = new Set([...readdirSync(idlDir).filter(f => f.endsWith('.idl')).map(f => f.slice(0, -4)), 'synthetic']);
 const narrow = (t, owner, name) => {
   if (!t || t.union || t.generic || !['double', 'unrestricted double'].includes(t.idlType)) return;
   const type = ov.integer(owner, name);
@@ -154,6 +154,36 @@ for (const d of defs.values()) {
     if (m.type === 'attribute' || m.type === 'field') narrow(m.idlType, d.name, m.name);
     if (m.type === 'operation' || m.type === 'constructor') for (const a of m.arguments) narrow(a.idlType, d.name, a.name);
   }
+}
+
+// A dictionary that contains itself (Service Workers' RouterCondition, through `sequence<RouterCondition> _or`)
+// would be a recursive Lean structure: the member that closes the cycle is `any` (Data) instead (0.3-14).
+{
+  const state = new Map(); // dictionary → 'active' | 'done'
+  const walk = (t, onType) => {
+    if (!t) return;
+    if (t.union || t.generic) { for (const x of t.idlType) walk(x, onType); return; }
+    if (typeof t.idlType !== 'string') return walk(t.idlType, onType);
+    onType(t);
+  };
+  const visitDict = name => {
+    state.set(name, 'active');
+    const d = defs.get(name);
+    const fields = [];
+    for (let x = d; x; x = x.inheritance && defs.get(x.inheritance)) fields.push(...x.members.filter(m => m.type === 'field'));
+    const seenTypedefs = new Set();
+    const onType = t => {
+      const target = defs.get(t.idlType);
+      if (!target) return;
+      if (target.type === 'typedef' && !seenTypedefs.has(t.idlType)) { seenTypedefs.add(t.idlType); return walk(target.idlType, onType); }
+      if (target.type !== 'dictionary') return;
+      if (state.get(t.idlType) === 'active') Object.assign(t, { narrowedFrom: `${t.idlType} /* recursive: any */`, idlType: 'any' });
+      else if (!state.has(t.idlType)) visitDict(t.idlType);
+    };
+    for (const f of fields) walk(f.idlType, onType);
+    state.set(name, 'done');
+  };
+  for (const d of [...defs.values()].filter(d => d.type === 'dictionary').sort((a, b) => a.name < b.name ? -1 : 1)) if (!state.has(d.name)) visitDict(d.name);
 }
 
 // ---------- names ----------
@@ -216,7 +246,7 @@ const namespaceOf = d => extValue(extAttr(d, 'LegacyNamespace'));
 /** The name a definition is known by: Lasm.JS.Node's LasmName (`Stats` of `Node_fs_Stats`), a rename, or its IDL name. */
 function displayName(name) {
   const d = def(name);
-  return (d && extValue(extAttr(d, 'LasmName'))) ?? tier.renames[name] ?? name;
+  return (d && extValue(extAttr(d, 'LasmName'))) ?? rules.renames[name] ?? name;
 }
 /** The Lean name (under Lasm.JS.Web or Lasm.JS.Node) of an IDL definition. */
 function leanTypeName(name) {
@@ -240,106 +270,194 @@ const memberName = m => extValue(extAttr(m, 'LasmName')) ?? m.name;
 
 // ---------- exposure ----------
 
-const exposedToWorkers = node => {
-  const e = extValue(extAttr(node, 'Exposed'));
-  if (e === undefined) return true;
-  const list = Array.isArray(e) ? e : [e];
-  return list.some(x => x === '*' || /Worker/.test(x));
+/** A definition's or member's `[Exposed]` list (`['Window', 'Worker']`), or null when it inherits its interface's. */
+const exposedList = node => { const e = extValue(extAttr(node, 'Exposed')); return e === undefined ? null : Array.isArray(e) ? e : [e]; };
+
+// ---------- modules ----------
+// Lasm.JS.Web is the whole web platform of the pinned @webref/idl: one module per spec,
+// `Lasm.JS.Web.<Spec>` (UpperCamel of the shortname: `fetch` → Fetch, `hr-time` → HrTime), all in
+// namespace Lasm.JS.Web (docs/JS_BINDINGS.md, "Lasm.JS.Web"; docs/api/decisions/0.3.md 0.3-1). A module holds
+// its spec's interfaces and namespaces, and the members its partials and mixins add to interfaces of other
+// specs (`Navigator.geolocation` is in Geolocation). `Window` is the global object of a page: its members
+// (with those of its mixins, WindowOrWorkerGlobalScope's among them) are top-level functions on globalThis
+// (`document`, `fetch`), each in the module of the spec that adds it. Specs that name each other in a cycle
+// are one module. Lasm.JS.Node, Deno and Bun come after, and use its types.
+// One context for all: every generated interface is visible to every module (ctxTier is 2: WindowProxy is
+// Window). ctxExt is whether the module is outside Lasm.JS.Web, whose unions are its own.
+let ctxTier = 2;
+let ctxExt = false;
+const inTier = (t, f, ext = ctxExt) => {
+  const saved = [ctxTier, ctxExt]; ctxTier = t; ctxExt = ext;
+  try { return f(); } finally { [ctxTier, ctxExt] = saved; }
 };
-
-// ---------- selection ----------
-
-const exposedToWindow = node => {
-  const e = extValue(extAttr(node, 'Exposed'));
-  if (e === undefined) return true;
-  const list = Array.isArray(e) ? e : [e];
-  return list.some(x => x === '*' || x === 'Window');
-};
-
-// ---------- tiers ----------
-// Tier 1 (web-tier1.mjs, the modules of Lasm.JS.Web) and the browser tier
-// (web-browser.mjs, the modules Lasm.JS.Web.Browser adds). The tier being
-// generated (ctxTier) decides which members an interface has (exposed to
-// workers, or to Window) and which selected interfaces a type may name: tier 1
-// sees only tier 1's, so its output does not depend on the browser tier.
-// Supporting types are resolved in the tier of the module that owns them.
-let ctxTier = 1;
-const inTier = (t, f) => { const saved = ctxTier; ctxTier = t; try { return f(); } finally { ctxTier = saved; } };
-// The modules: Lasm.JS.Web's tier 1 and browser tier, then Lasm.JS.Node's, each with
-// its full Lean name (`key`). Lasm.JS.Node is generated in tier 1's context (members
-// exposed to workers, only tier 1's interfaces visible); its members are its node.idl
-// definitions marked with its LasmLeanModule.
+/** Whether a module is outside Lasm.JS.Web. */
+const extModule = key => nsOf(key) !== NS;
+/** Runs `f` in the context of module `key`. */
+const inModule = (key, f) => inTier(2, f, extModule(key));
+/** Runs `f` in the context of the module that owns the supporting type `key` (or the current one). */
+const inOwner = (key, f) => moduleOfType.has(key) ? inTier(2, f, extModule(moduleOfType.get(key))) : f();
+// Lasm.JS.Node's modules: its members are its node.idl definitions marked with its LasmLeanModule.
 const nodeDefs = [...defs.values()].filter(d => extAttr(d, 'LasmLeanModule') && !extAttr(d, 'LasmHost'));
-const nodeModules = nodeTier.modules.map(m => {
+// In node-api.mjs's import order (node-modules.json: each module after those whose types it uses).
+const nodeModuleOrder = JSON.parse(readFileSync(join(root, 'scripts', 'bindings', 'node-modules.json'), 'utf8')).modules;
+const nodeModules = nodeModuleOrder.map(m => {
   const mine = nodeDefs.filter(d => extValue(extAttr(d, 'LasmLeanModule')) === m.name);
-  return { name: m.name, title: m.title, specs: `Node.js ${nodeTier.version} documentation, ${m.doc}.md`, tier: 1, ns: NODE_NS, key: `${NODE_NS}.${m.name}`,
+  return { name: m.name, title: m.title, specs: `Node.js ${nodeTier.version} documentation, ${m.doc}.md`, tier: 2, ns: NODE_NS, key: `${NODE_NS}.${m.name}`,
     interfaces: mine.filter(d => d.type === 'interface').map(d => d.name), namespaces: mine.filter(d => d.type === 'namespace').map(d => d.name) };
 });
-// Lasm.JS.Deno and Lasm.JS.Bun (serve-tier2.mjs), generated in tier 1's context too: their
-// members are their IDL's definitions marked with their LasmHost and LasmLeanModule.
+// Lasm.JS.Deno and Lasm.JS.Bun (serve-tier2.mjs): their IDL's definitions marked with their LasmHost and LasmLeanModule.
 const hostOf = d => extValue(extAttr(d, 'LasmHost'));
+/** Interfaces with each one's base before it (a Lean structure extends one already declared). */
+function parentsFirst(ds) {
+  const left = [...ds], out = [];
+  while (left.length) {
+    const i = left.findIndex(d => !left.some(p => p.name === d.inheritance));
+    out.push(...left.splice(i < 0 ? 0 : i, 1));
+  }
+  return out;
+}
 const hostModules = hosts.flatMap(h => h.modules.map(m => {
   const mine = [...defs.values()].filter(d => hostOf(d) === h.name && extValue(extAttr(d, 'LasmLeanModule')) === m.name);
-  return { name: m.name, title: m.title, specs: `${hostSource(h)} type declarations`, tier: 1, ns: `Lasm.JS.${h.name}`, key: `Lasm.JS.${h.name}.${m.name}`,
-    host: h, interfaces: mine.filter(d => d.type === 'interface').map(d => d.name), namespaces: mine.filter(d => d.type === 'namespace').map(d => d.name),
+  return { name: m.name, title: m.title, specs: `${hostSource(h)} type declarations`, tier: 2, ns: `Lasm.JS.${h.name}`, key: `Lasm.JS.${h.name}.${m.name}`,
+    host: h, interfaces: parentsFirst(mine.filter(d => d.type === 'interface')).map(d => d.name), namespaces: mine.filter(d => d.type === 'namespace').map(d => d.name),
     // Lasm.JS.Cloudflare: every selected dictionary, callback and enum is generated, also one no member names
     // (ExportedHandler and its handlers, which a program passes to Lasm.JS.exportDefault).
     extraTypes: h.rich ? mine.filter(d => ['dictionary', 'callback', 'enum'].includes(d.type)).map(d => d.name) : undefined };
 }));
-const allModules = [...tier.modules.map(m => ({ ...m, tier: 1, ns: NS, key: `${NS}.${m.name}` })),
-  ...browser.modules.map(m => ({ ...m, tier: 2, ns: NS, key: `${NS}.${m.name}` })), ...nodeModules, ...hostModules];
-const moduleTier = new Map(allModules.map(m => [m.key, m.tier]));
+const allModules = [...nodeModules, ...hostModules];
+const moduleTier = new Map(allModules.map(m => [m.key, 2]));
 if (moduleTier.size !== allModules.length) fail('two modules share a name');
-const nsOf = key => key.slice(0, key.lastIndexOf('.'));
+const moduleNs = new Map(allModules.map(m => [m.key, m.ns]));
+/** A module's Lean namespace. */
+const nsOf = key => moduleNs.get(key) ?? key.slice(0, key.lastIndexOf('.'));
 /** The first components of Lasm.JS.Node's names (`path` of `path.PathObject`, `fsPromises`). */
 const nodeNamespaces = new Set(nodeDefs.flatMap(d => [extValue(extAttr(d, 'LasmNamespace')), d.type === 'namespace' ? extValue(extAttr(d, 'LasmName')) : null]).filter(Boolean));
 
 const selectedInterfaces = new Map(); // IDL name → module key
 const moduleOfType = new Map();       // IDL name or union key → module key
-const configIdl = n => n.startsWith('WebAssembly.') ? n.slice('WebAssembly.'.length) : n;
-for (const m of allModules) for (const n of m.interfaces ?? []) {
-  const name = configIdl(n);
+for (const m of allModules) for (const name of m.interfaces ?? []) {
   const d = def(name);
-  if (!d || d.type !== 'interface') fail(`interface ${n} not found`);
-  if (selectedInterfaces.has(name)) fail(`interface ${n} is selected twice`);
+  if (!d || d.type !== 'interface') fail(`interface ${name} not found`);
   selectedInterfaces.set(name, m.key);
   moduleOfType.set(name, m.key);
 }
 for (const m of allModules) for (const n of m.namespaces ?? []) if (!def(n) || def(n).type !== 'namespace') fail(`namespace ${n} not found`);
-/** The tier of a supporting type's (or interface's) owner, or the current one before it has an owner. */
-const tierOfKey = key => moduleOfType.has(key) ? moduleTier.get(moduleOfType.get(key)) : ctxTier;
-/** Whether an interface is selected and visible from the current tier. */
-const visibleInterface = n => selectedInterfaces.has(n) && moduleTier.get(selectedInterfaces.get(n)) <= ctxTier;
-// In the browser tier an interface's parent must be generated too (the Lean structure extends it).
-for (const m of browser.modules) for (const n of m.interfaces) {
-  const parent = def(n).inheritance;
-  if (parent && !selectedInterfaces.has(parent)) fail(`${n} extends ${parent}, which is not selected`);
+const tierOfKey = () => 2;
+/** Whether an interface is generated. */
+const visibleInterface = n => selectedInterfaces.has(n);
+/** The spec of a web definition or member, for its module (rules.syntheticIdl's are the WebAssembly JS API's). */
+const specOfMember = spec => spec === 'synthetic' ? 'wasm-js-api' : spec;
+const specModuleName = spec => rules.moduleNames[spec] ?? spec.split(/[^A-Za-z0-9]+/).filter(Boolean).map(capital).join('');
+const webModules = new Map(); // key → module
+const mergedInto = new Map(); // a module merged into another (a cycle) → that one
+function webModuleOf(spec) {
+  spec = specOfMember(spec);
+  if (!webSpecs.has(spec)) fail(`no web module for spec ${spec}`);
+  let key = `${NS}.${specModuleName(spec)}`;
+  while (mergedInto.has(key)) key = mergedInto.get(key);
+  if (!webModules.has(key)) {
+    webModules.set(key, { name: key.slice(NS.length + 1), key, tier: 2, ns: NS, specSet: new Set(),
+      interfaces: [], contributions: [], globalMembers: [], nsMembers: [] });
+    moduleTier.set(key, 2);
+    moduleNs.set(key, NS);
+  }
+  const m = webModules.get(key);
+  if (m.specSet.size && !m.specSet.has(spec) && ![...m.specSet].every(s => specModuleName(s) === specModuleName(spec))) fail(`specs ${[...m.specSet]} and ${spec} share the module name ${key}`);
+  m.specSet.add(spec);
+  return key;
 }
-/** Whether a member is an event handler IDL attribute (`onclick`), not generated in the browser tier. */
-const isEventHandler = m => m.type === 'attribute' && !m.idlType.union && !m.idlType.generic && browser.eventHandlerTypes.includes(m.idlType.idlType);
+// Every interface the web specs define, in its spec's module.
+for (const d of [...defs.values()].filter(d => d.type === 'interface' && !d.partialOnly && d.spec && webSpecs.has(specOfMember(d.spec))
+  && !rules.excludedInterfaces[d.name]).sort((a, b) => a.name < b.name ? -1 : 1)) {
+  const key = webModuleOf(d.spec);
+  webModules.get(key).interfaces.push(d.name);
+  selectedInterfaces.set(d.name, key);
+  moduleOfType.set(d.name, key);
+}
+for (const n of Object.keys(rules.excludedInterfaces)) if (!def(n)) fail(`web-rules.mjs excludes ${n}, which no spec defines`);
+/** Window, whose members are the page's globals (top-level functions), not methods of its handle. */
+const GLOBAL = 'Window';
+// Lasm.JS.Web.Types: the handle type of every web interface (a structure over a Value, with its instances), so
+// that a spec's module needs no other spec's module to name its interfaces; the specs name each other's
+// interfaces everywhere (DOM and HTML, HTML and WebCodecs, Fetch and Streams), never so each other's dictionaries.
+const TYPES = `${NS}.Types`;
+moduleTier.set(TYPES, 2);
+moduleNs.set(TYPES, NS);
+const isWebInterface = n => nsOf(selectedInterfaces.get(n) ?? '') === NS;
+for (const [n, k] of selectedInterfaces) if (isWebInterface(n)) moduleOfType.set(n, TYPES);
+/** The types module of a web spec's enum (`Lasm.JS.Web.Types.Fetch` for RequestCredentials), or null. */
+function enumOwner(name) {
+  const d = def(name);
+  return d && d.spec && !d.partialOnly && webSpecs.has(specOfMember(d.spec)) ? `${NS}.Types.${webModules.get(webModuleOf(d.spec)).name}` : null;
+}
+/** The module of a supporting type (dictionary, enum, callback, typedef'd union) a web spec defines, or null. */
+function definedOwner(name) {
+  const d = def(name);
+  // Enums name nothing, so they go to the first module that uses one (which never makes a cycle).
+  return d && d.spec && !d.partialOnly && webSpecs.has(specOfMember(d.spec)) && !['interface', 'namespace', 'enum', 'interface mixin'].includes(d.type) ? webModuleOf(d.spec) : null;
+}
 
 const promiseOfUndefined = JSON.parse(JSON.stringify(webidl2.parse('interface X { Promise<undefined> f(); };')[0].members[0].idlType));
 
 /** Members of an interface: its own (and partials'), then its mixins'. */
-function membersOf(name) {
+function allMembersOf(name) {
   const d = def(name);
-  let members = [...d.members];
-  const excluded = ctxTier >= 2 ? browser.excludeMixins[name] ?? [] : [];
+  const members = [...d.members];
   for (const mixin of includes.get(name) ?? []) {
-    if (excluded.includes(mixin)) continue;
     const md = def(mixin);
     if (!md) fail(`mixin ${mixin} not found`);
-    members.push(...md.members);
+    // The mixin's own members are added by the spec of the `includes` statement (LinkStyle's `sheet` on
+    // HTMLStyleElement, by HTML); a partial mixin's members by the partial's spec.
+    const by = includesSpec.get(`${name} includes ${mixin}`);
+    members.push(...md.members.map(m => m.spec === md.spec && by ? { ...m, spec: by } : m));
   }
-  members = members.filter(ctxTier >= 2 ? exposedToWindow : exposedToWorkers);
-  if (ctxTier >= 2) members = members.filter(m => !isEventHandler(m));
-  // Operations the specs now type as returning a promise that shipping browsers do not return (scrollIntoView):
-  // read as Promise<undefined>, which awaits either (docs/JS_BINDINGS.md).
-  if (ctxTier >= 2) members = members.map(m => m.type === 'operation' && browser.undefinedPromises.includes(`${name}.${m.name}`)
+  // The same member declared by two specs (CaptureController's constructor, in Screen Capture and in a spec
+  // that extends it) is one member: the first declaration, its own interface's spec before partials.
+  const own = members.filter(m => m.spec === d.spec), rest = members.filter(m => m.spec !== d.spec);
+  const seen = new Set();
+  return [...own, ...rest].filter(m => {
+    // An overload named by its constant argument (LasmOverloadName, Lasm.JS.Cloudflare's `get(key, 'arrayBuffer')`) is its own member.
+    const key = `${m.type} ${m.special ?? ''} ${m.name ?? ''}(${(m.arguments ?? []).map(a => idlText(a.idlType)).join(',')}) ${extValue(extAttr(m, 'LasmOverloadName')) ?? ''}`;
+    if (m.type !== 'const' && seen.has(key)) return false;
+    seen.add(key);
+    return !rules.excludedMembers[`${name}.${m.name}`];
+  });
+}
+/** The module that generates member `m` of interface `name`: its spec's, for a web interface. */
+function memberModule(name, m) {
+  const home = selectedInterfaces.get(name);
+  return nsOf(home) === NS ? webModuleOf(m.spec) : home;
+}
+/**
+ * Members of an interface, all of them (every exposure: each carries its `[Exposed]` in its doc comment).
+ * With `module`, only the members that module generates (a spec's partials go to the spec's module).
+ */
+function membersOf(name, module = null) {
+  let members = allMembersOf(name);
+  if (module) members = members.filter(m => memberModule(name, m) === module);
+  // Operations the specs type as returning a promise that the engines do not return (scrollIntoView):
+  // read as Promise<undefined>, which awaits either (web-rules.mjs, undefinedPromises).
+  return members.map(m => m.type === 'operation' && rules.undefinedPromises.includes(`${name}.${m.name}`)
     ? { ...m, specIdlType: m.idlType, idlType: promiseOfUndefined } : m);
-  const only = tier.memberFilter[name];
-  if (only) members = members.filter(m => only.includes(m.name));
-  return members;
+}
+
+// What each web module adds to interfaces of other modules, its globals and its namespaces' members.
+for (const [name, home] of [...selectedInterfaces]) {
+  if (nsOf(home) !== NS) continue;
+  // Window's members are also globals: top-level functions on globalThis (`document`), beside the methods of a
+  // Window handle (another window: an iframe's `contentWindow`, `window.open`'s result).
+  if (name === GLOBAL) for (const m of membersOf(name)) if (m.name) webModules.get(memberModule(name, m)).globalMembers.push(m);
+  const by = new Set();
+  for (const m of membersOf(name)) { const key = memberModule(name, m); if (key !== home) by.add(key); }
+  for (const key of [...by].sort()) webModules.get(key).contributions.push(name);
+}
+for (const d of [...defs.values()].filter(d => d.type === 'namespace' && d.spec && webSpecs.has(specOfMember(d.spec)))) {
+  for (const m of d.members.filter(m => m.name)) {
+    const wm = webModules.get(webModuleOf(m.spec));
+    let entry = wm.nsMembers.find(e => e.ns === d.name);
+    if (!entry) wm.nsMembers.push(entry = { ns: d.name, members: [] });
+    entry.members.push(m);
+  }
 }
 
 // ---------- types ----------
@@ -384,7 +502,7 @@ function resolveInner(t) {
   return resolveName(t.idlType);
 }
 function resolveName(n) {
-  if (ctxTier >= 2) n = browser.aliases[n] ?? n;
+  n = rules.aliases[n] ?? n;
   // CSSOMString is DOMString or USVString, as the implementation chooses (CSSOM).
   if (['DOMString', 'USVString', 'ByteString', 'CSSOMString'].includes(n)) return { k: 'prim', lean: 'String', idl: n };
   if (n === 'boolean') return { k: 'prim', lean: 'Bool', idl: n };
@@ -443,6 +561,7 @@ function altBaseName(t) {
   return lowerName(displayName(n));
 }
 function typeKeyName(t) {
+  if (t.nullable) return 'Nullable' + typeKeyName({ ...t, nullable: false });
   if (t.generic === 'sequence' || t.generic === 'FrozenArray') return 'SequenceOf' + typeKeyName(t.idlType[0]);
   if (t.generic === 'record') return 'RecordOf' + typeKeyName(t.idlType[1]);
   if (t.generic === 'Promise') return 'PromiseOf' + typeKeyName(t.idlType[0]);
@@ -459,17 +578,28 @@ function makeUnion(types, typedefName, outerNullable = false) {
     // A union that names a browser interface is resolved anew in the browser tier.
     const resolved = flat.alts.map(resolve);
     const browserOnly = ctxTier >= 2 && resolved.some(namesBrowserInterface);
-    const key = (browserOnly ? 'browser:' : '') + (typedefName ?? flat.alts.map(idlText).join('|'));
+    let key = (browserOnly ? 'browser:' : '') + (typedefName ?? flat.alts.map(idlText).join('|'));
+    // Lasm.JS.Web never uses a union of Lasm.JS.Node's or Deno's or Bun's (another namespace): it makes its own.
+    if (!ctxExt && unions.get(key)?.ext) key = 'web:' + key;
     if (!unions.has(key)) {
       // A host's union typedef (Lasm.JS.Cloudflare's) is named by LasmName, in the host's namespace.
       const hostTypedef = typedefName && def(typedefName) && hostOf(def(typedefName));
-      let name = typedefName ? (tier.renames[typedefName] ?? (hostTypedef ? displayName(typedefName) : typedefName)) : flat.alts.map(typeKeyName).join('Or');
+      let name = typedefName ? (rules.renames[typedefName] ?? (hostTypedef ? displayName(typedefName) : typedefName)) : flat.alts.map(typeKeyName).join('Or');
       // A union of a Lasm.JS.Node dictionary or class in a namespace lives in that namespace
       // (`fsPromises.ReadFileOptionsOrDOMString` beside `FileHandle.ReadFileOptionsOrDOMString`).
       const home = flat.alts.map(t => !t.union && !t.generic && def(t.idlType) && extValue(extAttr(def(t.idlType), 'LasmNamespace'))).find(Boolean);
       if (home) name = `${home}.${name}`;
-      if ([...unions.values()].some(o => o.name === name && (o.host ?? null) === (hostTypedef || null))) fail(`two unions are named ${name} (one in each tier)`);
-      const u = { key, name, alts: [], typedef: typedefName, host: hostTypedef || null };
+      const same = [...unions.values()].find(o => o.name === name && o.ext === ctxExt && (o.host ?? null) === (hostTypedef || null));
+      // The rest of the browser platform (tier 3) takes the union tiers 1 and 2 already generate under the
+      // name (where those tiers resolved a member it sees as an interface as Value): one type per name.
+      // Two IDL unions with one Lean shape (`double or sequence<double>` and its `unrestricted` twin) are one type.
+      if (same && same.alts.length === resolved.length && same.alts.every((x, i) => argType(x.t) === argType(resolved[i]))) {
+        unions.set(key, same);
+        r = { k: 'union', key: same.key };
+        return (flat.nullable || outerNullable) && r.k !== 'nullable' ? { k: 'nullable', inner: r } : r;
+      }
+      if (same) fail(`two unions are named ${name}: ${same.key} [${same.alts.map(x => argType(x.t))}] and ${key} [${resolved.map(argType)}]`);
+      const u = { key, name, alts: [], typedef: typedefName, ext: ctxExt, host: hostTypedef || null };
       unions.set(key, u);
       const used = new Set();
       flat.alts.forEach((t, i) => {
@@ -514,18 +644,23 @@ const needsPost = t => t.k === 'arraybuffer' || otherView(t) || (t.k === 'nullab
 function unionRead(u) {
   const shapes = u.alts.map(a => shape(a.t));
   const distinct = new Set(shapes).size === shapes.length && !shapes.includes('any')
-    && u.alts.every(a => a.t.k !== 'promise' && a.t.k !== 'nullable' && (a.t.k !== 'union') && readable(a.t));
+    && u.alts.every(a => a.t.k !== 'promise' && a.t.k !== 'nullable' && (a.t.k !== 'union') && readable(a.t) && !readsAsData(a.t));
   if (distinct) return u.alts.some(a => needsPost(a.t)) ? 'decode' : 'fromjs';
   // Only interfaces (generated or not: HTMLCanvasElement.getContext's contexts): a reference.
   if (u.alts.every(a => a.t.k === 'iface' || a.t.k === 'unknown' && (def(a.t.idl)?.type === 'interface' || otherInterfaces.has(a.t.idl)))) return 'value';
   return 'data';
 }
+/** A union's alternative written as a typed value but read as data (an array of a union of
+ * interfaces: written `Array X`, read `Array Data`): the union is then not read back typed. */
+const readsAsData = t => t.k === 'seq' && !needsPost(t) && retType(t).includes('Data') && !argType(t).includes('Data');
 /** Whether a type has a FromJS reading (possibly through an IO decoder). */
 function readable(t) {
   switch (t.k) {
   case 'nullable': case 'seq': case 'record': return readable(t.inner) && !(t.k === 'record' && needsPost(t.inner));
   case 'dict': return dictReadable(t.name);
   case 'promise': return false;
+  // A union read back as Value or Data has no FromJS of its own type (a dictionary holding one is not readable).
+  case 'union': return ['fromjs', 'decode'].includes(unionRead(unions.get(t.key)));
   default: return true;
   }
 }
@@ -533,7 +668,12 @@ const dictReadableMemo = new Map();
 function dictReadable(name) {
   if (dictReadableMemo.has(name)) return dictReadableMemo.get(name);
   dictReadableMemo.set(name, false);
-  const ok = inTier(tierOfKey(name), () => dictFields(name).every(f => { const t = resolve(f.idlType); return readable(t) && !needsPost(t); }));
+  // Readable when every field is, and is read as the type it is written as (a union written
+  // as its inductive but read as Data is not).
+  const ok = inOwner(name, () => dictFields(name).every(f => {
+    const t = resolve(f.idlType), inner0 = t.k === 'nullable' && !f.required ? t.inner : t, inner = inner0.k === 'nullable' ? inner0.inner : inner0;
+    return readable(t) && !needsPost(t) && (!['union', 'seq', 'dict', 'record'].includes(inner.k) || argType(inner) === retType(inner));
+  }));
   dictReadableMemo.set(name, ok);
   return ok;
 }
@@ -616,22 +756,26 @@ function visit(t, mode, module) {
   const key = typeKey(t);
   if (!key) return;
   const first = !moduleOfType.has(key);
-  if (first) moduleOfType.set(key, module);
+  // A web spec's dictionary, enum, callback or typedef'd union lives in that spec's module; an inline union in
+  // the first module that uses it.
+  if (first) moduleOfType.set(key, (t.k === 'union' ? unions.get(t.key).typedef && !ctxExt && definedOwner(unions.get(t.key).typedef)
+    : t.k === 'enum' ? enumOwner(t.name) : t.k !== 'iface' && definedOwner(t.name)) || module);
   if (mode === 'to') { if (needTo.has(key)) return; needTo.add(key); }
   else if (mode === 'from') { if (needFrom.has(key)) return; needFrom.add(key); }
   else if (!first) return;
   const owner = moduleOfType.get(key);
-  inTier(moduleTier.get(owner), () => {
+  inTier(2, () => {
     if (t.k === 'dict') for (const f of dictFields(t.name)) visit(resolve(f.idlType), mode, owner);
     if (t.k === 'union') for (const a of unions.get(t.key).alts) visit(a.t, mode, owner);
     if (t.k === 'callback') {
       // A callback handle is made from a Lean function: its arguments are read, its result written.
       const c = callbackSignature(t.name);
       for (const a of c.args) visit(resolve(a.idlType), 'from', owner);
-      visit(c.ret, 'to', owner);
+      // A promise the Lean function returns is resolved with its value, written to JavaScript.
+      visit(c.ret.k === 'promise' ? c.ret.inner : c.ret, 'to', owner);
       needTo.add(key); needFrom.add(key);
     }
-  });
+  }, extModule(owner));
 }
 function callbackSignature(name) {
   const d = def(name);
@@ -640,21 +784,148 @@ function callbackSignature(name) {
   return { args: op.arguments, ret: resolve(op.idlType), idl: op };
 }
 
+// ---------- module order ----------
+
+// The interfaces a type names, through dictionaries, typedefs, unions and callbacks (not through interfaces).
+function namedInterfaces(t, out, seen = new Set()) {
+  if (!t) return;
+  if (t.union || t.generic) { for (const x of t.idlType) namedInterfaces(x, out, seen); return; }
+  if (typeof t.idlType !== 'string') return namedInterfaces(t.idlType, out, seen);
+  const n = rules.aliases[t.idlType] ?? t.idlType;
+  if (seen.has(n)) return;
+  seen.add(n);
+  const d = def(n);
+  if (!d) return;
+  if (d.type === 'interface') out.add(n);
+  else if (d.type === 'dictionary') for (const f of dictFields(n)) namedInterfaces(f.idlType, out, seen);
+  else if (d.type === 'typedef') namedInterfaces(d.idlType, out, seen);
+  else if (d.type === 'callback') { namedInterfaces(d.idlType, out, seen); for (const a of d.arguments) namedInterfaces(a.idlType, out, seen); }
+  else if (d.type === 'callback interface') for (const op of d.members.filter(x => x.type === 'operation')) {
+    namedInterfaces(op.idlType, out, seen); for (const a of op.arguments) namedInterfaces(a.idlType, out, seen);
+  }
+}
+/** The alternatives of a union type, through typedefs (null when `t` is not a union). */
+function unionAlternatives(t) {
+  if (t.generic) return null;
+  if (t.union) return t.idlType.flatMap(x => unionAlternatives(x) ?? [x]);
+  const d = typeof t.idlType === 'string' && def(t.idlType);
+  return d?.type === 'typedef' ? unionAlternatives(d.idlType) : null;
+}
+const memberInterfaces = (m, out) => {
+  // A result union of interfaces only (OffscreenCanvas.getContext's contexts) is read back as a Value.
+  const alts = m.idlType && m.type !== 'constructor' && unionAlternatives(m.idlType.generic === 'Promise' ? m.idlType.idlType[0] : m.idlType);
+  const valueRead = alts && alts.every(x => !x.generic && !x.union && def(x.idlType)?.type === 'interface');
+  if (m.idlType && !valueRead) namedInterfaces(m.idlType, out);
+  for (const a of m.arguments ?? []) namedInterfaces(a.idlType, out);
+};
+/** The web modules owning the supporting types a type names directly (an inline union's alternatives too). */
+function typeOwners(t, out, inUnion = false) {
+  if (!t) return;
+  if (t.union) { for (const x of t.idlType) typeOwners(x, out, true); return; }
+  if (t.generic) { for (const x of t.idlType) typeOwners(x, out); return; }
+  if (typeof t.idlType !== 'string') return typeOwners(t.idlType, out, inUnion);
+  const d = def(t.idlType);
+  if (!d || d.type === 'interface') return;
+  // A typedef'd union inside a union is spliced into it; a typedef of anything else is its type.
+  if (d.type === 'typedef' && (inUnion || !d.idlType.union)) return typeOwners(d.idlType, out, inUnion);
+  const o = definedOwner(t.idlType);
+  if (o) out.add(o);
+}
+/** The supporting types a type refers to inside its own definition. */
+function definitionTypes(name) {
+  const d = def(name);
+  if (d.type === 'dictionary') return dictFields(name).map(f => f.idlType);
+  if (d.type === 'typedef') return [d.idlType];
+  if (d.type === 'callback') return [d.idlType, ...d.arguments.map(a => a.idlType)];
+  if (d.type === 'callback interface') return d.members.filter(x => x.type === 'operation').flatMap(op => [op.idlType, ...op.arguments.map(a => a.idlType)]);
+  return [];
+}
+const memberTypes = m => [...(Array.isArray(m.idlType) ? m.idlType : [m.idlType]), ...(m.arguments ?? []).map(a => a.idlType)].filter(Boolean);
+/** The other web modules a web module's declarations need. */
+function webDeps(wm) {
+  const owners = new Set();
+  const add = t => typeOwners(t, owners);
+  for (const i of wm.interfaces) for (const m of membersOf(i, wm.key)) memberTypes(m).forEach(add);
+  for (const i of wm.contributions) for (const m of membersOf(i, wm.key)) memberTypes(m).forEach(add);
+  for (const m of wm.globalMembers) memberTypes(m).forEach(add);
+  for (const e of wm.nsMembers) for (const m of e.members) memberTypes(m).forEach(add);
+  // The supporting types the module's specs define, with what they name.
+  for (const d of defs.values()) if (definedOwner(d.name) === wm.key) definitionTypes(d.name).forEach(add);
+  owners.delete(wm.key);
+  return owners;
+}
+// Every spec that defines a supporting type has its module (it may hold only those).
+for (const d of [...defs.values()]) { definedOwner(d.name); if (d.type === 'enum' && d.spec && webSpecs.has(specOfMember(d.spec))) webModuleOf(d.spec); }
+// Cycles (Tarjan's strongly connected components) are merged into one module, named after its specs.
+for (;;) {
+  const keys = [...webModules.keys()].sort();
+  const deps = new Map(keys.map(k => [k, [...webDeps(webModules.get(k))].sort()]));
+  let index = 0; const idx = new Map(), low = new Map(), stack = [], on = new Set(), sccs = [];
+  const strong = v => {
+    idx.set(v, index); low.set(v, index); index++; stack.push(v); on.add(v);
+    for (const w of deps.get(v)) {
+      if (!idx.has(w)) { strong(w); low.set(v, Math.min(low.get(v), low.get(w))); }
+      else if (on.has(w)) low.set(v, Math.min(low.get(v), idx.get(w)));
+    }
+    if (low.get(v) === idx.get(v)) { const c = []; let w; do { w = stack.pop(); on.delete(w); c.push(w); } while (w !== v); sccs.push(c); }
+  };
+  for (const k of keys) if (!idx.has(k)) strong(k);
+  const cycles = sccs.filter(c => c.length > 1);
+  if (process.env.LASM_CYCLES) for (const c of cycles) console.error(`cycle: ${c.join(' ')}`);
+  if (!cycles.length) {
+    // Tarjan emits components dependencies first: that is the module order, before Lasm.JS.Node, Deno and Bun.
+    const ordered = sccs.map(c => webModules.get(c[0]));
+    for (const m of ordered) {
+      const specs = [...m.specSet].sort();
+      Object.assign(m, { title: specs.join(', '), specs: specs.map(x => specTitles[x]).join('; ') });
+      // A parent interface before its children (the Lean structure extends it).
+      const depth = n => { const p = def(n).inheritance; return p && m.interfaces.includes(p) ? 1 + depth(p) : 0; };
+      m.interfaces.sort((a, b) => depth(a) - depth(b) || (a < b ? -1 : 1));
+    }
+    // The handle types, one module per spec module (`Lasm.JS.Web.Types.Fetch`), so a program links only the handle
+    // types of the specs it imports; each imports only its parents' (inheritance is acyclic), ordered by it.
+    const typesOf = new Map();
+    for (const m of ordered) for (const i of m.interfaces) typesOf.set(i, `${NS}.Types.${m.name}`);
+    // A spec's enums are there too: they name nothing, so the types modules stay acyclic.
+    const hasEnum = new Set([...defs.values()].filter(d => d.type === 'enum' && d.spec && webSpecs.has(specOfMember(d.spec))).map(d => webModuleOf(d.spec)));
+    const typeModules = [...new Set(ordered.filter(m => m.interfaces.length || hasEnum.has(m.key)).map(m => `${NS}.Types.${m.name}`))];
+    const typeDeps = new Map(typeModules.map(k => [k, new Set()]));
+    for (const [i, k] of typesOf) { const p = def(i).inheritance; if (p && typesOf.has(p) && typesOf.get(p) !== k) typeDeps.get(k).add(typesOf.get(p)); }
+    const sortedTypes = [], state = new Map();
+    const place = k => {
+      if (state.get(k) === 'done') return;
+      if (state.get(k) === 'active') fail(`the handle types of ${k} and its parents' form a cycle`);
+      state.set(k, 'active'); for (const d of [...typeDeps.get(k)].sort()) place(d); state.set(k, 'done'); sortedTypes.push(k);
+    };
+    for (const k of typeModules) place(k);
+    for (const k of sortedTypes) { moduleTier.set(k, 2); moduleNs.set(k, NS); }
+    for (const [i, k] of typesOf) moduleOfType.set(i, k);
+    allModules.unshift(...sortedTypes.map(k => ({ name: k.slice(NS.length + 1), key: k, tier: 2, ns: NS, typesFor: k.slice(NS.length + 7),
+      title: `the handle types of ${k.slice(NS.length + 7)}'s interfaces`, specs: webModules.get(`${NS}.${k.slice(NS.length + 7)}`).specs, interfaces: [] })), ...ordered);
+    break;
+  }
+  for (const c of cycles) {
+    const members = c.map(k => webModules.get(k)).sort((a, b) => a.key < b.key ? -1 : 1);
+    const name = members.map(m => m.name).join('And');
+    const merged = { name, key: `${NS}.${name}`, tier: 2, ns: NS, specSet: new Set(members.flatMap(m => [...m.specSet])),
+      interfaces: members.flatMap(m => m.interfaces), contributions: [...new Set(members.flatMap(m => m.contributions))].sort(),
+      globalMembers: members.flatMap(m => m.globalMembers), nsMembers: [] };
+    for (const m of members) for (const e of m.nsMembers) {
+      const found = merged.nsMembers.find(x => x.ns === e.ns);
+      if (found) found.members.push(...e.members); else merged.nsMembers.push({ ns: e.ns, members: [...e.members] });
+    }
+    merged.contributions = merged.contributions.filter(i => !merged.interfaces.includes(i));
+    for (const m of members) { webModules.delete(m.key); mergedInto.set(m.key, merged.key); }
+    webModules.set(merged.key, merged);
+    moduleTier.set(merged.key, 2); moduleNs.set(merged.key, NS);
+    for (const i of merged.interfaces) selectedInterfaces.set(i, merged.key);
+  }
+}
+
 // The members to generate, per module.
-const plan = allModules.map(m => ({ ...m, ifaces: (m.interfaces ?? []).map(configIdl), globals: m.globals ?? [], namespaces: m.namespaces ?? [],
-  windowGlobals: m.windowGlobals ?? [] }));
-const globalMixin = def('WindowOrWorkerGlobalScope');
-const globalMember = n => {
-  const found = globalMixin.members.filter(x => x.name === n);
-  if (!found.length) fail(`global ${n} not found`);
-  return found;
-};
-/** A member of Window (with its mixins and partials) that the browser tier also generates as a global (`document`). */
-const windowMember = n => {
-  const found = inTier(2, () => membersOf('Window')).filter(x => x.name === n);
-  if (!found.length) fail(`Window member ${n} not found`);
-  return found;
-};
+const planEntry = m => ({ ...m, ifaces: m.interfaces ?? [], namespaces: m.namespaces ?? [],
+  contributions: m.contributions ?? [], globalMembers: m.globalMembers ?? [], nsMembers: m.nsMembers ?? [] });
+const plan = allModules.map(planEntry);
 const promiseRet = t => t.k === 'promise';
 function visitMember(m, module) {
   if (m.type === 'operation' || m.type === 'constructor') {
@@ -668,22 +939,46 @@ function visitMember(m, module) {
     for (const t of m.idlType) visit(resolve(t), 'from', module);
   }
 }
-for (const m of plan) inTier(m.tier, () => {
+for (const m of plan) inModule(m.key, () => {
   for (const i of m.ifaces) {
     const d = def(i);
     if (d.inheritance && selectedInterfaces.has(d.inheritance)) visit({ k: 'iface', name: d.inheritance }, 'none', m.key);
-    for (const mem of membersOf(i)) visitMember(mem, m.key);
+    for (const mem of membersOf(i, m.key)) visitMember(mem, m.key);
   }
-  for (const g of m.globals) for (const mem of globalMember(g)) visitMember(mem, m.key);
-  for (const n of m.namespaces) for (const mem of def(n).members.filter(exposedToWorkers)) visitMember(mem, m.key);
-  for (const g of m.windowGlobals) for (const mem of windowMember(g)) visitMember(mem, m.key);
+  for (const i of m.contributions) {
+    visit({ k: 'iface', name: i }, 'none', m.key);
+    for (const mem of membersOf(i, m.key)) visitMember(mem, m.key);
+  }
   for (const x of m.extraTypes ?? []) {
     const d = def(x);
     if (!d) fail(`extra type ${x} not found`);
+    // Lasm.JS.Cloudflare: each is written and read wherever it is met (a field of a type read
+    // here and written there), so it gets both instances where it can.
+    // Lasm.JS.Cloudflare: a type no member uses (Workers AI's per-model inputs and outputs) gets
+    // both instances, as a program may write or read it; one that members use gets what they need.
+    // Lasm.JS.Cloudflare: a type no member names gets instances by the ways it flows where the
+    // declarations use it (LasmDirection: Workers AI's model inputs are written, its outputs read),
+    // else a ToJS, for a program to pass it (ExportedHandler to exportDefault).
+    if (m.host?.rich) {
+      if (moduleOfType.has(typeKey(resolveName(x)) ?? x)) continue;
+      const t = resolveName(x), ways = (extValue(extAttr(d, 'LasmDirection')) ?? 'to').split(' ');
+      for (const w of ways) visit(t, w, m.key);
+      continue;
+    }
     if (m.host && moduleOfType.has(x)) continue;
     visit(resolveName(x), 'to', m.key);
   }
+  for (const mem of m.globalMembers) visitMember(mem, m.key);
+  for (const e of m.nsMembers) for (const mem of e.members) visitMember(mem, m.key);
+  // Lasm.JS.Node's, Deno's and Bun's namespaces.
+  for (const n of m.namespaces) for (const mem of def(n).members) visitMember(mem, m.key);
+  // Every dictionary, callback and enum a spec defines, used by a member or not: specs take some through `object`
+  // arguments in prose (Streams' UnderlyingSource, Web Crypto's algorithm dictionaries). Written to JavaScript.
+  if (nsOf(m.key) === NS && !m.typesFor) for (const d of defs.values())
+    if (definedOwner(d.name) === m.key && ['dictionary', 'callback', 'callback interface', 'enum'].includes(d.type)
+      || d.type === 'enum' && d.spec && webSpecs.has(specOfMember(d.spec)) && webModuleOf(d.spec) === m.key) visit(resolveName(d.name), 'to', m.key);
 });
+
 
 // ---------- emitting ----------
 
@@ -699,6 +994,7 @@ function requireType(module, t) {
   if (!owner) fail(`no module for ${key}`);
   if (owner !== module) {
     if (moduleIndex(owner) > moduleIndex(module)) fail(`${module} uses ${key} of the later module ${owner}`);
+    if (!extModule(module) && extModule(owner)) fail(`${module} uses ${key} of ${owner}, outside Lasm.JS.Web`);
     out.get(module).imports.add(owner);
   }
 }
@@ -716,9 +1012,15 @@ const memberIdl = (m, owner) => {
   }
 };
 /** A Lasm.JS.Node member's documented signature (LasmSignature), quoted before its WebIDL. */
+const nodeVersionOf = m => extValue(extAttr(m, 'LasmSince')) ?? nodeTier.version;
 const nodeSignature = m => {
   const sig = extValue(extAttr(m, 'LasmSignature')), added = extValue(extAttr(m, 'LasmAdded'));
-  return sig ? `\`${sig}\`${added ? ` (added in Node.js ${added})` : ''}: ` : '';
+  // Node's stability index: 0 Deprecated, 1 Experimental, 3 Legacy (docs/JS_BINDINGS.md, "Stability").
+  const stability = extValue(extAttr(m, 'LasmStability'));
+  const mark = stability === undefined ? '' : `**${{ 0: 'Deprecated', 1: 'Experimental', 3: 'Legacy' }[stability[0]] ?? 'Stability ' + stability}** in the Node.js ${nodeVersionOf(m)} docs. `;
+  const since = extValue(extAttr(m, 'LasmSince'));
+  const removed = extValue(extAttr(m, 'LasmRemovedIn'));
+  return sig ? `${since ? `**Node.js ${since.split('.')[0]} and later** (documented from Node.js ${since}, not in ${nodeTier.version}). ` : ''}${removed ? `**Not documented in Node.js ${removed}** (removed or changed there). ` : ''}${mark}\`${sig}\`${added ? ` (added in Node.js ${added})` : ''}: ` : '';
 };
 const specOf = spec => spec === 'synthetic' ? 'written for Lasm (docs/JS_BINDINGS.md)' : specTitles[spec];
 
@@ -783,14 +1085,13 @@ function resultOf(idlType, member = null) {
   // URLPattern returns its groups as objects that are not plain.
   const dict = t.k === 'nullable' ? t.inner : t;
   if (dict.k === 'dict' && dictReadable(dict.name) && holdsRecord(dict)) return { async, t, lean, req: 'Value', post: `Support.cloneAs ${paren(lean)}` };
-  // A record result is read through Object.entries (Lasm.JS.Node.Support.recordOf): Node's
+  // A record result is read through Object.entries (Lasm.JS.Web.Support.recordOf): Node's
   // process.env is not a plain object, and Deno's is a Proxy that structuredClone rejects.
   // A nullable record (D1's first(), R2's customMetadata) is read as data, none for null or
-  // undefined (Option Value would be a reference to null). Lasm.JS.Deno and Lasm.JS.Bun read records as
-  // data (Lasm.JS.Node.Support and Lasm.JS.Cloudflare.Support are not theirs).
+  // undefined (Option Value would be a reference to null). Lasm.JS.Deno and Lasm.JS.Bun read records as data.
   if (dict.k === 'record' && !needsPost(dict.inner) && !emittingHost) return t.k === 'nullable'
     ? { async, t, lean, req: 'Data', post: `Support.optionalRecordOf ${paren(retType(dict.inner))}` }
-    : { async, t, lean, req: 'Value', post: `Support.recordOf ${paren(retType(dict.inner))}` };
+    : { async, t, lean, req: 'Value', post: `Lasm.JS.Web.Support.recordOf ${paren(retType(dict.inner))}` };
   return { async, t, lean, req: paren(reqType(t)), post: postFn(t) };
 }
 function holdsRecord(t, seen = new Set()) {
@@ -823,17 +1124,92 @@ function overloadNames(group) {
     if (given) return given;
     if (i === 0) return m.name;
     const idx = m.arguments.findIndex((a, j) => first[j]?.name !== a.name);
-    return idx >= 0 ? `${m.name}With${capital(m.arguments[idx].name)}` : `${m.name}${m.arguments.length}`;
+    if (idx >= 0) return `${m.name}With${capital(m.arguments[idx].name)}`;
+    // The same argument names: a shorter overload adds its arity (`first0`); one of the same length differs
+    // only by its arguments' types, and adds them (RTCDataChannel's send(data): `sendWithBlob`).
+    return m.arguments.length !== first.length ? `${m.name}${m.arguments.length}` : withTypes(m);
   });
   // Two overloads that would get one name: each adds all its argument names (FileHandle's
   // read(options) and read(buffer, options): readWithOptions, readWithBufferOptions).
-  return names.map((n, i) => i > 0 && names.indexOf(n) !== i ? `${group[i].name}With${group[i].arguments.map(a => capital(a.name)).join('')}` : n);
+  const named = names.map((n, i) => i > 0 && names.indexOf(n) !== i ? `${group[i].name}With${group[i].arguments.map(a => capital(a.name)).join('')}` : n);
+  // Still one name: each one after the first adds its argument types instead, then, if still the same, its position.
+  const typed = named.map((n, i) => i > 0 && named.indexOf(n) !== i ? withTypes(group[i]) : n);
+  return typed.map((n, i) => typed.indexOf(n) !== i ? `${n}${i + 1}` : n);
 }
+/** An overload's name with its argument types: `sendWithBlob`. */
+const withTypes = m => `${m.name}With${m.arguments.map(a => typeKeyName(a.idlType)).join('')}`;
 const constructorName = 'new';
 
-function emitInterface(module, name) {
+// ---------- the web APIs a program references (for `lasm build --target`'s availability check) ----------
+// Every generated function of Lasm.JS.Web that calls the platform is `@[noinline]`, so a program's generated C
+// names it, and is recorded with the compatibility-data paths that say where it exists (0.3-10).
+/** { lean: full Lean name, paths: [[root, …keys]] in order of preference }. */
+const apiDecls = [];
+let apiOwner = null; // { kind: 'interface', name } | { kind: 'global' } | { kind: 'namespace', name }
+/** The compatibility-data root and key of an interface or namespace: WebAssembly's are under `webassembly.api`. */
+const compatBase = name => {
   const d = def(name);
+  return d && namespaceOf(d) === 'WebAssembly' ? ['webassembly', 'api', name] : name === 'WebAssembly' ? ['webassembly', 'api'] : ['api', name];
+};
+/** A web API definition's text, `@[noinline]`, recorded with its compatibility paths. */
+function api(member, text) {
+  const lean = /\ndef (\S+)/.exec(text)[1].replaceAll('«', '').replaceAll('»', '');
+  // Lasm.JS.Node, Deno and Bun: the same data representation, with no availability record.
+  if (apiOwner.kind === 'ext') return macroInline(text, `${apiOwner.ns}.${lean}`);
+  const key = member.type === 'constructor' ? null : member.type === 'iterable' ? member.key : member.name;
+  let paths;
+  if (apiOwner.kind === 'global') {
+    const event = /^on(.+)$/.exec(key);
+    paths = [['api', key], ...(event ? [['api', 'Window', `${event[1]}_event`]] : []), ['api', 'Window', key]];
+  } else {
+    const base = compatBase(apiOwner.name);
+    if (member.type === 'cast') paths = [base];
+    else if (member.type === 'constructor') paths = [[...base, apiOwner.name.split('.').at(-1)], base];
+    else {
+      const event = member.type === 'attribute' && /^on(.+)$/.exec(key);
+      paths = [...(event ? [[...base, `${event[1]}_event`]] : []), ...(member.special === 'static' || apiOwner.kind === 'namespace' ? [[...base, `${key}_static`]] : []),
+        [...base, key], base];
+    }
+  }
+  apiDecls.push({ lean: `${NS}.${lean}`, paths });
+  return macroInline(text, `${NS}.${lean}`);
+}
+/**
+ * A web binding as data (0.3-12): `@[macro_inline]`, so it has no code of its own and a program's call site gets
+ * the generic Lasm.JS call, wrapped in `Internal.api "<full name>"` (the error names the binding, and
+ * `lasm build --target` finds the program's web APIs by these names in its C). macro_inline substitutes the
+ * arguments as they are written, so every parameter must occur exactly once in the body: checked here.
+ */
+function macroInline(text, fullName) {
+  const at = text.indexOf('\ndef ');
+  const lineEnd = text.indexOf('\n', at + 1) < 0 ? text.length : text.indexOf('\n', at + 1);
+  const header = text.slice(at + 1, lineEnd);
+  const typeAt = Math.max(header.lastIndexOf(' : IO '), header.lastIndexOf(' : Async '));
+  if (typeAt < 0) fail(`${fullName}: no IO or Async result in ${header}`);
+  const defineAt = at + 1 + header.indexOf(':=', typeAt);
+  let body = text.slice(defineAt + 2);
+  const params = [...header.slice(0, typeAt).matchAll(/\((«[^»]+»|[A-Za-z_][A-Za-z0-9_']*) :/g)].map(m => m[1]);
+  for (const p of params) {
+    const uses = body.replace(/"(?:[^"\\]|\\.)*"/g, '""').match(new RegExp(`(?<![A-Za-z0-9_'.«])${p.replace(/[«»]/g, x => '\\' + x)}(?![A-Za-z0-9_'»])(?! :=)`, 'g'))?.length ?? 0;
+    if (uses !== 1) fail(`${fullName}: parameter ${p} occurs ${uses} times in its body (macro_inline needs exactly once)`);
+  }
+  body = body.startsWith(' do\n') ? body.slice(3) : body.startsWith('\n') ? body : '\n  ' + body.trimStart();
+  return text.slice(0, at) + '\n@[macro_inline] ' + text.slice(at + 1, defineAt) + `:= Internal.api "${fullName}" do` + body;
+}
+/** The handle types of the web interfaces, for Lasm.JS.Web.Types. */
+const handleDecls = [];
+/** Names taken per interface, across the modules that generate its members. */
+const takenNames = new Map();
+/** Interface `name`'s handle type (with `declare`) and the members `module` generates. */
+function emitInterface(module, name, declare = true) {
+  const d = def(name);
+  // Every type a member names is imported (a host's class members: constructors, statics).
+  if (hostOf(d)) for (const mem of membersOf(name)) {
+    for (const a of mem.arguments ?? []) requireType(module, resolve(a.idlType));
+    if (mem.idlType && !Array.isArray(mem.idlType)) requireType(module, resolve(mem.idlType));
+  }
   const o = out.get(module);
+  apiOwner = nsOf(module) === NS ? { kind: 'interface', name } : { kind: 'ext', ns: nsOf(module) };
   const T = leanTypeName(name);
   const ns = nsOf(module), jsModule = jsModuleOf(name);
   const isNode = jsModule !== 'globalThis';
@@ -845,7 +1221,7 @@ function emitInterface(module, name) {
     ? `/-- \`class ${leanTypeName(name)}${d.inheritance ? ' extends ' + leanTypeName(d.inheritance) : ''}\` of \`${jsModule}\` (${specOf(d.spec)}): a handle to the JavaScript object. -/`
     : `/-- \`interface ${jsPath(name)}${d.inheritance ? ' : ' + d.inheritance : ''}\` (${specOf(d.spec)}): a handle to the JavaScript object. -/`;
   // LasmNoHandle (Node's Buffer): no handle type, a Lean ByteArray stands for the object.
-  if (!extAttr(d, 'LasmNoHandle')) {
+  if (declare && !extAttr(d, 'LasmNoHandle')) {
     // The parent projection is `to<Parent>` (`toEventEmitter`), or, where an ancestor's projection has that name
     // (https.Server → http.Server → net.Server), `to` and every component of the parent's name (`toHttpServer`).
     const ancestorsLast = [];
@@ -858,21 +1234,28 @@ function emitInterface(module, name) {
     decls.push(`instance : FromJS ${T} := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "${ns}.${T}", .data⟩`);
     // An instance where its parent is expected (an HTMLElement for a Node argument).
     if (parent) decls.push(`instance : Coe ${T} ${parent} := ⟨${T}.${projection ?? 'to' + parent.split('.').at(-1)}⟩`);
-    o.types.push(decls.join('\n'));
+    // A web interface's handle type lives in Lasm.JS.Web.Types (ordered by inheritance when written).
+    if (isWebInterface(name)) {
+      handleDecls.push({ name, text: decls.join('\n'), module: moduleOfType.get(name) });
+      if (parent) requireType(moduleOfType.get(name), { k: 'iface', name: d.inheritance });
+    }
+    else o.types.push(decls.join('\n'));
     // Rule A12: a checked downcast through the interface object's prototype (`instanceof`), for
     // every interface JavaScript code can name: not [LegacyNoInterfaceObject] ones, not Deno's and
     // Bun's declared-only interfaces, not Node classes their module does not export.
     const ctor = hostOf(d) || extAttr(d, 'LegacyNoInterfaceObject') ? null
       : isNode ? (extValue(extAttr(d, 'LasmPath')) ? `Support.getExport "${jsModule}" [${jsPath(name).split('.').map(s => `"${s}"`).join(', ')}] Value` : null)
       : `Support.getGlobal [${jsPath(name).split('.').map(s => `"${s}"`).join(', ')}] Value`;
-    if (ctor) o.decls.push(`/-- \`v instanceof ${jsPath(name)}\`: \`some\` handle to \`v\` when it is one, else \`none\` (also when the runtime has no \`${jsPath(name)}\`). -/\ndef ${T}.cast? (v : Value) : IO (Option ${T}) := do\n  return if (← Lasm.JS.Web.Support.isInstance (${ctor}) v) then some { val := v } else none`);
+    if (ctor) o.decls.push(api({ type: 'cast' }, `/-- \`v instanceof ${jsPath(name)}\`: \`some\` handle to \`v\` when it is one, else \`none\` (also when the runtime has no \`${jsPath(name)}\`). -/\ndef ${T}.cast? (v : Value) : IO (Option ${T}) :=\n  Lasm.JS.Web.Support.cast (${ctor}) (fun x => { val := x }) v`));
   }
 
-  const members = membersOf(name);
-  const taken = new Set(['mk', 'val', 'rec', 'recOn', 'casesOn', 'noConfusion', 'noConfusionType', 'ctorIdx', 'ofFn', 'ofSyncFn', 'cast?']);
+  // Window's members are the page's globals (emitted as top-level functions), not methods of its handle.
+  const members = membersOf(name, module);
+  if (!takenNames.has(name)) takenNames.set(name, new Set(['mk', 'val', 'rec', 'recOn', 'casesOn', 'noConfusion', 'noConfusionType', 'ctorIdx', 'ofFn', 'ofSyncFn', 'cast?']));
+  const taken = takenNames.get(name);
   const take = (n, what) => { if (taken.has(n)) fail(`${T}.${n} (${what}) is generated twice`); taken.add(n); return n; };
-  const staticNames = new Set(members.filter(m => m.special === 'static').map(memberName));
-  const instanceNames = new Set(members.filter(m => m.special !== 'static' && m.name).map(memberName));
+  // Static names clash with instance names of every module's members.
+  const instanceNames = new Set(allMembersOf(name).filter(m => m.special !== 'static' && m.name).map(memberName));
   const fns = [];
   const doc = (m, extra = '') => `/-- ${nodeSignature(m)}\`${docText(memberIdl(m, name))}\`${extra}${m.specIdlType
     ? `: read as \`Promise<undefined>\`, since shipping browsers return \`undefined\` (awaited at once) where the spec now returns a promise` : ''} -/`;
@@ -883,7 +1266,7 @@ function emitInterface(module, name) {
     const c = ctors[i];
     for (const a of c.arguments) requireType(module, resolve(a.idlType));
     const al = argumentList(c.arguments, module);
-    fns.push(`${doc(c)}\ndef ${T}.${id(take(n, 'constructor'))}${al.binders ? ' ' + al.binders : ''} : IO ${T} :=${withPre(al, `\n  Lasm.JS.Binding.invoke ${T} ${binding(`${T}.${n}`, jsPath(name), true, al.arity, ns, jsModule)}\n    ${al.args} (await := false)`)}`);
+    fns.push(api(c, `${doc(c)}\ndef ${T}.${id(take(n, 'constructor'))}${al.binders ? ' ' + al.binders : ''} : IO ${T} :=${withPre(al, `\n  Lasm.JS.Binding.invoke ${T} ${binding(`${T}.${n}`, jsPath(name), true, al.arity, ns, jsModule)}\n    ${al.args} (await := false)`)}`));
   });
   // Constants.
   for (const c of members.filter(m => m.type === 'const')) {
@@ -897,22 +1280,23 @@ function emitInterface(module, name) {
     requireType(module, r);
     const res = resultOf(a.idlType, a);
     const isStatic = a.special === 'static';
-    const getName = take(isStatic && instanceNames.has(a.name) ? 'static' + capital(a.name) : a.name, 'attribute');
+    // LasmLeanName (Lasm.JS.Cloudflare): a Lean name other than the property's (`Tracing.SpanClass`).
+    const getName = take(extValue(extAttr(a, 'LasmLeanName')) ?? (isStatic && instanceNames.has(a.name) ? 'static' + capital(a.name) : a.name), 'attribute');
     if (isStatic) {
       const path = `[${jsPath(name).split('.').map(s => `"${s}"`).join(', ')}, "${a.name}"]`;
       const call = isNode ? exportOf(jsModule, path, res.async ? 'Value' : res.req, !!hostOf(d)) : `Support.getGlobal ${path} ${res.async ? 'Value' : res.req}`;
-      fns.push(`${doc(a)}\ndef ${T}.${id(getName)} : ${monad(res)} ${paren(res.lean)} := ${res.async ? `do\n  let p ← ${call}\n  ${finish(`p.await ${res.req}`, res).replace(/^do\n {2}/, '')}` : finish(call, res)}`);
+      fns.push(api(a, `${doc(a)}\ndef ${T}.${id(getName)} : ${monad(res)} ${paren(res.lean)} := ${res.async ? `do\n  let p ← ${call}\n  ${finish(`p.await ${res.req}`, res).replace(/^do\n {2}/, '')}` : finish(call, res)}`));
     } else if (res.async) {
-      fns.push(`${doc(a)}\ndef ${T}.${id(getName)} (self : ${T}) : Async ${paren(res.lean)} := do\n  let p ← self.val.get "${a.name}" Value\n  ${res.post ? `let r ← p.await ${res.req}\n  ${asyncPost(res.post, 'r')}` : `p.await ${res.req}`}`);
+      fns.push(api(a, `${doc(a)}\ndef ${T}.${id(getName)} (self : ${T}) : Async ${paren(res.lean)} := do\n  let p ← self.val.get "${a.name}" Value\n  ${res.post ? `let r ← p.await ${res.req}\n  ${asyncPost(res.post, 'r')}` : `p.await ${res.req}`}`));
     } else {
-      fns.push(`${doc(a)}\ndef ${T}.${id(getName)} (self : ${T}) : IO ${paren(res.lean)} := ${finish(`self.val.get "${a.name}" ${res.req}`, res)}`);
+      fns.push(api(a, `${doc(a)}\ndef ${T}.${id(getName)} (self : ${T}) : IO ${paren(res.lean)} := ${finish(`self.val.get "${a.name}" ${res.req}`, res)}`));
     }
     if (!a.readonly && !isStatic) {
       const setName = take('set' + capital(a.name), 'setter');
-      fns.push(`/-- Sets \`${a.name}\`: \`${docText(memberIdl(a, name))}\` -/\ndef ${T}.${id(setName)} (self : ${T}) (value : ${argType(r)}) : IO Unit :=\n  self.val.set "${a.name}" (${toData(r, 'value')})`);
+      fns.push(api(a, `/-- Sets \`${a.name}\`: \`${docText(memberIdl(a, name))}\` -/\ndef ${T}.${id(setName)} (self : ${T}) (value : ${argType(r)}) : IO Unit :=\n  self.val.set "${a.name}" (${toData(r, 'value')})`));
     }
     if (a.special === 'stringifier') {
-      fns.push(`/-- The stringifier (\`${a.name}\`). -/\ndef ${T}.${id(take('toString', 'stringifier'))} (self : ${T}) : IO String := self.val.callMethod "toString" #[] String`);
+      fns.push(api({ type: 'operation', name: 'toString' }, `/-- The stringifier (\`${a.name}\`). -/\ndef ${T}.${id(take('toString', 'stringifier'))} (self : ${T}) : IO String := self.val.callMethod "toString" #[] String`));
     }
   }
   // Operations, grouped by name and static-ness.
@@ -920,7 +1304,7 @@ function emitInterface(module, name) {
   const groups = new Map();
   for (const op of ops) {
     if (op.special === 'stringifier' && !op.name) {
-      fns.push(`/-- The stringifier. -/\ndef ${T}.${id(take('toString', 'stringifier'))} (self : ${T}) : IO String := self.val.callMethod "toString" #[] String`);
+      fns.push(api({ type: 'operation', name: 'toString' }, `/-- The stringifier. -/\ndef ${T}.${id(take('toString', 'stringifier'))} (self : ${T}) : IO String := self.val.callMethod "toString" #[] String`));
       continue;
     }
     // Unnamed getters, setters and deleters (DOMStringMap's properties, Window's named elements) have no method to call.
@@ -946,17 +1330,17 @@ function emitInterface(module, name) {
       if (isStatic) {
         const b = binding(`${T}.${n}`, `${jsPath(name)}.${op.name}`, false, al.arity, ns, jsModule);
         body = res.async ? `Lasm.JS.Binding.invokeAsync ${res.req} ${b}\n    ${al.args}` : `Lasm.JS.Binding.invoke ${res.req} ${b}\n    ${al.args} (await := false)`;
-        fns.push(`${doc(op)}\ndef ${T}.${id(take(n, 'static operation'))}${al.binders ? ' ' + al.binders : ''} : ${monad(res)} ${paren(res.lean)} :=${withPre(al, res.post ? ' ' + finish(body, res) : '\n  ' + body)}`);
+        fns.push(api(op, `${doc(op)}\ndef ${T}.${id(take(n, 'static operation'))}${al.binders ? ' ' + al.binders : ''} : ${monad(res)} ${paren(res.lean)} :=${withPre(al, res.post ? ' ' + finish(body, res) : '\n  ' + body)}`));
       } else if (extAttr(op, 'LasmBytesThis')) {
         // A method of the prototype called on bytes (Node's Buffer methods take any Uint8Array as `this`).
         if (res.async) fail(`${T}.${n}: an asynchronous method on bytes`);
         body = `Support.callOnBytes "${jsModule}" "${jsPath(name)}.prototype.${op.name}" self ${al.args} ${res.req}`;
-        fns.push(`${doc(op)}\ndef ${T}.${id(take(n, 'operation'))} (self : ByteArray)${al.binders ? ' ' + al.binders : ''} : IO ${paren(res.lean)} :=${withPre(al, res.post ? ' ' + finish(body, res) : '\n  ' + body)}`);
+        fns.push(api(op, `${doc(op)}\ndef ${T}.${id(take(n, 'operation'))} (self : ByteArray)${al.binders ? ' ' + al.binders : ''} : IO ${paren(res.lean)} :=${withPre(al, res.post ? ' ' + finish(body, res) : '\n  ' + body)}`));
       } else if (extAttr(op, 'LasmEvent')) {
         // Lasm.JS.Node's events: `on<Event>` / `once<Event>` call emitter.on / emitter.once with the event's name.
         const args = al.args.replace('(Support.args #[', `(Support.args #[toJS ${JSON.stringify(extValue(extAttr(op, 'LasmEvent')))}, `);
         body = `self.val.callMethod "${extAttr(op, 'LasmOnce') ? 'once' : 'on'}" ${args} ${res.req}`;
-        fns.push(`${doc(op, `: calls \`${extAttr(op, 'LasmOnce') ? 'once' : 'on'}(${JSON.stringify(extValue(extAttr(op, 'LasmEvent')))}, listener)\``)}\ndef ${T}.${id(take(n, 'event'))} (self : ${T})${al.binders ? ' ' + al.binders : ''} : IO ${paren(res.lean)} :=${res.post ? ' ' + finish(body, res) : '\n  ' + body}`);
+        fns.push(api(op, `${doc(op, `: calls \`${extAttr(op, 'LasmOnce') ? 'once' : 'on'}(${JSON.stringify(extValue(extAttr(op, 'LasmEvent')))}, listener)\``)}\ndef ${T}.${id(take(n, 'event'))} (self : ${T})${al.binders ? ' ' + al.binders : ''} : IO ${paren(res.lean)} :=${res.post ? ' ' + finish(body, res) : '\n  ' + body}`));
       } else {
         body = res.async ? `self.val.callMethodAwait "${op.name}" ${al.args} ${res.req}` : `self.val.callMethod "${op.name}" ${al.args} ${res.req}`;
         // LasmPromisify on a method (`server.getConnections(callback)`): the bound method through util.promisify.
@@ -964,7 +1348,7 @@ function emitInterface(module, name) {
           if (!res.async) fail(`${T}.${n}: LasmPromisify without a Promise result`);
           body = `Support.promisifiedMethod ${res.req} self.val "${op.name}" ${al.args}`;
         }
-        fns.push(`${doc(op)}\ndef ${T}.${id(take(n, 'operation'))} (self : ${T})${al.binders ? ' ' + al.binders : ''} : ${monad(res)} ${paren(res.lean)} :=${withPre(al, res.post ? ' ' + finish(body, res) : '\n  ' + body)}`);
+        fns.push(api(op, `${doc(op)}\ndef ${T}.${id(take(n, 'operation'))} (self : ${T})${al.binders ? ' ' + al.binders : ''} : ${monad(res)} ${paren(res.lean)} :=${withPre(al, res.post ? ' ' + finish(body, res) : '\n  ' + body)}`));
       }
     });
   }
@@ -972,12 +1356,13 @@ function emitInterface(module, name) {
   for (const it of members.filter(m => m.type === 'iterable' && m.idlType.length === 2)) {
     const [k, v] = it.idlType.map(resolve);
     for (const t of [k, v]) requireType(module, t);
-    if (needsPost(k) || needsPost(v)) fail(`${T}: iterable needing decoding`);
+    // An iterable of ArrayBuffers (MediaKeyStatusMap's key IDs) would need decoding per entry: not generated (docs/JS_BINDINGS.md).
+    if (needsPost(k) || needsPost(v)) continue;
     const K = paren(retType(k)), V = paren(retType(v));
     const idl = `iterable<${it.idlType.map(idlText).join(', ')}>`;
-    fns.push(`/-- \`${idl}\`: \`entries()\`, collected into an array. -/\ndef ${T}.${id(take('entries', 'iterable'))} (self : ${T}) : IO (Array (${K} × ${V})) :=\n  Support.iterate self.val "entries" (Array (${K} × ${V}))`);
-    fns.push(`/-- \`${idl}\`: \`keys()\`, collected into an array. -/\ndef ${T}.${id(take('keys', 'iterable'))} (self : ${T}) : IO (Array ${K}) :=\n  Support.iterate self.val "keys" (Array ${K})`);
-    fns.push(`/-- \`${idl}\`: \`values()\`, collected into an array. -/\ndef ${T}.${id(take('values', 'iterable'))} (self : ${T}) : IO (Array ${V}) :=\n  Support.iterate self.val "values" (Array ${V})`);
+    fns.push(api({ type: 'iterable', key: 'entries' }, `/-- \`${idl}\`: \`entries()\`, collected into an array. -/\ndef ${T}.${id(take('entries', 'iterable'))} (self : ${T}) : IO (Array (${K} × ${V})) :=\n  Support.iterate self.val "entries" (Array (${K} × ${V}))`));
+    fns.push(api({ type: 'iterable', key: 'keys' }, `/-- \`${idl}\`: \`keys()\`, collected into an array. -/\ndef ${T}.${id(take('keys', 'iterable'))} (self : ${T}) : IO (Array ${K}) :=\n  Support.iterate self.val "keys" (Array ${K})`));
+    fns.push(api({ type: 'iterable', key: 'values' }, `/-- \`${idl}\`: \`values()\`, collected into an array. -/\ndef ${T}.${id(take('values', 'iterable'))} (self : ${T}) : IO (Array ${V}) :=\n  Support.iterate self.val "values" (Array ${V})`));
   }
   // Lasm.JS.Deno and Lasm.JS.Bun: an async iterable (`for await`): its iterator, read one value at a time, and
   // `values`, every value read to the end.
@@ -997,17 +1382,20 @@ function emitInterface(module, name) {
   for (const it of members.filter(m => m.type === 'iterable' && m.idlType.length === 1 && !m.async)) {
     const v = resolve(it.idlType[0]);
     requireType(module, v);
-    if (needsPost(v)) fail(`${T}: iterable needing decoding`);
+    if (needsPost(v)) continue;
     const V = paren(retType(v));
-    fns.push(`/-- \`iterable<${idlText(it.idlType[0])}>\`: \`values()\`, collected into an array. -/\ndef ${T}.${id(take('values', 'iterable'))} (self : ${T}) : IO (Array ${V}) :=\n  Support.iterate self.val "values" (Array ${V})`);
+    fns.push(api({ type: 'iterable', key: 'values' }, `/-- \`iterable<${idlText(it.idlType[0])}>\`: \`values()\`, collected into an array. -/\ndef ${T}.${id(take('values', 'iterable'))} (self : ${T}) : IO (Array ${V}) :=\n  Support.iterate self.val "values" (Array ${V})`));
   }
-  if (parent) requireType(module, { k: 'iface', name: d.inheritance });
+  if (parent && declare) requireType(module, { k: 'iface', name: d.inheritance });
+  // The handle type: in Lasm.JS.Web.Types for a web interface, declared above otherwise.
+  if (!declare || isWebInterface(name)) requireType(module, { k: 'iface', name });
   o.decls.push(...fns);
 }
 
 function emitNamespaceOrGlobal(module, owner, members, pathPrefix, leanPrefix, jsModule = 'globalThis') {
   const o = out.get(module);
   const ns = nsOf(module);
+  apiOwner = nsOf(module) !== NS ? { kind: 'ext', ns: nsOf(module) } : owner === GLOBAL ? { kind: 'global' } : { kind: 'namespace', name: owner };
   const groups = new Map();
   for (const m of members) {
     if (m.type === 'attribute') {
@@ -1017,7 +1405,12 @@ function emitNamespaceOrGlobal(module, owner, members, pathPrefix, leanPrefix, j
       const path = [...pathPrefix, m.name].map(s => `"${s}"`).join(', ');
       const call = jsModule === 'globalThis' ? `Support.getGlobal [${path}] ${res.async ? 'Value' : res.req}`
         : exportOf(jsModule, `[${path}]`, res.async ? 'Value' : res.req, emittingHost);
-      o.decls.push(`/-- ${nodeSignature(m)}\`${docText(memberIdl(m, owner))}\` (${specOf(m.spec)}) -/\ndef ${leanPrefix}${id(m.name)}${typeBinders(r)} : ${monad(res)} ${paren(res.lean)} := ${res.async ? `do\n  let p ← ${call}\n  p.await ${res.req}` : finish(call, res)}`);
+      o.decls.push(api(m, `/-- ${nodeSignature(m)}\`${docText(memberIdl(m, owner))}\` (${specOf(m.spec)}) -/\ndef ${leanPrefix}${id(m.name)}${typeBinders(r)} : ${monad(res)} ${paren(res.lean)} := ${res.async ? `do\n  let p ← ${call}\n  p.await ${res.req}` : finish(call, res)}`));
+      continue;
+    }
+    if (m.type === 'const') {
+      const v = m.value.type === 'number' ? m.value.value : m.value.type === 'boolean' ? String(m.value.value) : fail(`const ${m.name}`);
+      o.decls.push(`/-- \`const ${idlText(m.idlType)} ${m.name} = ${v}\` (${specOf(m.spec)}) -/\ndef ${leanPrefix}${id(m.name)} : ${retType(resolve(m.idlType))} := ${v}`);
       continue;
     }
     if (m.type !== 'operation') fail(`${owner}: unsupported member ${m.type}`);
@@ -1031,7 +1424,7 @@ function emitNamespaceOrGlobal(module, owner, members, pathPrefix, leanPrefix, j
       requireType(module, resolve(op.idlType));
       const al = argumentList(op.arguments, module);
       const res = resultOf(op.idlType);
-      if (tier.numberResults.includes(op.name) && !pathPrefix.length && jsModule === 'globalThis') Object.assign(res, { req: 'Value', post: `Support.number ${paren(res.lean)}` });
+      if (rules.numberResults.includes(op.name) && !pathPrefix.length && jsModule === 'globalThis') Object.assign(res, { req: 'Value', post: `Support.number ${paren(res.lean)}` });
       const b = binding(`${leanPrefix}${n}`, [...pathPrefix, op.name].join('.'), false, al.arity, ns, jsModule);
       let body = res.async ? `Lasm.JS.Binding.invokeAsync ${res.req} ${b}\n    ${al.args}` : `Lasm.JS.Binding.invoke ${res.req} ${b}\n    ${al.args} (await := false)`;
       // LasmPromisify: a Node function taking a final (err, value) callback, called through util.promisify.
@@ -1039,7 +1432,7 @@ function emitNamespaceOrGlobal(module, owner, members, pathPrefix, leanPrefix, j
         if (!res.async) fail(`${owner}.${op.name}: LasmPromisify without a Promise result`);
         body = `Support.promisified ${res.req} "${jsModule}" "${[...pathPrefix, op.name].join('.')}" ${al.args}`;
       }
-      o.decls.push(`/-- ${nodeSignature(op)}\`${docText(memberIdl(op, owner))}\` (${specOf(op.spec)}) -/\ndef ${leanPrefix}${id(n)}${al.binders ? ' ' + al.binders : ''} : ${monad(res)} ${paren(res.lean)} :=${withPre(al, res.post ? ' ' + finish(body, res) : '\n  ' + body)}`);
+      o.decls.push(api(op, `/-- ${nodeSignature(op)}\`${docText(memberIdl(op, owner))}\` (${specOf(op.spec)}) -/\ndef ${leanPrefix}${id(n)}${al.binders ? ' ' + al.binders : ''} : ${monad(res)} ${paren(res.lean)} :=${withPre(al, res.post ? ' ' + finish(body, res) : '\n  ' + body)}`));
     });
   }
 }
@@ -1053,11 +1446,13 @@ function emitEnum(name) {
   // Values that differ only in case ("m" and "M"): the capitalised one is `upperM`.
   ctors = ctors.map(x => ctors.some(y => y !== x && y.c === x.c) && /^[A-Z]/.test(x.v) ? { ...x, c: 'upper' + x.v.replace(/[^A-Za-z0-9]/g, '') } : x);
   if (new Set(ctors.map(x => x.c)).size !== ctors.length) fail(`enum ${name}: constructor names collide`);
-  const lines = [`/-- \`enum ${hostDoc(name)}\` (${specOf(d.spec)}): ${ctors.map(x => JSON.stringify(x.v)).join(', ')}. -/`, `inductive ${T} where`];
-  for (const x of ctors) lines.push(`  /-- ${JSON.stringify(x.v)} -/\n  | ${id(x.c)}`);
-  lines.push('  deriving BEq, Repr, Inhabited');
-  lines.push(`instance : ToJS ${T} := ⟨fun\n${ctors.map(x => `  | .${id(x.c)} => .string ${JSON.stringify(x.v)}`).join('\n')}⟩`);
-  lines.push(`instance : FromJS ${T} where\n  fromJS\n${ctors.map(x => `    | .string ${JSON.stringify(x.v)} => .ok .${id(x.c)}`).join('\n')}\n    | _ => .error "not a value of the enumeration"\n  typeName := "${nsOf(moduleOfType.get(name))}.${T}"`);
+  // A WebIDL enum is a string with known values (0.3-17): a structure over the string, and one match pattern per
+  // value (`.noCors`), about a tenth of an inductive's size. A value the pinned IDL lacks still reads.
+  const lines = [`/-- \`enum ${hostDoc(name)}\` (${specOf(d.spec)}): ${ctors.map(x => JSON.stringify(x.v)).join(', ')}. -/`,
+    `structure ${T} where\n  /-- A value from its string, unchecked: the generated values (\`.${id(ctors[0]?.c ?? 'x')}\`) are the normal way to make one. -/\n  unsafeOfString ::\n  /-- The string. -/\n  val : String\n  deriving BEq, Repr, Inhabited`];
+  for (const x of ctors) lines.push(`/-- ${JSON.stringify(x.v)} -/\n@[match_pattern] abbrev ${T}.${id(x.c)} : ${T} := .unsafeOfString ${JSON.stringify(x.v)}`);
+  lines.push(`instance : ToJS ${T} := ⟨fun x => .string x.val⟩`);
+  lines.push(`instance : FromJS ${T} where\n  fromJS\n    | .string s => .ok (.unsafeOfString s)\n    | _ => .error "not a string"\n  typeName := "${nsOf(moduleOfType.get(name))}.${T}"`);
   return lines.join('\n');
 }
 function emitCallback(module, name) {
@@ -1097,7 +1492,7 @@ function emitCallback(module, name) {
     `/-- A JavaScript function that runs \`f\` synchronously (\`Lasm.JS.Function.ofSyncFn\`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling \`preventDefault\`, a queuing strategy's \`size\`). -/\ndef ${T}.ofSyncFn${typeBinders(...resolved)} (f : ${fnType('IO')}) : IO ${T} := do\n  ${withLength(`← Lasm.JS.Function.ofSyncFn fun ${reads.length ? 'args' : '_'} => do return toJS (← ${call})`)}`];
   // Rule A10: reviewed aliases of the mechanical name (overrides.json `aliases`).
   for (const a of ov.aliasesOf(`${nsOf(module)}.${T}`))
-    lines.push(`/-- \`${a.alias.split('.').at(-1)}\`: \`${T}\` (an alias, docs/API_DECISIONS.md ${a.decision}: ${docText(a.why)}). -/\nabbrev ${a.alias.slice(nsOf(module).length + 1)} := ${T}`);
+    lines.push(`/-- \`${a.alias.split('.').at(-1)}\`: \`${T}\` (an alias, docs/api/decisions/0.3.md ${a.decision}: ${docText(a.why)}). -/\nabbrev ${a.alias.slice(nsOf(module).length + 1)} := ${T}`);
   return lines.join('\n');
 }
 function emitDict(module, name) {
@@ -1143,7 +1538,8 @@ const shapePattern = { string: '.string _', bool: '.bool _', number: '.number _'
 function emitUnion(module, key) {
   const u = unions.get(key);
   const how = unionRead(u);
-  if (!needTo.has('union:' + key) && how !== 'fromjs' && how !== 'decode') return null;
+  // Lasm.JS.Cloudflare: a union a structure's field names is declared even when only read as data.
+  if (!needTo.has('union:' + key) && how !== 'fromjs' && how !== 'decode' && !module.startsWith('Lasm.JS.Cloudflare.')) return null;
   const lines = [`/-- \`${docText(u.typedef ? `typedef ${u.alts.map(a => a.idl).join(' or ')} ${u.typedef}` : `(${u.alts.map(a => a.idl).join(' or ')})`)}\`: one constructor per member type. -/`, `inductive ${u.name} where`];
   for (const a of u.alts) { requireType(module, a.t); lines.push(`  /-- \`${docText(a.idl)}\` -/\n  | ${id(a.ctor)} (value : ${argType(a.t)})`); }
   const decl = [lines.join('\n')];
@@ -1171,10 +1567,13 @@ function emitUnion(module, key) {
 for (const o of out.values()) Object.assign(o, { types: [], support: [] });
 /** Whether the module being emitted is Lasm.JS.Deno's or Lasm.JS.Bun's. */
 let emittingHost = false;
-for (const m of plan) inTier(m.tier, () => { emittingHost = /^Lasm\.JS\.(Deno|Bun)\./.test(m.key); for (const i of m.ifaces) emitInterface(m.key, i); });
-for (const m of plan) inTier(m.tier, () => {
+for (const m of plan) inModule(m.key, () => {
   emittingHost = /^Lasm\.JS\.(Deno|Bun)\./.test(m.key);
-  emitNamespaceOrGlobal(m.key, 'WindowOrWorkerGlobalScope', m.globals.flatMap(globalMember), [], '');
+  for (const i of m.ifaces) emitInterface(m.key, i);
+  for (const i of m.contributions) emitInterface(m.key, i, false);
+});
+for (const m of plan) inModule(m.key, () => {
+  emittingHost = /^Lasm\.JS\.(Deno|Bun)\./.test(m.key);
   for (const n of m.namespaces) {
     const jsModule = jsModuleOf(n);
     // Lasm.JS.Deno and Lasm.JS.Bun: the runtime's global object's functions, at the top of the module's namespace (`Lasm.JS.Deno.serve`);
@@ -1185,14 +1584,15 @@ for (const m of plan) inTier(m.tier, () => {
       emitNamespaceOrGlobal(m.key, n, def(n).members.map(x => ({ ...x, name: memberName(x) })), path ? path.split('.') : [], extValue(extAttr(def(n), 'LasmLeanPrefix')) ?? '',
         extValue(extAttr(def(n), 'LasmModule')) ?? 'globalThis');
     }
-    else if (jsModule === 'globalThis') emitNamespaceOrGlobal(m.key, n, def(n).members.filter(exposedToWorkers), [n], `${n}.`);
-    else emitNamespaceOrGlobal(m.key, n, def(n).members.map(x => ({ ...x, name: memberName(x) })), [], `${leanTypeName(n)}.`, jsModule);
+    // A Node namespace that is an export of its module (`performance` of node:perf_hooks, `fs.realpath`): its LasmPath.
+    else emitNamespaceOrGlobal(m.key, n, def(n).members.map(x => ({ ...x, name: memberName(x) })), extValue(extAttr(def(n), 'LasmPath'))?.split('.') ?? [], `${leanTypeName(n)}.`, jsModule);
   }
-  emitNamespaceOrGlobal(m.key, 'Window', m.windowGlobals.flatMap(windowMember), [], '');
+  emitNamespaceOrGlobal(m.key, GLOBAL, m.globalMembers, [], '');
+  for (const e of m.nsMembers) emitNamespaceOrGlobal(m.key, e.ns, e.members, [e.ns], `${e.ns}.`);
 });
 // Supporting declarations, topologically sorted per module.
 const supportKeys = [...moduleOfType.keys()].filter(k => !selectedInterfaces.has(k));
-const depsOf = key => inTier(tierOfKey(key), () => {
+const depsOf = key => inOwner(key, () => {
   const deps = [];
   const walk = t => {
     if (!t) return;
@@ -1217,7 +1617,7 @@ function emitSupport(key, stack = []) {
   const module = moduleOfType.get(key);
   const o = out.get(module);
   emittingHost = /^Lasm\.JS\.(Deno|Bun)\./.test(module);
-  const text = inTier(moduleTier.get(module), () => {
+  const text = inModule(module, () => {
     if (key.startsWith('union:')) return emitUnion(module, key.slice(6));
     const d = def(key);
     return d.type === 'enum' ? emitEnum(key) : d.type === 'dictionary' ? emitDict(module, key) : emitCallback(module, key);
@@ -1227,6 +1627,15 @@ function emitSupport(key, stack = []) {
 // Enums first (nothing depends on order for them), then the rest in first-use order.
 for (const k of supportKeys.filter(k => !k.startsWith('union:') && def(k).type === 'enum')) emitSupport(k);
 for (const k of supportKeys) emitSupport(k);
+// Lasm.JS.Cloudflare's shared shapes (cloudflare-api.mjs shareShapes): each later type of the same
+// members is an abbrev of the first, in its own module, after every type of that module.
+for (const m of plan) if (m.host?.rich) inTier(m.tier, () => {
+  for (const d of [...defs.values()].filter(d => d.type === 'typedef' && extAttr(d, 'LasmAlias') && hostOf(d) === m.host.name && extValue(extAttr(d, 'LasmLeanModule')) === m.name)) {
+    const target = resolve(d.idlType);
+    requireType(m.key, target);
+    out.get(m.key).support.push(`/-- \`${extValue(extAttr(d, 'LasmName')) ?? d.name}\` (${specOf(d.spec)}): the same members as \`${argType(target)}\`. -/\nabbrev ${leanTypeName(d.name)} := ${argType(target)}`);
+  }
+});
 
 // ---------- writing ----------
 
@@ -1251,6 +1660,16 @@ lowered to WebIDL by scripts/bindings/serve-api.mjs (webidl2 ${webidl2Version});
 \`node scripts/bindings/serve-api.mjs && node scripts/bindings/generate-web.mjs\`; the mapping is in
 docs/JS_BINDINGS.md ("Lasm.JS.Deno and Lasm.JS.Bun"). The doc comments quote each member's TypeScript
 declaration and its lowered WebIDL.`;
+{
+  const depth = n => { const p = def(n).inheritance; return p && isWebInterface(p) ? 1 + depth(p) : 0; };
+  handleDecls.sort((a, b) => depth(a.name) - depth(b.name) || (a.name < b.name ? -1 : 1));
+  for (const h of handleDecls) out.get(h.module).types.push(h.text);
+}
+// Lasm.JS.Web's helpers are in the namespace Lasm.JS.Web.Internal (0.3-3); Node's (getExport, promisified,
+// callOnBytes) stay Lasm.JS.Node.Support.
+const webHelpers = ['optional', 'args', 'argsWith', 'fields', 'arg', 'optionalValue', 'arrayBufferBytes', 'viewBytes', 'typedArray', 'number',
+  'cloneAs', 'iterate', 'getGlobal', 'isInstance', 'cast', 'recordOf', 'nullableArrayBufferBytes'];
+const internal = text => text.replace(new RegExp(`(?:Lasm\\.JS\\.Web\\.)?\\bSupport\\.(${webHelpers.join('|')})\\b`, 'g'), 'Internal.$1');
 const files = new Map();
 /** Lasm.JS.Node: an instance on a type with a namespaced name (`stream.Readable.CloseListener`, `FileHandle.CloseListener`)
  * is named after every component of it (`instFromJSStreamReadableCloseListener`): Lean's automatic name keeps only the
@@ -1270,73 +1689,78 @@ for (const m of plan) {
   const text = [`/-
 ${m.key}: ${m.title} (${m.specs}).
 ${isNode ? nodeGeneratedBy : m.host ? hostGeneratedBy(m.host) : generatedBy}
--/`, ...imports.map(i => `import ${i}`), '', `namespace ${m.ns}`, isNode || m.host ? 'open Lasm.JS Lasm.JS.Web' : 'open Lasm.JS', '',
+-/`, ...imports.map(i => `import ${i}`), '', `namespace ${m.ns}`, isNode || m.host ? 'open Lasm.JS Lasm.JS.Web' : 'open Lasm.JS',
+  // Measured on the generated bindings: no injectivity or sizeOf lemmas, no extracted closed terms (smaller .olean, faster).
+  'set_option genInjectivity false', 'set_option genSizeOfSpec false', 'set_option compiler.extract_closed false', '',
   ...o.types.flatMap(t => [t, '']), ...o.support.flatMap(t => [t, '']), ...o.decls.flatMap(t => [t, '']), `end ${m.ns}`, ''].join('\n');
-  files.set(moduleFile(m.key), isNode ? nameInstances(text) : text);
+  files.set(moduleFile(m.key), internal(isNode ? nameInstances(text) : text));
 }
-files.set(join(root, 'library', 'Lasm', 'JS', 'Web.lean'), [`/-
-${NS}: the WinterTC Minimum Common Web API (https://min-common-api.proposal.wintertc.org/),
-available on every JavaScript target Lasm supports: Node, Bun, Deno, Cloudflare Workers and the
-other edge platforms, and browsers. Spec-faithful bindings on Lasm.JS: interfaces are handle
-types, Promise results are \`Async\`, nullable values \`Option\`s, dictionaries structures
-(docs/JS_BINDINGS.md, "Standard bindings").
-${generatedBy}
--/`, ...plan.filter(m => m.ns === NS && m.tier === 1).map(m => `import ${m.key}`), ''].join('\n'));
-files.set(join(outDir, 'Browser.lean'), [`/-
-${NS}.Browser: everything Lasm.JS.Web has in a browser: the Minimum Common Web API (\`import Lasm.JS.Web\`)
-and the browser tier (scripts/bindings/web-browser.mjs): the DOM and the HTML elements, the window,
-location, history and storage, user-interface events, canvas 2D and WebSocket
-(docs/JS_BINDINGS.md, "The browser tier").
-${generatedBy}
--/`, `import ${NS}`, ...plan.filter(m => m.ns === NS && m.tier === 2).map(m => `import ${m.key}`), ''].join('\n'));
-files.set(join(root, 'library', 'Lasm', 'JS', 'Node.lean'), [`/-
-${NODE_NS}: the server-essential Node.js modules (node:fs/promises, node:path, node:os,
-node:process, node:buffer, node:crypto, node:child_process, node:events, node:stream) as
-documented for Node.js ${nodeTier.version}, for Node and for what Bun and Deno implement of them.
-The same mapping as Lasm.JS.Web: classes are handle types, Promise results are \`Async\`,
-options objects dictionaries (docs/JS_BINDINGS.md, "Lasm.JS.Node").
-${nodeGeneratedBy}
--/`, ...order.filter(n => n.startsWith(NODE_NS + '.')).map(n => `import ${n}`), ''].join('\n'));
+// Lasm.JS.Web: the umbrella module, and the module list src/lasm-library.mjs compiles (in import order).
+const webPlan = plan.filter(m => m.ns === NS);
+// No umbrella module (0.3-18): with modules compiled on first import, `import Lasm.JS.Web` would compile every spec.
+// Where each web API is available (scripts/bindings/web-availability.mjs), for `lasm build --target`.
+{
+  const rcd = await compat.loadRuntimeCompat();
+  const { overrides } = JSON.parse(readFileSync(join(root, 'scripts', 'bindings', 'availability-overrides.json'), 'utf8'));
+  const used = new Set();
+  const apis = {};
+  for (const a of apiDecls) {
+    const where = compat.availability(a.paths, rcd);
+    const path = Object.values(where).find(w => w.path)?.path ?? a.paths[0].join('.');
+    // An entry names a binding (its Lean name), a compatibility path, or a path and everything under it (`api.URLPattern.*`).
+    const matches = o => o.api === a.lean || o.api === path || o.api.endsWith('.*') && (path === o.api.slice(0, -2) || path.startsWith(o.api.slice(0, -1)));
+    for (const o of overrides) if (matches(o)) {
+      used.add(o.api);
+      for (const r of o.runtimes) { if (!where[r]) fail(`availability-overrides.json: unknown runtime ${r}`); where[r].ok = o.available; }
+    }
+    const missing = Object.keys(where).filter(r => !where[r].ok);
+    if (missing.length) apis[a.lean] = [path, missing.join(' ')];
+  }
+  for (const o of overrides) if (!used.has(o.api)) fail(`availability-overrides.json: ${o.api} matches no generated API`);
+  files.set(join(outDir, 'availability.json'), JSON.stringify({
+    generatedBy: `scripts/bindings/generate-web.mjs (@webref/idl ${webrefVersion}, @mdn/browser-compat-data ${compat.bcd.__meta.version}, ${compat.runtimeCompat.repo} ${compat.runtimeCompat.commit.slice(0, 12)})`,
+    runtimes: Object.fromEntries(Object.entries(compat.runtimes).map(([id, r]) => [id, r.label])),
+    apis }) + '\n');
+}
+files.set(join(outDir, 'modules.json'), JSON.stringify({
+  generatedBy: `scripts/bindings/generate-web.mjs (@webref/idl ${webrefVersion})`, modules: webPlan.map(m => m.key) }, null, 2) + '\n');
+// No umbrella module (docs/api/decisions/0.4.md 0.4-39): programs import each Lasm.JS.Node module they use.
 
-files.set(join(root, 'library', 'Lasm', 'JS', 'Cloudflare.lean'), [`/-
-Lasm.JS.Cloudflare: the runtime APIs of Cloudflare Workers as declared by ${hostSource(cloudflareTier.hosts[0])}: the
-bindings of a Worker's env (Workers KV, D1, R2, Durable Objects, Queues), the handlers (fetch, scheduled, queue) and
-their ExecutionContext, the Cache API and TCP sockets, with Lasm.JS.Web's Request, Response and streams as their web
-types. The same mapping as Lasm.JS.Web: bindings are handle types, Promise results are \`Async\`, options
-dictionaries, handlers callbacks made from Lean functions (docs/JS_BINDINGS.md, "Cloudflare Workers: Lasm.JS.Cloudflare").
-${hostGeneratedBy(cloudflareTier.hosts[0])}
--/`, ...order.filter(n => n.startsWith('Lasm.JS.Cloudflare.')).map(n => `import ${n}`), ''].join('\n'));
+// Lasm.JS.Cloudflare has no umbrella module (API_DECISIONS 0.5-16): a program imports the modules of
+// the areas it uses (Lasm.JS.Cloudflare.Kv, .D1, .Workers, …), which compile on first import.
 // Lasm.JS.Deno and Lasm.JS.Bun have no umbrella module (docs/api/decisions/0.4.md, 0.4-21): their modules compile
 // on first import, so a program imports the modules it uses (`import Lasm.JS.Deno.Kv`), never the whole namespace.
 
-// The generated surface, for the availability probes: tier 1's (test/fixtures/js-web)
-// and the browser tier's (test/browser/platform).
-const surfaceOf = t => {
+// The generated surface, for the availability probes (test/fixtures/js-web on the server runtimes,
+// test/browser/platform on the engines): reported, never a failure.
 const surface = {};
-for (const m of plan.filter(m => m.ns === NS && m.tier === t)) inTier(t, () => {
-  for (const i of m.ifaces) {
-    const members = membersOf(i);
-    surface[jsPath(i)] = {
-      module: m.name,
-      static: [...new Set(members.filter(x => x.special === 'static' && x.name).map(x => x.name))],
+{
+  const add = (path, module, kind, names) => {
+    const e = (surface[path] ??= { module, static: [], prototype: [] });
+    e[kind] = [...new Set([...e[kind], ...names])];
+  };
+  for (const m of webPlan) inModule(m.key, () => {
+    for (const i of [...m.ifaces, ...m.contributions]) {
+      if (extAttr(def(i), 'LegacyNoInterfaceObject')) continue;
+      const members = membersOf(i, m.key);
+      const home = selectedInterfaces.get(i).slice(NS.length + 1);
+      add(jsPath(i), home, 'static', members.filter(x => x.special === 'static' && x.name).map(x => x.name));
       // [LegacyUnforgeable] attributes are own properties of each instance, not of the prototype.
-      prototype: [...new Set(members.filter(x => x.special !== 'static' && (x.type === 'operation' || x.type === 'attribute') && x.name
-        && !extAttr(x, 'LegacyUnforgeable')).map(x => x.name))],
-    };
-  }
-  for (const g of m.globals) surface[g] = { module: m.name, global: true };
-  for (const n of m.namespaces) surface[n] = { module: m.name, namespace: [...new Set(def(n).members.filter(exposedToWorkers).map(x => x.name))] };
-  for (const g of m.windowGlobals) surface[g] = { module: m.name, global: true };
-});
-return surface;
-};
-const surface = surfaceOf(1), browserSurface = surfaceOf(2);
+      add(jsPath(i), home, 'prototype', members.filter(x => x.special !== 'static' && (x.type === 'operation' || x.type === 'attribute') && x.name
+        && !extAttr(x, 'LegacyUnforgeable')).map(x => x.name));
+    }
+    for (const g of m.globalMembers) surface[g.name] = { module: m.name, global: true };
+    for (const e of m.nsMembers) {
+      const ns = (surface[e.ns] ??= { module: m.name, namespace: [] });
+      ns.namespace = [...new Set([...ns.namespace, ...e.members.map(x => x.name)])];
+    }
+  });
+}
 files.set(join(root, 'scripts', 'bindings', 'web-surface.json'), JSON.stringify({ generatedBy: `scripts/bindings/generate-web.mjs (@webref/idl ${webrefVersion})`, surface }, null, 2) + '\n');
-
-// The same surface as Lean data for the conformance program's availability probe.
-files.set(join(root, 'test', 'fixtures', 'js-web', 'Surface.lean'), `/-
+// The same surface as Lean data for the conformance programs' availability probes.
+for (const dir of [['test', 'fixtures', 'js-web'], ['test', 'browser', 'platform']]) files.set(join(root, ...dir, 'Surface.lean'), `/-
 ${generatedBy}
-The generated surface (scripts/bindings/web-surface.json), for the availability probe of Main.lean.
+The generated surface (scripts/bindings/web-surface.json), for the availability probe.
 -/
 namespace Surface
 
@@ -1345,24 +1769,12 @@ def json : String := r#"${JSON.stringify(surface)}"#
 
 end Surface
 `);
-files.set(join(root, 'scripts', 'bindings', 'browser-surface.json'), JSON.stringify({ generatedBy: `scripts/bindings/generate-web.mjs (@webref/idl ${webrefVersion})`, surface: browserSurface }, null, 2) + '\n');
-files.set(join(root, 'test', 'browser', 'platform', 'Surface.lean'), `/-
-${generatedBy}
-The browser tier's generated surface (scripts/bindings/browser-surface.json), for the availability probe of Bindings.lean.
--/
-namespace Surface
-
-/-- \`{path: {static?, prototype?, global?}}\` for every interface and global of the browser tier. -/
-def json : String := r#"${JSON.stringify(browserSurface)}"#
-
-end Surface
-`);
 
 // Lasm.JS.Node's surface: per JavaScript module and export, the members generated
 // (classes without an export, FileHandle, are probed on an instance by the test).
 const nodeSurface = [];
 for (const m of plan.filter(m => m.ns === NODE_NS)) {
-  for (const n of m.namespaces) nodeSurface.push({ lean: leanTypeName(n), module: jsModuleOf(n), path: '', leanModule: m.name,
+  for (const n of m.namespaces) nodeSurface.push({ lean: leanTypeName(n), module: jsModuleOf(n), path: '', ...(extAttr(def(n), 'LasmPath') ? { export: extValue(extAttr(def(n), 'LasmPath')) } : {}), leanModule: m.name,
     namespace: [...new Set(def(n).members.map(memberName))] });
   for (const i of m.ifaces) {
     const members = membersOf(i);
@@ -1374,7 +1786,40 @@ for (const m of plan.filter(m => m.ns === NODE_NS)) {
       instance: [...new Set(members.filter(x => x.special !== 'static' && x.type === 'attribute').map(memberName))] });
   }
 }
-files.set(join(root, 'scripts', 'bindings', 'node-surface.json'), JSON.stringify({ generatedBy: `scripts/bindings/generate-web.mjs (Node.js ${nodeTier.version} docs)`, surface: nodeSurface }, null, 2) + '\n');
+// What Node itself may lack, in the availability probe's words (`<module> <path>.<member>`): on Node 24, what only Node 26's
+// docs document (LasmSince); on either, Experimental members (stability 1, which can sit behind a flag).
+const nodeMayLack = { node24: [], node: [] };
+for (const m of plan.filter(m => m.ns === NODE_NS)) {
+  const note = (d, x, probe) => {
+    if (extAttr(x, 'LasmSince') || extAttr(d, 'LasmSince')) nodeMayLack.node24.push(probe);
+    // Documented by the Node 24 docs, no longer by the Node 26 docs (removed in 26).
+    if (extAttr(x, 'LasmRemovedIn') || extAttr(d, 'LasmRemovedIn')) nodeMayLack.node.push(probe);
+    if (/^1/.test(extValue(extAttr(x, 'LasmStability')) ?? extValue(extAttr(d, 'LasmStability')) ?? '')) { nodeMayLack.node.push(probe); nodeMayLack.node24.push(probe); }
+  };
+  for (const n of m.namespaces) {
+    const d = def(n);
+    if (extAttr(d, 'LasmSince')) nodeMayLack.node24.push(jsModuleOf(n));
+    const ex = extValue(extAttr(d, 'LasmPath'));
+    for (const x of d.members) note(d, x, `${jsModuleOf(n)} ${ex ? ex + '.' : ''}${memberName(x)}`);
+  }
+  for (const i of m.ifaces) {
+    const d = def(i), p = extValue(extAttr(d, 'LasmPath'));
+    if (!p) continue;
+    if (extAttr(d, 'LasmSince')) nodeMayLack.node24.push(`${jsModuleOf(i)} ${p}`);
+    if (extAttr(d, 'LasmRemovedIn')) nodeMayLack.node.push(`${jsModuleOf(i)} ${p}`);
+    if (/^1/.test(extValue(extAttr(d, 'LasmStability')) ?? '')) { nodeMayLack.node.push(`${jsModuleOf(i)} ${p}`); nodeMayLack.node24.push(`${jsModuleOf(i)} ${p}`); }
+    for (const x of membersOf(i)) if (!extAttr(x, 'LasmEvent')) note(d, x, `${jsModuleOf(i)} ${p}.${x.special === 'static' ? '' : x.type === 'operation' ? 'prototype.' : ''}${memberName(x)}`);
+  }
+}
+// A module the docs mark Experimental as a whole (node:stream/iter: behind a flag), and the members node-tier2.mjs
+// `conditional` lists (present only in some processes or on some objects), on both.
+for (const m of nodeModuleOrder) {
+  const mods = new Set(nodeDefs.filter(d => extValue(extAttr(d, 'LasmLeanModule')) === m.name).map(d => extValue(extAttr(d, 'LasmModule'))));
+  if (m.stability !== undefined && m.stability !== 2) for (const k of Object.keys(nodeMayLack)) nodeMayLack[k].push(...mods);
+}
+for (const probe of Object.keys(nodeTier.conditional)) for (const k of Object.keys(nodeMayLack)) nodeMayLack[k].push(probe);
+for (const k of Object.keys(nodeMayLack)) nodeMayLack[k] = [...new Set(nodeMayLack[k])].sort();
+files.set(join(root, 'scripts', 'bindings', 'node-surface.json'), JSON.stringify({ generatedBy: `scripts/bindings/generate-web.mjs (Node.js ${nodeTier.version} docs)`, mayLack: nodeMayLack, surface: nodeSurface }, null, 2) + '\n');
 files.set(join(root, 'test', 'fixtures', 'js-node', 'Surface.lean'), `/-
 ${nodeGeneratedBy}
 The generated surface (scripts/bindings/node-surface.json), for the availability probe of Main.lean.
@@ -1480,6 +1925,10 @@ if (check) {
   const handWritten = new Set([join('library', 'Lasm', 'JS', 'Node', 'Serve.lean')]);
   for (const [dir, tierName] of [[outDir, 'Web'], [nodeOutDir, 'Node'], ...hosts.map(h => [join(root, 'library', 'Lasm', 'JS', h.name), h.name])]) for (const name of existsSync(dir) ? readdirSync(dir) : []) {
     const rel = join('library', 'Lasm', 'JS', tierName, name);
+    if (name === 'Types') {
+      for (const t of readdirSync(join(dir, 'Types'))) if (!known.has(join(rel, t))) stale.push(join(rel, t) + ' (not generated)');
+      continue;
+    }
     if (name !== 'Support.lean' && !handWritten.has(rel) && !known.has(rel)) stale.push(rel + ' (not generated)');
   }
   for (const h of serveTier.hosts) if (existsSync(join(root, 'library', 'Lasm', 'JS', `${h.name}.lean`)))

@@ -108,7 +108,7 @@ export async function autoSetupEditor(source, { log = console.error, env = proce
       }
       throw error;
     }
-    if (!cachedOnly) await compileLibrary(project, lean, log);
+    await compileLibrary(project, lean, log, { compile: !cachedOnly });
     return setupEditor({ project, prefix: lean.executionPrefix, version: lean.version, native, log, env });
   } catch (error) {
     log(`[lasm] Editor setup skipped: ${String(error.message).split('\n')[0]}`);
@@ -116,13 +116,31 @@ export async function autoSetupEditor(source, { log = console.error, env = proce
   }
 }
 
-/** Compiles the lazily compiled Lasm library modules the project's files import, so the editor resolves them.
- * Returns ensureProgramLibrary's result (`compiled`: the modules compiled now). */
-export async function compileProjectLibrary(project, lean, log = console.error) {
+/** Makes the lazily compiled Lasm library modules the project's files import resolvable in the editor
+ * (src/lake-library.mjs, 0.3-7): the project's `.lake/lasm-library` link to Lasm's Lake package, made or repaired;
+ * when the lakefile requires that package, Lake builds them on demand. Otherwise, unless `compile` is false
+ * (lasm init's cached-only setup), Lasm compiles them into the prefix now (src/lazy-library.mjs).
+ * Returns { compiled: the modules compiled now, lake: whether Lake builds them }. */
+export async function compileProjectLibrary(project, lean, log = console.error, { compile = true, cache, eager, root } = {}) {
+  // `eager` and `root`: Lasm's prebuilt module list and library sources (a test's own library), by default the real ones.
+  const libraryModules = eager ?? (await import('./lasm-library.mjs')).libraryModules;
+  const { ensureLakeLibrary, lakefileOf } = await import('./lake-library.mjs');
+  if (lakefileOf(project) && ensureLakeLibrary(project, lean.prefix, { eager: libraryModules, cache, root }).required) return { compiled: [], lake: true };
+  if (!compile) return { compiled: [], lake: false };
   const { ensureProgramLibrary } = await import('./lazy-library.mjs');
-  const { libraryModules } = await import('./lasm-library.mjs');
   const { withApplicationLock } = await import('./application-lock.mjs');
-  return ensureProgramLibrary(lean.prefix, project, { eager: libraryModules, log, lock: withApplicationLock });
+  return { ...await ensureProgramLibrary(lean.prefix, project, { eager: libraryModules, root, log, lock: withApplicationLock }), lake: false };
+}
+
+/** lasm init's step when the editor setup is off: the `.lake/lasm-library` link (0.3-7) for a Lake project, with
+ * Lasm's Lean if it is already on this machine (cachedOnly); otherwise the first build makes it. Never fails.
+ * Returns whether the link was made. */
+export async function linkProjectLibrary(project, { cachedOnly = true, lean: leanFor = editorLean, compileLibrary = compileProjectLibrary } = {}) {
+  try {
+    const { lean } = await leanFor(project, { note: () => {}, log: () => {}, cachedOnly });
+    await compileLibrary(project, lean, () => {}, { compile: false });
+    return true;
+  } catch { return false; }
 }
 
 /** `lasm editor [directory]`: set up (or refresh) the editor explicitly. */
@@ -139,7 +157,9 @@ export async function runEditor({ input = '.' } = {}) {
   try { ({ lean, native } = await editorLean(project, { progress: event => progress.update(event), note: line => notes.push(line) })); }
   finally { progress.finish(); }
   for (const line of notes) console.error(line);
-  // The Lasm library modules this project imports that are compiled on first import (src/lazy-library.mjs).
+  // Lasm's library as a Lake package (0.3-7): the lakefile requires it, so Lake builds the modules compiled on first import.
+  const { addLakeRequire, lakefileOf } = await import('./lake-library.mjs');
+  if (addLakeRequire(project)) console.error(`[lasm] Editor: added Lasm's library to ${basename(lakefileOf(project))} ([[require]] "lasm", path .lake/lasm-library), so Lake builds its modules on first import, in the editor too.`);
   await compileProjectLibrary(project, lean);
   const result = setupEditor({ project, prefix: lean.executionPrefix, version: lean.version, native, explicit: true });
   return result.status === 'linked' || result.status === 'current' ? 0 : 1;

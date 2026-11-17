@@ -1,12 +1,7 @@
 {
   "$comment": "Checks of test/fixtures/js-web that fail on a target because of the runtime itself, never the binding, with the reason (scripts/bindings/test-web.mjs). A name ending in * matches every check it prefixes.",
-  "node": {
-    "messaging.promiseRejectionEvent (section)": "Node has no PromiseRejectionEvent"
-  },
-  "node24": {
-    "messaging.promiseRejectionEvent (section)": "Node has no PromiseRejectionEvent",
-    "messaging.errorEvent (section)": "Node 24 has no ErrorEvent (Node 26 has)"
-  },
+  "node": {},
+  "node24": {},
   "bun": {
     "url[88] *": "Bun 1.4.4's URL parser (WebKit's) differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
     "url[99] *": "Bun 1.4.4's URL parser (WebKit's) differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
@@ -24,7 +19,6 @@
     "url[738] *": "Bun 1.4.4's URL parser (WebKit's) differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
     "url[813] *": "Bun 1.4.4's URL parser (WebKit's) differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",
     "urlencoded[1] formData": "Bun's Response.formData() drops a leading U+FEFF of an urlencoded body (the URL Standard keeps it; URLSearchParams itself is right)",
-    "messaging.promiseRejectionEvent (section)": "Bun has no PromiseRejectionEvent",
     "headers entries": "Bun lists set-cookie after the other headers instead of in sorted order",
     "GET with a body throws": "Bun accepts a body on a GET Request",
     "Response.json": "Bun's Response.json sets content-type application/json;charset=utf-8",
@@ -125,8 +119,7 @@
     "performance.timeOrigin": "Workers report a timeOrigin of 0 (time is frozen per request by design)",
     "files.objectURL (section)": "workerd does not implement URL.createObjectURL",
     "wasmCompile (section)": "Workers forbid compiling WebAssembly at run time (code generation is disallowed by the embedder)",
-    "urlencoded[1] formData": "workerd's Response.formData() drops a leading U+FEFF of an urlencoded body (the URL Standard keeps it; URLSearchParams itself is right)",
-    "messaging.promiseRejectionEvent (section)": "workerd's PromiseRejectionEvent cannot be constructed (Illegal constructor)"
+    "urlencoded[1] formData": "workerd's Response.formData() drops a leading U+FEFF of an urlencoded body (the URL Standard keeps it; URLSearchParams itself is right)"
   },
   "browser-chromium": {
     "url[114] *": "Chromium (Playwright 1.63.0)'s URL parser differs from the URL Standard on this WPT urltestdata case (the binding returns the runtime's own result)",

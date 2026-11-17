@@ -6,7 +6,9 @@ SVG, a keyed list, ports and messages from JavaScript, and server-side
 rendering of a component that a second instance hydrates.
 -/
 import Lasm.UI
-import Lasm.JS.Web.Browser
+import Lasm.JS.Web.Dom
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Html
 open Lasm.UI
 
 /-- `fetch(path)`: the status and the body, or the error (Lasm.JS.Web). -/

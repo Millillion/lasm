@@ -19,7 +19,12 @@ Output: a line `FAIL <check>: <detail>` per failed check, a line
 `summary <passed> <failed>`.
 -/
 import Lasm.JS
-import Lasm.JS.Web
+import Lasm.JS.Web.Dom
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.HrTime
+import Lasm.JS.Web.Html
+import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Url
 import Lasm.JS.Deno.Fs
 import Lasm.JS.Deno.Net
 import Lasm.JS.Deno.Serve

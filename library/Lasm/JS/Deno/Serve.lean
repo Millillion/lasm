@@ -8,12 +8,15 @@ docs/JS_BINDINGS.md ("Lasm.JS.Deno and Lasm.JS.Bun"). The doc comments quote eac
 declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Dom
-import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Fetch
 import Lasm.JS.Deno.Net
 
 namespace Lasm.JS.Deno
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface Deno.HttpServer` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts): a handle to the JavaScript object. -/
 structure HttpServer where
@@ -64,55 +67,67 @@ instance : ToJS ServeHandlerInfoVsockAddr := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ServeHandlerInfoVsockAddr := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.ServeHandlerInfoVsockAddr", .data⟩
 
 /-- `enum ServeUnixOptionsTransport` (Deno 2.9.6 type declarations): "unix". -/
-inductive ServeUnixOptionsTransport where
-  /-- "unix" -/
-  | unix
+structure ServeUnixOptionsTransport where
+  /-- A value from its string, unchecked: the generated values (`.unix`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ServeUnixOptionsTransport := ⟨fun
-  | .unix => .string "unix"⟩
+/-- "unix" -/
+@[match_pattern] abbrev ServeUnixOptionsTransport.unix : ServeUnixOptionsTransport := .unsafeOfString "unix"
+instance : ToJS ServeUnixOptionsTransport := ⟨fun x => .string x.val⟩
 instance : FromJS ServeUnixOptionsTransport where
   fromJS
-    | .string "unix" => .ok .unix
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.ServeUnixOptionsTransport"
 
 /-- `enum ServeVsockOptionsTransport` (Deno 2.9.6 type declarations): "vsock". -/
-inductive ServeVsockOptionsTransport where
-  /-- "vsock" -/
-  | vsock
+structure ServeVsockOptionsTransport where
+  /-- A value from its string, unchecked: the generated values (`.vsock`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ServeVsockOptionsTransport := ⟨fun
-  | .vsock => .string "vsock"⟩
+/-- "vsock" -/
+@[match_pattern] abbrev ServeVsockOptionsTransport.vsock : ServeVsockOptionsTransport := .unsafeOfString "vsock"
+instance : ToJS ServeVsockOptionsTransport := ⟨fun x => .string x.val⟩
 instance : FromJS ServeVsockOptionsTransport where
   fromJS
-    | .string "vsock" => .ok .vsock
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.ServeVsockOptionsTransport"
 
 /-- `enum ServeTcpOptionsTransport` (Deno 2.9.6 type declarations): "tcp". -/
-inductive ServeTcpOptionsTransport where
-  /-- "tcp" -/
-  | tcp
+structure ServeTcpOptionsTransport where
+  /-- A value from its string, unchecked: the generated values (`.tcp`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ServeTcpOptionsTransport := ⟨fun
-  | .tcp => .string "tcp"⟩
+/-- "tcp" -/
+@[match_pattern] abbrev ServeTcpOptionsTransport.tcp : ServeTcpOptionsTransport := .unsafeOfString "tcp"
+instance : ToJS ServeTcpOptionsTransport := ⟨fun x => .string x.val⟩
 instance : FromJS ServeTcpOptionsTransport where
   fromJS
-    | .string "tcp" => .ok .tcp
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.ServeTcpOptionsTransport"
 
 /-- `enum ServeTcpTlsOptionsKeyFormat` (Deno 2.9.6 type declarations): "pem". -/
-inductive ServeTcpTlsOptionsKeyFormat where
-  /-- "pem" -/
-  | pem
+structure ServeTcpTlsOptionsKeyFormat where
+  /-- A value from its string, unchecked: the generated values (`.pem`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ServeTcpTlsOptionsKeyFormat := ⟨fun
-  | .pem => .string "pem"⟩
+/-- "pem" -/
+@[match_pattern] abbrev ServeTcpTlsOptionsKeyFormat.pem : ServeTcpTlsOptionsKeyFormat := .unsafeOfString "pem"
+instance : ToJS ServeTcpTlsOptionsKeyFormat := ⟨fun x => .string x.val⟩
 instance : FromJS ServeTcpTlsOptionsKeyFormat where
   fromJS
-    | .string "pem" => .ok .pem
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.ServeTcpTlsOptionsKeyFormat"
 
 /-- `callback ServeHandler = Promise<Response> (Request request, ServeHandlerInfo info)` (Deno 2.9.6 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
@@ -124,13 +139,13 @@ instance : ToJS ServeHandler := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ServeHandler := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.ServeHandler", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ServeHandler.ofFn (f : Request → ServeHandlerInfo → Async Response) : IO ServeHandler := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Request args 0) (← Support.arg ServeHandlerInfo args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Request args 0) (← Internal.arg ServeHandlerInfo args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ServeHandler.ofSyncFn (f : Request → ServeHandlerInfo → IO Response) : IO ServeHandler := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Request args 0) (← Support.arg ServeHandlerInfo args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Request args 0) (← Internal.arg ServeHandlerInfo args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -144,13 +159,13 @@ instance : ToJS ServeOptionsUnixAddrOnError := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ServeOptionsUnixAddrOnError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.ServeOptionsUnixAddrOnError", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ServeOptionsUnixAddrOnError.ofFn (f : Data → Async Response) : IO ServeOptionsUnixAddrOnError := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ServeOptionsUnixAddrOnError.ofSyncFn (f : Data → IO Response) : IO ServeOptionsUnixAddrOnError := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -164,13 +179,13 @@ instance : ToJS ServeOptionsUnixAddrOnListen := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ServeOptionsUnixAddrOnListen := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.ServeOptionsUnixAddrOnListen", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ServeOptionsUnixAddrOnListen.ofFn (f : UnixAddr → Async Unit) : IO ServeOptionsUnixAddrOnListen := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg UnixAddr args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg UnixAddr args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ServeOptionsUnixAddrOnListen.ofSyncFn (f : UnixAddr → IO Unit) : IO ServeOptionsUnixAddrOnListen := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg UnixAddr args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg UnixAddr args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -189,11 +204,11 @@ structure ServeUnixOptions where
   transport : Option ServeUnixOptionsTransport := none
   /-- `required DOMString path` -/
   path : String
-instance : ToJS ServeUnixOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal),
-    ("onError", Support.optional d.onError),
-    ("onListen", Support.optional d.onListen),
-    ("automaticCompression", Support.optional d.automaticCompression),
-    ("transport", Support.optional d.transport),
+instance : ToJS ServeUnixOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal),
+    ("onError", Internal.optional d.onError),
+    ("onListen", Internal.optional d.onListen),
+    ("automaticCompression", Internal.optional d.automaticCompression),
+    ("transport", Internal.optional d.transport),
     ("path", toJS d.path)]⟩
 
 /-- `callback ServeHandlerUnixAddr = Promise<Response> (Request request, ServeHandlerInfoUnixAddr info)` (Deno 2.9.6 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
@@ -205,13 +220,13 @@ instance : ToJS ServeHandlerUnixAddr := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ServeHandlerUnixAddr := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.ServeHandlerUnixAddr", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ServeHandlerUnixAddr.ofFn (f : Request → ServeHandlerInfoUnixAddr → Async Response) : IO ServeHandlerUnixAddr := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Request args 0) (← Support.arg ServeHandlerInfoUnixAddr args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Request args 0) (← Internal.arg ServeHandlerInfoUnixAddr args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ServeHandlerUnixAddr.ofSyncFn (f : Request → ServeHandlerInfoUnixAddr → IO Response) : IO ServeHandlerUnixAddr := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Request args 0) (← Support.arg ServeHandlerInfoUnixAddr args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Request args 0) (← Internal.arg ServeHandlerInfoUnixAddr args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -225,13 +240,13 @@ instance : ToJS ServeOptionsVsockAddrOnError := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ServeOptionsVsockAddrOnError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.ServeOptionsVsockAddrOnError", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ServeOptionsVsockAddrOnError.ofFn (f : Data → Async Response) : IO ServeOptionsVsockAddrOnError := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ServeOptionsVsockAddrOnError.ofSyncFn (f : Data → IO Response) : IO ServeOptionsVsockAddrOnError := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -245,13 +260,13 @@ instance : ToJS ServeOptionsVsockAddrOnListen := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ServeOptionsVsockAddrOnListen := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.ServeOptionsVsockAddrOnListen", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ServeOptionsVsockAddrOnListen.ofFn (f : VsockAddr → Async Unit) : IO ServeOptionsVsockAddrOnListen := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg VsockAddr args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg VsockAddr args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ServeOptionsVsockAddrOnListen.ofSyncFn (f : VsockAddr → IO Unit) : IO ServeOptionsVsockAddrOnListen := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg VsockAddr args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg VsockAddr args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -272,11 +287,11 @@ structure ServeVsockOptions where
   cid : Float
   /-- `required double /* integer: Nat */ port` -/
   port : Nat
-instance : ToJS ServeVsockOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal),
-    ("onError", Support.optional d.onError),
-    ("onListen", Support.optional d.onListen),
-    ("automaticCompression", Support.optional d.automaticCompression),
-    ("transport", Support.optional d.transport),
+instance : ToJS ServeVsockOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal),
+    ("onError", Internal.optional d.onError),
+    ("onListen", Internal.optional d.onListen),
+    ("automaticCompression", Internal.optional d.automaticCompression),
+    ("transport", Internal.optional d.transport),
     ("cid", toJS d.cid),
     ("port", toJS d.port)]⟩
 
@@ -289,13 +304,13 @@ instance : ToJS ServeHandlerVsockAddr := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ServeHandlerVsockAddr := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.ServeHandlerVsockAddr", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ServeHandlerVsockAddr.ofFn (f : Request → ServeHandlerInfoVsockAddr → Async Response) : IO ServeHandlerVsockAddr := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Request args 0) (← Support.arg ServeHandlerInfoVsockAddr args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Request args 0) (← Internal.arg ServeHandlerInfoVsockAddr args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ServeHandlerVsockAddr.ofSyncFn (f : Request → ServeHandlerInfoVsockAddr → IO Response) : IO ServeHandlerVsockAddr := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Request args 0) (← Support.arg ServeHandlerInfoVsockAddr args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Request args 0) (← Internal.arg ServeHandlerInfoVsockAddr args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -309,13 +324,13 @@ instance : ToJS ServeOptionsOnError := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ServeOptionsOnError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.ServeOptionsOnError", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ServeOptionsOnError.ofFn (f : Data → Async Response) : IO ServeOptionsOnError := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ServeOptionsOnError.ofSyncFn (f : Data → IO Response) : IO ServeOptionsOnError := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -329,13 +344,13 @@ instance : ToJS ServeOptionsOnListen := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ServeOptionsOnListen := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.ServeOptionsOnListen", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ServeOptionsOnListen.ofFn (f : NetAddr → Async Unit) : IO ServeOptionsOnListen := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg NetAddr args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg NetAddr args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ServeOptionsOnListen.ofSyncFn (f : NetAddr → IO Unit) : IO ServeOptionsOnListen := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg NetAddr args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg NetAddr args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -360,15 +375,15 @@ structure ServeTcpOptions where
   reusePort : Option Bool := none
   /-- `unsigned long tcpBacklog` -/
   tcpBacklog : Option Nat := none
-instance : ToJS ServeTcpOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal),
-    ("onError", Support.optional d.onError),
-    ("onListen", Support.optional d.onListen),
-    ("automaticCompression", Support.optional d.automaticCompression),
-    ("transport", Support.optional d.transport),
-    ("port", Support.optional d.port),
-    ("hostname", Support.optional d.hostname),
-    ("reusePort", Support.optional d.reusePort),
-    ("tcpBacklog", Support.optional d.tcpBacklog)]⟩
+instance : ToJS ServeTcpOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal),
+    ("onError", Internal.optional d.onError),
+    ("onListen", Internal.optional d.onListen),
+    ("automaticCompression", Internal.optional d.automaticCompression),
+    ("transport", Internal.optional d.transport),
+    ("port", Internal.optional d.port),
+    ("hostname", Internal.optional d.hostname),
+    ("reusePort", Internal.optional d.reusePort),
+    ("tcpBacklog", Internal.optional d.tcpBacklog)]⟩
 
 /-- `dictionary ServeTcpTlsOptions : ServeTcpOptions` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ServeTcpTlsOptions where
@@ -396,131 +411,137 @@ structure ServeTcpTlsOptions where
   key : String
   /-- `required DOMString cert` -/
   cert : String
-instance : ToJS ServeTcpTlsOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal),
-    ("onError", Support.optional d.onError),
-    ("onListen", Support.optional d.onListen),
-    ("automaticCompression", Support.optional d.automaticCompression),
-    ("transport", Support.optional d.transport),
-    ("port", Support.optional d.port),
-    ("hostname", Support.optional d.hostname),
-    ("reusePort", Support.optional d.reusePort),
-    ("tcpBacklog", Support.optional d.tcpBacklog),
-    ("keyFormat", Support.optional d.keyFormat),
+instance : ToJS ServeTcpTlsOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal),
+    ("onError", Internal.optional d.onError),
+    ("onListen", Internal.optional d.onListen),
+    ("automaticCompression", Internal.optional d.automaticCompression),
+    ("transport", Internal.optional d.transport),
+    ("port", Internal.optional d.port),
+    ("hostname", Internal.optional d.hostname),
+    ("reusePort", Internal.optional d.reusePort),
+    ("tcpBacklog", Internal.optional d.tcpBacklog),
+    ("keyFormat", Internal.optional d.keyFormat),
     ("key", toJS d.key),
     ("cert", toJS d.cert)]⟩
 
 /-- `finished: Promise<void>`: `readonly attribute Promise<undefined> finished` -/
-def HttpServer.finished (self : HttpServer) : Async Unit := do
+@[macro_inline] def HttpServer.finished (self : HttpServer) : Async Unit := Internal.api "Lasm.JS.Deno.HttpServer.finished" do
   let p ← self.val.get "finished" Value
   p.await Unit
 
 /-- `addr: Addr`: `readonly attribute NetAddr addr` -/
-def HttpServer.addr (self : HttpServer) : IO NetAddr := self.val.get "addr" NetAddr
+@[macro_inline] def HttpServer.addr (self : HttpServer) : IO NetAddr := Internal.api "Lasm.JS.Deno.HttpServer.addr" do
+  self.val.get "addr" NetAddr
 
 /-- `ref(): void`: `undefined ref()` -/
-def HttpServer.ref (self : HttpServer) : IO Unit :=
-  self.val.callMethod "ref" (Support.args #[]) Unit
+@[macro_inline] def HttpServer.ref (self : HttpServer) : IO Unit := Internal.api "Lasm.JS.Deno.HttpServer.ref" do
+  self.val.callMethod "ref" (Internal.args #[]) Unit
 
 /-- `unref(): void`: `undefined unref()` -/
-def HttpServer.unref (self : HttpServer) : IO Unit :=
-  self.val.callMethod "unref" (Support.args #[]) Unit
+@[macro_inline] def HttpServer.unref (self : HttpServer) : IO Unit := Internal.api "Lasm.JS.Deno.HttpServer.unref" do
+  self.val.callMethod "unref" (Internal.args #[]) Unit
 
 /-- `shutdown(): Promise<void>`: `Promise<undefined> shutdown()` -/
-def HttpServer.shutdown (self : HttpServer) : Async Unit :=
-  self.val.callMethodAwait "shutdown" (Support.args #[]) Unit
+@[macro_inline] def HttpServer.shutdown (self : HttpServer) : Async Unit := Internal.api "Lasm.JS.Deno.HttpServer.shutdown" do
+  self.val.callMethodAwait "shutdown" (Internal.args #[]) Unit
 
 /-- `remoteAddr: Addr`: `readonly attribute NetAddr remoteAddr` -/
-def ServeHandlerInfo.remoteAddr (self : ServeHandlerInfo) : IO NetAddr := self.val.get "remoteAddr" NetAddr
+@[macro_inline] def ServeHandlerInfo.remoteAddr (self : ServeHandlerInfo) : IO NetAddr := Internal.api "Lasm.JS.Deno.ServeHandlerInfo.remoteAddr" do
+  self.val.get "remoteAddr" NetAddr
 
 /-- `completed: Promise<void>`: `readonly attribute Promise<undefined> completed` -/
-def ServeHandlerInfo.completed (self : ServeHandlerInfo) : Async Unit := do
+@[macro_inline] def ServeHandlerInfo.completed (self : ServeHandlerInfo) : Async Unit := Internal.api "Lasm.JS.Deno.ServeHandlerInfo.completed" do
   let p ← self.val.get "completed" Value
   p.await Unit
 
 /-- `finished: Promise<void>`: `readonly attribute Promise<undefined> finished` -/
-def HttpServerUnixAddr.finished (self : HttpServerUnixAddr) : Async Unit := do
+@[macro_inline] def HttpServerUnixAddr.finished (self : HttpServerUnixAddr) : Async Unit := Internal.api "Lasm.JS.Deno.HttpServerUnixAddr.finished" do
   let p ← self.val.get "finished" Value
   p.await Unit
 
 /-- `addr: Addr`: `readonly attribute UnixAddr addr` -/
-def HttpServerUnixAddr.addr (self : HttpServerUnixAddr) : IO UnixAddr := self.val.get "addr" UnixAddr
+@[macro_inline] def HttpServerUnixAddr.addr (self : HttpServerUnixAddr) : IO UnixAddr := Internal.api "Lasm.JS.Deno.HttpServerUnixAddr.addr" do
+  self.val.get "addr" UnixAddr
 
 /-- `ref(): void`: `undefined ref()` -/
-def HttpServerUnixAddr.ref (self : HttpServerUnixAddr) : IO Unit :=
-  self.val.callMethod "ref" (Support.args #[]) Unit
+@[macro_inline] def HttpServerUnixAddr.ref (self : HttpServerUnixAddr) : IO Unit := Internal.api "Lasm.JS.Deno.HttpServerUnixAddr.ref" do
+  self.val.callMethod "ref" (Internal.args #[]) Unit
 
 /-- `unref(): void`: `undefined unref()` -/
-def HttpServerUnixAddr.unref (self : HttpServerUnixAddr) : IO Unit :=
-  self.val.callMethod "unref" (Support.args #[]) Unit
+@[macro_inline] def HttpServerUnixAddr.unref (self : HttpServerUnixAddr) : IO Unit := Internal.api "Lasm.JS.Deno.HttpServerUnixAddr.unref" do
+  self.val.callMethod "unref" (Internal.args #[]) Unit
 
 /-- `shutdown(): Promise<void>`: `Promise<undefined> shutdown()` -/
-def HttpServerUnixAddr.shutdown (self : HttpServerUnixAddr) : Async Unit :=
-  self.val.callMethodAwait "shutdown" (Support.args #[]) Unit
+@[macro_inline] def HttpServerUnixAddr.shutdown (self : HttpServerUnixAddr) : Async Unit := Internal.api "Lasm.JS.Deno.HttpServerUnixAddr.shutdown" do
+  self.val.callMethodAwait "shutdown" (Internal.args #[]) Unit
 
 /-- `remoteAddr: Addr`: `readonly attribute UnixAddr remoteAddr` -/
-def ServeHandlerInfoUnixAddr.remoteAddr (self : ServeHandlerInfoUnixAddr) : IO UnixAddr := self.val.get "remoteAddr" UnixAddr
+@[macro_inline] def ServeHandlerInfoUnixAddr.remoteAddr (self : ServeHandlerInfoUnixAddr) : IO UnixAddr := Internal.api "Lasm.JS.Deno.ServeHandlerInfoUnixAddr.remoteAddr" do
+  self.val.get "remoteAddr" UnixAddr
 
 /-- `completed: Promise<void>`: `readonly attribute Promise<undefined> completed` -/
-def ServeHandlerInfoUnixAddr.completed (self : ServeHandlerInfoUnixAddr) : Async Unit := do
+@[macro_inline] def ServeHandlerInfoUnixAddr.completed (self : ServeHandlerInfoUnixAddr) : Async Unit := Internal.api "Lasm.JS.Deno.ServeHandlerInfoUnixAddr.completed" do
   let p ← self.val.get "completed" Value
   p.await Unit
 
 /-- `finished: Promise<void>`: `readonly attribute Promise<undefined> finished` -/
-def HttpServerVsockAddr.finished (self : HttpServerVsockAddr) : Async Unit := do
+@[macro_inline] def HttpServerVsockAddr.finished (self : HttpServerVsockAddr) : Async Unit := Internal.api "Lasm.JS.Deno.HttpServerVsockAddr.finished" do
   let p ← self.val.get "finished" Value
   p.await Unit
 
 /-- `addr: Addr`: `readonly attribute VsockAddr addr` -/
-def HttpServerVsockAddr.addr (self : HttpServerVsockAddr) : IO VsockAddr := self.val.get "addr" VsockAddr
+@[macro_inline] def HttpServerVsockAddr.addr (self : HttpServerVsockAddr) : IO VsockAddr := Internal.api "Lasm.JS.Deno.HttpServerVsockAddr.addr" do
+  self.val.get "addr" VsockAddr
 
 /-- `ref(): void`: `undefined ref()` -/
-def HttpServerVsockAddr.ref (self : HttpServerVsockAddr) : IO Unit :=
-  self.val.callMethod "ref" (Support.args #[]) Unit
+@[macro_inline] def HttpServerVsockAddr.ref (self : HttpServerVsockAddr) : IO Unit := Internal.api "Lasm.JS.Deno.HttpServerVsockAddr.ref" do
+  self.val.callMethod "ref" (Internal.args #[]) Unit
 
 /-- `unref(): void`: `undefined unref()` -/
-def HttpServerVsockAddr.unref (self : HttpServerVsockAddr) : IO Unit :=
-  self.val.callMethod "unref" (Support.args #[]) Unit
+@[macro_inline] def HttpServerVsockAddr.unref (self : HttpServerVsockAddr) : IO Unit := Internal.api "Lasm.JS.Deno.HttpServerVsockAddr.unref" do
+  self.val.callMethod "unref" (Internal.args #[]) Unit
 
 /-- `shutdown(): Promise<void>`: `Promise<undefined> shutdown()` -/
-def HttpServerVsockAddr.shutdown (self : HttpServerVsockAddr) : Async Unit :=
-  self.val.callMethodAwait "shutdown" (Support.args #[]) Unit
+@[macro_inline] def HttpServerVsockAddr.shutdown (self : HttpServerVsockAddr) : Async Unit := Internal.api "Lasm.JS.Deno.HttpServerVsockAddr.shutdown" do
+  self.val.callMethodAwait "shutdown" (Internal.args #[]) Unit
 
 /-- `remoteAddr: Addr`: `readonly attribute VsockAddr remoteAddr` -/
-def ServeHandlerInfoVsockAddr.remoteAddr (self : ServeHandlerInfoVsockAddr) : IO VsockAddr := self.val.get "remoteAddr" VsockAddr
+@[macro_inline] def ServeHandlerInfoVsockAddr.remoteAddr (self : ServeHandlerInfoVsockAddr) : IO VsockAddr := Internal.api "Lasm.JS.Deno.ServeHandlerInfoVsockAddr.remoteAddr" do
+  self.val.get "remoteAddr" VsockAddr
 
 /-- `completed: Promise<void>`: `readonly attribute Promise<undefined> completed` -/
-def ServeHandlerInfoVsockAddr.completed (self : ServeHandlerInfoVsockAddr) : Async Unit := do
+@[macro_inline] def ServeHandlerInfoVsockAddr.completed (self : ServeHandlerInfoVsockAddr) : Async Unit := Internal.api "Lasm.JS.Deno.ServeHandlerInfoVsockAddr.completed" do
   let p ← self.val.get "completed" Value
   p.await Unit
 
 /-- `Deno.serve(handler: ServeHandler<Deno.NetAddr>): HttpServer<Deno.NetAddr>`: `HttpServer serve(ServeHandler handler)` (Deno 2.9.6 type declarations) -/
-def serve (handler : ServeHandler) : IO HttpServer := do
+@[macro_inline] def serve (handler : ServeHandler) : IO HttpServer := Internal.api "Lasm.JS.Deno.serve" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.serve", module := "globalThis", path := "Deno.serve", construct := false, arity := 1 }
-    (Support.args #[toJS handler]) (await := false)
+    (Internal.args #[toJS handler]) (await := false)
   pure { val := r }
 
 /-- `Deno.serve(options: ServeUnixOptions, handler: ServeHandler<Deno.UnixAddr>): HttpServer<Deno.UnixAddr>`: `HttpServerUnixAddr serve(ServeUnixOptions options, ServeHandlerUnixAddr handler)` (Deno 2.9.6 type declarations) -/
-def serveWithUnixOptions (options : ServeUnixOptions) (handler : ServeHandlerUnixAddr) : IO HttpServerUnixAddr := do
+@[macro_inline] def serveWithUnixOptions (options : ServeUnixOptions) (handler : ServeHandlerUnixAddr) : IO HttpServerUnixAddr := Internal.api "Lasm.JS.Deno.serveWithUnixOptions" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.serveWithUnixOptions", module := "globalThis", path := "Deno.serve", construct := false, arity := 2 }
-    (Support.args #[toJS options, toJS handler]) (await := false)
+    (Internal.args #[toJS options, toJS handler]) (await := false)
   pure { val := r }
 
 /-- `Deno.serve(options: ServeVsockOptions, handler: ServeHandler<Deno.VsockAddr>): HttpServer<Deno.VsockAddr>`: `HttpServerVsockAddr serve(ServeVsockOptions options, ServeHandlerVsockAddr handler)` (Deno 2.9.6 type declarations) -/
-def serveWithVsockOptions (options : ServeVsockOptions) (handler : ServeHandlerVsockAddr) : IO HttpServerVsockAddr := do
+@[macro_inline] def serveWithVsockOptions (options : ServeVsockOptions) (handler : ServeHandlerVsockAddr) : IO HttpServerVsockAddr := Internal.api "Lasm.JS.Deno.serveWithVsockOptions" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.serveWithVsockOptions", module := "globalThis", path := "Deno.serve", construct := false, arity := 2 }
-    (Support.args #[toJS options, toJS handler]) (await := false)
+    (Internal.args #[toJS options, toJS handler]) (await := false)
   pure { val := r }
 
 /-- `Deno.serve(options: ServeTcpOptions | (ServeTcpOptions & TlsCertifiedKeyPem), handler: ServeHandler<Deno.NetAddr>): HttpServer<Deno.NetAddr>`: `HttpServer serve(ServeTcpOptions options, ServeHandler handler)` (Deno 2.9.6 type declarations) -/
-def serveWithOptions (options : ServeTcpOptions) (handler : ServeHandler) : IO HttpServer := do
+@[macro_inline] def serveWithOptions (options : ServeTcpOptions) (handler : ServeHandler) : IO HttpServer := Internal.api "Lasm.JS.Deno.serveWithOptions" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.serveWithOptions", module := "globalThis", path := "Deno.serve", construct := false, arity := 2 }
-    (Support.args #[toJS options, toJS handler]) (await := false)
+    (Internal.args #[toJS options, toJS handler]) (await := false)
   pure { val := r }
 
 /-- `Deno.serve(options: ServeTcpOptions | (ServeTcpOptions & TlsCertifiedKeyPem), handler: ServeHandler<Deno.NetAddr>): HttpServer<Deno.NetAddr>`: `HttpServer serve(ServeTcpTlsOptions tlsOptions, ServeHandler handler)` (Deno 2.9.6 type declarations) -/
-def serveWithTlsOptions (tlsOptions : ServeTcpTlsOptions) (handler : ServeHandler) : IO HttpServer := do
+@[macro_inline] def serveWithTlsOptions (tlsOptions : ServeTcpTlsOptions) (handler : ServeHandler) : IO HttpServer := Internal.api "Lasm.JS.Deno.serveWithTlsOptions" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.serveWithTlsOptions", module := "globalThis", path := "Deno.serve", construct := false, arity := 2 }
-    (Support.args #[toJS tlsOptions, toJS handler]) (await := false)
+    (Internal.args #[toJS tlsOptions, toJS handler]) (await := false)
   pure { val := r }
 
 end Lasm.JS.Deno

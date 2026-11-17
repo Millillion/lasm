@@ -8,10 +8,13 @@ docs/JS_BINDINGS.md ("Lasm.JS.Deno and Lasm.JS.Bun"). The doc comments quote eac
 declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Url
+import Lasm.JS.Web.Types.Url
 
 namespace Lasm.JS.Deno
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface Deno.Env` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts): a handle to the JavaScript object. -/
 structure Env where
@@ -22,218 +25,139 @@ instance : ToJS Env := ⟨fun x => .ref x.val ""⟩
 instance : FromJS Env := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.Env", .data⟩
 
 /-- `enum Signal` (Deno 2.9.6 type declarations): "SIGABRT", "SIGALRM", "SIGBREAK", "SIGBUS", "SIGCHLD", "SIGCONT", "SIGEMT", "SIGFPE", "SIGHUP", "SIGILL", "SIGINFO", "SIGINT", "SIGIO", "SIGPOLL", "SIGUNUSED", "SIGKILL", "SIGPIPE", "SIGPROF", "SIGPWR", "SIGQUIT", "SIGSEGV", "SIGSTKFLT", "SIGSTOP", "SIGSYS", "SIGTERM", "SIGTRAP", "SIGTSTP", "SIGTTIN", "SIGTTOU", "SIGURG", "SIGUSR1", "SIGUSR2", "SIGVTALRM", "SIGWINCH", "SIGXCPU", "SIGXFSZ". -/
-inductive Signal where
-  /-- "SIGABRT" -/
-  | sigabrt
-  /-- "SIGALRM" -/
-  | sigalrm
-  /-- "SIGBREAK" -/
-  | sigbreak
-  /-- "SIGBUS" -/
-  | sigbus
-  /-- "SIGCHLD" -/
-  | sigchld
-  /-- "SIGCONT" -/
-  | sigcont
-  /-- "SIGEMT" -/
-  | sigemt
-  /-- "SIGFPE" -/
-  | sigfpe
-  /-- "SIGHUP" -/
-  | sighup
-  /-- "SIGILL" -/
-  | sigill
-  /-- "SIGINFO" -/
-  | siginfo
-  /-- "SIGINT" -/
-  | sigint
-  /-- "SIGIO" -/
-  | sigio
-  /-- "SIGPOLL" -/
-  | sigpoll
-  /-- "SIGUNUSED" -/
-  | sigunused
-  /-- "SIGKILL" -/
-  | sigkill
-  /-- "SIGPIPE" -/
-  | sigpipe
-  /-- "SIGPROF" -/
-  | sigprof
-  /-- "SIGPWR" -/
-  | sigpwr
-  /-- "SIGQUIT" -/
-  | sigquit
-  /-- "SIGSEGV" -/
-  | sigsegv
-  /-- "SIGSTKFLT" -/
-  | sigstkflt
-  /-- "SIGSTOP" -/
-  | sigstop
-  /-- "SIGSYS" -/
-  | sigsys
-  /-- "SIGTERM" -/
-  | sigterm
-  /-- "SIGTRAP" -/
-  | sigtrap
-  /-- "SIGTSTP" -/
-  | sigtstp
-  /-- "SIGTTIN" -/
-  | sigttin
-  /-- "SIGTTOU" -/
-  | sigttou
-  /-- "SIGURG" -/
-  | sigurg
-  /-- "SIGUSR1" -/
-  | sigusr1
-  /-- "SIGUSR2" -/
-  | sigusr2
-  /-- "SIGVTALRM" -/
-  | sigvtalrm
-  /-- "SIGWINCH" -/
-  | sigwinch
-  /-- "SIGXCPU" -/
-  | sigxcpu
-  /-- "SIGXFSZ" -/
-  | sigxfsz
+structure Signal where
+  /-- A value from its string, unchecked: the generated values (`.sigabrt`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS Signal := ⟨fun
-  | .sigabrt => .string "SIGABRT"
-  | .sigalrm => .string "SIGALRM"
-  | .sigbreak => .string "SIGBREAK"
-  | .sigbus => .string "SIGBUS"
-  | .sigchld => .string "SIGCHLD"
-  | .sigcont => .string "SIGCONT"
-  | .sigemt => .string "SIGEMT"
-  | .sigfpe => .string "SIGFPE"
-  | .sighup => .string "SIGHUP"
-  | .sigill => .string "SIGILL"
-  | .siginfo => .string "SIGINFO"
-  | .sigint => .string "SIGINT"
-  | .sigio => .string "SIGIO"
-  | .sigpoll => .string "SIGPOLL"
-  | .sigunused => .string "SIGUNUSED"
-  | .sigkill => .string "SIGKILL"
-  | .sigpipe => .string "SIGPIPE"
-  | .sigprof => .string "SIGPROF"
-  | .sigpwr => .string "SIGPWR"
-  | .sigquit => .string "SIGQUIT"
-  | .sigsegv => .string "SIGSEGV"
-  | .sigstkflt => .string "SIGSTKFLT"
-  | .sigstop => .string "SIGSTOP"
-  | .sigsys => .string "SIGSYS"
-  | .sigterm => .string "SIGTERM"
-  | .sigtrap => .string "SIGTRAP"
-  | .sigtstp => .string "SIGTSTP"
-  | .sigttin => .string "SIGTTIN"
-  | .sigttou => .string "SIGTTOU"
-  | .sigurg => .string "SIGURG"
-  | .sigusr1 => .string "SIGUSR1"
-  | .sigusr2 => .string "SIGUSR2"
-  | .sigvtalrm => .string "SIGVTALRM"
-  | .sigwinch => .string "SIGWINCH"
-  | .sigxcpu => .string "SIGXCPU"
-  | .sigxfsz => .string "SIGXFSZ"⟩
+/-- "SIGABRT" -/
+@[match_pattern] abbrev Signal.sigabrt : Signal := .unsafeOfString "SIGABRT"
+/-- "SIGALRM" -/
+@[match_pattern] abbrev Signal.sigalrm : Signal := .unsafeOfString "SIGALRM"
+/-- "SIGBREAK" -/
+@[match_pattern] abbrev Signal.sigbreak : Signal := .unsafeOfString "SIGBREAK"
+/-- "SIGBUS" -/
+@[match_pattern] abbrev Signal.sigbus : Signal := .unsafeOfString "SIGBUS"
+/-- "SIGCHLD" -/
+@[match_pattern] abbrev Signal.sigchld : Signal := .unsafeOfString "SIGCHLD"
+/-- "SIGCONT" -/
+@[match_pattern] abbrev Signal.sigcont : Signal := .unsafeOfString "SIGCONT"
+/-- "SIGEMT" -/
+@[match_pattern] abbrev Signal.sigemt : Signal := .unsafeOfString "SIGEMT"
+/-- "SIGFPE" -/
+@[match_pattern] abbrev Signal.sigfpe : Signal := .unsafeOfString "SIGFPE"
+/-- "SIGHUP" -/
+@[match_pattern] abbrev Signal.sighup : Signal := .unsafeOfString "SIGHUP"
+/-- "SIGILL" -/
+@[match_pattern] abbrev Signal.sigill : Signal := .unsafeOfString "SIGILL"
+/-- "SIGINFO" -/
+@[match_pattern] abbrev Signal.siginfo : Signal := .unsafeOfString "SIGINFO"
+/-- "SIGINT" -/
+@[match_pattern] abbrev Signal.sigint : Signal := .unsafeOfString "SIGINT"
+/-- "SIGIO" -/
+@[match_pattern] abbrev Signal.sigio : Signal := .unsafeOfString "SIGIO"
+/-- "SIGPOLL" -/
+@[match_pattern] abbrev Signal.sigpoll : Signal := .unsafeOfString "SIGPOLL"
+/-- "SIGUNUSED" -/
+@[match_pattern] abbrev Signal.sigunused : Signal := .unsafeOfString "SIGUNUSED"
+/-- "SIGKILL" -/
+@[match_pattern] abbrev Signal.sigkill : Signal := .unsafeOfString "SIGKILL"
+/-- "SIGPIPE" -/
+@[match_pattern] abbrev Signal.sigpipe : Signal := .unsafeOfString "SIGPIPE"
+/-- "SIGPROF" -/
+@[match_pattern] abbrev Signal.sigprof : Signal := .unsafeOfString "SIGPROF"
+/-- "SIGPWR" -/
+@[match_pattern] abbrev Signal.sigpwr : Signal := .unsafeOfString "SIGPWR"
+/-- "SIGQUIT" -/
+@[match_pattern] abbrev Signal.sigquit : Signal := .unsafeOfString "SIGQUIT"
+/-- "SIGSEGV" -/
+@[match_pattern] abbrev Signal.sigsegv : Signal := .unsafeOfString "SIGSEGV"
+/-- "SIGSTKFLT" -/
+@[match_pattern] abbrev Signal.sigstkflt : Signal := .unsafeOfString "SIGSTKFLT"
+/-- "SIGSTOP" -/
+@[match_pattern] abbrev Signal.sigstop : Signal := .unsafeOfString "SIGSTOP"
+/-- "SIGSYS" -/
+@[match_pattern] abbrev Signal.sigsys : Signal := .unsafeOfString "SIGSYS"
+/-- "SIGTERM" -/
+@[match_pattern] abbrev Signal.sigterm : Signal := .unsafeOfString "SIGTERM"
+/-- "SIGTRAP" -/
+@[match_pattern] abbrev Signal.sigtrap : Signal := .unsafeOfString "SIGTRAP"
+/-- "SIGTSTP" -/
+@[match_pattern] abbrev Signal.sigtstp : Signal := .unsafeOfString "SIGTSTP"
+/-- "SIGTTIN" -/
+@[match_pattern] abbrev Signal.sigttin : Signal := .unsafeOfString "SIGTTIN"
+/-- "SIGTTOU" -/
+@[match_pattern] abbrev Signal.sigttou : Signal := .unsafeOfString "SIGTTOU"
+/-- "SIGURG" -/
+@[match_pattern] abbrev Signal.sigurg : Signal := .unsafeOfString "SIGURG"
+/-- "SIGUSR1" -/
+@[match_pattern] abbrev Signal.sigusr1 : Signal := .unsafeOfString "SIGUSR1"
+/-- "SIGUSR2" -/
+@[match_pattern] abbrev Signal.sigusr2 : Signal := .unsafeOfString "SIGUSR2"
+/-- "SIGVTALRM" -/
+@[match_pattern] abbrev Signal.sigvtalrm : Signal := .unsafeOfString "SIGVTALRM"
+/-- "SIGWINCH" -/
+@[match_pattern] abbrev Signal.sigwinch : Signal := .unsafeOfString "SIGWINCH"
+/-- "SIGXCPU" -/
+@[match_pattern] abbrev Signal.sigxcpu : Signal := .unsafeOfString "SIGXCPU"
+/-- "SIGXFSZ" -/
+@[match_pattern] abbrev Signal.sigxfsz : Signal := .unsafeOfString "SIGXFSZ"
+instance : ToJS Signal := ⟨fun x => .string x.val⟩
 instance : FromJS Signal where
   fromJS
-    | .string "SIGABRT" => .ok .sigabrt
-    | .string "SIGALRM" => .ok .sigalrm
-    | .string "SIGBREAK" => .ok .sigbreak
-    | .string "SIGBUS" => .ok .sigbus
-    | .string "SIGCHLD" => .ok .sigchld
-    | .string "SIGCONT" => .ok .sigcont
-    | .string "SIGEMT" => .ok .sigemt
-    | .string "SIGFPE" => .ok .sigfpe
-    | .string "SIGHUP" => .ok .sighup
-    | .string "SIGILL" => .ok .sigill
-    | .string "SIGINFO" => .ok .siginfo
-    | .string "SIGINT" => .ok .sigint
-    | .string "SIGIO" => .ok .sigio
-    | .string "SIGPOLL" => .ok .sigpoll
-    | .string "SIGUNUSED" => .ok .sigunused
-    | .string "SIGKILL" => .ok .sigkill
-    | .string "SIGPIPE" => .ok .sigpipe
-    | .string "SIGPROF" => .ok .sigprof
-    | .string "SIGPWR" => .ok .sigpwr
-    | .string "SIGQUIT" => .ok .sigquit
-    | .string "SIGSEGV" => .ok .sigsegv
-    | .string "SIGSTKFLT" => .ok .sigstkflt
-    | .string "SIGSTOP" => .ok .sigstop
-    | .string "SIGSYS" => .ok .sigsys
-    | .string "SIGTERM" => .ok .sigterm
-    | .string "SIGTRAP" => .ok .sigtrap
-    | .string "SIGTSTP" => .ok .sigtstp
-    | .string "SIGTTIN" => .ok .sigttin
-    | .string "SIGTTOU" => .ok .sigttou
-    | .string "SIGURG" => .ok .sigurg
-    | .string "SIGUSR1" => .ok .sigusr1
-    | .string "SIGUSR2" => .ok .sigusr2
-    | .string "SIGVTALRM" => .ok .sigvtalrm
-    | .string "SIGWINCH" => .ok .sigwinch
-    | .string "SIGXCPU" => .ok .sigxcpu
-    | .string "SIGXFSZ" => .ok .sigxfsz
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.Signal"
 
 /-- `enum BuildArch` (Deno 2.9.6 type declarations): "x86_64", "aarch64". -/
-inductive BuildArch where
-  /-- "x86_64" -/
-  | x8664
-  /-- "aarch64" -/
-  | aarch64
+structure BuildArch where
+  /-- A value from its string, unchecked: the generated values (`.x8664`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS BuildArch := ⟨fun
-  | .x8664 => .string "x86_64"
-  | .aarch64 => .string "aarch64"⟩
+/-- "x86_64" -/
+@[match_pattern] abbrev BuildArch.x8664 : BuildArch := .unsafeOfString "x86_64"
+/-- "aarch64" -/
+@[match_pattern] abbrev BuildArch.aarch64 : BuildArch := .unsafeOfString "aarch64"
+instance : ToJS BuildArch := ⟨fun x => .string x.val⟩
 instance : FromJS BuildArch where
   fromJS
-    | .string "x86_64" => .ok .x8664
-    | .string "aarch64" => .ok .aarch64
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.BuildArch"
 
 /-- `enum BuildOs` (Deno 2.9.6 type declarations): "darwin", "linux", "android", "windows", "freebsd", "netbsd", "aix", "solaris", "illumos". -/
-inductive BuildOs where
-  /-- "darwin" -/
-  | darwin
-  /-- "linux" -/
-  | linux
-  /-- "android" -/
-  | android
-  /-- "windows" -/
-  | windows
-  /-- "freebsd" -/
-  | freebsd
-  /-- "netbsd" -/
-  | netbsd
-  /-- "aix" -/
-  | aix
-  /-- "solaris" -/
-  | solaris
-  /-- "illumos" -/
-  | illumos
+structure BuildOs where
+  /-- A value from its string, unchecked: the generated values (`.darwin`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS BuildOs := ⟨fun
-  | .darwin => .string "darwin"
-  | .linux => .string "linux"
-  | .android => .string "android"
-  | .windows => .string "windows"
-  | .freebsd => .string "freebsd"
-  | .netbsd => .string "netbsd"
-  | .aix => .string "aix"
-  | .solaris => .string "solaris"
-  | .illumos => .string "illumos"⟩
+/-- "darwin" -/
+@[match_pattern] abbrev BuildOs.darwin : BuildOs := .unsafeOfString "darwin"
+/-- "linux" -/
+@[match_pattern] abbrev BuildOs.linux : BuildOs := .unsafeOfString "linux"
+/-- "android" -/
+@[match_pattern] abbrev BuildOs.android : BuildOs := .unsafeOfString "android"
+/-- "windows" -/
+@[match_pattern] abbrev BuildOs.windows : BuildOs := .unsafeOfString "windows"
+/-- "freebsd" -/
+@[match_pattern] abbrev BuildOs.freebsd : BuildOs := .unsafeOfString "freebsd"
+/-- "netbsd" -/
+@[match_pattern] abbrev BuildOs.netbsd : BuildOs := .unsafeOfString "netbsd"
+/-- "aix" -/
+@[match_pattern] abbrev BuildOs.aix : BuildOs := .unsafeOfString "aix"
+/-- "solaris" -/
+@[match_pattern] abbrev BuildOs.solaris : BuildOs := .unsafeOfString "solaris"
+/-- "illumos" -/
+@[match_pattern] abbrev BuildOs.illumos : BuildOs := .unsafeOfString "illumos"
+instance : ToJS BuildOs := ⟨fun x => .string x.val⟩
 instance : FromJS BuildOs where
   fromJS
-    | .string "darwin" => .ok .darwin
-    | .string "linux" => .ok .linux
-    | .string "android" => .ok .android
-    | .string "windows" => .ok .windows
-    | .string "freebsd" => .ok .freebsd
-    | .string "netbsd" => .ok .netbsd
-    | .string "aix" => .ok .aix
-    | .string "solaris" => .ok .solaris
-    | .string "illumos" => .ok .illumos
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.BuildOs"
 
 /-- `dictionary MemoryUsage` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -373,132 +297,140 @@ instance : FromJS Version where
   typeName := "Lasm.JS.Deno.Version"
 
 /-- `get(key: string): string | undefined`: `DOMString? get(DOMString key)` -/
-def Env.get (self : Env) (key : String) : IO (Option String) :=
-  self.val.callMethod "get" (Support.args #[toJS key]) (Option String)
+@[macro_inline] def Env.get (self : Env) (key : String) : IO (Option String) := Internal.api "Lasm.JS.Deno.Env.get" do
+  self.val.callMethod "get" (Internal.args #[toJS key]) (Option String)
 
 /-- `set(key: string, value: string): void`: `undefined set(DOMString key, DOMString value)` -/
-def Env.set (self : Env) (key : String) (value : String) : IO Unit :=
-  self.val.callMethod "set" (Support.args #[toJS key, toJS value]) Unit
+@[macro_inline] def Env.set (self : Env) (key : String) (value : String) : IO Unit := Internal.api "Lasm.JS.Deno.Env.set" do
+  self.val.callMethod "set" (Internal.args #[toJS key, toJS value]) Unit
 
 /-- `delete(key: string): void`: `undefined delete(DOMString key)` -/
-def Env.delete (self : Env) (key : String) : IO Unit :=
-  self.val.callMethod "delete" (Support.args #[toJS key]) Unit
+@[macro_inline] def Env.delete (self : Env) (key : String) : IO Unit := Internal.api "Lasm.JS.Deno.Env.delete" do
+  self.val.callMethod "delete" (Internal.args #[toJS key]) Unit
 
 /-- `has(key: string): boolean`: `boolean has(DOMString key)` -/
-def Env.has (self : Env) (key : String) : IO Bool :=
-  self.val.callMethod "has" (Support.args #[toJS key]) Bool
+@[macro_inline] def Env.has (self : Env) (key : String) : IO Bool := Internal.api "Lasm.JS.Deno.Env.has" do
+  self.val.callMethod "has" (Internal.args #[toJS key]) Bool
 
 /-- `toObject(): { [index: string]: string }`: `record<DOMString, DOMString> toObject()` -/
-def Env.toObject (self : Env) : IO (Record String) :=
-  self.val.callMethod "toObject" (Support.args #[]) (Record String)
+@[macro_inline] def Env.toObject (self : Env) : IO (Record String) := Internal.api "Lasm.JS.Deno.Env.toObject" do
+  self.val.callMethod "toObject" (Internal.args #[]) (Record String)
 
 /-- `const Deno.pid: number`: `readonly attribute double /* integer: Int */ pid` (Deno 2.9.6 type declarations) -/
-def pid : IO Int := Support.getGlobal ["Deno", "pid"] Int
+@[macro_inline] def pid : IO Int := Internal.api "Lasm.JS.Deno.pid" do
+  Internal.getGlobal ["Deno", "pid"] Int
 
 /-- `const Deno.ppid: number`: `readonly attribute double /* integer: Int */ ppid` (Deno 2.9.6 type declarations) -/
-def ppid : IO Int := Support.getGlobal ["Deno", "ppid"] Int
+@[macro_inline] def ppid : IO Int := Internal.api "Lasm.JS.Deno.ppid" do
+  Internal.getGlobal ["Deno", "ppid"] Int
 
 /-- `const Deno.noColor: boolean`: `readonly attribute boolean noColor` (Deno 2.9.6 type declarations) -/
-def noColor : IO Bool := Support.getGlobal ["Deno", "noColor"] Bool
+@[macro_inline] def noColor : IO Bool := Internal.api "Lasm.JS.Deno.noColor" do
+  Internal.getGlobal ["Deno", "noColor"] Bool
 
 /-- `var Deno.exitCode: number`: `readonly attribute double exitCode` (Deno 2.9.6 type declarations) -/
-def exitCode : IO Float := Support.getGlobal ["Deno", "exitCode"] Float
+@[macro_inline] def exitCode : IO Float := Internal.api "Lasm.JS.Deno.exitCode" do
+  Internal.getGlobal ["Deno", "exitCode"] Float
 
 /-- `const Deno.env: Env`: `readonly attribute Env env` (Deno 2.9.6 type declarations) -/
-def env : IO Env := do
-  let r ← Support.getGlobal ["Deno", "env"] Value
+@[macro_inline] def env : IO Env := Internal.api "Lasm.JS.Deno.env" do
+  let r ← Internal.getGlobal ["Deno", "env"] Value
   pure { val := r }
 
 /-- `const Deno.build: { target: string; arch: 'x86_64' | 'aarch64'; os: | 'darwin' | 'linux' | 'android' | 'windows' | 'freebsd' | 'netbsd' | 'aix' | 'solaris' | 'illumos'; standalone: boolean; vendor: string; env?: string; }`: `readonly attribute Build build` (Deno 2.9.6 type declarations) -/
-def build : IO Build := Support.getGlobal ["Deno", "build"] Build
+@[macro_inline] def build : IO Build := Internal.api "Lasm.JS.Deno.build" do
+  Internal.getGlobal ["Deno", "build"] Build
 
 /-- `const Deno.version: { deno: string; v8: string; typescript: string; }`: `readonly attribute Version version` (Deno 2.9.6 type declarations) -/
-def version : IO Version := Support.getGlobal ["Deno", "version"] Version
+@[macro_inline] def version : IO Version := Internal.api "Lasm.JS.Deno.version" do
+  Internal.getGlobal ["Deno", "version"] Version
 
 /-- `const Deno.args: string[]`: `readonly attribute sequence<DOMString> args` (Deno 2.9.6 type declarations) -/
-def args : IO (Array String) := Support.getGlobal ["Deno", "args"] (Array String)
+@[macro_inline] def args : IO (Array String) := Internal.api "Lasm.JS.Deno.args" do
+  Internal.getGlobal ["Deno", "args"] (Array String)
 
 /-- `const Deno.mainModule: string`: `readonly attribute DOMString mainModule` (Deno 2.9.6 type declarations) -/
-def mainModule : IO String := Support.getGlobal ["Deno", "mainModule"] String
+@[macro_inline] def mainModule : IO String := Internal.api "Lasm.JS.Deno.mainModule" do
+  Internal.getGlobal ["Deno", "mainModule"] String
 
 /-- `Deno.memoryUsage(): MemoryUsage`: `MemoryUsage memoryUsage()` (Deno 2.9.6 type declarations) -/
-def memoryUsage : IO MemoryUsage :=
+@[macro_inline] def memoryUsage : IO MemoryUsage := Internal.api "Lasm.JS.Deno.memoryUsage" do
   Lasm.JS.Binding.invoke MemoryUsage { name := "Lasm.JS.Deno.memoryUsage", module := "globalThis", path := "Deno.memoryUsage", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `Deno.hostname(): string`: `DOMString hostname()` (Deno 2.9.6 type declarations) -/
-def hostname : IO String :=
+@[macro_inline] def hostname : IO String := Internal.api "Lasm.JS.Deno.hostname" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Deno.hostname", module := "globalThis", path := "Deno.hostname", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `Deno.loadavg(): number[]`: `sequence<double> loadavg()` (Deno 2.9.6 type declarations) -/
-def loadavg : IO (Array Float) :=
+@[macro_inline] def loadavg : IO (Array Float) := Internal.api "Lasm.JS.Deno.loadavg" do
   Lasm.JS.Binding.invoke (Array Float) { name := "Lasm.JS.Deno.loadavg", module := "globalThis", path := "Deno.loadavg", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `Deno.systemMemoryInfo(): SystemMemoryInfo`: `SystemMemoryInfo systemMemoryInfo()` (Deno 2.9.6 type declarations) -/
-def systemMemoryInfo : IO SystemMemoryInfo :=
+@[macro_inline] def systemMemoryInfo : IO SystemMemoryInfo := Internal.api "Lasm.JS.Deno.systemMemoryInfo" do
   Lasm.JS.Binding.invoke SystemMemoryInfo { name := "Lasm.JS.Deno.systemMemoryInfo", module := "globalThis", path := "Deno.systemMemoryInfo", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `Deno.osRelease(): string`: `DOMString osRelease()` (Deno 2.9.6 type declarations) -/
-def osRelease : IO String :=
+@[macro_inline] def osRelease : IO String := Internal.api "Lasm.JS.Deno.osRelease" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Deno.osRelease", module := "globalThis", path := "Deno.osRelease", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `Deno.osUptime(): number`: `double osUptime()` (Deno 2.9.6 type declarations) -/
-def osUptime : IO Float :=
+@[macro_inline] def osUptime : IO Float := Internal.api "Lasm.JS.Deno.osUptime" do
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Deno.osUptime", module := "globalThis", path := "Deno.osUptime", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `Deno.exit(code?: number): never`: `undefined exit(optional double code)` (Deno 2.9.6 type declarations) -/
-def exit (code : Option Float := none) : IO Unit :=
+@[macro_inline] def exit (code : Option Float := none) : IO Unit := Internal.api "Lasm.JS.Deno.exit" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.exit", module := "globalThis", path := "Deno.exit", construct := false, arity := 1 }
-    (Support.args #[Support.optional code]) (await := false)
+    (Internal.args #[Internal.optional code]) (await := false)
 
 /-- `Deno.execPath(): string`: `DOMString execPath()` (Deno 2.9.6 type declarations) -/
-def execPath : IO String :=
+@[macro_inline] def execPath : IO String := Internal.api "Lasm.JS.Deno.execPath" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Deno.execPath", module := "globalThis", path := "Deno.execPath", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `Deno.chdir(directory: string | URL): void`: `undefined chdir(DOMStringOrURL directory)` (Deno 2.9.6 type declarations) -/
-def chdir (directory : DOMStringOrURL) : IO Unit :=
+@[macro_inline] def chdir (directory : DOMStringOrURL) : IO Unit := Internal.api "Lasm.JS.Deno.chdir" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.chdir", module := "globalThis", path := "Deno.chdir", construct := false, arity := 1 }
-    (Support.args #[toJS directory]) (await := false)
+    (Internal.args #[toJS directory]) (await := false)
 
 /-- `Deno.cwd(): string`: `DOMString cwd()` (Deno 2.9.6 type declarations) -/
-def cwd : IO String :=
+@[macro_inline] def cwd : IO String := Internal.api "Lasm.JS.Deno.cwd" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Deno.cwd", module := "globalThis", path := "Deno.cwd", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `Deno.addSignalListener(signal: Signal, handler: () => void): void`: `undefined addSignalListener(Signal signal, AddSignalListenerHandler handler)` (Deno 2.9.6 type declarations) -/
-def addSignalListener (signal : Signal) (handler : AddSignalListenerHandler) : IO Unit :=
+@[macro_inline] def addSignalListener (signal : Signal) (handler : AddSignalListenerHandler) : IO Unit := Internal.api "Lasm.JS.Deno.addSignalListener" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.addSignalListener", module := "globalThis", path := "Deno.addSignalListener", construct := false, arity := 2 }
-    (Support.args #[toJS signal, toJS handler]) (await := false)
+    (Internal.args #[toJS signal, toJS handler]) (await := false)
 
 /-- `Deno.removeSignalListener(signal: Signal, handler: () => void): void`: `undefined removeSignalListener(Signal signal, RemoveSignalListenerHandler handler)` (Deno 2.9.6 type declarations) -/
-def removeSignalListener (signal : Signal) (handler : RemoveSignalListenerHandler) : IO Unit :=
+@[macro_inline] def removeSignalListener (signal : Signal) (handler : RemoveSignalListenerHandler) : IO Unit := Internal.api "Lasm.JS.Deno.removeSignalListener" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.removeSignalListener", module := "globalThis", path := "Deno.removeSignalListener", construct := false, arity := 2 }
-    (Support.args #[toJS signal, toJS handler]) (await := false)
+    (Internal.args #[toJS signal, toJS handler]) (await := false)
 
 /-- `Deno.refTimer(id: number | NodeJS.Timeout): void`: `undefined refTimer(any id)` (Deno 2.9.6 type declarations) -/
-def refTimer (id : Data) : IO Unit :=
+@[macro_inline] def refTimer (id : Data) : IO Unit := Internal.api "Lasm.JS.Deno.refTimer" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.refTimer", module := "globalThis", path := "Deno.refTimer", construct := false, arity := 1 }
-    (Support.args #[toJS id]) (await := false)
+    (Internal.args #[toJS id]) (await := false)
 
 /-- `Deno.unrefTimer(id: number | NodeJS.Timeout): void`: `undefined unrefTimer(any id)` (Deno 2.9.6 type declarations) -/
-def unrefTimer (id : Data) : IO Unit :=
+@[macro_inline] def unrefTimer (id : Data) : IO Unit := Internal.api "Lasm.JS.Deno.unrefTimer" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.unrefTimer", module := "globalThis", path := "Deno.unrefTimer", construct := false, arity := 1 }
-    (Support.args #[toJS id]) (await := false)
+    (Internal.args #[toJS id]) (await := false)
 
 /-- `Deno.uid(): number | null`: `double? uid()` (Deno 2.9.6 type declarations) -/
-def uid : IO (Option Float) :=
+@[macro_inline] def uid : IO (Option Float) := Internal.api "Lasm.JS.Deno.uid" do
   Lasm.JS.Binding.invoke (Option Float) { name := "Lasm.JS.Deno.uid", module := "globalThis", path := "Deno.uid", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `Deno.gid(): number | null`: `double? gid()` (Deno 2.9.6 type declarations) -/
-def gid : IO (Option Float) :=
+@[macro_inline] def gid : IO (Option Float) := Internal.api "Lasm.JS.Deno.gid" do
   Lasm.JS.Binding.invoke (Option Float) { name := "Lasm.JS.Deno.gid", module := "globalThis", path := "Deno.gid", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 end Lasm.JS.Deno
