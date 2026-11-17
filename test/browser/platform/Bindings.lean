@@ -1,6 +1,6 @@
 /-
-Conformance checks for the browser tier of Lasm.JS.Web (docs/JS_BINDINGS.md,
-"The browser tier"; scripts/bindings/web-browser.mjs), part of the platform
+Conformance checks for Lasm.JS.Web in a browser (docs/JS_BINDINGS.md,
+"Lasm.JS.Web"), part of the platform
 suite (Main.lean): run on Chromium, Firefox and WebKit by
 scripts/browser/browser-ci.mjs, each check reported as `bindings.<name>`.
 
@@ -8,7 +8,7 @@ Every check is a property: the comment above it states the Lean proposition it
 checks, over generated inputs (a seeded generator, so a failure is
 reproducible), against a Lean model (a list, an association list, a string
 function) or the specification's stated behaviour. They are properties of the
-browsers behind the bindings, which Lean has no model of, so (as for tier 1's
+browsers behind the bindings, which Lean has no model of, so (as for
 test/fixtures/js-web, docs/TESTING_STRATEGY.md §4) they stay comments rather
 than `Candidates.lean` definitions.
 
@@ -17,7 +17,18 @@ writes the missing ones to `#bindings-missing` (reported, never a failure).
 -/
 import Std.Async
 import Lasm.JS
-import Lasm.JS.Web.Browser
+import Lasm.JS.Web.Cssom
+import Lasm.JS.Web.CssomView
+import Lasm.JS.Web.Dom
+import Lasm.JS.Web.Fs
+import Lasm.JS.Web.Geometry
+import Lasm.JS.Web.Html
+import Lasm.JS.Web.Pointerevents
+import Lasm.JS.Web.Uievents
+import Lasm.JS.Web.Url
+import Lasm.JS.Web.WaiAria
+import Lasm.JS.Web.Websockets
+import Lasm.JS.Web.Xhr
 import Surface
 open Lasm.JS Lasm.JS.Web
 
@@ -414,7 +425,7 @@ def forms (record : Record) (root : Element) : IO Unit := do
       discard <| form.appendChild input
       model := model.push (n, v)
     discard <| root.appendChild form
-    let entries ← (← FormData.new (some form.val)).entries
+    let entries ← (← FormData.new (some form)).entries
     discard <| root.removeChild form
     let got := entries.map fun (k, v) => (k, match v with | .usvString s => s | .file _ => "(file)")
     return (got == model, s!"{got.size} entries")
@@ -640,7 +651,7 @@ def messageText (d : Data) : IO String := do
   match d with
   | .string s => return s!"text:{s}"
   | .bytes b => return s!"bytes:{b.toList}"
-  | .ref v _ => return s!"bytes:{(← Support.arrayBufferBytes v).toList}"
+  | .ref v _ => return s!"bytes:{(← Lasm.JS.Web.Internal.arrayBufferBytes v).toList}"
   | d => return s!"other:{d.describe}"
 
 def socket (record : Record) : Async Unit := do

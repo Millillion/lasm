@@ -8,10 +8,13 @@ docs/JS_BINDINGS.md ("Cloudflare Workers: Lasm.JS.Cloudflare"). The doc comments
 declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Cloudflare.Support
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Types.Streams
 
 namespace Lasm.JS.Cloudflare
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface Socket` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
 structure Socket where
@@ -22,24 +25,23 @@ instance : ToJS Socket := ⟨fun x => .ref x.val ""⟩
 instance : FromJS Socket := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.Socket", .data⟩
 
 /-- `enum SocketSecureTransport` (@cloudflare/workers-types 5.20261019.1 type declarations): "on", "off", "starttls". -/
-inductive SocketSecureTransport where
-  /-- "on" -/
-  | on
-  /-- "off" -/
-  | off
-  /-- "starttls" -/
-  | starttls
+structure SocketSecureTransport where
+  /-- A value from its string, unchecked: the generated values (`.on`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS SocketSecureTransport := ⟨fun
-  | .on => .string "on"
-  | .off => .string "off"
-  | .starttls => .string "starttls"⟩
+/-- "on" -/
+@[match_pattern] abbrev SocketSecureTransport.on : SocketSecureTransport := .unsafeOfString "on"
+/-- "off" -/
+@[match_pattern] abbrev SocketSecureTransport.off : SocketSecureTransport := .unsafeOfString "off"
+/-- "starttls" -/
+@[match_pattern] abbrev SocketSecureTransport.starttls : SocketSecureTransport := .unsafeOfString "starttls"
+instance : ToJS SocketSecureTransport := ⟨fun x => .string x.val⟩
 instance : FromJS SocketSecureTransport where
   fromJS
-    | .string "on" => .ok .on
-    | .string "off" => .ok .off
-    | .string "starttls" => .ok .starttls
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Cloudflare.SocketSecureTransport"
 
 /-- `dictionary SocketInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -58,28 +60,7 @@ instance : FromJS SocketInfo where
 structure TlsOptions where
   /-- `DOMString expectedServerHostname` -/
   expectedServerHostname : Option String := none
-instance : ToJS TlsOptions := ⟨fun d => Support.fields #[("expectedServerHostname", Support.optional d.expectedServerHostname)]⟩
-
-/-- `dictionary SocketAddress` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
-structure SocketAddress where
-  /-- `required DOMString hostname` -/
-  hostname : String
-  /-- `required double /* integer: Nat */ port` -/
-  port : Nat
-instance : ToJS SocketAddress := ⟨fun d => Support.fields #[("hostname", toJS d.hostname),
-    ("port", toJS d.port)]⟩
-
-/-- `typedef DOMString or SocketAddress DOMStringOrSocketAddress`: one constructor per member type. -/
-inductive DOMStringOrSocketAddress where
-  /-- `DOMString` -/
-  | domString (value : String)
-  /-- `SocketAddress` -/
-  | socketAddress (value : SocketAddress)
-instance : ToJS DOMStringOrSocketAddress := ⟨fun
-  | .domString v => toJS v
-  | .socketAddress v => toJS v⟩
-instance : Coe String DOMStringOrSocketAddress := ⟨.domString⟩
-instance : Coe SocketAddress DOMStringOrSocketAddress := ⟨.socketAddress⟩
+instance : ToJS TlsOptions := ⟨fun d => Internal.fields #[("expectedServerHostname", Internal.optional d.expectedServerHostname)]⟩
 
 /-- `typedef double or bigint DoubleOrBigint`: one constructor per member type. -/
 inductive DoubleOrBigint where
@@ -101,49 +82,72 @@ structure SocketOptions where
   allowHalfOpen : Bool
   /-- `DoubleOrBigint highWaterMark` -/
   highWaterMark : Option DoubleOrBigint := none
-instance : ToJS SocketOptions := ⟨fun d => Support.fields #[("secureTransport", Support.optional d.secureTransport),
+instance : ToJS SocketOptions := ⟨fun d => Internal.fields #[("secureTransport", Internal.optional d.secureTransport),
     ("allowHalfOpen", toJS d.allowHalfOpen),
-    ("highWaterMark", Support.optional d.highWaterMark)]⟩
+    ("highWaterMark", Internal.optional d.highWaterMark)]⟩
+
+/-- `dictionary SocketAddress` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure SocketAddress where
+  /-- `required DOMString hostname` -/
+  hostname : String
+  /-- `required double /* integer: Nat */ port` -/
+  port : Nat
+instance : ToJS SocketAddress := ⟨fun d => Internal.fields #[("hostname", toJS d.hostname),
+    ("port", toJS d.port)]⟩
+
+/-- `typedef DOMString or SocketAddress DOMStringOrSocketAddress`: one constructor per member type. -/
+inductive DOMStringOrSocketAddress where
+  /-- `DOMString` -/
+  | domString (value : String)
+  /-- `SocketAddress` -/
+  | socketAddress (value : SocketAddress)
+instance : ToJS DOMStringOrSocketAddress := ⟨fun
+  | .domString v => toJS v
+  | .socketAddress v => toJS v⟩
+instance : Coe String DOMStringOrSocketAddress := ⟨.domString⟩
+instance : Coe SocketAddress DOMStringOrSocketAddress := ⟨.socketAddress⟩
 
 /-- `get readable(): ReadableStream`: `readonly attribute ReadableStream readable` -/
-def Socket.readable (self : Socket) : IO ReadableStream := do
+@[macro_inline] def Socket.readable (self : Socket) : IO ReadableStream := Internal.api "Lasm.JS.Cloudflare.Socket.readable" do
   let r ← self.val.get "readable" Value
   pure { val := r }
 
 /-- `get writable(): WritableStream`: `readonly attribute WritableStream writable` -/
-def Socket.writable (self : Socket) : IO WritableStream := do
+@[macro_inline] def Socket.writable (self : Socket) : IO WritableStream := Internal.api "Lasm.JS.Cloudflare.Socket.writable" do
   let r ← self.val.get "writable" Value
   pure { val := r }
 
 /-- `get closed(): Promise<void>`: `readonly attribute Promise<undefined> closed` -/
-def Socket.closed (self : Socket) : Async Unit := do
+@[macro_inline] def Socket.closed (self : Socket) : Async Unit := Internal.api "Lasm.JS.Cloudflare.Socket.closed" do
   let p ← self.val.get "closed" Value
   p.await Unit
 
 /-- `get opened(): Promise<SocketInfo>`: `readonly attribute Promise<SocketInfo> opened` -/
-def Socket.opened (self : Socket) : Async SocketInfo := do
+@[macro_inline] def Socket.opened (self : Socket) : Async SocketInfo := Internal.api "Lasm.JS.Cloudflare.Socket.opened" do
   let p ← self.val.get "opened" Value
   p.await SocketInfo
 
 /-- `get upgraded(): boolean`: `readonly attribute boolean upgraded` -/
-def Socket.upgraded (self : Socket) : IO Bool := self.val.get "upgraded" Bool
+@[macro_inline] def Socket.upgraded (self : Socket) : IO Bool := Internal.api "Lasm.JS.Cloudflare.Socket.upgraded" do
+  self.val.get "upgraded" Bool
 
 /-- `get secureTransport(): 'on' | 'off' | 'starttls'`: `readonly attribute SocketSecureTransport secureTransport` -/
-def Socket.secureTransport (self : Socket) : IO SocketSecureTransport := self.val.get "secureTransport" SocketSecureTransport
+@[macro_inline] def Socket.secureTransport (self : Socket) : IO SocketSecureTransport := Internal.api "Lasm.JS.Cloudflare.Socket.secureTransport" do
+  self.val.get "secureTransport" SocketSecureTransport
 
 /-- `close(): Promise<void>`: `Promise<undefined> close()` -/
-def Socket.close (self : Socket) : Async Unit :=
-  self.val.callMethodAwait "close" (Support.args #[]) Unit
+@[macro_inline] def Socket.close (self : Socket) : Async Unit := Internal.api "Lasm.JS.Cloudflare.Socket.close" do
+  self.val.callMethodAwait "close" (Internal.args #[]) Unit
 
 /-- `startTls(options?: TlsOptions): Socket`: `Socket startTls(optional TlsOptions options)` -/
-def Socket.startTls (self : Socket) (options : Option TlsOptions := none) : IO Socket := do
-  let r ← self.val.callMethod "startTls" (Support.args #[Support.optional options]) Value
+@[macro_inline] def Socket.startTls (self : Socket) (options : Option TlsOptions := none) : IO Socket := Internal.api "Lasm.JS.Cloudflare.Socket.startTls" do
+  let r ← self.val.callMethod "startTls" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `connect(address: string | SocketAddress, options?: SocketOptions): Socket`: `Socket connect(DOMStringOrSocketAddress address, optional SocketOptions options)` (@cloudflare/workers-types 5.20261019.1 type declarations) -/
-def connect (address : DOMStringOrSocketAddress) (options : Option SocketOptions := none) : IO Socket := do
+@[macro_inline] def connect (address : DOMStringOrSocketAddress) (options : Option SocketOptions := none) : IO Socket := Internal.api "Lasm.JS.Cloudflare.connect" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Cloudflare.connect", module := "cloudflare:sockets", path := "connect", construct := false, arity := 2 }
-    (Support.args #[toJS address, Support.optional options]) (await := false)
+    (Internal.args #[toJS address, Internal.optional options]) (await := false)
   pure { val := r }
 
 end Lasm.JS.Cloudflare

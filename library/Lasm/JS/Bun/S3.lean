@@ -8,12 +8,15 @@ docs/JS_BINDINGS.md ("Lasm.JS.Deno and Lasm.JS.Bun"). The doc comments quote eac
 declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.File
-import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Types.Fetch
+import Lasm.JS.Web.Types.FileAPI
 import Lasm.JS.Bun.Core
 
 namespace Lasm.JS.Bun
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface Bun.S3Client` (Bun 1.4.4 type declarations, s3.d.ts): a handle to the JavaScript object. -/
 structure S3Client where
@@ -24,128 +27,113 @@ instance : ToJS S3Client := ⟨fun x => .ref x.val ""⟩
 instance : FromJS S3Client := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.S3Client", .data⟩
 
 /-- `enum S3ListObjectsOptionsEncodingType` (Bun 1.4.4 type declarations): "url". -/
-inductive S3ListObjectsOptionsEncodingType where
-  /-- "url" -/
-  | url
+structure S3ListObjectsOptionsEncodingType where
+  /-- A value from its string, unchecked: the generated values (`.url`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS S3ListObjectsOptionsEncodingType := ⟨fun
-  | .url => .string "url"⟩
+/-- "url" -/
+@[match_pattern] abbrev S3ListObjectsOptionsEncodingType.url : S3ListObjectsOptionsEncodingType := .unsafeOfString "url"
+instance : ToJS S3ListObjectsOptionsEncodingType := ⟨fun x => .string x.val⟩
 instance : FromJS S3ListObjectsOptionsEncodingType where
   fromJS
-    | .string "url" => .ok .url
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.S3ListObjectsOptionsEncodingType"
 
 /-- `enum S3ListObjectsResponseContentsChecksumAlgorithm` (Bun 1.4.4 type declarations): "CRC32", "CRC32C", "SHA1", "SHA256", "CRC64NVME". -/
-inductive S3ListObjectsResponseContentsChecksumAlgorithm where
-  /-- "CRC32" -/
-  | crc32
-  /-- "CRC32C" -/
-  | crc32c
-  /-- "SHA1" -/
-  | sha1
-  /-- "SHA256" -/
-  | sha256
-  /-- "CRC64NVME" -/
-  | crc64nvme
+structure S3ListObjectsResponseContentsChecksumAlgorithm where
+  /-- A value from its string, unchecked: the generated values (`.crc32`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS S3ListObjectsResponseContentsChecksumAlgorithm := ⟨fun
-  | .crc32 => .string "CRC32"
-  | .crc32c => .string "CRC32C"
-  | .sha1 => .string "SHA1"
-  | .sha256 => .string "SHA256"
-  | .crc64nvme => .string "CRC64NVME"⟩
+/-- "CRC32" -/
+@[match_pattern] abbrev S3ListObjectsResponseContentsChecksumAlgorithm.crc32 : S3ListObjectsResponseContentsChecksumAlgorithm := .unsafeOfString "CRC32"
+/-- "CRC32C" -/
+@[match_pattern] abbrev S3ListObjectsResponseContentsChecksumAlgorithm.crc32c : S3ListObjectsResponseContentsChecksumAlgorithm := .unsafeOfString "CRC32C"
+/-- "SHA1" -/
+@[match_pattern] abbrev S3ListObjectsResponseContentsChecksumAlgorithm.sha1 : S3ListObjectsResponseContentsChecksumAlgorithm := .unsafeOfString "SHA1"
+/-- "SHA256" -/
+@[match_pattern] abbrev S3ListObjectsResponseContentsChecksumAlgorithm.sha256 : S3ListObjectsResponseContentsChecksumAlgorithm := .unsafeOfString "SHA256"
+/-- "CRC64NVME" -/
+@[match_pattern] abbrev S3ListObjectsResponseContentsChecksumAlgorithm.crc64nvme : S3ListObjectsResponseContentsChecksumAlgorithm := .unsafeOfString "CRC64NVME"
+instance : ToJS S3ListObjectsResponseContentsChecksumAlgorithm := ⟨fun x => .string x.val⟩
 instance : FromJS S3ListObjectsResponseContentsChecksumAlgorithm where
   fromJS
-    | .string "CRC32" => .ok .crc32
-    | .string "CRC32C" => .ok .crc32c
-    | .string "SHA1" => .ok .sha1
-    | .string "SHA256" => .ok .sha256
-    | .string "CRC64NVME" => .ok .crc64nvme
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.S3ListObjectsResponseContentsChecksumAlgorithm"
 
 /-- `enum S3ListObjectsResponseContentsChecksumType` (Bun 1.4.4 type declarations): "COMPOSITE", "FULL_OBJECT". -/
-inductive S3ListObjectsResponseContentsChecksumType where
-  /-- "COMPOSITE" -/
-  | composite
-  /-- "FULL_OBJECT" -/
-  | fullObject
+structure S3ListObjectsResponseContentsChecksumType where
+  /-- A value from its string, unchecked: the generated values (`.composite`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS S3ListObjectsResponseContentsChecksumType := ⟨fun
-  | .composite => .string "COMPOSITE"
-  | .fullObject => .string "FULL_OBJECT"⟩
+/-- "COMPOSITE" -/
+@[match_pattern] abbrev S3ListObjectsResponseContentsChecksumType.composite : S3ListObjectsResponseContentsChecksumType := .unsafeOfString "COMPOSITE"
+/-- "FULL_OBJECT" -/
+@[match_pattern] abbrev S3ListObjectsResponseContentsChecksumType.fullObject : S3ListObjectsResponseContentsChecksumType := .unsafeOfString "FULL_OBJECT"
+instance : ToJS S3ListObjectsResponseContentsChecksumType := ⟨fun x => .string x.val⟩
 instance : FromJS S3ListObjectsResponseContentsChecksumType where
   fromJS
-    | .string "COMPOSITE" => .ok .composite
-    | .string "FULL_OBJECT" => .ok .fullObject
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.S3ListObjectsResponseContentsChecksumType"
 
 /-- `enum S3ListObjectsResponseContentsStorageClass` (Bun 1.4.4 type declarations): "STANDARD", "REDUCED_REDUNDANCY", "GLACIER", "STANDARD_IA", "ONEZONE_IA", "INTELLIGENT_TIERING", "DEEP_ARCHIVE", "OUTPOSTS", "GLACIER_IR", "SNOW", "EXPRESS_ONEZONE". -/
-inductive S3ListObjectsResponseContentsStorageClass where
-  /-- "STANDARD" -/
-  | standard
-  /-- "REDUCED_REDUNDANCY" -/
-  | reducedRedundancy
-  /-- "GLACIER" -/
-  | glacier
-  /-- "STANDARD_IA" -/
-  | standardIa
-  /-- "ONEZONE_IA" -/
-  | onezoneIa
-  /-- "INTELLIGENT_TIERING" -/
-  | intelligentTiering
-  /-- "DEEP_ARCHIVE" -/
-  | deepArchive
-  /-- "OUTPOSTS" -/
-  | outposts
-  /-- "GLACIER_IR" -/
-  | glacierIr
-  /-- "SNOW" -/
-  | snow
-  /-- "EXPRESS_ONEZONE" -/
-  | expressOnezone
+structure S3ListObjectsResponseContentsStorageClass where
+  /-- A value from its string, unchecked: the generated values (`.standard`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS S3ListObjectsResponseContentsStorageClass := ⟨fun
-  | .standard => .string "STANDARD"
-  | .reducedRedundancy => .string "REDUCED_REDUNDANCY"
-  | .glacier => .string "GLACIER"
-  | .standardIa => .string "STANDARD_IA"
-  | .onezoneIa => .string "ONEZONE_IA"
-  | .intelligentTiering => .string "INTELLIGENT_TIERING"
-  | .deepArchive => .string "DEEP_ARCHIVE"
-  | .outposts => .string "OUTPOSTS"
-  | .glacierIr => .string "GLACIER_IR"
-  | .snow => .string "SNOW"
-  | .expressOnezone => .string "EXPRESS_ONEZONE"⟩
+/-- "STANDARD" -/
+@[match_pattern] abbrev S3ListObjectsResponseContentsStorageClass.standard : S3ListObjectsResponseContentsStorageClass := .unsafeOfString "STANDARD"
+/-- "REDUCED_REDUNDANCY" -/
+@[match_pattern] abbrev S3ListObjectsResponseContentsStorageClass.reducedRedundancy : S3ListObjectsResponseContentsStorageClass := .unsafeOfString "REDUCED_REDUNDANCY"
+/-- "GLACIER" -/
+@[match_pattern] abbrev S3ListObjectsResponseContentsStorageClass.glacier : S3ListObjectsResponseContentsStorageClass := .unsafeOfString "GLACIER"
+/-- "STANDARD_IA" -/
+@[match_pattern] abbrev S3ListObjectsResponseContentsStorageClass.standardIa : S3ListObjectsResponseContentsStorageClass := .unsafeOfString "STANDARD_IA"
+/-- "ONEZONE_IA" -/
+@[match_pattern] abbrev S3ListObjectsResponseContentsStorageClass.onezoneIa : S3ListObjectsResponseContentsStorageClass := .unsafeOfString "ONEZONE_IA"
+/-- "INTELLIGENT_TIERING" -/
+@[match_pattern] abbrev S3ListObjectsResponseContentsStorageClass.intelligentTiering : S3ListObjectsResponseContentsStorageClass := .unsafeOfString "INTELLIGENT_TIERING"
+/-- "DEEP_ARCHIVE" -/
+@[match_pattern] abbrev S3ListObjectsResponseContentsStorageClass.deepArchive : S3ListObjectsResponseContentsStorageClass := .unsafeOfString "DEEP_ARCHIVE"
+/-- "OUTPOSTS" -/
+@[match_pattern] abbrev S3ListObjectsResponseContentsStorageClass.outposts : S3ListObjectsResponseContentsStorageClass := .unsafeOfString "OUTPOSTS"
+/-- "GLACIER_IR" -/
+@[match_pattern] abbrev S3ListObjectsResponseContentsStorageClass.glacierIr : S3ListObjectsResponseContentsStorageClass := .unsafeOfString "GLACIER_IR"
+/-- "SNOW" -/
+@[match_pattern] abbrev S3ListObjectsResponseContentsStorageClass.snow : S3ListObjectsResponseContentsStorageClass := .unsafeOfString "SNOW"
+/-- "EXPRESS_ONEZONE" -/
+@[match_pattern] abbrev S3ListObjectsResponseContentsStorageClass.expressOnezone : S3ListObjectsResponseContentsStorageClass := .unsafeOfString "EXPRESS_ONEZONE"
+instance : ToJS S3ListObjectsResponseContentsStorageClass := ⟨fun x => .string x.val⟩
 instance : FromJS S3ListObjectsResponseContentsStorageClass where
   fromJS
-    | .string "STANDARD" => .ok .standard
-    | .string "REDUCED_REDUNDANCY" => .ok .reducedRedundancy
-    | .string "GLACIER" => .ok .glacier
-    | .string "STANDARD_IA" => .ok .standardIa
-    | .string "ONEZONE_IA" => .ok .onezoneIa
-    | .string "INTELLIGENT_TIERING" => .ok .intelligentTiering
-    | .string "DEEP_ARCHIVE" => .ok .deepArchive
-    | .string "OUTPOSTS" => .ok .outposts
-    | .string "GLACIER_IR" => .ok .glacierIr
-    | .string "SNOW" => .ok .snow
-    | .string "EXPRESS_ONEZONE" => .ok .expressOnezone
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.S3ListObjectsResponseContentsStorageClass"
 
 /-- `enum S3ListObjectsResponseEncodingType` (Bun 1.4.4 type declarations): "url". -/
-inductive S3ListObjectsResponseEncodingType where
-  /-- "url" -/
-  | url
+structure S3ListObjectsResponseEncodingType where
+  /-- A value from its string, unchecked: the generated values (`.url`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS S3ListObjectsResponseEncodingType := ⟨fun
-  | .url => .string "url"⟩
+/-- "url" -/
+@[match_pattern] abbrev S3ListObjectsResponseEncodingType.url : S3ListObjectsResponseEncodingType := .unsafeOfString "url"
+instance : ToJS S3ListObjectsResponseEncodingType := ⟨fun x => .string x.val⟩
 instance : FromJS S3ListObjectsResponseEncodingType where
   fromJS
-    | .string "url" => .ok .url
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.S3ListObjectsResponseEncodingType"
 
 /-- `typedef DOMString or Uint8Array or ArrayBuffer or Request or Response or BunFile or S3File or Blob or File or Archive DOMStringOrUint8ArrayOrArrayBufferOrRequestOrResponseOrBunFileOrS3FileOrBlobOrFileOrArchive`: one constructor per member type. -/
@@ -206,13 +194,13 @@ structure S3ListObjectsOptions where
   encodingType : Option S3ListObjectsOptionsEncodingType := none
   /-- `boolean fetchOwner` -/
   fetchOwner : Option Bool := none
-instance : ToJS S3ListObjectsOptions := ⟨fun d => Support.fields #[("prefix", Support.optional d.«prefix»),
-    ("continuationToken", Support.optional d.continuationToken),
-    ("delimiter", Support.optional d.delimiter),
-    ("maxKeys", Support.optional d.maxKeys),
-    ("startAfter", Support.optional d.startAfter),
-    ("encodingType", Support.optional d.encodingType),
-    ("fetchOwner", Support.optional d.fetchOwner)]⟩
+instance : ToJS S3ListObjectsOptions := ⟨fun d => Internal.fields #[("prefix", Internal.optional d.«prefix»),
+    ("continuationToken", Internal.optional d.continuationToken),
+    ("delimiter", Internal.optional d.delimiter),
+    ("maxKeys", Internal.optional d.maxKeys),
+    ("startAfter", Internal.optional d.startAfter),
+    ("encodingType", Internal.optional d.encodingType),
+    ("fetchOwner", Internal.optional d.fetchOwner)]⟩
 
 /-- `dictionary S3ListObjectsResponseCommonPrefixes` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure S3ListObjectsResponseCommonPrefixes where
@@ -323,96 +311,96 @@ instance : FromJS S3ListObjectsResponse where
   typeName := "Lasm.JS.Bun.S3ListObjectsResponse"
 
 /-- `constructor(options?: S3Options)`: `constructor(optional S3Options options)` -/
-def S3Client.new (options : Option S3Options := none) : IO S3Client :=
+@[macro_inline] def S3Client.new (options : Option S3Options := none) : IO S3Client := Internal.api "Lasm.JS.Bun.S3Client.new" do
   Lasm.JS.Binding.invoke S3Client { name := "Lasm.JS.Bun.S3Client.new", module := "globalThis", path := "Bun.S3Client", construct := true, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- `file(path: string, options?: S3Options): S3File`: `S3File file(DOMString path, optional S3Options options)` -/
-def S3Client.file (self : S3Client) (path : String) (options : Option S3Options := none) : IO S3File := do
-  let r ← self.val.callMethod "file" (Support.args #[toJS path, Support.optional options]) Value
+@[macro_inline] def S3Client.file (self : S3Client) (path : String) (options : Option S3Options := none) : IO S3File := Internal.api "Lasm.JS.Bun.S3Client.file" do
+  let r ← self.val.callMethod "file" (Internal.args #[toJS path, Internal.optional options]) Value
   pure { val := r }
 
 /-- `static file(path: string, options?: S3Options): S3File`: `static S3File file(DOMString path, optional S3Options options)` -/
-def S3Client.staticFile (path : String) (options : Option S3Options := none) : IO S3File := do
+@[macro_inline] def S3Client.staticFile (path : String) (options : Option S3Options := none) : IO S3File := Internal.api "Lasm.JS.Bun.S3Client.staticFile" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Bun.S3Client.staticFile", module := "globalThis", path := "Bun.S3Client.file", construct := false, arity := 2 }
-    (Support.args #[toJS path, Support.optional options]) (await := false)
+    (Internal.args #[toJS path, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `write(path: string, data: | string | ArrayBufferView | ArrayBuffer | SharedArrayBuffer | Request | Response | BunFile | S3File | Blob | File | Archive, options?: S3Options): Promise<number>`: `Promise<double> write(DOMString path, DOMStringOrUint8ArrayOrArrayBufferOrRequestOrResponseOrBunFileOrS3FileOrBlobOrFileOrArchive data, optional S3Options options)` -/
-def S3Client.write (self : S3Client) (path : String) (data : DOMStringOrUint8ArrayOrArrayBufferOrRequestOrResponseOrBunFileOrS3FileOrBlobOrFileOrArchive) (options : Option S3Options := none) : Async Float :=
-  self.val.callMethodAwait "write" (Support.args #[toJS path, toJS data, Support.optional options]) Float
+@[macro_inline] def S3Client.write (self : S3Client) (path : String) (data : DOMStringOrUint8ArrayOrArrayBufferOrRequestOrResponseOrBunFileOrS3FileOrBlobOrFileOrArchive) (options : Option S3Options := none) : Async Float := Internal.api "Lasm.JS.Bun.S3Client.write" do
+  self.val.callMethodAwait "write" (Internal.args #[toJS path, toJS data, Internal.optional options]) Float
 
 /-- `static write(path: string, data: | string | ArrayBufferView | ArrayBuffer | SharedArrayBuffer | Request | Response | BunFile | S3File | Blob | File | Archive, options?: S3Options): Promise<number>`: `static Promise<double> write(DOMString path, DOMStringOrUint8ArrayOrArrayBufferOrRequestOrResponseOrBunFileOrS3FileOrBlobOrFileOrArchive data, optional S3Options options)` -/
-def S3Client.staticWrite (path : String) (data : DOMStringOrUint8ArrayOrArrayBufferOrRequestOrResponseOrBunFileOrS3FileOrBlobOrFileOrArchive) (options : Option S3Options := none) : Async Float :=
+@[macro_inline] def S3Client.staticWrite (path : String) (data : DOMStringOrUint8ArrayOrArrayBufferOrRequestOrResponseOrBunFileOrS3FileOrBlobOrFileOrArchive) (options : Option S3Options := none) : Async Float := Internal.api "Lasm.JS.Bun.S3Client.staticWrite" do
   Lasm.JS.Binding.invokeAsync Float { name := "Lasm.JS.Bun.S3Client.staticWrite", module := "globalThis", path := "Bun.S3Client.write", construct := false, arity := 3 }
-    (Support.args #[toJS path, toJS data, Support.optional options])
+    (Internal.args #[toJS path, toJS data, Internal.optional options])
 
 /-- `presign(path: string, options?: S3FilePresignOptions): string`: `DOMString presign(DOMString path, optional S3FilePresignOptions options)` -/
-def S3Client.presign (self : S3Client) (path : String) (options : Option S3FilePresignOptions := none) : IO String :=
-  self.val.callMethod "presign" (Support.args #[toJS path, Support.optional options]) String
+@[macro_inline] def S3Client.presign (self : S3Client) (path : String) (options : Option S3FilePresignOptions := none) : IO String := Internal.api "Lasm.JS.Bun.S3Client.presign" do
+  self.val.callMethod "presign" (Internal.args #[toJS path, Internal.optional options]) String
 
 /-- `static presign(path: string, options?: S3FilePresignOptions): string`: `static DOMString presign(DOMString path, optional S3FilePresignOptions options)` -/
-def S3Client.staticPresign (path : String) (options : Option S3FilePresignOptions := none) : IO String :=
+@[macro_inline] def S3Client.staticPresign (path : String) (options : Option S3FilePresignOptions := none) : IO String := Internal.api "Lasm.JS.Bun.S3Client.staticPresign" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.S3Client.staticPresign", module := "globalThis", path := "Bun.S3Client.presign", construct := false, arity := 2 }
-    (Support.args #[toJS path, Support.optional options]) (await := false)
+    (Internal.args #[toJS path, Internal.optional options]) (await := false)
 
 /-- `unlink(path: string, options?: S3Options): Promise<void>`: `Promise<undefined> unlink(DOMString path, optional S3Options options)` -/
-def S3Client.unlink (self : S3Client) (path : String) (options : Option S3Options := none) : Async Unit :=
-  self.val.callMethodAwait "unlink" (Support.args #[toJS path, Support.optional options]) Unit
+@[macro_inline] def S3Client.unlink (self : S3Client) (path : String) (options : Option S3Options := none) : Async Unit := Internal.api "Lasm.JS.Bun.S3Client.unlink" do
+  self.val.callMethodAwait "unlink" (Internal.args #[toJS path, Internal.optional options]) Unit
 
 /-- `static unlink(path: string, options?: S3Options): Promise<void>`: `static Promise<undefined> unlink(DOMString path, optional S3Options options)` -/
-def S3Client.staticUnlink (path : String) (options : Option S3Options := none) : Async Unit :=
+@[macro_inline] def S3Client.staticUnlink (path : String) (options : Option S3Options := none) : Async Unit := Internal.api "Lasm.JS.Bun.S3Client.staticUnlink" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Bun.S3Client.staticUnlink", module := "globalThis", path := "Bun.S3Client.unlink", construct := false, arity := 2 }
-    (Support.args #[toJS path, Support.optional options])
+    (Internal.args #[toJS path, Internal.optional options])
 
 /-- `delete(path: string, options?: S3Options): Promise<void>`: `Promise<undefined> delete(DOMString path, optional S3Options options)` -/
-def S3Client.delete (self : S3Client) (path : String) (options : Option S3Options := none) : Async Unit :=
-  self.val.callMethodAwait "delete" (Support.args #[toJS path, Support.optional options]) Unit
+@[macro_inline] def S3Client.delete (self : S3Client) (path : String) (options : Option S3Options := none) : Async Unit := Internal.api "Lasm.JS.Bun.S3Client.delete" do
+  self.val.callMethodAwait "delete" (Internal.args #[toJS path, Internal.optional options]) Unit
 
 /-- `static delete(path: string, options?: S3Options): Promise<void>`: `static Promise<undefined> delete(DOMString path, optional S3Options options)` -/
-def S3Client.staticDelete (path : String) (options : Option S3Options := none) : Async Unit :=
+@[macro_inline] def S3Client.staticDelete (path : String) (options : Option S3Options := none) : Async Unit := Internal.api "Lasm.JS.Bun.S3Client.staticDelete" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Bun.S3Client.staticDelete", module := "globalThis", path := "Bun.S3Client.delete", construct := false, arity := 2 }
-    (Support.args #[toJS path, Support.optional options])
+    (Internal.args #[toJS path, Internal.optional options])
 
 /-- `size(path: string, options?: S3Options): Promise<number>`: `Promise<double> size(DOMString path, optional S3Options options)` -/
-def S3Client.size (self : S3Client) (path : String) (options : Option S3Options := none) : Async Float :=
-  self.val.callMethodAwait "size" (Support.args #[toJS path, Support.optional options]) Float
+@[macro_inline] def S3Client.size (self : S3Client) (path : String) (options : Option S3Options := none) : Async Float := Internal.api "Lasm.JS.Bun.S3Client.size" do
+  self.val.callMethodAwait "size" (Internal.args #[toJS path, Internal.optional options]) Float
 
 /-- `static size(path: string, options?: S3Options): Promise<number>`: `static Promise<double> size(DOMString path, optional S3Options options)` -/
-def S3Client.staticSize (path : String) (options : Option S3Options := none) : Async Float :=
+@[macro_inline] def S3Client.staticSize (path : String) (options : Option S3Options := none) : Async Float := Internal.api "Lasm.JS.Bun.S3Client.staticSize" do
   Lasm.JS.Binding.invokeAsync Float { name := "Lasm.JS.Bun.S3Client.staticSize", module := "globalThis", path := "Bun.S3Client.size", construct := false, arity := 2 }
-    (Support.args #[toJS path, Support.optional options])
+    (Internal.args #[toJS path, Internal.optional options])
 
 /-- `exists(path: string, options?: S3Options): Promise<boolean>`: `Promise<boolean> exists(DOMString path, optional S3Options options)` -/
-def S3Client.«exists» (self : S3Client) (path : String) (options : Option S3Options := none) : Async Bool :=
-  self.val.callMethodAwait "exists" (Support.args #[toJS path, Support.optional options]) Bool
+@[macro_inline] def S3Client.«exists» (self : S3Client) (path : String) (options : Option S3Options := none) : Async Bool := Internal.api "Lasm.JS.Bun.S3Client.exists" do
+  self.val.callMethodAwait "exists" (Internal.args #[toJS path, Internal.optional options]) Bool
 
 /-- `static exists(path: string, options?: S3Options): Promise<boolean>`: `static Promise<boolean> exists(DOMString path, optional S3Options options)` -/
-def S3Client.staticExists (path : String) (options : Option S3Options := none) : Async Bool :=
+@[macro_inline] def S3Client.staticExists (path : String) (options : Option S3Options := none) : Async Bool := Internal.api "Lasm.JS.Bun.S3Client.staticExists" do
   Lasm.JS.Binding.invokeAsync Bool { name := "Lasm.JS.Bun.S3Client.staticExists", module := "globalThis", path := "Bun.S3Client.exists", construct := false, arity := 2 }
-    (Support.args #[toJS path, Support.optional options])
+    (Internal.args #[toJS path, Internal.optional options])
 
 /-- `stat(path: string, options?: S3Options): Promise<S3Stats>`: `Promise<S3Stats> stat(DOMString path, optional S3Options options)` -/
-def S3Client.stat (self : S3Client) (path : String) (options : Option S3Options := none) : Async S3Stats :=
-  self.val.callMethodAwait "stat" (Support.args #[toJS path, Support.optional options]) S3Stats
+@[macro_inline] def S3Client.stat (self : S3Client) (path : String) (options : Option S3Options := none) : Async S3Stats := Internal.api "Lasm.JS.Bun.S3Client.stat" do
+  self.val.callMethodAwait "stat" (Internal.args #[toJS path, Internal.optional options]) S3Stats
 
 /-- `static stat(path: string, options?: S3Options): Promise<S3Stats>`: `static Promise<S3Stats> stat(DOMString path, optional S3Options options)` -/
-def S3Client.staticStat (path : String) (options : Option S3Options := none) : Async S3Stats :=
+@[macro_inline] def S3Client.staticStat (path : String) (options : Option S3Options := none) : Async S3Stats := Internal.api "Lasm.JS.Bun.S3Client.staticStat" do
   Lasm.JS.Binding.invokeAsync S3Stats { name := "Lasm.JS.Bun.S3Client.staticStat", module := "globalThis", path := "Bun.S3Client.stat", construct := false, arity := 2 }
-    (Support.args #[toJS path, Support.optional options])
+    (Internal.args #[toJS path, Internal.optional options])
 
 /-- `list(input?: S3ListObjectsOptions | null, options?: Pick<S3Options, 'accessKeyId' | 'secretAccessKey' | 'sessionToken' | 'region' | 'bucket' | 'endpoint'>): Promise<S3ListObjectsResponse>`: `Promise<S3ListObjectsResponse> list(optional S3ListObjectsOptions input, optional S3Options options)` -/
-def S3Client.list (self : S3Client) (input : Option S3ListObjectsOptions := none) (options : Option S3Options := none) : Async S3ListObjectsResponse :=
-  self.val.callMethodAwait "list" (Support.args #[Support.optional input, Support.optional options]) S3ListObjectsResponse
+@[macro_inline] def S3Client.list (self : S3Client) (input : Option S3ListObjectsOptions := none) (options : Option S3Options := none) : Async S3ListObjectsResponse := Internal.api "Lasm.JS.Bun.S3Client.list" do
+  self.val.callMethodAwait "list" (Internal.args #[Internal.optional input, Internal.optional options]) S3ListObjectsResponse
 
 /-- `static list(input?: S3ListObjectsOptions | null, options?: Pick<S3Options, 'accessKeyId' | 'secretAccessKey' | 'sessionToken' | 'region' | 'bucket' | 'endpoint'>): Promise<S3ListObjectsResponse>`: `static Promise<S3ListObjectsResponse> list(optional S3ListObjectsOptions input, optional S3Options options)` -/
-def S3Client.staticList (input : Option S3ListObjectsOptions := none) (options : Option S3Options := none) : Async S3ListObjectsResponse :=
+@[macro_inline] def S3Client.staticList (input : Option S3ListObjectsOptions := none) (options : Option S3Options := none) : Async S3ListObjectsResponse := Internal.api "Lasm.JS.Bun.S3Client.staticList" do
   Lasm.JS.Binding.invokeAsync S3ListObjectsResponse { name := "Lasm.JS.Bun.S3Client.staticList", module := "globalThis", path := "Bun.S3Client.list", construct := false, arity := 2 }
-    (Support.args #[Support.optional input, Support.optional options])
+    (Internal.args #[Internal.optional input, Internal.optional options])
 
 /-- `var Bun.s3: S3Client`: `readonly attribute S3Client s3` (Bun 1.4.4 type declarations) -/
-def s3 : IO S3Client := do
-  let r ← Support.getGlobal ["Bun", "s3"] Value
+@[macro_inline] def s3 : IO S3Client := Internal.api "Lasm.JS.Bun.s3" do
+  let r ← Internal.getGlobal ["Bun", "s3"] Value
   pure { val := r }
 
 end Lasm.JS.Bun

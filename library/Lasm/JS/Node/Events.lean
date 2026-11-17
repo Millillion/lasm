@@ -8,11 +8,14 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Dom
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Webidl
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class EventEmitter` of `node:events` (Node.js 24.22.2 documentation, events.md): a handle to the JavaScript object. -/
 structure EventEmitter where
@@ -48,10 +51,10 @@ instance instToJSEventEmitterNewListenerListener : ToJS EventEmitter.NewListener
 instance instFromJSEventEmitterNewListenerListener : FromJS EventEmitter.NewListenerListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.EventEmitter.NewListenerListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def EventEmitter.NewListenerListener.ofFn (f : DOMStringOrSymbol → JSFunction → Async Unit) : IO EventEmitter.NewListenerListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg DOMStringOrSymbol args 0) (← Support.arg JSFunction args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg DOMStringOrSymbol args 0) (← Internal.arg JSFunction args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def EventEmitter.NewListenerListener.ofSyncFn (f : DOMStringOrSymbol → JSFunction → IO Unit) : IO EventEmitter.NewListenerListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg DOMStringOrSymbol args 0) (← Support.arg JSFunction args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg DOMStringOrSymbol args 0) (← Internal.arg JSFunction args 1)) }
 
 /-- `callback EventEmitter.RemoveListenerListener = undefined ((DOMString or symbol) eventName, Function listener)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure EventEmitter.RemoveListenerListener where
@@ -62,76 +65,76 @@ instance instToJSEventEmitterRemoveListenerListener : ToJS EventEmitter.RemoveLi
 instance instFromJSEventEmitterRemoveListenerListener : FromJS EventEmitter.RemoveListenerListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.EventEmitter.RemoveListenerListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def EventEmitter.RemoveListenerListener.ofFn (f : DOMStringOrSymbol → JSFunction → Async Unit) : IO EventEmitter.RemoveListenerListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg DOMStringOrSymbol args 0) (← Support.arg JSFunction args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg DOMStringOrSymbol args 0) (← Internal.arg JSFunction args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def EventEmitter.RemoveListenerListener.ofSyncFn (f : DOMStringOrSymbol → JSFunction → IO Unit) : IO EventEmitter.RemoveListenerListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg DOMStringOrSymbol args 0) (← Support.arg JSFunction args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg DOMStringOrSymbol args 0) (← Internal.arg JSFunction args 1)) }
 
 /-- `dictionary events.OnceOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure events.OnceOptions where
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSEventsOnceOptions : ToJS events.OnceOptions := ⟨fun d => Support.fields #[("signal", Support.optional d.signal)]⟩
+instance instToJSEventsOnceOptions : ToJS events.OnceOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal)]⟩
 
 /-- `v instanceof EventEmitter`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `EventEmitter`). -/
-def EventEmitter.cast? (v : Value) : IO (Option EventEmitter) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:events" ["EventEmitter"] Value) v) then some { val := v } else none
+@[macro_inline] def EventEmitter.cast? (v : Value) : IO (Option EventEmitter) := Internal.api "Lasm.JS.Node.EventEmitter.cast?" do
+  Internal.cast (Support.getExport "node:events" ["EventEmitter"] Value) (fun x => { val := x }) v
 
 /-- `Event: 'newListener'` (added in Node.js v0.1.26): `EventEmitter onNewListener(EventEmitter.NewListenerListener listener)`: calls `on("newListener", listener)` -/
-def EventEmitter.onNewListener (self : EventEmitter) (listener : EventEmitter.NewListenerListener) : IO EventEmitter := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "newListener", toJS listener]) Value
+@[macro_inline] def EventEmitter.onNewListener (self : EventEmitter) (listener : EventEmitter.NewListenerListener) : IO EventEmitter := Internal.api "Lasm.JS.Node.EventEmitter.onNewListener" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "newListener", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'newListener'` (added in Node.js v0.1.26): `EventEmitter onceNewListener(EventEmitter.NewListenerListener listener)`: calls `once("newListener", listener)` -/
-def EventEmitter.onceNewListener (self : EventEmitter) (listener : EventEmitter.NewListenerListener) : IO EventEmitter := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "newListener", toJS listener]) Value
+@[macro_inline] def EventEmitter.onceNewListener (self : EventEmitter) (listener : EventEmitter.NewListenerListener) : IO EventEmitter := Internal.api "Lasm.JS.Node.EventEmitter.onceNewListener" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "newListener", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'removeListener'` (added in Node.js v0.9.3): `EventEmitter onRemoveListener(EventEmitter.RemoveListenerListener listener)`: calls `on("removeListener", listener)` -/
-def EventEmitter.onRemoveListener (self : EventEmitter) (listener : EventEmitter.RemoveListenerListener) : IO EventEmitter := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "removeListener", toJS listener]) Value
+@[macro_inline] def EventEmitter.onRemoveListener (self : EventEmitter) (listener : EventEmitter.RemoveListenerListener) : IO EventEmitter := Internal.api "Lasm.JS.Node.EventEmitter.onRemoveListener" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "removeListener", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'removeListener'` (added in Node.js v0.9.3): `EventEmitter onceRemoveListener(EventEmitter.RemoveListenerListener listener)`: calls `once("removeListener", listener)` -/
-def EventEmitter.onceRemoveListener (self : EventEmitter) (listener : EventEmitter.RemoveListenerListener) : IO EventEmitter := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "removeListener", toJS listener]) Value
+@[macro_inline] def EventEmitter.onceRemoveListener (self : EventEmitter) (listener : EventEmitter.RemoveListenerListener) : IO EventEmitter := Internal.api "Lasm.JS.Node.EventEmitter.onceRemoveListener" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "removeListener", toJS listener]) Value
   pure { val := r }
 
 /-- `emitter.emit(eventName[, ...args])` (added in Node.js v0.1.26): `boolean emit((DOMString or symbol) eventName, any... args)` -/
-def EventEmitter.emit (self : EventEmitter) (eventName : DOMStringOrSymbol) (args : Array Data := #[]) : IO Bool :=
-  self.val.callMethod "emit" (Support.argsWith #[toJS eventName] (args.map toJS)) Bool
+@[macro_inline] def EventEmitter.emit (self : EventEmitter) (eventName : DOMStringOrSymbol) (args : Array Data := #[]) : IO Bool := Internal.api "Lasm.JS.Node.EventEmitter.emit" do
+  self.val.callMethod "emit" (Internal.argsWith #[toJS eventName] (args.map toJS)) Bool
 
 /-- `emitter.eventNames()` (added in Node.js v6.0.0): `(sequence<DOMString> or sequence<symbol>) eventNames()` -/
-def EventEmitter.eventNames (self : EventEmitter) : IO Data :=
-  self.val.callMethod "eventNames" (Support.args #[]) Data
+@[macro_inline] def EventEmitter.eventNames (self : EventEmitter) : IO Data := Internal.api "Lasm.JS.Node.EventEmitter.eventNames" do
+  self.val.callMethod "eventNames" (Internal.args #[]) Data
 
 /-- `emitter.listenerCount(eventName[, listener])` (added in Node.js v3.2.0): `long long listenerCount((DOMString or symbol) eventName, optional Function listener)` -/
-def EventEmitter.listenerCount (self : EventEmitter) (eventName : DOMStringOrSymbol) (listener : Option JSFunction := none) : IO Int :=
-  self.val.callMethod "listenerCount" (Support.args #[toJS eventName, Support.optional listener]) Int
+@[macro_inline] def EventEmitter.listenerCount (self : EventEmitter) (eventName : DOMStringOrSymbol) (listener : Option JSFunction := none) : IO Int := Internal.api "Lasm.JS.Node.EventEmitter.listenerCount" do
+  self.val.callMethod "listenerCount" (Internal.args #[toJS eventName, Internal.optional listener]) Int
 
 /-- `emitter.off(eventName, listener)` (added in Node.js v10.0.0): `EventEmitter off((DOMString or symbol) eventName, Function listener)` -/
-def EventEmitter.off (self : EventEmitter) (eventName : DOMStringOrSymbol) (listener : JSFunction) : IO EventEmitter := do
-  let r ← self.val.callMethod "off" (Support.args #[toJS eventName, toJS listener]) Value
+@[macro_inline] def EventEmitter.off (self : EventEmitter) (eventName : DOMStringOrSymbol) (listener : JSFunction) : IO EventEmitter := Internal.api "Lasm.JS.Node.EventEmitter.off" do
+  let r ← self.val.callMethod "off" (Internal.args #[toJS eventName, toJS listener]) Value
   pure { val := r }
 
 /-- `emitter.on(eventName, listener)` (added in Node.js v0.1.101): `EventEmitter on((DOMString or symbol) eventName, Function listener)` -/
-def EventEmitter.on (self : EventEmitter) (eventName : DOMStringOrSymbol) (listener : JSFunction) : IO EventEmitter := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS eventName, toJS listener]) Value
+@[macro_inline] def EventEmitter.on (self : EventEmitter) (eventName : DOMStringOrSymbol) (listener : JSFunction) : IO EventEmitter := Internal.api "Lasm.JS.Node.EventEmitter.on" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS eventName, toJS listener]) Value
   pure { val := r }
 
 /-- `emitter.once(eventName, listener)` (added in Node.js v0.3.0): `EventEmitter once((DOMString or symbol) eventName, Function listener)` -/
-def EventEmitter.once (self : EventEmitter) (eventName : DOMStringOrSymbol) (listener : JSFunction) : IO EventEmitter := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS eventName, toJS listener]) Value
+@[macro_inline] def EventEmitter.once (self : EventEmitter) (eventName : DOMStringOrSymbol) (listener : JSFunction) : IO EventEmitter := Internal.api "Lasm.JS.Node.EventEmitter.once" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS eventName, toJS listener]) Value
   pure { val := r }
 
 /-- `emitter.removeAllListeners([eventName])` (added in Node.js v0.1.26): `EventEmitter removeAllListeners(optional (DOMString or symbol) eventName)` -/
-def EventEmitter.removeAllListeners (self : EventEmitter) (eventName : Option DOMStringOrSymbol := none) : IO EventEmitter := do
-  let r ← self.val.callMethod "removeAllListeners" (Support.args #[Support.optional eventName]) Value
+@[macro_inline] def EventEmitter.removeAllListeners (self : EventEmitter) (eventName : Option DOMStringOrSymbol := none) : IO EventEmitter := Internal.api "Lasm.JS.Node.EventEmitter.removeAllListeners" do
+  let r ← self.val.callMethod "removeAllListeners" (Internal.args #[Internal.optional eventName]) Value
   pure { val := r }
 
 /-- `events.once(emitter, name[, options])` (added in Node.js v11.13.0, v10.16.0): `Promise<sequence<any>> once(EventEmitter emitter, (DOMString or symbol) name, optional events.OnceOptions options)` (Node.js 24.22.2 documentation, events.md) -/
-def events.once (emitter : EventEmitter) (name : DOMStringOrSymbol) (options : Option events.OnceOptions := none) : Async (Array Data) :=
+@[macro_inline] def events.once (emitter : EventEmitter) (name : DOMStringOrSymbol) (options : Option events.OnceOptions := none) : Async (Array Data) := Internal.api "Lasm.JS.Node.events.once" do
   Lasm.JS.Binding.invokeAsync (Array Data) { name := "Lasm.JS.Node.events.once", module := "node:events", path := "once", construct := false, arity := 3 }
-    (Support.args #[toJS emitter, toJS name, Support.optional options])
+    (Internal.args #[toJS emitter, toJS name, Internal.optional options])
 
 end Lasm.JS.Node

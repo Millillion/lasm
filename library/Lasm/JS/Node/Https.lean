@@ -8,12 +8,15 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Url
+import Lasm.JS.Web.Types.Url
 import Lasm.JS.Node.Fs
 import Lasm.JS.Node.Http
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class https.Agent extends http.Agent` of `node:https` (Node.js 24.22.2 documentation, https.md): a handle to the JavaScript object. -/
 structure https.Agent extends http.Agent
@@ -35,8 +38,8 @@ structure https.Agent.NewOptions where
   maxCachedSessions : Option Float := none
   /-- `DOMString servername` -/
   servername : Option String := none
-instance instToJSHttpsAgentNewOptions : ToJS https.Agent.NewOptions := ⟨fun d => Support.fields #[("maxCachedSessions", Support.optional d.maxCachedSessions),
-    ("servername", Support.optional d.servername)]⟩
+instance instToJSHttpsAgentNewOptions : ToJS https.Agent.NewOptions := ⟨fun d => Internal.fields #[("maxCachedSessions", Internal.optional d.maxCachedSessions),
+    ("servername", Internal.optional d.servername)]⟩
 
 /-- `(object or DOMString or URL)`: one constructor per member type. -/
 inductive ObjectOrDOMStringOrURL where
@@ -61,9 +64,9 @@ structure https.RequestOptions where
   port : Option Unit := none
   /-- `undefined agent` -/
   agent : Option Unit := none
-instance instToJSHttpsRequestOptions : ToJS https.RequestOptions := ⟨fun d => Support.fields #[("protocol", Support.optional d.protocol),
-    ("port", Support.optional d.port),
-    ("agent", Support.optional d.agent)]⟩
+instance instToJSHttpsRequestOptions : ToJS https.RequestOptions := ⟨fun d => Internal.fields #[("protocol", Internal.optional d.protocol),
+    ("port", Internal.optional d.port),
+    ("agent", Internal.optional d.agent)]⟩
 
 /-- `(https.RequestOptions or DOMString or URL)`: one constructor per member type. -/
 inductive https.RequestOptionsOrDOMStringOrURL where
@@ -82,84 +85,89 @@ instance instCoeStringHttpsRequestOptionsOrDOMStringOrURL : Coe String https.Req
 instance instCoeURLHttpsRequestOptionsOrDOMStringOrURL : Coe URL https.RequestOptionsOrDOMStringOrURL := ⟨.url⟩
 
 /-- `v instanceof Agent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Agent`). -/
-def https.Agent.cast? (v : Value) : IO (Option https.Agent) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:https" ["Agent"] Value) v) then some { val := v } else none
+@[macro_inline] def https.Agent.cast? (v : Value) : IO (Option https.Agent) := Internal.api "Lasm.JS.Node.https.Agent.cast?" do
+  Internal.cast (Support.getExport "node:https" ["Agent"] Value) (fun x => { val := x }) v
 
 /-- `new Agent([options])` (added in Node.js v0.4.5): `constructor(optional https.Agent.NewOptions options)` -/
-def https.Agent.new (options : Option https.Agent.NewOptions := none) : IO https.Agent :=
+@[macro_inline] def https.Agent.new (options : Option https.Agent.NewOptions := none) : IO https.Agent := Internal.api "Lasm.JS.Node.https.Agent.new" do
   Lasm.JS.Binding.invoke https.Agent { name := "Lasm.JS.Node.https.Agent.new", module := "node:https", path := "Agent", construct := true, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- `v instanceof Server`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Server`). -/
-def https.Server.cast? (v : Value) : IO (Option https.Server) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:https" ["Server"] Value) v) then some { val := v } else none
+@[macro_inline] def https.Server.cast? (v : Value) : IO (Option https.Server) := Internal.api "Lasm.JS.Node.https.Server.cast?" do
+  Internal.cast (Support.getExport "node:https" ["Server"] Value) (fun x => { val := x }) v
 
 /-- `server.headersTimeout` (added in Node.js v11.3.0): `readonly attribute double headersTimeout` -/
-def https.Server.headersTimeout (self : https.Server) : IO Float := self.val.get "headersTimeout" Float
+@[macro_inline] def https.Server.headersTimeout (self : https.Server) : IO Float := Internal.api "Lasm.JS.Node.https.Server.headersTimeout" do
+  self.val.get "headersTimeout" Float
 
 /-- `server.maxHeadersCount`: `readonly attribute double maxHeadersCount` -/
-def https.Server.maxHeadersCount (self : https.Server) : IO Float := self.val.get "maxHeadersCount" Float
+@[macro_inline] def https.Server.maxHeadersCount (self : https.Server) : IO Float := Internal.api "Lasm.JS.Node.https.Server.maxHeadersCount" do
+  self.val.get "maxHeadersCount" Float
 
 /-- `server.requestTimeout` (added in Node.js v14.11.0): `readonly attribute double requestTimeout` -/
-def https.Server.requestTimeout (self : https.Server) : IO Float := self.val.get "requestTimeout" Float
+@[macro_inline] def https.Server.requestTimeout (self : https.Server) : IO Float := Internal.api "Lasm.JS.Node.https.Server.requestTimeout" do
+  self.val.get "requestTimeout" Float
 
 /-- `server.timeout` (added in Node.js v0.11.2): `readonly attribute double /* integer: Nat */ timeout` -/
-def https.Server.timeout (self : https.Server) : IO Nat := self.val.get "timeout" Nat
+@[macro_inline] def https.Server.timeout (self : https.Server) : IO Nat := Internal.api "Lasm.JS.Node.https.Server.timeout" do
+  self.val.get "timeout" Nat
 
 /-- `server.keepAliveTimeout` (added in Node.js v8.0.0): `readonly attribute double keepAliveTimeout` -/
-def https.Server.keepAliveTimeout (self : https.Server) : IO Float := self.val.get "keepAliveTimeout" Float
+@[macro_inline] def https.Server.keepAliveTimeout (self : https.Server) : IO Float := Internal.api "Lasm.JS.Node.https.Server.keepAliveTimeout" do
+  self.val.get "keepAliveTimeout" Float
 
 /-- `server.close([callback])` (added in Node.js v0.1.90): `https.Server close()` -/
-def https.Server.close (self : https.Server) : IO https.Server := do
-  let r ← self.val.callMethod "close" (Support.args #[]) Value
+@[macro_inline] def https.Server.close (self : https.Server) : IO https.Server := Internal.api "Lasm.JS.Node.https.Server.close" do
+  let r ← self.val.callMethod "close" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `server.closeAllConnections()` (added in Node.js v18.2.0): `undefined closeAllConnections()` -/
-def https.Server.closeAllConnections (self : https.Server) : IO Unit :=
-  self.val.callMethod "closeAllConnections" (Support.args #[]) Unit
+@[macro_inline] def https.Server.closeAllConnections (self : https.Server) : IO Unit := Internal.api "Lasm.JS.Node.https.Server.closeAllConnections" do
+  self.val.callMethod "closeAllConnections" (Internal.args #[]) Unit
 
 /-- `server.closeIdleConnections()` (added in Node.js v18.2.0): `undefined closeIdleConnections()` -/
-def https.Server.closeIdleConnections (self : https.Server) : IO Unit :=
-  self.val.callMethod "closeIdleConnections" (Support.args #[]) Unit
+@[macro_inline] def https.Server.closeIdleConnections (self : https.Server) : IO Unit := Internal.api "Lasm.JS.Node.https.Server.closeIdleConnections" do
+  self.val.callMethod "closeIdleConnections" (Internal.args #[]) Unit
 
 /-- `server.setTimeout([msecs][, callback])` (added in Node.js v0.11.2): `https.Server setTimeout(optional double msecs)` -/
-def https.Server.setTimeout (self : https.Server) (msecs : Option Float := none) : IO https.Server := do
-  let r ← self.val.callMethod "setTimeout" (Support.args #[Support.optional msecs]) Value
+@[macro_inline] def https.Server.setTimeout (self : https.Server) (msecs : Option Float := none) : IO https.Server := Internal.api "Lasm.JS.Node.https.Server.setTimeout" do
+  let r ← self.val.callMethod "setTimeout" (Internal.args #[Internal.optional msecs]) Value
   pure { val := r }
 
 /-- `https.globalAgent` (added in Node.js v0.5.9): `readonly attribute https.Agent globalAgent` (Node.js 24.22.2 documentation, https.md) -/
-def https.globalAgent : IO https.Agent := do
+@[macro_inline] def https.globalAgent : IO https.Agent := Internal.api "Lasm.JS.Node.https.globalAgent" do
   let r ← Support.getExport "node:https" ["globalAgent"] Value
   pure { val := r }
 
 /-- `https.createServer([options][, requestListener])` (added in Node.js v0.3.4): `https.Server createServer(optional object options, optional http.Server.RequestListener requestListener)` (Node.js 24.22.2 documentation, https.md) -/
-def https.createServer (options : Data := .undefined) (requestListener : Option http.Server.RequestListener := none) : IO https.Server := do
+@[macro_inline] def https.createServer (options : Data := .undefined) (requestListener : Option http.Server.RequestListener := none) : IO https.Server := Internal.api "Lasm.JS.Node.https.createServer" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.https.createServer", module := "node:https", path := "createServer", construct := false, arity := 2 }
-    (Support.args #[options, Support.optional requestListener]) (await := false)
+    (Internal.args #[options, Internal.optional requestListener]) (await := false)
   pure { val := r }
 
 /-- `https.get(options[, callback])` (added in Node.js v0.3.6): `http.ClientRequest get((object or DOMString or URL) options)` (Node.js 24.22.2 documentation, https.md) -/
-def https.get (options : ObjectOrDOMStringOrURL) : IO http.ClientRequest := do
+@[macro_inline] def https.get (options : ObjectOrDOMStringOrURL) : IO http.ClientRequest := Internal.api "Lasm.JS.Node.https.get" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.https.get", module := "node:https", path := "get", construct := false, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
   pure { val := r }
 
 /-- `https.get(url[, options][, callback])` (added in Node.js v0.3.6): `http.ClientRequest get((DOMString or URL) url, optional (object or DOMString or URL) options)` (Node.js 24.22.2 documentation, https.md) -/
-def https.getWithUrl (url : DOMStringOrURL) (options : Option ObjectOrDOMStringOrURL := none) : IO http.ClientRequest := do
+@[macro_inline] def https.getWithUrl (url : DOMStringOrURL) (options : Option ObjectOrDOMStringOrURL := none) : IO http.ClientRequest := Internal.api "Lasm.JS.Node.https.getWithUrl" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.https.getWithUrl", module := "node:https", path := "get", construct := false, arity := 2 }
-    (Support.args #[toJS url, Support.optional options]) (await := false)
+    (Internal.args #[toJS url, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `https.request(options[, callback])` (added in Node.js v0.3.6): `http.ClientRequest request((https.RequestOptions or DOMString or URL) options)` (Node.js 24.22.2 documentation, https.md) -/
-def https.request (options : https.RequestOptionsOrDOMStringOrURL) : IO http.ClientRequest := do
+@[macro_inline] def https.request (options : https.RequestOptionsOrDOMStringOrURL) : IO http.ClientRequest := Internal.api "Lasm.JS.Node.https.request" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.https.request", module := "node:https", path := "request", construct := false, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
   pure { val := r }
 
 /-- `https.request(url[, options][, callback])` (added in Node.js v0.3.6): `http.ClientRequest request((DOMString or URL) url, optional (https.RequestOptions or DOMString or URL) options)` (Node.js 24.22.2 documentation, https.md) -/
-def https.requestWithUrl (url : DOMStringOrURL) (options : Option https.RequestOptionsOrDOMStringOrURL := none) : IO http.ClientRequest := do
+@[macro_inline] def https.requestWithUrl (url : DOMStringOrURL) (options : Option https.RequestOptionsOrDOMStringOrURL := none) : IO http.ClientRequest := Internal.api "Lasm.JS.Node.https.requestWithUrl" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.https.requestWithUrl", module := "node:https", path := "request", construct := false, arity := 2 }
-    (Support.args #[toJS url, Support.optional options]) (await := false)
+    (Internal.args #[toJS url, Internal.optional options]) (await := false)
   pure { val := r }
 
 end Lasm.JS.Node

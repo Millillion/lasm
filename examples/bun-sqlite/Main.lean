@@ -9,7 +9,8 @@ Routes (JSON): `GET /todos` lists the todos in id order, `POST /todos` adds one 
 title) and answers 201 with it, `DELETE /todos/<id>` removes one. Environment: PORT (default
 3000), DB_PATH (the SQLite file; `:memory:` when unset).
 -/
-import Lasm.JS.Web
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Url
 import Lasm.JS.Bun
 open Lasm.JS Lasm.JS.Web
 

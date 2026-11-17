@@ -11,5 +11,8 @@ import Lasm.JS.Web.Support
 
 namespace Lasm.JS.Bun
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 end Lasm.JS.Bun

@@ -11,6 +11,9 @@ import Lasm.JS.Web.Support
 
 namespace Lasm.JS.Deno
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface Deno.HttpClient` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts): a handle to the JavaScript object. -/
 structure HttpClient where
@@ -21,49 +24,45 @@ instance : ToJS HttpClient := ⟨fun x => .ref x.val ""⟩
 instance : FromJS HttpClient := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.HttpClient", .data⟩
 
 /-- `enum ProxyTransport` (Deno 2.9.6 type declarations): "http", "https", "socks5", "tcp", "unix", "vsock". -/
-inductive ProxyTransport where
-  /-- "http" -/
-  | http
-  /-- "https" -/
-  | https
-  /-- "socks5" -/
-  | socks5
-  /-- "tcp" -/
-  | tcp
-  /-- "unix" -/
-  | unix
-  /-- "vsock" -/
-  | vsock
+structure ProxyTransport where
+  /-- A value from its string, unchecked: the generated values (`.http`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ProxyTransport := ⟨fun
-  | .http => .string "http"
-  | .https => .string "https"
-  | .socks5 => .string "socks5"
-  | .tcp => .string "tcp"
-  | .unix => .string "unix"
-  | .vsock => .string "vsock"⟩
+/-- "http" -/
+@[match_pattern] abbrev ProxyTransport.http : ProxyTransport := .unsafeOfString "http"
+/-- "https" -/
+@[match_pattern] abbrev ProxyTransport.https : ProxyTransport := .unsafeOfString "https"
+/-- "socks5" -/
+@[match_pattern] abbrev ProxyTransport.socks5 : ProxyTransport := .unsafeOfString "socks5"
+/-- "tcp" -/
+@[match_pattern] abbrev ProxyTransport.tcp : ProxyTransport := .unsafeOfString "tcp"
+/-- "unix" -/
+@[match_pattern] abbrev ProxyTransport.unix : ProxyTransport := .unsafeOfString "unix"
+/-- "vsock" -/
+@[match_pattern] abbrev ProxyTransport.vsock : ProxyTransport := .unsafeOfString "vsock"
+instance : ToJS ProxyTransport := ⟨fun x => .string x.val⟩
 instance : FromJS ProxyTransport where
   fromJS
-    | .string "http" => .ok .http
-    | .string "https" => .ok .https
-    | .string "socks5" => .ok .socks5
-    | .string "tcp" => .ok .tcp
-    | .string "unix" => .ok .unix
-    | .string "vsock" => .ok .vsock
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.ProxyTransport"
 
 /-- `enum CreateHttpClientOptionsKeyFormat` (Deno 2.9.6 type declarations): "pem". -/
-inductive CreateHttpClientOptionsKeyFormat where
-  /-- "pem" -/
-  | pem
+structure CreateHttpClientOptionsKeyFormat where
+  /-- A value from its string, unchecked: the generated values (`.pem`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS CreateHttpClientOptionsKeyFormat := ⟨fun
-  | .pem => .string "pem"⟩
+/-- "pem" -/
+@[match_pattern] abbrev CreateHttpClientOptionsKeyFormat.pem : CreateHttpClientOptionsKeyFormat := .unsafeOfString "pem"
+instance : ToJS CreateHttpClientOptionsKeyFormat := ⟨fun x => .string x.val⟩
 instance : FromJS CreateHttpClientOptionsKeyFormat where
   fromJS
-    | .string "pem" => .ok .pem
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.CreateHttpClientOptionsKeyFormat"
 
 /-- `dictionary BasicAuth` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -72,7 +71,7 @@ structure BasicAuth where
   username : String
   /-- `required DOMString password` -/
   password : String
-instance : ToJS BasicAuth := ⟨fun d => Support.fields #[("username", toJS d.username),
+instance : ToJS BasicAuth := ⟨fun d => Internal.fields #[("username", toJS d.username),
     ("password", toJS d.password)]⟩
 
 /-- `dictionary Proxy` (Deno 2.9.6 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -91,13 +90,13 @@ structure Proxy where
   path : Option String := none
   /-- `double cid` -/
   cid : Option Float := none
-instance : ToJS Proxy := ⟨fun d => Support.fields #[("transport", Support.optional d.transport),
-    ("url", Support.optional d.url),
-    ("basicAuth", Support.optional d.basicAuth),
-    ("hostname", Support.optional d.hostname),
-    ("port", Support.optional d.port),
-    ("path", Support.optional d.path),
-    ("cid", Support.optional d.cid)]⟩
+instance : ToJS Proxy := ⟨fun d => Internal.fields #[("transport", Internal.optional d.transport),
+    ("url", Internal.optional d.url),
+    ("basicAuth", Internal.optional d.basicAuth),
+    ("hostname", Internal.optional d.hostname),
+    ("port", Internal.optional d.port),
+    ("path", Internal.optional d.path),
+    ("cid", Internal.optional d.cid)]⟩
 
 /-- `typedef double or boolean DoubleOrBoolean`: one constructor per member type. -/
 inductive DoubleOrBoolean where
@@ -137,27 +136,27 @@ structure CreateHttpClientOptions where
   key : Option String := none
   /-- `DOMString cert` -/
   cert : Option String := none
-instance : ToJS CreateHttpClientOptions := ⟨fun d => Support.fields #[("caCerts", Support.optional d.caCerts),
-    ("proxy", Support.optional d.proxy),
-    ("poolMaxIdlePerHost", Support.optional d.poolMaxIdlePerHost),
-    ("poolIdleTimeout", Support.optional d.poolIdleTimeout),
-    ("http1", Support.optional d.http1),
-    ("http2", Support.optional d.http2),
-    ("allowHost", Support.optional d.allowHost),
-    ("localAddress", Support.optional d.localAddress),
-    ("http2MaxHeaderListSize", Support.optional d.http2MaxHeaderListSize),
-    ("keyFormat", Support.optional d.keyFormat),
-    ("key", Support.optional d.key),
-    ("cert", Support.optional d.cert)]⟩
+instance : ToJS CreateHttpClientOptions := ⟨fun d => Internal.fields #[("caCerts", Internal.optional d.caCerts),
+    ("proxy", Internal.optional d.proxy),
+    ("poolMaxIdlePerHost", Internal.optional d.poolMaxIdlePerHost),
+    ("poolIdleTimeout", Internal.optional d.poolIdleTimeout),
+    ("http1", Internal.optional d.http1),
+    ("http2", Internal.optional d.http2),
+    ("allowHost", Internal.optional d.allowHost),
+    ("localAddress", Internal.optional d.localAddress),
+    ("http2MaxHeaderListSize", Internal.optional d.http2MaxHeaderListSize),
+    ("keyFormat", Internal.optional d.keyFormat),
+    ("key", Internal.optional d.key),
+    ("cert", Internal.optional d.cert)]⟩
 
 /-- `close(): void`: `undefined close()` -/
-def HttpClient.close (self : HttpClient) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def HttpClient.close (self : HttpClient) : IO Unit := Internal.api "Lasm.JS.Deno.HttpClient.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `Deno.createHttpClient(options: | CreateHttpClientOptions | (CreateHttpClientOptions & TlsCertifiedKeyPem)): HttpClient`: `HttpClient createHttpClient(CreateHttpClientOptions options)` (Deno 2.9.6 type declarations) -/
-def createHttpClient (options : CreateHttpClientOptions) : IO HttpClient := do
+@[macro_inline] def createHttpClient (options : CreateHttpClientOptions) : IO HttpClient := Internal.api "Lasm.JS.Deno.createHttpClient" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.createHttpClient", module := "globalThis", path := "Deno.createHttpClient", construct := false, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
   pure { val := r }
 
 end Lasm.JS.Deno

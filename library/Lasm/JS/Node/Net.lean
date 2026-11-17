@@ -8,8 +8,8 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Dom
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Webidl
 import Lasm.JS.Node.Events
 import Lasm.JS.Node.Stream
 import Lasm.JS.Node.Buffer
@@ -17,6 +17,9 @@ import Lasm.JS.Node.Fs
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class net.SocketAddress` of `node:net` (Node.js 24.22.2 documentation, net.md): a handle to the JavaScript object. -/
 structure net.SocketAddress where
@@ -66,10 +69,10 @@ structure net.SocketAddress.NewOptions where
   flowlabel : Option Float := none
   /-- `double /* integer: Nat */ port` -/
   port : Option Nat := none
-instance instToJSNetSocketAddressNewOptions : ToJS net.SocketAddress.NewOptions := ⟨fun d => Support.fields #[("address", Support.optional d.address),
-    ("family", Support.optional d.family),
-    ("flowlabel", Support.optional d.flowlabel),
-    ("port", Support.optional d.port)]⟩
+instance instToJSNetSocketAddressNewOptions : ToJS net.SocketAddress.NewOptions := ⟨fun d => Internal.fields #[("address", Internal.optional d.address),
+    ("family", Internal.optional d.family),
+    ("flowlabel", Internal.optional d.flowlabel),
+    ("port", Internal.optional d.port)]⟩
 
 /-- `(DOMString or net.SocketAddress)`: one constructor per member type. -/
 inductive net.DOMStringOrSocketAddress where
@@ -107,11 +110,11 @@ structure net.BoundSocket.NewOptions where
   reusePort : Option Bool := none
   /-- `DOMString path` -/
   path : Option String := none
-instance instToJSNetBoundSocketNewOptions : ToJS net.BoundSocket.NewOptions := ⟨fun d => Support.fields #[("host", Support.optional d.host),
-    ("port", Support.optional d.port),
-    ("ipv6Only", Support.optional d.ipv6Only),
-    ("reusePort", Support.optional d.reusePort),
-    ("path", Support.optional d.path)]⟩
+instance instToJSNetBoundSocketNewOptions : ToJS net.BoundSocket.NewOptions := ⟨fun d => Internal.fields #[("host", Internal.optional d.host),
+    ("port", Internal.optional d.port),
+    ("ipv6Only", Internal.optional d.ipv6Only),
+    ("reusePort", Internal.optional d.reusePort),
+    ("path", Internal.optional d.path)]⟩
 
 /-- `callback net.Server.CloseListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure net.Server.CloseListener where
@@ -136,10 +139,10 @@ instance instToJSNetServerConnectionListener : ToJS net.Server.ConnectionListene
 instance instFromJSNetServerConnectionListener : FromJS net.Server.ConnectionListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.net.Server.ConnectionListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def net.Server.ConnectionListener.ofFn (f : net.Socket → Async Unit) : IO net.Server.ConnectionListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg net.Socket args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg net.Socket args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def net.Server.ConnectionListener.ofSyncFn (f : net.Socket → IO Unit) : IO net.Server.ConnectionListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg net.Socket args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg net.Socket args 0)) }
 
 /-- `callback net.Server.ErrorListener = undefined (any value)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure net.Server.ErrorListener where
@@ -150,10 +153,10 @@ instance instToJSNetServerErrorListener : ToJS net.Server.ErrorListener := ⟨fu
 instance instFromJSNetServerErrorListener : FromJS net.Server.ErrorListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.net.Server.ErrorListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def net.Server.ErrorListener.ofFn (f : Data → Async Unit) : IO net.Server.ErrorListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def net.Server.ErrorListener.ofSyncFn (f : Data → IO Unit) : IO net.Server.ErrorListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 
 /-- `callback net.Server.ListeningListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure net.Server.ListeningListener where
@@ -202,10 +205,10 @@ instance instToJSNetServerDropListener : ToJS net.Server.DropListener := ⟨fun 
 instance instFromJSNetServerDropListener : FromJS net.Server.DropListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.net.Server.DropListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def net.Server.DropListener.ofFn (f : (Option net.Server.DropData) → Async Unit) : IO net.Server.DropListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg (Option net.Server.DropData) args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg (Option net.Server.DropData) args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def net.Server.DropListener.ofSyncFn (f : (Option net.Server.DropData) → IO Unit) : IO net.Server.DropListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg (Option net.Server.DropData) args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg (Option net.Server.DropData) args 0)) }
 
 /-- `dictionary net.AddressInfo` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure net.AddressInfo where
@@ -259,17 +262,17 @@ structure net.Server.ListenOptions where
   signal : Option AbortSignal := none
   /-- `boolean writableAll = false` -/
   writableAll : Option Bool := none
-instance instToJSNetServerListenOptions : ToJS net.Server.ListenOptions := ⟨fun d => Support.fields #[("backlog", Support.optional d.backlog),
-    ("exclusive", Support.optional d.exclusive),
-    ("handle", Support.optional d.handle),
-    ("host", Support.optional d.host),
-    ("ipv6Only", Support.optional d.ipv6Only),
-    ("reusePort", Support.optional d.reusePort),
-    ("path", Support.optional d.path),
-    ("port", Support.optional d.port),
-    ("readableAll", Support.optional d.readableAll),
-    ("signal", Support.optional d.signal),
-    ("writableAll", Support.optional d.writableAll)]⟩
+instance instToJSNetServerListenOptions : ToJS net.Server.ListenOptions := ⟨fun d => Internal.fields #[("backlog", Internal.optional d.backlog),
+    ("exclusive", Internal.optional d.exclusive),
+    ("handle", Internal.optional d.handle),
+    ("host", Internal.optional d.host),
+    ("ipv6Only", Internal.optional d.ipv6Only),
+    ("reusePort", Internal.optional d.reusePort),
+    ("path", Internal.optional d.path),
+    ("port", Internal.optional d.port),
+    ("readableAll", Internal.optional d.readableAll),
+    ("signal", Internal.optional d.signal),
+    ("writableAll", Internal.optional d.writableAll)]⟩
 
 /-- `callback net.Socket.CloseListener = undefined (boolean hadError)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure net.Socket.CloseListener where
@@ -280,10 +283,10 @@ instance instToJSNetSocketCloseListener : ToJS net.Socket.CloseListener := ⟨fu
 instance instFromJSNetSocketCloseListener : FromJS net.Socket.CloseListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.net.Socket.CloseListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def net.Socket.CloseListener.ofFn (f : Bool → Async Unit) : IO net.Socket.CloseListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Bool args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Bool args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def net.Socket.CloseListener.ofSyncFn (f : Bool → IO Unit) : IO net.Socket.CloseListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Bool args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Bool args 0)) }
 
 /-- `callback net.Socket.ConnectListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure net.Socket.ConnectListener where
@@ -308,10 +311,10 @@ instance instToJSNetSocketConnectionAttemptListener : ToJS net.Socket.Connection
 instance instFromJSNetSocketConnectionAttemptListener : FromJS net.Socket.ConnectionAttemptListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.net.Socket.ConnectionAttemptListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def net.Socket.ConnectionAttemptListener.ofFn (f : String → Nat → Float → Async Unit) : IO net.Socket.ConnectionAttemptListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg Nat args 1) (← Support.arg Float args 2)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg Nat args 1) (← Internal.arg Float args 2)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def net.Socket.ConnectionAttemptListener.ofSyncFn (f : String → Nat → Float → IO Unit) : IO net.Socket.ConnectionAttemptListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg Nat args 1) (← Support.arg Float args 2)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg Nat args 1) (← Internal.arg Float args 2)) }
 
 /-- `callback net.Socket.ConnectionAttemptFailedListener = undefined (DOMString ip, double /* integer: Nat */ port, double family, any error)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure net.Socket.ConnectionAttemptFailedListener where
@@ -322,10 +325,10 @@ instance instToJSNetSocketConnectionAttemptFailedListener : ToJS net.Socket.Conn
 instance instFromJSNetSocketConnectionAttemptFailedListener : FromJS net.Socket.ConnectionAttemptFailedListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.net.Socket.ConnectionAttemptFailedListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def net.Socket.ConnectionAttemptFailedListener.ofFn (f : String → Nat → Float → Data → Async Unit) : IO net.Socket.ConnectionAttemptFailedListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg Nat args 1) (← Support.arg Float args 2) (← Support.arg Data args 3)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg Nat args 1) (← Internal.arg Float args 2) (← Internal.arg Data args 3)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def net.Socket.ConnectionAttemptFailedListener.ofSyncFn (f : String → Nat → Float → Data → IO Unit) : IO net.Socket.ConnectionAttemptFailedListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg Nat args 1) (← Support.arg Float args 2) (← Support.arg Data args 3)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg Nat args 1) (← Internal.arg Float args 2) (← Internal.arg Data args 3)) }
 
 /-- `callback net.Socket.ConnectionAttemptTimeoutListener = undefined (DOMString ip, double /* integer: Nat */ port, double family)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure net.Socket.ConnectionAttemptTimeoutListener where
@@ -336,10 +339,10 @@ instance instToJSNetSocketConnectionAttemptTimeoutListener : ToJS net.Socket.Con
 instance instFromJSNetSocketConnectionAttemptTimeoutListener : FromJS net.Socket.ConnectionAttemptTimeoutListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.net.Socket.ConnectionAttemptTimeoutListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def net.Socket.ConnectionAttemptTimeoutListener.ofFn (f : String → Nat → Float → Async Unit) : IO net.Socket.ConnectionAttemptTimeoutListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg Nat args 1) (← Support.arg Float args 2)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg Nat args 1) (← Internal.arg Float args 2)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def net.Socket.ConnectionAttemptTimeoutListener.ofSyncFn (f : String → Nat → Float → IO Unit) : IO net.Socket.ConnectionAttemptTimeoutListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg Nat args 1) (← Support.arg Float args 2)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg Nat args 1) (← Internal.arg Float args 2)) }
 
 /-- `callback net.Socket.DataListener = undefined ((Uint8Array or DOMString) value)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure net.Socket.DataListener where
@@ -350,10 +353,10 @@ instance instToJSNetSocketDataListener : ToJS net.Socket.DataListener := ⟨fun 
 instance instFromJSNetSocketDataListener : FromJS net.Socket.DataListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.net.Socket.DataListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def net.Socket.DataListener.ofFn (f : Uint8ArrayOrDOMString → Async Unit) : IO net.Socket.DataListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Uint8ArrayOrDOMString args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Uint8ArrayOrDOMString args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def net.Socket.DataListener.ofSyncFn (f : Uint8ArrayOrDOMString → IO Unit) : IO net.Socket.DataListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Uint8ArrayOrDOMString args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Uint8ArrayOrDOMString args 0)) }
 
 /-- `callback net.Socket.DrainListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure net.Socket.DrainListener where
@@ -392,10 +395,10 @@ instance instToJSNetSocketErrorListener : ToJS net.Socket.ErrorListener := ⟨fu
 instance instFromJSNetSocketErrorListener : FromJS net.Socket.ErrorListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.net.Socket.ErrorListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def net.Socket.ErrorListener.ofFn (f : Data → Async Unit) : IO net.Socket.ErrorListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def net.Socket.ErrorListener.ofSyncFn (f : Data → IO Unit) : IO net.Socket.ErrorListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 
 /-- `callback net.Socket.LookupListener = undefined (any err, DOMString address, double? family, DOMString host)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure net.Socket.LookupListener where
@@ -406,10 +409,10 @@ instance instToJSNetSocketLookupListener : ToJS net.Socket.LookupListener := ⟨
 instance instFromJSNetSocketLookupListener : FromJS net.Socket.LookupListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.net.Socket.LookupListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def net.Socket.LookupListener.ofFn (f : Data → String → (Option Float) → String → Async Unit) : IO net.Socket.LookupListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg String args 1) (← Support.arg (Option Float) args 2) (← Support.arg String args 3)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg String args 1) (← Internal.arg (Option Float) args 2) (← Internal.arg String args 3)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def net.Socket.LookupListener.ofSyncFn (f : Data → String → (Option Float) → String → IO Unit) : IO net.Socket.LookupListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg String args 1) (← Support.arg (Option Float) args 2) (← Support.arg String args 3)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg String args 1) (← Internal.arg (Option Float) args 2) (← Internal.arg String args 3)) }
 
 /-- `callback net.Socket.ReadyListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure net.Socket.ReadyListener where
@@ -445,8 +448,8 @@ structure net.Socket.NewOptionsOnread where
   buffer : Option Uint8ArrayOrJSFunction := none
   /-- `Function callback` -/
   callback : Option JSFunction := none
-instance instToJSNetSocketNewOptionsOnread : ToJS net.Socket.NewOptionsOnread := ⟨fun d => Support.fields #[("buffer", Support.optional d.buffer),
-    ("callback", Support.optional d.callback)]⟩
+instance instToJSNetSocketNewOptionsOnread : ToJS net.Socket.NewOptionsOnread := ⟨fun d => Internal.fields #[("buffer", Internal.optional d.buffer),
+    ("callback", Internal.optional d.callback)]⟩
 
 /-- `dictionary net.Socket.NewOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure net.Socket.NewOptions where
@@ -474,18 +477,18 @@ structure net.Socket.NewOptions where
   typeOfService : Option Float := none
   /-- `boolean writable = false` -/
   writable : Option Bool := none
-instance instToJSNetSocketNewOptions : ToJS net.Socket.NewOptions := ⟨fun d => Support.fields #[("allowHalfOpen", Support.optional d.allowHalfOpen),
-    ("blockList", Support.optional d.blockList),
-    ("fd", Support.optional d.fd),
-    ("handle", Support.optional d.handle),
-    ("keepAlive", Support.optional d.keepAlive),
-    ("keepAliveInitialDelay", Support.optional d.keepAliveInitialDelay),
-    ("noDelay", Support.optional d.noDelay),
-    ("onread", Support.optional d.onread),
-    ("readable", Support.optional d.readable),
-    ("signal", Support.optional d.signal),
-    ("typeOfService", Support.optional d.typeOfService),
-    ("writable", Support.optional d.writable)]⟩
+instance instToJSNetSocketNewOptions : ToJS net.Socket.NewOptions := ⟨fun d => Internal.fields #[("allowHalfOpen", Internal.optional d.allowHalfOpen),
+    ("blockList", Internal.optional d.blockList),
+    ("fd", Internal.optional d.fd),
+    ("handle", Internal.optional d.handle),
+    ("keepAlive", Internal.optional d.keepAlive),
+    ("keepAliveInitialDelay", Internal.optional d.keepAliveInitialDelay),
+    ("noDelay", Internal.optional d.noDelay),
+    ("onread", Internal.optional d.onread),
+    ("readable", Internal.optional d.readable),
+    ("signal", Internal.optional d.signal),
+    ("typeOfService", Internal.optional d.typeOfService),
+    ("writable", Internal.optional d.writable)]⟩
 
 /-- `dictionary net.Socket.SetKeepAliveOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure net.Socket.SetKeepAliveOptions where
@@ -497,10 +500,10 @@ structure net.Socket.SetKeepAliveOptions where
   interval : Option Float := none
   /-- `double /* integer: Nat */ count = 10` -/
   count : Option Nat := none
-instance instToJSNetSocketSetKeepAliveOptions : ToJS net.Socket.SetKeepAliveOptions := ⟨fun d => Support.fields #[("enable", Support.optional d.enable),
-    ("initialDelay", Support.optional d.initialDelay),
-    ("interval", Support.optional d.interval),
-    ("count", Support.optional d.count)]⟩
+instance instToJSNetSocketSetKeepAliveOptions : ToJS net.Socket.SetKeepAliveOptions := ⟨fun d => Internal.fields #[("enable", Internal.optional d.enable),
+    ("initialDelay", Internal.optional d.initialDelay),
+    ("interval", Internal.optional d.interval),
+    ("count", Internal.optional d.count)]⟩
 
 /-- `dictionary net.CreateServerOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure net.CreateServerOptions where
@@ -518,587 +521,613 @@ structure net.CreateServerOptions where
   pauseOnConnect : Option Bool := none
   /-- `Node_net_BlockList blockList` -/
   blockList : Option net.BlockList := none
-instance instToJSNetCreateServerOptions : ToJS net.CreateServerOptions := ⟨fun d => Support.fields #[("allowHalfOpen", Support.optional d.allowHalfOpen),
-    ("highWaterMark", Support.optional d.highWaterMark),
-    ("keepAlive", Support.optional d.keepAlive),
-    ("keepAliveInitialDelay", Support.optional d.keepAliveInitialDelay),
-    ("noDelay", Support.optional d.noDelay),
-    ("pauseOnConnect", Support.optional d.pauseOnConnect),
-    ("blockList", Support.optional d.blockList)]⟩
+instance instToJSNetCreateServerOptions : ToJS net.CreateServerOptions := ⟨fun d => Internal.fields #[("allowHalfOpen", Internal.optional d.allowHalfOpen),
+    ("highWaterMark", Internal.optional d.highWaterMark),
+    ("keepAlive", Internal.optional d.keepAlive),
+    ("keepAliveInitialDelay", Internal.optional d.keepAliveInitialDelay),
+    ("noDelay", Internal.optional d.noDelay),
+    ("pauseOnConnect", Internal.optional d.pauseOnConnect),
+    ("blockList", Internal.optional d.blockList)]⟩
 
 /-- `v instanceof SocketAddress`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SocketAddress`). -/
-def net.SocketAddress.cast? (v : Value) : IO (Option net.SocketAddress) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:net" ["SocketAddress"] Value) v) then some { val := v } else none
+@[macro_inline] def net.SocketAddress.cast? (v : Value) : IO (Option net.SocketAddress) := Internal.api "Lasm.JS.Node.net.SocketAddress.cast?" do
+  Internal.cast (Support.getExport "node:net" ["SocketAddress"] Value) (fun x => { val := x }) v
 
 /-- `new net.SocketAddress([options])` (added in Node.js v15.14.0, v14.18.0): `constructor(optional net.SocketAddress.NewOptions options)` -/
-def net.SocketAddress.new (options : Option net.SocketAddress.NewOptions := none) : IO net.SocketAddress :=
+@[macro_inline] def net.SocketAddress.new (options : Option net.SocketAddress.NewOptions := none) : IO net.SocketAddress := Internal.api "Lasm.JS.Node.net.SocketAddress.new" do
   Lasm.JS.Binding.invoke net.SocketAddress { name := "Lasm.JS.Node.net.SocketAddress.new", module := "node:net", path := "SocketAddress", construct := true, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- `socketaddress.address` (added in Node.js v15.14.0, v14.18.0): `readonly attribute DOMString address` -/
-def net.SocketAddress.address (self : net.SocketAddress) : IO String := self.val.get "address" String
+@[macro_inline] def net.SocketAddress.address (self : net.SocketAddress) : IO String := Internal.api "Lasm.JS.Node.net.SocketAddress.address" do
+  self.val.get "address" String
 
 /-- `socketaddress.family` (added in Node.js v15.14.0, v14.18.0): `readonly attribute DOMString family` -/
-def net.SocketAddress.family (self : net.SocketAddress) : IO String := self.val.get "family" String
+@[macro_inline] def net.SocketAddress.family (self : net.SocketAddress) : IO String := Internal.api "Lasm.JS.Node.net.SocketAddress.family" do
+  self.val.get "family" String
 
 /-- `socketaddress.flowlabel` (added in Node.js v15.14.0, v14.18.0): `readonly attribute double flowlabel` -/
-def net.SocketAddress.flowlabel (self : net.SocketAddress) : IO Float := self.val.get "flowlabel" Float
+@[macro_inline] def net.SocketAddress.flowlabel (self : net.SocketAddress) : IO Float := Internal.api "Lasm.JS.Node.net.SocketAddress.flowlabel" do
+  self.val.get "flowlabel" Float
 
 /-- `socketaddress.port` (added in Node.js v15.14.0, v14.18.0): `readonly attribute double /* integer: Nat */ port` -/
-def net.SocketAddress.port (self : net.SocketAddress) : IO Nat := self.val.get "port" Nat
+@[macro_inline] def net.SocketAddress.port (self : net.SocketAddress) : IO Nat := Internal.api "Lasm.JS.Node.net.SocketAddress.port" do
+  self.val.get "port" Nat
 
 /-- `SocketAddress.parse(input)` (added in Node.js v23.4.0, v22.13.0): `static net.SocketAddress parse(DOMString input)` -/
-def net.SocketAddress.parse (input : String) : IO net.SocketAddress := do
+@[macro_inline] def net.SocketAddress.parse (input : String) : IO net.SocketAddress := Internal.api "Lasm.JS.Node.net.SocketAddress.parse" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.net.SocketAddress.parse", module := "node:net", path := "SocketAddress.parse", construct := false, arity := 1 }
-    (Support.args #[toJS input]) (await := false)
+    (Internal.args #[toJS input]) (await := false)
   pure { val := r }
 
 /-- `v instanceof BlockList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BlockList`). -/
-def net.BlockList.cast? (v : Value) : IO (Option net.BlockList) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:net" ["BlockList"] Value) v) then some { val := v } else none
+@[macro_inline] def net.BlockList.cast? (v : Value) : IO (Option net.BlockList) := Internal.api "Lasm.JS.Node.net.BlockList.cast?" do
+  Internal.cast (Support.getExport "node:net" ["BlockList"] Value) (fun x => { val := x }) v
 
 /-- `new net.BlockList()` (added in Node.js v15.0.0, v14.18.0): `constructor()` -/
-def net.BlockList.new : IO net.BlockList :=
+@[macro_inline] def net.BlockList.new : IO net.BlockList := Internal.api "Lasm.JS.Node.net.BlockList.new" do
   Lasm.JS.Binding.invoke net.BlockList { name := "Lasm.JS.Node.net.BlockList.new", module := "node:net", path := "BlockList", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `blockList.PRIVATE_RANGES` (added in Node.js v24.21.0): `readonly attribute sequence<DOMString> PRIVATE_RANGES` -/
-def net.BlockList.PRIVATE_RANGES (self : net.BlockList) : IO (Array String) := self.val.get "PRIVATE_RANGES" (Array String)
+@[macro_inline] def net.BlockList.PRIVATE_RANGES (self : net.BlockList) : IO (Array String) := Internal.api "Lasm.JS.Node.net.BlockList.PRIVATE_RANGES" do
+  self.val.get "PRIVATE_RANGES" (Array String)
 
 /-- `blockList.rules` (added in Node.js v15.0.0, v14.18.0): `readonly attribute sequence<DOMString> rules` -/
-def net.BlockList.rules (self : net.BlockList) : IO (Array String) := self.val.get "rules" (Array String)
+@[macro_inline] def net.BlockList.rules (self : net.BlockList) : IO (Array String) := Internal.api "Lasm.JS.Node.net.BlockList.rules" do
+  self.val.get "rules" (Array String)
 
 /-- `blockList.size` (added in Node.js v24.21.0): `readonly attribute double /* integer: Nat */ size` -/
-def net.BlockList.size (self : net.BlockList) : IO Nat := self.val.get "size" Nat
+@[macro_inline] def net.BlockList.size (self : net.BlockList) : IO Nat := Internal.api "Lasm.JS.Node.net.BlockList.size" do
+  self.val.get "size" Nat
 
 /-- `blockList.addAddress(address[, type])` (added in Node.js v15.0.0, v14.18.0): `undefined addAddress((DOMString or net.SocketAddress) address, optional DOMString type)` -/
-def net.BlockList.addAddress (self : net.BlockList) (address : net.DOMStringOrSocketAddress) (type : Option String := none) : IO Unit :=
-  self.val.callMethod "addAddress" (Support.args #[toJS address, Support.optional type]) Unit
+@[macro_inline] def net.BlockList.addAddress (self : net.BlockList) (address : net.DOMStringOrSocketAddress) (type : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.net.BlockList.addAddress" do
+  self.val.callMethod "addAddress" (Internal.args #[toJS address, Internal.optional type]) Unit
 
 /-- `blockList.addAddresses(addresses[, type])` (added in Node.js v24.21.0): `undefined addAddresses((sequence<DOMString> or sequence<net.SocketAddress>) addresses, optional DOMString type)` -/
-def net.BlockList.addAddresses (self : net.BlockList) (addresses : SequenceOfDOMStringOrSequenceOfSocketAddress) (type : Option String := none) : IO Unit :=
-  self.val.callMethod "addAddresses" (Support.args #[toJS addresses, Support.optional type]) Unit
+@[macro_inline] def net.BlockList.addAddresses (self : net.BlockList) (addresses : SequenceOfDOMStringOrSequenceOfSocketAddress) (type : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.net.BlockList.addAddresses" do
+  self.val.callMethod "addAddresses" (Internal.args #[toJS addresses, Internal.optional type]) Unit
 
 /-- `blockList.addCIDR(cidr)` (added in Node.js v24.21.0): `undefined addCIDR(DOMString cidr)` -/
-def net.BlockList.addCIDR (self : net.BlockList) (cidr : String) : IO Unit :=
-  self.val.callMethod "addCIDR" (Support.args #[toJS cidr]) Unit
+@[macro_inline] def net.BlockList.addCIDR (self : net.BlockList) (cidr : String) : IO Unit := Internal.api "Lasm.JS.Node.net.BlockList.addCIDR" do
+  self.val.callMethod "addCIDR" (Internal.args #[toJS cidr]) Unit
 
 /-- `blockList.addCIDRs(cidrs)` (added in Node.js v24.21.0): `undefined addCIDRs(sequence<DOMString> cidrs)` -/
-def net.BlockList.addCIDRs (self : net.BlockList) (cidrs : Array String) : IO Unit :=
-  self.val.callMethod "addCIDRs" (Support.args #[toJS cidrs]) Unit
+@[macro_inline] def net.BlockList.addCIDRs (self : net.BlockList) (cidrs : Array String) : IO Unit := Internal.api "Lasm.JS.Node.net.BlockList.addCIDRs" do
+  self.val.callMethod "addCIDRs" (Internal.args #[toJS cidrs]) Unit
 
 /-- `blockList.addRange(start, end[, type])` (added in Node.js v15.0.0, v14.18.0): `undefined addRange((DOMString or net.SocketAddress) start, (DOMString or net.SocketAddress) end, optional DOMString type)` -/
-def net.BlockList.addRange (self : net.BlockList) (start : net.DOMStringOrSocketAddress) («end» : net.DOMStringOrSocketAddress) (type : Option String := none) : IO Unit :=
-  self.val.callMethod "addRange" (Support.args #[toJS start, toJS «end», Support.optional type]) Unit
+@[macro_inline] def net.BlockList.addRange (self : net.BlockList) (start : net.DOMStringOrSocketAddress) («end» : net.DOMStringOrSocketAddress) (type : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.net.BlockList.addRange" do
+  self.val.callMethod "addRange" (Internal.args #[toJS start, toJS «end», Internal.optional type]) Unit
 
 /-- `blockList.addSubnet(net, prefix[, type])` (added in Node.js v15.0.0, v14.18.0): `undefined addSubnet((DOMString or net.SocketAddress) net, double prefix, optional DOMString type)` -/
-def net.BlockList.addSubnet (self : net.BlockList) (net_ : net.DOMStringOrSocketAddress) («prefix» : Float) (type : Option String := none) : IO Unit :=
-  self.val.callMethod "addSubnet" (Support.args #[toJS net_, toJS «prefix», Support.optional type]) Unit
+@[macro_inline] def net.BlockList.addSubnet (self : net.BlockList) (net_ : net.DOMStringOrSocketAddress) («prefix» : Float) (type : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.net.BlockList.addSubnet" do
+  self.val.callMethod "addSubnet" (Internal.args #[toJS net_, toJS «prefix», Internal.optional type]) Unit
 
 /-- `blockList.check(address[, type])` (added in Node.js v15.0.0, v14.18.0): `boolean check((DOMString or net.SocketAddress) address, optional DOMString type)` -/
-def net.BlockList.check (self : net.BlockList) (address : net.DOMStringOrSocketAddress) (type : Option String := none) : IO Bool :=
-  self.val.callMethod "check" (Support.args #[toJS address, Support.optional type]) Bool
+@[macro_inline] def net.BlockList.check (self : net.BlockList) (address : net.DOMStringOrSocketAddress) (type : Option String := none) : IO Bool := Internal.api "Lasm.JS.Node.net.BlockList.check" do
+  self.val.callMethod "check" (Internal.args #[toJS address, Internal.optional type]) Bool
 
 /-- `blockList.clear()`: `undefined clear()` -/
-def net.BlockList.clear (self : net.BlockList) : IO Unit :=
-  self.val.callMethod "clear" (Support.args #[]) Unit
+@[macro_inline] def net.BlockList.clear (self : net.BlockList) : IO Unit := Internal.api "Lasm.JS.Node.net.BlockList.clear" do
+  self.val.callMethod "clear" (Internal.args #[]) Unit
 
 /-- `BlockList.isBlockList(value)` (added in Node.js v23.4.0, v22.13.0): `static boolean isBlockList(any value)` -/
-def net.BlockList.isBlockList (value : Data) : IO Bool :=
+@[macro_inline] def net.BlockList.isBlockList (value : Data) : IO Bool := Internal.api "Lasm.JS.Node.net.BlockList.isBlockList" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.net.BlockList.isBlockList", module := "node:net", path := "BlockList.isBlockList", construct := false, arity := 1 }
-    (Support.args #[toJS value]) (await := false)
+    (Internal.args #[toJS value]) (await := false)
 
 /-- `blockList.removeAddress(address[, type])` (added in Node.js v24.21.0): `undefined removeAddress((DOMString or net.SocketAddress) address, optional DOMString type)` -/
-def net.BlockList.removeAddress (self : net.BlockList) (address : net.DOMStringOrSocketAddress) (type : Option String := none) : IO Unit :=
-  self.val.callMethod "removeAddress" (Support.args #[toJS address, Support.optional type]) Unit
+@[macro_inline] def net.BlockList.removeAddress (self : net.BlockList) (address : net.DOMStringOrSocketAddress) (type : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.net.BlockList.removeAddress" do
+  self.val.callMethod "removeAddress" (Internal.args #[toJS address, Internal.optional type]) Unit
 
 /-- `blockList.removeCIDR(cidr)` (added in Node.js v24.21.0): `undefined removeCIDR(DOMString cidr)` -/
-def net.BlockList.removeCIDR (self : net.BlockList) (cidr : String) : IO Unit :=
-  self.val.callMethod "removeCIDR" (Support.args #[toJS cidr]) Unit
+@[macro_inline] def net.BlockList.removeCIDR (self : net.BlockList) (cidr : String) : IO Unit := Internal.api "Lasm.JS.Node.net.BlockList.removeCIDR" do
+  self.val.callMethod "removeCIDR" (Internal.args #[toJS cidr]) Unit
 
 /-- `blockList.removeRange(start, end[, type])` (added in Node.js v24.21.0): `undefined removeRange((DOMString or net.SocketAddress) start, (DOMString or net.SocketAddress) end, optional DOMString type)` -/
-def net.BlockList.removeRange (self : net.BlockList) (start : net.DOMStringOrSocketAddress) («end» : net.DOMStringOrSocketAddress) (type : Option String := none) : IO Unit :=
-  self.val.callMethod "removeRange" (Support.args #[toJS start, toJS «end», Support.optional type]) Unit
+@[macro_inline] def net.BlockList.removeRange (self : net.BlockList) (start : net.DOMStringOrSocketAddress) («end» : net.DOMStringOrSocketAddress) (type : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.net.BlockList.removeRange" do
+  self.val.callMethod "removeRange" (Internal.args #[toJS start, toJS «end», Internal.optional type]) Unit
 
 /-- `blockList.removeSubnet(net, prefix[, type])` (added in Node.js v24.21.0): `undefined removeSubnet((DOMString or net.SocketAddress) net, double prefix, optional DOMString type)` -/
-def net.BlockList.removeSubnet (self : net.BlockList) (net_ : net.DOMStringOrSocketAddress) («prefix» : Float) (type : Option String := none) : IO Unit :=
-  self.val.callMethod "removeSubnet" (Support.args #[toJS net_, toJS «prefix», Support.optional type]) Unit
+@[macro_inline] def net.BlockList.removeSubnet (self : net.BlockList) (net_ : net.DOMStringOrSocketAddress) («prefix» : Float) (type : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.net.BlockList.removeSubnet" do
+  self.val.callMethod "removeSubnet" (Internal.args #[toJS net_, toJS «prefix», Internal.optional type]) Unit
 
 /-- `v instanceof BoundSocket`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BoundSocket`). -/
-def net.BoundSocket.cast? (v : Value) : IO (Option net.BoundSocket) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:net" ["BoundSocket"] Value) v) then some { val := v } else none
+@[macro_inline] def net.BoundSocket.cast? (v : Value) : IO (Option net.BoundSocket) := Internal.api "Lasm.JS.Node.net.BoundSocket.cast?" do
+  Internal.cast (Support.getExport "node:net" ["BoundSocket"] Value) (fun x => { val := x }) v
 
 /-- `new net.BoundSocket([options])` (added in Node.js v24.19.0): `constructor(optional net.BoundSocket.NewOptions options)` -/
-def net.BoundSocket.new (options : Option net.BoundSocket.NewOptions := none) : IO net.BoundSocket :=
+@[macro_inline] def net.BoundSocket.new (options : Option net.BoundSocket.NewOptions := none) : IO net.BoundSocket := Internal.api "Lasm.JS.Node.net.BoundSocket.new" do
   Lasm.JS.Binding.invoke net.BoundSocket { name := "Lasm.JS.Node.net.BoundSocket.new", module := "node:net", path := "BoundSocket", construct := true, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- `boundSocket.isPipe` (added in Node.js v24.20.0): `readonly attribute boolean isPipe` -/
-def net.BoundSocket.isPipe (self : net.BoundSocket) : IO Bool := self.val.get "isPipe" Bool
+@[macro_inline] def net.BoundSocket.isPipe (self : net.BoundSocket) : IO Bool := Internal.api "Lasm.JS.Node.net.BoundSocket.isPipe" do
+  self.val.get "isPipe" Bool
 
 /-- `boundSocket.address()` (added in Node.js v24.19.0): `(object or DOMString) address()` -/
-def net.BoundSocket.address (self : net.BoundSocket) : IO Data :=
-  self.val.callMethod "address" (Support.args #[]) Data
+@[macro_inline] def net.BoundSocket.address (self : net.BoundSocket) : IO Data := Internal.api "Lasm.JS.Node.net.BoundSocket.address" do
+  self.val.callMethod "address" (Internal.args #[]) Data
 
 /-- `boundSocket.fd()` (added in Node.js v24.19.0): `long long fd()` -/
-def net.BoundSocket.fd (self : net.BoundSocket) : IO Int :=
-  self.val.callMethod "fd" (Support.args #[]) Int
+@[macro_inline] def net.BoundSocket.fd (self : net.BoundSocket) : IO Int := Internal.api "Lasm.JS.Node.net.BoundSocket.fd" do
+  self.val.callMethod "fd" (Internal.args #[]) Int
 
 /-- `boundSocket.close()` (added in Node.js v24.19.0): `undefined close()` -/
-def net.BoundSocket.close (self : net.BoundSocket) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def net.BoundSocket.close (self : net.BoundSocket) : IO Unit := Internal.api "Lasm.JS.Node.net.BoundSocket.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `v instanceof Server`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Server`). -/
-def net.Server.cast? (v : Value) : IO (Option net.Server) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:net" ["Server"] Value) v) then some { val := v } else none
+@[macro_inline] def net.Server.cast? (v : Value) : IO (Option net.Server) := Internal.api "Lasm.JS.Node.net.Server.cast?" do
+  Internal.cast (Support.getExport "node:net" ["Server"] Value) (fun x => { val := x }) v
 
 /-- `new net.Server([options][, connectionListener])` (added in Node.js v0.1.90): `constructor(optional object options, optional net.Server.ConnectionListener connectionListener)` -/
-def net.Server.new (options : Data := .undefined) (connectionListener : Option net.Server.ConnectionListener := none) : IO net.Server :=
+@[macro_inline] def net.Server.new (options : Data := .undefined) (connectionListener : Option net.Server.ConnectionListener := none) : IO net.Server := Internal.api "Lasm.JS.Node.net.Server.new" do
   Lasm.JS.Binding.invoke net.Server { name := "Lasm.JS.Node.net.Server.new", module := "node:net", path := "Server", construct := true, arity := 2 }
-    (Support.args #[options, Support.optional connectionListener]) (await := false)
+    (Internal.args #[options, Internal.optional connectionListener]) (await := false)
 
 /-- `server.listening` (added in Node.js v5.7.0): `readonly attribute boolean listening` -/
-def net.Server.listening (self : net.Server) : IO Bool := self.val.get "listening" Bool
+@[macro_inline] def net.Server.listening (self : net.Server) : IO Bool := Internal.api "Lasm.JS.Node.net.Server.listening" do
+  self.val.get "listening" Bool
 
 /-- `server.maxConnections` (added in Node.js v0.2.0): `readonly attribute long long maxConnections` -/
-def net.Server.maxConnections (self : net.Server) : IO Int := self.val.get "maxConnections" Int
+@[macro_inline] def net.Server.maxConnections (self : net.Server) : IO Int := Internal.api "Lasm.JS.Node.net.Server.maxConnections" do
+  self.val.get "maxConnections" Int
 
 /-- `server.dropMaxConnection` (added in Node.js v23.1.0, v22.12.0): `readonly attribute boolean dropMaxConnection` -/
-def net.Server.dropMaxConnection (self : net.Server) : IO Bool := self.val.get "dropMaxConnection" Bool
+@[macro_inline] def net.Server.dropMaxConnection (self : net.Server) : IO Bool := Internal.api "Lasm.JS.Node.net.Server.dropMaxConnection" do
+  self.val.get "dropMaxConnection" Bool
 
 /-- `Event: 'close'` (added in Node.js v0.5.0): `net.Server onClose(net.Server.CloseListener listener)`: calls `on("close", listener)` -/
-def net.Server.onClose (self : net.Server) (listener : net.Server.CloseListener) : IO net.Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def net.Server.onClose (self : net.Server) (listener : net.Server.CloseListener) : IO net.Server := Internal.api "Lasm.JS.Node.net.Server.onClose" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'close'` (added in Node.js v0.5.0): `net.Server onceClose(net.Server.CloseListener listener)`: calls `once("close", listener)` -/
-def net.Server.onceClose (self : net.Server) (listener : net.Server.CloseListener) : IO net.Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def net.Server.onceClose (self : net.Server) (listener : net.Server.CloseListener) : IO net.Server := Internal.api "Lasm.JS.Node.net.Server.onceClose" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'connection'` (added in Node.js v0.1.90): `net.Server onConnection(net.Server.ConnectionListener listener)`: calls `on("connection", listener)` -/
-def net.Server.onConnection (self : net.Server) (listener : net.Server.ConnectionListener) : IO net.Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "connection", toJS listener]) Value
+@[macro_inline] def net.Server.onConnection (self : net.Server) (listener : net.Server.ConnectionListener) : IO net.Server := Internal.api "Lasm.JS.Node.net.Server.onConnection" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "connection", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'connection'` (added in Node.js v0.1.90): `net.Server onceConnection(net.Server.ConnectionListener listener)`: calls `once("connection", listener)` -/
-def net.Server.onceConnection (self : net.Server) (listener : net.Server.ConnectionListener) : IO net.Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "connection", toJS listener]) Value
+@[macro_inline] def net.Server.onceConnection (self : net.Server) (listener : net.Server.ConnectionListener) : IO net.Server := Internal.api "Lasm.JS.Node.net.Server.onceConnection" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "connection", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'error'` (added in Node.js v0.1.90): `net.Server onError(net.Server.ErrorListener listener)`: calls `on("error", listener)` -/
-def net.Server.onError (self : net.Server) (listener : net.Server.ErrorListener) : IO net.Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "error", toJS listener]) Value
+@[macro_inline] def net.Server.onError (self : net.Server) (listener : net.Server.ErrorListener) : IO net.Server := Internal.api "Lasm.JS.Node.net.Server.onError" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'error'` (added in Node.js v0.1.90): `net.Server onceError(net.Server.ErrorListener listener)`: calls `once("error", listener)` -/
-def net.Server.onceError (self : net.Server) (listener : net.Server.ErrorListener) : IO net.Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "error", toJS listener]) Value
+@[macro_inline] def net.Server.onceError (self : net.Server) (listener : net.Server.ErrorListener) : IO net.Server := Internal.api "Lasm.JS.Node.net.Server.onceError" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'listening'` (added in Node.js v0.1.90): `net.Server onListening(net.Server.ListeningListener listener)`: calls `on("listening", listener)` -/
-def net.Server.onListening (self : net.Server) (listener : net.Server.ListeningListener) : IO net.Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "listening", toJS listener]) Value
+@[macro_inline] def net.Server.onListening (self : net.Server) (listener : net.Server.ListeningListener) : IO net.Server := Internal.api "Lasm.JS.Node.net.Server.onListening" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "listening", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'listening'` (added in Node.js v0.1.90): `net.Server onceListening(net.Server.ListeningListener listener)`: calls `once("listening", listener)` -/
-def net.Server.onceListening (self : net.Server) (listener : net.Server.ListeningListener) : IO net.Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "listening", toJS listener]) Value
+@[macro_inline] def net.Server.onceListening (self : net.Server) (listener : net.Server.ListeningListener) : IO net.Server := Internal.api "Lasm.JS.Node.net.Server.onceListening" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "listening", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'drop'` (added in Node.js v18.6.0, v16.17.0): `net.Server onDrop(net.Server.DropListener listener)`: calls `on("drop", listener)` -/
-def net.Server.onDrop (self : net.Server) (listener : net.Server.DropListener) : IO net.Server := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "drop", toJS listener]) Value
+@[macro_inline] def net.Server.onDrop (self : net.Server) (listener : net.Server.DropListener) : IO net.Server := Internal.api "Lasm.JS.Node.net.Server.onDrop" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "drop", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'drop'` (added in Node.js v18.6.0, v16.17.0): `net.Server onceDrop(net.Server.DropListener listener)`: calls `once("drop", listener)` -/
-def net.Server.onceDrop (self : net.Server) (listener : net.Server.DropListener) : IO net.Server := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "drop", toJS listener]) Value
+@[macro_inline] def net.Server.onceDrop (self : net.Server) (listener : net.Server.DropListener) : IO net.Server := Internal.api "Lasm.JS.Node.net.Server.onceDrop" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "drop", toJS listener]) Value
   pure { val := r }
 
 /-- `server.address()` (added in Node.js v0.1.90): `(net.AddressInfo or DOMString)? address()` -/
-def net.Server.address (self : net.Server) : IO (Option net.AddressInfoOrDOMString) :=
-  self.val.callMethod "address" (Support.args #[]) (Option net.AddressInfoOrDOMString)
+@[macro_inline] def net.Server.address (self : net.Server) : IO (Option net.AddressInfoOrDOMString) := Internal.api "Lasm.JS.Node.net.Server.address" do
+  self.val.callMethod "address" (Internal.args #[]) (Option net.AddressInfoOrDOMString)
 
 /-- `server.close([callback])` (added in Node.js v0.1.90): `net.Server close()` -/
-def net.Server.close (self : net.Server) : IO net.Server := do
-  let r ← self.val.callMethod "close" (Support.args #[]) Value
+@[macro_inline] def net.Server.close (self : net.Server) : IO net.Server := Internal.api "Lasm.JS.Node.net.Server.close" do
+  let r ← self.val.callMethod "close" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `server.getConnections(callback)` (added in Node.js v0.9.7): `Promise<long long> getConnections()` -/
-def net.Server.getConnections (self : net.Server) : Async Int :=
-  Support.promisifiedMethod Int self.val "getConnections" (Support.args #[])
+@[macro_inline] def net.Server.getConnections (self : net.Server) : Async Int := Internal.api "Lasm.JS.Node.net.Server.getConnections" do
+  Support.promisifiedMethod Int self.val "getConnections" (Internal.args #[])
 
 /-- `server.listen(options[, callback])` (added in Node.js v0.11.14): `net.Server listen(net.Server.ListenOptions options)` -/
-def net.Server.listen (self : net.Server) (options : net.Server.ListenOptions) : IO net.Server := do
-  let r ← self.val.callMethod "listen" (Support.args #[toJS options]) Value
+@[macro_inline] def net.Server.listen (self : net.Server) (options : net.Server.ListenOptions) : IO net.Server := Internal.api "Lasm.JS.Node.net.Server.listen" do
+  let r ← self.val.callMethod "listen" (Internal.args #[toJS options]) Value
   pure { val := r }
 
 /-- `server.listen(path[, backlog][, callback])` (added in Node.js v0.1.90): `net.Server listen(DOMString path, optional double backlog)` -/
-def net.Server.listenWithPath (self : net.Server) (path_ : String) (backlog : Option Float := none) : IO net.Server := do
-  let r ← self.val.callMethod "listen" (Support.args #[toJS path_, Support.optional backlog]) Value
+@[macro_inline] def net.Server.listenWithPath (self : net.Server) (path_ : String) (backlog : Option Float := none) : IO net.Server := Internal.api "Lasm.JS.Node.net.Server.listenWithPath" do
+  let r ← self.val.callMethod "listen" (Internal.args #[toJS path_, Internal.optional backlog]) Value
   pure { val := r }
 
 /-- `server.listen([port[, host[, backlog]]][, callback])` (added in Node.js v0.1.90): `net.Server listen(optional double /* integer: Nat */ port, optional DOMString host, optional double backlog)` -/
-def net.Server.listenWithPort (self : net.Server) (port : Option Nat := none) (host : Option String := none) (backlog : Option Float := none) : IO net.Server := do
-  let r ← self.val.callMethod "listen" (Support.args #[Support.optional port, Support.optional host, Support.optional backlog]) Value
+@[macro_inline] def net.Server.listenWithPort (self : net.Server) (port : Option Nat := none) (host : Option String := none) (backlog : Option Float := none) : IO net.Server := Internal.api "Lasm.JS.Node.net.Server.listenWithPort" do
+  let r ← self.val.callMethod "listen" (Internal.args #[Internal.optional port, Internal.optional host, Internal.optional backlog]) Value
   pure { val := r }
 
 /-- `server.ref()` (added in Node.js v0.9.1): `net.Server ref()` -/
-def net.Server.ref (self : net.Server) : IO net.Server := do
-  let r ← self.val.callMethod "ref" (Support.args #[]) Value
+@[macro_inline] def net.Server.ref (self : net.Server) : IO net.Server := Internal.api "Lasm.JS.Node.net.Server.ref" do
+  let r ← self.val.callMethod "ref" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `server.unref()` (added in Node.js v0.9.1): `net.Server unref()` -/
-def net.Server.unref (self : net.Server) : IO net.Server := do
-  let r ← self.val.callMethod "unref" (Support.args #[]) Value
+@[macro_inline] def net.Server.unref (self : net.Server) : IO net.Server := Internal.api "Lasm.JS.Node.net.Server.unref" do
+  let r ← self.val.callMethod "unref" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `v instanceof Socket`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Socket`). -/
-def net.Socket.cast? (v : Value) : IO (Option net.Socket) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:net" ["Socket"] Value) v) then some { val := v } else none
+@[macro_inline] def net.Socket.cast? (v : Value) : IO (Option net.Socket) := Internal.api "Lasm.JS.Node.net.Socket.cast?" do
+  Internal.cast (Support.getExport "node:net" ["Socket"] Value) (fun x => { val := x }) v
 
 /-- `new net.Socket([options])` (added in Node.js v0.3.4): `constructor(optional net.Socket.NewOptions options)` -/
-def net.Socket.new (options : Option net.Socket.NewOptions := none) : IO net.Socket :=
+@[macro_inline] def net.Socket.new (options : Option net.Socket.NewOptions := none) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.new" do
   Lasm.JS.Binding.invoke net.Socket { name := "Lasm.JS.Node.net.Socket.new", module := "node:net", path := "Socket", construct := true, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- `socket.autoSelectFamilyAttemptedAddresses` (added in Node.js v19.4.0, v18.18.0): `readonly attribute sequence<DOMString> autoSelectFamilyAttemptedAddresses` -/
-def net.Socket.autoSelectFamilyAttemptedAddresses (self : net.Socket) : IO (Array String) := self.val.get "autoSelectFamilyAttemptedAddresses" (Array String)
+@[macro_inline] def net.Socket.autoSelectFamilyAttemptedAddresses (self : net.Socket) : IO (Array String) := Internal.api "Lasm.JS.Node.net.Socket.autoSelectFamilyAttemptedAddresses" do
+  self.val.get "autoSelectFamilyAttemptedAddresses" (Array String)
 
 /-- `socket.bytesRead` (added in Node.js v0.5.3): `readonly attribute long long bytesRead` -/
-def net.Socket.bytesRead (self : net.Socket) : IO Int := self.val.get "bytesRead" Int
+@[macro_inline] def net.Socket.bytesRead (self : net.Socket) : IO Int := Internal.api "Lasm.JS.Node.net.Socket.bytesRead" do
+  self.val.get "bytesRead" Int
 
 /-- `socket.bytesWritten` (added in Node.js v0.5.3): `readonly attribute long long bytesWritten` -/
-def net.Socket.bytesWritten (self : net.Socket) : IO Int := self.val.get "bytesWritten" Int
+@[macro_inline] def net.Socket.bytesWritten (self : net.Socket) : IO Int := Internal.api "Lasm.JS.Node.net.Socket.bytesWritten" do
+  self.val.get "bytesWritten" Int
 
 /-- `socket.connecting` (added in Node.js v6.1.0): `readonly attribute boolean connecting` -/
-def net.Socket.connecting (self : net.Socket) : IO Bool := self.val.get "connecting" Bool
+@[macro_inline] def net.Socket.connecting (self : net.Socket) : IO Bool := Internal.api "Lasm.JS.Node.net.Socket.connecting" do
+  self.val.get "connecting" Bool
 
 /-- `socket.destroyed`: `readonly attribute boolean destroyed` -/
-def net.Socket.destroyed (self : net.Socket) : IO Bool := self.val.get "destroyed" Bool
+@[macro_inline] def net.Socket.destroyed (self : net.Socket) : IO Bool := Internal.api "Lasm.JS.Node.net.Socket.destroyed" do
+  self.val.get "destroyed" Bool
 
 /-- `socket.localAddress` (added in Node.js v0.9.6): `readonly attribute DOMString localAddress` -/
-def net.Socket.localAddress (self : net.Socket) : IO String := self.val.get "localAddress" String
+@[macro_inline] def net.Socket.localAddress (self : net.Socket) : IO String := Internal.api "Lasm.JS.Node.net.Socket.localAddress" do
+  self.val.get "localAddress" String
 
 /-- `socket.localPort` (added in Node.js v0.9.6): `readonly attribute long long localPort` -/
-def net.Socket.localPort (self : net.Socket) : IO Int := self.val.get "localPort" Int
+@[macro_inline] def net.Socket.localPort (self : net.Socket) : IO Int := Internal.api "Lasm.JS.Node.net.Socket.localPort" do
+  self.val.get "localPort" Int
 
 /-- `socket.localFamily` (added in Node.js v18.8.0, v16.18.0): `readonly attribute DOMString localFamily` -/
-def net.Socket.localFamily (self : net.Socket) : IO String := self.val.get "localFamily" String
+@[macro_inline] def net.Socket.localFamily (self : net.Socket) : IO String := Internal.api "Lasm.JS.Node.net.Socket.localFamily" do
+  self.val.get "localFamily" String
 
 /-- `socket.pending` (added in Node.js v11.2.0, v10.16.0): `readonly attribute boolean pending` -/
-def net.Socket.pending (self : net.Socket) : IO Bool := self.val.get "pending" Bool
+@[macro_inline] def net.Socket.pending (self : net.Socket) : IO Bool := Internal.api "Lasm.JS.Node.net.Socket.pending" do
+  self.val.get "pending" Bool
 
 /-- `socket.remoteAddress` (added in Node.js v0.5.10): `readonly attribute DOMString remoteAddress` -/
-def net.Socket.remoteAddress (self : net.Socket) : IO String := self.val.get "remoteAddress" String
+@[macro_inline] def net.Socket.remoteAddress (self : net.Socket) : IO String := Internal.api "Lasm.JS.Node.net.Socket.remoteAddress" do
+  self.val.get "remoteAddress" String
 
 /-- `socket.remoteFamily` (added in Node.js v0.11.14): `readonly attribute DOMString remoteFamily` -/
-def net.Socket.remoteFamily (self : net.Socket) : IO String := self.val.get "remoteFamily" String
+@[macro_inline] def net.Socket.remoteFamily (self : net.Socket) : IO String := Internal.api "Lasm.JS.Node.net.Socket.remoteFamily" do
+  self.val.get "remoteFamily" String
 
 /-- `socket.remotePort` (added in Node.js v0.5.10): `readonly attribute long long remotePort` -/
-def net.Socket.remotePort (self : net.Socket) : IO Int := self.val.get "remotePort" Int
+@[macro_inline] def net.Socket.remotePort (self : net.Socket) : IO Int := Internal.api "Lasm.JS.Node.net.Socket.remotePort" do
+  self.val.get "remotePort" Int
 
 /-- `socket.server` (added in Node.js v0.3.4): `readonly attribute net.Server? server` -/
-def net.Socket.server (self : net.Socket) : IO (Option net.Server) := self.val.get "server" (Option net.Server)
+@[macro_inline] def net.Socket.server (self : net.Socket) : IO (Option net.Server) := Internal.api "Lasm.JS.Node.net.Socket.server" do
+  self.val.get "server" (Option net.Server)
 
 /-- `socket.timeout` (added in Node.js v10.7.0): `readonly attribute double /* integer: Nat */? timeout` -/
-def net.Socket.timeout (self : net.Socket) : IO (Option Nat) := self.val.get "timeout" (Option Nat)
+@[macro_inline] def net.Socket.timeout (self : net.Socket) : IO (Option Nat) := Internal.api "Lasm.JS.Node.net.Socket.timeout" do
+  self.val.get "timeout" (Option Nat)
 
 /-- `socket.readyState` (added in Node.js v0.5.0): `readonly attribute DOMString readyState` -/
-def net.Socket.readyState (self : net.Socket) : IO String := self.val.get "readyState" String
+@[macro_inline] def net.Socket.readyState (self : net.Socket) : IO String := Internal.api "Lasm.JS.Node.net.Socket.readyState" do
+  self.val.get "readyState" String
 
 /-- `Event: 'close'` (added in Node.js v0.1.90): `net.Socket onClose(net.Socket.CloseListener listener)`: calls `on("close", listener)` -/
-def net.Socket.onClose (self : net.Socket) (listener : net.Socket.CloseListener) : IO net.Socket := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def net.Socket.onClose (self : net.Socket) (listener : net.Socket.CloseListener) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.onClose" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'close'` (added in Node.js v0.1.90): `net.Socket onceClose(net.Socket.CloseListener listener)`: calls `once("close", listener)` -/
-def net.Socket.onceClose (self : net.Socket) (listener : net.Socket.CloseListener) : IO net.Socket := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def net.Socket.onceClose (self : net.Socket) (listener : net.Socket.CloseListener) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.onceClose" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'connect'` (added in Node.js v0.1.90): `net.Socket onConnect(net.Socket.ConnectListener listener)`: calls `on("connect", listener)` -/
-def net.Socket.onConnect (self : net.Socket) (listener : net.Socket.ConnectListener) : IO net.Socket := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "connect", toJS listener]) Value
+@[macro_inline] def net.Socket.onConnect (self : net.Socket) (listener : net.Socket.ConnectListener) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.onConnect" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "connect", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'connect'` (added in Node.js v0.1.90): `net.Socket onceConnect(net.Socket.ConnectListener listener)`: calls `once("connect", listener)` -/
-def net.Socket.onceConnect (self : net.Socket) (listener : net.Socket.ConnectListener) : IO net.Socket := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "connect", toJS listener]) Value
+@[macro_inline] def net.Socket.onceConnect (self : net.Socket) (listener : net.Socket.ConnectListener) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.onceConnect" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "connect", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'connectionAttempt'` (added in Node.js v21.6.0, v20.12.0): `net.Socket onConnectionAttempt(net.Socket.ConnectionAttemptListener listener)`: calls `on("connectionAttempt", listener)` -/
-def net.Socket.onConnectionAttempt (self : net.Socket) (listener : net.Socket.ConnectionAttemptListener) : IO net.Socket := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "connectionAttempt", toJS listener]) Value
+@[macro_inline] def net.Socket.onConnectionAttempt (self : net.Socket) (listener : net.Socket.ConnectionAttemptListener) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.onConnectionAttempt" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "connectionAttempt", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'connectionAttempt'` (added in Node.js v21.6.0, v20.12.0): `net.Socket onceConnectionAttempt(net.Socket.ConnectionAttemptListener listener)`: calls `once("connectionAttempt", listener)` -/
-def net.Socket.onceConnectionAttempt (self : net.Socket) (listener : net.Socket.ConnectionAttemptListener) : IO net.Socket := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "connectionAttempt", toJS listener]) Value
+@[macro_inline] def net.Socket.onceConnectionAttempt (self : net.Socket) (listener : net.Socket.ConnectionAttemptListener) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.onceConnectionAttempt" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "connectionAttempt", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'connectionAttemptFailed'` (added in Node.js v21.6.0, v20.12.0): `net.Socket onConnectionAttemptFailed(net.Socket.ConnectionAttemptFailedListener listener)`: calls `on("connectionAttemptFailed", listener)` -/
-def net.Socket.onConnectionAttemptFailed (self : net.Socket) (listener : net.Socket.ConnectionAttemptFailedListener) : IO net.Socket := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "connectionAttemptFailed", toJS listener]) Value
+@[macro_inline] def net.Socket.onConnectionAttemptFailed (self : net.Socket) (listener : net.Socket.ConnectionAttemptFailedListener) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.onConnectionAttemptFailed" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "connectionAttemptFailed", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'connectionAttemptFailed'` (added in Node.js v21.6.0, v20.12.0): `net.Socket onceConnectionAttemptFailed(net.Socket.ConnectionAttemptFailedListener listener)`: calls `once("connectionAttemptFailed", listener)` -/
-def net.Socket.onceConnectionAttemptFailed (self : net.Socket) (listener : net.Socket.ConnectionAttemptFailedListener) : IO net.Socket := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "connectionAttemptFailed", toJS listener]) Value
+@[macro_inline] def net.Socket.onceConnectionAttemptFailed (self : net.Socket) (listener : net.Socket.ConnectionAttemptFailedListener) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.onceConnectionAttemptFailed" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "connectionAttemptFailed", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'connectionAttemptTimeout'` (added in Node.js v21.6.0, v20.12.0): `net.Socket onConnectionAttemptTimeout(net.Socket.ConnectionAttemptTimeoutListener listener)`: calls `on("connectionAttemptTimeout", listener)` -/
-def net.Socket.onConnectionAttemptTimeout (self : net.Socket) (listener : net.Socket.ConnectionAttemptTimeoutListener) : IO net.Socket := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "connectionAttemptTimeout", toJS listener]) Value
+@[macro_inline] def net.Socket.onConnectionAttemptTimeout (self : net.Socket) (listener : net.Socket.ConnectionAttemptTimeoutListener) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.onConnectionAttemptTimeout" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "connectionAttemptTimeout", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'connectionAttemptTimeout'` (added in Node.js v21.6.0, v20.12.0): `net.Socket onceConnectionAttemptTimeout(net.Socket.ConnectionAttemptTimeoutListener listener)`: calls `once("connectionAttemptTimeout", listener)` -/
-def net.Socket.onceConnectionAttemptTimeout (self : net.Socket) (listener : net.Socket.ConnectionAttemptTimeoutListener) : IO net.Socket := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "connectionAttemptTimeout", toJS listener]) Value
+@[macro_inline] def net.Socket.onceConnectionAttemptTimeout (self : net.Socket) (listener : net.Socket.ConnectionAttemptTimeoutListener) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.onceConnectionAttemptTimeout" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "connectionAttemptTimeout", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'data'` (added in Node.js v0.1.90): `net.Socket onData(net.Socket.DataListener listener)`: calls `on("data", listener)` -/
-def net.Socket.onData (self : net.Socket) (listener : net.Socket.DataListener) : IO net.Socket := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "data", toJS listener]) Value
+@[macro_inline] def net.Socket.onData (self : net.Socket) (listener : net.Socket.DataListener) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.onData" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "data", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'data'` (added in Node.js v0.1.90): `net.Socket onceData(net.Socket.DataListener listener)`: calls `once("data", listener)` -/
-def net.Socket.onceData (self : net.Socket) (listener : net.Socket.DataListener) : IO net.Socket := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "data", toJS listener]) Value
+@[macro_inline] def net.Socket.onceData (self : net.Socket) (listener : net.Socket.DataListener) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.onceData" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "data", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'drain'` (added in Node.js v0.1.90): `net.Socket onDrain(net.Socket.DrainListener listener)`: calls `on("drain", listener)` -/
-def net.Socket.onDrain (self : net.Socket) (listener : net.Socket.DrainListener) : IO net.Socket := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "drain", toJS listener]) Value
+@[macro_inline] def net.Socket.onDrain (self : net.Socket) (listener : net.Socket.DrainListener) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.onDrain" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "drain", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'drain'` (added in Node.js v0.1.90): `net.Socket onceDrain(net.Socket.DrainListener listener)`: calls `once("drain", listener)` -/
-def net.Socket.onceDrain (self : net.Socket) (listener : net.Socket.DrainListener) : IO net.Socket := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "drain", toJS listener]) Value
+@[macro_inline] def net.Socket.onceDrain (self : net.Socket) (listener : net.Socket.DrainListener) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.onceDrain" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "drain", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'end'` (added in Node.js v0.1.90): `net.Socket onEnd(net.Socket.EndListener listener)`: calls `on("end", listener)` -/
-def net.Socket.onEnd (self : net.Socket) (listener : net.Socket.EndListener) : IO net.Socket := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "end", toJS listener]) Value
+@[macro_inline] def net.Socket.onEnd (self : net.Socket) (listener : net.Socket.EndListener) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.onEnd" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "end", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'end'` (added in Node.js v0.1.90): `net.Socket onceEnd(net.Socket.EndListener listener)`: calls `once("end", listener)` -/
-def net.Socket.onceEnd (self : net.Socket) (listener : net.Socket.EndListener) : IO net.Socket := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "end", toJS listener]) Value
+@[macro_inline] def net.Socket.onceEnd (self : net.Socket) (listener : net.Socket.EndListener) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.onceEnd" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "end", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'error'` (added in Node.js v0.1.90): `net.Socket onError(net.Socket.ErrorListener listener)`: calls `on("error", listener)` -/
-def net.Socket.onError (self : net.Socket) (listener : net.Socket.ErrorListener) : IO net.Socket := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "error", toJS listener]) Value
+@[macro_inline] def net.Socket.onError (self : net.Socket) (listener : net.Socket.ErrorListener) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.onError" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'error'` (added in Node.js v0.1.90): `net.Socket onceError(net.Socket.ErrorListener listener)`: calls `once("error", listener)` -/
-def net.Socket.onceError (self : net.Socket) (listener : net.Socket.ErrorListener) : IO net.Socket := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "error", toJS listener]) Value
+@[macro_inline] def net.Socket.onceError (self : net.Socket) (listener : net.Socket.ErrorListener) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.onceError" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'lookup'` (added in Node.js v0.11.3): `net.Socket onLookup(net.Socket.LookupListener listener)`: calls `on("lookup", listener)` -/
-def net.Socket.onLookup (self : net.Socket) (listener : net.Socket.LookupListener) : IO net.Socket := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "lookup", toJS listener]) Value
+@[macro_inline] def net.Socket.onLookup (self : net.Socket) (listener : net.Socket.LookupListener) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.onLookup" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "lookup", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'lookup'` (added in Node.js v0.11.3): `net.Socket onceLookup(net.Socket.LookupListener listener)`: calls `once("lookup", listener)` -/
-def net.Socket.onceLookup (self : net.Socket) (listener : net.Socket.LookupListener) : IO net.Socket := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "lookup", toJS listener]) Value
+@[macro_inline] def net.Socket.onceLookup (self : net.Socket) (listener : net.Socket.LookupListener) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.onceLookup" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "lookup", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'ready'` (added in Node.js v9.11.0): `net.Socket onReady(net.Socket.ReadyListener listener)`: calls `on("ready", listener)` -/
-def net.Socket.onReady (self : net.Socket) (listener : net.Socket.ReadyListener) : IO net.Socket := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "ready", toJS listener]) Value
+@[macro_inline] def net.Socket.onReady (self : net.Socket) (listener : net.Socket.ReadyListener) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.onReady" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "ready", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'ready'` (added in Node.js v9.11.0): `net.Socket onceReady(net.Socket.ReadyListener listener)`: calls `once("ready", listener)` -/
-def net.Socket.onceReady (self : net.Socket) (listener : net.Socket.ReadyListener) : IO net.Socket := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "ready", toJS listener]) Value
+@[macro_inline] def net.Socket.onceReady (self : net.Socket) (listener : net.Socket.ReadyListener) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.onceReady" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "ready", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'timeout'` (added in Node.js v0.1.90): `net.Socket onTimeout(net.Socket.TimeoutListener listener)`: calls `on("timeout", listener)` -/
-def net.Socket.onTimeout (self : net.Socket) (listener : net.Socket.TimeoutListener) : IO net.Socket := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "timeout", toJS listener]) Value
+@[macro_inline] def net.Socket.onTimeout (self : net.Socket) (listener : net.Socket.TimeoutListener) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.onTimeout" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "timeout", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'timeout'` (added in Node.js v0.1.90): `net.Socket onceTimeout(net.Socket.TimeoutListener listener)`: calls `once("timeout", listener)` -/
-def net.Socket.onceTimeout (self : net.Socket) (listener : net.Socket.TimeoutListener) : IO net.Socket := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "timeout", toJS listener]) Value
+@[macro_inline] def net.Socket.onceTimeout (self : net.Socket) (listener : net.Socket.TimeoutListener) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.onceTimeout" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "timeout", toJS listener]) Value
   pure { val := r }
 
 /-- `socket.address()` (added in Node.js v0.1.90): `net.AddressInfo address()` -/
-def net.Socket.address (self : net.Socket) : IO net.AddressInfo :=
-  self.val.callMethod "address" (Support.args #[]) net.AddressInfo
+@[macro_inline] def net.Socket.address (self : net.Socket) : IO net.AddressInfo := Internal.api "Lasm.JS.Node.net.Socket.address" do
+  self.val.callMethod "address" (Internal.args #[]) net.AddressInfo
 
 /-- `socket.connect(options[, connectListener])` (added in Node.js v0.1.90): `net.Socket connect(object options, optional net.Socket.ConnectListener connectListener)` -/
-def net.Socket.connect (self : net.Socket) (options : Data) (connectListener : Option net.Socket.ConnectListener := none) : IO net.Socket := do
-  let r ← self.val.callMethod "connect" (Support.args #[toJS options, Support.optional connectListener]) Value
+@[macro_inline] def net.Socket.connect (self : net.Socket) (options : Data) (connectListener : Option net.Socket.ConnectListener := none) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.connect" do
+  let r ← self.val.callMethod "connect" (Internal.args #[toJS options, Internal.optional connectListener]) Value
   pure { val := r }
 
 /-- `socket.connect(path[, connectListener])`: `net.Socket connect(DOMString path, optional net.Socket.ConnectListener connectListener)` -/
-def net.Socket.connectWithPath (self : net.Socket) (path_ : String) (connectListener : Option net.Socket.ConnectListener := none) : IO net.Socket := do
-  let r ← self.val.callMethod "connect" (Support.args #[toJS path_, Support.optional connectListener]) Value
+@[macro_inline] def net.Socket.connectWithPath (self : net.Socket) (path_ : String) (connectListener : Option net.Socket.ConnectListener := none) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.connectWithPath" do
+  let r ← self.val.callMethod "connect" (Internal.args #[toJS path_, Internal.optional connectListener]) Value
   pure { val := r }
 
 /-- `socket.connect(port[, host][, connectListener])` (added in Node.js v0.1.90): `net.Socket connect(double /* integer: Nat */ port, optional DOMString host, optional net.Socket.ConnectListener connectListener)` -/
-def net.Socket.connectWithPort (self : net.Socket) (port : Nat) (host : Option String := none) (connectListener : Option net.Socket.ConnectListener := none) : IO net.Socket := do
-  let r ← self.val.callMethod "connect" (Support.args #[toJS port, Support.optional host, Support.optional connectListener]) Value
+@[macro_inline] def net.Socket.connectWithPort (self : net.Socket) (port : Nat) (host : Option String := none) (connectListener : Option net.Socket.ConnectListener := none) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.connectWithPort" do
+  let r ← self.val.callMethod "connect" (Internal.args #[toJS port, Internal.optional host, Internal.optional connectListener]) Value
   pure { val := r }
 
 /-- `socket.destroy([error])` (added in Node.js v0.1.90): `net.Socket destroy(optional object error)` -/
-def net.Socket.destroy (self : net.Socket) (error : Data := .undefined) : IO net.Socket := do
-  let r ← self.val.callMethod "destroy" (Support.args #[error]) Value
+@[macro_inline] def net.Socket.destroy (self : net.Socket) (error : Data := .undefined) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.destroy" do
+  let r ← self.val.callMethod "destroy" (Internal.args #[error]) Value
   pure { val := r }
 
 /-- `socket.destroySoon()` (added in Node.js v0.3.4): `undefined destroySoon()` -/
-def net.Socket.destroySoon (self : net.Socket) : IO Unit :=
-  self.val.callMethod "destroySoon" (Support.args #[]) Unit
+@[macro_inline] def net.Socket.destroySoon (self : net.Socket) : IO Unit := Internal.api "Lasm.JS.Node.net.Socket.destroySoon" do
+  self.val.callMethod "destroySoon" (Internal.args #[]) Unit
 
 /-- `socket.end([data[, encoding]][, callback])` (added in Node.js v0.1.90): `net.Socket end(optional (DOMString or Uint8Array) data, optional DOMString encoding)` -/
-def net.Socket.«end» (self : net.Socket) (data : Option DOMStringOrUint8Array := none) (encoding : Option String := none) : IO net.Socket := do
-  let r ← self.val.callMethod "end" (Support.args #[Support.optional data, Support.optional encoding]) Value
+@[macro_inline] def net.Socket.«end» (self : net.Socket) (data : Option DOMStringOrUint8Array := none) (encoding : Option String := none) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.end" do
+  let r ← self.val.callMethod "end" (Internal.args #[Internal.optional data, Internal.optional encoding]) Value
   pure { val := r }
 
 /-- `socket.pause()`: `net.Socket pause()` -/
-def net.Socket.pause (self : net.Socket) : IO net.Socket := do
-  let r ← self.val.callMethod "pause" (Support.args #[]) Value
+@[macro_inline] def net.Socket.pause (self : net.Socket) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.pause" do
+  let r ← self.val.callMethod "pause" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `socket.ref()` (added in Node.js v0.9.1): `net.Socket ref()` -/
-def net.Socket.ref (self : net.Socket) : IO net.Socket := do
-  let r ← self.val.callMethod "ref" (Support.args #[]) Value
+@[macro_inline] def net.Socket.ref (self : net.Socket) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.ref" do
+  let r ← self.val.callMethod "ref" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `socket.resetAndDestroy()` (added in Node.js v18.3.0, v16.17.0): `net.Socket resetAndDestroy()` -/
-def net.Socket.resetAndDestroy (self : net.Socket) : IO net.Socket := do
-  let r ← self.val.callMethod "resetAndDestroy" (Support.args #[]) Value
+@[macro_inline] def net.Socket.resetAndDestroy (self : net.Socket) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.resetAndDestroy" do
+  let r ← self.val.callMethod "resetAndDestroy" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `socket.resume()`: `net.Socket resume()` -/
-def net.Socket.resume (self : net.Socket) : IO net.Socket := do
-  let r ← self.val.callMethod "resume" (Support.args #[]) Value
+@[macro_inline] def net.Socket.resume (self : net.Socket) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.resume" do
+  let r ← self.val.callMethod "resume" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `socket.setEncoding([encoding])` (added in Node.js v0.1.90): `net.Socket setEncoding(optional DOMString encoding)` -/
-def net.Socket.setEncoding (self : net.Socket) (encoding : Option String := none) : IO net.Socket := do
-  let r ← self.val.callMethod "setEncoding" (Support.args #[Support.optional encoding]) Value
+@[macro_inline] def net.Socket.setEncoding (self : net.Socket) (encoding : Option String := none) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.setEncoding" do
+  let r ← self.val.callMethod "setEncoding" (Internal.args #[Internal.optional encoding]) Value
   pure { val := r }
 
 /-- `socket.setKeepAlive([options])` (added in Node.js v24.19.0): `net.Socket setKeepAlive(optional net.Socket.SetKeepAliveOptions options)` -/
-def net.Socket.setKeepAlive (self : net.Socket) (options : Option net.Socket.SetKeepAliveOptions := none) : IO net.Socket := do
-  let r ← self.val.callMethod "setKeepAlive" (Support.args #[Support.optional options]) Value
+@[macro_inline] def net.Socket.setKeepAlive (self : net.Socket) (options : Option net.Socket.SetKeepAliveOptions := none) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.setKeepAlive" do
+  let r ← self.val.callMethod "setKeepAlive" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `socket.setKeepAlive([enable][, initialDelay][, interval][, count])` (added in Node.js v0.1.92): `net.Socket setKeepAlive(optional boolean enable, optional double initialDelay, optional double interval, optional double /* integer: Nat */ count)` -/
-def net.Socket.setKeepAliveWithEnable (self : net.Socket) (enable : Option Bool := none) (initialDelay : Option Float := none) (interval : Option Float := none) (count : Option Nat := none) : IO net.Socket := do
-  let r ← self.val.callMethod "setKeepAlive" (Support.args #[Support.optional enable, Support.optional initialDelay, Support.optional interval, Support.optional count]) Value
+@[macro_inline] def net.Socket.setKeepAliveWithEnable (self : net.Socket) (enable : Option Bool := none) (initialDelay : Option Float := none) (interval : Option Float := none) (count : Option Nat := none) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.setKeepAliveWithEnable" do
+  let r ← self.val.callMethod "setKeepAlive" (Internal.args #[Internal.optional enable, Internal.optional initialDelay, Internal.optional interval, Internal.optional count]) Value
   pure { val := r }
 
 /-- `socket.setNoDelay([noDelay])` (added in Node.js v0.1.90): `net.Socket setNoDelay(optional boolean noDelay)` -/
-def net.Socket.setNoDelay (self : net.Socket) (noDelay : Option Bool := none) : IO net.Socket := do
-  let r ← self.val.callMethod "setNoDelay" (Support.args #[Support.optional noDelay]) Value
+@[macro_inline] def net.Socket.setNoDelay (self : net.Socket) (noDelay : Option Bool := none) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.setNoDelay" do
+  let r ← self.val.callMethod "setNoDelay" (Internal.args #[Internal.optional noDelay]) Value
   pure { val := r }
 
 /-- `socket.setTimeout(timeout[, callback])` (added in Node.js v0.1.90): `net.Socket setTimeout(double /* integer: Nat */ timeout)` -/
-def net.Socket.setTimeout (self : net.Socket) (timeout : Nat) : IO net.Socket := do
-  let r ← self.val.callMethod "setTimeout" (Support.args #[toJS timeout]) Value
+@[macro_inline] def net.Socket.setTimeout (self : net.Socket) (timeout : Nat) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.setTimeout" do
+  let r ← self.val.callMethod "setTimeout" (Internal.args #[toJS timeout]) Value
   pure { val := r }
 
 /-- `socket.getTypeOfService()` (added in Node.js v24.15.0): `long long getTypeOfService()` -/
-def net.Socket.getTypeOfService (self : net.Socket) : IO Int :=
-  self.val.callMethod "getTypeOfService" (Support.args #[]) Int
+@[macro_inline] def net.Socket.getTypeOfService (self : net.Socket) : IO Int := Internal.api "Lasm.JS.Node.net.Socket.getTypeOfService" do
+  self.val.callMethod "getTypeOfService" (Internal.args #[]) Int
 
 /-- `socket.setTypeOfService(tos)` (added in Node.js v24.15.0): `net.Socket setTypeOfService(long long tos)` -/
-def net.Socket.setTypeOfService (self : net.Socket) (tos : Int) : IO net.Socket := do
-  let r ← self.val.callMethod "setTypeOfService" (Support.args #[toJS tos]) Value
+@[macro_inline] def net.Socket.setTypeOfService (self : net.Socket) (tos : Int) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.setTypeOfService" do
+  let r ← self.val.callMethod "setTypeOfService" (Internal.args #[toJS tos]) Value
   pure { val := r }
 
 /-- `socket.unref()` (added in Node.js v0.9.1): `net.Socket unref()` -/
-def net.Socket.unref (self : net.Socket) : IO net.Socket := do
-  let r ← self.val.callMethod "unref" (Support.args #[]) Value
+@[macro_inline] def net.Socket.unref (self : net.Socket) : IO net.Socket := Internal.api "Lasm.JS.Node.net.Socket.unref" do
+  let r ← self.val.callMethod "unref" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `socket.write(data[, encoding][, callback])` (added in Node.js v0.1.90): `boolean write((DOMString or Uint8Array) data, optional DOMString encoding)` -/
-def net.Socket.write (self : net.Socket) (data : DOMStringOrUint8Array) (encoding : Option String := none) : IO Bool :=
-  self.val.callMethod "write" (Support.args #[toJS data, Support.optional encoding]) Bool
+@[macro_inline] def net.Socket.write (self : net.Socket) (data : DOMStringOrUint8Array) (encoding : Option String := none) : IO Bool := Internal.api "Lasm.JS.Node.net.Socket.write" do
+  self.val.callMethod "write" (Internal.args #[toJS data, Internal.optional encoding]) Bool
 
 /-- `net.connect(options[, connectListener])` (added in Node.js v0.7.0): `net.Socket connect(object options, optional net.Socket.ConnectListener connectListener)` (Node.js 24.22.2 documentation, net.md) -/
-def net.connect (options : Data) (connectListener : Option net.Socket.ConnectListener := none) : IO net.Socket := do
+@[macro_inline] def net.connect (options : Data) (connectListener : Option net.Socket.ConnectListener := none) : IO net.Socket := Internal.api "Lasm.JS.Node.net.connect" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.net.connect", module := "node:net", path := "connect", construct := false, arity := 2 }
-    (Support.args #[toJS options, Support.optional connectListener]) (await := false)
+    (Internal.args #[toJS options, Internal.optional connectListener]) (await := false)
   pure { val := r }
 
 /-- `net.connect(path[, connectListener])` (added in Node.js v0.1.90): `net.Socket connect(DOMString path, optional net.Socket.ConnectListener connectListener)` (Node.js 24.22.2 documentation, net.md) -/
-def net.connectWithPath (path_ : String) (connectListener : Option net.Socket.ConnectListener := none) : IO net.Socket := do
+@[macro_inline] def net.connectWithPath (path_ : String) (connectListener : Option net.Socket.ConnectListener := none) : IO net.Socket := Internal.api "Lasm.JS.Node.net.connectWithPath" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.net.connectWithPath", module := "node:net", path := "connect", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional connectListener]) (await := false)
+    (Internal.args #[toJS path_, Internal.optional connectListener]) (await := false)
   pure { val := r }
 
 /-- `net.connect(port[, host][, connectListener])` (added in Node.js v0.1.90): `net.Socket connect(double /* integer: Nat */ port, optional DOMString host, optional net.Socket.ConnectListener connectListener)` (Node.js 24.22.2 documentation, net.md) -/
-def net.connectWithPort (port : Nat) (host : Option String := none) (connectListener : Option net.Socket.ConnectListener := none) : IO net.Socket := do
+@[macro_inline] def net.connectWithPort (port : Nat) (host : Option String := none) (connectListener : Option net.Socket.ConnectListener := none) : IO net.Socket := Internal.api "Lasm.JS.Node.net.connectWithPort" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.net.connectWithPort", module := "node:net", path := "connect", construct := false, arity := 3 }
-    (Support.args #[toJS port, Support.optional host, Support.optional connectListener]) (await := false)
+    (Internal.args #[toJS port, Internal.optional host, Internal.optional connectListener]) (await := false)
   pure { val := r }
 
 /-- `net.createConnection(options[, connectListener])` (added in Node.js v0.1.90): `net.Socket createConnection(object options, optional net.Socket.ConnectListener connectListener)` (Node.js 24.22.2 documentation, net.md) -/
-def net.createConnection (options : Data) (connectListener : Option net.Socket.ConnectListener := none) : IO net.Socket := do
+@[macro_inline] def net.createConnection (options : Data) (connectListener : Option net.Socket.ConnectListener := none) : IO net.Socket := Internal.api "Lasm.JS.Node.net.createConnection" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.net.createConnection", module := "node:net", path := "createConnection", construct := false, arity := 2 }
-    (Support.args #[toJS options, Support.optional connectListener]) (await := false)
+    (Internal.args #[toJS options, Internal.optional connectListener]) (await := false)
   pure { val := r }
 
 /-- `net.createConnection(path[, connectListener])` (added in Node.js v0.1.90): `net.Socket createConnection(DOMString path, optional net.Socket.ConnectListener connectListener)` (Node.js 24.22.2 documentation, net.md) -/
-def net.createConnectionWithPath (path_ : String) (connectListener : Option net.Socket.ConnectListener := none) : IO net.Socket := do
+@[macro_inline] def net.createConnectionWithPath (path_ : String) (connectListener : Option net.Socket.ConnectListener := none) : IO net.Socket := Internal.api "Lasm.JS.Node.net.createConnectionWithPath" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.net.createConnectionWithPath", module := "node:net", path := "createConnection", construct := false, arity := 2 }
-    (Support.args #[toJS path_, Support.optional connectListener]) (await := false)
+    (Internal.args #[toJS path_, Internal.optional connectListener]) (await := false)
   pure { val := r }
 
 /-- `net.createConnection(port[, host][, connectListener])` (added in Node.js v0.1.90): `net.Socket createConnection(double /* integer: Nat */ port, optional DOMString host, optional net.Socket.ConnectListener connectListener)` (Node.js 24.22.2 documentation, net.md) -/
-def net.createConnectionWithPort (port : Nat) (host : Option String := none) (connectListener : Option net.Socket.ConnectListener := none) : IO net.Socket := do
+@[macro_inline] def net.createConnectionWithPort (port : Nat) (host : Option String := none) (connectListener : Option net.Socket.ConnectListener := none) : IO net.Socket := Internal.api "Lasm.JS.Node.net.createConnectionWithPort" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.net.createConnectionWithPort", module := "node:net", path := "createConnection", construct := false, arity := 3 }
-    (Support.args #[toJS port, Support.optional host, Support.optional connectListener]) (await := false)
+    (Internal.args #[toJS port, Internal.optional host, Internal.optional connectListener]) (await := false)
   pure { val := r }
 
 /-- `net.createServer([options][, connectionListener])` (added in Node.js v0.5.0): `net.Server createServer(optional net.CreateServerOptions options, optional net.Server.ConnectionListener connectionListener)` (Node.js 24.22.2 documentation, net.md) -/
-def net.createServer (options : Option net.CreateServerOptions := none) (connectionListener : Option net.Server.ConnectionListener := none) : IO net.Server := do
+@[macro_inline] def net.createServer (options : Option net.CreateServerOptions := none) (connectionListener : Option net.Server.ConnectionListener := none) : IO net.Server := Internal.api "Lasm.JS.Node.net.createServer" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.net.createServer", module := "node:net", path := "createServer", construct := false, arity := 2 }
-    (Support.args #[Support.optional options, Support.optional connectionListener]) (await := false)
+    (Internal.args #[Internal.optional options, Internal.optional connectionListener]) (await := false)
   pure { val := r }
 
 /-- `net.getDefaultAutoSelectFamily()` (added in Node.js v19.4.0): `boolean getDefaultAutoSelectFamily()` (Node.js 24.22.2 documentation, net.md) -/
-def net.getDefaultAutoSelectFamily : IO Bool :=
+@[macro_inline] def net.getDefaultAutoSelectFamily : IO Bool := Internal.api "Lasm.JS.Node.net.getDefaultAutoSelectFamily" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.net.getDefaultAutoSelectFamily", module := "node:net", path := "getDefaultAutoSelectFamily", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `net.setDefaultAutoSelectFamily(value)` (added in Node.js v19.4.0): `undefined setDefaultAutoSelectFamily(boolean value)` (Node.js 24.22.2 documentation, net.md) -/
-def net.setDefaultAutoSelectFamily (value : Bool) : IO Unit :=
+@[macro_inline] def net.setDefaultAutoSelectFamily (value : Bool) : IO Unit := Internal.api "Lasm.JS.Node.net.setDefaultAutoSelectFamily" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.net.setDefaultAutoSelectFamily", module := "node:net", path := "setDefaultAutoSelectFamily", construct := false, arity := 1 }
-    (Support.args #[toJS value]) (await := false)
+    (Internal.args #[toJS value]) (await := false)
 
 /-- `net.getDefaultAutoSelectFamilyAttemptTimeout()` (added in Node.js v19.8.0, v18.18.0): `double getDefaultAutoSelectFamilyAttemptTimeout()` (Node.js 24.22.2 documentation, net.md) -/
-def net.getDefaultAutoSelectFamilyAttemptTimeout : IO Float :=
+@[macro_inline] def net.getDefaultAutoSelectFamilyAttemptTimeout : IO Float := Internal.api "Lasm.JS.Node.net.getDefaultAutoSelectFamilyAttemptTimeout" do
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Node.net.getDefaultAutoSelectFamilyAttemptTimeout", module := "node:net", path := "getDefaultAutoSelectFamilyAttemptTimeout", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `net.setDefaultAutoSelectFamilyAttemptTimeout(value)` (added in Node.js v19.8.0, v18.18.0): `undefined setDefaultAutoSelectFamilyAttemptTimeout(double value)` (Node.js 24.22.2 documentation, net.md) -/
-def net.setDefaultAutoSelectFamilyAttemptTimeout (value : Float) : IO Unit :=
+@[macro_inline] def net.setDefaultAutoSelectFamilyAttemptTimeout (value : Float) : IO Unit := Internal.api "Lasm.JS.Node.net.setDefaultAutoSelectFamilyAttemptTimeout" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.net.setDefaultAutoSelectFamilyAttemptTimeout", module := "node:net", path := "setDefaultAutoSelectFamilyAttemptTimeout", construct := false, arity := 1 }
-    (Support.args #[toJS value]) (await := false)
+    (Internal.args #[toJS value]) (await := false)
 
 /-- `net.isIP(input)` (added in Node.js v0.3.0): `long long isIP(DOMString input)` (Node.js 24.22.2 documentation, net.md) -/
-def net.isIP (input : String) : IO Int :=
+@[macro_inline] def net.isIP (input : String) : IO Int := Internal.api "Lasm.JS.Node.net.isIP" do
   Lasm.JS.Binding.invoke Int { name := "Lasm.JS.Node.net.isIP", module := "node:net", path := "isIP", construct := false, arity := 1 }
-    (Support.args #[toJS input]) (await := false)
+    (Internal.args #[toJS input]) (await := false)
 
 /-- `net.isIPv4(input)` (added in Node.js v0.3.0): `boolean isIPv4(DOMString input)` (Node.js 24.22.2 documentation, net.md) -/
-def net.isIPv4 (input : String) : IO Bool :=
+@[macro_inline] def net.isIPv4 (input : String) : IO Bool := Internal.api "Lasm.JS.Node.net.isIPv4" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.net.isIPv4", module := "node:net", path := "isIPv4", construct := false, arity := 1 }
-    (Support.args #[toJS input]) (await := false)
+    (Internal.args #[toJS input]) (await := false)
 
 /-- `net.isIPv6(input)` (added in Node.js v0.3.0): `boolean isIPv6(DOMString input)` (Node.js 24.22.2 documentation, net.md) -/
-def net.isIPv6 (input : String) : IO Bool :=
+@[macro_inline] def net.isIPv6 (input : String) : IO Bool := Internal.api "Lasm.JS.Node.net.isIPv6" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.net.isIPv6", module := "node:net", path := "isIPv6", construct := false, arity := 1 }
-    (Support.args #[toJS input]) (await := false)
+    (Internal.args #[toJS input]) (await := false)
 
 end Lasm.JS.Node
