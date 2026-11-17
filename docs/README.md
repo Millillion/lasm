@@ -27,8 +27,8 @@ in the current release on npm (`npm view @lasm/cli version`).
 | [WASI, wasi-http and Fastly Compute](WASI.md) | Standard WebAssembly with no JavaScript: wasmtime, wasmer, Spin, Fastly | 0.3.0 |
 | [Browser apps](BROWSER.md) | `--target browser`, the loader and mount API, `Lasm.JS.Web` (the whole web platform, generated) and `Lasm.UI.Mount`, the Vite plugin | 0.3.0 |
 | [Frontends in Lean (`Lasm.UI`)](UI.md) | The Elm architecture, `html!` markup, commands, subscriptions, routing, SSR and hydration | 0.3.0 |
-| [The whole stack (`Lasm.RPC`)](RPC.md) | A server and a browser app sharing typed endpoints and validation, proved once for both sides | 0.3.0 |
-| Verification | What is proved and what is tested: [UI diff](UI.md#what-is-proved), [RPC](RPC.md#what-is-proved), [testing and proving your app](UI.md#testing-and-proving-your-app) | 0.3.0 |
+| [The whole stack](../templates/fullstack) | A server with plain REST routes and a `Lasm.UI` app calling them with `Cmd.task` and `fetch`, sharing Lean types | 0.10.0 |
+| Verification | What is proved and what is tested: [UI diff](UI.md#what-is-proved), [testing and proving your app](UI.md#testing-and-proving-your-app) | 0.3.0 |
 | [Lean IO under Lasm](IO.md) | Files, processes, sockets, threads and their exact behavior on Node; what IO each other target provides | 0.1.0 |
 | [Lean packages that work](COMPATIBILITY.md) | Batteries, Aesop, Qq, LSpec, leansqlite and others, tested | 0.1.0 |
 

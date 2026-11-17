@@ -26,7 +26,7 @@ test('the glue, its link flags and the outputs of every module relative to a pre
   const outputs = libraryOutputs();
   assert.equal(outputs.length, 3 * libraryModules.length);
   assert.deepEqual(outputs.slice(0, 3), ['lib/lean/Lasm/JS/Core.olean', 'lib/lasm/c/Lasm/JS/Core.c', 'src/lean/Lasm/JS/Core.lean']);
-  assert.deepEqual(outputs.slice(-3), ['lib/lean/Lasm/RPC.olean', 'lib/lasm/c/Lasm/RPC.c', 'src/lean/Lasm/RPC.lean']);
+  assert.deepEqual(outputs.slice(-3), ['lib/lean/Lasm/UI.olean', 'lib/lasm/c/Lasm/UI.c', 'src/lean/Lasm/UI.lean']);
   for (const module of libraryModules) assert.ok(existsSync(join(library, ...module.split('.')) + '.lean'), module);
   assert.equal(new Set(libraryModules).size, libraryModules.length);
 });
@@ -130,7 +130,7 @@ test('the library sources a program links come from the prefix, with the glue, a
   put(c('Lasm.JS.Web.IndexedDB'), call('Lasm.JS'));
   put(join(prefix, 'lib', 'lasm', 'lazy', 'Lasm.JS.Web.IndexedDB.json'), '{}');
   assert.deepEqual(librarySources(lean, [program, lakeC], { supplied: ['Main', 'Lasm.JS.Web.IndexedDB'] }).modules, ['Lasm.JS.Core', 'Lasm.JS']);
-  rmSync(c('Lasm.RPC'));
+  rmSync(c('Lasm.UI'));
   assert.throws(() => librarySources(lean, [program]), { message: `This program imports Lasm's library (Lasm.JS, Lasm.Fetch, Lasm.UI), which needs Lean 4.35.0 or Lean's elaborator libraries (the extended tier); it is missing from ${prefix}`.replace('4.35.0 or Lean', '4.35.0 with Lean') });
 });
 

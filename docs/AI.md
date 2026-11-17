@@ -19,7 +19,7 @@ deploys Lean with Lasm. The [README](../README.md) has the complete reference;
 - **Lake projects** work as usual (local modules, Reservoir/Git dependencies). Pure
   modules without `Lasm.*` imports also build natively with `lake build`.
 - **`Lasm.*` libraries ship inside Lasm** (`Lasm.JS` with its generated
-  `Lasm.JS.Web`, `Lasm.Fetch`, `Lasm.UI`, `Lasm.RPC`, `Lasm.KV`, `Lasm.Fastly`). Never add them as Lake
+  `Lasm.JS.Web`, `Lasm.Fetch`, `Lasm.UI`, `Lasm.KV`, `Lasm.Fastly`). Never add them as Lake
   dependencies. For the editor, run `npx lasm editor`.
 
 ## Rules
@@ -74,6 +74,6 @@ deploys Lean with Lasm. The [README](../README.md) has the complete reference;
 | Server with npm framework | [GETTING_STARTED](GETTING_STARTED.md) | `--template hono`, [examples/js-crud](../examples/js-crud) |
 | Pure-Lean HTTP on any target | [FETCH.md](FETCH.md) | `--template fetch`, [examples/fetch](../examples/fetch) |
 | Browser UI | [UI.md](UI.md) | `--template web`, [examples/ui](../examples/ui) |
-| Full stack with proofs | [RPC.md](RPC.md) | `--template fullstack` |
+| Full stack with proofs | [templates/fullstack](../templates/fullstack) | `--template fullstack` |
 | Bindings to an npm package | [JS_BINDINGS.md](JS_BINDINGS.md) | [examples/js-fetch](../examples/js-fetch) |
 | Deploying | [deploy/README.md](deploy/README.md) | `--deploy <target>` |

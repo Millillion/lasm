@@ -7,7 +7,7 @@
 //
 // JavaScript targets (test/fuzz/targets/*.mjs) run in a worker under V8 block
 // coverage (test/fuzz/worker.mjs). Native targets (test/fuzz/native/: Lean's
-// Lasm.Fetch and Lasm.RPC compiled to C, and the WASI C host) are libFuzzer
+// Lasm.Fetch compiled to C, and the WASI C host) are libFuzzer
 // binaries that test/fuzz/native/build.mjs writes to --native (default
 // .work/fuzz/native); without them the native targets are skipped, and named
 // ones fail.
