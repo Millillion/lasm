@@ -1609,8 +1609,9 @@ objects. [examples/bun-sqlite](../examples/bun-sqlite) is a todo API on
 
 ## Cloudflare Workers: `Lasm.JS.Cloudflare`
 
-`import Lasm.JS.Cloudflare` gives typed bindings of the runtime APIs of
-Cloudflare Workers, **generated from Cloudflare's own TypeScript declarations**
+`Lasm.JS.Cloudflare.*` (`import Lasm.JS.Cloudflare.Kv`, `.D1`, `.Workers`, …,
+one module per area) gives typed bindings of the runtime APIs of Cloudflare
+Workers, **generated from Cloudflare's own TypeScript declarations**
 (`@cloudflare/workers-types` 5.20261019.1, the declarations of the workerd that
 CI's wrangler 4.152.0 runs). Status: **current source, not yet released** (tier
 3 of the standard bindings). It covers what a Worker's `env` holds and what its
@@ -1626,7 +1627,10 @@ Lasm.JS.Web's `Request`, `Response`, `Headers` and streams are their web types.
 
 ```lean
 import Lasm.JS              -- deriving FromJS
-import Lasm.JS.Cloudflare
+import Lasm.JS.Cloudflare.Kv
+import Lasm.JS.Cloudflare.D1
+import Lasm.JS.Cloudflare.Workers
+import Lasm.JS.Cloudflare.Handlers
 open Lasm.JS Lasm.JS.Web Lasm.JS.Cloudflare
 
 /-- The Worker's bindings and variables, as wrangler.toml declares them. -/
@@ -1670,37 +1674,54 @@ starts the computation at once and returns its promise.
 
 ### What is covered
 
-| Module | Members | Declared in |
-| --- | --- | --- |
-| `Lasm.JS.Cloudflare.Kv` | `KVNamespace`: `get` (text), `getJson`, `getArrayBuffer`, `getStream`, `getWithMetadata`, `put` (string, bytes or stream; `expiration`, `expirationTtl`, `metadata`), `list` (`prefix`, `limit`, `cursor`; `KVNamespaceListResult`), `delete` | `@cloudflare/workers-types` 5.20261019.1, `index.d.ts` |
-| `Lasm.JS.Cloudflare.D1` | `D1Database` (`prepare`, `batch`, `exec`, `withSession`), `D1DatabaseSession`, `D1PreparedStatement` (`bind`, `first`, `first0`, `run`, `all`, `raw`), `D1Result` with `D1Meta`, `D1ExecResult` | same |
-| `Lasm.JS.Cloudflare.R2` | `R2Bucket` (`head`, `get` with ranges and conditions, `put` with HTTP and custom metadata and checksums, `list`, `delete`, multipart uploads), `R2Object`, `R2ObjectBody` (`body`, `bytes`, `text`, `json`, `blob`, `arrayBuffer`), `R2Checksums`, `R2MultipartUpload` and every options dictionary | same |
-| `Lasm.JS.Cloudflare.Queues` | `Queue` (`send`, `sendBatch`, `metrics`), `MessageBatch` (`messages`, `queue`, `metadata`, `ackAll`, `retryAll`), `Message` (`id`, `timestamp`, `body`, `attempts`, `ack`, `retry`) | same |
-| `Lasm.JS.Cloudflare.Cache` | `caches` (`CacheStorage`: `default`, `open`), `Cache` (`match`, `put`, `delete`) | same |
-| `Lasm.JS.Cloudflare.Sockets` | `connect` (of `cloudflare:sockets`), `Socket` (`readable`, `writable`, `opened`, `closed`, `close`, `startTls`, `secureTransport`, `upgraded`) | same |
-| `Lasm.JS.Cloudflare.DurableObjects` | `DurableObjectNamespace` (`idFromName`, `idFromString`, `newUniqueId`, `get`, `getByName`, `jurisdiction`), `DurableObjectId`, `DurableObjectStub` (`fetch`, `connect`, `id`, `name`), `DurableObjectState` (`storage`, `id`, `waitUntil`, `blockConcurrencyWhile`, `abort`, `props`), `DurableObjectStorage` and `DurableObjectTransaction` (`get`, `put`, `delete`, `list`, `deleteAll`, `transaction`, alarms, `sync`, bookmarks) | same |
-| `Lasm.JS.Cloudflare.Workers` | `ExportedHandler` (`fetch`, `scheduled`, `queue`) and its handler types `ExportedHandlerFetchHandler`, `ExportedHandlerScheduledHandler`, `ExportedHandlerQueueHandler`; `ExecutionContext` (`waitUntil`, `passThroughOnException`, `abort`, `props`, `cache`), `CacheContext`, `ScheduledController` (`cron`, `scheduledTime`, `noRetry`); `env` (of `cloudflare:workers`) | same |
+**Every declaration of Cloudflare's own in `@cloudflare/workers-types`** (838 of
+them; API_DECISIONS 0.5-11). [`cloudflare-classify.mjs`](../scripts/bindings/cloudflare-classify.mjs)
+tells them apart from the web platform's, which are Lasm.JS.Web's (`Request`,
+streams, `WebSocket`), and Node's. Each declaration goes to the module of its
+area, listed in [`cloudflare-modules.json`](../scripts/bindings/cloudflare-modules.json)
+in import order:
 
-Not generated, with the reason (each listed in
-[`cloudflare-tier3.mjs`](../scripts/bindings/cloudflare-tier3.mjs) and at the
-top of [`cloudflare.idl`](../scripts/bindings/cloudflare.idl)):
+| Module | Area |
+| --- | --- |
+| `Lasm.JS.Cloudflare.Kv`, `.D1`, `.R2`, `.Queues` | Workers KV, D1, R2, Queues (with the queue handler) |
+| `Lasm.JS.Cloudflare.Workers` | the fetch and scheduled handlers, `ExecutionContext`, `env` of `cloudflare:workers` |
+| `Lasm.JS.Cloudflare.Handlers` | `ExportedHandler`, every handler together |
+| `Lasm.JS.Cloudflare.Cache`, `.Sockets` | the Cache API (until Lasm.JS.Web has it), `connect` of `cloudflare:sockets` |
+| `Lasm.JS.Cloudflare.DurableObjects`, `.Containers` | Durable Objects (storage, SQLite, alarms, facets, WebSocket hibernation), Containers |
+| `Lasm.JS.Cloudflare.Tail`, `.Email` | Tail Workers, trace events, `TailStream`, tracing; Email Workers and sending email |
+| `Lasm.JS.Cloudflare.Ai` | Workers AI and every model's inputs and outputs, AI Gateway, AI Search, AutoRAG, Agent memory, Markdown conversion |
+| `Lasm.JS.Cloudflare.Stream`, `.Services` | Cloudflare Stream; rate limiting, Secrets Store, Artifacts, Flagship, Pipelines and the other bindings |
+| `Lasm.JS.Cloudflare.Vectorize`, `.Hyperdrive`, `.Images`, `.Workflows`, `.Rpc`, `.BrowserRun`, `.Analytics`, `.HtmlRewriter`, `.Cf` | Vectorize, Hyperdrive, Images and Media, Workflows, service bindings, RPC, Worker loaders and dispatch namespaces, Browser Rendering, Analytics Engine, HTMLRewriter, the `cf` properties of requests |
 
-- **Overloads another overload already covers:** KV's `get(key, "text")` (that
-  is `get`), the `get(key, options)` forms that pair a type with `cacheTtl`
-  (`get` takes `cacheTtl`), and R2's `get` and `put` forms with `onlyIf`
-  required (the options have `onlyIf`).
-- **Not expressible yet:** KV's batch reads (an `Array<Key>` key: the same
-  parameter names as the one-key overloads, so the overload naming cannot tell
-  them apart), `getWithMetadata` of JSON, bytes or a stream (a second
-  instantiation of `KVNamespaceGetWithMetadataResult`), D1's
-  `raw({columnNames: true})` (a tuple result).
-- **Outside this tier:** the RPC methods of a Durable Object stub (they are the
-  class's own: call them with `Value.callMethodAwait`), WebSocket hibernation
-  (WebSocket is the browser tier's), SQLite storage (`storage.sql`, `kv`,
-  `transactionSync`), containers and facets, `ctx.exports`, Access identity,
-  tracing, and the `connect`, `tail`, `trace`, `tailStream`, `test` and
-  `email` handlers.
-- **Deprecated:** `D1Database.dump`.
+**Import the modules of the areas the Worker uses** (API_DECISIONS 0.5-16:
+there is no umbrella `Lasm.JS.Cloudflare`). A Worker links the modules it
+imports. `Lasm.JS.Cloudflare.Support`, `.Kv`, `.D1` and `.Workers` ship
+compiled; every other module compiles the first time a program imports it
+(docs/HOW_LASM_WORKS.md, "Lasm's library"). Workers AI's catalog takes about
+25 seconds then. A Worker that uses KV and D1 imports `Lasm.JS.Cloudflare.Kv`,
+`.D1` and `.Workers`, which import no other Cloudflare module. Its smallest form
+publishes the fetch function itself (`exportDefault fetch`), because
+`ExportedHandler` names every handler and so imports their modules.
+
+Not generated, by class (API_DECISIONS 0.5-12; each listed at the top of
+[`cloudflare.idl`](../scripts/bindings/cloudflare.idl)):
+
+- **Symbol-keyed members** (`[Symbol.iterator]()`, `[Symbol.dispose]()`): use
+  `Lasm.JS.Value.get` with the Symbol.
+- **Keys that are not identifiers** (`AiModels`' `"@cf/…"` model names, a map
+  that exists only in the types): read through `Data`.
+- **Private and protected class members**, and **constructors of abstract
+  classes** (`WorkerEntrypoint`, `DurableObject` of `cloudflare:workers`: they
+  are subclassed, A28).
+- **Index signatures beside named members**: the named members are generated,
+  and other keys go through `Data`.
+- **Type-level helpers** (`Rpc.Stub<T>`, conditional and mapped types, and
+  `AiModelList[Name]["inputs"]` for a generic `Name`) are read as `Data` where
+  they are used. `Ai.run model inputs` therefore takes and returns `Data`, and each
+  model's typed inputs and outputs (`Ai_Cf_Openai_Whisper_Input`, …) convert to and
+  from it with `toJS` and `FromJS`.
+- **Deprecated** declarations (the declaration says `@deprecated`,
+  `@experimental` or `UNSTABLE`).
 
 ### How the declarations become Lean
 
@@ -1736,6 +1757,16 @@ or the lowering fails.
 | `...values: unknown[]` | `any... values` | `(values : Array Data := #[])` |
 | `toString()`, `toJSON()` | `toString_` with `[LasmName]` | `DurableObjectId.toString` |
 | `declare const caches`, `export const env` (of `cloudflare:workers`), `connect` (of `cloudflare:sockets`) | a namespace per module (`[LasmModule]`) | `Lasm.JS.Cloudflare.caches`, `env`, `connect` |
+| `[a, b]` (a tuple) | `sequence<T>` (one element type), else `sequence<any>` | `Array T` |
+| a template literal type, `keyof T` | `DOMString` | `String` |
+| `typeof C`, a conditional type, `List[Name]["f"]` for a generic `Name` | `any` | `Data` |
+| `T["f"]` (a member's type) | that member's type | — |
+| `Omit<T, K>`, `Pick<T, K>`, `Partial<T>`, `Required<T>`, `A & B` of object types | a dictionary of the resulting members, named after its owner and member | a structure |
+| `string & NonNullable<unknown>` (a branded string) | `DOMString` | `String` |
+| a class's `constructor(…)`, `static` members | `constructor(…)`, `static` | `X.new`, `X.member` |
+| a member holding a class (`Span: typeof Span`) | `[LasmLeanName="SpanClass"]` | `Tracing.SpanClass` |
+| a destructured parameter (`{ type, payload }: {…}`) | an argument named `options` | `(options : …)` |
+| two dictionaries or enums of one module with the same members | the later a `[LasmAlias] typedef` of the first | `abbrev Later := First` |
 
 Numbers are `Float`, as workers-types declares them, except the members that
 the shared integer table names (A11.1, `scripts/bindings/overrides.json`: `size`,
@@ -1782,7 +1813,7 @@ takes a promise (`Async.toPromise`).
 ### Where it runs, tests and cost
 
 Only on Workers (`--target workers`): the bindings are looked up on the objects
-the runtime hands over, so a program that imports `Lasm.JS.Cloudflare` builds
+the runtime hands over, so a program that imports `Lasm.JS.Cloudflare.*` builds
 for any target, but the calls work only in a Worker.
 
 [`test/fixtures/js-cloudflare`](../test/fixtures/js-cloudflare) is one Worker

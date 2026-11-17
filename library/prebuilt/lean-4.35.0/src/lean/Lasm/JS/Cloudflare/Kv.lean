@@ -13,6 +13,10 @@ import Lasm.JS.Web.Streams
 namespace Lasm.JS.Cloudflare
 open Lasm.JS Lasm.JS.Web
 
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
+
 /-- `interface KVNamespace` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
 structure KVNamespace where
   /-- The JavaScript object. -/
@@ -115,22 +119,68 @@ instance : FromJS KVNamespaceGetWithMetadataResult where
     cacheStatus := ← Lasm.JS.readField (Option String) d "cacheStatus" }
   typeName := "Lasm.JS.Cloudflare.KVNamespaceGetWithMetadataResult"
 
-/-- `get(key: Key, options?: Partial<KVNamespaceGetOptions<undefined>>): Promise<string | null>`: `Promise<DOMString?> get(DOMString key, optional KVNamespaceGetOptions options)` -/
+/-- `get(key: Key, options?: KVNamespaceGetOptions<'text'>): Promise<string | null>`: `Promise<DOMString?> get(DOMString key, optional KVNamespaceGetOptions options)` -/
 def KVNamespace.get (self : KVNamespace) (key : String) (options : Option KVNamespaceGetOptions := none) : Async (Option String) :=
   self.val.callMethodAwait "get" (Support.args #[toJS key, Support.optional options]) (Option String)
 
-/-- `get<ExpectedValue = unknown>(key: Key, type: 'json'): Promise<ExpectedValue | null>`: `Promise<any> get(DOMString key, DOMString type)` -/
-def KVNamespace.getJson (self : KVNamespace) (key : String) : Async Data :=
-  self.val.callMethodAwait "get" (Support.args #[toJS key, toJS "json"]) Data
+/-- `get(key: Key, options?: KVNamespaceGetOptions<'stream'>): Promise<ReadableStream | null>`: `Promise<ReadableStream?> get(DOMString key, optional KVNamespaceGetOptions options)` -/
+def KVNamespace.get2 (self : KVNamespace) (key : String) (options : Option KVNamespaceGetOptions := none) : Async (Option ReadableStream) :=
+  self.val.callMethodAwait "get" (Support.args #[toJS key, Support.optional options]) (Option ReadableStream)
+
+/-- `get(key: Key, options?: Partial<KVNamespaceGetOptions<undefined>>): Promise<string | null>`: `Promise<DOMString?> get(DOMString key, optional KVNamespaceGetOptions options)` -/
+def KVNamespace.getWithKeyOptions (self : KVNamespace) (key : String) (options : Option KVNamespaceGetOptions := none) : Async (Option String) :=
+  self.val.callMethodAwait "get" (Support.args #[toJS key, Support.optional options]) (Option String)
+
+/-- `get(key: Key, options?: KVNamespaceGetOptions<'arrayBuffer'>): Promise<ArrayBuffer | null>`: `Promise<ArrayBuffer?> get(DOMString key, optional KVNamespaceGetOptions options)` -/
+def KVNamespace.getWithKeyOptions4 (self : KVNamespace) (key : String) (options : Option KVNamespaceGetOptions := none) : Async (Option ByteArray) := do
+  let r ← self.val.callMethodAwait "get" (Support.args #[toJS key, Support.optional options]) Data
+  Support.nullableArrayBufferBytes r
+
+/-- `get(key: Array<Key>, options?: KVNamespaceGetOptions<'text'>): Promise<Map<string, string | null>>`: `Promise<record<DOMString, DOMString?>> get(sequence<DOMString> key, optional KVNamespaceGetOptions options)` -/
+def KVNamespace.getWithKeyOptionsOfSequenceOfDOMString (self : KVNamespace) (key : Array String) (options : Option KVNamespaceGetOptions := none) : Async (Record (Option String)) := do
+  let r ← self.val.callMethodAwait "get" (Support.args #[toJS key, Support.optional options]) Value
+  Support.mapOf (Option String) r
+
+/-- `get<ExpectedValue = unknown>(key: Key, options?: KVNamespaceGetOptions<'json'>): Promise<ExpectedValue | null>`: `Promise<any> get(DOMString key, optional KVNamespaceGetOptions options)` -/
+def KVNamespace.getWithKeyOptions6 (self : KVNamespace) (key : String) (options : Option KVNamespaceGetOptions := none) : Async Data :=
+  self.val.callMethodAwait "get" (Support.args #[toJS key, Support.optional options]) Data
+
+/-- `get(key: Array<Key>, options?: Partial<KVNamespaceGetOptions<undefined>>): Promise<Map<string, string | null>>`: `Promise<record<DOMString, DOMString?>> get(sequence<DOMString> key, optional KVNamespaceGetOptions options)` -/
+def KVNamespace.getWithKeyOptionsOfSequenceOfDOMString7 (self : KVNamespace) (key : Array String) (options : Option KVNamespaceGetOptions := none) : Async (Record (Option String)) := do
+  let r ← self.val.callMethodAwait "get" (Support.args #[toJS key, Support.optional options]) Value
+  Support.mapOf (Option String) r
+
+/-- `get<ExpectedValue = unknown>(key: Array<Key>, options?: KVNamespaceGetOptions<'json'>): Promise<Map<string, ExpectedValue | null>>`: `Promise<record<DOMString, any>> get(sequence<DOMString> key, optional KVNamespaceGetOptions options)` -/
+def KVNamespace.getWithKeyOptionsOfSequenceOfDOMString8 (self : KVNamespace) (key : Array String) (options : Option KVNamespaceGetOptions := none) : Async (Record Data) := do
+  let r ← self.val.callMethodAwait "get" (Support.args #[toJS key, Support.optional options]) Value
+  Support.mapOf Data r
+
+/-- `get(key: Key, type: 'text'): Promise<string | null>`: `Promise<DOMString?> get(DOMString key, DOMString type)` -/
+def KVNamespace.getText (self : KVNamespace) (key : String) : Async (Option String) :=
+  self.val.callMethodAwait "get" (Support.args #[toJS key, toJS "text"]) (Option String)
+
+/-- `get(key: Key, type: 'stream'): Promise<ReadableStream | null>`: `Promise<ReadableStream?> get(DOMString key, DOMString type)` -/
+def KVNamespace.getStream (self : KVNamespace) (key : String) : Async (Option ReadableStream) :=
+  self.val.callMethodAwait "get" (Support.args #[toJS key, toJS "stream"]) (Option ReadableStream)
 
 /-- `get(key: Key, type: 'arrayBuffer'): Promise<ArrayBuffer | null>`: `Promise<ArrayBuffer?> get(DOMString key, DOMString type)` -/
 def KVNamespace.getArrayBuffer (self : KVNamespace) (key : String) : Async (Option ByteArray) := do
   let r ← self.val.callMethodAwait "get" (Support.args #[toJS key, toJS "arrayBuffer"]) Data
   Support.nullableArrayBufferBytes r
 
-/-- `get(key: Key, type: 'stream'): Promise<ReadableStream | null>`: `Promise<ReadableStream?> get(DOMString key, DOMString type)` -/
-def KVNamespace.getStream (self : KVNamespace) (key : String) : Async (Option ReadableStream) :=
-  self.val.callMethodAwait "get" (Support.args #[toJS key, toJS "stream"]) (Option ReadableStream)
+/-- `get(key: Array<Key>, type: 'text'): Promise<Map<string, string | null>>`: `Promise<record<DOMString, DOMString?>> get(sequence<DOMString> key, DOMString type)` -/
+def KVNamespace.getTextOfArray (self : KVNamespace) (key : Array String) : Async (Record (Option String)) := do
+  let r ← self.val.callMethodAwait "get" (Support.args #[toJS key, toJS "text"]) Value
+  Support.mapOf (Option String) r
+
+/-- `get<ExpectedValue = unknown>(key: Key, type: 'json'): Promise<ExpectedValue | null>`: `Promise<any> get(DOMString key, DOMString type)` -/
+def KVNamespace.getJson (self : KVNamespace) (key : String) : Async Data :=
+  self.val.callMethodAwait "get" (Support.args #[toJS key, toJS "json"]) Data
+
+/-- `get<ExpectedValue = unknown>(key: Array<Key>, type: 'json'): Promise<Map<string, ExpectedValue | null>>`: `Promise<record<DOMString, any>> get(sequence<DOMString> key, DOMString type)` -/
+def KVNamespace.getJsonOfArray (self : KVNamespace) (key : Array String) : Async (Record Data) := do
+  let r ← self.val.callMethodAwait "get" (Support.args #[toJS key, toJS "json"]) Value
+  Support.mapOf Data r
 
 /-- `list<Metadata = unknown>(options?: KVNamespaceListOptions): Promise<KVNamespaceListResult<Metadata, Key>>`: `Promise<KVNamespaceListResult> list(optional KVNamespaceListOptions options)` -/
 def KVNamespace.list (self : KVNamespace) (options : Option KVNamespaceListOptions := none) : Async KVNamespaceListResult :=
@@ -143,6 +193,63 @@ def KVNamespace.put (self : KVNamespace) (key : String) (value : DOMStringOrRead
 /-- `getWithMetadata<Metadata = unknown>(key: Key, options?: Partial<KVNamespaceGetOptions<undefined>>): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>`: `Promise<KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, optional KVNamespaceGetOptions options)` -/
 def KVNamespace.getWithMetadata (self : KVNamespace) (key : String) (options : Option KVNamespaceGetOptions := none) : Async KVNamespaceGetWithMetadataResult :=
   self.val.callMethodAwait "getWithMetadata" (Support.args #[toJS key, Support.optional options]) KVNamespaceGetWithMetadataResult
+
+/-- `getWithMetadata<Metadata = unknown>(key: Array<Key>, options?: KVNamespaceGetOptions<'text'>): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>`: `Promise<record<DOMString, KVNamespaceGetWithMetadataResult>> getWithMetadata(sequence<DOMString> key, optional KVNamespaceGetOptions options)` -/
+def KVNamespace.getWithMetadata2 (self : KVNamespace) (key : Array String) (options : Option KVNamespaceGetOptions := none) : Async (Record KVNamespaceGetWithMetadataResult) := do
+  let r ← self.val.callMethodAwait "getWithMetadata" (Support.args #[toJS key, Support.optional options]) Value
+  Support.mapOf KVNamespaceGetWithMetadataResult r
+
+/-- `getWithMetadata<Metadata = unknown>(key: Array<Key>, options?: Partial<KVNamespaceGetOptions<undefined>>): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>`: `Promise<record<DOMString, KVNamespaceGetWithMetadataResult>> getWithMetadata(sequence<DOMString> key, optional KVNamespaceGetOptions options)` -/
+def KVNamespace.getWithMetadataWithKeyOptions (self : KVNamespace) (key : Array String) (options : Option KVNamespaceGetOptions := none) : Async (Record KVNamespaceGetWithMetadataResult) := do
+  let r ← self.val.callMethodAwait "getWithMetadata" (Support.args #[toJS key, Support.optional options]) Value
+  Support.mapOf KVNamespaceGetWithMetadataResult r
+
+/-- `getWithMetadata<ExpectedValue = unknown, Metadata = unknown>(key: Array<Key>, options?: KVNamespaceGetOptions<'json'>): Promise<Map<string, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>>`: `Promise<record<DOMString, KVNamespaceGetWithMetadataResult>> getWithMetadata(sequence<DOMString> key, optional KVNamespaceGetOptions options)` -/
+def KVNamespace.getWithMetadataWithKeyOptionsOfSequenceOfDOMString (self : KVNamespace) (key : Array String) (options : Option KVNamespaceGetOptions := none) : Async (Record KVNamespaceGetWithMetadataResult) := do
+  let r ← self.val.callMethodAwait "getWithMetadata" (Support.args #[toJS key, Support.optional options]) Value
+  Support.mapOf KVNamespaceGetWithMetadataResult r
+
+/-- `getWithMetadata<Metadata = unknown>(key: Key, options: KVNamespaceGetOptions<'text'>): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>`: `Promise<KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, KVNamespaceGetOptions options)` -/
+def KVNamespace.getWithMetadataWithKeyOptions5 (self : KVNamespace) (key : String) (options : KVNamespaceGetOptions) : Async KVNamespaceGetWithMetadataResult :=
+  self.val.callMethodAwait "getWithMetadata" (Support.args #[toJS key, toJS options]) KVNamespaceGetWithMetadataResult
+
+/-- `getWithMetadata<Metadata = unknown>(key: Key, options: KVNamespaceGetOptions<'stream'>): Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>>`: `Promise<KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, KVNamespaceGetOptions options)` -/
+def KVNamespace.getWithMetadataWithKeyOptions6 (self : KVNamespace) (key : String) (options : KVNamespaceGetOptions) : Async KVNamespaceGetWithMetadataResult :=
+  self.val.callMethodAwait "getWithMetadata" (Support.args #[toJS key, toJS options]) KVNamespaceGetWithMetadataResult
+
+/-- `getWithMetadata<Metadata = unknown>(key: Key, options: KVNamespaceGetOptions<'arrayBuffer'>): Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>>`: `Promise<KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, KVNamespaceGetOptions options)` -/
+def KVNamespace.getWithMetadataWithKeyOptions7 (self : KVNamespace) (key : String) (options : KVNamespaceGetOptions) : Async KVNamespaceGetWithMetadataResult :=
+  self.val.callMethodAwait "getWithMetadata" (Support.args #[toJS key, toJS options]) KVNamespaceGetWithMetadataResult
+
+/-- `getWithMetadata<ExpectedValue = unknown, Metadata = unknown>(key: Key, options: KVNamespaceGetOptions<'json'>): Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>`: `Promise<KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, KVNamespaceGetOptions options)` -/
+def KVNamespace.getWithMetadataWithKeyOptions8 (self : KVNamespace) (key : String) (options : KVNamespaceGetOptions) : Async KVNamespaceGetWithMetadataResult :=
+  self.val.callMethodAwait "getWithMetadata" (Support.args #[toJS key, toJS options]) KVNamespaceGetWithMetadataResult
+
+/-- `getWithMetadata<Metadata = unknown>(key: Key, type: 'text'): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>`: `Promise<KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, DOMString type)` -/
+def KVNamespace.getWithMetadataText (self : KVNamespace) (key : String) : Async KVNamespaceGetWithMetadataResult :=
+  self.val.callMethodAwait "getWithMetadata" (Support.args #[toJS key, toJS "text"]) KVNamespaceGetWithMetadataResult
+
+/-- `getWithMetadata<Metadata = unknown>(key: Key, type: 'stream'): Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>>`: `Promise<KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, DOMString type)` -/
+def KVNamespace.getWithMetadataStream (self : KVNamespace) (key : String) : Async KVNamespaceGetWithMetadataResult :=
+  self.val.callMethodAwait "getWithMetadata" (Support.args #[toJS key, toJS "stream"]) KVNamespaceGetWithMetadataResult
+
+/-- `getWithMetadata<Metadata = unknown>(key: Key, type: 'arrayBuffer'): Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>>`: `Promise<KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, DOMString type)` -/
+def KVNamespace.getWithMetadataArrayBuffer (self : KVNamespace) (key : String) : Async KVNamespaceGetWithMetadataResult :=
+  self.val.callMethodAwait "getWithMetadata" (Support.args #[toJS key, toJS "arrayBuffer"]) KVNamespaceGetWithMetadataResult
+
+/-- `getWithMetadata<Metadata = unknown>(key: Array<Key>, type: 'text'): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>`: `Promise<record<DOMString, KVNamespaceGetWithMetadataResult>> getWithMetadata(sequence<DOMString> key, DOMString type)` -/
+def KVNamespace.getWithMetadataTextOfArray (self : KVNamespace) (key : Array String) : Async (Record KVNamespaceGetWithMetadataResult) := do
+  let r ← self.val.callMethodAwait "getWithMetadata" (Support.args #[toJS key, toJS "text"]) Value
+  Support.mapOf KVNamespaceGetWithMetadataResult r
+
+/-- `getWithMetadata<ExpectedValue = unknown, Metadata = unknown>(key: Key, type: 'json'): Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>`: `Promise<KVNamespaceGetWithMetadataResult> getWithMetadata(DOMString key, DOMString type)` -/
+def KVNamespace.getWithMetadataJson (self : KVNamespace) (key : String) : Async KVNamespaceGetWithMetadataResult :=
+  self.val.callMethodAwait "getWithMetadata" (Support.args #[toJS key, toJS "json"]) KVNamespaceGetWithMetadataResult
+
+/-- `getWithMetadata<ExpectedValue = unknown, Metadata = unknown>(key: Array<Key>, type: 'json'): Promise<Map<string, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>>`: `Promise<record<DOMString, KVNamespaceGetWithMetadataResult>> getWithMetadata(sequence<DOMString> key, DOMString type)` -/
+def KVNamespace.getWithMetadataJsonOfArray (self : KVNamespace) (key : Array String) : Async (Record KVNamespaceGetWithMetadataResult) := do
+  let r ← self.val.callMethodAwait "getWithMetadata" (Support.args #[toJS key, toJS "json"]) Value
+  Support.mapOf KVNamespaceGetWithMetadataResult r
 
 /-- `delete(key: Key): Promise<void>`: `Promise<undefined> delete(DOMString key)` -/
 def KVNamespace.delete (self : KVNamespace) (key : String) : Async Unit :=

@@ -9,6 +9,7 @@ declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Cloudflare.Support
 import Lasm.JS.Web.Types.Streams
+import Lasm.JS.Cloudflare.Workers
 
 namespace Lasm.JS.Cloudflare
 open Lasm.JS Lasm.JS.Web
@@ -73,6 +74,12 @@ instance : ToJS DoubleOrBigint := ⟨fun
   | .bigint v => toJS v⟩
 instance : Coe Float DoubleOrBigint := ⟨.double⟩
 instance : Coe Int DoubleOrBigint := ⟨.bigint⟩
+instance : FromJS DoubleOrBigint where
+  fromJS
+    | d@(.number _) => (FromJS.fromJS d : Except String Float).map .double
+    | d@(.bigint _) => (FromJS.fromJS d : Except String Int).map .bigint
+    | _ => .error ""
+  typeName := "Lasm.JS.Cloudflare.DoubleOrBigint"
 
 /-- `dictionary SocketOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SocketOptions where
@@ -85,6 +92,12 @@ structure SocketOptions where
 instance : ToJS SocketOptions := ⟨fun d => Internal.fields #[("secureTransport", Internal.optional d.secureTransport),
     ("allowHalfOpen", toJS d.allowHalfOpen),
     ("highWaterMark", Internal.optional d.highWaterMark)]⟩
+instance : FromJS SocketOptions where
+  fromJS d := do return {
+    secureTransport := ← Lasm.JS.readField (Option String) d "secureTransport",
+    allowHalfOpen := ← Lasm.JS.readField Bool d "allowHalfOpen",
+    highWaterMark := ← Lasm.JS.readField (Option DoubleOrBigint) d "highWaterMark" }
+  typeName := "Lasm.JS.Cloudflare.SocketOptions"
 
 /-- `dictionary SocketAddress` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SocketAddress where
@@ -94,6 +107,31 @@ structure SocketAddress where
   port : Nat
 instance : ToJS SocketAddress := ⟨fun d => Internal.fields #[("hostname", toJS d.hostname),
     ("port", toJS d.port)]⟩
+instance : FromJS SocketAddress where
+  fromJS d := do return {
+    hostname := ← Lasm.JS.readField String d "hostname",
+    port := ← Lasm.JS.readField Nat d "port" }
+  typeName := "Lasm.JS.Cloudflare.SocketAddress"
+
+/-- `callback ExportedHandlerConnectHandler = Promise<undefined> (Socket socket, Env env, ExecutionContext ctx)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure ExportedHandlerConnectHandler where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty ExportedHandlerConnectHandler := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS ExportedHandlerConnectHandler := ⟨fun x => .ref x.val ""⟩
+instance : FromJS ExportedHandlerConnectHandler := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.ExportedHandlerConnectHandler", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def ExportedHandlerConnectHandler.ofFn {Env : Type} [FromJS Env] (f : Socket → Env → ExecutionContext → Async Unit) : IO ExportedHandlerConnectHandler := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Socket args 0) (← Support.declared Env (← Internal.arg Data args 1)) (← Internal.arg ExecutionContext args 2))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def ExportedHandlerConnectHandler.ofSyncFn {Env : Type} [FromJS Env] (f : Socket → Env → ExecutionContext → IO Unit) : IO ExportedHandlerConnectHandler := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Socket args 0) (← Support.declared Env (← Internal.arg Data args 1)) (← Internal.arg ExecutionContext args 2))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
+  return { val := fn }
 
 /-- `typedef DOMString or SocketAddress DOMStringOrSocketAddress`: one constructor per member type. -/
 inductive DOMStringOrSocketAddress where

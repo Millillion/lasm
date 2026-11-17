@@ -307,10 +307,19 @@ const nodeModules = nodeModuleOrder.map(m => {
 });
 // Lasm.JS.Deno and Lasm.JS.Bun (serve-tier2.mjs): their IDL's definitions marked with their LasmHost and LasmLeanModule.
 const hostOf = d => extValue(extAttr(d, 'LasmHost'));
+/** Interfaces with each one's base before it (a Lean structure extends one already declared). */
+function parentsFirst(ds) {
+  const left = [...ds], out = [];
+  while (left.length) {
+    const i = left.findIndex(d => !left.some(p => p.name === d.inheritance));
+    out.push(...left.splice(i < 0 ? 0 : i, 1));
+  }
+  return out;
+}
 const hostModules = hosts.flatMap(h => h.modules.map(m => {
   const mine = [...defs.values()].filter(d => hostOf(d) === h.name && extValue(extAttr(d, 'LasmLeanModule')) === m.name);
   return { name: m.name, title: m.title, specs: `${hostSource(h)} type declarations`, tier: 2, ns: `Lasm.JS.${h.name}`, key: `Lasm.JS.${h.name}.${m.name}`,
-    host: h, interfaces: mine.filter(d => d.type === 'interface').map(d => d.name), namespaces: mine.filter(d => d.type === 'namespace').map(d => d.name),
+    host: h, interfaces: parentsFirst(mine.filter(d => d.type === 'interface')).map(d => d.name), namespaces: mine.filter(d => d.type === 'namespace').map(d => d.name),
     // Lasm.JS.Cloudflare: every selected dictionary, callback and enum is generated, also one no member names
     // (ExportedHandler and its handlers, which a program passes to Lasm.JS.exportDefault).
     extraTypes: h.rich ? mine.filter(d => ['dictionary', 'callback', 'enum'].includes(d.type)).map(d => d.name) : undefined };
@@ -635,12 +644,15 @@ const needsPost = t => t.k === 'arraybuffer' || otherView(t) || (t.k === 'nullab
 function unionRead(u) {
   const shapes = u.alts.map(a => shape(a.t));
   const distinct = new Set(shapes).size === shapes.length && !shapes.includes('any')
-    && u.alts.every(a => a.t.k !== 'promise' && a.t.k !== 'nullable' && (a.t.k !== 'union') && readable(a.t));
+    && u.alts.every(a => a.t.k !== 'promise' && a.t.k !== 'nullable' && (a.t.k !== 'union') && readable(a.t) && !readsAsData(a.t));
   if (distinct) return u.alts.some(a => needsPost(a.t)) ? 'decode' : 'fromjs';
   // Only interfaces (generated or not: HTMLCanvasElement.getContext's contexts): a reference.
   if (u.alts.every(a => a.t.k === 'iface' || a.t.k === 'unknown' && (def(a.t.idl)?.type === 'interface' || otherInterfaces.has(a.t.idl)))) return 'value';
   return 'data';
 }
+/** A union's alternative written as a typed value but read as data (an array of a union of
+ * interfaces: written `Array X`, read `Array Data`): the union is then not read back typed. */
+const readsAsData = t => t.k === 'seq' && !needsPost(t) && retType(t).includes('Data') && !argType(t).includes('Data');
 /** Whether a type has a FromJS reading (possibly through an IO decoder). */
 function readable(t) {
   switch (t.k) {
@@ -656,7 +668,12 @@ const dictReadableMemo = new Map();
 function dictReadable(name) {
   if (dictReadableMemo.has(name)) return dictReadableMemo.get(name);
   dictReadableMemo.set(name, false);
-  const ok = inOwner(name, () => dictFields(name).every(f => { const t = resolve(f.idlType); return readable(t) && !needsPost(t); }));
+  // Readable when every field is, and is read as the type it is written as (a union written
+  // as its inductive but read as Data is not).
+  const ok = inOwner(name, () => dictFields(name).every(f => {
+    const t = resolve(f.idlType), inner0 = t.k === 'nullable' && !f.required ? t.inner : t, inner = inner0.k === 'nullable' ? inner0.inner : inner0;
+    return readable(t) && !needsPost(t) && (!['union', 'seq', 'dict', 'record'].includes(inner.k) || argType(inner) === retType(inner));
+  }));
   dictReadableMemo.set(name, ok);
   return ok;
 }
@@ -935,6 +952,19 @@ for (const m of plan) inModule(m.key, () => {
   for (const x of m.extraTypes ?? []) {
     const d = def(x);
     if (!d) fail(`extra type ${x} not found`);
+    // Lasm.JS.Cloudflare: each is written and read wherever it is met (a field of a type read
+    // here and written there), so it gets both instances where it can.
+    // Lasm.JS.Cloudflare: a type no member uses (Workers AI's per-model inputs and outputs) gets
+    // both instances, as a program may write or read it; one that members use gets what they need.
+    // Lasm.JS.Cloudflare: a type no member names gets instances by the ways it flows where the
+    // declarations use it (LasmDirection: Workers AI's model inputs are written, its outputs read),
+    // else a ToJS, for a program to pass it (ExportedHandler to exportDefault).
+    if (m.host?.rich) {
+      if (moduleOfType.has(typeKey(resolveName(x)) ?? x)) continue;
+      const t = resolveName(x), ways = (extValue(extAttr(d, 'LasmDirection')) ?? 'to').split(' ');
+      for (const w of ways) visit(t, w, m.key);
+      continue;
+    }
     if (m.host && moduleOfType.has(x)) continue;
     visit(resolveName(x), 'to', m.key);
   }
@@ -1101,8 +1131,9 @@ function overloadNames(group) {
   // Two overloads that would get one name: each adds all its argument names (FileHandle's
   // read(options) and read(buffer, options): readWithOptions, readWithBufferOptions).
   const named = names.map((n, i) => i > 0 && names.indexOf(n) !== i ? `${group[i].name}With${group[i].arguments.map(a => capital(a.name)).join('')}` : n);
-  // Still one name: each one after the first adds its argument types instead.
-  return named.map((n, i) => i > 0 && named.indexOf(n) !== i ? withTypes(group[i]) : n);
+  // Still one name: each one after the first adds its argument types instead, then, if still the same, its position.
+  const typed = named.map((n, i) => i > 0 && named.indexOf(n) !== i ? withTypes(group[i]) : n);
+  return typed.map((n, i) => typed.indexOf(n) !== i ? `${n}${i + 1}` : n);
 }
 /** An overload's name with its argument types: `sendWithBlob`. */
 const withTypes = m => `${m.name}With${m.arguments.map(a => typeKeyName(a.idlType)).join('')}`;
@@ -1171,6 +1202,11 @@ const takenNames = new Map();
 /** Interface `name`'s handle type (with `declare`) and the members `module` generates. */
 function emitInterface(module, name, declare = true) {
   const d = def(name);
+  // Every type a member names is imported (a host's class members: constructors, statics).
+  if (hostOf(d)) for (const mem of membersOf(name)) {
+    for (const a of mem.arguments ?? []) requireType(module, resolve(a.idlType));
+    if (mem.idlType && !Array.isArray(mem.idlType)) requireType(module, resolve(mem.idlType));
+  }
   const o = out.get(module);
   apiOwner = nsOf(module) === NS ? { kind: 'interface', name } : { kind: 'ext', ns: nsOf(module) };
   const T = leanTypeName(name);
@@ -1243,7 +1279,8 @@ function emitInterface(module, name, declare = true) {
     requireType(module, r);
     const res = resultOf(a.idlType, a);
     const isStatic = a.special === 'static';
-    const getName = take(isStatic && instanceNames.has(a.name) ? 'static' + capital(a.name) : a.name, 'attribute');
+    // LasmLeanName (Lasm.JS.Cloudflare): a Lean name other than the property's (`Tracing.SpanClass`).
+    const getName = take(extValue(extAttr(a, 'LasmLeanName')) ?? (isStatic && instanceNames.has(a.name) ? 'static' + capital(a.name) : a.name), 'attribute');
     if (isStatic) {
       const path = `[${jsPath(name).split('.').map(s => `"${s}"`).join(', ')}, "${a.name}"]`;
       const call = isNode ? exportOf(jsModule, path, res.async ? 'Value' : res.req, !!hostOf(d)) : `Support.getGlobal ${path} ${res.async ? 'Value' : res.req}`;
@@ -1500,7 +1537,8 @@ const shapePattern = { string: '.string _', bool: '.bool _', number: '.number _'
 function emitUnion(module, key) {
   const u = unions.get(key);
   const how = unionRead(u);
-  if (!needTo.has('union:' + key) && how !== 'fromjs' && how !== 'decode') return null;
+  // Lasm.JS.Cloudflare: a union a structure's field names is declared even when only read as data.
+  if (!needTo.has('union:' + key) && how !== 'fromjs' && how !== 'decode' && !module.startsWith('Lasm.JS.Cloudflare.')) return null;
   const lines = [`/-- \`${docText(u.typedef ? `typedef ${u.alts.map(a => a.idl).join(' or ')} ${u.typedef}` : `(${u.alts.map(a => a.idl).join(' or ')})`)}\`: one constructor per member type. -/`, `inductive ${u.name} where`];
   for (const a of u.alts) { requireType(module, a.t); lines.push(`  /-- \`${docText(a.idl)}\` -/\n  | ${id(a.ctor)} (value : ${argType(a.t)})`); }
   const decl = [lines.join('\n')];
@@ -1588,6 +1626,15 @@ function emitSupport(key, stack = []) {
 // Enums first (nothing depends on order for them), then the rest in first-use order.
 for (const k of supportKeys.filter(k => !k.startsWith('union:') && def(k).type === 'enum')) emitSupport(k);
 for (const k of supportKeys) emitSupport(k);
+// Lasm.JS.Cloudflare's shared shapes (cloudflare-api.mjs shareShapes): each later type of the same
+// members is an abbrev of the first, in its own module, after every type of that module.
+for (const m of plan) if (m.host?.rich) inTier(m.tier, () => {
+  for (const d of [...defs.values()].filter(d => d.type === 'typedef' && extAttr(d, 'LasmAlias') && hostOf(d) === m.host.name && extValue(extAttr(d, 'LasmLeanModule')) === m.name)) {
+    const target = resolve(d.idlType);
+    requireType(m.key, target);
+    out.get(m.key).support.push(`/-- \`${extValue(extAttr(d, 'LasmName')) ?? d.name}\` (${specOf(d.spec)}): the same members as \`${argType(target)}\`. -/\nabbrev ${leanTypeName(d.name)} := ${argType(target)}`);
+  }
+});
 
 // ---------- writing ----------
 
@@ -1676,14 +1723,8 @@ files.set(join(outDir, 'modules.json'), JSON.stringify({
   generatedBy: `scripts/bindings/generate-web.mjs (@webref/idl ${webrefVersion})`, modules: webPlan.map(m => m.key) }, null, 2) + '\n');
 // No umbrella module (docs/api/decisions/0.4.md 0.4-39): programs import each Lasm.JS.Node module they use.
 
-files.set(join(root, 'library', 'Lasm', 'JS', 'Cloudflare.lean'), [`/-
-Lasm.JS.Cloudflare: the runtime APIs of Cloudflare Workers as declared by ${hostSource(cloudflareTier.hosts[0])}: the
-bindings of a Worker's env (Workers KV, D1, R2, Durable Objects, Queues), the handlers (fetch, scheduled, queue) and
-their ExecutionContext, the Cache API and TCP sockets, with Lasm.JS.Web's Request, Response and streams as their web
-types. The same mapping as Lasm.JS.Web: bindings are handle types, Promise results are \`Async\`, options
-dictionaries, handlers callbacks made from Lean functions (docs/JS_BINDINGS.md, "Cloudflare Workers: Lasm.JS.Cloudflare").
-${hostGeneratedBy(cloudflareTier.hosts[0])}
--/`, ...order.filter(n => n.startsWith('Lasm.JS.Cloudflare.')).map(n => `import ${n}`), ''].join('\n'));
+// Lasm.JS.Cloudflare has no umbrella module (API_DECISIONS 0.5-16): a program imports the modules of
+// the areas it uses (Lasm.JS.Cloudflare.Kv, .D1, .Workers, …), which compile on first import.
 for (const h of serveTier.hosts) files.set(join(root, 'library', 'Lasm', 'JS', `${h.name}.lean`), [`/-
 ${h.auto ? `Lasm.JS.${h.name}: ${h.title} as declared for ${h.name} ${h.version} (every function, constant and class, with
 the types they use), on Lasm.JS.Web's types. The same mapping as Lasm.JS.Web: classes and the objects the runtime

@@ -180,4 +180,8 @@ instance : ToJS D1PreparedStatementRawOptions := ⟨fun d => Internal.fields #[(
 @[macro_inline] def D1PreparedStatement.raw (self : D1PreparedStatement) (options : Option D1PreparedStatementRawOptions := none) : Async (Array (Array Data)) := Internal.api "Lasm.JS.Cloudflare.D1PreparedStatement.raw" do
   self.val.callMethodAwait "raw" (Internal.args #[Internal.optional options]) (Array (Array Data))
 
+/-- `raw<T = unknown[]>(options: { columnNames: true; }): Promise<[string[], ...T[]]>`: `Promise<sequence<any>> raw(any options)` -/
+@[macro_inline] def D1PreparedStatement.rawWithColumnNames (self : D1PreparedStatement) (options : Data) : Async (Array Data) := Internal.api "Lasm.JS.Cloudflare.D1PreparedStatement.rawWithColumnNames" do
+  self.val.callMethodAwait "raw" (Internal.args #[toJS options]) (Array Data)
+
 end Lasm.JS.Cloudflare
