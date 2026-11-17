@@ -12,7 +12,7 @@ import { bundleModules, compactModule, emscriptenModule } from '../src/browser/b
 import { browserBundle, browserConfigModule, defaultIndexHtml, injectIndexHtml, browserAppName } from '../src/browser/browser-build.mjs';
 import { parseLasmArguments } from '../src/cli-arguments.mjs';
 import { workersEntry, vercelEdgeEntry, netlifyEdgeEntry, portableEntry } from '../src/edge/edge-build.mjs';
-import { linkedLibraryModules, libraryModules } from '../src/lasm-library.mjs';
+import { linkedLibraryModules } from '../src/lasm-library.mjs';
 
 test('builtin modules: lasm:<name> is src/lasm-modules/<name>.mjs', () => {
   const names = builtinModuleNames();
@@ -58,9 +58,11 @@ test('library modules: only those a program initializes, and their imports', () 
     'Lasm.JS': 'initialize_Lasm_JS_Core( initialize_Lasm_JS_Json( initialize_Lasm_JS_Meta(' };
   const libraryText = module => library[module] ?? '';
   const read = text => text;
-  assert.deepEqual(linkedLibraryModules(['initialize_Lasm_JS('], { read, libraryText }), libraryModules.filter(m => m.startsWith('Lasm.JS') && !m.startsWith('Lasm.JS.Web') && !m.startsWith('Lasm.JS.Node') && !m.startsWith('Lasm.JS.Deno') && !m.startsWith('Lasm.JS.Bun') && !m.startsWith('Lasm.JS.Cloudflare') && m !== 'Lasm.JS.Class'));
-  assert.deepEqual(linkedLibraryModules(['initialize_Lasm_JS_Core('], { read, libraryText }), ['Lasm.JS.Core']);
-  assert.deepEqual(linkedLibraryModules(['nothing'], { read, libraryText }), []);
+  // The test's own library, in import order (the real list reads library/, which the mutation sandbox does not have).
+  const modules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS', 'Lasm.JS.Class', 'Lasm.UI'];
+  assert.deepEqual(linkedLibraryModules(['initialize_Lasm_JS('], { read, libraryText, modules }), ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS']);
+  assert.deepEqual(linkedLibraryModules(['initialize_Lasm_JS_Core('], { read, libraryText, modules }), ['Lasm.JS.Core']);
+  assert.deepEqual(linkedLibraryModules(['nothing'], { read, libraryText, modules }), []);
 });
 
 test('bundler: modules become scopes; the entry keeps its exports', async () => {
