@@ -129,7 +129,7 @@ export async function compileProjectLibrary(project, lean, log = console.error, 
   if (!compile) return { compiled: [], lake: false };
   const { ensureProgramLibrary } = await import('./lazy-library.mjs');
   const { withApplicationLock } = await import('./application-lock.mjs');
-  return { ...await ensureProgramLibrary(lean.prefix, project, { eager: libraryModules, log, lock: withApplicationLock }), lake: false };
+  return { ...await ensureProgramLibrary(lean.prefix, project, { eager: libraryModules, root, log, lock: withApplicationLock }), lake: false };
 }
 
 /** lasm init's step when the editor setup is off: the `.lake/lasm-library` link (0.3-7) for a Lake project, with
