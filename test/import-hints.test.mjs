@@ -3,8 +3,8 @@
 // `lasm dev` prints under Lean's unknown-name errors.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, statSync } from 'node:fs';
-import { buildImportIndex, declaredNames, loadImportIndex, missingImportHints, modulesDefining, unknownNames } from '../src/import-hints.mjs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
+import { buildImportIndex, declaredNames, loadImportIndex, missingImportHints, modulesDefining, unknownNames, useImportIndex } from '../src/import-hints.mjs';
 import { formatLeanDiagnostics } from '../src/dev.mjs';
 
 test('declarations: namespaces and keywords, without enum values, checked downcasts or private ones', () => {
@@ -50,6 +50,18 @@ test('the names Lean reports unknown, in its wordings', () => {
   assert.deepEqual(unknownNames('type mismatch: `x` has type `Nat`'), []);
 });
 
+// The tests' own index (the shipped one is in library/, which a mutation sandbox does not have).
+const fakeIndex = buildImportIndex(new Map([
+  ['Lasm.JS.Web.Types.Fetch', 'namespace Lasm.JS.Web\nstructure Response where\nend Lasm.JS.Web'],
+  ['Lasm.JS.Web.Fetch', 'namespace Lasm.JS.Web\n@[macro_inline] def fetch : Nat := 1\nend Lasm.JS.Web'],
+  ['Lasm.JS.Web.Streams', 'namespace Lasm.JS.Web\ndef WritableStream.getWriter : Nat := 1\nend Lasm.JS.Web'],
+  ['Lasm.JS.Node.Path', 'namespace Lasm.JS.Node\ndef path.basename : Nat := 1\nend Lasm.JS.Node'],
+  ['Lasm.JS.Node.Serve', 'namespace Lasm.JS.Node\ndef serve : Nat := 1\nend Lasm.JS.Node'],
+  ['Lasm.JS.Deno.Serve', 'namespace Lasm.JS.Deno\ndef serve : Nat := 1\nend Lasm.JS.Deno'],
+  ['Lasm.JS.Bun.Serve', 'namespace Lasm.JS.Bun\ndef serve : Nat := 1\nend Lasm.JS.Bun'],
+  ['Lasm.JS.Cloudflare.Kv', 'namespace Lasm.JS.Cloudflare\ndef KVNamespace.get : Nat := 1\nend Lasm.JS.Cloudflare']]));
+useImportIndex(fakeIndex);
+
 test('the hints: the import to add, the choice among runtimes, nothing for other names', () => {
   assert.deepEqual(missingImportHints('Main.lean:4:12: error: Unknown identifier `fetch`'),
     ['hint: fetch is defined in Lasm.JS.Web.Fetch; add: import Lasm.JS.Web.Fetch']);
@@ -75,7 +87,8 @@ test('lasm build and lasm dev print the hint under the error (formatLeanDiagnost
   assert.equal(lines.length, 3);
 });
 
-test('the shipped index is small and covers every generated namespace', () => {
+const shipped = new URL('../library/Lasm/JS/import-index.json', import.meta.url);
+test('the shipped index is small and covers every generated namespace', { skip: !existsSync(shipped) && 'no library/ here (a mutation sandbox)' }, () => {
   const file = new URL('../library/Lasm/JS/import-index.json', import.meta.url);
   // Measured 2026-11-17 after the whole Node and Cloudflare surfaces (Train B): 494 KB (105 KB compressed in the npm
   // package) for about 24,000 names; it grows with the generated bindings, not with programs.
@@ -95,4 +108,13 @@ test('lasm build\'s error report (reportCliError) carries the hint, as lasm dev\
   const text = printed.join('\n').replace(/\x1b\[[0-9;]*m/g, '');
   assert.match(text, /Main\.lean:4:12: error: Unknown identifier `fetch`\nhint: fetch is defined in Lasm\.JS\.Web\.Fetch; add: import Lasm\.JS\.Web\.Fetch/);
   assert.match(text, /\[lasm\] Build failed\. Fix the error above/);
+});
+
+test('the shipped index knows the generated declarations', { skip: !existsSync(shipped) && 'no library/ here (a mutation sandbox)' }, () => {
+  const names = loadImportIndex(JSON.parse(readFileSync(shipped, 'utf8')));
+  assert.deepEqual(modulesDefining('fetch', names), ['Lasm.JS.Web.Fetch']);
+  assert.deepEqual(modulesDefining('Response', names), ['Lasm.JS.Web.Fetch']);
+  assert.deepEqual(modulesDefining('path.basename', names), ['Lasm.JS.Node.Path']);
+  assert.deepEqual(modulesDefining('KVNamespace.get', names), ['Lasm.JS.Cloudflare.Kv']);
+  assert.deepEqual(modulesDefining('serve', names), ['Lasm.JS.Node.Serve', 'Lasm.JS.Deno.Serve', 'Lasm.JS.Bun.Serve']);
 });

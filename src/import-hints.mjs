@@ -57,6 +57,8 @@ export function buildImportIndex(sources, { generatedBy } = {}) {
 // ---------- reading it (the CLI) ----------
 
 let loaded;
+/** Uses `index` (the index's data) for every later hint instead of the shipped file: tests give their own. */
+export function useImportIndex(index) { loaded = loadImportIndex(index); }
 /** Full declaration name → the modules that define it. */
 export function loadImportIndex(index) {
   if (!index && loaded) return loaded;
