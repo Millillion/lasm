@@ -1,6 +1,6 @@
 # What is proved about Lasm's library
 
-Lasm's own Lean library (Lasm.UI, Lasm.RPC, Lasm.KV, Lasm.Fetch, Lasm.JS) is ordinary
+Lasm's own Lean library (Lasm.UI, Lasm.KV, Lasm.Fetch, Lasm.JS) is ordinary
 Lean code, and programs run exactly that code. So some of its guarantees are
 proved, for every possible input, rather than only tested. (The propositions
 about the function-platform shims, src/serverless/, are about a model of the
@@ -22,7 +22,6 @@ Each library has a `Spec.lean` that states its propositions, each a named
 proofs in that file:
 
 - [`Lasm/UI/Spec.lean`](Lasm/UI/Spec.lean): the diff and the commands;
-- [`Lasm/RPC/Spec.lean`](Lasm/RPC/Spec.lean): request validation, serving, dispatch and the client;
 - [`Lasm/KV/Spec.lean`](Lasm/KV/Spec.lean): the memory store;
 - [`Lasm/Fetch/Spec.lean`](Lasm/Fetch/Spec.lean): request paths;
 - [`Lasm/JS/Spec.lean`](Lasm/JS/Spec.lean): the value codec between Lean and JavaScript;
@@ -44,7 +43,7 @@ managed Lean 4.35.0 and only Lean's own library (no Mathlib).
 ## Where the proofs live, and what ships
 
 The propositions are about the shipped code (`Lasm.UI.diff`,
-`Lasm.RPC.Endpoint.decodeRequest`, `Lasm.KV.Table.write`, …). The Spec,
+`Lasm.KV.Table.write`, …). The Spec,
 Theorems, `Lasm/UI/Proofs*` and `Lasm/JS/Proofs*` modules are a proofs-only target: they are not
 in the shipped library (`libraryModules` in
 [src/lasm-library.mjs](../src/lasm-library.mjs)), so they are not compiled
@@ -75,7 +74,7 @@ store's table; and the platform stores and HTTP stacks, which Lasm only calls.
 <!-- BEGIN PROPOSITIONS -->
 <!-- Generated from the Spec.lean files by `node scripts/library-proofs.mjs --write`; do not edit by hand. -->
 
-**36 proved propositions (353 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
+**23 proved propositions (338 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
 
 ## Lasm.UI (14)
 
@@ -112,36 +111,6 @@ store's table; and the platform stores and HTTP stacks, which Lasm only calls.
 | [`cmd_map_effects`](Lasm/UI/Spec.lean#L198) | **Mapping commands keeps their effects.** Mapping a command by any `f` keeps exactly its effects, in order, each of the same kind with the same data (the same delay, the same URL, the same task): with the messages they deliver forgotten (`Effect.forget`), the effects before and after are equal. Only the messages change. |
 | [`cmd_map_id`](Lasm/UI/Spec.lean#L206) | **Mapping by the identity changes nothing.** |
 | [`cmd_map_batch`](Lasm/UI/Spec.lean#L210) | **Mapping commutes with batching.** Mapping a batch of commands is the batch of the mapped commands: no effect is lost, duplicated or reordered. |
-
-## Lasm.RPC (13)
-
-### The server only runs handlers on valid requests
-
-| Proposition | In plain English |
-| --- | --- |
-| [`decodeRequest_valid`](Lasm/RPC/Spec.lean#L29) | **A decoded request is valid.** Whenever `decodeRequest` accepts a body as the request `r`, `r` passed the endpoint's `validate`. (This is the proof that `serve` hands to every handler.) |
-| [`decodeRequest_accepts`](Lasm/RPC/Spec.lean#L36) | **A valid request is accepted.** If a body is JSON that reads as the request `r`, and `r` passes `validate`, then `decodeRequest` accepts it as exactly `r`: the server never refuses a well-formed, valid request. |
-| [`decodeRequest_rejects`](Lasm/RPC/Spec.lean#L43) | **An invalid request is refused with the validation's message.** If a body reads as the request `r` but `validate r` fails with message `m`, `decodeRequest` refuses it with `Error.invalid m`. |
-| [`decodeRequest_error_invalid`](Lasm/RPC/Spec.lean#L51) | **Decoding only fails as "invalid".** Every way `decodeRequest` can refuse a body (not JSON, not the request type, or failing `validate`) is an `Error.invalid`, which the server answers with status 400. |
-| [`decodeRequest_hugeExponent`](Lasm/RPC/Spec.lean#L58) | **Huge exponents are refused before parsing.** A body holding a number whose exponent has more than four digits (`1e10000`, which would make Lean's JSON parser compute `10 ^ 10000`) is refused as invalid without being parsed, so such a request cannot exhaust the server's time or memory. |
-| [`serve_invalid`](Lasm/RPC/Spec.lean#L66) | **An invalid request answers 400 without running the handler.** When `decodeRequest` refuses a body, the route that `serve` builds answers status 400 with the error, and does nothing else: the handler is not called. |
-| [`serve_valid`](Lasm/RPC/Spec.lean#L75) | **A valid request runs the handler once.** When `decodeRequest` accepts a body as `r`, the route runs the handler on `r` (with the proof that `r` is valid), once, and answers status 200 with its result if it succeeded and 500 with its message if it failed. |
-
-### Dispatch: `POST /rpc/<name>` and nothing else
-
-| Proposition | In plain English |
-| --- | --- |
-| [`handler_fallback`](Lasm/RPC/Spec.lean#L88) | **Other paths reach the fallback.** A request whose path is not `/rpc/<name>` (one segment after `rpc`) is passed to the fallback handler unchanged, whatever its method. |
-| [`handler_route`](Lasm/RPC/Spec.lean#L95) | **`POST /rpc/<name>` runs the route of that name.** For a `POST` to `/rpc/<name>`, the handler runs the first route named `name` on the request body and answers its status and JSON body, never cached. |
-| [`handler_unknown`](Lasm/RPC/Spec.lean#L104) | **An unknown endpoint answers 404.** A `POST` to `/rpc/<name>` when no route has that name answers status 404, and runs no route and not the fallback. |
-| [`handler_method`](Lasm/RPC/Spec.lean#L113) | **Only `POST` reaches an endpoint.** Any other method on `/rpc/<name>` answers 405 with `allow: POST`, and runs no route and not the fallback. |
-
-### The client
-
-| Proposition | In plain English |
-| --- | --- |
-| [`call_invalid`](Lasm/RPC/Spec.lean#L122) | **An invalid request is never sent.** When `validate` refuses a request with message `m`, the command `call` performs no HTTP request: its only effect delivers `Error.invalid m` to the app. |
-| [`decodeResponse_not_network`](Lasm/RPC/Spec.lean#L130) | **Reading an answer never claims a network failure.** Whatever status and body the server answers, `decodeResponse` never reports `Error.network`: that error means only that no answer arrived. |
 
 ## Lasm.KV (6)
 
@@ -191,7 +160,7 @@ the CLI's JavaScript (`Lasm.Cli`) are listed in
 <!-- BEGIN CANDIDATES -->
 <!-- Generated from the Candidates.lean files by `node scripts/propositions.mjs --write`; do not edit by hand. -->
 
-**14 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
+**10 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
 
 ### Lasm.Fetch (5)
 
@@ -202,15 +171,6 @@ the CLI's JavaScript (`Lasm.Cli`) are listed in
 | [`fastly_request_read`](Lasm/Fetch/Candidates.lean#L116) | **The Fastly host reads the request as Fastly holds it.** Whatever an honest host chooses within the ABI (one name per call or many, short reads, BUFLEN), the program gets the method, the URI, the headers grouped as the host lists them, and the body, byte for byte. | [test/fuzz/native/fastly_driver.c](../test/fuzz/native/fastly_driver.c) |
 | [`fastly_response_written`](Lasm/Fetch/Candidates.lean#L124) | **The Fastly host sends the response as the program wrote it.** Whatever part of each write an honest host takes, it receives the status, every header in order and the body, byte for byte, sent once. | [test/fuzz/native/fastly_driver.c](../test/fuzz/native/fastly_driver.c) |
 | [`fastly_backend_authority`](Lasm/Fetch/Candidates.lean#L133) | **A fetch's dynamic backend is the URL's authority.** For every URL RFC 3986 allows, the backend targets its host and port (the scheme's default when there is none, or it is empty) and overrides the Host with the host name, whatever the userinfo, path, query or fragment hold. | [test/fuzz/native/fastly_driver.c](../test/fuzz/native/fastly_driver.c) |
-
-### Lasm.RPC (4)
-
-| Candidate | In plain English | Tested by |
-| --- | --- | --- |
-| [`request_round_trip`](Lasm/RPC/Candidates.lean#L21) | **A valid request's encoding decodes to itself.** For a request type whose `ToJson` and `FromJson` round-trip, the body the client sends for a valid request is accepted by the server as exactly that request. | [test/fuzz/native/LasmFuzz.lean](../test/fuzz/native/LasmFuzz.lean) |
-| [`response_round_trip`](Lasm/RPC/Candidates.lean#L29) | **A result crosses intact.** For a response type whose `ToJson` and `FromJson` round-trip, the client reads the server's 200 answer for the result `r` as exactly `r`. | [test/fuzz/native/LasmFuzz.lean](../test/fuzz/native/LasmFuzz.lean) |
-| [`error_round_trip`](Lasm/RPC/Candidates.lean#L39) | **A validation error reaches the client as itself.** The server's 400 answer for a validation message `m` is read by the client as `Error.invalid m`, with the same message, and any other status as `Error.failed` with that status and message. | [test/fuzz/native/LasmFuzz.lean](../test/fuzz/native/LasmFuzz.lean) |
-| [`json_print_normal_form`](Lasm/RPC/Candidates.lean#L47) | **Printed JSON is a normal form.** Whatever JSON `parseJson` accepts, its printed form parses again and prints the same. | [test/fuzz/native/LasmFuzz.lean](../test/fuzz/native/LasmFuzz.lean) |
 
 ### Lasm.UI (5)
 

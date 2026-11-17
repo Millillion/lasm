@@ -78,7 +78,7 @@ against both; use it for every JSON text that comes from the network. -/
 /-- Whether JSON text holds a number, outside strings, whose exponent has more
 than four significant digits (`1e10000`). Lean's parser computes
 `10 ^ exponent` for such a number, so a 90-byte request with `1E26191701`
-took the server's whole time and memory (test/fuzz, target lean-rpc). -/
+took the server's whole time and memory (found by fuzzing). -/
 def hugeExponent (text : String) : Bool := Id.run do
   let mut inString := false
   let mut escaped := false

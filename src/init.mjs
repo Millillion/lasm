@@ -70,7 +70,7 @@ export const templates = {
   // on the edge, Bun, Deno and the function platforms; with --deploy, the same
   // routes on Fastly's (Lasm.Fastly) and wasi:http's (Lasm.WASI.Http) own interfaces.
   fetch: { summary: 'an HTTP handler on the web\'s Request and Response (Lasm.JS.Web) for Node, the edge, Bun, Deno and the function platforms, and on Fastly Compute and wasi-http (Spin) through their own interfaces', server: true, interop: false, library: 'Lasm.JS.Web', portable: true, handler: 'Handler' },
-  // The whole stack in Lean (docs/RPC.md): shared types, API and validation; a
+  // The whole stack in Lean (templates/fullstack): shared types, API and validation; a
   // Lasm.Fetch server with server-side rendering; a Lasm.UI app that hydrates it.
   fullstack: { summary: 'a full-stack Lean app: shared types and validation, a REST server that renders the first page, a browser app (Lasm.UI) that hydrates it; Node, Workers, Bun, Deno, and every edge --deploy target', server: true, interop: false, fullstack: true },
 };
@@ -756,12 +756,12 @@ function writeFiles(target, name, files) {
   return { directory: target, name, files: Object.keys(files) };
 }
 
-/** The fullstack template (docs/RPC.md): one Lake project with shared, server
+/** The fullstack template (templates/fullstack): one Lake project with shared, server
  * and client modules; the client is built for the browser into
  * dist/public/client, which the Node server serves and Workers serves as
  * static assets. */
 /** The fullstack template's programs for Fastly and wasi:http (their own interfaces). */
-const fullstackEntries = { fastly: 'Fastly.lean', 'wasi-http': 'WasiHttp.lean' };
+const fullstackEntries = { fastly: 'Fastly.lean', 'wasi-http': 'WasiHttp.lean', 'deno-deploy': 'Deno.lean' };
 
 function fullstackFiles(name, deploy) {
   const lasm = lasmPackage();
@@ -795,7 +795,7 @@ name = "Site"
 [[lean_lib]]
 name = "JsSite"
 
-# Server.lean (Node), Export.lean (the edge, Bun, Deno), Fastly.lean,
+# Server.lean (Node), Workers.lean, Deno.lean, Export.lean (Bun, the other edge targets), Fastly.lean,
 # WasiHttp.lean and Client.lean (the browser) are the programs: lasm builds them
 # (npm run build). They are not Lake targets.
 ${lasmRequire}`,
@@ -812,11 +812,11 @@ ${lasmRequire}`,
         // Every other target: the browser app is embedded in the server program
         // (embed_dir! in Site.lean), so the same build serves everything.
         // Cloudflare Workers (wrangler.toml; Workers also serve dist/public as static assets).
-        'build:workers': 'npm run build:client && lasm build Export.lean --target workers',
+        'build:workers': 'npm run build:client && lasm build Workers.lean --target workers',
         // Bun and Deno: bun bun/main.mjs, deno run -A --unstable-kv deno/main.mjs (on $PORT; Deno KV keeps the todos).
         'build:bun': 'npm run build:client && lasm build Export.lean --target bun',
         'start:bun': 'bun bun/main.mjs',
-        'build:deno': 'npm run build:client && lasm build Export.lean --target deno',
+        'build:deno': 'npm run build:client && lasm build Deno.lean --target deno',
         'start:deno': 'deno run -A --unstable-kv deno/main.mjs',
         ...Object.fromEntries(deploy.filter(t => !['workers'].includes(t)).map(t => [`build:${deployTargets[t].package}`,
           // A function platform packages the Node server in dist/server; a
@@ -831,7 +831,7 @@ ${lasmRequire}`,
     }, null, 2) + '\n',
     'Shared.lean': read('Shared.lean'),
     'View.lean': read('View.lean'),
-    ...Object.fromEntries(['Http.lean', 'Embed.lean', 'Site.lean', 'JsSite.lean', 'Server.lean', 'Export.lean', 'Client.lean'].map(file => [file, read(file)])),
+    ...Object.fromEntries(['Http.lean', 'Embed.lean', 'Site.lean', 'JsSite.lean', 'Server.lean', 'Workers.lean', 'Deno.lean', 'Export.lean', 'Client.lean'].map(file => [file, read(file)])),
     ...Object.fromEntries([...new Set(deploy.map(t => fullstackEntries[deployTargets[t].package]).filter(Boolean))].map(file => [file, read(file)])),
     'public/style.css': read('public/style.css'),
     'wrangler.toml': `# Cloudflare Workers: npm run build:workers writes workers/ (the server) and
@@ -844,12 +844,12 @@ compatibility_date = "2026-10-01"
 [assets]
 directory = "./dist/public"
 
-# Lasm.KV keeps the todos in this KV namespace when it is bound (create one with
-# npx wrangler kv namespace create TODOS and put its id here); without it they
-# live in the isolate's memory. wrangler dev keeps a local copy.
-# [[kv_namespaces]]
-# binding = "TODOS"
-# id = "…"
+# The todos live in this KV namespace (Workers.lean's Env.TODOS). wrangler dev
+# keeps a local copy under this id; to deploy, create one with
+# npx wrangler kv namespace create TODOS and put its id here.
+[[kv_namespaces]]
+binding = "TODOS"
+id = "TODOS"
 
 # Lasm's program.wasm is imported as a precompiled module.
 [[rules]]
@@ -876,15 +876,19 @@ the API between them, whose types and validation are written once.
 | \`Site.lean\` | The server's routes (\`GET\`, \`POST\`, \`PATCH\`, \`DELETE\` on \`/api/todos\`), the first page and the embedded files. It can only store titles that passed the shared check: the store takes a \`ValidTitle\`, a title with its proof. |
 | \`Http.lean\`, \`Embed.lean\` | HTTP as plain Lean data, and \`embed_dir!\`, which embeds the browser app's files. |
 | \`Server.lean\`, \`JsSite.lean\` | The server on Node (\`Node.serve\`), on the web's \`Request\` and \`Response\`. |
-| \`Export.lean\` | The server as the program's default export: Cloudflare Workers, the other edge targets, Bun and Deno. |
+| \`Workers.lean\` | The server on Cloudflare Workers: the fetch handler, with the Worker's bindings typed (\`Env\`, the \`TODOS\` KV namespace). |
+| \`Deno.lean\` | The server on Deno and Deno Deploy, keeping the todos in Deno KV. |
+| \`Export.lean\` | The server as the program's default export: Bun, Vercel Edge and Netlify Edge (todos in memory). |
 | \`Client.lean\` | The browser app (\`Lasm.UI\`): hydrates the server's page and calls the API with \`fetch\` (\`Cmd.task\`). A theorem shows it never sends an invalid title. |
 | \`public/style.css\` | Copied next to the browser app. |
 | \`wrangler.toml\` | Cloudflare Workers: the server as a Worker, the browser app as static assets. |
 
 The server embeds \`dist/public\` (the browser app and \`public/\`) when it is
 built (\`embed_dir!\`), so one build serves the whole app on every platform.
-The todos are kept with \`Lasm.KV\`: Workers KV, Deno KV or a Fastly KV Store
-where one is bound, otherwise memory.
+The todos are kept in each platform's own store: Workers KV (the \`TODOS\`
+binding), Deno KV, or the Fastly KV Store \`TODOS\`; on Node, Bun, the other
+edge targets and wasi-http, in memory. A store that is declared but missing
+fails with an error naming it; the todos never fall back to memory silently.
 
 ## Requirements
 
@@ -911,9 +915,9 @@ command makes: on a fresh clone, run any lasm command once (\`npm run dev\`, \`n
 
 - **Node** (any host, container or VM): \`npm run build\`, then \`npm start\` with \`dist/\`.
 - **Cloudflare Workers**: \`npm run build:workers\`, then \`npx wrangler deploy\`
-  (\`npx wrangler dev\` runs it locally). Bind a KV namespace as \`TODOS\`
-  (\`wrangler.toml\`) to keep the todos in Workers KV; otherwise each isolate
-  keeps its own copy in memory.
+  (\`npx wrangler dev\` runs it locally, with a local copy of the \`TODOS\` KV
+  namespace). Before deploying, create the namespace (\`npx wrangler kv namespace
+  create TODOS\`) and put its id in \`wrangler.toml\`.
 - **Bun**: \`npm run build:bun\`, then \`npm run start:bun\` (memory).
 - **Deno**: \`npm run build:deno\`, then \`npm run start:deno\` (Deno KV).
 - Other platforms: \`lasm init --deploy …\` adds their files and a

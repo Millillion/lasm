@@ -59,7 +59,7 @@ files, except on WASI); the rest of Lean works.
 | Output | `dist/` with `program.wasm` + a JS launcher (Node); or a platform package (`--target …`) |
 | Node apps run on | Node ≥ 24, Linux x64/arm64 (glibc 2.28+ or musl) from any build machine, plus the build machine's own OS; ≥ 512 MB memory |
 | JS/npm interop | `import Lasm.JS`; one `@[js "pkg" "export"]` line per function you call; no premade bindings ([guide](docs/JS_BINDINGS.md)) |
-| Frameworks in Lean | `Lasm.Fetch` (HTTP, every server target), `Lasm.UI` (browser, Elm architecture, proved diff), `Lasm.RPC` (typed client/server API), `Lasm.KV`; `Lasm.JS.Web` (the standard web APIs of every JavaScript target, generated from WebIDL), `Lasm.JS.Node` (Node's fs, path, os, process, crypto, child_process, generated from Node's docs), `Lasm.JS.Cloudflare` (Workers KV, D1, R2, Durable Objects, Queues, cron and queue handlers, generated from `@cloudflare/workers-types`); `Lasm.Fastly` (Fastly Compute's host ABI, generated from its witx) and `Lasm.WASI.Http` (the wasi:http proxy world, generated from the WASI WIT); source, not yet released |
+| Frameworks in Lean | `Lasm.Fetch` (HTTP, every server target), `Lasm.UI` (browser, Elm architecture, proved diff), `Lasm.KV`; `Lasm.JS.Web` (the standard web APIs of every JavaScript target, generated from WebIDL), `Lasm.JS.Node` (Node's fs, path, os, process, crypto, child_process, generated from Node's docs), `Lasm.JS.Cloudflare` (Workers KV, D1, R2, Durable Objects, Queues, cron and queue handlers, generated from `@cloudflare/workers-types`); `Lasm.Fastly` (Fastly Compute's host ABI, generated from its witx) and `Lasm.WASI.Http` (the wasi:http proxy world, generated from the WASI WIT); source, not yet released |
 | Not available at run time | elaboration, `#eval`-style evaluation, loading `.olean`, Lean's kernel ([exact list](#lean-support-and-restrictions)); all of these work at build time |
 | License | MIT (Lasm); templates, examples and README code samples also MIT-0 |
 | Repository / issues | https://github.com/Millillion/lasm · [report a bug](https://github.com/Millillion/lasm/issues/new?template=bug.yml) (include `npx lasm --version`) |
@@ -283,7 +283,7 @@ theorem add_invalid (m : Model) (e : String) (h : checkTitle m.draft = .error e)
 Not proved, tested in CI instead: the JSON/HTTP transport between client and
 server, the JavaScript that applies patches to the real DOM, the Lasm compiler and
 runtime, and the browsers. Lean's own compiler is trusted, as in any Lean program
-([UI.md](docs/UI.md#what-is-proved), [RPC.md](docs/RPC.md#what-is-proved)).
+([UI.md](docs/UI.md#what-is-proved)).
 
 ## Calling JavaScript and npm from Lean
 
@@ -400,7 +400,7 @@ is slower than native Lean (no GMP).
 - **Guides:** [servers and npm interop](docs/JS_BINDINGS.md) ·
   [serverless and containers](docs/deploy/README.md) · [edge](docs/EDGE.md) ·
   [Bun and Deno](docs/BUN_DENO.md) · [browser](docs/BROWSER.md) and
-  [Lasm.UI](docs/UI.md) · [full stack (Lasm.RPC)](docs/RPC.md) ·
+  [Lasm.UI](docs/UI.md) · [full stack](templates/fullstack) ·
   [Lasm.Fetch](docs/FETCH.md) · [WASI and Fastly](docs/WASI.md) · [Lasm.Fastly and Lasm.WASI.Http](docs/WASI_FASTLY_BINDINGS.md) ·
   [the edit loop](docs/DEVELOPER_WORKFLOW.md#lasm-dev)
 - **Evidence:** [benchmarks](docs/BENCHMARKS.md) · [where apps run](docs/DEPLOYMENT.md) ·

@@ -24,7 +24,7 @@ name = "Site"
 [[lean_lib]]
 name = "JsSite"
 
-# Server.lean (Node), Export.lean (the edge, Bun, Deno), Fastly.lean,
+# Server.lean (Node), Workers.lean, Deno.lean, Export.lean (Bun, the other edge targets), Fastly.lean,
 # WasiHttp.lean and Client.lean (the browser) are the programs: lasm builds them
 # (npm run build). They are not Lake targets.
 
