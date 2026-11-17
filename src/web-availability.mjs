@@ -18,7 +18,9 @@ export function targetRuntime(target) {
 /** The Lasm.JS.Web bindings (full Lean names) that these generated C texts call, unavailable somewhere. */
 export function referencedWebApis(texts, apis = loadTable().apis) {
   const found = new Set();
-  for (const text of texts) for (const [, name] of text.matchAll(/"(Lasm\.JS\.Web\.[^"\\]+)"/g)) if (apis[name]) found.add(name);
+  // Lean's C has the name as `Internal.api` uses it, joined with its error's separator at compile time
+  // ("Lasm.JS.Web.Navigator.userAgent: "), and, for a global, static or constructor, as the binding record's name too.
+  for (const text of texts) for (const [, name] of text.matchAll(/"(Lasm\.JS\.Web\.[A-Za-z0-9_.']+)(?:: )?"/g)) if (apis[name]) found.add(name);
   return [...found].sort();
 }
 
