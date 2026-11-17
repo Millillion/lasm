@@ -11,8 +11,7 @@ on JavaScript runtimes"):
   servers run on Node is decided).
 -/
 import Lasm.JS
-import Lasm.JS.Web.Dom
-import Lasm.JS.Web.Fetch
+import Lasm.JS.Web
 import Lasm.JS.Deno
 import Lasm.JS.Bun
 import Server.Web
