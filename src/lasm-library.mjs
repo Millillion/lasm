@@ -23,18 +23,19 @@ const fastlyModules = ['Types', 'Cache', 'ConfigStore', 'HttpCache', 'Shielding'
 // with what they import (test/web-bindings.test.mjs checks the templates and examples need no other). Every other
 // module of the whole platform ships as source and is compiled on first import (src/lazy-library.mjs, 0.3-6).
 export const eagerWebRoots = ['Lasm.JS.Web.Dom', 'Lasm.JS.Web.Fetch', 'Lasm.JS.Web.Html', 'Lasm.JS.Web.Url', 'Lasm.JS.Web.Websockets'];
-/** Lasm.JS.Web's prebuilt modules, from library/ on first use (importing this module reads no file). */
-const eagerWebModules = () => {
-  const all = JSON.parse(readFileSync(join(root, 'Lasm', 'JS', 'Web', 'modules.json'), 'utf8')).modules;
+/** Lasm.JS.Web's prebuilt modules, read from the library at `library` (by default library/) on first use: the
+ * closure of eagerWebRoots and of what the host modules import, in modules.json's order. */
+export const eagerWebModules = (library = root) => {
+  const all = JSON.parse(readFileSync(join(library, 'Lasm', 'JS', 'Web', 'modules.json'), 'utf8')).modules;
   const need = new Set();
   const visit = module => {
     if (need.has(module) || !all.includes(module)) return;
     need.add(module);
-    for (const imported of importsOfSource(readFileSync(join(root, ...module.split('.')) + '.lean', 'utf8'))) visit(imported);
+    for (const imported of importsOfSource(readFileSync(join(library, ...module.split('.')) + '.lean', 'utf8'))) visit(imported);
   };
   // And whatever Lasm.JS.Node, Deno and Bun (compiled with the prefix) import of it.
   const hostRoots = ['Node', 'Deno', 'Bun'].flatMap(host => {
-    const dir = join(root, 'Lasm', 'JS', host);
+    const dir = join(library, 'Lasm', 'JS', host);
     const files = [`${dir}.lean`, ...(existsSync(dir) ? readdirSync(dir).filter(f => f.endsWith('.lean')).map(f => join(dir, f)) : [])];
     return files.filter(existsSync).flatMap(file => importsOfSource(readFileSync(file, 'utf8')));
   });
@@ -46,7 +47,7 @@ const eagerWebModules = () => {
 const wasiHttpModules = ['Io.Error', 'Io.Poll', 'Io.Streams', 'Clocks.MonotonicClock', 'Http.Types', 'Http.OutgoingHandler',
   'Http.IncomingHandler', 'Http.Respond', 'Http'].map(name => `Lasm.WASI.${name}`);
 /** An array computed on first use and kept: every array operation (`includes`, spread, `indexOf`) reads it. */
-function lazyArray(compute) {
+export function lazyArray(compute) {
   let value;
   const array = () => (value ??= compute());
   return new Proxy([], {
