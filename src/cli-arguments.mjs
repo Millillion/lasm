@@ -29,7 +29,7 @@ export const suspendModes = ['none', 'jspi'];
 // Names people try for a target, and the target they mean.
 const targetAliases = { cloudflare: 'workers', 'cloudflare-workers': 'workers', worker: 'workers', aws: 'lambda', 'aws-lambda': 'lambda',
   cloudfront: 'lambda-edge', supabase: 'supabase-edge', 'deno-deploy-edge': 'deno-deploy', spin: 'wasi-http', wasmtime: 'wasi', web: 'browser',
-  vite: 'browser', 'azure-functions': 'azure', 'google-cloud-functions': 'gcf', 'cloud-functions': 'gcf', 'vercel-functions': 'vercel', 'netlify-functions': 'netlify' };
+  vite: 'browser', 'azure-functions': 'azure', 'google-cloud-functions': 'gcf', 'cloud-functions': 'gcf', 'vercel-functions': 'vercel', 'netlify-functions': 'netlify', 'lambda-zip': 'lambda' };
 export function targetHint(value) {
   const alias = asciiLower(value);
   const guess = (Object.hasOwn(targetAliases, alias) ? targetAliases[alias] : undefined) ?? closest(value, buildTargets);

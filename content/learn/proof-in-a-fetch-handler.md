@@ -36,8 +36,9 @@ cd verified-limit
 
 This is the same template as in
 [From zero to Lean on Cloudflare Workers](lean-on-cloudflare-workers.md): a
-`Lasm.Fetch` handler in `Main.lean`, pure logic in `App.lean`, and the files
-for Workers.
+handler on the web's `Request` and `Response` in `Handler.lean`, served on Node
+by `Main.lean` and on Workers by `Export.lean`, pure logic in `App.lean`, and
+the files for Workers.
 
 ## 2. The rule and its proofs
 
@@ -91,7 +92,7 @@ end App
 
 ## 3. Use it in the handler
 
-Replace `Main.lean` with this:
+Replace `Handler.lean` with this:
 
 ```lean
 /-
@@ -99,23 +100,31 @@ Replace `Main.lean` with this:
 `App.pageSize`: the function the theorems in App.lean are about.
 -/
 import App
-import Lasm.Fetch
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Url
 import Lean.Data.Json
-open Lasm.Fetch Lean
+open Lasm.JS Lasm.JS.Web Lean
 
-def handle (req : Request) : Async Response := do
-  match req.method, req.segments with
-  | "GET", ["items"] =>
-    let size := App.pageSize (req.queryParam? "limit")
+namespace Handler
+
+def handle (request : Request) : Async Response := do
+  let url ← URL.new (← request.url)
+  match (← request.method), (← url.pathname) with
+  | "GET", "/items" =>
+    let size := App.pageSize (← (← url.searchParams).get "limit")
     let items := (List.range size).map (· + 1)
-    return .json (Json.mkObj [("size", toJson size), ("items", toJson items)]).compress
-  | _, _ => return .notFound
+    let body := (Json.mkObj [("size", toJson size), ("items", toJson items)]).compress
+    Response.new (some (.usvString body))
+      (some { headers := some (.record ⟨#[("content-type", "application/json")]⟩) })
+  | _, _ => Response.new (some (.usvString "Not Found\n")) (some { status := some 404 })
 
-def main : IO Unit := serve handle
+end Handler
 ```
 
-The handler calls `App.pageSize`, the function the theorems are about. There
-is no second copy of the rule to keep in sync.
+The handler reads `limit` from the URL's query (`URL.searchParams`, as in
+JavaScript) and calls `App.pageSize`, the function the theorems are about.
+There is no second copy of the rule to keep in sync. `Main.lean` and
+`Export.lean` stay as the template wrote them.
 
 ## 4. Build and run it on Node
 

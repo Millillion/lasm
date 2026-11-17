@@ -45,6 +45,8 @@ const webModules = (() => {
 const wasiHttpModules = ['Io.Error', 'Io.Poll', 'Io.Streams', 'Clocks.MonotonicClock', 'Http.Types', 'Http.OutgoingHandler',
   'Http.IncomingHandler', 'Http.Respond', 'Http'].map(name => `Lasm.WASI.${name}`);
 export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS',
+  // Lasm.JS.Class (docs/JS_BINDINGS.md, "JavaScript classes"): not imported by Lasm.JS.
+  'Lasm.JS.Class',
   // Lasm.Fetch (docs/FETCH.md): one HTTP handler for Node, WASI, Fastly and the edge.
   // Lasm.Fastly (docs/WASI_FASTLY_BINDINGS.md): Fastly Compute's host ABI, generated from its witx
   // by scripts/bindings/generate-fastly.mjs (fastlyModules, in import order).
@@ -59,10 +61,18 @@ export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', '
   // Lasm.JS.Node (docs/JS_BINDINGS.md, "Lasm.JS.Node"): Node's server-essential modules, generated from
   // Node's API docs (scripts/bindings/node-api.mjs, generate-web.mjs).
   'Lasm.JS.Node.Support', 'Lasm.JS.Node.Events', 'Lasm.JS.Node.Stream', 'Lasm.JS.Node.Buffer', 'Lasm.JS.Node.Path',
-  'Lasm.JS.Node.Os', 'Lasm.JS.Node.Process', 'Lasm.JS.Node.Fs', 'Lasm.JS.Node.Crypto', 'Lasm.JS.Node.ChildProcess', 'Lasm.JS.Node',
-  // Lasm.JS.Deno and Lasm.JS.Bun (docs/JS_BINDINGS.md, "Lasm.JS.Deno and Lasm.JS.Bun"): Deno.serve and Bun.serve,
-  // generated from the runtimes' TypeScript declarations (scripts/bindings/serve-api.mjs, generate-web.mjs).
-  'Lasm.JS.Deno.Serve', 'Lasm.JS.Deno', 'Lasm.JS.Bun.Serve', 'Lasm.JS.Bun',
+  'Lasm.JS.Node.Os', 'Lasm.JS.Node.Process', 'Lasm.JS.Node.Fs', 'Lasm.JS.Node.Crypto', 'Lasm.JS.Node.ChildProcess', 'Lasm.JS.Node.Net',
+  'Lasm.JS.Node.Http', 'Lasm.JS.Node.Https', 'Lasm.JS.Node',
+  // Node.serve (docs/JS_BINDINGS.md, "Serving HTTP on Node: Node.serve"): provided by Lasm, hand-written, not generated.
+  'Lasm.JS.Node.Serve',
+  // Lasm.JS.Deno and Lasm.JS.Bun (docs/JS_BINDINGS.md, "Standard bindings for Deno" and "...for Bun") have no prebuilt core
+  // (docs/api/decisions/0.4.md, 0.4-20): their modules ship as source and compile on first import
+  // (src/lazy-library.mjs), so none is listed here.
+  // Lasm.JS.Cloudflare (docs/JS_BINDINGS.md, "Cloudflare Workers: Lasm.JS.Cloudflare"): Workers' runtime APIs,
+  // generated from @cloudflare/workers-types (scripts/bindings/cloudflare-api.mjs, generate-web.mjs).
+  'Lasm.JS.Cloudflare.Support', 'Lasm.JS.Cloudflare.Kv', 'Lasm.JS.Cloudflare.D1', 'Lasm.JS.Cloudflare.R2', 'Lasm.JS.Cloudflare.Queues',
+  'Lasm.JS.Cloudflare.Cache', 'Lasm.JS.Cloudflare.Sockets', 'Lasm.JS.Cloudflare.DurableObjects', 'Lasm.JS.Cloudflare.Workers',
+  'Lasm.JS.Cloudflare',
   // Lasm.UI (docs/UI.md): the Elm-architecture frontend framework.
   'Lasm.UI.Html', 'Lasm.UI.Diff', 'Lasm.UI.Model', 'Lasm.UI.Encode', 'Lasm.UI.Elements', 'Lasm.UI.Cmd', 'Lasm.UI.Subs',
   'Lasm.UI.Url', 'Lasm.UI.Mount', 'Lasm.UI.App', 'Lasm.UI.Render', 'Lasm.UI.Syntax', 'Lasm.UI',

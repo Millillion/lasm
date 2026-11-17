@@ -1,17 +1,29 @@
 name: Serverless adapters
 # The function-platform shims (src/serverless/) on each platform's own local
 # runtime, with a stand-in application instead of a Lean build (no toolchain,
-# no build: scripts/serverless/stand-in-app.mjs): several Set-Cookie headers
+# no build: scripts/serverless/stand-in-app.mjs, a program that publishes a
+# fetch handler as Lasm.JS.exportDefault does): several Set-Cookie headers
 # in one reply, two Cookie header lines in one request, and a 303 with no
 # body must reach the other side intact (#80, #82;
 # scripts/serverless/adapter-platforms.mjs). Linux x64 free runners, local
 # tooling only: no account, nothing deployed.
+# The lean-function job builds one real Lean program as well (the fetch
+# template's Export.lean, `lasm build --target lambda` with this checkout
+# packed as a candidate) and runs it in the Lambda image through its Runtime
+# Interface Emulator: init must publish the handler and requests answer 200
+# (scripts/serverless/lean-function-check.mjs). The stand-in is JavaScript, so
+# only this job runs the function host against Emscripten's own runtime.
 on:
   workflow_dispatch:
   pull_request:
     paths:
       - '.github/workflows/serverless-adapters.yml'
+      - 'scripts/serverless/lean-function-check.mjs'
+      - 'scripts/serverless/lambda-events.mjs'
+      - 'templates/fetch/**'
+      - 'library/Lasm/JS/Core.lean'
       - 'src/serverless/**'
+      - 'src/lasm-modules/node-serve.mjs'
       - 'src/package.mjs'
       - 'scripts/serverless/adapter-platforms.mjs'
       - 'scripts/serverless/stand-in-app.mjs'
@@ -20,7 +32,12 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/serverless-adapters.yml'
+      - 'scripts/serverless/lean-function-check.mjs'
+      - 'scripts/serverless/lambda-events.mjs'
+      - 'templates/fetch/**'
+      - 'library/Lasm/JS/Core.lean'
       - 'src/serverless/**'
+      - 'src/lasm-modules/node-serve.mjs'
       - 'src/package.mjs'
       - 'scripts/serverless/adapter-platforms.mjs'
       - 'scripts/serverless/stand-in-app.mjs'
@@ -119,5 +136,74 @@ jobs:
         with:
           name: serverless-adapters-${{ matrix.platform }}
           path: ${{ runner.temp }}/adapters-${{ matrix.platform }}.json
+          retention-days: 14
+          if-no-files-found: ignore
+  pack:
+    if: github.event.repository.visibility == 'public'
+    permissions:
+      contents: write # read the pinned runtime input's draft release
+      actions: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.1
+          package-manager-cache: false
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - uses: ./.github/actions/process-guard
+      - name: Download the pinned retained runtime input
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/fetch-node-runtime.mjs
+      - name: Verify and extract the runtime
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 2048 -- node scripts/ci/restore-node-runtime.mjs
+      - name: Pack this checkout as a candidate
+        run: node scripts/full-lean/run-bounded.mjs --memory-mib 4096 -- /usr/bin/env GITHUB_RUN_ID="$GITHUB_RUN_ID" node scripts/package-node-release.mjs .work/node-candidate .work/node-runtime-restored/runtime .work/node-runtime-restored/native "$(node -p "require('./.work/node-runtime-restored/provenance.json').runtimeManifestSha256")" "$LASM_CANDIDATE_VERSION"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: serverless-adapters-candidate
+          path: .work/node-candidate/lasm-compiler-${{ env.LASM_CANDIDATE_VERSION }}.tgz
+          retention-days: 3
+          if-no-files-found: error
+  lean-function:
+    name: A compiled Lean program on AWS Lambda (Runtime Interface Emulator)
+    needs: pack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 24.22.3
+          package-manager-cache: false
+      - name: Install the candidate as a user would
+        id: candidate
+        uses: ./.github/actions/install-candidate
+        with:
+          artifact: serverless-adapters-candidate
+          version: ${{ env.LASM_CANDIDATE_VERSION }}
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/image-cache/lambda
+          key: ci-images-lambda-${{ hashFiles('scripts/ci/images.lock.json') }}
+      - name: The pinned Lambda images (cache, else registry by digest)
+        run: node scripts/ci/image-cache.mjs ensure "$RUNNER_TEMP/image-cache/lambda" lambda
+      - name: Build the fetch template for Lambda and invoke it in the Lambda image
+        run: node scripts/serverless/lean-function-check.mjs "${{ steps.candidate.outputs.lasm }}" "$RUNNER_TEMP/lean-function" "$RUNNER_TEMP/lean-function.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: serverless-adapters-lean-function
+          path: ${{ runner.temp }}/lean-function.json
           retention-days: 14
           if-no-files-found: ignore

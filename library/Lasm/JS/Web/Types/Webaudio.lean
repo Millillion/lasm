@@ -468,7 +468,7 @@ structure PanningModelType where
 /-- "equalpower" -/
 @[match_pattern] abbrev PanningModelType.equalpower : PanningModelType := .unsafeOfString "equalpower"
 /-- "HRTF" -/
-@[match_pattern] abbrev PanningModelType.hRTF : PanningModelType := .unsafeOfString "HRTF"
+@[match_pattern] abbrev PanningModelType.hrtf : PanningModelType := .unsafeOfString "HRTF"
 instance : ToJS PanningModelType := ⟨fun x => .string x.val⟩
 instance : FromJS PanningModelType where
   fromJS

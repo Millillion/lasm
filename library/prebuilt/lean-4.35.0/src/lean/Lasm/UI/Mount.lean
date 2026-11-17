@@ -4,11 +4,11 @@ Lean program (`lasm:app`, src/lasm-modules/app.mjs): its root element, the
 flags, whether it hydrates server-rendered content, ports (named channels to
 and from the page's JavaScript), messages from `app.send`, unmount handlers and
 the state kept across a hot reload. `Lasm.UI.App.run` uses it; programs that
-draw the page themselves (with `Lasm.JS.Web`) use it directly.
+draw the page themselves (with `Lasm.JS.Web.Browser`) use it directly.
 
 These are bindings of Lasm's own loader, not of a web standard, so they are
 written by hand (moved unchanged from `Lasm.Web.App` when the generated
-`Lasm.JS.Web` replaced `Lasm.Web`; docs/BROWSER.md).
+`Lasm.JS.Web.Browser` replaced `Lasm.Web`; docs/BROWSER.md).
 -/
 import Lasm.JS.Core
 import Lasm.JS.Meta
@@ -33,7 +33,6 @@ namespace Raw
 @[js "lasm:app" "port"] opaque port : String → IO Port
 @[js "lasm:app" "onMessage"] opaque onMessage : Value → IO Unit
 @[js "lasm:app" "onUnmount"] opaque onUnmount : Value → IO Unit
-@[js "lasm:app" "signal"] opaque signal : IO Value
 @[js "lasm:app" "hotState"] opaque hotState : IO Data
 @[js "lasm:app" "onHotSave"] opaque onHotSave : Value → IO Unit
 end Raw
@@ -43,7 +42,7 @@ private def callback (f : Array Data → IO Unit) : IO Value :=
   Function.ofSyncFn fun args => do f args; pure .undefined
 
 /-- The element the app is mounted on, as `α`: `root Lasm.JS.Web.Element`
-(`import Lasm.JS.Web.Dom`), or a `Value`. -/
+(`import Lasm.JS.Web.Browser`), or a `Value`. -/
 def root (α : Type := Value) [FromJS α] : IO α := do decodeAs α "Lasm.UI.Mount.root" (.ref (← Raw.root) "")
 /-- The `flags` passed to `mount` (or `data-lasm-flags`), converted to `α`. -/
 def flags (α : Type := Data) [FromJS α] : IO α := do decodeAs α "Lasm.UI.Mount.flags" (← Raw.flags)
@@ -78,12 +77,6 @@ def onMessageAsync (f : Data → Async Unit) : IO Unit := do
 stops: the place to remove listeners, timers and sockets the app added to the
 page itself. -/
 def onUnmount (f : IO Unit) : IO Unit := do Raw.onUnmount (← callback fun _ => f)
-/-- An `AbortSignal` that aborts when the app is unmounted, as `α`: `signal Lasm.JS.Web.AbortSignal`
-(`import Lasm.JS.Web.Dom`), or a `Value`. Pass it where the platform takes one, and the platform
-removes what it registered: `addEventListener`'s `signal` option, `fetch`'s, and
-`signal.addEventListener "abort"` for a timer or a socket (docs/api/decisions/0.3.md A14.1).
-It aborts before the `onUnmount` handlers run. Outside a mounted app it never aborts. -/
-def signal (α : Type := Value) [FromJS α] : IO α := do decodeAs α "Lasm.UI.Mount.signal" (.ref (← Raw.signal) "")
 
 /-- During a hot reload (`@lasm/cli/vite` in development), the state the previous
 version saved with `onHotSave`, converted to `α`; `none` otherwise or when it

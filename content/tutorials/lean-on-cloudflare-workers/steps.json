@@ -7,7 +7,13 @@
       "cwd": "."
     },
     {
+      "show": "Handler.lean"
+    },
+    {
       "show": "Main.lean"
+    },
+    {
+      "show": "Export.lean"
     },
     {
       "show": "App.lean"

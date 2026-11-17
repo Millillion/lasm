@@ -9,14 +9,14 @@ are in [EDGE.md](../EDGE.md).
 ```sh
 npx lasm init my-app --template hono --deploy netlify-edge
 cd my-app && npm install
-npm run build:netlify-edge   # lasm build Main.lean --target netlify-edge
+npm run build:netlify-edge   # lasm build Export.lean --target netlify-edge
 npx netlify dev --offline    # Netlify's local edge runtime (Deno)
 npx netlify deploy --build   # your account; Lasm never runs this
 ```
 
 `--deploy netlify-edge` writes `netlify.toml`, which makes Netlify run
-`npm run build:netlify-edge`, and an empty `public/`. The same `Main.lean`
-serves Node and the edge (`Lasm.JS.onEdge`).
+`npm run build:netlify-edge`, and an empty `public/`. The edge function serves
+the program's default export (`Export.lean`); `Main.lean` serves Node.
 
 ## What the build writes
 

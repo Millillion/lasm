@@ -213,8 +213,8 @@ instance : ToJS PushPermissionDescriptor := ⟨fun d => Internal.fields #[("name
 
 /-- `ArrayBuffer? getKey(PushEncryptionKeyName name)` -/
 @[macro_inline] def PushSubscription.getKey (self : PushSubscription) (name : PushEncryptionKeyName) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.PushSubscription.getKey" do
-  let r ← self.val.callMethod "getKey" (Internal.args #[toJS name]) (Option Value)
-  (fun x => x.mapM Internal.arrayBufferBytes) r
+  let r ← self.val.callMethod "getKey" (Internal.args #[toJS name]) Data
+  Internal.nullableArrayBufferBytes r
 
 /-- `Promise<boolean> unsubscribe()` -/
 @[macro_inline] def PushSubscription.unsubscribe (self : PushSubscription) : Async Bool := Internal.api "Lasm.JS.Web.PushSubscription.unsubscribe" do
@@ -251,8 +251,8 @@ instance : ToJS PushPermissionDescriptor := ⟨fun d => Internal.fields #[("name
 
 /-- `readonly attribute ArrayBuffer? applicationServerKey` -/
 @[macro_inline] def PushSubscriptionOptions.applicationServerKey (self : PushSubscriptionOptions) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.PushSubscriptionOptions.applicationServerKey" do
-  let r ← self.val.get "applicationServerKey" (Option Value)
-  (fun x => x.mapM Internal.arrayBufferBytes) r
+  let r ← self.val.get "applicationServerKey" Data
+  Internal.nullableArrayBufferBytes r
 
 /-- `attribute EventHandler onpush` -/
 @[macro_inline] def ServiceWorkerGlobalScope.onpush (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onpush" do

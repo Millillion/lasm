@@ -3,6 +3,9 @@ The Lean examples of docs/UI.md, with the definitions around them, elaborated
 by scripts/ui/lean-tests.mjs so the guide stays correct.
 -/
 import Lasm.UI
+import Lasm.JS.Web.Dom
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Html
 open Lasm.UI
 
 namespace Views
@@ -93,15 +96,51 @@ structure Model where
 
 inductive Msg where
   | load
-  | loaded (r : Except Http.Error String)
+  | loaded (body : String)
+  | failed (error : String)
 
 def update : Msg → Model → Model × Cmd Msg
-  | .load, m => ({ m with loading := true }, Http.get "/api/items" .loaded)
-  | .loaded (.ok body), m => ({ m with loading := false, body }, .none)
-  | .loaded (.error e), m => ({ m with loading := false, error := toString e }, .none)
+  | .load, m => ({ m with loading := true }, Cmd.task do
+      try
+        let r ← Lasm.JS.Web.fetch (.usvString "/api/items")
+        return .loaded (← r.text)
+      catch e => return .failed (toString e))
+  | .loaded body, m => ({ m with loading := false, body }, .none)
+  | .failed e, m => ({ m with loading := false, error := e }, .none)
 
-#guard match (update .load {}).2.effects with | [.http r _] => r.url == "/api/items" | _ => false
+#guard match (update .load {}).2.effects with | [.task _] => true | _ => false
+
+def focus (id : String) : Cmd Msg := Cmd.ofEffect (.task fun _ => do
+  afterFrame
+  if let some el ← (← Lasm.JS.Web.document).getElementById id then
+    ({ toElement := el } : Lasm.JS.Web.HTMLElement).focus)
 end Commands
+
+namespace TestableEffects
+structure Model where
+  todos : List String := []
+
+inductive Msg where
+  | clear
+
+/-- What the app asks the page to do. -/
+inductive Effect where
+  | save (key json : String)
+  deriving Repr, BEq
+
+def step : Msg → Model → Model × List Effect
+  | .clear, _ => ({}, [.save "todos" "[]"])
+
+def perform : Effect → Cmd Msg
+  | .save key json => Cmd.ofEffect (.task fun _ => do (← Lasm.JS.Web.localStorage).setItem key json)
+
+def app : App Unit Model Msg where
+  init _ _ := ({}, .none)
+  update msg m := let (m', effects) := step msg m; (m', Cmd.batch (effects.map perform))
+  view _ := .text ""
+
+#guard (step .clear {}).2 == [.save "todos" "[]"]
+end TestableEffects
 
 namespace Subscriptions
 structure Model where

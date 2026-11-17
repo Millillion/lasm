@@ -3,5 +3,8 @@
   "node": "26.13.1",
   "npm": "11.20.0",
   "node24": "24.22.3",
-  "minimumNode": "24.0.0"
+  "minimumNode": "24.0.0",
+  "deferredLatest": {
+    "lean": "4.36.0"
+  }
 }

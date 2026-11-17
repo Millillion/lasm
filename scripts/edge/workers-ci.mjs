@@ -41,6 +41,8 @@ if (!existsSync(hono)) {
 if (!existsSync(pure)) cpSync(join(root, 'examples/edge-pure'), pure, { recursive: true });
 // The platforms' builds run nothing here: the harness builds with this source
 // checkout first (projects made by lasm init run npm run build:<target> instead).
+// The program each edge target builds: the template's default export (Export.lean), else Main.lean.
+const entryOf = project => existsSync(join(project, 'Export.lean')) ? 'Export.lean' : 'Main.lean';
 for (const project of [hono, pure]) {
   // Each app is its own repository, as a user's project is: inside the Lasm
   // checkout, netlify dev takes the checkout as the site root and finds no
@@ -50,7 +52,7 @@ for (const project of [hono, pure]) {
   writeFileSync(join(project, 'public/lasm.txt'), 'Requests are served by the Lean edge function.\n');
   // vercel build runs the build itself, as on Vercel (from a clean tree below).
   writeFileSync(join(project, 'vercel.json'), JSON.stringify({ framework: null, installCommand: 'true',
-    buildCommand: `${JSON.stringify(process.execPath)} ${JSON.stringify(join(root, 'bin/lasm.mjs'))} build Main.lean --target vercel-edge`,
+    buildCommand: `${JSON.stringify(process.execPath)} ${JSON.stringify(join(root, 'bin/lasm.mjs'))} build ${entryOf(project)} --target vercel-edge`,
     outputDirectory: 'public', routes: [{ src: '/(.*)', dest: '/api/lasm' }] }, null, 2) + '\n');
   writeFileSync(join(project, 'netlify.toml'), '[build]\n  command = "true"\n  publish = "public"\n');
 }
@@ -58,7 +60,7 @@ for (const project of [hono, pure]) {
 // The resource guard starts commands with a minimal environment: pass the runtimes on.
 const passed = ['LASM_APPLICATION_RUNTIME', 'LASM_EDGE_RUNTIME', 'LASM_BUILD_JOBS', 'LASM_KEEP_LINK_WORK'].filter(key => process.env[key]).map(key => `${key}=${resolve(process.env[key]) === process.env[key] || key === 'LASM_BUILD_JOBS' ? process.env[key] : resolve(process.env[key])}`);
 const bounded = [join(root, 'scripts/full-lean/run-bounded.mjs'), '--', 'python3', join(root, 'scripts/full-lean/base-pages.py'), 'env', ...passed];
-const lasmBuild = (project, target) => run(process.execPath, [...bounded, process.execPath, join(root, 'bin/lasm.mjs'), 'build', 'Main.lean', '--target', target], { cwd: project });
+const lasmBuild = (project, target) => run(process.execPath, [...bounded, process.execPath, join(root, 'bin/lasm.mjs'), 'build', entryOf(project), '--target', target], { cwd: project });
 for (const [name, project, served, ports] of [['hono', hono, hono, [8787, 8889, 8891]], ['pure', pure, join(pure, 'workers'), [8788, 8890, 8892]]]) {
   const started = Date.now();
   lasmBuild(project, 'workers');

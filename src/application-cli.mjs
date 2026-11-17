@@ -131,8 +131,9 @@ export async function buildEdge(input, target, buildOptions, verbose, { build, l
   buildOptions = nodeOptions;
   // A dev build only links the Node program for its inputs: nobody runs its Node output.
   const linkOnly = buildOptions.profile === 'dev';
-  // The target's web APIs are checked by the build (src/web-availability.mjs).
-  buildOptions = { ...buildOptions, webTarget: target };
+  // The target's web APIs are checked by the build (src/web-availability.mjs); the binding check runs on Node:
+  // globals of the target runtime that Node lacks only warn.
+  buildOptions = { ...buildOptions, webTarget: target, bindingTarget: target };
   let result = await buildApplicationWithProgress(input, { ...buildOptions, keepLinkWork: 'if-built', linkOnly });
   const found = await findEdgeProgram({ result, nodeRuntime, suspend });
   let program = found.cached;

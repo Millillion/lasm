@@ -60,8 +60,10 @@ const TARGETS = {
   workers: { build: ['--target', 'workers'], serve: port => [tools.wrangler, ['dev', '--cwd', 'workers', '--port', String(port), '--ip', '127.0.0.1', '--var', 'LASM_EQ_VALUE:same everywhere', '--show-interactive-dev-session=false'], { WRANGLER_SEND_METRICS: 'false' }] },
 };
 function build(target) {
-  // The fetch template's wasi:http program is WasiHttp.lean (its own interface); every other target builds Main.lean.
-  const entry = target === 'wasi-http' && existsSync(join(project, 'WasiHttp.lean')) ? 'WasiHttp.lean' : 'Main.lean';
+  // The fetch template: wasi:http builds WasiHttp.lean (its own interface), Node builds Main.lean
+  // (Node.serve), and Deno, Bun and Workers build the default export (Export.lean).
+  const entry = target === 'wasi-http' && existsSync(join(project, 'WasiHttp.lean')) ? 'WasiHttp.lean'
+    : target !== 'node' && existsSync(join(project, 'Export.lean')) ? 'Export.lean' : 'Main.lean';
   const args = [lasm, 'build', entry, ...TARGETS[target].build];
   const [cmd, ...rest] = wrap.length ? [...wrap, process.execPath, ...args] : [process.execPath, ...args];
   const r = spawnSync(cmd, rest, { cwd: project, env, encoding: 'utf8', timeout: 40 * 60_000 });

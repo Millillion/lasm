@@ -67,7 +67,7 @@ test('edge modules: bindings plus configuration, minus Node-only modules', () =>
 test('generated Worker entry and configuration', () => {
   const entry = workersEntry(['hono', '@scope/x']);
   assert.match(entry, /import \* as m0 from "hono";\nimport \* as m1 from "@scope\/x";/);
-  assert.match(entry, /const modules = \{ "hono": m0, "@scope\/x": m1 \};/);
+  assert.match(entry, /const modules = \{ 'cloudflare:workers': workersModule, 'cloudflare:sockets': socketsModule, "hono": m0, "@scope\/x": m1 \};/);
   assert.match(entry, /from 'cloudflare:workers'/);
   assert.match(entry, /lasmEdge\.stopped/);
   const config = workersConfig('my-app');

@@ -13,7 +13,7 @@ import { insideDirectory } from './platform.mjs';
 const lasmPackages = new Set(['@lasm/compiler', '@lasm/cli']);
 
 const readJson = file => {
-  try { return JSON.parse(readFileSync(file, 'utf8')); }
+  try { return JSON.parse(readFileSync(file)); }
   catch (error) { throw new Error(`Cannot read ${file}: ${error.message}`); }
 };
 

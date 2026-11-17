@@ -276,7 +276,9 @@ test('edge targets link a new edge program, building again when the Node build k
   const build = async (input, options) => { builds.push(options); return { output: 'node-out', linkWork: options.keepLinkWork === true ? linkWork() : undefined }; };
   const output = await buildEdge(source, 'supabase-edge', { profile: 'dev', output: 'fn', verbose: true }, true, { build, log: line => logged.push(line) });
   assert.equal(output, program);
-  assert.deepEqual(builds, [{ profile: 'dev', verbose: true, webTarget: 'supabase-edge', keepLinkWork: 'if-built', linkOnly: true }, { profile: 'dev', verbose: true, webTarget: 'supabase-edge', keepLinkWork: true, linkOnly: true }]);
+  // The binding check learns the target: its missing globals only warn (A5); the web availability check refuses them.
+  assert.deepEqual(builds, [{ profile: 'dev', verbose: true, webTarget: 'supabase-edge', bindingTarget: 'supabase-edge', keepLinkWork: 'if-built', linkOnly: true },
+    { profile: 'dev', verbose: true, webTarget: 'supabase-edge', bindingTarget: 'supabase-edge', keepLinkWork: true, linkOnly: true }]);
   assert.deepEqual(logged, ['[lasm] Linking the single-threaded (portable) program with Asyncify (this engine has no JSPI)…', '[lasm] linker ready']);
   const [[edge, , env, suspend]] = named('provisionEdgeLinker');
   assert.equal(edge, 'edge-runtime'); assert.equal(env, process.env); assert.equal(suspend, 'asyncify');

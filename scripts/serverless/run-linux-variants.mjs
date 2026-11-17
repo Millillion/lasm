@@ -73,7 +73,7 @@ async function server(run, image, dist, framework, label = 'dist') {
 for (const image of images) {
   try { await pull(image); } catch (error) { result.runs.push({ image, ok: false, error: error.message }); failed = true; continue; }
   const imageInfo = docker(['run', '--rm', ...runtimeArgs, image, 'sh', '-c', 'node --version; (ldd --version 2>&1 || true) | head -1; cat /etc/os-release | grep PRETTY_NAME']).stdout.trim();
-  for (const app of apps.filter(app => app.framework && app.packages.lambda || app.kind === 'program')) {
+  for (const app of apps.filter(app => app.framework && app.packages.lambda || app.kind === 'server' || app.kind === 'program')) {
     const run = { image, app: app.name, imageInfo };
     result.runs.push(run); save();
     try {
