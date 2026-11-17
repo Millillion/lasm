@@ -23,7 +23,8 @@ const fastlyModules = ['Types', 'Cache', 'ConfigStore', 'HttpCache', 'Shielding'
 // with what they import (test/web-bindings.test.mjs checks the templates and examples need no other). Every other
 // module of the whole platform ships as source and is compiled on first import (src/lazy-library.mjs, 0.3-6).
 export const eagerWebRoots = ['Lasm.JS.Web.Dom', 'Lasm.JS.Web.Fetch', 'Lasm.JS.Web.Html', 'Lasm.JS.Web.Url', 'Lasm.JS.Web.Websockets'];
-const webModules = (() => {
+/** Lasm.JS.Web's prebuilt modules, from library/ on first use (importing this module reads no file). */
+const eagerWebModules = () => {
   const all = JSON.parse(readFileSync(join(root, 'Lasm', 'JS', 'Web', 'modules.json'), 'utf8')).modules;
   const need = new Set();
   const visit = module => {
@@ -39,12 +40,25 @@ const webModules = (() => {
   });
   [...eagerWebRoots, ...hostRoots].forEach(visit);
   return all.filter(module => need.has(module));
-})();
+};
 // The generated Lasm.WASI.Http modules: one per WIT interface, then the umbrella module.
 // Http.Respond is hand-written (whole bodies and respond), imported by the umbrella module.
 const wasiHttpModules = ['Io.Error', 'Io.Poll', 'Io.Streams', 'Clocks.MonotonicClock', 'Http.Types', 'Http.OutgoingHandler',
   'Http.IncomingHandler', 'Http.Respond', 'Http'].map(name => `Lasm.WASI.${name}`);
-export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS',
+/** An array computed on first use and kept: every array operation (`includes`, spread, `indexOf`) reads it. */
+function lazyArray(compute) {
+  let value;
+  const array = () => (value ??= compute());
+  return new Proxy([], {
+    get: (_, key) => { const a = array(), v = Reflect.get(a, key, a); return typeof v === 'function' ? v.bind(a) : v; },
+    has: (_, key) => Reflect.has(array(), key),
+    ownKeys: () => Reflect.ownKeys(array()),
+    getOwnPropertyDescriptor: (_, key) => Reflect.getOwnPropertyDescriptor(array(), key),
+  });
+}
+// Lasm's library modules compiled with the prefix, in import order. Lazy: it reads library/Lasm/JS/Web's
+// module list and sources, and importing this module must touch no file (mutation sandboxes have no library/).
+export const libraryModules = lazyArray(() => ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS',
   // Lasm.JS.Class (docs/JS_BINDINGS.md, "JavaScript classes"): not imported by Lasm.JS.
   'Lasm.JS.Class',
   // Lasm.Fetch (docs/FETCH.md): one HTTP handler for Node, WASI, Fastly and the edge.
@@ -56,8 +70,8 @@ export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', '
   ...wasiHttpModules,
   'Lasm.Fetch', 'Lasm.Fetch.Assets', 'Lasm.Fetch.Embed', 'Lasm.KV',
   // Lasm.JS.Web (docs/JS_BINDINGS.md, "Lasm.JS.Web"): the whole web platform, generated from the WebIDL of
-  // @webref/idl by scripts/bindings/generate-web.mjs (webModules, in import order).
-  'Lasm.JS.Web.Support', ...webModules,
+  // @webref/idl by scripts/bindings/generate-web.mjs (eagerWebModules, in import order).
+  'Lasm.JS.Web.Support', ...eagerWebModules(),
   // Lasm.JS.Node (docs/JS_BINDINGS.md, "Lasm.JS.Node"): Node's core set, compiled (scripts/bindings/node-modules.json
   // `core`, in import order). Every other Lasm.JS.Node.* module ships as source and is compiled on first import
   // (src/lazy-library.mjs). No umbrella module: programs import each module they use (0.4-39).
@@ -78,7 +92,7 @@ export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', '
   'Lasm.UI.Html', 'Lasm.UI.Diff', 'Lasm.UI.Model', 'Lasm.UI.Encode', 'Lasm.UI.Elements', 'Lasm.UI.Cmd', 'Lasm.UI.Subs',
   'Lasm.UI.Url', 'Lasm.UI.Mount', 'Lasm.UI.App', 'Lasm.UI.Render', 'Lasm.UI.Syntax', 'Lasm.UI',
   // Lasm.RPC (docs/RPC.md): typed endpoints shared by a Lasm.Fetch server and a Lasm.UI app.
-  'Lasm.RPC.Core', 'Lasm.RPC.Server', 'Lasm.RPC.Client', 'Lasm.RPC'];
+  'Lasm.RPC.Core', 'Lasm.RPC.Server', 'Lasm.RPC.Client', 'Lasm.RPC']);
 // The proofs-only modules (library/Lasm/UI/Proofs*, each library's Spec.lean and Theorems.lean;
 // library/PROOFS.md) are checked by scripts/library-proofs.mjs (Lasm.UI's also by scripts/ui/lean-tests.mjs), not shipped.
 
