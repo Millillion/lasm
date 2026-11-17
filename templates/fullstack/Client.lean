@@ -6,7 +6,7 @@ server, with the todos as flags; mounting hydrates it.
 -/
 import Lasm.UI
 import Lasm.JS.Json
-import Lasm.JS.Web
+import Lasm.JS.Web.Fetch
 import View
 open Lean Lasm.UI
 

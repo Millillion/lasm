@@ -145,6 +145,10 @@ test('the generated modules are shipped library modules, in import order', () =>
   for (const file of [...walk(`${root}templates`), ...walk(`${root}examples`)])
     for (const [, m] of readFileSync(file, 'utf8').matchAll(/^import (Lasm\.JS\.Web\.\S+)$/gm))
       assert.ok(libraryModules.includes(m), `${file.slice(root.length)} imports ${m}, which is not prebuilt (src/lasm-library.mjs eagerWebRoots)`);
+  // Every Lasm module a template, an example or a tutorial imports exists: no umbrella Lasm.JS.Web (0.3-18).
+  for (const file of [...walk(`${root}templates`), ...walk(`${root}examples`), ...walk(`${root}content`)])
+    for (const [, m] of readFileSync(file, 'utf8').matchAll(/^import (Lasm\.\S+)$/gm))
+      assert.ok(existsSync(`${root}library/${m.replaceAll('.', '/')}.lean`), `${file.slice(root.length)} imports ${m}, which Lasm's library does not have`);
 });
 
 test('handle types are per spec (Lasm.JS.Web.Types.<Spec>), importing only their parents\' types', () => {
