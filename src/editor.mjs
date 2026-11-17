@@ -121,10 +121,11 @@ export async function autoSetupEditor(source, { log = console.error, env = proce
  * when the lakefile requires that package, Lake builds them on demand. Otherwise, unless `compile` is false
  * (lasm init's cached-only setup), Lasm compiles them into the prefix now (src/lazy-library.mjs).
  * Returns { compiled: the modules compiled now, lake: whether Lake builds them }. */
-export async function compileProjectLibrary(project, lean, log = console.error, { compile = true, cache } = {}) {
-  const { libraryModules } = await import('./lasm-library.mjs');
+export async function compileProjectLibrary(project, lean, log = console.error, { compile = true, cache, eager, root } = {}) {
+  // `eager` and `root`: Lasm's prebuilt module list and library sources (a test's own library), by default the real ones.
+  const libraryModules = eager ?? (await import('./lasm-library.mjs')).libraryModules;
   const { ensureLakeLibrary, lakefileOf } = await import('./lake-library.mjs');
-  if (lakefileOf(project) && ensureLakeLibrary(project, lean.prefix, { eager: libraryModules, cache }).required) return { compiled: [], lake: true };
+  if (lakefileOf(project) && ensureLakeLibrary(project, lean.prefix, { eager: libraryModules, cache, root }).required) return { compiled: [], lake: true };
   if (!compile) return { compiled: [], lake: false };
   const { ensureProgramLibrary } = await import('./lazy-library.mjs');
   const { withApplicationLock } = await import('./application-lock.mjs');

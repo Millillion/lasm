@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { autoSetupEditor, compileProjectLibrary, editorLean, linkProjectLibrary, editorToolchainName, findElan, setupEditor } from '../src/editor.mjs';
@@ -175,14 +175,20 @@ test('in a Lake project that requires Lasm\'s package, the editor links it and l
     const project = join(dir, 'app'), prefix = join(dir, 'prefix');
     mkdirSync(project); mkdirSync(join(prefix, 'lib', 'lean'), { recursive: true });
     writeFileSync(join(project, 'lakefile.toml'), 'name = "app"\n\n[[require]]\nname = "lasm"\npath = ".lake/lasm-library"\n');
+    // The test's own library: Lasm.JS (prebuilt) and Lasm.JS.Web.IndexedDB (compiled on first import).
+    const root = join(dir, 'library'), eager = ['Lasm.JS'];
+    mkdirSync(join(root, 'Lasm', 'JS', 'Web'), { recursive: true });
+    writeFileSync(join(root, 'Lasm', 'JS.lean'), '');
+    writeFileSync(join(root, 'Lasm', 'JS', 'Web', 'IndexedDB.lean'), 'import Lasm.JS\n');
     // A lazily compiled module: Lasm would have to compile it, but Lake does (no Lean here to compile it with).
     writeFileSync(join(project, 'Main.lean'), 'import Lasm.JS.Web.IndexedDB\n');
-    const result = await compileProjectLibrary(project, { prefix }, () => {}, { cache: join(dir, 'cache') });
+    const options = { cache: join(dir, 'cache'), eager, root };
+    const result = await compileProjectLibrary(project, { prefix }, () => {}, options);
     assert.deepEqual(result, { compiled: [], lake: true });
-    assert.ok(existsSync(join(project, '.lake', 'lasm-library', 'lakefile.toml')));
+    assert.match(readFileSync(join(project, '.lake', 'lasm-library', 'lakefile.toml'), 'utf8'), /^roots = \["Lasm\.JS\.Web\.IndexedDB"\]$/m);
     // Without the require (an older project), the link is still made; the cached-only mode compiles nothing.
     writeFileSync(join(project, 'lakefile.toml'), 'name = "app"\n');
-    assert.deepEqual(await compileProjectLibrary(project, { prefix }, () => {}, { cache: join(dir, 'cache'), compile: false }), { compiled: [], lake: false });
+    assert.deepEqual(await compileProjectLibrary(project, { prefix }, () => {}, { ...options, compile: false }), { compiled: [], lake: false });
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
