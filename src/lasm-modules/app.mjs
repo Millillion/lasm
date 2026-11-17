@@ -13,6 +13,8 @@ export const target = () => 'none';
 export const port = unavailable('ports');
 export const onMessage = unavailable('messages');
 export const onUnmount = unavailable('onUnmount');
+// Outside a mounted app nothing unmounts: a signal that never aborts.
+export const signal = () => new AbortController().signal;
 export const report = error => console.error(error);
 export const hotState = () => undefined;
 export const onHotSave = () => {};
@@ -25,6 +27,8 @@ export function lasmInstance(context) {
   const inbox = [];
   const unmountHandlers = [];
   const ports = new Map();
+  // Aborted when the app is unmounted: the platform's own way to remove listeners and cancel fetches.
+  const unmounting = new AbortController();
   let disposed = false;
   const settle = (value) => Promise.resolve(value);
   // A handler that throws rejects the sender's promise (it is not thrown at the sender, or at Lean).
@@ -59,6 +63,7 @@ export function lasmInstance(context) {
   }
   context.onDispose?.(() => {
     disposed = true;
+    unmounting.abort(new DOMException('The Lasm app is unmounted', 'AbortError'));
     for (const fn of unmountHandlers.splice(0).reverse()) { try { fn(); } catch (error) { context.report?.(error); } }
   });
   const app = {
@@ -92,6 +97,7 @@ export function lasmInstance(context) {
       for (const { message, resolve, reject } of inbox.splice(0)) attempt(fn, message).then(() => resolve(undefined), reject);
     },
     onUnmount: fn => { unmountHandlers.push(fn); },
+    signal: () => unmounting.signal,
     report: error => (context.report ?? console.error)(error),
     // Hot reload (the Vite plugin, @lasm/cli/vite): the state the previous instance saved, and the saver.
     hotState: () => context.hotState,

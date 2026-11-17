@@ -87,8 +87,8 @@ def serve (options : ServeOptions) : IO Unit := do
         let message := match args.getD 0 .undefined with | .string s => s | _ => "the handler failed"
         return toJS (← onError (IO.userError message))
       pure (.ref f "")
-  let handle ← Serve.start (obj [("fetch", .ref fetch ""), ("port", Lasm.JS.Web.Support.optional options.port),
-    ("hostname", Lasm.JS.Web.Support.optional options.hostname), ("signal", Lasm.JS.Web.Support.optional options.signal), ("error", error)])
+  let handle ← Serve.start (obj [("fetch", .ref fetch ""), ("port", Lasm.JS.Web.Internal.optional options.port),
+    ("hostname", Lasm.JS.Web.Internal.optional options.hostname), ("signal", Lasm.JS.Web.Internal.optional options.signal), ("error", error)])
   let fields ← handle.getFields #["hostname", "port", "url"]
   let server : Server := {
     hostname := match fields.field "hostname" with | .string s => s | _ => ""

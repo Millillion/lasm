@@ -8,12 +8,15 @@ docs/JS_BINDINGS.md ("Cloudflare Workers: Lasm.JS.Cloudflare"). The doc comments
 declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Cloudflare.Support
-import Lasm.JS.Web.Streams
-import Lasm.JS.Web.File
-import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Types.Fetch
+import Lasm.JS.Web.Types.FileAPI
+import Lasm.JS.Web.Types.Streams
 
 namespace Lasm.JS.Cloudflare
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface R2Bucket` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
 structure R2Bucket where
@@ -55,20 +58,21 @@ instance : ToJS R2MultipartUpload := ⟨fun x => .ref x.val ""⟩
 instance : FromJS R2MultipartUpload := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.R2MultipartUpload", .data⟩
 
 /-- `enum R2ListOptionsInclude` (@cloudflare/workers-types 5.20261019.1 type declarations): "httpMetadata", "customMetadata". -/
-inductive R2ListOptionsInclude where
-  /-- "httpMetadata" -/
-  | httpMetadata
-  /-- "customMetadata" -/
-  | customMetadata
+structure R2ListOptionsInclude where
+  /-- A value from its string, unchecked: the generated values (`.httpMetadata`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS R2ListOptionsInclude := ⟨fun
-  | .httpMetadata => .string "httpMetadata"
-  | .customMetadata => .string "customMetadata"⟩
+/-- "httpMetadata" -/
+@[match_pattern] abbrev R2ListOptionsInclude.httpMetadata : R2ListOptionsInclude := .unsafeOfString "httpMetadata"
+/-- "customMetadata" -/
+@[match_pattern] abbrev R2ListOptionsInclude.customMetadata : R2ListOptionsInclude := .unsafeOfString "customMetadata"
+instance : ToJS R2ListOptionsInclude := ⟨fun x => .string x.val⟩
 instance : FromJS R2ListOptionsInclude where
   fromJS
-    | .string "httpMetadata" => .ok .httpMetadata
-    | .string "customMetadata" => .ok .customMetadata
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Cloudflare.R2ListOptionsInclude"
 
 /-- `dictionary R2Conditional` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -83,11 +87,11 @@ structure R2Conditional where
   uploadedAfter : Data := .undefined
   /-- `boolean secondsGranularity` -/
   secondsGranularity : Option Bool := none
-instance : ToJS R2Conditional := ⟨fun d => Support.fields #[("etagMatches", Support.optional d.etagMatches),
-    ("etagDoesNotMatch", Support.optional d.etagDoesNotMatch),
+instance : ToJS R2Conditional := ⟨fun d => Internal.fields #[("etagMatches", Internal.optional d.etagMatches),
+    ("etagDoesNotMatch", Internal.optional d.etagDoesNotMatch),
     ("uploadedBefore", d.uploadedBefore),
     ("uploadedAfter", d.uploadedAfter),
-    ("secondsGranularity", Support.optional d.secondsGranularity)]⟩
+    ("secondsGranularity", Internal.optional d.secondsGranularity)]⟩
 
 /-- `typedef R2Conditional or Headers R2ConditionalOrHeaders`: one constructor per member type. -/
 inductive R2ConditionalOrHeaders where
@@ -109,9 +113,9 @@ structure R2Range where
   length : Option Nat := none
   /-- `double suffix` -/
   suffix : Option Float := none
-instance : ToJS R2Range := ⟨fun d => Support.fields #[("offset", Support.optional d.offset),
-    ("length", Support.optional d.length),
-    ("suffix", Support.optional d.suffix)]⟩
+instance : ToJS R2Range := ⟨fun d => Internal.fields #[("offset", Internal.optional d.offset),
+    ("length", Internal.optional d.length),
+    ("suffix", Internal.optional d.suffix)]⟩
 instance : FromJS R2Range where
   fromJS d := do return {
     offset := ← Lasm.JS.readField (Option Float) d "offset",
@@ -151,9 +155,28 @@ structure R2GetOptions where
   range : Option R2RangeOrHeaders := none
   /-- `ArrayBufferOrDOMString ssecKey` -/
   ssecKey : Option ArrayBufferOrDOMString := none
-instance : ToJS R2GetOptions := ⟨fun d => Support.fields #[("onlyIf", Support.optional d.onlyIf),
-    ("range", Support.optional d.range),
-    ("ssecKey", Support.optional d.ssecKey)]⟩
+instance : ToJS R2GetOptions := ⟨fun d => Internal.fields #[("onlyIf", Internal.optional d.onlyIf),
+    ("range", Internal.optional d.range),
+    ("ssecKey", Internal.optional d.ssecKey)]⟩
+
+/-- `dictionary R2BucketGetOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure R2BucketGetOptions where
+  /-- `required R2ConditionalOrHeaders onlyIf` -/
+  onlyIf : R2ConditionalOrHeaders
+  /-- `R2RangeOrHeaders range` -/
+  range : Option R2RangeOrHeaders := none
+  /-- `ArrayBufferOrDOMString ssecKey` -/
+  ssecKey : Option ArrayBufferOrDOMString := none
+instance : ToJS R2BucketGetOptions := ⟨fun d => Internal.fields #[("onlyIf", toJS d.onlyIf),
+    ("range", Internal.optional d.range),
+    ("ssecKey", Internal.optional d.ssecKey)]⟩
+
+/-- `typedef R2ObjectBody or R2Object R2ObjectBodyOrR2Object`: one constructor per member type. -/
+inductive R2ObjectBodyOrR2Object where
+  /-- `R2ObjectBody` -/
+  | r2ObjectBody (value : R2ObjectBody)
+  /-- `R2Object` -/
+  | r2Object (value : R2Object)
 
 /-- `typedef ReadableStream or DOMString or Blob or BufferSource ReadableStreamOrDOMStringOrBlobOrBufferSource`: one constructor per member type. -/
 inductive ReadableStreamOrDOMStringOrBlobOrBufferSource where
@@ -189,11 +212,11 @@ structure R2HTTPMetadata where
   cacheControl : Option String := none
   /-- `any cacheExpiry` -/
   cacheExpiry : Data := .undefined
-instance : ToJS R2HTTPMetadata := ⟨fun d => Support.fields #[("contentType", Support.optional d.contentType),
-    ("contentLanguage", Support.optional d.contentLanguage),
-    ("contentDisposition", Support.optional d.contentDisposition),
-    ("contentEncoding", Support.optional d.contentEncoding),
-    ("cacheControl", Support.optional d.cacheControl),
+instance : ToJS R2HTTPMetadata := ⟨fun d => Internal.fields #[("contentType", Internal.optional d.contentType),
+    ("contentLanguage", Internal.optional d.contentLanguage),
+    ("contentDisposition", Internal.optional d.contentDisposition),
+    ("contentEncoding", Internal.optional d.contentEncoding),
+    ("cacheControl", Internal.optional d.cacheControl),
     ("cacheExpiry", d.cacheExpiry)]⟩
 instance : FromJS R2HTTPMetadata where
   fromJS d := do return {
@@ -251,16 +274,49 @@ structure R2PutOptions where
   storageClass : Option String := none
   /-- `ArrayBufferOrDOMString ssecKey` -/
   ssecKey : Option ArrayBufferOrDOMString := none
-instance : ToJS R2PutOptions := ⟨fun d => Support.fields #[("onlyIf", Support.optional d.onlyIf),
-    ("httpMetadata", Support.optional d.httpMetadata),
-    ("customMetadata", Support.optional d.customMetadata),
-    ("md5", Support.optional d.md5),
-    ("sha1", Support.optional d.sha1),
-    ("sha256", Support.optional d.sha256),
-    ("sha384", Support.optional d.sha384),
-    ("sha512", Support.optional d.sha512),
-    ("storageClass", Support.optional d.storageClass),
-    ("ssecKey", Support.optional d.ssecKey)]⟩
+instance : ToJS R2PutOptions := ⟨fun d => Internal.fields #[("onlyIf", Internal.optional d.onlyIf),
+    ("httpMetadata", Internal.optional d.httpMetadata),
+    ("customMetadata", Internal.optional d.customMetadata),
+    ("md5", Internal.optional d.md5),
+    ("sha1", Internal.optional d.sha1),
+    ("sha256", Internal.optional d.sha256),
+    ("sha384", Internal.optional d.sha384),
+    ("sha512", Internal.optional d.sha512),
+    ("storageClass", Internal.optional d.storageClass),
+    ("ssecKey", Internal.optional d.ssecKey)]⟩
+
+/-- `dictionary R2BucketPutOptions` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure R2BucketPutOptions where
+  /-- `required R2ConditionalOrHeaders onlyIf` -/
+  onlyIf : R2ConditionalOrHeaders
+  /-- `R2HTTPMetadataOrHeaders httpMetadata` -/
+  httpMetadata : Option R2HTTPMetadataOrHeaders := none
+  /-- `record<DOMString, DOMString> customMetadata` -/
+  customMetadata : Option (Record String) := none
+  /-- `DOMStringOrBufferSource md5` -/
+  md5 : Option DOMStringOrBufferSource := none
+  /-- `DOMStringOrBufferSource sha1` -/
+  sha1 : Option DOMStringOrBufferSource := none
+  /-- `DOMStringOrBufferSource sha256` -/
+  sha256 : Option DOMStringOrBufferSource := none
+  /-- `DOMStringOrBufferSource sha384` -/
+  sha384 : Option DOMStringOrBufferSource := none
+  /-- `DOMStringOrBufferSource sha512` -/
+  sha512 : Option DOMStringOrBufferSource := none
+  /-- `DOMString storageClass` -/
+  storageClass : Option String := none
+  /-- `ArrayBufferOrDOMString ssecKey` -/
+  ssecKey : Option ArrayBufferOrDOMString := none
+instance : ToJS R2BucketPutOptions := ⟨fun d => Internal.fields #[("onlyIf", toJS d.onlyIf),
+    ("httpMetadata", Internal.optional d.httpMetadata),
+    ("customMetadata", Internal.optional d.customMetadata),
+    ("md5", Internal.optional d.md5),
+    ("sha1", Internal.optional d.sha1),
+    ("sha256", Internal.optional d.sha256),
+    ("sha384", Internal.optional d.sha384),
+    ("sha512", Internal.optional d.sha512),
+    ("storageClass", Internal.optional d.storageClass),
+    ("ssecKey", Internal.optional d.ssecKey)]⟩
 
 /-- `dictionary R2MultipartOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure R2MultipartOptions where
@@ -272,10 +328,10 @@ structure R2MultipartOptions where
   storageClass : Option String := none
   /-- `ArrayBufferOrDOMString ssecKey` -/
   ssecKey : Option ArrayBufferOrDOMString := none
-instance : ToJS R2MultipartOptions := ⟨fun d => Support.fields #[("httpMetadata", Support.optional d.httpMetadata),
-    ("customMetadata", Support.optional d.customMetadata),
-    ("storageClass", Support.optional d.storageClass),
-    ("ssecKey", Support.optional d.ssecKey)]⟩
+instance : ToJS R2MultipartOptions := ⟨fun d => Internal.fields #[("httpMetadata", Internal.optional d.httpMetadata),
+    ("customMetadata", Internal.optional d.customMetadata),
+    ("storageClass", Internal.optional d.storageClass),
+    ("ssecKey", Internal.optional d.ssecKey)]⟩
 
 /-- `typedef DOMString or sequence<DOMString> DOMStringOrSequenceOfDOMString`: one constructor per member type. -/
 inductive DOMStringOrSequenceOfDOMString where
@@ -288,6 +344,12 @@ instance : ToJS DOMStringOrSequenceOfDOMString := ⟨fun
   | .sequence v => toJS v⟩
 instance : Coe String DOMStringOrSequenceOfDOMString := ⟨.domString⟩
 instance : Coe (Array String) DOMStringOrSequenceOfDOMString := ⟨.sequence⟩
+instance : FromJS DOMStringOrSequenceOfDOMString where
+  fromJS
+    | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
+    | d@(.array _) => (FromJS.fromJS d : Except String (Array String)).map .sequence
+    | _ => .error ""
+  typeName := "Lasm.JS.Cloudflare.DOMStringOrSequenceOfDOMString"
 
 /-- `dictionary R2ListOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure R2ListOptions where
@@ -303,12 +365,12 @@ structure R2ListOptions where
   startAfter : Option String := none
   /-- `sequence<R2ListOptionsInclude> include` -/
   «include» : Option (Array R2ListOptionsInclude) := none
-instance : ToJS R2ListOptions := ⟨fun d => Support.fields #[("limit", Support.optional d.limit),
-    ("prefix", Support.optional d.«prefix»),
-    ("cursor", Support.optional d.cursor),
-    ("delimiter", Support.optional d.delimiter),
-    ("startAfter", Support.optional d.startAfter),
-    ("include", Support.optional d.«include»)]⟩
+instance : ToJS R2ListOptions := ⟨fun d => Internal.fields #[("limit", Internal.optional d.limit),
+    ("prefix", Internal.optional d.«prefix»),
+    ("cursor", Internal.optional d.cursor),
+    ("delimiter", Internal.optional d.delimiter),
+    ("startAfter", Internal.optional d.startAfter),
+    ("include", Internal.optional d.«include»)]⟩
 
 /-- `dictionary R2Objects` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure R2Objects where
@@ -353,7 +415,7 @@ instance : FromJS R2StringChecksums where
 structure R2UploadPartOptions where
   /-- `ArrayBufferOrDOMString ssecKey` -/
   ssecKey : Option ArrayBufferOrDOMString := none
-instance : ToJS R2UploadPartOptions := ⟨fun d => Support.fields #[("ssecKey", Support.optional d.ssecKey)]⟩
+instance : ToJS R2UploadPartOptions := ⟨fun d => Internal.fields #[("ssecKey", Internal.optional d.ssecKey)]⟩
 
 /-- `dictionary R2UploadedPart` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure R2UploadedPart where
@@ -361,7 +423,7 @@ structure R2UploadedPart where
   partNumber : Float
   /-- `required DOMString etag` -/
   etag : String
-instance : ToJS R2UploadedPart := ⟨fun d => Support.fields #[("partNumber", toJS d.partNumber),
+instance : ToJS R2UploadedPart := ⟨fun d => Internal.fields #[("partNumber", toJS d.partNumber),
     ("etag", toJS d.etag)]⟩
 instance : FromJS R2UploadedPart where
   fromJS d := do return {
@@ -370,156 +432,178 @@ instance : FromJS R2UploadedPart where
   typeName := "Lasm.JS.Cloudflare.R2UploadedPart"
 
 /-- `head(key: string): Promise<R2Object | null>`: `Promise<R2Object?> head(DOMString key)` -/
-def R2Bucket.head (self : R2Bucket) (key : String) : Async (Option R2Object) :=
-  self.val.callMethodAwait "head" (Support.args #[toJS key]) (Option R2Object)
+@[macro_inline] def R2Bucket.head (self : R2Bucket) (key : String) : Async (Option R2Object) := Internal.api "Lasm.JS.Cloudflare.R2Bucket.head" do
+  self.val.callMethodAwait "head" (Internal.args #[toJS key]) (Option R2Object)
 
 /-- `get(key: string, options?: R2GetOptions): Promise<R2ObjectBody | null>`: `Promise<R2ObjectBody?> get(DOMString key, optional R2GetOptions options)` -/
-def R2Bucket.get (self : R2Bucket) (key : String) (options : Option R2GetOptions := none) : Async (Option R2ObjectBody) :=
-  self.val.callMethodAwait "get" (Support.args #[toJS key, Support.optional options]) (Option R2ObjectBody)
+@[macro_inline] def R2Bucket.get (self : R2Bucket) (key : String) (options : Option R2GetOptions := none) : Async (Option R2ObjectBody) := Internal.api "Lasm.JS.Cloudflare.R2Bucket.get" do
+  self.val.callMethodAwait "get" (Internal.args #[toJS key, Internal.optional options]) (Option R2ObjectBody)
+
+/-- `get(key: string, options: R2GetOptions & { onlyIf: R2Conditional | Headers; }): Promise<R2ObjectBody | R2Object | null>`: `Promise<R2ObjectBodyOrR2Object?> get(DOMString key, R2BucketGetOptions options)` -/
+@[macro_inline] def R2Bucket.getWithOnlyIf (self : R2Bucket) (key : String) (options : R2BucketGetOptions) : Async (Option Value) := Internal.api "Lasm.JS.Cloudflare.R2Bucket.getWithOnlyIf" do
+  let r ← self.val.callMethodAwait "get" (Internal.args #[toJS key, toJS options]) Data
+  Internal.optionalValue r
 
 /-- `put(key: string, value: ReadableStream | ArrayBuffer | ArrayBufferView | string | null | Blob, options?: R2PutOptions): Promise<R2Object>`: `Promise<R2Object> put(DOMString key, ReadableStreamOrDOMStringOrBlobOrBufferSource? value, optional R2PutOptions options)` -/
-def R2Bucket.put (self : R2Bucket) (key : String) (value : Option ReadableStreamOrDOMStringOrBlobOrBufferSource) (options : Option R2PutOptions := none) : Async R2Object := do
-  let r ← self.val.callMethodAwait "put" (Support.args #[toJS key, toJS value, Support.optional options]) Value
+@[macro_inline] def R2Bucket.put (self : R2Bucket) (key : String) (value : Option ReadableStreamOrDOMStringOrBlobOrBufferSource) (options : Option R2PutOptions := none) : Async R2Object := Internal.api "Lasm.JS.Cloudflare.R2Bucket.put" do
+  let r ← self.val.callMethodAwait "put" (Internal.args #[toJS key, toJS value, Internal.optional options]) Value
   pure { val := r }
 
+/-- `put(key: string, value: ReadableStream | ArrayBuffer | ArrayBufferView | string | null | Blob, options?: R2PutOptions & { onlyIf: R2Conditional | Headers; }): Promise<R2Object | null>`: `Promise<R2Object?> put(DOMString key, ReadableStreamOrDOMStringOrBlobOrBufferSource? value, optional R2BucketPutOptions options)` -/
+@[macro_inline] def R2Bucket.putWithOnlyIf (self : R2Bucket) (key : String) (value : Option ReadableStreamOrDOMStringOrBlobOrBufferSource) (options : Option R2BucketPutOptions := none) : Async (Option R2Object) := Internal.api "Lasm.JS.Cloudflare.R2Bucket.putWithOnlyIf" do
+  self.val.callMethodAwait "put" (Internal.args #[toJS key, toJS value, Internal.optional options]) (Option R2Object)
+
 /-- `createMultipartUpload(key: string, options?: R2MultipartOptions): Promise<R2MultipartUpload>`: `Promise<R2MultipartUpload> createMultipartUpload(DOMString key, optional R2MultipartOptions options)` -/
-def R2Bucket.createMultipartUpload (self : R2Bucket) (key : String) (options : Option R2MultipartOptions := none) : Async R2MultipartUpload := do
-  let r ← self.val.callMethodAwait "createMultipartUpload" (Support.args #[toJS key, Support.optional options]) Value
+@[macro_inline] def R2Bucket.createMultipartUpload (self : R2Bucket) (key : String) (options : Option R2MultipartOptions := none) : Async R2MultipartUpload := Internal.api "Lasm.JS.Cloudflare.R2Bucket.createMultipartUpload" do
+  let r ← self.val.callMethodAwait "createMultipartUpload" (Internal.args #[toJS key, Internal.optional options]) Value
   pure { val := r }
 
 /-- `resumeMultipartUpload(key: string, uploadId: string): R2MultipartUpload`: `R2MultipartUpload resumeMultipartUpload(DOMString key, DOMString uploadId)` -/
-def R2Bucket.resumeMultipartUpload (self : R2Bucket) (key : String) (uploadId : String) : IO R2MultipartUpload := do
-  let r ← self.val.callMethod "resumeMultipartUpload" (Support.args #[toJS key, toJS uploadId]) Value
+@[macro_inline] def R2Bucket.resumeMultipartUpload (self : R2Bucket) (key : String) (uploadId : String) : IO R2MultipartUpload := Internal.api "Lasm.JS.Cloudflare.R2Bucket.resumeMultipartUpload" do
+  let r ← self.val.callMethod "resumeMultipartUpload" (Internal.args #[toJS key, toJS uploadId]) Value
   pure { val := r }
 
 /-- `delete(keys: string | string[]): Promise<void>`: `Promise<undefined> delete(DOMStringOrSequenceOfDOMString keys)` -/
-def R2Bucket.delete (self : R2Bucket) (keys : DOMStringOrSequenceOfDOMString) : Async Unit :=
-  self.val.callMethodAwait "delete" (Support.args #[toJS keys]) Unit
+@[macro_inline] def R2Bucket.delete (self : R2Bucket) (keys : DOMStringOrSequenceOfDOMString) : Async Unit := Internal.api "Lasm.JS.Cloudflare.R2Bucket.delete" do
+  self.val.callMethodAwait "delete" (Internal.args #[toJS keys]) Unit
 
 /-- `list(options?: R2ListOptions): Promise<R2Objects>`: `Promise<R2Objects> list(optional R2ListOptions options)` -/
-def R2Bucket.list (self : R2Bucket) (options : Option R2ListOptions := none) : Async R2Objects :=
-  self.val.callMethodAwait "list" (Support.args #[Support.optional options]) R2Objects
+@[macro_inline] def R2Bucket.list (self : R2Bucket) (options : Option R2ListOptions := none) : Async R2Objects := Internal.api "Lasm.JS.Cloudflare.R2Bucket.list" do
+  self.val.callMethodAwait "list" (Internal.args #[Internal.optional options]) R2Objects
 
 /-- `readonly key: string`: `readonly attribute DOMString key` -/
-def R2Object.key (self : R2Object) : IO String := self.val.get "key" String
+@[macro_inline] def R2Object.key (self : R2Object) : IO String := Internal.api "Lasm.JS.Cloudflare.R2Object.key" do
+  self.val.get "key" String
 
 /-- `readonly version: string`: `readonly attribute DOMString version` -/
-def R2Object.version (self : R2Object) : IO String := self.val.get "version" String
+@[macro_inline] def R2Object.version (self : R2Object) : IO String := Internal.api "Lasm.JS.Cloudflare.R2Object.version" do
+  self.val.get "version" String
 
 /-- `readonly size: number`: `readonly attribute double /* integer: Nat */ size` -/
-def R2Object.size (self : R2Object) : IO Nat := self.val.get "size" Nat
+@[macro_inline] def R2Object.size (self : R2Object) : IO Nat := Internal.api "Lasm.JS.Cloudflare.R2Object.size" do
+  self.val.get "size" Nat
 
 /-- `readonly etag: string`: `readonly attribute DOMString etag` -/
-def R2Object.etag (self : R2Object) : IO String := self.val.get "etag" String
+@[macro_inline] def R2Object.etag (self : R2Object) : IO String := Internal.api "Lasm.JS.Cloudflare.R2Object.etag" do
+  self.val.get "etag" String
 
 /-- `readonly httpEtag: string`: `readonly attribute DOMString httpEtag` -/
-def R2Object.httpEtag (self : R2Object) : IO String := self.val.get "httpEtag" String
+@[macro_inline] def R2Object.httpEtag (self : R2Object) : IO String := Internal.api "Lasm.JS.Cloudflare.R2Object.httpEtag" do
+  self.val.get "httpEtag" String
 
 /-- `readonly checksums: R2Checksums`: `readonly attribute R2Checksums checksums` -/
-def R2Object.checksums (self : R2Object) : IO R2Checksums := do
+@[macro_inline] def R2Object.checksums (self : R2Object) : IO R2Checksums := Internal.api "Lasm.JS.Cloudflare.R2Object.checksums" do
   let r ← self.val.get "checksums" Value
   pure { val := r }
 
 /-- `readonly uploaded: Date`: `readonly attribute any uploaded` -/
-def R2Object.uploaded (self : R2Object) : IO Data := self.val.get "uploaded" Data
+@[macro_inline] def R2Object.uploaded (self : R2Object) : IO Data := Internal.api "Lasm.JS.Cloudflare.R2Object.uploaded" do
+  self.val.get "uploaded" Data
 
 /-- `readonly httpMetadata?: R2HTTPMetadata`: `readonly attribute R2HTTPMetadata? httpMetadata` -/
-def R2Object.httpMetadata (self : R2Object) : IO (Option R2HTTPMetadata) := self.val.get "httpMetadata" (Option R2HTTPMetadata)
+@[macro_inline] def R2Object.httpMetadata (self : R2Object) : IO (Option R2HTTPMetadata) := Internal.api "Lasm.JS.Cloudflare.R2Object.httpMetadata" do
+  self.val.get "httpMetadata" (Option R2HTTPMetadata)
 
 /-- `readonly customMetadata?: Record<string, string>`: `readonly attribute record<DOMString, DOMString>? customMetadata` -/
-def R2Object.customMetadata (self : R2Object) : IO (Option (Record String)) := do
+@[macro_inline] def R2Object.customMetadata (self : R2Object) : IO (Option (Record String)) := Internal.api "Lasm.JS.Cloudflare.R2Object.customMetadata" do
   let r ← self.val.get "customMetadata" Data
   Support.optionalRecordOf String r
 
 /-- `readonly range?: R2Range`: `readonly attribute R2Range? range` -/
-def R2Object.range (self : R2Object) : IO (Option R2Range) := self.val.get "range" (Option R2Range)
+@[macro_inline] def R2Object.range (self : R2Object) : IO (Option R2Range) := Internal.api "Lasm.JS.Cloudflare.R2Object.range" do
+  self.val.get "range" (Option R2Range)
 
 /-- `readonly storageClass: string`: `readonly attribute DOMString storageClass` -/
-def R2Object.storageClass (self : R2Object) : IO String := self.val.get "storageClass" String
+@[macro_inline] def R2Object.storageClass (self : R2Object) : IO String := Internal.api "Lasm.JS.Cloudflare.R2Object.storageClass" do
+  self.val.get "storageClass" String
 
 /-- `readonly ssecKeyMd5?: string`: `readonly attribute DOMString? ssecKeyMd5` -/
-def R2Object.ssecKeyMd5 (self : R2Object) : IO (Option String) := self.val.get "ssecKeyMd5" (Option String)
+@[macro_inline] def R2Object.ssecKeyMd5 (self : R2Object) : IO (Option String) := Internal.api "Lasm.JS.Cloudflare.R2Object.ssecKeyMd5" do
+  self.val.get "ssecKeyMd5" (Option String)
 
 /-- `writeHttpMetadata(headers: Headers): void`: `undefined writeHttpMetadata(Headers headers)` -/
-def R2Object.writeHttpMetadata (self : R2Object) (headers : Headers) : IO Unit :=
-  self.val.callMethod "writeHttpMetadata" (Support.args #[toJS headers]) Unit
+@[macro_inline] def R2Object.writeHttpMetadata (self : R2Object) (headers : Headers) : IO Unit := Internal.api "Lasm.JS.Cloudflare.R2Object.writeHttpMetadata" do
+  self.val.callMethod "writeHttpMetadata" (Internal.args #[toJS headers]) Unit
 
 /-- `get body(): ReadableStream`: `readonly attribute ReadableStream body` -/
-def R2ObjectBody.body (self : R2ObjectBody) : IO ReadableStream := do
+@[macro_inline] def R2ObjectBody.body (self : R2ObjectBody) : IO ReadableStream := Internal.api "Lasm.JS.Cloudflare.R2ObjectBody.body" do
   let r ← self.val.get "body" Value
   pure { val := r }
 
 /-- `get bodyUsed(): boolean`: `readonly attribute boolean bodyUsed` -/
-def R2ObjectBody.bodyUsed (self : R2ObjectBody) : IO Bool := self.val.get "bodyUsed" Bool
+@[macro_inline] def R2ObjectBody.bodyUsed (self : R2ObjectBody) : IO Bool := Internal.api "Lasm.JS.Cloudflare.R2ObjectBody.bodyUsed" do
+  self.val.get "bodyUsed" Bool
 
 /-- `arrayBuffer(): Promise<ArrayBuffer>`: `Promise<ArrayBuffer> arrayBuffer()` -/
-def R2ObjectBody.arrayBuffer (self : R2ObjectBody) : Async ByteArray := do
-  let r ← self.val.callMethodAwait "arrayBuffer" (Support.args #[]) Value
-  Support.arrayBufferBytes r
+@[macro_inline] def R2ObjectBody.arrayBuffer (self : R2ObjectBody) : Async ByteArray := Internal.api "Lasm.JS.Cloudflare.R2ObjectBody.arrayBuffer" do
+  let r ← self.val.callMethodAwait "arrayBuffer" (Internal.args #[]) Value
+  Internal.arrayBufferBytes r
 
 /-- `bytes(): Promise<Uint8Array>`: `Promise<Uint8Array> bytes()` -/
-def R2ObjectBody.bytes (self : R2ObjectBody) : Async ByteArray :=
-  self.val.callMethodAwait "bytes" (Support.args #[]) ByteArray
+@[macro_inline] def R2ObjectBody.bytes (self : R2ObjectBody) : Async ByteArray := Internal.api "Lasm.JS.Cloudflare.R2ObjectBody.bytes" do
+  self.val.callMethodAwait "bytes" (Internal.args #[]) ByteArray
 
 /-- `text(): Promise<string>`: `Promise<DOMString> text()` -/
-def R2ObjectBody.text (self : R2ObjectBody) : Async String :=
-  self.val.callMethodAwait "text" (Support.args #[]) String
+@[macro_inline] def R2ObjectBody.text (self : R2ObjectBody) : Async String := Internal.api "Lasm.JS.Cloudflare.R2ObjectBody.text" do
+  self.val.callMethodAwait "text" (Internal.args #[]) String
 
 /-- `json<T>(): Promise<T>`: `Promise<any> json()` -/
-def R2ObjectBody.json (self : R2ObjectBody) : Async Data :=
-  self.val.callMethodAwait "json" (Support.args #[]) Data
+@[macro_inline] def R2ObjectBody.json (self : R2ObjectBody) : Async Data := Internal.api "Lasm.JS.Cloudflare.R2ObjectBody.json" do
+  self.val.callMethodAwait "json" (Internal.args #[]) Data
 
 /-- `blob(): Promise<Blob>`: `Promise<Blob> blob()` -/
-def R2ObjectBody.blob (self : R2ObjectBody) : Async Blob := do
-  let r ← self.val.callMethodAwait "blob" (Support.args #[]) Value
+@[macro_inline] def R2ObjectBody.blob (self : R2ObjectBody) : Async Blob := Internal.api "Lasm.JS.Cloudflare.R2ObjectBody.blob" do
+  let r ← self.val.callMethodAwait "blob" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `readonly md5?: ArrayBuffer`: `readonly attribute ArrayBuffer? md5` -/
-def R2Checksums.md5 (self : R2Checksums) : IO (Option ByteArray) := do
+@[macro_inline] def R2Checksums.md5 (self : R2Checksums) : IO (Option ByteArray) := Internal.api "Lasm.JS.Cloudflare.R2Checksums.md5" do
   let r ← self.val.get "md5" Data
-  Support.nullableArrayBufferBytes r
+  Internal.nullableArrayBufferBytes r
 
 /-- `readonly sha1?: ArrayBuffer`: `readonly attribute ArrayBuffer? sha1` -/
-def R2Checksums.sha1 (self : R2Checksums) : IO (Option ByteArray) := do
+@[macro_inline] def R2Checksums.sha1 (self : R2Checksums) : IO (Option ByteArray) := Internal.api "Lasm.JS.Cloudflare.R2Checksums.sha1" do
   let r ← self.val.get "sha1" Data
-  Support.nullableArrayBufferBytes r
+  Internal.nullableArrayBufferBytes r
 
 /-- `readonly sha256?: ArrayBuffer`: `readonly attribute ArrayBuffer? sha256` -/
-def R2Checksums.sha256 (self : R2Checksums) : IO (Option ByteArray) := do
+@[macro_inline] def R2Checksums.sha256 (self : R2Checksums) : IO (Option ByteArray) := Internal.api "Lasm.JS.Cloudflare.R2Checksums.sha256" do
   let r ← self.val.get "sha256" Data
-  Support.nullableArrayBufferBytes r
+  Internal.nullableArrayBufferBytes r
 
 /-- `readonly sha384?: ArrayBuffer`: `readonly attribute ArrayBuffer? sha384` -/
-def R2Checksums.sha384 (self : R2Checksums) : IO (Option ByteArray) := do
+@[macro_inline] def R2Checksums.sha384 (self : R2Checksums) : IO (Option ByteArray) := Internal.api "Lasm.JS.Cloudflare.R2Checksums.sha384" do
   let r ← self.val.get "sha384" Data
-  Support.nullableArrayBufferBytes r
+  Internal.nullableArrayBufferBytes r
 
 /-- `readonly sha512?: ArrayBuffer`: `readonly attribute ArrayBuffer? sha512` -/
-def R2Checksums.sha512 (self : R2Checksums) : IO (Option ByteArray) := do
+@[macro_inline] def R2Checksums.sha512 (self : R2Checksums) : IO (Option ByteArray) := Internal.api "Lasm.JS.Cloudflare.R2Checksums.sha512" do
   let r ← self.val.get "sha512" Data
-  Support.nullableArrayBufferBytes r
+  Internal.nullableArrayBufferBytes r
 
 /-- `toJSON(): R2StringChecksums`: `R2StringChecksums toJSON()` -/
-def R2Checksums.toJSON (self : R2Checksums) : IO R2StringChecksums :=
-  self.val.callMethod "toJSON" (Support.args #[]) R2StringChecksums
+@[macro_inline] def R2Checksums.toJSON (self : R2Checksums) : IO R2StringChecksums := Internal.api "Lasm.JS.Cloudflare.R2Checksums.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) R2StringChecksums
 
 /-- `readonly key: string`: `readonly attribute DOMString key` -/
-def R2MultipartUpload.key (self : R2MultipartUpload) : IO String := self.val.get "key" String
+@[macro_inline] def R2MultipartUpload.key (self : R2MultipartUpload) : IO String := Internal.api "Lasm.JS.Cloudflare.R2MultipartUpload.key" do
+  self.val.get "key" String
 
 /-- `readonly uploadId: string`: `readonly attribute DOMString uploadId` -/
-def R2MultipartUpload.uploadId (self : R2MultipartUpload) : IO String := self.val.get "uploadId" String
+@[macro_inline] def R2MultipartUpload.uploadId (self : R2MultipartUpload) : IO String := Internal.api "Lasm.JS.Cloudflare.R2MultipartUpload.uploadId" do
+  self.val.get "uploadId" String
 
 /-- `uploadPart(partNumber: number, value: ReadableStream | (ArrayBuffer | ArrayBufferView) | string | Blob, options?: R2UploadPartOptions): Promise<R2UploadedPart>`: `Promise<R2UploadedPart> uploadPart(double partNumber, ReadableStreamOrDOMStringOrBlobOrBufferSource value, optional R2UploadPartOptions options)` -/
-def R2MultipartUpload.uploadPart (self : R2MultipartUpload) (partNumber : Float) (value : ReadableStreamOrDOMStringOrBlobOrBufferSource) (options : Option R2UploadPartOptions := none) : Async R2UploadedPart :=
-  self.val.callMethodAwait "uploadPart" (Support.args #[toJS partNumber, toJS value, Support.optional options]) R2UploadedPart
+@[macro_inline] def R2MultipartUpload.uploadPart (self : R2MultipartUpload) (partNumber : Float) (value : ReadableStreamOrDOMStringOrBlobOrBufferSource) (options : Option R2UploadPartOptions := none) : Async R2UploadedPart := Internal.api "Lasm.JS.Cloudflare.R2MultipartUpload.uploadPart" do
+  self.val.callMethodAwait "uploadPart" (Internal.args #[toJS partNumber, toJS value, Internal.optional options]) R2UploadedPart
 
 /-- `abort(): Promise<void>`: `Promise<undefined> abort()` -/
-def R2MultipartUpload.abort (self : R2MultipartUpload) : Async Unit :=
-  self.val.callMethodAwait "abort" (Support.args #[]) Unit
+@[macro_inline] def R2MultipartUpload.abort (self : R2MultipartUpload) : Async Unit := Internal.api "Lasm.JS.Cloudflare.R2MultipartUpload.abort" do
+  self.val.callMethodAwait "abort" (Internal.args #[]) Unit
 
 /-- `complete(uploadedParts: R2UploadedPart[]): Promise<R2Object>`: `Promise<R2Object> complete(sequence<R2UploadedPart> uploadedParts)` -/
-def R2MultipartUpload.complete (self : R2MultipartUpload) (uploadedParts : Array R2UploadedPart) : Async R2Object := do
-  let r ← self.val.callMethodAwait "complete" (Support.args #[toJS uploadedParts]) Value
+@[macro_inline] def R2MultipartUpload.complete (self : R2MultipartUpload) (uploadedParts : Array R2UploadedPart) : Async R2Object := Internal.api "Lasm.JS.Cloudflare.R2MultipartUpload.complete" do
+  let r ← self.val.callMethodAwait "complete" (Internal.args #[toJS uploadedParts]) Value
   pure { val := r }
 
 end Lasm.JS.Cloudflare

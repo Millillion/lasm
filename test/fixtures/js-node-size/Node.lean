@@ -1,5 +1,6 @@
-/- The same program through Lasm.JS.Node (all of it imported), for scripts/bindings/test-web.mjs --fixture js-node --sizes. -/
-import Lasm.JS.Node
+/- The same program through Lasm.JS.Node (the modules it uses), for scripts/bindings/test-web.mjs --fixture js-node --sizes. -/
+import Lasm.JS.Node.Path
+import Lasm.JS.Node.Crypto
 open Lasm.JS.Node
 
 def main : IO Unit := do

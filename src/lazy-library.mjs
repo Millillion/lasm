@@ -15,7 +15,7 @@ import { basename, dirname, join, relative, toNamespacedPath } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { executableName } from './platform.mjs';
 
-const libraryRoot = fileURLToPath(new URL('../library/', import.meta.url));
+export const libraryRoot = fileURLToPath(new URL('../library/', import.meta.url));
 
 /** The generated binding namespaces whose modules (and umbrella module, `Lasm.JS.Deno`) may be compiled on first import. */
 export const lazyNamespaces = ['Lasm.JS.Web.', 'Lasm.JS.Node.', 'Lasm.JS.Deno.', 'Lasm.JS.Bun.', 'Lasm.JS.Cloudflare.'];
@@ -208,9 +208,9 @@ export async function ensureLazyModules(tree, roots, { eager, root = libraryRoot
  * import. Messages go to `progress` (as stages) when there is one, else to `log`; `lock` is
  * src/application-lock.mjs withApplicationLock, so builds of different projects share the compiles.
  */
-export function ensureProgramLibrary(prefix, directory, { eager, log = message => console.error(message), progress, lock } = {}) {
+export function ensureProgramLibrary(prefix, directory, { eager, root, log = message => console.error(message), progress, lock } = {}) {
   return ensureLazyModules(prefix, programLibraryImports(directory), {
-    eager, log: message => (progress ? progress({ stage: message.replace(/^\[lasm\] /, '') }) : log(message)),
+    eager, ...(root ? { root } : {}), log: message => (progress ? progress({ stage: message.replace(/^\[lasm\] /, '') }) : log(message)),
     lock: lock && ((path, action) => lock(path, action, { onWait: () => progress?.({ stage: 'Waiting for another build compiling Lasm library modules' }) })) });
 }
 

@@ -8,12 +8,18 @@ docs/JS_BINDINGS.md ("Cloudflare Workers: Lasm.JS.Cloudflare"). The doc comments
 declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Cloudflare.Support
+import Lasm.JS.Web.Types.Fetch
+import Lasm.JS.Web.Types.Websockets
 import Lasm.JS.Web.Fetch
 import Lasm.JS.Cloudflare.Cache
 import Lasm.JS.Cloudflare.Sockets
+import Lasm.JS.Cloudflare.Containers
 
 namespace Lasm.JS.Cloudflare
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface DurableObjectNamespace` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
 structure DurableObjectNamespace where
@@ -63,102 +69,161 @@ instance : Nonempty DurableObjectTransaction := ⟨{ val := Classical.ofNonempty
 instance : ToJS DurableObjectTransaction := ⟨fun x => .ref x.val ""⟩
 instance : FromJS DurableObjectTransaction := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.DurableObjectTransaction", .data⟩
 
+/-- `interface ColoLocalActorNamespace` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
+structure ColoLocalActorNamespace where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty ColoLocalActorNamespace := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS ColoLocalActorNamespace := ⟨fun x => .ref x.val ""⟩
+instance : FromJS ColoLocalActorNamespace := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.ColoLocalActorNamespace", .data⟩
+
+/-- `interface DurableObject` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
+structure DurableObject where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty DurableObject := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS DurableObject := ⟨fun x => .ref x.val ""⟩
+instance : FromJS DurableObject := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.DurableObject", .data⟩
+
+/-- `interface WebSocketRequestResponsePair` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
+structure WebSocketRequestResponsePair where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty WebSocketRequestResponsePair := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS WebSocketRequestResponsePair := ⟨fun x => .ref x.val ""⟩
+instance : FromJS WebSocketRequestResponsePair := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.WebSocketRequestResponsePair", .data⟩
+
+/-- `interface DurableObjectFacets` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
+structure DurableObjectFacets where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty DurableObjectFacets := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS DurableObjectFacets := ⟨fun x => .ref x.val ""⟩
+instance : FromJS DurableObjectFacets := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.DurableObjectFacets", .data⟩
+
+/-- `interface SqlStorage` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
+structure SqlStorage where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty SqlStorage := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS SqlStorage := ⟨fun x => .ref x.val ""⟩
+instance : FromJS SqlStorage := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.SqlStorage", .data⟩
+
+/-- `interface SqlStorageStatement` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
+structure SqlStorageStatement where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty SqlStorageStatement := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS SqlStorageStatement := ⟨fun x => .ref x.val ""⟩
+instance : FromJS SqlStorageStatement := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.SqlStorageStatement", .data⟩
+
+/-- `interface SqlStorageCursor` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
+structure SqlStorageCursor where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty SqlStorageCursor := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS SqlStorageCursor := ⟨fun x => .ref x.val ""⟩
+instance : FromJS SqlStorageCursor := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.SqlStorageCursor", .data⟩
+
+/-- `interface SyncKvStorage` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
+structure SyncKvStorage where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty SyncKvStorage := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS SyncKvStorage := ⟨fun x => .ref x.val ""⟩
+instance : FromJS SyncKvStorage := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.SyncKvStorage", .data⟩
+
+/-- `interface CloudflareWorkersModule.DurableObject` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a handle to the JavaScript object. -/
+structure CloudflareWorkersModuleDurableObject where
+  /-- The JavaScript object. -/
+  val : Value
+instance : Nonempty CloudflareWorkersModuleDurableObject := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS CloudflareWorkersModuleDurableObject := ⟨fun x => .ref x.val ""⟩
+instance : FromJS CloudflareWorkersModuleDurableObject := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.CloudflareWorkersModuleDurableObject", .data⟩
+
 /-- `enum DurableObjectJurisdiction` (@cloudflare/workers-types 5.20261019.1 type declarations): "eu", "fedramp", "fedramp-high", "us". -/
-inductive DurableObjectJurisdiction where
-  /-- "eu" -/
-  | eu
-  /-- "fedramp" -/
-  | fedramp
-  /-- "fedramp-high" -/
-  | fedrampHigh
-  /-- "us" -/
-  | us
+structure DurableObjectJurisdiction where
+  /-- A value from its string, unchecked: the generated values (`.eu`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS DurableObjectJurisdiction := ⟨fun
-  | .eu => .string "eu"
-  | .fedramp => .string "fedramp"
-  | .fedrampHigh => .string "fedramp-high"
-  | .us => .string "us"⟩
+/-- "eu" -/
+@[match_pattern] abbrev DurableObjectJurisdiction.eu : DurableObjectJurisdiction := .unsafeOfString "eu"
+/-- "fedramp" -/
+@[match_pattern] abbrev DurableObjectJurisdiction.fedramp : DurableObjectJurisdiction := .unsafeOfString "fedramp"
+/-- "fedramp-high" -/
+@[match_pattern] abbrev DurableObjectJurisdiction.fedrampHigh : DurableObjectJurisdiction := .unsafeOfString "fedramp-high"
+/-- "us" -/
+@[match_pattern] abbrev DurableObjectJurisdiction.us : DurableObjectJurisdiction := .unsafeOfString "us"
+instance : ToJS DurableObjectJurisdiction := ⟨fun x => .string x.val⟩
 instance : FromJS DurableObjectJurisdiction where
   fromJS
-    | .string "eu" => .ok .eu
-    | .string "fedramp" => .ok .fedramp
-    | .string "fedramp-high" => .ok .fedrampHigh
-    | .string "us" => .ok .us
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Cloudflare.DurableObjectJurisdiction"
 
 /-- `enum DurableObjectLocationHint` (@cloudflare/workers-types 5.20261019.1 type declarations): "wnam", "enam", "sam", "weur", "eeur", "apac", "apac-ne", "apac-se", "oc", "afr", "me". -/
-inductive DurableObjectLocationHint where
-  /-- "wnam" -/
-  | wnam
-  /-- "enam" -/
-  | enam
-  /-- "sam" -/
-  | sam
-  /-- "weur" -/
-  | weur
-  /-- "eeur" -/
-  | eeur
-  /-- "apac" -/
-  | apac
-  /-- "apac-ne" -/
-  | apacNe
-  /-- "apac-se" -/
-  | apacSe
-  /-- "oc" -/
-  | oc
-  /-- "afr" -/
-  | afr
-  /-- "me" -/
-  | me
+structure DurableObjectLocationHint where
+  /-- A value from its string, unchecked: the generated values (`.wnam`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS DurableObjectLocationHint := ⟨fun
-  | .wnam => .string "wnam"
-  | .enam => .string "enam"
-  | .sam => .string "sam"
-  | .weur => .string "weur"
-  | .eeur => .string "eeur"
-  | .apac => .string "apac"
-  | .apacNe => .string "apac-ne"
-  | .apacSe => .string "apac-se"
-  | .oc => .string "oc"
-  | .afr => .string "afr"
-  | .me => .string "me"⟩
+/-- "wnam" -/
+@[match_pattern] abbrev DurableObjectLocationHint.wnam : DurableObjectLocationHint := .unsafeOfString "wnam"
+/-- "enam" -/
+@[match_pattern] abbrev DurableObjectLocationHint.enam : DurableObjectLocationHint := .unsafeOfString "enam"
+/-- "sam" -/
+@[match_pattern] abbrev DurableObjectLocationHint.sam : DurableObjectLocationHint := .unsafeOfString "sam"
+/-- "weur" -/
+@[match_pattern] abbrev DurableObjectLocationHint.weur : DurableObjectLocationHint := .unsafeOfString "weur"
+/-- "eeur" -/
+@[match_pattern] abbrev DurableObjectLocationHint.eeur : DurableObjectLocationHint := .unsafeOfString "eeur"
+/-- "apac" -/
+@[match_pattern] abbrev DurableObjectLocationHint.apac : DurableObjectLocationHint := .unsafeOfString "apac"
+/-- "apac-ne" -/
+@[match_pattern] abbrev DurableObjectLocationHint.apacNe : DurableObjectLocationHint := .unsafeOfString "apac-ne"
+/-- "apac-se" -/
+@[match_pattern] abbrev DurableObjectLocationHint.apacSe : DurableObjectLocationHint := .unsafeOfString "apac-se"
+/-- "oc" -/
+@[match_pattern] abbrev DurableObjectLocationHint.oc : DurableObjectLocationHint := .unsafeOfString "oc"
+/-- "afr" -/
+@[match_pattern] abbrev DurableObjectLocationHint.afr : DurableObjectLocationHint := .unsafeOfString "afr"
+/-- "me" -/
+@[match_pattern] abbrev DurableObjectLocationHint.me : DurableObjectLocationHint := .unsafeOfString "me"
+instance : ToJS DurableObjectLocationHint := ⟨fun x => .string x.val⟩
 instance : FromJS DurableObjectLocationHint where
   fromJS
-    | .string "wnam" => .ok .wnam
-    | .string "enam" => .ok .enam
-    | .string "sam" => .ok .sam
-    | .string "weur" => .ok .weur
-    | .string "eeur" => .ok .eeur
-    | .string "apac" => .ok .apac
-    | .string "apac-ne" => .ok .apacNe
-    | .string "apac-se" => .ok .apacSe
-    | .string "oc" => .ok .oc
-    | .string "afr" => .ok .afr
-    | .string "me" => .ok .me
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Cloudflare.DurableObjectLocationHint"
 
 /-- `enum DurableObjectRoutingMode` (@cloudflare/workers-types 5.20261019.1 type declarations): "primary-only". -/
-inductive DurableObjectRoutingMode where
-  /-- "primary-only" -/
-  | primaryOnly
+structure DurableObjectRoutingMode where
+  /-- A value from its string, unchecked: the generated values (`.primaryOnly`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS DurableObjectRoutingMode := ⟨fun
-  | .primaryOnly => .string "primary-only"⟩
+/-- "primary-only" -/
+@[match_pattern] abbrev DurableObjectRoutingMode.primaryOnly : DurableObjectRoutingMode := .unsafeOfString "primary-only"
+instance : ToJS DurableObjectRoutingMode := ⟨fun x => .string x.val⟩
 instance : FromJS DurableObjectRoutingMode where
   fromJS
-    | .string "primary-only" => .ok .primaryOnly
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Cloudflare.DurableObjectRoutingMode"
 
 /-- `dictionary DurableObjectNamespaceNewUniqueIdOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DurableObjectNamespaceNewUniqueIdOptions where
   /-- `DurableObjectJurisdiction jurisdiction` -/
   jurisdiction : Option DurableObjectJurisdiction := none
-instance : ToJS DurableObjectNamespaceNewUniqueIdOptions := ⟨fun d => Support.fields #[("jurisdiction", Support.optional d.jurisdiction)]⟩
+instance : ToJS DurableObjectNamespaceNewUniqueIdOptions := ⟨fun d => Internal.fields #[("jurisdiction", Internal.optional d.jurisdiction)]⟩
+instance : FromJS DurableObjectNamespaceNewUniqueIdOptions where
+  fromJS d := do return {
+    jurisdiction := ← Lasm.JS.readField (Option DurableObjectJurisdiction) d "jurisdiction" }
+  typeName := "Lasm.JS.Cloudflare.DurableObjectNamespaceNewUniqueIdOptions"
 
 /-- `dictionary DurableObjectNamespaceGetDurableObjectOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DurableObjectNamespaceGetDurableObjectOptions where
@@ -166,20 +231,13 @@ structure DurableObjectNamespaceGetDurableObjectOptions where
   locationHint : Option DurableObjectLocationHint := none
   /-- `DurableObjectRoutingMode routingMode` -/
   routingMode : Option DurableObjectRoutingMode := none
-instance : ToJS DurableObjectNamespaceGetDurableObjectOptions := ⟨fun d => Support.fields #[("locationHint", Support.optional d.locationHint),
-    ("routingMode", Support.optional d.routingMode)]⟩
-
-/-- `typedef SocketAddress or DOMString SocketAddressOrDOMString`: one constructor per member type. -/
-inductive SocketAddressOrDOMString where
-  /-- `SocketAddress` -/
-  | socketAddress (value : SocketAddress)
-  /-- `DOMString` -/
-  | domString (value : String)
-instance : ToJS SocketAddressOrDOMString := ⟨fun
-  | .socketAddress v => toJS v
-  | .domString v => toJS v⟩
-instance : Coe SocketAddress SocketAddressOrDOMString := ⟨.socketAddress⟩
-instance : Coe String SocketAddressOrDOMString := ⟨.domString⟩
+instance : ToJS DurableObjectNamespaceGetDurableObjectOptions := ⟨fun d => Internal.fields #[("locationHint", Internal.optional d.locationHint),
+    ("routingMode", Internal.optional d.routingMode)]⟩
+instance : FromJS DurableObjectNamespaceGetDurableObjectOptions where
+  fromJS d := do return {
+    locationHint := ← Lasm.JS.readField (Option DurableObjectLocationHint) d "locationHint",
+    routingMode := ← Lasm.JS.readField (Option DurableObjectRoutingMode) d "routingMode" }
+  typeName := "Lasm.JS.Cloudflare.DurableObjectNamespaceGetDurableObjectOptions"
 
 /-- `callback DurableObjectStateBlockConcurrencyWhileCallback = Promise<any> ()` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure DurableObjectStateBlockConcurrencyWhileCallback where
@@ -205,7 +263,7 @@ def DurableObjectStateBlockConcurrencyWhileCallback.ofSyncFn (f : IO Data) : IO 
 structure DurableObjectAbortOptions where
   /-- `boolean retryAlarm` -/
   retryAlarm : Option Bool := none
-instance : ToJS DurableObjectAbortOptions := ⟨fun d => Support.fields #[("retryAlarm", Support.optional d.retryAlarm)]⟩
+instance : ToJS DurableObjectAbortOptions := ⟨fun d => Internal.fields #[("retryAlarm", Internal.optional d.retryAlarm)]⟩
 
 /-- `dictionary DurableObjectGetOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DurableObjectGetOptions where
@@ -213,8 +271,8 @@ structure DurableObjectGetOptions where
   allowConcurrency : Option Bool := none
   /-- `boolean noCache` -/
   noCache : Option Bool := none
-instance : ToJS DurableObjectGetOptions := ⟨fun d => Support.fields #[("allowConcurrency", Support.optional d.allowConcurrency),
-    ("noCache", Support.optional d.noCache)]⟩
+instance : ToJS DurableObjectGetOptions := ⟨fun d => Internal.fields #[("allowConcurrency", Internal.optional d.allowConcurrency),
+    ("noCache", Internal.optional d.noCache)]⟩
 
 /-- `dictionary DurableObjectListOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DurableObjectListOptions where
@@ -234,14 +292,14 @@ structure DurableObjectListOptions where
   allowConcurrency : Option Bool := none
   /-- `boolean noCache` -/
   noCache : Option Bool := none
-instance : ToJS DurableObjectListOptions := ⟨fun d => Support.fields #[("start", Support.optional d.start),
-    ("startAfter", Support.optional d.startAfter),
-    ("end", Support.optional d.«end»),
-    ("prefix", Support.optional d.«prefix»),
-    ("reverse", Support.optional d.reverse),
-    ("limit", Support.optional d.limit),
-    ("allowConcurrency", Support.optional d.allowConcurrency),
-    ("noCache", Support.optional d.noCache)]⟩
+instance : ToJS DurableObjectListOptions := ⟨fun d => Internal.fields #[("start", Internal.optional d.start),
+    ("startAfter", Internal.optional d.startAfter),
+    ("end", Internal.optional d.«end»),
+    ("prefix", Internal.optional d.«prefix»),
+    ("reverse", Internal.optional d.reverse),
+    ("limit", Internal.optional d.limit),
+    ("allowConcurrency", Internal.optional d.allowConcurrency),
+    ("noCache", Internal.optional d.noCache)]⟩
 
 /-- `dictionary DurableObjectPutOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DurableObjectPutOptions where
@@ -251,9 +309,9 @@ structure DurableObjectPutOptions where
   allowUnconfirmed : Option Bool := none
   /-- `boolean noCache` -/
   noCache : Option Bool := none
-instance : ToJS DurableObjectPutOptions := ⟨fun d => Support.fields #[("allowConcurrency", Support.optional d.allowConcurrency),
-    ("allowUnconfirmed", Support.optional d.allowUnconfirmed),
-    ("noCache", Support.optional d.noCache)]⟩
+instance : ToJS DurableObjectPutOptions := ⟨fun d => Internal.fields #[("allowConcurrency", Internal.optional d.allowConcurrency),
+    ("allowUnconfirmed", Internal.optional d.allowUnconfirmed),
+    ("noCache", Internal.optional d.noCache)]⟩
 
 /-- `callback DurableObjectStorageTransactionClosure = Promise<any> (DurableObjectTransaction txn)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure DurableObjectStorageTransactionClosure where
@@ -264,13 +322,13 @@ instance : ToJS DurableObjectStorageTransactionClosure := ⟨fun x => .ref x.val
 instance : FromJS DurableObjectStorageTransactionClosure := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.DurableObjectStorageTransactionClosure", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def DurableObjectStorageTransactionClosure.ofFn (f : DurableObjectTransaction → Async Data) : IO DurableObjectStorageTransactionClosure := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg DurableObjectTransaction args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg DurableObjectTransaction args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def DurableObjectStorageTransactionClosure.ofSyncFn (f : DurableObjectTransaction → IO Data) : IO DurableObjectStorageTransactionClosure := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg DurableObjectTransaction args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg DurableObjectTransaction args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -279,7 +337,7 @@ def DurableObjectStorageTransactionClosure.ofSyncFn (f : DurableObjectTransactio
 structure DurableObjectGetAlarmOptions where
   /-- `boolean allowConcurrency` -/
   allowConcurrency : Option Bool := none
-instance : ToJS DurableObjectGetAlarmOptions := ⟨fun d => Support.fields #[("allowConcurrency", Support.optional d.allowConcurrency)]⟩
+instance : ToJS DurableObjectGetAlarmOptions := ⟨fun d => Internal.fields #[("allowConcurrency", Internal.optional d.allowConcurrency)]⟩
 
 /-- `dictionary DurableObjectSetAlarmOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DurableObjectSetAlarmOptions where
@@ -287,206 +345,846 @@ structure DurableObjectSetAlarmOptions where
   allowConcurrency : Option Bool := none
   /-- `boolean allowUnconfirmed` -/
   allowUnconfirmed : Option Bool := none
-instance : ToJS DurableObjectSetAlarmOptions := ⟨fun d => Support.fields #[("allowConcurrency", Support.optional d.allowConcurrency),
-    ("allowUnconfirmed", Support.optional d.allowUnconfirmed)]⟩
+instance : ToJS DurableObjectSetAlarmOptions := ⟨fun d => Internal.fields #[("allowConcurrency", Internal.optional d.allowConcurrency),
+    ("allowUnconfirmed", Internal.optional d.allowUnconfirmed)]⟩
+
+/-- `callback DurableObjectStorageTransactionSyncClosure = any ()` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure DurableObjectStorageTransactionSyncClosure where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty DurableObjectStorageTransactionSyncClosure := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS DurableObjectStorageTransactionSyncClosure := ⟨fun x => .ref x.val ""⟩
+instance : FromJS DurableObjectStorageTransactionSyncClosure := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.DurableObjectStorageTransactionSyncClosure", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def DurableObjectStorageTransactionSyncClosure.ofFn (f : Async Data) : IO DurableObjectStorageTransactionSyncClosure := do
+  let fn ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f)
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 0)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def DurableObjectStorageTransactionSyncClosure.ofSyncFn (f : IO Data) : IO DurableObjectStorageTransactionSyncClosure := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f)
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 0)]] Value
+  return { val := fn }
+
+/-- `callback ColoLocalActorNamespaceGetFetch = Promise<Response> (RequestInfoOrURL input, optional RequestInit init)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure ColoLocalActorNamespaceGetFetch where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty ColoLocalActorNamespaceGetFetch := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS ColoLocalActorNamespaceGetFetch := ⟨fun x => .ref x.val ""⟩
+instance : FromJS ColoLocalActorNamespaceGetFetch := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.ColoLocalActorNamespaceGetFetch", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def ColoLocalActorNamespaceGetFetch.ofFn (f : Data → Data → Async Response) : IO ColoLocalActorNamespaceGetFetch := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Data args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def ColoLocalActorNamespaceGetFetch.ofSyncFn (f : Data → Data → IO Response) : IO ColoLocalActorNamespaceGetFetch := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Data args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+
+/-- `callback ColoLocalActorNamespaceGetConnect = Socket (SocketAddressOrDOMString address, optional SocketOptions options)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure ColoLocalActorNamespaceGetConnect where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty ColoLocalActorNamespaceGetConnect := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS ColoLocalActorNamespaceGetConnect := ⟨fun x => .ref x.val ""⟩
+instance : FromJS ColoLocalActorNamespaceGetConnect := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.ColoLocalActorNamespaceGetConnect", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def ColoLocalActorNamespaceGetConnect.ofFn (f : SocketAddressOrDOMString → (Option SocketOptions) → Async Socket) : IO ColoLocalActorNamespaceGetConnect := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg SocketAddressOrDOMString args 0) (← Internal.arg (Option SocketOptions) args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def ColoLocalActorNamespaceGetConnect.ofSyncFn (f : SocketAddressOrDOMString → (Option SocketOptions) → IO Socket) : IO ColoLocalActorNamespaceGetConnect := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg SocketAddressOrDOMString args 0) (← Internal.arg (Option SocketOptions) args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+
+/-- `dictionary ColoLocalActorNamespaceGet` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure ColoLocalActorNamespaceGet where
+  /-- `required ColoLocalActorNamespaceGetFetch fetch` -/
+  fetch : ColoLocalActorNamespaceGetFetch
+  /-- `required ColoLocalActorNamespaceGetConnect connect` -/
+  connect : ColoLocalActorNamespaceGetConnect
+instance : FromJS ColoLocalActorNamespaceGet where
+  fromJS d := do return {
+    fetch := ← Lasm.JS.readField ColoLocalActorNamespaceGetFetch d "fetch",
+    connect := ← Lasm.JS.readField ColoLocalActorNamespaceGetConnect d "connect" }
+  typeName := "Lasm.JS.Cloudflare.ColoLocalActorNamespaceGet"
+
+/-- `dictionary AlarmInvocationInfo` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure AlarmInvocationInfo where
+  /-- `required boolean isRetry` -/
+  isRetry : Bool
+  /-- `required double retryCount` -/
+  retryCount : Float
+  /-- `required double scheduledTime` -/
+  scheduledTime : Float
+instance : ToJS AlarmInvocationInfo := ⟨fun d => Internal.fields #[("isRetry", toJS d.isRetry),
+    ("retryCount", toJS d.retryCount),
+    ("scheduledTime", toJS d.scheduledTime)]⟩
+
+/-- `typedef DOMString or ArrayBuffer DOMStringOrArrayBuffer`: one constructor per member type. -/
+inductive DOMStringOrArrayBuffer where
+  /-- `DOMString` -/
+  | domString (value : String)
+  /-- `ArrayBuffer` -/
+  | arrayBuffer (value : ByteArray)
+instance : ToJS DOMStringOrArrayBuffer := ⟨fun
+  | .domString v => toJS v
+  | .arrayBuffer v => toJS v⟩
+instance : Coe String DOMStringOrArrayBuffer := ⟨.domString⟩
+instance : Coe ByteArray DOMStringOrArrayBuffer := ⟨.arrayBuffer⟩
+
+/-- `typedef DurableObjectId or DOMString DurableObjectIdOrDOMString`: one constructor per member type. -/
+inductive DurableObjectIdOrDOMString where
+  /-- `DurableObjectId` -/
+  | durableObjectId (value : DurableObjectId)
+  /-- `DOMString` -/
+  | domString (value : String)
+instance : ToJS DurableObjectIdOrDOMString := ⟨fun
+  | .durableObjectId v => toJS v
+  | .domString v => toJS v⟩
+instance : Coe DurableObjectId DurableObjectIdOrDOMString := ⟨.durableObjectId⟩
+instance : Coe String DurableObjectIdOrDOMString := ⟨.domString⟩
+
+/-- `dictionary DurableObjectClass` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure DurableObjectClass where
+instance : ToJS DurableObjectClass := ⟨fun _ => Internal.fields #[]⟩
+instance : FromJS DurableObjectClass where
+  fromJS d := match d with | .object _ => .ok {} | _ => .error ""
+  typeName := "Lasm.JS.Cloudflare.DurableObjectClass"
+
+/-- `dictionary FacetStartupOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure FacetStartupOptions where
+  /-- `DurableObjectIdOrDOMString id` -/
+  id : Option DurableObjectIdOrDOMString := none
+  /-- `required DurableObjectClass class` -/
+  «class» : DurableObjectClass
+instance : ToJS FacetStartupOptions := ⟨fun d => Internal.fields #[("id", Internal.optional d.id),
+    ("class", toJS d.«class»)]⟩
+
+/-- `callback DurableObjectFacetsGetGetStartupOptions = Promise<FacetStartupOptions> ()` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure DurableObjectFacetsGetGetStartupOptions where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty DurableObjectFacetsGetGetStartupOptions := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS DurableObjectFacetsGetGetStartupOptions := ⟨fun x => .ref x.val ""⟩
+instance : FromJS DurableObjectFacetsGetGetStartupOptions := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.DurableObjectFacetsGetGetStartupOptions", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def DurableObjectFacetsGetGetStartupOptions.ofFn (f : Async FacetStartupOptions) : IO DurableObjectFacetsGetGetStartupOptions := do
+  let fn ← Lasm.JS.Function.ofFn fun _ => do return toJS (← f)
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 0)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def DurableObjectFacetsGetGetStartupOptions.ofSyncFn (f : IO FacetStartupOptions) : IO DurableObjectFacetsGetGetStartupOptions := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f)
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 0)]] Value
+  return { val := fn }
+
+/-- `callback DurableObjectFacetsGetFetch = Promise<Response> (RequestInfoOrURL input, optional RequestInit init)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure DurableObjectFacetsGetFetch where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty DurableObjectFacetsGetFetch := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS DurableObjectFacetsGetFetch := ⟨fun x => .ref x.val ""⟩
+instance : FromJS DurableObjectFacetsGetFetch := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.DurableObjectFacetsGetFetch", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def DurableObjectFacetsGetFetch.ofFn (f : Data → Data → Async Response) : IO DurableObjectFacetsGetFetch := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Data args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def DurableObjectFacetsGetFetch.ofSyncFn (f : Data → Data → IO Response) : IO DurableObjectFacetsGetFetch := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Data args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+
+/-- `callback DurableObjectFacetsGetConnect = Socket (SocketAddressOrDOMString address, optional SocketOptions options)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure DurableObjectFacetsGetConnect where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty DurableObjectFacetsGetConnect := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS DurableObjectFacetsGetConnect := ⟨fun x => .ref x.val ""⟩
+instance : FromJS DurableObjectFacetsGetConnect := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.DurableObjectFacetsGetConnect", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def DurableObjectFacetsGetConnect.ofFn (f : SocketAddressOrDOMString → (Option SocketOptions) → Async Socket) : IO DurableObjectFacetsGetConnect := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg SocketAddressOrDOMString args 0) (← Internal.arg (Option SocketOptions) args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def DurableObjectFacetsGetConnect.ofSyncFn (f : SocketAddressOrDOMString → (Option SocketOptions) → IO Socket) : IO DurableObjectFacetsGetConnect := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg SocketAddressOrDOMString args 0) (← Internal.arg (Option SocketOptions) args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+
+/-- `dictionary DurableObjectFacetsGet` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure DurableObjectFacetsGet where
+  /-- `required DurableObjectFacetsGetFetch fetch` -/
+  fetch : DurableObjectFacetsGetFetch
+  /-- `required DurableObjectFacetsGetConnect connect` -/
+  connect : DurableObjectFacetsGetConnect
+instance : FromJS DurableObjectFacetsGet where
+  fromJS d := do return {
+    fetch := ← Lasm.JS.readField DurableObjectFacetsGetFetch d "fetch",
+    connect := ← Lasm.JS.readField DurableObjectFacetsGetConnect d "connect" }
+  typeName := "Lasm.JS.Cloudflare.DurableObjectFacetsGet"
+
+/-- `dictionary SyncKvListOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure SyncKvListOptions where
+  /-- `DOMString start` -/
+  start : Option String := none
+  /-- `DOMString startAfter` -/
+  startAfter : Option String := none
+  /-- `DOMString end` -/
+  «end» : Option String := none
+  /-- `DOMString prefix` -/
+  «prefix» : Option String := none
+  /-- `boolean reverse` -/
+  reverse : Option Bool := none
+  /-- `double /* integer: Nat */ limit` -/
+  limit : Option Nat := none
+instance : ToJS SyncKvListOptions := ⟨fun d => Internal.fields #[("start", Internal.optional d.start),
+    ("startAfter", Internal.optional d.startAfter),
+    ("end", Internal.optional d.«end»),
+    ("prefix", Internal.optional d.«prefix»),
+    ("reverse", Internal.optional d.reverse),
+    ("limit", Internal.optional d.limit)]⟩
+
+/-- `callback LoopbackDurableObjectNamespaceNewUniqueId = DurableObjectId (optional DurableObjectNamespaceNewUniqueIdOptions options)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure LoopbackDurableObjectNamespaceNewUniqueId where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty LoopbackDurableObjectNamespaceNewUniqueId := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS LoopbackDurableObjectNamespaceNewUniqueId := ⟨fun x => .ref x.val ""⟩
+instance : FromJS LoopbackDurableObjectNamespaceNewUniqueId := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.LoopbackDurableObjectNamespaceNewUniqueId", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def LoopbackDurableObjectNamespaceNewUniqueId.ofFn (f : (Option DurableObjectNamespaceNewUniqueIdOptions) → Async DurableObjectId) : IO LoopbackDurableObjectNamespaceNewUniqueId := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg (Option DurableObjectNamespaceNewUniqueIdOptions) args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def LoopbackDurableObjectNamespaceNewUniqueId.ofSyncFn (f : (Option DurableObjectNamespaceNewUniqueIdOptions) → IO DurableObjectId) : IO LoopbackDurableObjectNamespaceNewUniqueId := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg (Option DurableObjectNamespaceNewUniqueIdOptions) args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+
+/-- `callback LoopbackDurableObjectNamespaceIdFromName = DurableObjectId (DOMString name)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure LoopbackDurableObjectNamespaceIdFromName where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty LoopbackDurableObjectNamespaceIdFromName := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS LoopbackDurableObjectNamespaceIdFromName := ⟨fun x => .ref x.val ""⟩
+instance : FromJS LoopbackDurableObjectNamespaceIdFromName := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.LoopbackDurableObjectNamespaceIdFromName", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def LoopbackDurableObjectNamespaceIdFromName.ofFn (f : String → Async DurableObjectId) : IO LoopbackDurableObjectNamespaceIdFromName := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def LoopbackDurableObjectNamespaceIdFromName.ofSyncFn (f : String → IO DurableObjectId) : IO LoopbackDurableObjectNamespaceIdFromName := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+
+/-- `callback LoopbackDurableObjectNamespaceIdFromString = DurableObjectId (DOMString id)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure LoopbackDurableObjectNamespaceIdFromString where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty LoopbackDurableObjectNamespaceIdFromString := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS LoopbackDurableObjectNamespaceIdFromString := ⟨fun x => .ref x.val ""⟩
+instance : FromJS LoopbackDurableObjectNamespaceIdFromString := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.LoopbackDurableObjectNamespaceIdFromString", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def LoopbackDurableObjectNamespaceIdFromString.ofFn (f : String → Async DurableObjectId) : IO LoopbackDurableObjectNamespaceIdFromString := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def LoopbackDurableObjectNamespaceIdFromString.ofSyncFn (f : String → IO DurableObjectId) : IO LoopbackDurableObjectNamespaceIdFromString := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+
+/-- `callback LoopbackDurableObjectNamespaceGet = DurableObjectStub (DurableObjectId id, optional DurableObjectNamespaceGetDurableObjectOptions options)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure LoopbackDurableObjectNamespaceGet where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty LoopbackDurableObjectNamespaceGet := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS LoopbackDurableObjectNamespaceGet := ⟨fun x => .ref x.val ""⟩
+instance : FromJS LoopbackDurableObjectNamespaceGet := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.LoopbackDurableObjectNamespaceGet", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def LoopbackDurableObjectNamespaceGet.ofFn (f : DurableObjectId → (Option DurableObjectNamespaceGetDurableObjectOptions) → Async DurableObjectStub) : IO LoopbackDurableObjectNamespaceGet := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg DurableObjectId args 0) (← Internal.arg (Option DurableObjectNamespaceGetDurableObjectOptions) args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def LoopbackDurableObjectNamespaceGet.ofSyncFn (f : DurableObjectId → (Option DurableObjectNamespaceGetDurableObjectOptions) → IO DurableObjectStub) : IO LoopbackDurableObjectNamespaceGet := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg DurableObjectId args 0) (← Internal.arg (Option DurableObjectNamespaceGetDurableObjectOptions) args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+
+/-- `callback LoopbackDurableObjectNamespaceGetByName = DurableObjectStub (DOMString name, optional DurableObjectNamespaceGetDurableObjectOptions options)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure LoopbackDurableObjectNamespaceGetByName where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty LoopbackDurableObjectNamespaceGetByName := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS LoopbackDurableObjectNamespaceGetByName := ⟨fun x => .ref x.val ""⟩
+instance : FromJS LoopbackDurableObjectNamespaceGetByName := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.LoopbackDurableObjectNamespaceGetByName", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def LoopbackDurableObjectNamespaceGetByName.ofFn (f : String → (Option DurableObjectNamespaceGetDurableObjectOptions) → Async DurableObjectStub) : IO LoopbackDurableObjectNamespaceGetByName := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg (Option DurableObjectNamespaceGetDurableObjectOptions) args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def LoopbackDurableObjectNamespaceGetByName.ofSyncFn (f : String → (Option DurableObjectNamespaceGetDurableObjectOptions) → IO DurableObjectStub) : IO LoopbackDurableObjectNamespaceGetByName := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg (Option DurableObjectNamespaceGetDurableObjectOptions) args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+
+/-- `callback LoopbackDurableObjectNamespaceJurisdiction = DurableObjectNamespace (DurableObjectJurisdiction jurisdiction)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure LoopbackDurableObjectNamespaceJurisdiction where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty LoopbackDurableObjectNamespaceJurisdiction := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS LoopbackDurableObjectNamespaceJurisdiction := ⟨fun x => .ref x.val ""⟩
+instance : FromJS LoopbackDurableObjectNamespaceJurisdiction := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.LoopbackDurableObjectNamespaceJurisdiction", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def LoopbackDurableObjectNamespaceJurisdiction.ofFn (f : DurableObjectJurisdiction → Async DurableObjectNamespace) : IO LoopbackDurableObjectNamespaceJurisdiction := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg DurableObjectJurisdiction args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def LoopbackDurableObjectNamespaceJurisdiction.ofSyncFn (f : DurableObjectJurisdiction → IO DurableObjectNamespace) : IO LoopbackDurableObjectNamespaceJurisdiction := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg DurableObjectJurisdiction args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+
+/-- `dictionary LoopbackDurableObjectNamespace` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure LoopbackDurableObjectNamespace where
+  /-- `required LoopbackDurableObjectNamespaceNewUniqueId newUniqueId` -/
+  newUniqueId : LoopbackDurableObjectNamespaceNewUniqueId
+  /-- `required LoopbackDurableObjectNamespaceIdFromName idFromName` -/
+  idFromName : LoopbackDurableObjectNamespaceIdFromName
+  /-- `required LoopbackDurableObjectNamespaceIdFromString idFromString` -/
+  idFromString : LoopbackDurableObjectNamespaceIdFromString
+  /-- `required LoopbackDurableObjectNamespaceGet get` -/
+  get : LoopbackDurableObjectNamespaceGet
+  /-- `required LoopbackDurableObjectNamespaceGetByName getByName` -/
+  getByName : LoopbackDurableObjectNamespaceGetByName
+  /-- `required LoopbackDurableObjectNamespaceJurisdiction jurisdiction` -/
+  jurisdiction : LoopbackDurableObjectNamespaceJurisdiction
+instance : ToJS LoopbackDurableObjectNamespace := ⟨fun d => Internal.fields #[("newUniqueId", toJS d.newUniqueId),
+    ("idFromName", toJS d.idFromName),
+    ("idFromString", toJS d.idFromString),
+    ("get", toJS d.get),
+    ("getByName", toJS d.getByName),
+    ("jurisdiction", toJS d.jurisdiction)]⟩
+
+/-- `callback LoopbackColoLocalActorNamespaceGetFetch = Promise<Response> (RequestInfoOrURL input, optional RequestInit init)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure LoopbackColoLocalActorNamespaceGetFetch where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty LoopbackColoLocalActorNamespaceGetFetch := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS LoopbackColoLocalActorNamespaceGetFetch := ⟨fun x => .ref x.val ""⟩
+instance : FromJS LoopbackColoLocalActorNamespaceGetFetch := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.LoopbackColoLocalActorNamespaceGetFetch", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def LoopbackColoLocalActorNamespaceGetFetch.ofFn (f : Data → Data → Async Response) : IO LoopbackColoLocalActorNamespaceGetFetch := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Data args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def LoopbackColoLocalActorNamespaceGetFetch.ofSyncFn (f : Data → Data → IO Response) : IO LoopbackColoLocalActorNamespaceGetFetch := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Data args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+
+/-- `callback LoopbackColoLocalActorNamespaceGetConnect = Socket (SocketAddressOrDOMString address, optional SocketOptions options)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure LoopbackColoLocalActorNamespaceGetConnect where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty LoopbackColoLocalActorNamespaceGetConnect := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS LoopbackColoLocalActorNamespaceGetConnect := ⟨fun x => .ref x.val ""⟩
+instance : FromJS LoopbackColoLocalActorNamespaceGetConnect := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.LoopbackColoLocalActorNamespaceGetConnect", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def LoopbackColoLocalActorNamespaceGetConnect.ofFn (f : SocketAddressOrDOMString → (Option SocketOptions) → Async Socket) : IO LoopbackColoLocalActorNamespaceGetConnect := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg SocketAddressOrDOMString args 0) (← Internal.arg (Option SocketOptions) args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def LoopbackColoLocalActorNamespaceGetConnect.ofSyncFn (f : SocketAddressOrDOMString → (Option SocketOptions) → IO Socket) : IO LoopbackColoLocalActorNamespaceGetConnect := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg SocketAddressOrDOMString args 0) (← Internal.arg (Option SocketOptions) args 1))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
+  return { val := fn }
+
+/-- `dictionary LoopbackColoLocalActorNamespaceGet` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure LoopbackColoLocalActorNamespaceGet where
+  /-- `required LoopbackColoLocalActorNamespaceGetFetch fetch` -/
+  fetch : LoopbackColoLocalActorNamespaceGetFetch
+  /-- `required LoopbackColoLocalActorNamespaceGetConnect connect` -/
+  connect : LoopbackColoLocalActorNamespaceGetConnect
+instance : ToJS LoopbackColoLocalActorNamespaceGet := ⟨fun d => Internal.fields #[("fetch", toJS d.fetch),
+    ("connect", toJS d.connect)]⟩
+
+/-- `callback LoopbackColoLocalActorNamespaceGet2 = LoopbackColoLocalActorNamespaceGet (DOMString actorId)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
+structure LoopbackColoLocalActorNamespaceGet2 where
+  /-- The JavaScript function. -/
+  val : Value
+instance : Nonempty LoopbackColoLocalActorNamespaceGet2 := ⟨{ val := Classical.ofNonempty }⟩
+instance : ToJS LoopbackColoLocalActorNamespaceGet2 := ⟨fun x => .ref x.val ""⟩
+instance : FromJS LoopbackColoLocalActorNamespaceGet2 := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.LoopbackColoLocalActorNamespaceGet2", .data⟩
+/-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
+def LoopbackColoLocalActorNamespaceGet2.ofFn (f : String → Async LoopbackColoLocalActorNamespaceGet) : IO LoopbackColoLocalActorNamespaceGet2 := do
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+/-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
+def LoopbackColoLocalActorNamespaceGet2.ofSyncFn (f : String → IO LoopbackColoLocalActorNamespaceGet) : IO LoopbackColoLocalActorNamespaceGet2 := do
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0))
+  let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
+    #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
+  return { val := fn }
+
+/-- `dictionary LoopbackColoLocalActorNamespace` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure LoopbackColoLocalActorNamespace where
+  /-- `required LoopbackColoLocalActorNamespaceGet2 get` -/
+  get : LoopbackColoLocalActorNamespaceGet2
+instance : ToJS LoopbackColoLocalActorNamespace := ⟨fun d => Internal.fields #[("get", toJS d.get)]⟩
 
 /-- `newUniqueId(options?: DurableObjectNamespaceNewUniqueIdOptions): DurableObjectId`: `DurableObjectId newUniqueId(optional DurableObjectNamespaceNewUniqueIdOptions options)` -/
-def DurableObjectNamespace.newUniqueId (self : DurableObjectNamespace) (options : Option DurableObjectNamespaceNewUniqueIdOptions := none) : IO DurableObjectId := do
-  let r ← self.val.callMethod "newUniqueId" (Support.args #[Support.optional options]) Value
+@[macro_inline] def DurableObjectNamespace.newUniqueId (self : DurableObjectNamespace) (options : Option DurableObjectNamespaceNewUniqueIdOptions := none) : IO DurableObjectId := Internal.api "Lasm.JS.Cloudflare.DurableObjectNamespace.newUniqueId" do
+  let r ← self.val.callMethod "newUniqueId" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `idFromName(name: string): DurableObjectId`: `DurableObjectId idFromName(DOMString name)` -/
-def DurableObjectNamespace.idFromName (self : DurableObjectNamespace) (name : String) : IO DurableObjectId := do
-  let r ← self.val.callMethod "idFromName" (Support.args #[toJS name]) Value
+@[macro_inline] def DurableObjectNamespace.idFromName (self : DurableObjectNamespace) (name : String) : IO DurableObjectId := Internal.api "Lasm.JS.Cloudflare.DurableObjectNamespace.idFromName" do
+  let r ← self.val.callMethod "idFromName" (Internal.args #[toJS name]) Value
   pure { val := r }
 
 /-- `idFromString(id: string): DurableObjectId`: `DurableObjectId idFromString(DOMString id)` -/
-def DurableObjectNamespace.idFromString (self : DurableObjectNamespace) (id : String) : IO DurableObjectId := do
-  let r ← self.val.callMethod "idFromString" (Support.args #[toJS id]) Value
+@[macro_inline] def DurableObjectNamespace.idFromString (self : DurableObjectNamespace) (id : String) : IO DurableObjectId := Internal.api "Lasm.JS.Cloudflare.DurableObjectNamespace.idFromString" do
+  let r ← self.val.callMethod "idFromString" (Internal.args #[toJS id]) Value
   pure { val := r }
 
 /-- `get(id: DurableObjectId, options?: DurableObjectNamespaceGetDurableObjectOptions): DurableObjectStub<T>`: `DurableObjectStub get(DurableObjectId id, optional DurableObjectNamespaceGetDurableObjectOptions options)` -/
-def DurableObjectNamespace.get (self : DurableObjectNamespace) (id : DurableObjectId) (options : Option DurableObjectNamespaceGetDurableObjectOptions := none) : IO DurableObjectStub := do
-  let r ← self.val.callMethod "get" (Support.args #[toJS id, Support.optional options]) Value
+@[macro_inline] def DurableObjectNamespace.get (self : DurableObjectNamespace) (id : DurableObjectId) (options : Option DurableObjectNamespaceGetDurableObjectOptions := none) : IO DurableObjectStub := Internal.api "Lasm.JS.Cloudflare.DurableObjectNamespace.get" do
+  let r ← self.val.callMethod "get" (Internal.args #[toJS id, Internal.optional options]) Value
   pure { val := r }
 
 /-- `getByName(name: string, options?: DurableObjectNamespaceGetDurableObjectOptions): DurableObjectStub<T>`: `DurableObjectStub getByName(DOMString name, optional DurableObjectNamespaceGetDurableObjectOptions options)` -/
-def DurableObjectNamespace.getByName (self : DurableObjectNamespace) (name : String) (options : Option DurableObjectNamespaceGetDurableObjectOptions := none) : IO DurableObjectStub := do
-  let r ← self.val.callMethod "getByName" (Support.args #[toJS name, Support.optional options]) Value
+@[macro_inline] def DurableObjectNamespace.getByName (self : DurableObjectNamespace) (name : String) (options : Option DurableObjectNamespaceGetDurableObjectOptions := none) : IO DurableObjectStub := Internal.api "Lasm.JS.Cloudflare.DurableObjectNamespace.getByName" do
+  let r ← self.val.callMethod "getByName" (Internal.args #[toJS name, Internal.optional options]) Value
   pure { val := r }
 
 /-- `jurisdiction(jurisdiction: DurableObjectJurisdiction): DurableObjectNamespace<T>`: `DurableObjectNamespace jurisdiction(DurableObjectJurisdiction jurisdiction)` -/
-def DurableObjectNamespace.jurisdiction (self : DurableObjectNamespace) (jurisdiction : DurableObjectJurisdiction) : IO DurableObjectNamespace := do
-  let r ← self.val.callMethod "jurisdiction" (Support.args #[toJS jurisdiction]) Value
+@[macro_inline] def DurableObjectNamespace.jurisdiction (self : DurableObjectNamespace) (jurisdiction : DurableObjectJurisdiction) : IO DurableObjectNamespace := Internal.api "Lasm.JS.Cloudflare.DurableObjectNamespace.jurisdiction" do
+  let r ← self.val.callMethod "jurisdiction" (Internal.args #[toJS jurisdiction]) Value
   pure { val := r }
 
 /-- `readonly name?: string`: `readonly attribute DOMString? name` -/
-def DurableObjectId.name (self : DurableObjectId) : IO (Option String) := self.val.get "name" (Option String)
+@[macro_inline] def DurableObjectId.name (self : DurableObjectId) : IO (Option String) := Internal.api "Lasm.JS.Cloudflare.DurableObjectId.name" do
+  self.val.get "name" (Option String)
 
 /-- `readonly jurisdiction?: string`: `readonly attribute DOMString? jurisdiction` -/
-def DurableObjectId.jurisdiction (self : DurableObjectId) : IO (Option String) := self.val.get "jurisdiction" (Option String)
+@[macro_inline] def DurableObjectId.jurisdiction (self : DurableObjectId) : IO (Option String) := Internal.api "Lasm.JS.Cloudflare.DurableObjectId.jurisdiction" do
+  self.val.get "jurisdiction" (Option String)
 
 /-- `toString(): string`: `DOMString toString()` -/
-def DurableObjectId.toString (self : DurableObjectId) : IO String :=
-  self.val.callMethod "toString" (Support.args #[]) String
+@[macro_inline] def DurableObjectId.toString (self : DurableObjectId) : IO String := Internal.api "Lasm.JS.Cloudflare.DurableObjectId.toString" do
+  self.val.callMethod "toString" (Internal.args #[]) String
 
 /-- `equals(other: DurableObjectId): boolean`: `boolean equals(DurableObjectId other)` -/
-def DurableObjectId.equals (self : DurableObjectId) (other : DurableObjectId) : IO Bool :=
-  self.val.callMethod "equals" (Support.args #[toJS other]) Bool
+@[macro_inline] def DurableObjectId.equals (self : DurableObjectId) (other : DurableObjectId) : IO Bool := Internal.api "Lasm.JS.Cloudflare.DurableObjectId.equals" do
+  self.val.callMethod "equals" (Internal.args #[toJS other]) Bool
 
 /-- `readonly id: DurableObjectId`: `readonly attribute DurableObjectId id` -/
-def DurableObjectStub.id (self : DurableObjectStub) : IO DurableObjectId := do
+@[macro_inline] def DurableObjectStub.id (self : DurableObjectStub) : IO DurableObjectId := Internal.api "Lasm.JS.Cloudflare.DurableObjectStub.id" do
   let r ← self.val.get "id" Value
   pure { val := r }
 
 /-- `readonly name?: string`: `readonly attribute DOMString? name` -/
-def DurableObjectStub.name (self : DurableObjectStub) : IO (Option String) := self.val.get "name" (Option String)
+@[macro_inline] def DurableObjectStub.name (self : DurableObjectStub) : IO (Option String) := Internal.api "Lasm.JS.Cloudflare.DurableObjectStub.name" do
+  self.val.get "name" (Option String)
 
 /-- `fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>`: `Promise<Response> fetch(RequestInfoOrURL input, optional RequestInit init)` -/
-def DurableObjectStub.fetch (self : DurableObjectStub) (input : RequestInfoOrURL) (init : Option RequestInit := none) : Async Response := do
-  let r ← self.val.callMethodAwait "fetch" (Support.args #[toJS input, Support.optional init]) Value
+@[macro_inline] def DurableObjectStub.fetch (self : DurableObjectStub) (input : RequestInfoOrURL) (init : Option RequestInit := none) : Async Response := Internal.api "Lasm.JS.Cloudflare.DurableObjectStub.fetch" do
+  let r ← self.val.callMethodAwait "fetch" (Internal.args #[toJS input, Internal.optional init]) Value
   pure { val := r }
 
 /-- `connect(address: SocketAddress | string, options?: SocketOptions): Socket`: `Socket connect(SocketAddressOrDOMString address, optional SocketOptions options)` -/
-def DurableObjectStub.connect (self : DurableObjectStub) (address : SocketAddressOrDOMString) (options : Option SocketOptions := none) : IO Socket := do
-  let r ← self.val.callMethod "connect" (Support.args #[toJS address, Support.optional options]) Value
+@[macro_inline] def DurableObjectStub.connect (self : DurableObjectStub) (address : SocketAddressOrDOMString) (options : Option SocketOptions := none) : IO Socket := Internal.api "Lasm.JS.Cloudflare.DurableObjectStub.connect" do
+  let r ← self.val.callMethod "connect" (Internal.args #[toJS address, Internal.optional options]) Value
   pure { val := r }
 
+/-- `readonly exports: Cloudflare.Exports`: `readonly attribute any exports` -/
+@[macro_inline] def DurableObjectState.exports (self : DurableObjectState) : IO Data := Internal.api "Lasm.JS.Cloudflare.DurableObjectState.exports" do
+  self.val.get "exports" Data
+
 /-- `readonly props: Props`: `readonly attribute any props` -/
-def DurableObjectState.props (self : DurableObjectState) : IO Data := self.val.get "props" Data
+@[macro_inline] def DurableObjectState.props (self : DurableObjectState) : IO Data := Internal.api "Lasm.JS.Cloudflare.DurableObjectState.props" do
+  self.val.get "props" Data
 
 /-- `readonly id: DurableObjectId`: `readonly attribute DurableObjectId id` -/
-def DurableObjectState.id (self : DurableObjectState) : IO DurableObjectId := do
+@[macro_inline] def DurableObjectState.id (self : DurableObjectState) : IO DurableObjectId := Internal.api "Lasm.JS.Cloudflare.DurableObjectState.id" do
   let r ← self.val.get "id" Value
   pure { val := r }
 
 /-- `readonly storage: DurableObjectStorage`: `readonly attribute DurableObjectStorage storage` -/
-def DurableObjectState.storage (self : DurableObjectState) : IO DurableObjectStorage := do
+@[macro_inline] def DurableObjectState.storage (self : DurableObjectState) : IO DurableObjectStorage := Internal.api "Lasm.JS.Cloudflare.DurableObjectState.storage" do
   let r ← self.val.get "storage" Value
   pure { val := r }
 
+/-- `container?: Container`: `readonly attribute Container? container` -/
+@[macro_inline] def DurableObjectState.container (self : DurableObjectState) : IO (Option Container) := Internal.api "Lasm.JS.Cloudflare.DurableObjectState.container" do
+  self.val.get "container" (Option Container)
+
+/-- `facets: DurableObjectFacets`: `readonly attribute DurableObjectFacets facets` -/
+@[macro_inline] def DurableObjectState.facets (self : DurableObjectState) : IO DurableObjectFacets := Internal.api "Lasm.JS.Cloudflare.DurableObjectState.facets" do
+  let r ← self.val.get "facets" Value
+  pure { val := r }
+
 /-- `waitUntil(promise: Promise<any>): void`: `undefined waitUntil(Promise<any> promise)` -/
-def DurableObjectState.waitUntil (self : DurableObjectState) (promise : Value) : IO Unit :=
-  self.val.callMethod "waitUntil" (Support.args #[toJS promise]) Unit
+@[macro_inline] def DurableObjectState.waitUntil (self : DurableObjectState) (promise : Value) : IO Unit := Internal.api "Lasm.JS.Cloudflare.DurableObjectState.waitUntil" do
+  self.val.callMethod "waitUntil" (Internal.args #[toJS promise]) Unit
 
 /-- `blockConcurrencyWhile<T>(callback: () => Promise<T>): Promise<T>`: `Promise<any> blockConcurrencyWhile(DurableObjectStateBlockConcurrencyWhileCallback callback)` -/
-def DurableObjectState.blockConcurrencyWhile (self : DurableObjectState) (callback : DurableObjectStateBlockConcurrencyWhileCallback) : Async Data :=
-  self.val.callMethodAwait "blockConcurrencyWhile" (Support.args #[toJS callback]) Data
+@[macro_inline] def DurableObjectState.blockConcurrencyWhile (self : DurableObjectState) (callback : DurableObjectStateBlockConcurrencyWhileCallback) : Async Data := Internal.api "Lasm.JS.Cloudflare.DurableObjectState.blockConcurrencyWhile" do
+  self.val.callMethodAwait "blockConcurrencyWhile" (Internal.args #[toJS callback]) Data
+
+/-- `acceptWebSocket(ws: WebSocket, tags?: string[]): void`: `undefined acceptWebSocket(WebSocket ws, optional sequence<DOMString> tags)` -/
+@[macro_inline] def DurableObjectState.acceptWebSocket (self : DurableObjectState) (ws : WebSocket) (tags : Option (Array String) := none) : IO Unit := Internal.api "Lasm.JS.Cloudflare.DurableObjectState.acceptWebSocket" do
+  self.val.callMethod "acceptWebSocket" (Internal.args #[toJS ws, Internal.optional tags]) Unit
+
+/-- `getWebSockets(tag?: string): WebSocket[]`: `sequence<WebSocket> getWebSockets(optional DOMString tag)` -/
+@[macro_inline] def DurableObjectState.getWebSockets (self : DurableObjectState) (tag : Option String := none) : IO (Array WebSocket) := Internal.api "Lasm.JS.Cloudflare.DurableObjectState.getWebSockets" do
+  self.val.callMethod "getWebSockets" (Internal.args #[Internal.optional tag]) (Array WebSocket)
+
+/-- `setWebSocketAutoResponse(maybeReqResp?: WebSocketRequestResponsePair): void`: `undefined setWebSocketAutoResponse(optional WebSocketRequestResponsePair maybeReqResp)` -/
+@[macro_inline] def DurableObjectState.setWebSocketAutoResponse (self : DurableObjectState) (maybeReqResp : Option WebSocketRequestResponsePair := none) : IO Unit := Internal.api "Lasm.JS.Cloudflare.DurableObjectState.setWebSocketAutoResponse" do
+  self.val.callMethod "setWebSocketAutoResponse" (Internal.args #[Internal.optional maybeReqResp]) Unit
+
+/-- `getWebSocketAutoResponse(): WebSocketRequestResponsePair | null`: `WebSocketRequestResponsePair? getWebSocketAutoResponse()` -/
+@[macro_inline] def DurableObjectState.getWebSocketAutoResponse (self : DurableObjectState) : IO (Option WebSocketRequestResponsePair) := Internal.api "Lasm.JS.Cloudflare.DurableObjectState.getWebSocketAutoResponse" do
+  self.val.callMethod "getWebSocketAutoResponse" (Internal.args #[]) (Option WebSocketRequestResponsePair)
+
+/-- `getWebSocketAutoResponseTimestamp(ws: WebSocket): Date | null`: `any getWebSocketAutoResponseTimestamp(WebSocket ws)` -/
+@[macro_inline] def DurableObjectState.getWebSocketAutoResponseTimestamp (self : DurableObjectState) (ws : WebSocket) : IO Data := Internal.api "Lasm.JS.Cloudflare.DurableObjectState.getWebSocketAutoResponseTimestamp" do
+  self.val.callMethod "getWebSocketAutoResponseTimestamp" (Internal.args #[toJS ws]) Data
+
+/-- `setHibernatableWebSocketEventTimeout(timeoutMs?: number): void`: `undefined setHibernatableWebSocketEventTimeout(optional double timeoutMs)` -/
+@[macro_inline] def DurableObjectState.setHibernatableWebSocketEventTimeout (self : DurableObjectState) (timeoutMs : Option Float := none) : IO Unit := Internal.api "Lasm.JS.Cloudflare.DurableObjectState.setHibernatableWebSocketEventTimeout" do
+  self.val.callMethod "setHibernatableWebSocketEventTimeout" (Internal.args #[Internal.optional timeoutMs]) Unit
+
+/-- `getHibernatableWebSocketEventTimeout(): number | null`: `double? getHibernatableWebSocketEventTimeout()` -/
+@[macro_inline] def DurableObjectState.getHibernatableWebSocketEventTimeout (self : DurableObjectState) : IO (Option Float) := Internal.api "Lasm.JS.Cloudflare.DurableObjectState.getHibernatableWebSocketEventTimeout" do
+  self.val.callMethod "getHibernatableWebSocketEventTimeout" (Internal.args #[]) (Option Float)
+
+/-- `getTags(ws: WebSocket): string[]`: `sequence<DOMString> getTags(WebSocket ws)` -/
+@[macro_inline] def DurableObjectState.getTags (self : DurableObjectState) (ws : WebSocket) : IO (Array String) := Internal.api "Lasm.JS.Cloudflare.DurableObjectState.getTags" do
+  self.val.callMethod "getTags" (Internal.args #[toJS ws]) (Array String)
 
 /-- `abort(reason?: string, options?: DurableObjectAbortOptions): void`: `undefined abort(optional DOMString reason, optional DurableObjectAbortOptions options)` -/
-def DurableObjectState.abort (self : DurableObjectState) (reason : Option String := none) (options : Option DurableObjectAbortOptions := none) : IO Unit :=
-  self.val.callMethod "abort" (Support.args #[Support.optional reason, Support.optional options]) Unit
+@[macro_inline] def DurableObjectState.abort (self : DurableObjectState) (reason : Option String := none) (options : Option DurableObjectAbortOptions := none) : IO Unit := Internal.api "Lasm.JS.Cloudflare.DurableObjectState.abort" do
+  self.val.callMethod "abort" (Internal.args #[Internal.optional reason, Internal.optional options]) Unit
+
+/-- `sql: SqlStorage`: `readonly attribute SqlStorage sql` -/
+@[macro_inline] def DurableObjectStorage.sql (self : DurableObjectStorage) : IO SqlStorage := Internal.api "Lasm.JS.Cloudflare.DurableObjectStorage.sql" do
+  let r ← self.val.get "sql" Value
+  pure { val := r }
+
+/-- `kv: SyncKvStorage`: `readonly attribute SyncKvStorage kv` -/
+@[macro_inline] def DurableObjectStorage.kv (self : DurableObjectStorage) : IO SyncKvStorage := Internal.api "Lasm.JS.Cloudflare.DurableObjectStorage.kv" do
+  let r ← self.val.get "kv" Value
+  pure { val := r }
 
 /-- `get<T = unknown>(key: string, options?: DurableObjectGetOptions): Promise<T | undefined>`: `Promise<any> get(DOMString key, optional DurableObjectGetOptions options)` -/
-def DurableObjectStorage.get (self : DurableObjectStorage) (key : String) (options : Option DurableObjectGetOptions := none) : Async Data :=
-  self.val.callMethodAwait "get" (Support.args #[toJS key, Support.optional options]) Data
+@[macro_inline] def DurableObjectStorage.get (self : DurableObjectStorage) (key : String) (options : Option DurableObjectGetOptions := none) : Async Data := Internal.api "Lasm.JS.Cloudflare.DurableObjectStorage.get" do
+  self.val.callMethodAwait "get" (Internal.args #[toJS key, Internal.optional options]) Data
 
 /-- `get<T = unknown>(keys: string[], options?: DurableObjectGetOptions): Promise<Map<string, T>>`: `Promise<record<DOMString, any>> get(sequence<DOMString> keys, optional DurableObjectGetOptions options)` -/
-def DurableObjectStorage.getWithKeys (self : DurableObjectStorage) (keys : Array String) (options : Option DurableObjectGetOptions := none) : Async (Record Data) := do
-  let r ← self.val.callMethodAwait "get" (Support.args #[toJS keys, Support.optional options]) Value
+@[macro_inline] def DurableObjectStorage.getWithKeys (self : DurableObjectStorage) (keys : Array String) (options : Option DurableObjectGetOptions := none) : Async (Record Data) := Internal.api "Lasm.JS.Cloudflare.DurableObjectStorage.getWithKeys" do
+  let r ← self.val.callMethodAwait "get" (Internal.args #[toJS keys, Internal.optional options]) Value
   Support.mapOf Data r
 
 /-- `list<T = unknown>(options?: DurableObjectListOptions): Promise<Map<string, T>>`: `Promise<record<DOMString, any>> list(optional DurableObjectListOptions options)` -/
-def DurableObjectStorage.list (self : DurableObjectStorage) (options : Option DurableObjectListOptions := none) : Async (Record Data) := do
-  let r ← self.val.callMethodAwait "list" (Support.args #[Support.optional options]) Value
+@[macro_inline] def DurableObjectStorage.list (self : DurableObjectStorage) (options : Option DurableObjectListOptions := none) : Async (Record Data) := Internal.api "Lasm.JS.Cloudflare.DurableObjectStorage.list" do
+  let r ← self.val.callMethodAwait "list" (Internal.args #[Internal.optional options]) Value
   Support.mapOf Data r
 
 /-- `put<T>(key: string, value: T, options?: DurableObjectPutOptions): Promise<void>`: `Promise<undefined> put(DOMString key, any value, optional DurableObjectPutOptions options)` -/
-def DurableObjectStorage.put (self : DurableObjectStorage) (key : String) (value : Data) (options : Option DurableObjectPutOptions := none) : Async Unit :=
-  self.val.callMethodAwait "put" (Support.args #[toJS key, toJS value, Support.optional options]) Unit
+@[macro_inline] def DurableObjectStorage.put (self : DurableObjectStorage) (key : String) (value : Data) (options : Option DurableObjectPutOptions := none) : Async Unit := Internal.api "Lasm.JS.Cloudflare.DurableObjectStorage.put" do
+  self.val.callMethodAwait "put" (Internal.args #[toJS key, toJS value, Internal.optional options]) Unit
 
 /-- `put<T>(entries: Record<string, T>, options?: DurableObjectPutOptions): Promise<void>`: `Promise<undefined> put(record<DOMString, any> entries, optional DurableObjectPutOptions options)` -/
-def DurableObjectStorage.putWithEntries (self : DurableObjectStorage) (entries : Record Data) (options : Option DurableObjectPutOptions := none) : Async Unit :=
-  self.val.callMethodAwait "put" (Support.args #[toJS entries, Support.optional options]) Unit
+@[macro_inline] def DurableObjectStorage.putWithEntries (self : DurableObjectStorage) (entries : Record Data) (options : Option DurableObjectPutOptions := none) : Async Unit := Internal.api "Lasm.JS.Cloudflare.DurableObjectStorage.putWithEntries" do
+  self.val.callMethodAwait "put" (Internal.args #[toJS entries, Internal.optional options]) Unit
 
 /-- `delete(key: string, options?: DurableObjectPutOptions): Promise<boolean>`: `Promise<boolean> delete(DOMString key, optional DurableObjectPutOptions options)` -/
-def DurableObjectStorage.delete (self : DurableObjectStorage) (key : String) (options : Option DurableObjectPutOptions := none) : Async Bool :=
-  self.val.callMethodAwait "delete" (Support.args #[toJS key, Support.optional options]) Bool
+@[macro_inline] def DurableObjectStorage.delete (self : DurableObjectStorage) (key : String) (options : Option DurableObjectPutOptions := none) : Async Bool := Internal.api "Lasm.JS.Cloudflare.DurableObjectStorage.delete" do
+  self.val.callMethodAwait "delete" (Internal.args #[toJS key, Internal.optional options]) Bool
 
 /-- `delete(keys: string[], options?: DurableObjectPutOptions): Promise<number>`: `Promise<double> delete(sequence<DOMString> keys, optional DurableObjectPutOptions options)` -/
-def DurableObjectStorage.deleteWithKeys (self : DurableObjectStorage) (keys : Array String) (options : Option DurableObjectPutOptions := none) : Async Float :=
-  self.val.callMethodAwait "delete" (Support.args #[toJS keys, Support.optional options]) Float
+@[macro_inline] def DurableObjectStorage.deleteWithKeys (self : DurableObjectStorage) (keys : Array String) (options : Option DurableObjectPutOptions := none) : Async Float := Internal.api "Lasm.JS.Cloudflare.DurableObjectStorage.deleteWithKeys" do
+  self.val.callMethodAwait "delete" (Internal.args #[toJS keys, Internal.optional options]) Float
 
 /-- `deleteAll(options?: DurableObjectPutOptions): Promise<void>`: `Promise<undefined> deleteAll(optional DurableObjectPutOptions options)` -/
-def DurableObjectStorage.deleteAll (self : DurableObjectStorage) (options : Option DurableObjectPutOptions := none) : Async Unit :=
-  self.val.callMethodAwait "deleteAll" (Support.args #[Support.optional options]) Unit
+@[macro_inline] def DurableObjectStorage.deleteAll (self : DurableObjectStorage) (options : Option DurableObjectPutOptions := none) : Async Unit := Internal.api "Lasm.JS.Cloudflare.DurableObjectStorage.deleteAll" do
+  self.val.callMethodAwait "deleteAll" (Internal.args #[Internal.optional options]) Unit
 
 /-- `transaction<T>(closure: (txn: DurableObjectTransaction) => Promise<T>): Promise<T>`: `Promise<any> transaction(DurableObjectStorageTransactionClosure closure)` -/
-def DurableObjectStorage.transaction (self : DurableObjectStorage) (closure : DurableObjectStorageTransactionClosure) : Async Data :=
-  self.val.callMethodAwait "transaction" (Support.args #[toJS closure]) Data
+@[macro_inline] def DurableObjectStorage.transaction (self : DurableObjectStorage) (closure : DurableObjectStorageTransactionClosure) : Async Data := Internal.api "Lasm.JS.Cloudflare.DurableObjectStorage.transaction" do
+  self.val.callMethodAwait "transaction" (Internal.args #[toJS closure]) Data
 
 /-- `getAlarm(options?: DurableObjectGetAlarmOptions): Promise<number | null>`: `Promise<double?> getAlarm(optional DurableObjectGetAlarmOptions options)` -/
-def DurableObjectStorage.getAlarm (self : DurableObjectStorage) (options : Option DurableObjectGetAlarmOptions := none) : Async (Option Float) :=
-  self.val.callMethodAwait "getAlarm" (Support.args #[Support.optional options]) (Option Float)
+@[macro_inline] def DurableObjectStorage.getAlarm (self : DurableObjectStorage) (options : Option DurableObjectGetAlarmOptions := none) : Async (Option Float) := Internal.api "Lasm.JS.Cloudflare.DurableObjectStorage.getAlarm" do
+  self.val.callMethodAwait "getAlarm" (Internal.args #[Internal.optional options]) (Option Float)
 
 /-- `setAlarm(scheduledTime: number | Date, options?: DurableObjectSetAlarmOptions): Promise<void>`: `Promise<undefined> setAlarm(any scheduledTime, optional DurableObjectSetAlarmOptions options)` -/
-def DurableObjectStorage.setAlarm (self : DurableObjectStorage) (scheduledTime : Data) (options : Option DurableObjectSetAlarmOptions := none) : Async Unit :=
-  self.val.callMethodAwait "setAlarm" (Support.args #[toJS scheduledTime, Support.optional options]) Unit
+@[macro_inline] def DurableObjectStorage.setAlarm (self : DurableObjectStorage) (scheduledTime : Data) (options : Option DurableObjectSetAlarmOptions := none) : Async Unit := Internal.api "Lasm.JS.Cloudflare.DurableObjectStorage.setAlarm" do
+  self.val.callMethodAwait "setAlarm" (Internal.args #[toJS scheduledTime, Internal.optional options]) Unit
 
 /-- `deleteAlarm(options?: DurableObjectSetAlarmOptions): Promise<void>`: `Promise<undefined> deleteAlarm(optional DurableObjectSetAlarmOptions options)` -/
-def DurableObjectStorage.deleteAlarm (self : DurableObjectStorage) (options : Option DurableObjectSetAlarmOptions := none) : Async Unit :=
-  self.val.callMethodAwait "deleteAlarm" (Support.args #[Support.optional options]) Unit
+@[macro_inline] def DurableObjectStorage.deleteAlarm (self : DurableObjectStorage) (options : Option DurableObjectSetAlarmOptions := none) : Async Unit := Internal.api "Lasm.JS.Cloudflare.DurableObjectStorage.deleteAlarm" do
+  self.val.callMethodAwait "deleteAlarm" (Internal.args #[Internal.optional options]) Unit
 
 /-- `sync(): Promise<void>`: `Promise<undefined> sync()` -/
-def DurableObjectStorage.sync (self : DurableObjectStorage) : Async Unit :=
-  self.val.callMethodAwait "sync" (Support.args #[]) Unit
+@[macro_inline] def DurableObjectStorage.sync (self : DurableObjectStorage) : Async Unit := Internal.api "Lasm.JS.Cloudflare.DurableObjectStorage.sync" do
+  self.val.callMethodAwait "sync" (Internal.args #[]) Unit
+
+/-- `transactionSync<T>(closure: () => T): T`: `any transactionSync(DurableObjectStorageTransactionSyncClosure closure)` -/
+@[macro_inline] def DurableObjectStorage.transactionSync (self : DurableObjectStorage) (closure : DurableObjectStorageTransactionSyncClosure) : IO Data := Internal.api "Lasm.JS.Cloudflare.DurableObjectStorage.transactionSync" do
+  self.val.callMethod "transactionSync" (Internal.args #[toJS closure]) Data
 
 /-- `getCurrentBookmark(): Promise<string>`: `Promise<DOMString> getCurrentBookmark()` -/
-def DurableObjectStorage.getCurrentBookmark (self : DurableObjectStorage) : Async String :=
-  self.val.callMethodAwait "getCurrentBookmark" (Support.args #[]) String
+@[macro_inline] def DurableObjectStorage.getCurrentBookmark (self : DurableObjectStorage) : Async String := Internal.api "Lasm.JS.Cloudflare.DurableObjectStorage.getCurrentBookmark" do
+  self.val.callMethodAwait "getCurrentBookmark" (Internal.args #[]) String
 
 /-- `getBookmarkForTime(timestamp: number | Date): Promise<string>`: `Promise<DOMString> getBookmarkForTime(any timestamp)` -/
-def DurableObjectStorage.getBookmarkForTime (self : DurableObjectStorage) (timestamp : Data) : Async String :=
-  self.val.callMethodAwait "getBookmarkForTime" (Support.args #[toJS timestamp]) String
+@[macro_inline] def DurableObjectStorage.getBookmarkForTime (self : DurableObjectStorage) (timestamp : Data) : Async String := Internal.api "Lasm.JS.Cloudflare.DurableObjectStorage.getBookmarkForTime" do
+  self.val.callMethodAwait "getBookmarkForTime" (Internal.args #[toJS timestamp]) String
 
 /-- `onNextSessionRestoreBookmark(bookmark: string): Promise<string>`: `Promise<DOMString> onNextSessionRestoreBookmark(DOMString bookmark)` -/
-def DurableObjectStorage.onNextSessionRestoreBookmark (self : DurableObjectStorage) (bookmark : String) : Async String :=
-  self.val.callMethodAwait "onNextSessionRestoreBookmark" (Support.args #[toJS bookmark]) String
+@[macro_inline] def DurableObjectStorage.onNextSessionRestoreBookmark (self : DurableObjectStorage) (bookmark : String) : Async String := Internal.api "Lasm.JS.Cloudflare.DurableObjectStorage.onNextSessionRestoreBookmark" do
+  self.val.callMethodAwait "onNextSessionRestoreBookmark" (Internal.args #[toJS bookmark]) String
 
 /-- `get<T = unknown>(key: string, options?: DurableObjectGetOptions): Promise<T | undefined>`: `Promise<any> get(DOMString key, optional DurableObjectGetOptions options)` -/
-def DurableObjectTransaction.get (self : DurableObjectTransaction) (key : String) (options : Option DurableObjectGetOptions := none) : Async Data :=
-  self.val.callMethodAwait "get" (Support.args #[toJS key, Support.optional options]) Data
+@[macro_inline] def DurableObjectTransaction.get (self : DurableObjectTransaction) (key : String) (options : Option DurableObjectGetOptions := none) : Async Data := Internal.api "Lasm.JS.Cloudflare.DurableObjectTransaction.get" do
+  self.val.callMethodAwait "get" (Internal.args #[toJS key, Internal.optional options]) Data
 
 /-- `get<T = unknown>(keys: string[], options?: DurableObjectGetOptions): Promise<Map<string, T>>`: `Promise<record<DOMString, any>> get(sequence<DOMString> keys, optional DurableObjectGetOptions options)` -/
-def DurableObjectTransaction.getWithKeys (self : DurableObjectTransaction) (keys : Array String) (options : Option DurableObjectGetOptions := none) : Async (Record Data) := do
-  let r ← self.val.callMethodAwait "get" (Support.args #[toJS keys, Support.optional options]) Value
+@[macro_inline] def DurableObjectTransaction.getWithKeys (self : DurableObjectTransaction) (keys : Array String) (options : Option DurableObjectGetOptions := none) : Async (Record Data) := Internal.api "Lasm.JS.Cloudflare.DurableObjectTransaction.getWithKeys" do
+  let r ← self.val.callMethodAwait "get" (Internal.args #[toJS keys, Internal.optional options]) Value
   Support.mapOf Data r
 
 /-- `list<T = unknown>(options?: DurableObjectListOptions): Promise<Map<string, T>>`: `Promise<record<DOMString, any>> list(optional DurableObjectListOptions options)` -/
-def DurableObjectTransaction.list (self : DurableObjectTransaction) (options : Option DurableObjectListOptions := none) : Async (Record Data) := do
-  let r ← self.val.callMethodAwait "list" (Support.args #[Support.optional options]) Value
+@[macro_inline] def DurableObjectTransaction.list (self : DurableObjectTransaction) (options : Option DurableObjectListOptions := none) : Async (Record Data) := Internal.api "Lasm.JS.Cloudflare.DurableObjectTransaction.list" do
+  let r ← self.val.callMethodAwait "list" (Internal.args #[Internal.optional options]) Value
   Support.mapOf Data r
 
 /-- `put<T>(key: string, value: T, options?: DurableObjectPutOptions): Promise<void>`: `Promise<undefined> put(DOMString key, any value, optional DurableObjectPutOptions options)` -/
-def DurableObjectTransaction.put (self : DurableObjectTransaction) (key : String) (value : Data) (options : Option DurableObjectPutOptions := none) : Async Unit :=
-  self.val.callMethodAwait "put" (Support.args #[toJS key, toJS value, Support.optional options]) Unit
+@[macro_inline] def DurableObjectTransaction.put (self : DurableObjectTransaction) (key : String) (value : Data) (options : Option DurableObjectPutOptions := none) : Async Unit := Internal.api "Lasm.JS.Cloudflare.DurableObjectTransaction.put" do
+  self.val.callMethodAwait "put" (Internal.args #[toJS key, toJS value, Internal.optional options]) Unit
 
 /-- `put<T>(entries: Record<string, T>, options?: DurableObjectPutOptions): Promise<void>`: `Promise<undefined> put(record<DOMString, any> entries, optional DurableObjectPutOptions options)` -/
-def DurableObjectTransaction.putWithEntries (self : DurableObjectTransaction) (entries : Record Data) (options : Option DurableObjectPutOptions := none) : Async Unit :=
-  self.val.callMethodAwait "put" (Support.args #[toJS entries, Support.optional options]) Unit
+@[macro_inline] def DurableObjectTransaction.putWithEntries (self : DurableObjectTransaction) (entries : Record Data) (options : Option DurableObjectPutOptions := none) : Async Unit := Internal.api "Lasm.JS.Cloudflare.DurableObjectTransaction.putWithEntries" do
+  self.val.callMethodAwait "put" (Internal.args #[toJS entries, Internal.optional options]) Unit
 
 /-- `delete(key: string, options?: DurableObjectPutOptions): Promise<boolean>`: `Promise<boolean> delete(DOMString key, optional DurableObjectPutOptions options)` -/
-def DurableObjectTransaction.delete (self : DurableObjectTransaction) (key : String) (options : Option DurableObjectPutOptions := none) : Async Bool :=
-  self.val.callMethodAwait "delete" (Support.args #[toJS key, Support.optional options]) Bool
+@[macro_inline] def DurableObjectTransaction.delete (self : DurableObjectTransaction) (key : String) (options : Option DurableObjectPutOptions := none) : Async Bool := Internal.api "Lasm.JS.Cloudflare.DurableObjectTransaction.delete" do
+  self.val.callMethodAwait "delete" (Internal.args #[toJS key, Internal.optional options]) Bool
 
 /-- `delete(keys: string[], options?: DurableObjectPutOptions): Promise<number>`: `Promise<double> delete(sequence<DOMString> keys, optional DurableObjectPutOptions options)` -/
-def DurableObjectTransaction.deleteWithKeys (self : DurableObjectTransaction) (keys : Array String) (options : Option DurableObjectPutOptions := none) : Async Float :=
-  self.val.callMethodAwait "delete" (Support.args #[toJS keys, Support.optional options]) Float
+@[macro_inline] def DurableObjectTransaction.deleteWithKeys (self : DurableObjectTransaction) (keys : Array String) (options : Option DurableObjectPutOptions := none) : Async Float := Internal.api "Lasm.JS.Cloudflare.DurableObjectTransaction.deleteWithKeys" do
+  self.val.callMethodAwait "delete" (Internal.args #[toJS keys, Internal.optional options]) Float
 
 /-- `rollback(): void`: `undefined rollback()` -/
-def DurableObjectTransaction.rollback (self : DurableObjectTransaction) : IO Unit :=
-  self.val.callMethod "rollback" (Support.args #[]) Unit
+@[macro_inline] def DurableObjectTransaction.rollback (self : DurableObjectTransaction) : IO Unit := Internal.api "Lasm.JS.Cloudflare.DurableObjectTransaction.rollback" do
+  self.val.callMethod "rollback" (Internal.args #[]) Unit
 
 /-- `getAlarm(options?: DurableObjectGetAlarmOptions): Promise<number | null>`: `Promise<double?> getAlarm(optional DurableObjectGetAlarmOptions options)` -/
-def DurableObjectTransaction.getAlarm (self : DurableObjectTransaction) (options : Option DurableObjectGetAlarmOptions := none) : Async (Option Float) :=
-  self.val.callMethodAwait "getAlarm" (Support.args #[Support.optional options]) (Option Float)
+@[macro_inline] def DurableObjectTransaction.getAlarm (self : DurableObjectTransaction) (options : Option DurableObjectGetAlarmOptions := none) : Async (Option Float) := Internal.api "Lasm.JS.Cloudflare.DurableObjectTransaction.getAlarm" do
+  self.val.callMethodAwait "getAlarm" (Internal.args #[Internal.optional options]) (Option Float)
 
 /-- `setAlarm(scheduledTime: number | Date, options?: DurableObjectSetAlarmOptions): Promise<void>`: `Promise<undefined> setAlarm(any scheduledTime, optional DurableObjectSetAlarmOptions options)` -/
-def DurableObjectTransaction.setAlarm (self : DurableObjectTransaction) (scheduledTime : Data) (options : Option DurableObjectSetAlarmOptions := none) : Async Unit :=
-  self.val.callMethodAwait "setAlarm" (Support.args #[toJS scheduledTime, Support.optional options]) Unit
+@[macro_inline] def DurableObjectTransaction.setAlarm (self : DurableObjectTransaction) (scheduledTime : Data) (options : Option DurableObjectSetAlarmOptions := none) : Async Unit := Internal.api "Lasm.JS.Cloudflare.DurableObjectTransaction.setAlarm" do
+  self.val.callMethodAwait "setAlarm" (Internal.args #[toJS scheduledTime, Internal.optional options]) Unit
 
 /-- `deleteAlarm(options?: DurableObjectSetAlarmOptions): Promise<void>`: `Promise<undefined> deleteAlarm(optional DurableObjectSetAlarmOptions options)` -/
-def DurableObjectTransaction.deleteAlarm (self : DurableObjectTransaction) (options : Option DurableObjectSetAlarmOptions := none) : Async Unit :=
-  self.val.callMethodAwait "deleteAlarm" (Support.args #[Support.optional options]) Unit
+@[macro_inline] def DurableObjectTransaction.deleteAlarm (self : DurableObjectTransaction) (options : Option DurableObjectSetAlarmOptions := none) : Async Unit := Internal.api "Lasm.JS.Cloudflare.DurableObjectTransaction.deleteAlarm" do
+  self.val.callMethodAwait "deleteAlarm" (Internal.args #[Internal.optional options]) Unit
+
+/-- `get(actorId: string): Fetcher`: `ColoLocalActorNamespaceGet get(DOMString actorId)` -/
+@[macro_inline] def ColoLocalActorNamespace.get (self : ColoLocalActorNamespace) (actorId : String) : IO ColoLocalActorNamespaceGet := Internal.api "Lasm.JS.Cloudflare.ColoLocalActorNamespace.get" do
+  self.val.callMethod "get" (Internal.args #[toJS actorId]) ColoLocalActorNamespaceGet
+
+/-- `fetch(request: Request): Response | Promise<Response>`: `Promise<Response> fetch(Request request)` -/
+@[macro_inline] def DurableObject.fetch (self : DurableObject) (request : Request) : Async Response := Internal.api "Lasm.JS.Cloudflare.DurableObject.fetch" do
+  let r ← self.val.callMethodAwait "fetch" (Internal.args #[toJS request]) Value
+  pure { val := r }
+
+/-- `connect?(socket: Socket): void | Promise<void>`: `Promise<undefined> connect(Socket socket)` -/
+@[macro_inline] def DurableObject.connect (self : DurableObject) (socket : Socket) : Async Unit := Internal.api "Lasm.JS.Cloudflare.DurableObject.connect" do
+  self.val.callMethodAwait "connect" (Internal.args #[toJS socket]) Unit
+
+/-- `alarm?(alarmInfo?: AlarmInvocationInfo): void | Promise<void>`: `Promise<undefined> alarm(optional AlarmInvocationInfo alarmInfo)` -/
+@[macro_inline] def DurableObject.alarm (self : DurableObject) (alarmInfo : Option AlarmInvocationInfo := none) : Async Unit := Internal.api "Lasm.JS.Cloudflare.DurableObject.alarm" do
+  self.val.callMethodAwait "alarm" (Internal.args #[Internal.optional alarmInfo]) Unit
+
+/-- `webSocketMessage?(ws: WebSocket, message: string | ArrayBuffer): void | Promise<void>`: `Promise<undefined> webSocketMessage(WebSocket ws, DOMStringOrArrayBuffer message)` -/
+@[macro_inline] def DurableObject.webSocketMessage (self : DurableObject) (ws : WebSocket) (message : DOMStringOrArrayBuffer) : Async Unit := Internal.api "Lasm.JS.Cloudflare.DurableObject.webSocketMessage" do
+  self.val.callMethodAwait "webSocketMessage" (Internal.args #[toJS ws, toJS message]) Unit
+
+/-- `webSocketClose?(ws: WebSocket, code: number, reason: string, wasClean: boolean): void | Promise<void>`: `Promise<undefined> webSocketClose(WebSocket ws, double code, DOMString reason, boolean wasClean)` -/
+@[macro_inline] def DurableObject.webSocketClose (self : DurableObject) (ws : WebSocket) (code : Float) (reason : String) (wasClean : Bool) : Async Unit := Internal.api "Lasm.JS.Cloudflare.DurableObject.webSocketClose" do
+  self.val.callMethodAwait "webSocketClose" (Internal.args #[toJS ws, toJS code, toJS reason, toJS wasClean]) Unit
+
+/-- `webSocketError?(ws: WebSocket, error: unknown): void | Promise<void>`: `Promise<undefined> webSocketError(WebSocket ws, any error)` -/
+@[macro_inline] def DurableObject.webSocketError (self : DurableObject) (ws : WebSocket) (error : Data) : Async Unit := Internal.api "Lasm.JS.Cloudflare.DurableObject.webSocketError" do
+  self.val.callMethodAwait "webSocketError" (Internal.args #[toJS ws, toJS error]) Unit
+
+/-- `constructor(request: string, response: string)`: `constructor(DOMString request, DOMString response)` -/
+@[macro_inline] def WebSocketRequestResponsePair.new (request : String) (response : String) : IO WebSocketRequestResponsePair := Internal.api "Lasm.JS.Cloudflare.WebSocketRequestResponsePair.new" do
+  Lasm.JS.Binding.invoke WebSocketRequestResponsePair { name := "Lasm.JS.Cloudflare.WebSocketRequestResponsePair.new", module := "globalThis", path := "WebSocketRequestResponsePair", construct := true, arity := 2 }
+    (Internal.args #[toJS request, toJS response]) (await := false)
+
+/-- `get request(): string`: `readonly attribute DOMString request` -/
+@[macro_inline] def WebSocketRequestResponsePair.request (self : WebSocketRequestResponsePair) : IO String := Internal.api "Lasm.JS.Cloudflare.WebSocketRequestResponsePair.request" do
+  self.val.get "request" String
+
+/-- `get response(): string`: `readonly attribute DOMString response` -/
+@[macro_inline] def WebSocketRequestResponsePair.response (self : WebSocketRequestResponsePair) : IO String := Internal.api "Lasm.JS.Cloudflare.WebSocketRequestResponsePair.response" do
+  self.val.get "response" String
+
+/-- `get<T extends Rpc.DurableObjectBranded | undefined = undefined>(name: string, getStartupOptions: () => FacetStartupOptions<T> | Promise<FacetStartupOptions<T>>): Fetcher<T>`: `DurableObjectFacetsGet get(DOMString name, DurableObjectFacetsGetGetStartupOptions getStartupOptions)` -/
+@[macro_inline] def DurableObjectFacets.get (self : DurableObjectFacets) (name : String) (getStartupOptions : DurableObjectFacetsGetGetStartupOptions) : IO DurableObjectFacetsGet := Internal.api "Lasm.JS.Cloudflare.DurableObjectFacets.get" do
+  self.val.callMethod "get" (Internal.args #[toJS name, toJS getStartupOptions]) DurableObjectFacetsGet
+
+/-- `abort(name: string, reason: any): void`: `undefined abort(DOMString name, any reason)` -/
+@[macro_inline] def DurableObjectFacets.abort (self : DurableObjectFacets) (name : String) (reason : Data) : IO Unit := Internal.api "Lasm.JS.Cloudflare.DurableObjectFacets.abort" do
+  self.val.callMethod "abort" (Internal.args #[toJS name, toJS reason]) Unit
+
+/-- `delete(name: string): void`: `undefined delete(DOMString name)` -/
+@[macro_inline] def DurableObjectFacets.delete (self : DurableObjectFacets) (name : String) : IO Unit := Internal.api "Lasm.JS.Cloudflare.DurableObjectFacets.delete" do
+  self.val.callMethod "delete" (Internal.args #[toJS name]) Unit
+
+/-- `clone(src: string, dst: string): void`: `undefined clone(DOMString src, DOMString dst)` -/
+@[macro_inline] def DurableObjectFacets.clone (self : DurableObjectFacets) (src : String) (dst : String) : IO Unit := Internal.api "Lasm.JS.Cloudflare.DurableObjectFacets.clone" do
+  self.val.callMethod "clone" (Internal.args #[toJS src, toJS dst]) Unit
+
+/-- `get databaseSize(): number`: `readonly attribute double databaseSize` -/
+@[macro_inline] def SqlStorage.databaseSize (self : SqlStorage) : IO Float := Internal.api "Lasm.JS.Cloudflare.SqlStorage.databaseSize" do
+  self.val.get "databaseSize" Float
+
+/-- `Cursor: typeof SqlStorageCursor`: `readonly attribute any Cursor` -/
+@[macro_inline] def SqlStorage.CursorClass (self : SqlStorage) : IO Data := Internal.api "Lasm.JS.Cloudflare.SqlStorage.CursorClass" do
+  self.val.get "Cursor" Data
+
+/-- `Statement: typeof SqlStorageStatement`: `readonly attribute any Statement` -/
+@[macro_inline] def SqlStorage.StatementClass (self : SqlStorage) : IO Data := Internal.api "Lasm.JS.Cloudflare.SqlStorage.StatementClass" do
+  self.val.get "Statement" Data
+
+/-- `exec<T extends Record<string, SqlStorageValue>>(query: string, ...bindings: any[]): SqlStorageCursor<T>`: `SqlStorageCursor exec(DOMString query, any... bindings)` -/
+@[macro_inline] def SqlStorage.exec (self : SqlStorage) (query : String) (bindings : Array Data := #[]) : IO SqlStorageCursor := Internal.api "Lasm.JS.Cloudflare.SqlStorage.exec" do
+  let r ← self.val.callMethod "exec" (Internal.argsWith #[toJS query] (bindings.map toJS)) Value
+  pure { val := r }
+
+/-- `columnNames: string[]`: `readonly attribute sequence<DOMString> columnNames` -/
+@[macro_inline] def SqlStorageCursor.columnNames (self : SqlStorageCursor) : IO (Array String) := Internal.api "Lasm.JS.Cloudflare.SqlStorageCursor.columnNames" do
+  self.val.get "columnNames" (Array String)
+
+/-- `get rowsRead(): number`: `readonly attribute double rowsRead` -/
+@[macro_inline] def SqlStorageCursor.rowsRead (self : SqlStorageCursor) : IO Float := Internal.api "Lasm.JS.Cloudflare.SqlStorageCursor.rowsRead" do
+  self.val.get "rowsRead" Float
+
+/-- `get rowsWritten(): number`: `readonly attribute double rowsWritten` -/
+@[macro_inline] def SqlStorageCursor.rowsWritten (self : SqlStorageCursor) : IO Float := Internal.api "Lasm.JS.Cloudflare.SqlStorageCursor.rowsWritten" do
+  self.val.get "rowsWritten" Float
+
+/-- `next(): IteratorResult<T, undefined>`: `any next()` -/
+@[macro_inline] def SqlStorageCursor.next (self : SqlStorageCursor) : IO Data := Internal.api "Lasm.JS.Cloudflare.SqlStorageCursor.next" do
+  self.val.callMethod "next" (Internal.args #[]) Data
+
+/-- `toArray(): T[]`: `sequence<any> toArray()` -/
+@[macro_inline] def SqlStorageCursor.toArray (self : SqlStorageCursor) : IO (Array Data) := Internal.api "Lasm.JS.Cloudflare.SqlStorageCursor.toArray" do
+  self.val.callMethod "toArray" (Internal.args #[]) (Array Data)
+
+/-- `one(): T`: `any one()` -/
+@[macro_inline] def SqlStorageCursor.one (self : SqlStorageCursor) : IO Data := Internal.api "Lasm.JS.Cloudflare.SqlStorageCursor.one" do
+  self.val.callMethod "one" (Internal.args #[]) Data
+
+/-- `raw<U extends SqlStorageValue[]>(): IterableIterator<U>`: `any raw()` -/
+@[macro_inline] def SqlStorageCursor.raw (self : SqlStorageCursor) : IO Data := Internal.api "Lasm.JS.Cloudflare.SqlStorageCursor.raw" do
+  self.val.callMethod "raw" (Internal.args #[]) Data
+
+/-- `get<T = unknown>(key: string): T | undefined`: `any get(DOMString key)` -/
+@[macro_inline] def SyncKvStorage.get (self : SyncKvStorage) (key : String) : IO Data := Internal.api "Lasm.JS.Cloudflare.SyncKvStorage.get" do
+  self.val.callMethod "get" (Internal.args #[toJS key]) Data
+
+/-- `list<T = unknown>(options?: SyncKvListOptions): Iterable<[string, T]>`: `sequence<sequence<any>> list(optional SyncKvListOptions options)` -/
+@[macro_inline] def SyncKvStorage.list (self : SyncKvStorage) (options : Option SyncKvListOptions := none) : IO (Array (Array Data)) := Internal.api "Lasm.JS.Cloudflare.SyncKvStorage.list" do
+  self.val.callMethod "list" (Internal.args #[Internal.optional options]) (Array (Array Data))
+
+/-- `put<T>(key: string, value: T): void`: `undefined put(DOMString key, any value)` -/
+@[macro_inline] def SyncKvStorage.put (self : SyncKvStorage) (key : String) (value : Data) : IO Unit := Internal.api "Lasm.JS.Cloudflare.SyncKvStorage.put" do
+  self.val.callMethod "put" (Internal.args #[toJS key, toJS value]) Unit
+
+/-- `delete(key: string): boolean`: `boolean delete(DOMString key)` -/
+@[macro_inline] def SyncKvStorage.delete (self : SyncKvStorage) (key : String) : IO Bool := Internal.api "Lasm.JS.Cloudflare.SyncKvStorage.delete" do
+  self.val.callMethod "delete" (Internal.args #[toJS key]) Bool
+
+/-- `alarm?(alarmInfo?: AlarmInvocationInfo): void | Promise<void>`: `Promise<undefined> alarm(optional AlarmInvocationInfo alarmInfo)` -/
+@[macro_inline] def CloudflareWorkersModuleDurableObject.alarm (self : CloudflareWorkersModuleDurableObject) (alarmInfo : Option AlarmInvocationInfo := none) : Async Unit := Internal.api "Lasm.JS.Cloudflare.CloudflareWorkersModuleDurableObject.alarm" do
+  self.val.callMethodAwait "alarm" (Internal.args #[Internal.optional alarmInfo]) Unit
+
+/-- `fetch?(request: Request): Response | Promise<Response>`: `Promise<Response> fetch(Request request)` -/
+@[macro_inline] def CloudflareWorkersModuleDurableObject.fetch (self : CloudflareWorkersModuleDurableObject) (request : Request) : Async Response := Internal.api "Lasm.JS.Cloudflare.CloudflareWorkersModuleDurableObject.fetch" do
+  let r ← self.val.callMethodAwait "fetch" (Internal.args #[toJS request]) Value
+  pure { val := r }
+
+/-- `connect?(socket: Socket): void | Promise<void>`: `Promise<undefined> connect(Socket socket)` -/
+@[macro_inline] def CloudflareWorkersModuleDurableObject.connect (self : CloudflareWorkersModuleDurableObject) (socket : Socket) : Async Unit := Internal.api "Lasm.JS.Cloudflare.CloudflareWorkersModuleDurableObject.connect" do
+  self.val.callMethodAwait "connect" (Internal.args #[toJS socket]) Unit
+
+/-- `webSocketMessage?(ws: WebSocket, message: string | ArrayBuffer): void | Promise<void>`: `Promise<undefined> webSocketMessage(WebSocket ws, DOMStringOrArrayBuffer message)` -/
+@[macro_inline] def CloudflareWorkersModuleDurableObject.webSocketMessage (self : CloudflareWorkersModuleDurableObject) (ws : WebSocket) (message : DOMStringOrArrayBuffer) : Async Unit := Internal.api "Lasm.JS.Cloudflare.CloudflareWorkersModuleDurableObject.webSocketMessage" do
+  self.val.callMethodAwait "webSocketMessage" (Internal.args #[toJS ws, toJS message]) Unit
+
+/-- `webSocketClose?(ws: WebSocket, code: number, reason: string, wasClean: boolean): void | Promise<void>`: `Promise<undefined> webSocketClose(WebSocket ws, double code, DOMString reason, boolean wasClean)` -/
+@[macro_inline] def CloudflareWorkersModuleDurableObject.webSocketClose (self : CloudflareWorkersModuleDurableObject) (ws : WebSocket) (code : Float) (reason : String) (wasClean : Bool) : Async Unit := Internal.api "Lasm.JS.Cloudflare.CloudflareWorkersModuleDurableObject.webSocketClose" do
+  self.val.callMethodAwait "webSocketClose" (Internal.args #[toJS ws, toJS code, toJS reason, toJS wasClean]) Unit
+
+/-- `webSocketError?(ws: WebSocket, error: unknown): void | Promise<void>`: `Promise<undefined> webSocketError(WebSocket ws, any error)` -/
+@[macro_inline] def CloudflareWorkersModuleDurableObject.webSocketError (self : CloudflareWorkersModuleDurableObject) (ws : WebSocket) (error : Data) : Async Unit := Internal.api "Lasm.JS.Cloudflare.CloudflareWorkersModuleDurableObject.webSocketError" do
+  self.val.callMethodAwait "webSocketError" (Internal.args #[toJS ws, toJS error]) Unit
 
 end Lasm.JS.Cloudflare

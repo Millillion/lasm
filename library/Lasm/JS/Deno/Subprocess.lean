@@ -8,12 +8,15 @@ docs/JS_BINDINGS.md ("Lasm.JS.Deno and Lasm.JS.Bun"). The doc comments quote eac
 declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Dom
-import Lasm.JS.Web.Streams
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Streams
 import Lasm.JS.Deno.Runtime
 
 namespace Lasm.JS.Deno
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface Deno.SubprocessReadableStream` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts): a handle to the JavaScript object. -/
 structure SubprocessReadableStream extends ReadableStream
@@ -39,66 +42,63 @@ instance : ToJS Command := ⟨fun x => .ref x.val ""⟩
 instance : FromJS Command := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Deno.Command", .data⟩
 
 /-- `enum CommandOptionsStdin` (Deno 2.9.6 type declarations): "piped", "inherit", "null". -/
-inductive CommandOptionsStdin where
-  /-- "piped" -/
-  | piped
-  /-- "inherit" -/
-  | inherit
-  /-- "null" -/
-  | null
+structure CommandOptionsStdin where
+  /-- A value from its string, unchecked: the generated values (`.piped`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS CommandOptionsStdin := ⟨fun
-  | .piped => .string "piped"
-  | .inherit => .string "inherit"
-  | .null => .string "null"⟩
+/-- "piped" -/
+@[match_pattern] abbrev CommandOptionsStdin.piped : CommandOptionsStdin := .unsafeOfString "piped"
+/-- "inherit" -/
+@[match_pattern] abbrev CommandOptionsStdin.inherit : CommandOptionsStdin := .unsafeOfString "inherit"
+/-- "null" -/
+@[match_pattern] abbrev CommandOptionsStdin.null : CommandOptionsStdin := .unsafeOfString "null"
+instance : ToJS CommandOptionsStdin := ⟨fun x => .string x.val⟩
 instance : FromJS CommandOptionsStdin where
   fromJS
-    | .string "piped" => .ok .piped
-    | .string "inherit" => .ok .inherit
-    | .string "null" => .ok .null
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.CommandOptionsStdin"
 
 /-- `enum CommandOptionsStdout` (Deno 2.9.6 type declarations): "piped", "inherit", "null". -/
-inductive CommandOptionsStdout where
-  /-- "piped" -/
-  | piped
-  /-- "inherit" -/
-  | inherit
-  /-- "null" -/
-  | null
+structure CommandOptionsStdout where
+  /-- A value from its string, unchecked: the generated values (`.piped`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS CommandOptionsStdout := ⟨fun
-  | .piped => .string "piped"
-  | .inherit => .string "inherit"
-  | .null => .string "null"⟩
+/-- "piped" -/
+@[match_pattern] abbrev CommandOptionsStdout.piped : CommandOptionsStdout := .unsafeOfString "piped"
+/-- "inherit" -/
+@[match_pattern] abbrev CommandOptionsStdout.inherit : CommandOptionsStdout := .unsafeOfString "inherit"
+/-- "null" -/
+@[match_pattern] abbrev CommandOptionsStdout.null : CommandOptionsStdout := .unsafeOfString "null"
+instance : ToJS CommandOptionsStdout := ⟨fun x => .string x.val⟩
 instance : FromJS CommandOptionsStdout where
   fromJS
-    | .string "piped" => .ok .piped
-    | .string "inherit" => .ok .inherit
-    | .string "null" => .ok .null
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.CommandOptionsStdout"
 
 /-- `enum CommandOptionsStderr` (Deno 2.9.6 type declarations): "piped", "inherit", "null". -/
-inductive CommandOptionsStderr where
-  /-- "piped" -/
-  | piped
-  /-- "inherit" -/
-  | inherit
-  /-- "null" -/
-  | null
+structure CommandOptionsStderr where
+  /-- A value from its string, unchecked: the generated values (`.piped`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS CommandOptionsStderr := ⟨fun
-  | .piped => .string "piped"
-  | .inherit => .string "inherit"
-  | .null => .string "null"⟩
+/-- "piped" -/
+@[match_pattern] abbrev CommandOptionsStderr.piped : CommandOptionsStderr := .unsafeOfString "piped"
+/-- "inherit" -/
+@[match_pattern] abbrev CommandOptionsStderr.inherit : CommandOptionsStderr := .unsafeOfString "inherit"
+/-- "null" -/
+@[match_pattern] abbrev CommandOptionsStderr.null : CommandOptionsStderr := .unsafeOfString "null"
+instance : ToJS CommandOptionsStderr := ⟨fun x => .string x.val⟩
 instance : FromJS CommandOptionsStderr where
   fromJS
-    | .string "piped" => .ok .piped
-    | .string "inherit" => .ok .inherit
-    | .string "null" => .ok .null
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Deno.CommandOptionsStderr"
 
 /-- `dictionary CommandStatus` (Deno 2.9.6 type declarations, lib.deno.ns.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -175,128 +175,129 @@ structure CommandOptions where
   windowsRawArguments : Option Bool := none
   /-- `boolean detached` -/
   detached : Option Bool := none
-instance : ToJS CommandOptions := ⟨fun d => Support.fields #[("args", Support.optional d.args),
-    ("cwd", Support.optional d.cwd),
-    ("clearEnv", Support.optional d.clearEnv),
-    ("env", Support.optional d.env),
-    ("uid", Support.optional d.uid),
-    ("gid", Support.optional d.gid),
-    ("signal", Support.optional d.signal),
-    ("stdin", Support.optional d.stdin),
-    ("stdout", Support.optional d.stdout),
-    ("stderr", Support.optional d.stderr),
-    ("windowsRawArguments", Support.optional d.windowsRawArguments),
-    ("detached", Support.optional d.detached)]⟩
+instance : ToJS CommandOptions := ⟨fun d => Internal.fields #[("args", Internal.optional d.args),
+    ("cwd", Internal.optional d.cwd),
+    ("clearEnv", Internal.optional d.clearEnv),
+    ("env", Internal.optional d.env),
+    ("uid", Internal.optional d.uid),
+    ("gid", Internal.optional d.gid),
+    ("signal", Internal.optional d.signal),
+    ("stdin", Internal.optional d.stdin),
+    ("stdout", Internal.optional d.stdout),
+    ("stderr", Internal.optional d.stderr),
+    ("windowsRawArguments", Internal.optional d.windowsRawArguments),
+    ("detached", Internal.optional d.detached)]⟩
 
 /-- `arrayBuffer(): Promise<ArrayBuffer>`: `Promise<ArrayBuffer> arrayBuffer()` -/
-def SubprocessReadableStream.arrayBuffer (self : SubprocessReadableStream) : Async ByteArray := do
-  let r ← self.val.callMethodAwait "arrayBuffer" (Support.args #[]) Value
-  Support.arrayBufferBytes r
+@[macro_inline] def SubprocessReadableStream.arrayBuffer (self : SubprocessReadableStream) : Async ByteArray := Internal.api "Lasm.JS.Deno.SubprocessReadableStream.arrayBuffer" do
+  let r ← self.val.callMethodAwait "arrayBuffer" (Internal.args #[]) Value
+  Internal.arrayBufferBytes r
 
 /-- `bytes(): Promise<Uint8Array<ArrayBuffer>>`: `Promise<Uint8Array> bytes()` -/
-def SubprocessReadableStream.bytes (self : SubprocessReadableStream) : Async ByteArray :=
-  self.val.callMethodAwait "bytes" (Support.args #[]) ByteArray
+@[macro_inline] def SubprocessReadableStream.bytes (self : SubprocessReadableStream) : Async ByteArray := Internal.api "Lasm.JS.Deno.SubprocessReadableStream.bytes" do
+  self.val.callMethodAwait "bytes" (Internal.args #[]) ByteArray
 
 /-- `json(): Promise<any>`: `Promise<any> json()` -/
-def SubprocessReadableStream.json (self : SubprocessReadableStream) : Async Data :=
-  self.val.callMethodAwait "json" (Support.args #[]) Data
+@[macro_inline] def SubprocessReadableStream.json (self : SubprocessReadableStream) : Async Data := Internal.api "Lasm.JS.Deno.SubprocessReadableStream.json" do
+  self.val.callMethodAwait "json" (Internal.args #[]) Data
 
 /-- `text(): Promise<string>`: `Promise<DOMString> text()` -/
-def SubprocessReadableStream.text (self : SubprocessReadableStream) : Async String :=
-  self.val.callMethodAwait "text" (Support.args #[]) String
+@[macro_inline] def SubprocessReadableStream.text (self : SubprocessReadableStream) : Async String := Internal.api "Lasm.JS.Deno.SubprocessReadableStream.text" do
+  self.val.callMethodAwait "text" (Internal.args #[]) String
 
 /-- `get stdin(): WritableStream<Uint8Array<ArrayBufferLike>>`: `readonly attribute WritableStream stdin` -/
-def ChildProcess.stdin (self : ChildProcess) : IO WritableStream := do
+@[macro_inline] def ChildProcess.stdin (self : ChildProcess) : IO WritableStream := Internal.api "Lasm.JS.Deno.ChildProcess.stdin" do
   let r ← self.val.get "stdin" Value
   pure { val := r }
 
 /-- `get stdout(): SubprocessReadableStream`: `readonly attribute SubprocessReadableStream stdout` -/
-def ChildProcess.stdout (self : ChildProcess) : IO SubprocessReadableStream := do
+@[macro_inline] def ChildProcess.stdout (self : ChildProcess) : IO SubprocessReadableStream := Internal.api "Lasm.JS.Deno.ChildProcess.stdout" do
   let r ← self.val.get "stdout" Value
   pure { val := r }
 
 /-- `get stderr(): SubprocessReadableStream`: `readonly attribute SubprocessReadableStream stderr` -/
-def ChildProcess.stderr (self : ChildProcess) : IO SubprocessReadableStream := do
+@[macro_inline] def ChildProcess.stderr (self : ChildProcess) : IO SubprocessReadableStream := Internal.api "Lasm.JS.Deno.ChildProcess.stderr" do
   let r ← self.val.get "stderr" Value
   pure { val := r }
 
 /-- `readonly pid: number`: `readonly attribute double /* integer: Int */ pid` -/
-def ChildProcess.pid (self : ChildProcess) : IO Int := self.val.get "pid" Int
+@[macro_inline] def ChildProcess.pid (self : ChildProcess) : IO Int := Internal.api "Lasm.JS.Deno.ChildProcess.pid" do
+  self.val.get "pid" Int
 
 /-- `readonly status: Promise<CommandStatus>`: `readonly attribute Promise<CommandStatus> status` -/
-def ChildProcess.status (self : ChildProcess) : Async CommandStatus := do
+@[macro_inline] def ChildProcess.status (self : ChildProcess) : Async CommandStatus := Internal.api "Lasm.JS.Deno.ChildProcess.status" do
   let p ← self.val.get "status" Value
   p.await CommandStatus
 
 /-- `output(): Promise<CommandOutput>`: `Promise<CommandOutput> output()` -/
-def ChildProcess.output (self : ChildProcess) : Async CommandOutput :=
-  self.val.callMethodAwait "output" (Support.args #[]) CommandOutput
+@[macro_inline] def ChildProcess.output (self : ChildProcess) : Async CommandOutput := Internal.api "Lasm.JS.Deno.ChildProcess.output" do
+  self.val.callMethodAwait "output" (Internal.args #[]) CommandOutput
 
 /-- `kill(signo?: Signal | number): void`: `undefined kill(optional SignalOrDouble signo)` -/
-def ChildProcess.kill (self : ChildProcess) (signo : Option SignalOrDouble := none) : IO Unit :=
-  self.val.callMethod "kill" (Support.args #[Support.optional signo]) Unit
+@[macro_inline] def ChildProcess.kill (self : ChildProcess) (signo : Option SignalOrDouble := none) : IO Unit := Internal.api "Lasm.JS.Deno.ChildProcess.kill" do
+  self.val.callMethod "kill" (Internal.args #[Internal.optional signo]) Unit
 
 /-- `ref(): void`: `undefined ref()` -/
-def ChildProcess.ref (self : ChildProcess) : IO Unit :=
-  self.val.callMethod "ref" (Support.args #[]) Unit
+@[macro_inline] def ChildProcess.ref (self : ChildProcess) : IO Unit := Internal.api "Lasm.JS.Deno.ChildProcess.ref" do
+  self.val.callMethod "ref" (Internal.args #[]) Unit
 
 /-- `unref(): void`: `undefined unref()` -/
-def ChildProcess.unref (self : ChildProcess) : IO Unit :=
-  self.val.callMethod "unref" (Support.args #[]) Unit
+@[macro_inline] def ChildProcess.unref (self : ChildProcess) : IO Unit := Internal.api "Lasm.JS.Deno.ChildProcess.unref" do
+  self.val.callMethod "unref" (Internal.args #[]) Unit
 
 /-- `constructor(command: string | URL, options?: CommandOptions)`: `constructor(DOMStringOrURL command, optional CommandOptions options)` -/
-def Command.new (command : DOMStringOrURL) (options : Option CommandOptions := none) : IO Command :=
+@[macro_inline] def Command.new (command : DOMStringOrURL) (options : Option CommandOptions := none) : IO Command := Internal.api "Lasm.JS.Deno.Command.new" do
   Lasm.JS.Binding.invoke Command { name := "Lasm.JS.Deno.Command.new", module := "globalThis", path := "Deno.Command", construct := true, arity := 2 }
-    (Support.args #[toJS command, Support.optional options]) (await := false)
+    (Internal.args #[toJS command, Internal.optional options]) (await := false)
 
 /-- `output(): Promise<CommandOutput>`: `Promise<CommandOutput> output()` -/
-def Command.output (self : Command) : Async CommandOutput :=
-  self.val.callMethodAwait "output" (Support.args #[]) CommandOutput
+@[macro_inline] def Command.output (self : Command) : Async CommandOutput := Internal.api "Lasm.JS.Deno.Command.output" do
+  self.val.callMethodAwait "output" (Internal.args #[]) CommandOutput
 
 /-- `outputSync(): CommandOutput`: `CommandOutput outputSync()` -/
-def Command.outputSync (self : Command) : IO CommandOutput :=
-  self.val.callMethod "outputSync" (Support.args #[]) CommandOutput
+@[macro_inline] def Command.outputSync (self : Command) : IO CommandOutput := Internal.api "Lasm.JS.Deno.Command.outputSync" do
+  self.val.callMethod "outputSync" (Internal.args #[]) CommandOutput
 
 /-- `spawn(): ChildProcess`: `ChildProcess spawn()` -/
-def Command.spawn (self : Command) : IO ChildProcess := do
-  let r ← self.val.callMethod "spawn" (Support.args #[]) Value
+@[macro_inline] def Command.spawn (self : Command) : IO ChildProcess := Internal.api "Lasm.JS.Deno.Command.spawn" do
+  let r ← self.val.callMethod "spawn" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `Deno.spawn(command: string | URL, options?: CommandOptions): ChildProcess`: `ChildProcess spawn(DOMStringOrURL command, optional CommandOptions options)` (Deno 2.9.6 type declarations) -/
-def spawn (command : DOMStringOrURL) (options : Option CommandOptions := none) : IO ChildProcess := do
+@[macro_inline] def spawn (command : DOMStringOrURL) (options : Option CommandOptions := none) : IO ChildProcess := Internal.api "Lasm.JS.Deno.spawn" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.spawn", module := "globalThis", path := "Deno.spawn", construct := false, arity := 2 }
-    (Support.args #[toJS command, Support.optional options]) (await := false)
+    (Internal.args #[toJS command, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `Deno.spawn(command: string | URL, args: string[], options?: Omit<CommandOptions, 'args'>): ChildProcess`: `ChildProcess spawn(DOMStringOrURL command, sequence<DOMString> args, optional CommandOptions options)` (Deno 2.9.6 type declarations) -/
-def spawnWithArgs (command : DOMStringOrURL) (args : Array String) (options : Option CommandOptions := none) : IO ChildProcess := do
+@[macro_inline] def spawnWithArgs (command : DOMStringOrURL) (args : Array String) (options : Option CommandOptions := none) : IO ChildProcess := Internal.api "Lasm.JS.Deno.spawnWithArgs" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Deno.spawnWithArgs", module := "globalThis", path := "Deno.spawn", construct := false, arity := 3 }
-    (Support.args #[toJS command, toJS args, Support.optional options]) (await := false)
+    (Internal.args #[toJS command, toJS args, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `Deno.spawnAndWait(command: string | URL, options?: CommandOptions): Promise<CommandOutput>`: `Promise<CommandOutput> spawnAndWait(DOMStringOrURL command, optional CommandOptions options)` (Deno 2.9.6 type declarations) -/
-def spawnAndWait (command : DOMStringOrURL) (options : Option CommandOptions := none) : Async CommandOutput :=
+@[macro_inline] def spawnAndWait (command : DOMStringOrURL) (options : Option CommandOptions := none) : Async CommandOutput := Internal.api "Lasm.JS.Deno.spawnAndWait" do
   Lasm.JS.Binding.invokeAsync CommandOutput { name := "Lasm.JS.Deno.spawnAndWait", module := "globalThis", path := "Deno.spawnAndWait", construct := false, arity := 2 }
-    (Support.args #[toJS command, Support.optional options])
+    (Internal.args #[toJS command, Internal.optional options])
 
 /-- `Deno.spawnAndWait(command: string | URL, args: string[], options?: Omit<CommandOptions, 'args'>): Promise<CommandOutput>`: `Promise<CommandOutput> spawnAndWait(DOMStringOrURL command, sequence<DOMString> args, optional CommandOptions options)` (Deno 2.9.6 type declarations) -/
-def spawnAndWaitWithArgs (command : DOMStringOrURL) (args : Array String) (options : Option CommandOptions := none) : Async CommandOutput :=
+@[macro_inline] def spawnAndWaitWithArgs (command : DOMStringOrURL) (args : Array String) (options : Option CommandOptions := none) : Async CommandOutput := Internal.api "Lasm.JS.Deno.spawnAndWaitWithArgs" do
   Lasm.JS.Binding.invokeAsync CommandOutput { name := "Lasm.JS.Deno.spawnAndWaitWithArgs", module := "globalThis", path := "Deno.spawnAndWait", construct := false, arity := 3 }
-    (Support.args #[toJS command, toJS args, Support.optional options])
+    (Internal.args #[toJS command, toJS args, Internal.optional options])
 
 /-- `Deno.spawnAndWaitSync(command: string | URL, options?: CommandOptions): CommandOutput`: `CommandOutput spawnAndWaitSync(DOMStringOrURL command, optional CommandOptions options)` (Deno 2.9.6 type declarations) -/
-def spawnAndWaitSync (command : DOMStringOrURL) (options : Option CommandOptions := none) : IO CommandOutput :=
+@[macro_inline] def spawnAndWaitSync (command : DOMStringOrURL) (options : Option CommandOptions := none) : IO CommandOutput := Internal.api "Lasm.JS.Deno.spawnAndWaitSync" do
   Lasm.JS.Binding.invoke CommandOutput { name := "Lasm.JS.Deno.spawnAndWaitSync", module := "globalThis", path := "Deno.spawnAndWaitSync", construct := false, arity := 2 }
-    (Support.args #[toJS command, Support.optional options]) (await := false)
+    (Internal.args #[toJS command, Internal.optional options]) (await := false)
 
 /-- `Deno.spawnAndWaitSync(command: string | URL, args: string[], options?: Omit<CommandOptions, 'args'>): CommandOutput`: `CommandOutput spawnAndWaitSync(DOMStringOrURL command, sequence<DOMString> args, optional CommandOptions options)` (Deno 2.9.6 type declarations) -/
-def spawnAndWaitSyncWithArgs (command : DOMStringOrURL) (args : Array String) (options : Option CommandOptions := none) : IO CommandOutput :=
+@[macro_inline] def spawnAndWaitSyncWithArgs (command : DOMStringOrURL) (args : Array String) (options : Option CommandOptions := none) : IO CommandOutput := Internal.api "Lasm.JS.Deno.spawnAndWaitSyncWithArgs" do
   Lasm.JS.Binding.invoke CommandOutput { name := "Lasm.JS.Deno.spawnAndWaitSyncWithArgs", module := "globalThis", path := "Deno.spawnAndWaitSync", construct := false, arity := 3 }
-    (Support.args #[toJS command, toJS args, Support.optional options]) (await := false)
+    (Internal.args #[toJS command, toJS args, Internal.optional options]) (await := false)
 
 /-- `Deno.kill(pid: number, signo?: Signal | number): void`: `undefined kill(double /* integer: Int */ pid, optional SignalOrDouble signo)` (Deno 2.9.6 type declarations) -/
-def kill (pid : Int) (signo : Option SignalOrDouble := none) : IO Unit :=
+@[macro_inline] def kill (pid : Int) (signo : Option SignalOrDouble := none) : IO Unit := Internal.api "Lasm.JS.Deno.kill" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Deno.kill", module := "globalThis", path := "Deno.kill", construct := false, arity := 2 }
-    (Support.args #[toJS pid, Support.optional signo]) (await := false)
+    (Internal.args #[toJS pid, Internal.optional signo]) (await := false)
 
 end Lasm.JS.Deno

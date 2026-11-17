@@ -8,14 +8,20 @@ docs/JS_BINDINGS.md ("Lasm.JS.Deno and Lasm.JS.Bun"). The doc comments quote eac
 declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Web.Support
-import Lasm.JS.Web.Dom
-import Lasm.JS.Web.Streams
-import Lasm.JS.Web.File
-import Lasm.JS.Web.Url
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Fetch
+import Lasm.JS.Web.Types.FileAPI
+import Lasm.JS.Web.Types.Streams
+import Lasm.JS.Web.Types.Url
+import Lasm.JS.Web.Types.Xhr
 import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.FileAPI
 
 namespace Lasm.JS.Bun
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `interface Bun.FileSink` (Bun 1.4.4 type declarations, s3.d.ts): a handle to the JavaScript object. -/
 structure FileSink where
@@ -410,1559 +416,1465 @@ instance : ToJS CookieMap := ⟨fun x => .ref x.val ""⟩
 instance : FromJS CookieMap := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.CookieMap", .data⟩
 
 /-- `enum S3OptionsAcl` (Bun 1.4.4 type declarations): "private", "public-read", "public-read-write", "aws-exec-read", "authenticated-read", "bucket-owner-read", "bucket-owner-full-control", "log-delivery-write". -/
-inductive S3OptionsAcl where
-  /-- "private" -/
-  | «private»
-  /-- "public-read" -/
-  | publicRead
-  /-- "public-read-write" -/
-  | publicReadWrite
-  /-- "aws-exec-read" -/
-  | awsExecRead
-  /-- "authenticated-read" -/
-  | authenticatedRead
-  /-- "bucket-owner-read" -/
-  | bucketOwnerRead
-  /-- "bucket-owner-full-control" -/
-  | bucketOwnerFullControl
-  /-- "log-delivery-write" -/
-  | logDeliveryWrite
+structure S3OptionsAcl where
+  /-- A value from its string, unchecked: the generated values (`.«private»`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS S3OptionsAcl := ⟨fun
-  | .«private» => .string "private"
-  | .publicRead => .string "public-read"
-  | .publicReadWrite => .string "public-read-write"
-  | .awsExecRead => .string "aws-exec-read"
-  | .authenticatedRead => .string "authenticated-read"
-  | .bucketOwnerRead => .string "bucket-owner-read"
-  | .bucketOwnerFullControl => .string "bucket-owner-full-control"
-  | .logDeliveryWrite => .string "log-delivery-write"⟩
+/-- "private" -/
+@[match_pattern] abbrev S3OptionsAcl.«private» : S3OptionsAcl := .unsafeOfString "private"
+/-- "public-read" -/
+@[match_pattern] abbrev S3OptionsAcl.publicRead : S3OptionsAcl := .unsafeOfString "public-read"
+/-- "public-read-write" -/
+@[match_pattern] abbrev S3OptionsAcl.publicReadWrite : S3OptionsAcl := .unsafeOfString "public-read-write"
+/-- "aws-exec-read" -/
+@[match_pattern] abbrev S3OptionsAcl.awsExecRead : S3OptionsAcl := .unsafeOfString "aws-exec-read"
+/-- "authenticated-read" -/
+@[match_pattern] abbrev S3OptionsAcl.authenticatedRead : S3OptionsAcl := .unsafeOfString "authenticated-read"
+/-- "bucket-owner-read" -/
+@[match_pattern] abbrev S3OptionsAcl.bucketOwnerRead : S3OptionsAcl := .unsafeOfString "bucket-owner-read"
+/-- "bucket-owner-full-control" -/
+@[match_pattern] abbrev S3OptionsAcl.bucketOwnerFullControl : S3OptionsAcl := .unsafeOfString "bucket-owner-full-control"
+/-- "log-delivery-write" -/
+@[match_pattern] abbrev S3OptionsAcl.logDeliveryWrite : S3OptionsAcl := .unsafeOfString "log-delivery-write"
+instance : ToJS S3OptionsAcl := ⟨fun x => .string x.val⟩
 instance : FromJS S3OptionsAcl where
   fromJS
-    | .string "private" => .ok .«private»
-    | .string "public-read" => .ok .publicRead
-    | .string "public-read-write" => .ok .publicReadWrite
-    | .string "aws-exec-read" => .ok .awsExecRead
-    | .string "authenticated-read" => .ok .authenticatedRead
-    | .string "bucket-owner-read" => .ok .bucketOwnerRead
-    | .string "bucket-owner-full-control" => .ok .bucketOwnerFullControl
-    | .string "log-delivery-write" => .ok .logDeliveryWrite
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.S3OptionsAcl"
 
 /-- `enum S3OptionsStorageClass` (Bun 1.4.4 type declarations): "STANDARD", "DEEP_ARCHIVE", "EXPRESS_ONEZONE", "GLACIER", "GLACIER_IR", "INTELLIGENT_TIERING", "ONEZONE_IA", "OUTPOSTS", "REDUCED_REDUNDANCY", "SNOW", "STANDARD_IA". -/
-inductive S3OptionsStorageClass where
-  /-- "STANDARD" -/
-  | standard
-  /-- "DEEP_ARCHIVE" -/
-  | deepArchive
-  /-- "EXPRESS_ONEZONE" -/
-  | expressOnezone
-  /-- "GLACIER" -/
-  | glacier
-  /-- "GLACIER_IR" -/
-  | glacierIr
-  /-- "INTELLIGENT_TIERING" -/
-  | intelligentTiering
-  /-- "ONEZONE_IA" -/
-  | onezoneIa
-  /-- "OUTPOSTS" -/
-  | outposts
-  /-- "REDUCED_REDUNDANCY" -/
-  | reducedRedundancy
-  /-- "SNOW" -/
-  | snow
-  /-- "STANDARD_IA" -/
-  | standardIa
+structure S3OptionsStorageClass where
+  /-- A value from its string, unchecked: the generated values (`.standard`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS S3OptionsStorageClass := ⟨fun
-  | .standard => .string "STANDARD"
-  | .deepArchive => .string "DEEP_ARCHIVE"
-  | .expressOnezone => .string "EXPRESS_ONEZONE"
-  | .glacier => .string "GLACIER"
-  | .glacierIr => .string "GLACIER_IR"
-  | .intelligentTiering => .string "INTELLIGENT_TIERING"
-  | .onezoneIa => .string "ONEZONE_IA"
-  | .outposts => .string "OUTPOSTS"
-  | .reducedRedundancy => .string "REDUCED_REDUNDANCY"
-  | .snow => .string "SNOW"
-  | .standardIa => .string "STANDARD_IA"⟩
+/-- "STANDARD" -/
+@[match_pattern] abbrev S3OptionsStorageClass.standard : S3OptionsStorageClass := .unsafeOfString "STANDARD"
+/-- "DEEP_ARCHIVE" -/
+@[match_pattern] abbrev S3OptionsStorageClass.deepArchive : S3OptionsStorageClass := .unsafeOfString "DEEP_ARCHIVE"
+/-- "EXPRESS_ONEZONE" -/
+@[match_pattern] abbrev S3OptionsStorageClass.expressOnezone : S3OptionsStorageClass := .unsafeOfString "EXPRESS_ONEZONE"
+/-- "GLACIER" -/
+@[match_pattern] abbrev S3OptionsStorageClass.glacier : S3OptionsStorageClass := .unsafeOfString "GLACIER"
+/-- "GLACIER_IR" -/
+@[match_pattern] abbrev S3OptionsStorageClass.glacierIr : S3OptionsStorageClass := .unsafeOfString "GLACIER_IR"
+/-- "INTELLIGENT_TIERING" -/
+@[match_pattern] abbrev S3OptionsStorageClass.intelligentTiering : S3OptionsStorageClass := .unsafeOfString "INTELLIGENT_TIERING"
+/-- "ONEZONE_IA" -/
+@[match_pattern] abbrev S3OptionsStorageClass.onezoneIa : S3OptionsStorageClass := .unsafeOfString "ONEZONE_IA"
+/-- "OUTPOSTS" -/
+@[match_pattern] abbrev S3OptionsStorageClass.outposts : S3OptionsStorageClass := .unsafeOfString "OUTPOSTS"
+/-- "REDUCED_REDUNDANCY" -/
+@[match_pattern] abbrev S3OptionsStorageClass.reducedRedundancy : S3OptionsStorageClass := .unsafeOfString "REDUCED_REDUNDANCY"
+/-- "SNOW" -/
+@[match_pattern] abbrev S3OptionsStorageClass.snow : S3OptionsStorageClass := .unsafeOfString "SNOW"
+/-- "STANDARD_IA" -/
+@[match_pattern] abbrev S3OptionsStorageClass.standardIa : S3OptionsStorageClass := .unsafeOfString "STANDARD_IA"
+instance : ToJS S3OptionsStorageClass := ⟨fun x => .string x.val⟩
 instance : FromJS S3OptionsStorageClass where
   fromJS
-    | .string "STANDARD" => .ok .standard
-    | .string "DEEP_ARCHIVE" => .ok .deepArchive
-    | .string "EXPRESS_ONEZONE" => .ok .expressOnezone
-    | .string "GLACIER" => .ok .glacier
-    | .string "GLACIER_IR" => .ok .glacierIr
-    | .string "INTELLIGENT_TIERING" => .ok .intelligentTiering
-    | .string "ONEZONE_IA" => .ok .onezoneIa
-    | .string "OUTPOSTS" => .ok .outposts
-    | .string "REDUCED_REDUNDANCY" => .ok .reducedRedundancy
-    | .string "SNOW" => .ok .snow
-    | .string "STANDARD_IA" => .ok .standardIa
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.S3OptionsStorageClass"
 
 /-- `enum ArchiveCompression` (Bun 1.4.4 type declarations): "gzip". -/
-inductive ArchiveCompression where
-  /-- "gzip" -/
-  | gzip
+structure ArchiveCompression where
+  /-- A value from its string, unchecked: the generated values (`.gzip`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ArchiveCompression := ⟨fun
-  | .gzip => .string "gzip"⟩
+/-- "gzip" -/
+@[match_pattern] abbrev ArchiveCompression.gzip : ArchiveCompression := .unsafeOfString "gzip"
+instance : ToJS ArchiveCompression := ⟨fun x => .string x.val⟩
 instance : FromJS ArchiveCompression where
   fromJS
-    | .string "gzip" => .ok .gzip
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.ArchiveCompression"
 
 /-- `enum S3FilePresignOptionsMethod` (Bun 1.4.4 type declarations): "GET", "POST", "PUT", "DELETE", "HEAD". -/
-inductive S3FilePresignOptionsMethod where
-  /-- "GET" -/
-  | get
-  /-- "POST" -/
-  | post
-  /-- "PUT" -/
-  | put
-  /-- "DELETE" -/
-  | delete
-  /-- "HEAD" -/
-  | head
+structure S3FilePresignOptionsMethod where
+  /-- A value from its string, unchecked: the generated values (`.get`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS S3FilePresignOptionsMethod := ⟨fun
-  | .get => .string "GET"
-  | .post => .string "POST"
-  | .put => .string "PUT"
-  | .delete => .string "DELETE"
-  | .head => .string "HEAD"⟩
+/-- "GET" -/
+@[match_pattern] abbrev S3FilePresignOptionsMethod.get : S3FilePresignOptionsMethod := .unsafeOfString "GET"
+/-- "POST" -/
+@[match_pattern] abbrev S3FilePresignOptionsMethod.post : S3FilePresignOptionsMethod := .unsafeOfString "POST"
+/-- "PUT" -/
+@[match_pattern] abbrev S3FilePresignOptionsMethod.put : S3FilePresignOptionsMethod := .unsafeOfString "PUT"
+/-- "DELETE" -/
+@[match_pattern] abbrev S3FilePresignOptionsMethod.delete : S3FilePresignOptionsMethod := .unsafeOfString "DELETE"
+/-- "HEAD" -/
+@[match_pattern] abbrev S3FilePresignOptionsMethod.head : S3FilePresignOptionsMethod := .unsafeOfString "HEAD"
+instance : ToJS S3FilePresignOptionsMethod := ⟨fun x => .string x.val⟩
 instance : FromJS S3FilePresignOptionsMethod where
   fromJS
-    | .string "GET" => .ok .get
-    | .string "POST" => .ok .post
-    | .string "PUT" => .ok .put
-    | .string "DELETE" => .ok .delete
-    | .string "HEAD" => .ok .head
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.S3FilePresignOptionsMethod"
 
 /-- `enum SocketHandlerBinaryType` (Bun 1.4.4 type declarations): "arraybuffer", "buffer", "uint8array". -/
-inductive SocketHandlerBinaryType where
-  /-- "arraybuffer" -/
-  | arraybuffer
-  /-- "buffer" -/
-  | buffer
-  /-- "uint8array" -/
-  | uint8array
+structure SocketHandlerBinaryType where
+  /-- A value from its string, unchecked: the generated values (`.arraybuffer`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS SocketHandlerBinaryType := ⟨fun
-  | .arraybuffer => .string "arraybuffer"
-  | .buffer => .string "buffer"
-  | .uint8array => .string "uint8array"⟩
+/-- "arraybuffer" -/
+@[match_pattern] abbrev SocketHandlerBinaryType.arraybuffer : SocketHandlerBinaryType := .unsafeOfString "arraybuffer"
+/-- "buffer" -/
+@[match_pattern] abbrev SocketHandlerBinaryType.buffer : SocketHandlerBinaryType := .unsafeOfString "buffer"
+/-- "uint8array" -/
+@[match_pattern] abbrev SocketHandlerBinaryType.uint8array : SocketHandlerBinaryType := .unsafeOfString "uint8array"
+instance : ToJS SocketHandlerBinaryType := ⟨fun x => .string x.val⟩
 instance : FromJS SocketHandlerBinaryType where
   fromJS
-    | .string "arraybuffer" => .ok .arraybuffer
-    | .string "buffer" => .ok .buffer
-    | .string "uint8array" => .ok .uint8array
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.SocketHandlerBinaryType"
 
 /-- `enum SocketHandlerUnknownBufferBinaryType` (Bun 1.4.4 type declarations): "arraybuffer", "buffer", "uint8array". -/
-inductive SocketHandlerUnknownBufferBinaryType where
-  /-- "arraybuffer" -/
-  | arraybuffer
-  /-- "buffer" -/
-  | buffer
-  /-- "uint8array" -/
-  | uint8array
+structure SocketHandlerUnknownBufferBinaryType where
+  /-- A value from its string, unchecked: the generated values (`.arraybuffer`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS SocketHandlerUnknownBufferBinaryType := ⟨fun
-  | .arraybuffer => .string "arraybuffer"
-  | .buffer => .string "buffer"
-  | .uint8array => .string "uint8array"⟩
+/-- "arraybuffer" -/
+@[match_pattern] abbrev SocketHandlerUnknownBufferBinaryType.arraybuffer : SocketHandlerUnknownBufferBinaryType := .unsafeOfString "arraybuffer"
+/-- "buffer" -/
+@[match_pattern] abbrev SocketHandlerUnknownBufferBinaryType.buffer : SocketHandlerUnknownBufferBinaryType := .unsafeOfString "buffer"
+/-- "uint8array" -/
+@[match_pattern] abbrev SocketHandlerUnknownBufferBinaryType.uint8array : SocketHandlerUnknownBufferBinaryType := .unsafeOfString "uint8array"
+instance : ToJS SocketHandlerUnknownBufferBinaryType := ⟨fun x => .string x.val⟩
 instance : FromJS SocketHandlerUnknownBufferBinaryType where
   fromJS
-    | .string "arraybuffer" => .ok .arraybuffer
-    | .string "buffer" => .ok .buffer
-    | .string "uint8array" => .ok .uint8array
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.SocketHandlerUnknownBufferBinaryType"
 
 /-- `enum SocketUnknownRemoteFamily` (Bun 1.4.4 type declarations): "IPv4", "IPv6". -/
-inductive SocketUnknownRemoteFamily where
-  /-- "IPv4" -/
-  | iPv4
-  /-- "IPv6" -/
-  | iPv6
+structure SocketUnknownRemoteFamily where
+  /-- A value from its string, unchecked: the generated values (`.iPv4`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS SocketUnknownRemoteFamily := ⟨fun
-  | .iPv4 => .string "IPv4"
-  | .iPv6 => .string "IPv6"⟩
+/-- "IPv4" -/
+@[match_pattern] abbrev SocketUnknownRemoteFamily.iPv4 : SocketUnknownRemoteFamily := .unsafeOfString "IPv4"
+/-- "IPv6" -/
+@[match_pattern] abbrev SocketUnknownRemoteFamily.iPv6 : SocketUnknownRemoteFamily := .unsafeOfString "IPv6"
+instance : ToJS SocketUnknownRemoteFamily := ⟨fun x => .string x.val⟩
 instance : FromJS SocketUnknownRemoteFamily where
   fromJS
-    | .string "IPv4" => .ok .iPv4
-    | .string "IPv6" => .ok .iPv6
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.SocketUnknownRemoteFamily"
 
 /-- `enum SocketUnknownLocalFamily` (Bun 1.4.4 type declarations): "IPv4", "IPv6". -/
-inductive SocketUnknownLocalFamily where
-  /-- "IPv4" -/
-  | iPv4
-  /-- "IPv6" -/
-  | iPv6
+structure SocketUnknownLocalFamily where
+  /-- A value from its string, unchecked: the generated values (`.iPv4`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS SocketUnknownLocalFamily := ⟨fun
-  | .iPv4 => .string "IPv4"
-  | .iPv6 => .string "IPv6"⟩
+/-- "IPv4" -/
+@[match_pattern] abbrev SocketUnknownLocalFamily.iPv4 : SocketUnknownLocalFamily := .unsafeOfString "IPv4"
+/-- "IPv6" -/
+@[match_pattern] abbrev SocketUnknownLocalFamily.iPv6 : SocketUnknownLocalFamily := .unsafeOfString "IPv6"
+instance : ToJS SocketUnknownLocalFamily := ⟨fun x => .string x.val⟩
 instance : FromJS SocketUnknownLocalFamily where
   fromJS
-    | .string "IPv4" => .ok .iPv4
-    | .string "IPv6" => .ok .iPv6
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.SocketUnknownLocalFamily"
 
 /-- `enum SocketRemoteFamily` (Bun 1.4.4 type declarations): "IPv4", "IPv6". -/
-inductive SocketRemoteFamily where
-  /-- "IPv4" -/
-  | iPv4
-  /-- "IPv6" -/
-  | iPv6
+structure SocketRemoteFamily where
+  /-- A value from its string, unchecked: the generated values (`.iPv4`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS SocketRemoteFamily := ⟨fun
-  | .iPv4 => .string "IPv4"
-  | .iPv6 => .string "IPv6"⟩
+/-- "IPv4" -/
+@[match_pattern] abbrev SocketRemoteFamily.iPv4 : SocketRemoteFamily := .unsafeOfString "IPv4"
+/-- "IPv6" -/
+@[match_pattern] abbrev SocketRemoteFamily.iPv6 : SocketRemoteFamily := .unsafeOfString "IPv6"
+instance : ToJS SocketRemoteFamily := ⟨fun x => .string x.val⟩
 instance : FromJS SocketRemoteFamily where
   fromJS
-    | .string "IPv4" => .ok .iPv4
-    | .string "IPv6" => .ok .iPv6
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.SocketRemoteFamily"
 
 /-- `enum SocketLocalFamily` (Bun 1.4.4 type declarations): "IPv4", "IPv6". -/
-inductive SocketLocalFamily where
-  /-- "IPv4" -/
-  | iPv4
-  /-- "IPv6" -/
-  | iPv6
+structure SocketLocalFamily where
+  /-- A value from its string, unchecked: the generated values (`.iPv4`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS SocketLocalFamily := ⟨fun
-  | .iPv4 => .string "IPv4"
-  | .iPv6 => .string "IPv6"⟩
+/-- "IPv4" -/
+@[match_pattern] abbrev SocketLocalFamily.iPv4 : SocketLocalFamily := .unsafeOfString "IPv4"
+/-- "IPv6" -/
+@[match_pattern] abbrev SocketLocalFamily.iPv6 : SocketLocalFamily := .unsafeOfString "IPv6"
+instance : ToJS SocketLocalFamily := ⟨fun x => .string x.val⟩
 instance : FromJS SocketLocalFamily where
   fromJS
-    | .string "IPv4" => .ok .iPv4
-    | .string "IPv6" => .ok .iPv6
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.SocketLocalFamily"
 
 /-- `enum SocketAddressFamily` (Bun 1.4.4 type declarations): "IPv4", "IPv6". -/
-inductive SocketAddressFamily where
-  /-- "IPv4" -/
-  | iPv4
-  /-- "IPv6" -/
-  | iPv6
+structure SocketAddressFamily where
+  /-- A value from its string, unchecked: the generated values (`.iPv4`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS SocketAddressFamily := ⟨fun
-  | .iPv4 => .string "IPv4"
-  | .iPv6 => .string "IPv6"⟩
+/-- "IPv4" -/
+@[match_pattern] abbrev SocketAddressFamily.iPv4 : SocketAddressFamily := .unsafeOfString "IPv4"
+/-- "IPv6" -/
+@[match_pattern] abbrev SocketAddressFamily.iPv6 : SocketAddressFamily := .unsafeOfString "IPv6"
+instance : ToJS SocketAddressFamily := ⟨fun x => .string x.val⟩
 instance : FromJS SocketAddressFamily where
   fromJS
-    | .string "IPv4" => .ok .iPv4
-    | .string "IPv6" => .ok .iPv6
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.SocketAddressFamily"
 
 /-- `enum UdpBaseUDPSocketBinaryType` (Bun 1.4.4 type declarations): "arraybuffer", "buffer", "uint8array". -/
-inductive UdpBaseUDPSocketBinaryType where
-  /-- "arraybuffer" -/
-  | arraybuffer
-  /-- "buffer" -/
-  | buffer
-  /-- "uint8array" -/
-  | uint8array
+structure UdpBaseUDPSocketBinaryType where
+  /-- A value from its string, unchecked: the generated values (`.arraybuffer`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS UdpBaseUDPSocketBinaryType := ⟨fun
-  | .arraybuffer => .string "arraybuffer"
-  | .buffer => .string "buffer"
-  | .uint8array => .string "uint8array"⟩
+/-- "arraybuffer" -/
+@[match_pattern] abbrev UdpBaseUDPSocketBinaryType.arraybuffer : UdpBaseUDPSocketBinaryType := .unsafeOfString "arraybuffer"
+/-- "buffer" -/
+@[match_pattern] abbrev UdpBaseUDPSocketBinaryType.buffer : UdpBaseUDPSocketBinaryType := .unsafeOfString "buffer"
+/-- "uint8array" -/
+@[match_pattern] abbrev UdpBaseUDPSocketBinaryType.uint8array : UdpBaseUDPSocketBinaryType := .unsafeOfString "uint8array"
+instance : ToJS UdpBaseUDPSocketBinaryType := ⟨fun x => .string x.val⟩
 instance : FromJS UdpBaseUDPSocketBinaryType where
   fromJS
-    | .string "arraybuffer" => .ok .arraybuffer
-    | .string "buffer" => .ok .buffer
-    | .string "uint8array" => .ok .uint8array
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.UdpBaseUDPSocketBinaryType"
 
 /-- `enum JavaScriptLoader` (Bun 1.4.4 type declarations): "jsx", "js", "ts", "tsx". -/
-inductive JavaScriptLoader where
-  /-- "jsx" -/
-  | jsx
-  /-- "js" -/
-  | js
-  /-- "ts" -/
-  | ts
-  /-- "tsx" -/
-  | tsx
+structure JavaScriptLoader where
+  /-- A value from its string, unchecked: the generated values (`.jsx`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS JavaScriptLoader := ⟨fun
-  | .jsx => .string "jsx"
-  | .js => .string "js"
-  | .ts => .string "ts"
-  | .tsx => .string "tsx"⟩
+/-- "jsx" -/
+@[match_pattern] abbrev JavaScriptLoader.jsx : JavaScriptLoader := .unsafeOfString "jsx"
+/-- "js" -/
+@[match_pattern] abbrev JavaScriptLoader.js : JavaScriptLoader := .unsafeOfString "js"
+/-- "ts" -/
+@[match_pattern] abbrev JavaScriptLoader.ts : JavaScriptLoader := .unsafeOfString "ts"
+/-- "tsx" -/
+@[match_pattern] abbrev JavaScriptLoader.tsx : JavaScriptLoader := .unsafeOfString "tsx"
+instance : ToJS JavaScriptLoader := ⟨fun x => .string x.val⟩
 instance : FromJS JavaScriptLoader where
   fromJS
-    | .string "jsx" => .ok .jsx
-    | .string "js" => .ok .js
-    | .string "ts" => .ok .ts
-    | .string "tsx" => .ok .tsx
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.JavaScriptLoader"
 
 /-- `enum Target` (Bun 1.4.4 type declarations): "bun", "node", "browser". -/
-inductive Target where
-  /-- "bun" -/
-  | bun
-  /-- "node" -/
-  | node
-  /-- "browser" -/
-  | browser
+structure Target where
+  /-- A value from its string, unchecked: the generated values (`.bun`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS Target := ⟨fun
-  | .bun => .string "bun"
-  | .node => .string "node"
-  | .browser => .string "browser"⟩
+/-- "bun" -/
+@[match_pattern] abbrev Target.bun : Target := .unsafeOfString "bun"
+/-- "node" -/
+@[match_pattern] abbrev Target.node : Target := .unsafeOfString "node"
+/-- "browser" -/
+@[match_pattern] abbrev Target.browser : Target := .unsafeOfString "browser"
+instance : ToJS Target := ⟨fun x => .string x.val⟩
 instance : FromJS Target where
   fromJS
-    | .string "bun" => .ok .bun
-    | .string "node" => .ok .node
-    | .string "browser" => .ok .browser
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.Target"
 
 /-- `enum TSConfigCompilerOptionsJsx` (Bun 1.4.4 type declarations): "preserve", "react", "react-jsx", "react-jsxdev". -/
-inductive TSConfigCompilerOptionsJsx where
-  /-- "preserve" -/
-  | preserve
-  /-- "react" -/
-  | react
-  /-- "react-jsx" -/
-  | reactJsx
-  /-- "react-jsxdev" -/
-  | reactJsxdev
+structure TSConfigCompilerOptionsJsx where
+  /-- A value from its string, unchecked: the generated values (`.preserve`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS TSConfigCompilerOptionsJsx := ⟨fun
-  | .preserve => .string "preserve"
-  | .react => .string "react"
-  | .reactJsx => .string "react-jsx"
-  | .reactJsxdev => .string "react-jsxdev"⟩
+/-- "preserve" -/
+@[match_pattern] abbrev TSConfigCompilerOptionsJsx.preserve : TSConfigCompilerOptionsJsx := .unsafeOfString "preserve"
+/-- "react" -/
+@[match_pattern] abbrev TSConfigCompilerOptionsJsx.react : TSConfigCompilerOptionsJsx := .unsafeOfString "react"
+/-- "react-jsx" -/
+@[match_pattern] abbrev TSConfigCompilerOptionsJsx.reactJsx : TSConfigCompilerOptionsJsx := .unsafeOfString "react-jsx"
+/-- "react-jsxdev" -/
+@[match_pattern] abbrev TSConfigCompilerOptionsJsx.reactJsxdev : TSConfigCompilerOptionsJsx := .unsafeOfString "react-jsxdev"
+instance : ToJS TSConfigCompilerOptionsJsx := ⟨fun x => .string x.val⟩
 instance : FromJS TSConfigCompilerOptionsJsx where
   fromJS
-    | .string "preserve" => .ok .preserve
-    | .string "react" => .ok .react
-    | .string "react-jsx" => .ok .reactJsx
-    | .string "react-jsxdev" => .ok .reactJsxdev
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.TSConfigCompilerOptionsJsx"
 
 /-- `enum TSConfigCompilerOptionsImportsNotUsedAsValues` (Bun 1.4.4 type declarations): "remove", "preserve", "error". -/
-inductive TSConfigCompilerOptionsImportsNotUsedAsValues where
-  /-- "remove" -/
-  | remove
-  /-- "preserve" -/
-  | preserve
-  /-- "error" -/
-  | error
+structure TSConfigCompilerOptionsImportsNotUsedAsValues where
+  /-- A value from its string, unchecked: the generated values (`.remove`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS TSConfigCompilerOptionsImportsNotUsedAsValues := ⟨fun
-  | .remove => .string "remove"
-  | .preserve => .string "preserve"
-  | .error => .string "error"⟩
+/-- "remove" -/
+@[match_pattern] abbrev TSConfigCompilerOptionsImportsNotUsedAsValues.remove : TSConfigCompilerOptionsImportsNotUsedAsValues := .unsafeOfString "remove"
+/-- "preserve" -/
+@[match_pattern] abbrev TSConfigCompilerOptionsImportsNotUsedAsValues.preserve : TSConfigCompilerOptionsImportsNotUsedAsValues := .unsafeOfString "preserve"
+/-- "error" -/
+@[match_pattern] abbrev TSConfigCompilerOptionsImportsNotUsedAsValues.error : TSConfigCompilerOptionsImportsNotUsedAsValues := .unsafeOfString "error"
+instance : ToJS TSConfigCompilerOptionsImportsNotUsedAsValues := ⟨fun x => .string x.val⟩
 instance : FromJS TSConfigCompilerOptionsImportsNotUsedAsValues where
   fromJS
-    | .string "remove" => .ok .remove
-    | .string "preserve" => .ok .preserve
-    | .string "error" => .ok .error
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.TSConfigCompilerOptionsImportsNotUsedAsValues"
 
 /-- `enum TranspilerOptionsLogLevel` (Bun 1.4.4 type declarations): "verbose", "debug", "info", "warn", "error". -/
-inductive TranspilerOptionsLogLevel where
-  /-- "verbose" -/
-  | verbose
-  /-- "debug" -/
-  | debug
-  /-- "info" -/
-  | info
-  /-- "warn" -/
-  | warn
-  /-- "error" -/
-  | error
+structure TranspilerOptionsLogLevel where
+  /-- A value from its string, unchecked: the generated values (`.verbose`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS TranspilerOptionsLogLevel := ⟨fun
-  | .verbose => .string "verbose"
-  | .debug => .string "debug"
-  | .info => .string "info"
-  | .warn => .string "warn"
-  | .error => .string "error"⟩
+/-- "verbose" -/
+@[match_pattern] abbrev TranspilerOptionsLogLevel.verbose : TranspilerOptionsLogLevel := .unsafeOfString "verbose"
+/-- "debug" -/
+@[match_pattern] abbrev TranspilerOptionsLogLevel.debug : TranspilerOptionsLogLevel := .unsafeOfString "debug"
+/-- "info" -/
+@[match_pattern] abbrev TranspilerOptionsLogLevel.info : TranspilerOptionsLogLevel := .unsafeOfString "info"
+/-- "warn" -/
+@[match_pattern] abbrev TranspilerOptionsLogLevel.warn : TranspilerOptionsLogLevel := .unsafeOfString "warn"
+/-- "error" -/
+@[match_pattern] abbrev TranspilerOptionsLogLevel.error : TranspilerOptionsLogLevel := .unsafeOfString "error"
+instance : ToJS TranspilerOptionsLogLevel := ⟨fun x => .string x.val⟩
 instance : FromJS TranspilerOptionsLogLevel where
   fromJS
-    | .string "verbose" => .ok .verbose
-    | .string "debug" => .ok .debug
-    | .string "info" => .ok .info
-    | .string "warn" => .ok .warn
-    | .string "error" => .ok .error
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.TranspilerOptionsLogLevel"
 
 /-- `enum ImportKind` (Bun 1.4.4 type declarations): "import-statement", "require-call", "require-resolve", "dynamic-import", "import-rule", "url-token", "internal", "entry-point-run", "entry-point-build". -/
-inductive ImportKind where
-  /-- "import-statement" -/
-  | importStatement
-  /-- "require-call" -/
-  | requireCall
-  /-- "require-resolve" -/
-  | requireResolve
-  /-- "dynamic-import" -/
-  | dynamicImport
-  /-- "import-rule" -/
-  | importRule
-  /-- "url-token" -/
-  | urlToken
-  /-- "internal" -/
-  | internal
-  /-- "entry-point-run" -/
-  | entryPointRun
-  /-- "entry-point-build" -/
-  | entryPointBuild
+structure ImportKind where
+  /-- A value from its string, unchecked: the generated values (`.importStatement`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ImportKind := ⟨fun
-  | .importStatement => .string "import-statement"
-  | .requireCall => .string "require-call"
-  | .requireResolve => .string "require-resolve"
-  | .dynamicImport => .string "dynamic-import"
-  | .importRule => .string "import-rule"
-  | .urlToken => .string "url-token"
-  | .internal => .string "internal"
-  | .entryPointRun => .string "entry-point-run"
-  | .entryPointBuild => .string "entry-point-build"⟩
+/-- "import-statement" -/
+@[match_pattern] abbrev ImportKind.importStatement : ImportKind := .unsafeOfString "import-statement"
+/-- "require-call" -/
+@[match_pattern] abbrev ImportKind.requireCall : ImportKind := .unsafeOfString "require-call"
+/-- "require-resolve" -/
+@[match_pattern] abbrev ImportKind.requireResolve : ImportKind := .unsafeOfString "require-resolve"
+/-- "dynamic-import" -/
+@[match_pattern] abbrev ImportKind.dynamicImport : ImportKind := .unsafeOfString "dynamic-import"
+/-- "import-rule" -/
+@[match_pattern] abbrev ImportKind.importRule : ImportKind := .unsafeOfString "import-rule"
+/-- "url-token" -/
+@[match_pattern] abbrev ImportKind.urlToken : ImportKind := .unsafeOfString "url-token"
+/-- "internal" -/
+@[match_pattern] abbrev ImportKind.internal : ImportKind := .unsafeOfString "internal"
+/-- "entry-point-run" -/
+@[match_pattern] abbrev ImportKind.entryPointRun : ImportKind := .unsafeOfString "entry-point-run"
+/-- "entry-point-build" -/
+@[match_pattern] abbrev ImportKind.entryPointBuild : ImportKind := .unsafeOfString "entry-point-build"
+instance : ToJS ImportKind := ⟨fun x => .string x.val⟩
 instance : FromJS ImportKind where
   fromJS
-    | .string "import-statement" => .ok .importStatement
-    | .string "require-call" => .ok .requireCall
-    | .string "require-resolve" => .ok .requireResolve
-    | .string "dynamic-import" => .ok .dynamicImport
-    | .string "import-rule" => .ok .importRule
-    | .string "url-token" => .ok .urlToken
-    | .string "internal" => .ok .internal
-    | .string "entry-point-run" => .ok .entryPointRun
-    | .string "entry-point-build" => .ok .entryPointBuild
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.ImportKind"
 
 /-- `enum PasswordAlgorithmLabel` (Bun 1.4.4 type declarations): "bcrypt", "argon2id", "argon2d", "argon2i". -/
-inductive PasswordAlgorithmLabel where
-  /-- "bcrypt" -/
-  | bcrypt
-  /-- "argon2id" -/
-  | argon2id
-  /-- "argon2d" -/
-  | argon2d
-  /-- "argon2i" -/
-  | argon2i
+structure PasswordAlgorithmLabel where
+  /-- A value from its string, unchecked: the generated values (`.bcrypt`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS PasswordAlgorithmLabel := ⟨fun
-  | .bcrypt => .string "bcrypt"
-  | .argon2id => .string "argon2id"
-  | .argon2d => .string "argon2d"
-  | .argon2i => .string "argon2i"⟩
+/-- "bcrypt" -/
+@[match_pattern] abbrev PasswordAlgorithmLabel.bcrypt : PasswordAlgorithmLabel := .unsafeOfString "bcrypt"
+/-- "argon2id" -/
+@[match_pattern] abbrev PasswordAlgorithmLabel.argon2id : PasswordAlgorithmLabel := .unsafeOfString "argon2id"
+/-- "argon2d" -/
+@[match_pattern] abbrev PasswordAlgorithmLabel.argon2d : PasswordAlgorithmLabel := .unsafeOfString "argon2d"
+/-- "argon2i" -/
+@[match_pattern] abbrev PasswordAlgorithmLabel.argon2i : PasswordAlgorithmLabel := .unsafeOfString "argon2i"
+instance : ToJS PasswordAlgorithmLabel := ⟨fun x => .string x.val⟩
 instance : FromJS PasswordAlgorithmLabel where
   fromJS
-    | .string "bcrypt" => .ok .bcrypt
-    | .string "argon2id" => .ok .argon2id
-    | .string "argon2d" => .ok .argon2d
-    | .string "argon2i" => .ok .argon2i
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.PasswordAlgorithmLabel"
 
 /-- `enum PasswordArgon2AlgorithmAlgorithm` (Bun 1.4.4 type declarations): "argon2id", "argon2d", "argon2i". -/
-inductive PasswordArgon2AlgorithmAlgorithm where
-  /-- "argon2id" -/
-  | argon2id
-  /-- "argon2d" -/
-  | argon2d
-  /-- "argon2i" -/
-  | argon2i
+structure PasswordArgon2AlgorithmAlgorithm where
+  /-- A value from its string, unchecked: the generated values (`.argon2id`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS PasswordArgon2AlgorithmAlgorithm := ⟨fun
-  | .argon2id => .string "argon2id"
-  | .argon2d => .string "argon2d"
-  | .argon2i => .string "argon2i"⟩
+/-- "argon2id" -/
+@[match_pattern] abbrev PasswordArgon2AlgorithmAlgorithm.argon2id : PasswordArgon2AlgorithmAlgorithm := .unsafeOfString "argon2id"
+/-- "argon2d" -/
+@[match_pattern] abbrev PasswordArgon2AlgorithmAlgorithm.argon2d : PasswordArgon2AlgorithmAlgorithm := .unsafeOfString "argon2d"
+/-- "argon2i" -/
+@[match_pattern] abbrev PasswordArgon2AlgorithmAlgorithm.argon2i : PasswordArgon2AlgorithmAlgorithm := .unsafeOfString "argon2i"
+instance : ToJS PasswordArgon2AlgorithmAlgorithm := ⟨fun x => .string x.val⟩
 instance : FromJS PasswordArgon2AlgorithmAlgorithm where
   fromJS
-    | .string "argon2id" => .ok .argon2id
-    | .string "argon2d" => .ok .argon2d
-    | .string "argon2i" => .ok .argon2i
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.PasswordArgon2AlgorithmAlgorithm"
 
 /-- `enum PasswordBCryptAlgorithmAlgorithm` (Bun 1.4.4 type declarations): "bcrypt". -/
-inductive PasswordBCryptAlgorithmAlgorithm where
-  /-- "bcrypt" -/
-  | bcrypt
+structure PasswordBCryptAlgorithmAlgorithm where
+  /-- A value from its string, unchecked: the generated values (`.bcrypt`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS PasswordBCryptAlgorithmAlgorithm := ⟨fun
-  | .bcrypt => .string "bcrypt"⟩
+/-- "bcrypt" -/
+@[match_pattern] abbrev PasswordBCryptAlgorithmAlgorithm.bcrypt : PasswordBCryptAlgorithmAlgorithm := .unsafeOfString "bcrypt"
+instance : ToJS PasswordBCryptAlgorithmAlgorithm := ⟨fun x => .string x.val⟩
 instance : FromJS PasswordBCryptAlgorithmAlgorithm where
   fromJS
-    | .string "bcrypt" => .ok .bcrypt
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.PasswordBCryptAlgorithmAlgorithm"
 
 /-- `enum SecretsSetOptionsPersist` (Bun 1.4.4 type declarations): "local", "enterprise". -/
-inductive SecretsSetOptionsPersist where
-  /-- "local" -/
-  | «local»
-  /-- "enterprise" -/
-  | enterprise
+structure SecretsSetOptionsPersist where
+  /-- A value from its string, unchecked: the generated values (`.«local»`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS SecretsSetOptionsPersist := ⟨fun
-  | .«local» => .string "local"
-  | .enterprise => .string "enterprise"⟩
+/-- "local" -/
+@[match_pattern] abbrev SecretsSetOptionsPersist.«local» : SecretsSetOptionsPersist := .unsafeOfString "local"
+/-- "enterprise" -/
+@[match_pattern] abbrev SecretsSetOptionsPersist.enterprise : SecretsSetOptionsPersist := .unsafeOfString "enterprise"
+instance : ToJS SecretsSetOptionsPersist := ⟨fun x => .string x.val⟩
 instance : FromJS SecretsSetOptionsPersist where
   fromJS
-    | .string "local" => .ok .«local»
-    | .string "enterprise" => .ok .enterprise
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.SecretsSetOptionsPersist"
 
 /-- `enum DigestEncoding` (Bun 1.4.4 type declarations): "utf8", "ucs2", "utf16le", "latin1", "ascii", "base64", "base64url", "hex". -/
-inductive DigestEncoding where
-  /-- "utf8" -/
-  | utf8
-  /-- "ucs2" -/
-  | ucs2
-  /-- "utf16le" -/
-  | utf16le
-  /-- "latin1" -/
-  | latin1
-  /-- "ascii" -/
-  | ascii
-  /-- "base64" -/
-  | base64
-  /-- "base64url" -/
-  | base64url
-  /-- "hex" -/
-  | hex
+structure DigestEncoding where
+  /-- A value from its string, unchecked: the generated values (`.utf8`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS DigestEncoding := ⟨fun
-  | .utf8 => .string "utf8"
-  | .ucs2 => .string "ucs2"
-  | .utf16le => .string "utf16le"
-  | .latin1 => .string "latin1"
-  | .ascii => .string "ascii"
-  | .base64 => .string "base64"
-  | .base64url => .string "base64url"
-  | .hex => .string "hex"⟩
+/-- "utf8" -/
+@[match_pattern] abbrev DigestEncoding.utf8 : DigestEncoding := .unsafeOfString "utf8"
+/-- "ucs2" -/
+@[match_pattern] abbrev DigestEncoding.ucs2 : DigestEncoding := .unsafeOfString "ucs2"
+/-- "utf16le" -/
+@[match_pattern] abbrev DigestEncoding.utf16le : DigestEncoding := .unsafeOfString "utf16le"
+/-- "latin1" -/
+@[match_pattern] abbrev DigestEncoding.latin1 : DigestEncoding := .unsafeOfString "latin1"
+/-- "ascii" -/
+@[match_pattern] abbrev DigestEncoding.ascii : DigestEncoding := .unsafeOfString "ascii"
+/-- "base64" -/
+@[match_pattern] abbrev DigestEncoding.base64 : DigestEncoding := .unsafeOfString "base64"
+/-- "base64url" -/
+@[match_pattern] abbrev DigestEncoding.base64url : DigestEncoding := .unsafeOfString "base64url"
+/-- "hex" -/
+@[match_pattern] abbrev DigestEncoding.hex : DigestEncoding := .unsafeOfString "hex"
+instance : ToJS DigestEncoding := ⟨fun x => .string x.val⟩
 instance : FromJS DigestEncoding where
   fromJS
-    | .string "utf8" => .ok .utf8
-    | .string "ucs2" => .ok .ucs2
-    | .string "utf16le" => .ok .utf16le
-    | .string "latin1" => .ok .latin1
-    | .string "ascii" => .ok .ascii
-    | .string "base64" => .ok .base64
-    | .string "base64url" => .ok .base64url
-    | .string "hex" => .ok .hex
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.DigestEncoding"
 
 /-- `enum SupportedCryptoAlgorithms` (Bun 1.4.4 type declarations): "blake2b256", "blake2b512", "blake2s256", "md4", "md5", "ripemd160", "sha1", "sha224", "sha256", "sha384", "sha512", "sha512-224", "sha512-256", "sha3-224", "sha3-256", "sha3-384", "sha3-512", "shake128", "shake256". -/
-inductive SupportedCryptoAlgorithms where
-  /-- "blake2b256" -/
-  | blake2b256
-  /-- "blake2b512" -/
-  | blake2b512
-  /-- "blake2s256" -/
-  | blake2s256
-  /-- "md4" -/
-  | md4
-  /-- "md5" -/
-  | md5
-  /-- "ripemd160" -/
-  | ripemd160
-  /-- "sha1" -/
-  | sha1
-  /-- "sha224" -/
-  | sha224
-  /-- "sha256" -/
-  | sha256
-  /-- "sha384" -/
-  | sha384
-  /-- "sha512" -/
-  | sha512
-  /-- "sha512-224" -/
-  | sha512224
-  /-- "sha512-256" -/
-  | sha512256
-  /-- "sha3-224" -/
-  | sha3224
-  /-- "sha3-256" -/
-  | sha3256
-  /-- "sha3-384" -/
-  | sha3384
-  /-- "sha3-512" -/
-  | sha3512
-  /-- "shake128" -/
-  | shake128
-  /-- "shake256" -/
-  | shake256
+structure SupportedCryptoAlgorithms where
+  /-- A value from its string, unchecked: the generated values (`.blake2b256`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS SupportedCryptoAlgorithms := ⟨fun
-  | .blake2b256 => .string "blake2b256"
-  | .blake2b512 => .string "blake2b512"
-  | .blake2s256 => .string "blake2s256"
-  | .md4 => .string "md4"
-  | .md5 => .string "md5"
-  | .ripemd160 => .string "ripemd160"
-  | .sha1 => .string "sha1"
-  | .sha224 => .string "sha224"
-  | .sha256 => .string "sha256"
-  | .sha384 => .string "sha384"
-  | .sha512 => .string "sha512"
-  | .sha512224 => .string "sha512-224"
-  | .sha512256 => .string "sha512-256"
-  | .sha3224 => .string "sha3-224"
-  | .sha3256 => .string "sha3-256"
-  | .sha3384 => .string "sha3-384"
-  | .sha3512 => .string "sha3-512"
-  | .shake128 => .string "shake128"
-  | .shake256 => .string "shake256"⟩
+/-- "blake2b256" -/
+@[match_pattern] abbrev SupportedCryptoAlgorithms.blake2b256 : SupportedCryptoAlgorithms := .unsafeOfString "blake2b256"
+/-- "blake2b512" -/
+@[match_pattern] abbrev SupportedCryptoAlgorithms.blake2b512 : SupportedCryptoAlgorithms := .unsafeOfString "blake2b512"
+/-- "blake2s256" -/
+@[match_pattern] abbrev SupportedCryptoAlgorithms.blake2s256 : SupportedCryptoAlgorithms := .unsafeOfString "blake2s256"
+/-- "md4" -/
+@[match_pattern] abbrev SupportedCryptoAlgorithms.md4 : SupportedCryptoAlgorithms := .unsafeOfString "md4"
+/-- "md5" -/
+@[match_pattern] abbrev SupportedCryptoAlgorithms.md5 : SupportedCryptoAlgorithms := .unsafeOfString "md5"
+/-- "ripemd160" -/
+@[match_pattern] abbrev SupportedCryptoAlgorithms.ripemd160 : SupportedCryptoAlgorithms := .unsafeOfString "ripemd160"
+/-- "sha1" -/
+@[match_pattern] abbrev SupportedCryptoAlgorithms.sha1 : SupportedCryptoAlgorithms := .unsafeOfString "sha1"
+/-- "sha224" -/
+@[match_pattern] abbrev SupportedCryptoAlgorithms.sha224 : SupportedCryptoAlgorithms := .unsafeOfString "sha224"
+/-- "sha256" -/
+@[match_pattern] abbrev SupportedCryptoAlgorithms.sha256 : SupportedCryptoAlgorithms := .unsafeOfString "sha256"
+/-- "sha384" -/
+@[match_pattern] abbrev SupportedCryptoAlgorithms.sha384 : SupportedCryptoAlgorithms := .unsafeOfString "sha384"
+/-- "sha512" -/
+@[match_pattern] abbrev SupportedCryptoAlgorithms.sha512 : SupportedCryptoAlgorithms := .unsafeOfString "sha512"
+/-- "sha512-224" -/
+@[match_pattern] abbrev SupportedCryptoAlgorithms.sha512224 : SupportedCryptoAlgorithms := .unsafeOfString "sha512-224"
+/-- "sha512-256" -/
+@[match_pattern] abbrev SupportedCryptoAlgorithms.sha512256 : SupportedCryptoAlgorithms := .unsafeOfString "sha512-256"
+/-- "sha3-224" -/
+@[match_pattern] abbrev SupportedCryptoAlgorithms.sha3224 : SupportedCryptoAlgorithms := .unsafeOfString "sha3-224"
+/-- "sha3-256" -/
+@[match_pattern] abbrev SupportedCryptoAlgorithms.sha3256 : SupportedCryptoAlgorithms := .unsafeOfString "sha3-256"
+/-- "sha3-384" -/
+@[match_pattern] abbrev SupportedCryptoAlgorithms.sha3384 : SupportedCryptoAlgorithms := .unsafeOfString "sha3-384"
+/-- "sha3-512" -/
+@[match_pattern] abbrev SupportedCryptoAlgorithms.sha3512 : SupportedCryptoAlgorithms := .unsafeOfString "sha3-512"
+/-- "shake128" -/
+@[match_pattern] abbrev SupportedCryptoAlgorithms.shake128 : SupportedCryptoAlgorithms := .unsafeOfString "shake128"
+/-- "shake256" -/
+@[match_pattern] abbrev SupportedCryptoAlgorithms.shake256 : SupportedCryptoAlgorithms := .unsafeOfString "shake256"
+instance : ToJS SupportedCryptoAlgorithms := ⟨fun x => .string x.val⟩
 instance : FromJS SupportedCryptoAlgorithms where
   fromJS
-    | .string "blake2b256" => .ok .blake2b256
-    | .string "blake2b512" => .ok .blake2b512
-    | .string "blake2s256" => .ok .blake2s256
-    | .string "md4" => .ok .md4
-    | .string "md5" => .ok .md5
-    | .string "ripemd160" => .ok .ripemd160
-    | .string "sha1" => .ok .sha1
-    | .string "sha224" => .ok .sha224
-    | .string "sha256" => .ok .sha256
-    | .string "sha384" => .ok .sha384
-    | .string "sha512" => .ok .sha512
-    | .string "sha512-224" => .ok .sha512224
-    | .string "sha512-256" => .ok .sha512256
-    | .string "sha3-224" => .ok .sha3224
-    | .string "sha3-256" => .ok .sha3256
-    | .string "sha3-384" => .ok .sha3384
-    | .string "sha3-512" => .ok .sha3512
-    | .string "shake128" => .ok .shake128
-    | .string "shake256" => .ok .shake256
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.SupportedCryptoAlgorithms"
 
 /-- `enum FileSystemRouterOptionsStyle` (Bun 1.4.4 type declarations): "nextjs". -/
-inductive FileSystemRouterOptionsStyle where
-  /-- "nextjs" -/
-  | nextjs
+structure FileSystemRouterOptionsStyle where
+  /-- A value from its string, unchecked: the generated values (`.nextjs`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS FileSystemRouterOptionsStyle := ⟨fun
-  | .nextjs => .string "nextjs"⟩
+/-- "nextjs" -/
+@[match_pattern] abbrev FileSystemRouterOptionsStyle.nextjs : FileSystemRouterOptionsStyle := .unsafeOfString "nextjs"
+instance : ToJS FileSystemRouterOptionsStyle := ⟨fun x => .string x.val⟩
 instance : FromJS FileSystemRouterOptionsStyle where
   fromJS
-    | .string "nextjs" => .ok .nextjs
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.FileSystemRouterOptionsStyle"
 
 /-- `enum MatchedRouteKind` (Bun 1.4.4 type declarations): "exact", "catch-all", "optional-catch-all", "dynamic". -/
-inductive MatchedRouteKind where
-  /-- "exact" -/
-  | exact
-  /-- "catch-all" -/
-  | catchAll
-  /-- "optional-catch-all" -/
-  | optionalCatchAll
-  /-- "dynamic" -/
-  | dynamic
+structure MatchedRouteKind where
+  /-- A value from its string, unchecked: the generated values (`.exact`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS MatchedRouteKind := ⟨fun
-  | .exact => .string "exact"
-  | .catchAll => .string "catch-all"
-  | .optionalCatchAll => .string "optional-catch-all"
-  | .dynamic => .string "dynamic"⟩
+/-- "exact" -/
+@[match_pattern] abbrev MatchedRouteKind.exact : MatchedRouteKind := .unsafeOfString "exact"
+/-- "catch-all" -/
+@[match_pattern] abbrev MatchedRouteKind.catchAll : MatchedRouteKind := .unsafeOfString "catch-all"
+/-- "optional-catch-all" -/
+@[match_pattern] abbrev MatchedRouteKind.optionalCatchAll : MatchedRouteKind := .unsafeOfString "optional-catch-all"
+/-- "dynamic" -/
+@[match_pattern] abbrev MatchedRouteKind.dynamic : MatchedRouteKind := .unsafeOfString "dynamic"
+instance : ToJS MatchedRouteKind := ⟨fun x => .string x.val⟩
 instance : FromJS MatchedRouteKind where
   fromJS
-    | .string "exact" => .ok .exact
-    | .string "catch-all" => .ok .catchAll
-    | .string "optional-catch-all" => .ok .optionalCatchAll
-    | .string "dynamic" => .ok .dynamic
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.MatchedRouteKind"
 
 /-- `enum FileSystemRouterStyle` (Bun 1.4.4 type declarations): "nextjs". -/
-inductive FileSystemRouterStyle where
-  /-- "nextjs" -/
-  | nextjs
+structure FileSystemRouterStyle where
+  /-- A value from its string, unchecked: the generated values (`.nextjs`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS FileSystemRouterStyle := ⟨fun
-  | .nextjs => .string "nextjs"⟩
+/-- "nextjs" -/
+@[match_pattern] abbrev FileSystemRouterStyle.nextjs : FileSystemRouterStyle := .unsafeOfString "nextjs"
+instance : ToJS FileSystemRouterStyle := ⟨fun x => .string x.val⟩
 instance : FromJS FileSystemRouterStyle where
   fromJS
-    | .string "nextjs" => .ok .nextjs
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.FileSystemRouterStyle"
 
 /-- `enum ImageBackend` (Bun 1.4.4 type declarations): "system", "bun". -/
-inductive ImageBackend where
-  /-- "system" -/
-  | system
-  /-- "bun" -/
-  | bun
+structure ImageBackend where
+  /-- A value from its string, unchecked: the generated values (`.system`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ImageBackend := ⟨fun
-  | .system => .string "system"
-  | .bun => .string "bun"⟩
+/-- "system" -/
+@[match_pattern] abbrev ImageBackend.system : ImageBackend := .unsafeOfString "system"
+/-- "bun" -/
+@[match_pattern] abbrev ImageBackend.bun : ImageBackend := .unsafeOfString "bun"
+instance : ToJS ImageBackend := ⟨fun x => .string x.val⟩
 instance : FromJS ImageBackend where
   fromJS
-    | .string "system" => .ok .system
-    | .string "bun" => .ok .bun
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.ImageBackend"
 
 /-- `enum ImageFilter` (Bun 1.4.4 type declarations): "nearest", "box", "bilinear", "linear", "cubic", "mitchell", "lanczos2", "lanczos3", "mks2013", "mks2021". -/
-inductive ImageFilter where
-  /-- "nearest" -/
-  | nearest
-  /-- "box" -/
-  | box
-  /-- "bilinear" -/
-  | bilinear
-  /-- "linear" -/
-  | linear
-  /-- "cubic" -/
-  | cubic
-  /-- "mitchell" -/
-  | mitchell
-  /-- "lanczos2" -/
-  | lanczos2
-  /-- "lanczos3" -/
-  | lanczos3
-  /-- "mks2013" -/
-  | mks2013
-  /-- "mks2021" -/
-  | mks2021
+structure ImageFilter where
+  /-- A value from its string, unchecked: the generated values (`.nearest`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ImageFilter := ⟨fun
-  | .nearest => .string "nearest"
-  | .box => .string "box"
-  | .bilinear => .string "bilinear"
-  | .linear => .string "linear"
-  | .cubic => .string "cubic"
-  | .mitchell => .string "mitchell"
-  | .lanczos2 => .string "lanczos2"
-  | .lanczos3 => .string "lanczos3"
-  | .mks2013 => .string "mks2013"
-  | .mks2021 => .string "mks2021"⟩
+/-- "nearest" -/
+@[match_pattern] abbrev ImageFilter.nearest : ImageFilter := .unsafeOfString "nearest"
+/-- "box" -/
+@[match_pattern] abbrev ImageFilter.box : ImageFilter := .unsafeOfString "box"
+/-- "bilinear" -/
+@[match_pattern] abbrev ImageFilter.bilinear : ImageFilter := .unsafeOfString "bilinear"
+/-- "linear" -/
+@[match_pattern] abbrev ImageFilter.linear : ImageFilter := .unsafeOfString "linear"
+/-- "cubic" -/
+@[match_pattern] abbrev ImageFilter.cubic : ImageFilter := .unsafeOfString "cubic"
+/-- "mitchell" -/
+@[match_pattern] abbrev ImageFilter.mitchell : ImageFilter := .unsafeOfString "mitchell"
+/-- "lanczos2" -/
+@[match_pattern] abbrev ImageFilter.lanczos2 : ImageFilter := .unsafeOfString "lanczos2"
+/-- "lanczos3" -/
+@[match_pattern] abbrev ImageFilter.lanczos3 : ImageFilter := .unsafeOfString "lanczos3"
+/-- "mks2013" -/
+@[match_pattern] abbrev ImageFilter.mks2013 : ImageFilter := .unsafeOfString "mks2013"
+/-- "mks2021" -/
+@[match_pattern] abbrev ImageFilter.mks2021 : ImageFilter := .unsafeOfString "mks2021"
+instance : ToJS ImageFilter := ⟨fun x => .string x.val⟩
 instance : FromJS ImageFilter where
   fromJS
-    | .string "nearest" => .ok .nearest
-    | .string "box" => .ok .box
-    | .string "bilinear" => .ok .bilinear
-    | .string "linear" => .ok .linear
-    | .string "cubic" => .ok .cubic
-    | .string "mitchell" => .ok .mitchell
-    | .string "lanczos2" => .ok .lanczos2
-    | .string "lanczos3" => .ok .lanczos3
-    | .string "mks2013" => .ok .mks2013
-    | .string "mks2021" => .ok .mks2021
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.ImageFilter"
 
 /-- `enum ImageResizeOptionsFit` (Bun 1.4.4 type declarations): "fill", "inside". -/
-inductive ImageResizeOptionsFit where
-  /-- "fill" -/
-  | fill
-  /-- "inside" -/
-  | inside
+structure ImageResizeOptionsFit where
+  /-- A value from its string, unchecked: the generated values (`.fill`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ImageResizeOptionsFit := ⟨fun
-  | .fill => .string "fill"
-  | .inside => .string "inside"⟩
+/-- "fill" -/
+@[match_pattern] abbrev ImageResizeOptionsFit.fill : ImageResizeOptionsFit := .unsafeOfString "fill"
+/-- "inside" -/
+@[match_pattern] abbrev ImageResizeOptionsFit.inside : ImageResizeOptionsFit := .unsafeOfString "inside"
+instance : ToJS ImageResizeOptionsFit := ⟨fun x => .string x.val⟩
 instance : FromJS ImageResizeOptionsFit where
   fromJS
-    | .string "fill" => .ok .fill
-    | .string "inside" => .ok .inside
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.ImageResizeOptionsFit"
 
 /-- `enum ImagePlaceholderAs` (Bun 1.4.4 type declarations): "dataurl". -/
-inductive ImagePlaceholderAs where
-  /-- "dataurl" -/
-  | dataurl
+structure ImagePlaceholderAs where
+  /-- A value from its string, unchecked: the generated values (`.dataurl`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ImagePlaceholderAs := ⟨fun
-  | .dataurl => .string "dataurl"⟩
+/-- "dataurl" -/
+@[match_pattern] abbrev ImagePlaceholderAs.dataurl : ImagePlaceholderAs := .unsafeOfString "dataurl"
+instance : ToJS ImagePlaceholderAs := ⟨fun x => .string x.val⟩
 instance : FromJS ImagePlaceholderAs where
   fromJS
-    | .string "dataurl" => .ok .dataurl
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.ImagePlaceholderAs"
 
 /-- `enum ImageFormat` (Bun 1.4.4 type declarations): "jpeg", "png", "webp", "heic", "avif", "bmp", "tiff", "gif". -/
-inductive ImageFormat where
-  /-- "jpeg" -/
-  | jpeg
-  /-- "png" -/
-  | png
-  /-- "webp" -/
-  | webp
-  /-- "heic" -/
-  | heic
-  /-- "avif" -/
-  | avif
-  /-- "bmp" -/
-  | bmp
-  /-- "tiff" -/
-  | tiff
-  /-- "gif" -/
-  | gif
+structure ImageFormat where
+  /-- A value from its string, unchecked: the generated values (`.jpeg`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ImageFormat := ⟨fun
-  | .jpeg => .string "jpeg"
-  | .png => .string "png"
-  | .webp => .string "webp"
-  | .heic => .string "heic"
-  | .avif => .string "avif"
-  | .bmp => .string "bmp"
-  | .tiff => .string "tiff"
-  | .gif => .string "gif"⟩
+/-- "jpeg" -/
+@[match_pattern] abbrev ImageFormat.jpeg : ImageFormat := .unsafeOfString "jpeg"
+/-- "png" -/
+@[match_pattern] abbrev ImageFormat.png : ImageFormat := .unsafeOfString "png"
+/-- "webp" -/
+@[match_pattern] abbrev ImageFormat.webp : ImageFormat := .unsafeOfString "webp"
+/-- "heic" -/
+@[match_pattern] abbrev ImageFormat.heic : ImageFormat := .unsafeOfString "heic"
+/-- "avif" -/
+@[match_pattern] abbrev ImageFormat.avif : ImageFormat := .unsafeOfString "avif"
+/-- "bmp" -/
+@[match_pattern] abbrev ImageFormat.bmp : ImageFormat := .unsafeOfString "bmp"
+/-- "tiff" -/
+@[match_pattern] abbrev ImageFormat.tiff : ImageFormat := .unsafeOfString "tiff"
+/-- "gif" -/
+@[match_pattern] abbrev ImageFormat.gif : ImageFormat := .unsafeOfString "gif"
+instance : ToJS ImageFormat := ⟨fun x => .string x.val⟩
 instance : FromJS ImageFormat where
   fromJS
-    | .string "jpeg" => .ok .jpeg
-    | .string "png" => .ok .png
-    | .string "webp" => .ok .webp
-    | .string "heic" => .ok .heic
-    | .string "avif" => .ok .avif
-    | .string "bmp" => .ok .bmp
-    | .string "tiff" => .ok .tiff
-    | .string "gif" => .ok .gif
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.ImageFormat"
 
 /-- `enum CookieSameSite` (Bun 1.4.4 type declarations): "strict", "lax", "none". -/
-inductive CookieSameSite where
-  /-- "strict" -/
-  | strict
-  /-- "lax" -/
-  | lax
-  /-- "none" -/
-  | none
+structure CookieSameSite where
+  /-- A value from its string, unchecked: the generated values (`.strict`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS CookieSameSite := ⟨fun
-  | .strict => .string "strict"
-  | .lax => .string "lax"
-  | .none => .string "none"⟩
+/-- "strict" -/
+@[match_pattern] abbrev CookieSameSite.strict : CookieSameSite := .unsafeOfString "strict"
+/-- "lax" -/
+@[match_pattern] abbrev CookieSameSite.lax : CookieSameSite := .unsafeOfString "lax"
+/-- "none" -/
+@[match_pattern] abbrev CookieSameSite.none : CookieSameSite := .unsafeOfString "none"
+instance : ToJS CookieSameSite := ⟨fun x => .string x.val⟩
 instance : FromJS CookieSameSite where
   fromJS
-    | .string "strict" => .ok .strict
-    | .string "lax" => .ok .lax
-    | .string "none" => .ok .none
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.CookieSameSite"
 
 /-- `enum ColorOutputFormat` (Bun 1.4.4 type declarations): "ansi", "ansi-16", "ansi-16m", "ansi-256", "css", "hex", "HEX", "hsl", "lab", "number", "rgb", "rgba". -/
-inductive ColorOutputFormat where
-  /-- "ansi" -/
-  | ansi
-  /-- "ansi-16" -/
-  | ansi16
-  /-- "ansi-16m" -/
-  | ansi16m
-  /-- "ansi-256" -/
-  | ansi256
-  /-- "css" -/
-  | css
-  /-- "hex" -/
-  | hex
-  /-- "HEX" -/
-  | hEX
-  /-- "hsl" -/
-  | hsl
-  /-- "lab" -/
-  | lab
-  /-- "number" -/
-  | number
-  /-- "rgb" -/
-  | rgb
-  /-- "rgba" -/
-  | rgba
+structure ColorOutputFormat where
+  /-- A value from its string, unchecked: the generated values (`.ansi`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ColorOutputFormat := ⟨fun
-  | .ansi => .string "ansi"
-  | .ansi16 => .string "ansi-16"
-  | .ansi16m => .string "ansi-16m"
-  | .ansi256 => .string "ansi-256"
-  | .css => .string "css"
-  | .hex => .string "hex"
-  | .hEX => .string "HEX"
-  | .hsl => .string "hsl"
-  | .lab => .string "lab"
-  | .number => .string "number"
-  | .rgb => .string "rgb"
-  | .rgba => .string "rgba"⟩
+/-- "ansi" -/
+@[match_pattern] abbrev ColorOutputFormat.ansi : ColorOutputFormat := .unsafeOfString "ansi"
+/-- "ansi-16" -/
+@[match_pattern] abbrev ColorOutputFormat.ansi16 : ColorOutputFormat := .unsafeOfString "ansi-16"
+/-- "ansi-16m" -/
+@[match_pattern] abbrev ColorOutputFormat.ansi16m : ColorOutputFormat := .unsafeOfString "ansi-16m"
+/-- "ansi-256" -/
+@[match_pattern] abbrev ColorOutputFormat.ansi256 : ColorOutputFormat := .unsafeOfString "ansi-256"
+/-- "css" -/
+@[match_pattern] abbrev ColorOutputFormat.css : ColorOutputFormat := .unsafeOfString "css"
+/-- "hex" -/
+@[match_pattern] abbrev ColorOutputFormat.hex : ColorOutputFormat := .unsafeOfString "hex"
+/-- "HEX" -/
+@[match_pattern] abbrev ColorOutputFormat.hEX : ColorOutputFormat := .unsafeOfString "HEX"
+/-- "hsl" -/
+@[match_pattern] abbrev ColorOutputFormat.hsl : ColorOutputFormat := .unsafeOfString "hsl"
+/-- "lab" -/
+@[match_pattern] abbrev ColorOutputFormat.lab : ColorOutputFormat := .unsafeOfString "lab"
+/-- "number" -/
+@[match_pattern] abbrev ColorOutputFormat.number : ColorOutputFormat := .unsafeOfString "number"
+/-- "rgb" -/
+@[match_pattern] abbrev ColorOutputFormat.rgb : ColorOutputFormat := .unsafeOfString "rgb"
+/-- "rgba" -/
+@[match_pattern] abbrev ColorOutputFormat.rgba : ColorOutputFormat := .unsafeOfString "rgba"
+instance : ToJS ColorOutputFormat := ⟨fun x => .string x.val⟩
 instance : FromJS ColorOutputFormat where
   fromJS
-    | .string "ansi" => .ok .ansi
-    | .string "ansi-16" => .ok .ansi16
-    | .string "ansi-16m" => .ok .ansi16m
-    | .string "ansi-256" => .ok .ansi256
-    | .string "css" => .ok .css
-    | .string "hex" => .ok .hex
-    | .string "HEX" => .ok .hEX
-    | .string "hsl" => .ok .hsl
-    | .string "lab" => .ok .lab
-    | .string "number" => .ok .number
-    | .string "rgb" => .ok .rgb
-    | .string "rgba" => .ok .rgba
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.ColorOutputFormat"
 
 /-- `enum ColorRgbOutputFormat` (Bun 1.4.4 type declarations): "[rgb]". -/
-inductive ColorRgbOutputFormat where
-  /-- "[rgb]" -/
-  | rgb
+structure ColorRgbOutputFormat where
+  /-- A value from its string, unchecked: the generated values (`.rgb`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ColorRgbOutputFormat := ⟨fun
-  | .rgb => .string "[rgb]"⟩
+/-- "[rgb]" -/
+@[match_pattern] abbrev ColorRgbOutputFormat.rgb : ColorRgbOutputFormat := .unsafeOfString "[rgb]"
+instance : ToJS ColorRgbOutputFormat := ⟨fun x => .string x.val⟩
 instance : FromJS ColorRgbOutputFormat where
   fromJS
-    | .string "[rgb]" => .ok .rgb
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.ColorRgbOutputFormat"
 
 /-- `enum ColorRgbaOutputFormat` (Bun 1.4.4 type declarations): "[rgba]". -/
-inductive ColorRgbaOutputFormat where
-  /-- "[rgba]" -/
-  | rgba
+structure ColorRgbaOutputFormat where
+  /-- A value from its string, unchecked: the generated values (`.rgba`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ColorRgbaOutputFormat := ⟨fun
-  | .rgba => .string "[rgba]"⟩
+/-- "[rgba]" -/
+@[match_pattern] abbrev ColorRgbaOutputFormat.rgba : ColorRgbaOutputFormat := .unsafeOfString "[rgba]"
+instance : ToJS ColorRgbaOutputFormat := ⟨fun x => .string x.val⟩
 instance : FromJS ColorRgbaOutputFormat where
   fromJS
-    | .string "[rgba]" => .ok .rgba
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.ColorRgbaOutputFormat"
 
 /-- `enum ColorWithRgbOutputFormat` (Bun 1.4.4 type declarations): "{rgb}". -/
-inductive ColorWithRgbOutputFormat where
-  /-- "{rgb}" -/
-  | rgb
+structure ColorWithRgbOutputFormat where
+  /-- A value from its string, unchecked: the generated values (`.rgb`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ColorWithRgbOutputFormat := ⟨fun
-  | .rgb => .string "{rgb}"⟩
+/-- "{rgb}" -/
+@[match_pattern] abbrev ColorWithRgbOutputFormat.rgb : ColorWithRgbOutputFormat := .unsafeOfString "{rgb}"
+instance : ToJS ColorWithRgbOutputFormat := ⟨fun x => .string x.val⟩
 instance : FromJS ColorWithRgbOutputFormat where
   fromJS
-    | .string "{rgb}" => .ok .rgb
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.ColorWithRgbOutputFormat"
 
 /-- `enum ColorWithRgbaOutputFormat` (Bun 1.4.4 type declarations): "{rgba}". -/
-inductive ColorWithRgbaOutputFormat where
-  /-- "{rgba}" -/
-  | rgba
+structure ColorWithRgbaOutputFormat where
+  /-- A value from its string, unchecked: the generated values (`.rgba`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ColorWithRgbaOutputFormat := ⟨fun
-  | .rgba => .string "{rgba}"⟩
+/-- "{rgba}" -/
+@[match_pattern] abbrev ColorWithRgbaOutputFormat.rgba : ColorWithRgbaOutputFormat := .unsafeOfString "{rgba}"
+instance : ToJS ColorWithRgbaOutputFormat := ⟨fun x => .string x.val⟩
 instance : FromJS ColorWithRgbaOutputFormat where
   fromJS
-    | .string "{rgba}" => .ok .rgba
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.ColorWithRgbaOutputFormat"
 
 /-- `enum ColorWithNumberOutputFormat` (Bun 1.4.4 type declarations): "number". -/
-inductive ColorWithNumberOutputFormat where
-  /-- "number" -/
-  | number
+structure ColorWithNumberOutputFormat where
+  /-- A value from its string, unchecked: the generated values (`.number`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS ColorWithNumberOutputFormat := ⟨fun
-  | .number => .string "number"⟩
+/-- "number" -/
+@[match_pattern] abbrev ColorWithNumberOutputFormat.number : ColorWithNumberOutputFormat := .unsafeOfString "number"
+instance : ToJS ColorWithNumberOutputFormat := ⟨fun x => .string x.val⟩
 instance : FromJS ColorWithNumberOutputFormat where
   fromJS
-    | .string "number" => .ok .number
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.ColorWithNumberOutputFormat"
 
 /-- `enum GenerateHeapSnapshotFormat` (Bun 1.4.4 type declarations): "jsc". -/
-inductive GenerateHeapSnapshotFormat where
-  /-- "jsc" -/
-  | jsc
+structure GenerateHeapSnapshotFormat where
+  /-- A value from its string, unchecked: the generated values (`.jsc`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS GenerateHeapSnapshotFormat := ⟨fun
-  | .jsc => .string "jsc"⟩
+/-- "jsc" -/
+@[match_pattern] abbrev GenerateHeapSnapshotFormat.jsc : GenerateHeapSnapshotFormat := .unsafeOfString "jsc"
+instance : ToJS GenerateHeapSnapshotFormat := ⟨fun x => .string x.val⟩
 instance : FromJS GenerateHeapSnapshotFormat where
   fromJS
-    | .string "jsc" => .ok .jsc
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.GenerateHeapSnapshotFormat"
 
 /-- `enum GenerateHeapSnapshotWithV8Format` (Bun 1.4.4 type declarations): "v8". -/
-inductive GenerateHeapSnapshotWithV8Format where
-  /-- "v8" -/
-  | v8
+structure GenerateHeapSnapshotWithV8Format where
+  /-- A value from its string, unchecked: the generated values (`.v8`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS GenerateHeapSnapshotWithV8Format := ⟨fun
-  | .v8 => .string "v8"⟩
+/-- "v8" -/
+@[match_pattern] abbrev GenerateHeapSnapshotWithV8Format.v8 : GenerateHeapSnapshotWithV8Format := .unsafeOfString "v8"
+instance : ToJS GenerateHeapSnapshotWithV8Format := ⟨fun x => .string x.val⟩
 instance : FromJS GenerateHeapSnapshotWithV8Format where
   fromJS
-    | .string "v8" => .ok .v8
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.GenerateHeapSnapshotWithV8Format"
 
 /-- `enum GenerateHeapSnapshotWithEncodingFormat` (Bun 1.4.4 type declarations): "v8". -/
-inductive GenerateHeapSnapshotWithEncodingFormat where
-  /-- "v8" -/
-  | v8
+structure GenerateHeapSnapshotWithEncodingFormat where
+  /-- A value from its string, unchecked: the generated values (`.v8`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS GenerateHeapSnapshotWithEncodingFormat := ⟨fun
-  | .v8 => .string "v8"⟩
+/-- "v8" -/
+@[match_pattern] abbrev GenerateHeapSnapshotWithEncodingFormat.v8 : GenerateHeapSnapshotWithEncodingFormat := .unsafeOfString "v8"
+instance : ToJS GenerateHeapSnapshotWithEncodingFormat := ⟨fun x => .string x.val⟩
 instance : FromJS GenerateHeapSnapshotWithEncodingFormat where
   fromJS
-    | .string "v8" => .ok .v8
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.GenerateHeapSnapshotWithEncodingFormat"
 
 /-- `enum GenerateHeapSnapshotWithEncodingEncoding` (Bun 1.4.4 type declarations): "arraybuffer". -/
-inductive GenerateHeapSnapshotWithEncodingEncoding where
-  /-- "arraybuffer" -/
-  | arraybuffer
+structure GenerateHeapSnapshotWithEncodingEncoding where
+  /-- A value from its string, unchecked: the generated values (`.arraybuffer`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS GenerateHeapSnapshotWithEncodingEncoding := ⟨fun
-  | .arraybuffer => .string "arraybuffer"⟩
+/-- "arraybuffer" -/
+@[match_pattern] abbrev GenerateHeapSnapshotWithEncodingEncoding.arraybuffer : GenerateHeapSnapshotWithEncodingEncoding := .unsafeOfString "arraybuffer"
+instance : ToJS GenerateHeapSnapshotWithEncodingEncoding := ⟨fun x => .string x.val⟩
 instance : FromJS GenerateHeapSnapshotWithEncodingEncoding where
   fromJS
-    | .string "arraybuffer" => .ok .arraybuffer
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.GenerateHeapSnapshotWithEncodingEncoding"
 
 /-- `enum EditorOptionsEditor` (Bun 1.4.4 type declarations): "vscode", "subl". -/
-inductive EditorOptionsEditor where
-  /-- "vscode" -/
-  | vscode
-  /-- "subl" -/
-  | subl
+structure EditorOptionsEditor where
+  /-- A value from its string, unchecked: the generated values (`.vscode`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS EditorOptionsEditor := ⟨fun
-  | .vscode => .string "vscode"
-  | .subl => .string "subl"⟩
+/-- "vscode" -/
+@[match_pattern] abbrev EditorOptionsEditor.vscode : EditorOptionsEditor := .unsafeOfString "vscode"
+/-- "subl" -/
+@[match_pattern] abbrev EditorOptionsEditor.subl : EditorOptionsEditor := .unsafeOfString "subl"
+instance : ToJS EditorOptionsEditor := ⟨fun x => .string x.val⟩
 instance : FromJS EditorOptionsEditor where
   fromJS
-    | .string "vscode" => .ok .vscode
-    | .string "subl" => .ok .subl
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.EditorOptionsEditor"
 
 /-- `enum DeflateSyncOptionsLibrary` (Bun 1.4.4 type declarations): "zlib", "libdeflate". -/
-inductive DeflateSyncOptionsLibrary where
-  /-- "zlib" -/
-  | zlib
-  /-- "libdeflate" -/
-  | libdeflate
+structure DeflateSyncOptionsLibrary where
+  /-- A value from its string, unchecked: the generated values (`.zlib`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS DeflateSyncOptionsLibrary := ⟨fun
-  | .zlib => .string "zlib"
-  | .libdeflate => .string "libdeflate"⟩
+/-- "zlib" -/
+@[match_pattern] abbrev DeflateSyncOptionsLibrary.zlib : DeflateSyncOptionsLibrary := .unsafeOfString "zlib"
+/-- "libdeflate" -/
+@[match_pattern] abbrev DeflateSyncOptionsLibrary.libdeflate : DeflateSyncOptionsLibrary := .unsafeOfString "libdeflate"
+instance : ToJS DeflateSyncOptionsLibrary := ⟨fun x => .string x.val⟩
 instance : FromJS DeflateSyncOptionsLibrary where
   fromJS
-    | .string "zlib" => .ok .zlib
-    | .string "libdeflate" => .ok .libdeflate
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.DeflateSyncOptionsLibrary"
 
 /-- `enum GzipSyncOptionsLibrary` (Bun 1.4.4 type declarations): "zlib", "libdeflate". -/
-inductive GzipSyncOptionsLibrary where
-  /-- "zlib" -/
-  | zlib
-  /-- "libdeflate" -/
-  | libdeflate
+structure GzipSyncOptionsLibrary where
+  /-- A value from its string, unchecked: the generated values (`.zlib`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS GzipSyncOptionsLibrary := ⟨fun
-  | .zlib => .string "zlib"
-  | .libdeflate => .string "libdeflate"⟩
+/-- "zlib" -/
+@[match_pattern] abbrev GzipSyncOptionsLibrary.zlib : GzipSyncOptionsLibrary := .unsafeOfString "zlib"
+/-- "libdeflate" -/
+@[match_pattern] abbrev GzipSyncOptionsLibrary.libdeflate : GzipSyncOptionsLibrary := .unsafeOfString "libdeflate"
+instance : ToJS GzipSyncOptionsLibrary := ⟨fun x => .string x.val⟩
 instance : FromJS GzipSyncOptionsLibrary where
   fromJS
-    | .string "zlib" => .ok .zlib
-    | .string "libdeflate" => .ok .libdeflate
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.GzipSyncOptionsLibrary"
 
 /-- `enum InflateSyncOptionsLibrary` (Bun 1.4.4 type declarations): "zlib", "libdeflate". -/
-inductive InflateSyncOptionsLibrary where
-  /-- "zlib" -/
-  | zlib
-  /-- "libdeflate" -/
-  | libdeflate
+structure InflateSyncOptionsLibrary where
+  /-- A value from its string, unchecked: the generated values (`.zlib`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS InflateSyncOptionsLibrary := ⟨fun
-  | .zlib => .string "zlib"
-  | .libdeflate => .string "libdeflate"⟩
+/-- "zlib" -/
+@[match_pattern] abbrev InflateSyncOptionsLibrary.zlib : InflateSyncOptionsLibrary := .unsafeOfString "zlib"
+/-- "libdeflate" -/
+@[match_pattern] abbrev InflateSyncOptionsLibrary.libdeflate : InflateSyncOptionsLibrary := .unsafeOfString "libdeflate"
+instance : ToJS InflateSyncOptionsLibrary := ⟨fun x => .string x.val⟩
 instance : FromJS InflateSyncOptionsLibrary where
   fromJS
-    | .string "zlib" => .ok .zlib
-    | .string "libdeflate" => .ok .libdeflate
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.InflateSyncOptionsLibrary"
 
 /-- `enum GunzipSyncOptionsLibrary` (Bun 1.4.4 type declarations): "zlib", "libdeflate". -/
-inductive GunzipSyncOptionsLibrary where
-  /-- "zlib" -/
-  | zlib
-  /-- "libdeflate" -/
-  | libdeflate
+structure GunzipSyncOptionsLibrary where
+  /-- A value from its string, unchecked: the generated values (`.zlib`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS GunzipSyncOptionsLibrary := ⟨fun
-  | .zlib => .string "zlib"
-  | .libdeflate => .string "libdeflate"⟩
+/-- "zlib" -/
+@[match_pattern] abbrev GunzipSyncOptionsLibrary.zlib : GunzipSyncOptionsLibrary := .unsafeOfString "zlib"
+/-- "libdeflate" -/
+@[match_pattern] abbrev GunzipSyncOptionsLibrary.libdeflate : GunzipSyncOptionsLibrary := .unsafeOfString "libdeflate"
+instance : ToJS GunzipSyncOptionsLibrary := ⟨fun x => .string x.val⟩
 instance : FromJS GunzipSyncOptionsLibrary where
   fromJS
-    | .string "zlib" => .ok .zlib
-    | .string "libdeflate" => .ok .libdeflate
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.GunzipSyncOptionsLibrary"
 
 /-- `enum UdpSocketOptionsBinaryType` (Bun 1.4.4 type declarations): "buffer". -/
-inductive UdpSocketOptionsBinaryType where
-  /-- "buffer" -/
-  | buffer
+structure UdpSocketOptionsBinaryType where
+  /-- A value from its string, unchecked: the generated values (`.buffer`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS UdpSocketOptionsBinaryType := ⟨fun
-  | .buffer => .string "buffer"⟩
+/-- "buffer" -/
+@[match_pattern] abbrev UdpSocketOptionsBinaryType.buffer : UdpSocketOptionsBinaryType := .unsafeOfString "buffer"
+instance : ToJS UdpSocketOptionsBinaryType := ⟨fun x => .string x.val⟩
 instance : FromJS UdpSocketOptionsBinaryType where
   fromJS
-    | .string "buffer" => .ok .buffer
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.UdpSocketOptionsBinaryType"
 
 /-- `enum UdpConnectSocketOptionsBinaryType` (Bun 1.4.4 type declarations): "buffer". -/
-inductive UdpConnectSocketOptionsBinaryType where
-  /-- "buffer" -/
-  | buffer
+structure UdpConnectSocketOptionsBinaryType where
+  /-- A value from its string, unchecked: the generated values (`.buffer`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS UdpConnectSocketOptionsBinaryType := ⟨fun
-  | .buffer => .string "buffer"⟩
+/-- "buffer" -/
+@[match_pattern] abbrev UdpConnectSocketOptionsBinaryType.buffer : UdpConnectSocketOptionsBinaryType := .unsafeOfString "buffer"
+instance : ToJS UdpConnectSocketOptionsBinaryType := ⟨fun x => .string x.val⟩
 instance : FromJS UdpConnectSocketOptionsBinaryType where
   fromJS
-    | .string "buffer" => .ok .buffer
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.UdpConnectSocketOptionsBinaryType"
 
 /-- `enum SpawnBaseOptionsIgnorePipeInheritStdin` (Bun 1.4.4 type declarations): "ignore". -/
-inductive SpawnBaseOptionsIgnorePipeInheritStdin where
-  /-- "ignore" -/
-  | ignore
+structure SpawnBaseOptionsIgnorePipeInheritStdin where
+  /-- A value from its string, unchecked: the generated values (`.ignore`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS SpawnBaseOptionsIgnorePipeInheritStdin := ⟨fun
-  | .ignore => .string "ignore"⟩
+/-- "ignore" -/
+@[match_pattern] abbrev SpawnBaseOptionsIgnorePipeInheritStdin.ignore : SpawnBaseOptionsIgnorePipeInheritStdin := .unsafeOfString "ignore"
+instance : ToJS SpawnBaseOptionsIgnorePipeInheritStdin := ⟨fun x => .string x.val⟩
 instance : FromJS SpawnBaseOptionsIgnorePipeInheritStdin where
   fromJS
-    | .string "ignore" => .ok .ignore
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipeInheritStdin"
 
 /-- `enum SpawnBaseOptionsIgnorePipeInheritStdout` (Bun 1.4.4 type declarations): "pipe". -/
-inductive SpawnBaseOptionsIgnorePipeInheritStdout where
-  /-- "pipe" -/
-  | pipe
+structure SpawnBaseOptionsIgnorePipeInheritStdout where
+  /-- A value from its string, unchecked: the generated values (`.pipe`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS SpawnBaseOptionsIgnorePipeInheritStdout := ⟨fun
-  | .pipe => .string "pipe"⟩
+/-- "pipe" -/
+@[match_pattern] abbrev SpawnBaseOptionsIgnorePipeInheritStdout.pipe : SpawnBaseOptionsIgnorePipeInheritStdout := .unsafeOfString "pipe"
+instance : ToJS SpawnBaseOptionsIgnorePipeInheritStdout := ⟨fun x => .string x.val⟩
 instance : FromJS SpawnBaseOptionsIgnorePipeInheritStdout where
   fromJS
-    | .string "pipe" => .ok .pipe
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipeInheritStdout"
 
 /-- `enum SpawnBaseOptionsIgnorePipeInheritStderr` (Bun 1.4.4 type declarations): "inherit". -/
-inductive SpawnBaseOptionsIgnorePipeInheritStderr where
-  /-- "inherit" -/
-  | inherit
+structure SpawnBaseOptionsIgnorePipeInheritStderr where
+  /-- A value from its string, unchecked: the generated values (`.inherit`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS SpawnBaseOptionsIgnorePipeInheritStderr := ⟨fun
-  | .inherit => .string "inherit"⟩
+/-- "inherit" -/
+@[match_pattern] abbrev SpawnBaseOptionsIgnorePipeInheritStderr.inherit : SpawnBaseOptionsIgnorePipeInheritStderr := .unsafeOfString "inherit"
+instance : ToJS SpawnBaseOptionsIgnorePipeInheritStderr := ⟨fun x => .string x.val⟩
 instance : FromJS SpawnBaseOptionsIgnorePipeInheritStderr where
   fromJS
-    | .string "inherit" => .ok .inherit
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipeInheritStderr"
 
 /-- `enum SpawnBaseOptionsIgnorePipeInheritSerialization` (Bun 1.4.4 type declarations): "json", "advanced". -/
-inductive SpawnBaseOptionsIgnorePipeInheritSerialization where
-  /-- "json" -/
-  | json
-  /-- "advanced" -/
-  | advanced
+structure SpawnBaseOptionsIgnorePipeInheritSerialization where
+  /-- A value from its string, unchecked: the generated values (`.json`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS SpawnBaseOptionsIgnorePipeInheritSerialization := ⟨fun
-  | .json => .string "json"
-  | .advanced => .string "advanced"⟩
+/-- "json" -/
+@[match_pattern] abbrev SpawnBaseOptionsIgnorePipeInheritSerialization.json : SpawnBaseOptionsIgnorePipeInheritSerialization := .unsafeOfString "json"
+/-- "advanced" -/
+@[match_pattern] abbrev SpawnBaseOptionsIgnorePipeInheritSerialization.advanced : SpawnBaseOptionsIgnorePipeInheritSerialization := .unsafeOfString "advanced"
+instance : ToJS SpawnBaseOptionsIgnorePipeInheritSerialization := ⟨fun x => .string x.val⟩
 instance : FromJS SpawnBaseOptionsIgnorePipeInheritSerialization where
   fromJS
-    | .string "json" => .ok .json
-    | .string "advanced" => .ok .advanced
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipeInheritSerialization"
 
 /-- `enum SpawnBaseOptionsIgnorePipePipeStdin` (Bun 1.4.4 type declarations): "ignore". -/
-inductive SpawnBaseOptionsIgnorePipePipeStdin where
-  /-- "ignore" -/
-  | ignore
+structure SpawnBaseOptionsIgnorePipePipeStdin where
+  /-- A value from its string, unchecked: the generated values (`.ignore`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS SpawnBaseOptionsIgnorePipePipeStdin := ⟨fun
-  | .ignore => .string "ignore"⟩
+/-- "ignore" -/
+@[match_pattern] abbrev SpawnBaseOptionsIgnorePipePipeStdin.ignore : SpawnBaseOptionsIgnorePipePipeStdin := .unsafeOfString "ignore"
+instance : ToJS SpawnBaseOptionsIgnorePipePipeStdin := ⟨fun x => .string x.val⟩
 instance : FromJS SpawnBaseOptionsIgnorePipePipeStdin where
   fromJS
-    | .string "ignore" => .ok .ignore
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipePipeStdin"
 
 /-- `enum SpawnBaseOptionsIgnorePipePipeStdout` (Bun 1.4.4 type declarations): "pipe". -/
-inductive SpawnBaseOptionsIgnorePipePipeStdout where
-  /-- "pipe" -/
-  | pipe
+structure SpawnBaseOptionsIgnorePipePipeStdout where
+  /-- A value from its string, unchecked: the generated values (`.pipe`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS SpawnBaseOptionsIgnorePipePipeStdout := ⟨fun
-  | .pipe => .string "pipe"⟩
+/-- "pipe" -/
+@[match_pattern] abbrev SpawnBaseOptionsIgnorePipePipeStdout.pipe : SpawnBaseOptionsIgnorePipePipeStdout := .unsafeOfString "pipe"
+instance : ToJS SpawnBaseOptionsIgnorePipePipeStdout := ⟨fun x => .string x.val⟩
 instance : FromJS SpawnBaseOptionsIgnorePipePipeStdout where
   fromJS
-    | .string "pipe" => .ok .pipe
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipePipeStdout"
 
 /-- `enum SpawnBaseOptionsIgnorePipePipeStderr` (Bun 1.4.4 type declarations): "pipe". -/
-inductive SpawnBaseOptionsIgnorePipePipeStderr where
-  /-- "pipe" -/
-  | pipe
+structure SpawnBaseOptionsIgnorePipePipeStderr where
+  /-- A value from its string, unchecked: the generated values (`.pipe`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS SpawnBaseOptionsIgnorePipePipeStderr := ⟨fun
-  | .pipe => .string "pipe"⟩
+/-- "pipe" -/
+@[match_pattern] abbrev SpawnBaseOptionsIgnorePipePipeStderr.pipe : SpawnBaseOptionsIgnorePipePipeStderr := .unsafeOfString "pipe"
+instance : ToJS SpawnBaseOptionsIgnorePipePipeStderr := ⟨fun x => .string x.val⟩
 instance : FromJS SpawnBaseOptionsIgnorePipePipeStderr where
   fromJS
-    | .string "pipe" => .ok .pipe
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipePipeStderr"
 
 /-- `enum SpawnBaseOptionsIgnorePipePipeSerialization` (Bun 1.4.4 type declarations): "json", "advanced". -/
-inductive SpawnBaseOptionsIgnorePipePipeSerialization where
-  /-- "json" -/
-  | json
-  /-- "advanced" -/
-  | advanced
+structure SpawnBaseOptionsIgnorePipePipeSerialization where
+  /-- A value from its string, unchecked: the generated values (`.json`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS SpawnBaseOptionsIgnorePipePipeSerialization := ⟨fun
-  | .json => .string "json"
-  | .advanced => .string "advanced"⟩
+/-- "json" -/
+@[match_pattern] abbrev SpawnBaseOptionsIgnorePipePipeSerialization.json : SpawnBaseOptionsIgnorePipePipeSerialization := .unsafeOfString "json"
+/-- "advanced" -/
+@[match_pattern] abbrev SpawnBaseOptionsIgnorePipePipeSerialization.advanced : SpawnBaseOptionsIgnorePipePipeSerialization := .unsafeOfString "advanced"
+instance : ToJS SpawnBaseOptionsIgnorePipePipeSerialization := ⟨fun x => .string x.val⟩
 instance : FromJS SpawnBaseOptionsIgnorePipePipeSerialization where
   fromJS
-    | .string "json" => .ok .json
-    | .string "advanced" => .ok .advanced
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipePipeSerialization"
 
 /-- `enum RandomUUIDv7Encoding` (Bun 1.4.4 type declarations): "hex", "base64", "base64url". -/
-inductive RandomUUIDv7Encoding where
-  /-- "hex" -/
-  | hex
-  /-- "base64" -/
-  | base64
-  /-- "base64url" -/
-  | base64url
+structure RandomUUIDv7Encoding where
+  /-- A value from its string, unchecked: the generated values (`.hex`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RandomUUIDv7Encoding := ⟨fun
-  | .hex => .string "hex"
-  | .base64 => .string "base64"
-  | .base64url => .string "base64url"⟩
+/-- "hex" -/
+@[match_pattern] abbrev RandomUUIDv7Encoding.hex : RandomUUIDv7Encoding := .unsafeOfString "hex"
+/-- "base64" -/
+@[match_pattern] abbrev RandomUUIDv7Encoding.base64 : RandomUUIDv7Encoding := .unsafeOfString "base64"
+/-- "base64url" -/
+@[match_pattern] abbrev RandomUUIDv7Encoding.base64url : RandomUUIDv7Encoding := .unsafeOfString "base64url"
+instance : ToJS RandomUUIDv7Encoding := ⟨fun x => .string x.val⟩
 instance : FromJS RandomUUIDv7Encoding where
   fromJS
-    | .string "hex" => .ok .hex
-    | .string "base64" => .ok .base64
-    | .string "base64url" => .ok .base64url
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RandomUUIDv7Encoding"
 
 /-- `enum RandomUUIDv7WithBufferEncoding` (Bun 1.4.4 type declarations): "buffer". -/
-inductive RandomUUIDv7WithBufferEncoding where
-  /-- "buffer" -/
-  | buffer
+structure RandomUUIDv7WithBufferEncoding where
+  /-- A value from its string, unchecked: the generated values (`.buffer`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RandomUUIDv7WithBufferEncoding := ⟨fun
-  | .buffer => .string "buffer"⟩
+/-- "buffer" -/
+@[match_pattern] abbrev RandomUUIDv7WithBufferEncoding.buffer : RandomUUIDv7WithBufferEncoding := .unsafeOfString "buffer"
+instance : ToJS RandomUUIDv7WithBufferEncoding := ⟨fun x => .string x.val⟩
 instance : FromJS RandomUUIDv7WithBufferEncoding where
   fromJS
-    | .string "buffer" => .ok .buffer
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RandomUUIDv7WithBufferEncoding"
 
 /-- `enum RandomUUIDv5NamespaceLiteral` (Bun 1.4.4 type declarations): "dns", "url", "oid", "x500". -/
-inductive RandomUUIDv5NamespaceLiteral where
-  /-- "dns" -/
-  | dns
-  /-- "url" -/
-  | url
-  /-- "oid" -/
-  | oid
-  /-- "x500" -/
-  | x500
+structure RandomUUIDv5NamespaceLiteral where
+  /-- A value from its string, unchecked: the generated values (`.dns`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RandomUUIDv5NamespaceLiteral := ⟨fun
-  | .dns => .string "dns"
-  | .url => .string "url"
-  | .oid => .string "oid"
-  | .x500 => .string "x500"⟩
+/-- "dns" -/
+@[match_pattern] abbrev RandomUUIDv5NamespaceLiteral.dns : RandomUUIDv5NamespaceLiteral := .unsafeOfString "dns"
+/-- "url" -/
+@[match_pattern] abbrev RandomUUIDv5NamespaceLiteral.url : RandomUUIDv5NamespaceLiteral := .unsafeOfString "url"
+/-- "oid" -/
+@[match_pattern] abbrev RandomUUIDv5NamespaceLiteral.oid : RandomUUIDv5NamespaceLiteral := .unsafeOfString "oid"
+/-- "x500" -/
+@[match_pattern] abbrev RandomUUIDv5NamespaceLiteral.x500 : RandomUUIDv5NamespaceLiteral := .unsafeOfString "x500"
+instance : ToJS RandomUUIDv5NamespaceLiteral := ⟨fun x => .string x.val⟩
 instance : FromJS RandomUUIDv5NamespaceLiteral where
   fromJS
-    | .string "dns" => .ok .dns
-    | .string "url" => .ok .url
-    | .string "oid" => .ok .oid
-    | .string "x500" => .ok .x500
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RandomUUIDv5NamespaceLiteral"
 
 /-- `enum RandomUUIDv5Encoding` (Bun 1.4.4 type declarations): "hex", "base64", "base64url". -/
-inductive RandomUUIDv5Encoding where
-  /-- "hex" -/
-  | hex
-  /-- "base64" -/
-  | base64
-  /-- "base64url" -/
-  | base64url
+structure RandomUUIDv5Encoding where
+  /-- A value from its string, unchecked: the generated values (`.hex`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RandomUUIDv5Encoding := ⟨fun
-  | .hex => .string "hex"
-  | .base64 => .string "base64"
-  | .base64url => .string "base64url"⟩
+/-- "hex" -/
+@[match_pattern] abbrev RandomUUIDv5Encoding.hex : RandomUUIDv5Encoding := .unsafeOfString "hex"
+/-- "base64" -/
+@[match_pattern] abbrev RandomUUIDv5Encoding.base64 : RandomUUIDv5Encoding := .unsafeOfString "base64"
+/-- "base64url" -/
+@[match_pattern] abbrev RandomUUIDv5Encoding.base64url : RandomUUIDv5Encoding := .unsafeOfString "base64url"
+instance : ToJS RandomUUIDv5Encoding := ⟨fun x => .string x.val⟩
 instance : FromJS RandomUUIDv5Encoding where
   fromJS
-    | .string "hex" => .ok .hex
-    | .string "base64" => .ok .base64
-    | .string "base64url" => .ok .base64url
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RandomUUIDv5Encoding"
 
 /-- `enum RandomUUIDv5WithBufferNamespaceLiteral` (Bun 1.4.4 type declarations): "dns", "url", "oid", "x500". -/
-inductive RandomUUIDv5WithBufferNamespaceLiteral where
-  /-- "dns" -/
-  | dns
-  /-- "url" -/
-  | url
-  /-- "oid" -/
-  | oid
-  /-- "x500" -/
-  | x500
+structure RandomUUIDv5WithBufferNamespaceLiteral where
+  /-- A value from its string, unchecked: the generated values (`.dns`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RandomUUIDv5WithBufferNamespaceLiteral := ⟨fun
-  | .dns => .string "dns"
-  | .url => .string "url"
-  | .oid => .string "oid"
-  | .x500 => .string "x500"⟩
+/-- "dns" -/
+@[match_pattern] abbrev RandomUUIDv5WithBufferNamespaceLiteral.dns : RandomUUIDv5WithBufferNamespaceLiteral := .unsafeOfString "dns"
+/-- "url" -/
+@[match_pattern] abbrev RandomUUIDv5WithBufferNamespaceLiteral.url : RandomUUIDv5WithBufferNamespaceLiteral := .unsafeOfString "url"
+/-- "oid" -/
+@[match_pattern] abbrev RandomUUIDv5WithBufferNamespaceLiteral.oid : RandomUUIDv5WithBufferNamespaceLiteral := .unsafeOfString "oid"
+/-- "x500" -/
+@[match_pattern] abbrev RandomUUIDv5WithBufferNamespaceLiteral.x500 : RandomUUIDv5WithBufferNamespaceLiteral := .unsafeOfString "x500"
+instance : ToJS RandomUUIDv5WithBufferNamespaceLiteral := ⟨fun x => .string x.val⟩
 instance : FromJS RandomUUIDv5WithBufferNamespaceLiteral where
   fromJS
-    | .string "dns" => .ok .dns
-    | .string "url" => .ok .url
-    | .string "oid" => .ok .oid
-    | .string "x500" => .ok .x500
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RandomUUIDv5WithBufferNamespaceLiteral"
 
 /-- `enum RandomUUIDv5WithBufferEncoding` (Bun 1.4.4 type declarations): "buffer". -/
-inductive RandomUUIDv5WithBufferEncoding where
-  /-- "buffer" -/
-  | buffer
+structure RandomUUIDv5WithBufferEncoding where
+  /-- A value from its string, unchecked: the generated values (`.buffer`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS RandomUUIDv5WithBufferEncoding := ⟨fun
-  | .buffer => .string "buffer"⟩
+/-- "buffer" -/
+@[match_pattern] abbrev RandomUUIDv5WithBufferEncoding.buffer : RandomUUIDv5WithBufferEncoding := .unsafeOfString "buffer"
+instance : ToJS RandomUUIDv5WithBufferEncoding := ⟨fun x => .string x.val⟩
 instance : FromJS RandomUUIDv5WithBufferEncoding where
   fromJS
-    | .string "buffer" => .ok .buffer
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.RandomUUIDv5WithBufferEncoding"
 
 /-- `enum MarkdownCellMetaAlign` (Bun 1.4.4 type declarations): "left", "center", "right". -/
-inductive MarkdownCellMetaAlign where
-  /-- "left" -/
-  | left
-  /-- "center" -/
-  | center
-  /-- "right" -/
-  | right
+structure MarkdownCellMetaAlign where
+  /-- A value from its string, unchecked: the generated values (`.left`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS MarkdownCellMetaAlign := ⟨fun
-  | .left => .string "left"
-  | .center => .string "center"
-  | .right => .string "right"⟩
+/-- "left" -/
+@[match_pattern] abbrev MarkdownCellMetaAlign.left : MarkdownCellMetaAlign := .unsafeOfString "left"
+/-- "center" -/
+@[match_pattern] abbrev MarkdownCellMetaAlign.center : MarkdownCellMetaAlign := .unsafeOfString "center"
+/-- "right" -/
+@[match_pattern] abbrev MarkdownCellMetaAlign.right : MarkdownCellMetaAlign := .unsafeOfString "right"
+instance : ToJS MarkdownCellMetaAlign := ⟨fun x => .string x.val⟩
 instance : FromJS MarkdownCellMetaAlign where
   fromJS
-    | .string "left" => .ok .left
-    | .string "center" => .ok .center
-    | .string "right" => .ok .right
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.MarkdownCellMetaAlign"
 
 /-- `enum PeekStatusResult` (Bun 1.4.4 type declarations): "pending", "fulfilled", "rejected". -/
-inductive PeekStatusResult where
-  /-- "pending" -/
-  | pending
-  /-- "fulfilled" -/
-  | fulfilled
-  /-- "rejected" -/
-  | rejected
+structure PeekStatusResult where
+  /-- A value from its string, unchecked: the generated values (`.pending`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS PeekStatusResult := ⟨fun
-  | .pending => .string "pending"
-  | .fulfilled => .string "fulfilled"
-  | .rejected => .string "rejected"⟩
+/-- "pending" -/
+@[match_pattern] abbrev PeekStatusResult.pending : PeekStatusResult := .unsafeOfString "pending"
+/-- "fulfilled" -/
+@[match_pattern] abbrev PeekStatusResult.fulfilled : PeekStatusResult := .unsafeOfString "fulfilled"
+/-- "rejected" -/
+@[match_pattern] abbrev PeekStatusResult.rejected : PeekStatusResult := .unsafeOfString "rejected"
+instance : ToJS PeekStatusResult := ⟨fun x => .string x.val⟩
 instance : FromJS PeekStatusResult where
   fromJS
-    | .string "pending" => .ok .pending
-    | .string "fulfilled" => .ok .fulfilled
-    | .string "rejected" => .ok .rejected
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.PeekStatusResult"
 
 /-- `enum DnsLookupOptionsFamilyLiteral` (Bun 1.4.4 type declarations): "IPv4", "IPv6", "any". -/
-inductive DnsLookupOptionsFamilyLiteral where
-  /-- "IPv4" -/
-  | iPv4
-  /-- "IPv6" -/
-  | iPv6
-  /-- "any" -/
-  | any
+structure DnsLookupOptionsFamilyLiteral where
+  /-- A value from its string, unchecked: the generated values (`.iPv4`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS DnsLookupOptionsFamilyLiteral := ⟨fun
-  | .iPv4 => .string "IPv4"
-  | .iPv6 => .string "IPv6"
-  | .any => .string "any"⟩
+/-- "IPv4" -/
+@[match_pattern] abbrev DnsLookupOptionsFamilyLiteral.iPv4 : DnsLookupOptionsFamilyLiteral := .unsafeOfString "IPv4"
+/-- "IPv6" -/
+@[match_pattern] abbrev DnsLookupOptionsFamilyLiteral.iPv6 : DnsLookupOptionsFamilyLiteral := .unsafeOfString "IPv6"
+/-- "any" -/
+@[match_pattern] abbrev DnsLookupOptionsFamilyLiteral.any : DnsLookupOptionsFamilyLiteral := .unsafeOfString "any"
+instance : ToJS DnsLookupOptionsFamilyLiteral := ⟨fun x => .string x.val⟩
 instance : FromJS DnsLookupOptionsFamilyLiteral where
   fromJS
-    | .string "IPv4" => .ok .iPv4
-    | .string "IPv6" => .ok .iPv6
-    | .string "any" => .ok .any
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.DnsLookupOptionsFamilyLiteral"
 
 /-- `enum DnsLookupOptionsSocketType` (Bun 1.4.4 type declarations): "udp", "tcp". -/
-inductive DnsLookupOptionsSocketType where
-  /-- "udp" -/
-  | udp
-  /-- "tcp" -/
-  | tcp
+structure DnsLookupOptionsSocketType where
+  /-- A value from its string, unchecked: the generated values (`.udp`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS DnsLookupOptionsSocketType := ⟨fun
-  | .udp => .string "udp"
-  | .tcp => .string "tcp"⟩
+/-- "udp" -/
+@[match_pattern] abbrev DnsLookupOptionsSocketType.udp : DnsLookupOptionsSocketType := .unsafeOfString "udp"
+/-- "tcp" -/
+@[match_pattern] abbrev DnsLookupOptionsSocketType.tcp : DnsLookupOptionsSocketType := .unsafeOfString "tcp"
+instance : ToJS DnsLookupOptionsSocketType := ⟨fun x => .string x.val⟩
 instance : FromJS DnsLookupOptionsSocketType where
   fromJS
-    | .string "udp" => .ok .udp
-    | .string "tcp" => .ok .tcp
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.DnsLookupOptionsSocketType"
 
 /-- `enum DnsLookupOptionsBackend` (Bun 1.4.4 type declarations): "libc", "c-ares", "system", "getaddrinfo". -/
-inductive DnsLookupOptionsBackend where
-  /-- "libc" -/
-  | libc
-  /-- "c-ares" -/
-  | cAres
-  /-- "system" -/
-  | system
-  /-- "getaddrinfo" -/
-  | getaddrinfo
+structure DnsLookupOptionsBackend where
+  /-- A value from its string, unchecked: the generated values (`.libc`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS DnsLookupOptionsBackend := ⟨fun
-  | .libc => .string "libc"
-  | .cAres => .string "c-ares"
-  | .system => .string "system"
-  | .getaddrinfo => .string "getaddrinfo"⟩
+/-- "libc" -/
+@[match_pattern] abbrev DnsLookupOptionsBackend.libc : DnsLookupOptionsBackend := .unsafeOfString "libc"
+/-- "c-ares" -/
+@[match_pattern] abbrev DnsLookupOptionsBackend.cAres : DnsLookupOptionsBackend := .unsafeOfString "c-ares"
+/-- "system" -/
+@[match_pattern] abbrev DnsLookupOptionsBackend.system : DnsLookupOptionsBackend := .unsafeOfString "system"
+/-- "getaddrinfo" -/
+@[match_pattern] abbrev DnsLookupOptionsBackend.getaddrinfo : DnsLookupOptionsBackend := .unsafeOfString "getaddrinfo"
+instance : ToJS DnsLookupOptionsBackend := ⟨fun x => .string x.val⟩
 instance : FromJS DnsLookupOptionsBackend where
   fromJS
-    | .string "libc" => .ok .libc
-    | .string "c-ares" => .ok .cAres
-    | .string "system" => .ok .system
-    | .string "getaddrinfo" => .ok .getaddrinfo
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.DnsLookupOptionsBackend"
 
 /-- `enum CSRFGenerateOptionsEncoding` (Bun 1.4.4 type declarations): "base64", "base64url", "hex". -/
-inductive CSRFGenerateOptionsEncoding where
-  /-- "base64" -/
-  | base64
-  /-- "base64url" -/
-  | base64url
-  /-- "hex" -/
-  | hex
+structure CSRFGenerateOptionsEncoding where
+  /-- A value from its string, unchecked: the generated values (`.base64`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS CSRFGenerateOptionsEncoding := ⟨fun
-  | .base64 => .string "base64"
-  | .base64url => .string "base64url"
-  | .hex => .string "hex"⟩
+/-- "base64" -/
+@[match_pattern] abbrev CSRFGenerateOptionsEncoding.base64 : CSRFGenerateOptionsEncoding := .unsafeOfString "base64"
+/-- "base64url" -/
+@[match_pattern] abbrev CSRFGenerateOptionsEncoding.base64url : CSRFGenerateOptionsEncoding := .unsafeOfString "base64url"
+/-- "hex" -/
+@[match_pattern] abbrev CSRFGenerateOptionsEncoding.hex : CSRFGenerateOptionsEncoding := .unsafeOfString "hex"
+instance : ToJS CSRFGenerateOptionsEncoding := ⟨fun x => .string x.val⟩
 instance : FromJS CSRFGenerateOptionsEncoding where
   fromJS
-    | .string "base64" => .ok .base64
-    | .string "base64url" => .ok .base64url
-    | .string "hex" => .ok .hex
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.CSRFGenerateOptionsEncoding"
 
 /-- `enum CSRFAlgorithm` (Bun 1.4.4 type declarations): "blake2b256", "blake2b512", "sha256", "sha384", "sha512", "sha512-256". -/
-inductive CSRFAlgorithm where
-  /-- "blake2b256" -/
-  | blake2b256
-  /-- "blake2b512" -/
-  | blake2b512
-  /-- "sha256" -/
-  | sha256
-  /-- "sha384" -/
-  | sha384
-  /-- "sha512" -/
-  | sha512
-  /-- "sha512-256" -/
-  | sha512256
+structure CSRFAlgorithm where
+  /-- A value from its string, unchecked: the generated values (`.blake2b256`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS CSRFAlgorithm := ⟨fun
-  | .blake2b256 => .string "blake2b256"
-  | .blake2b512 => .string "blake2b512"
-  | .sha256 => .string "sha256"
-  | .sha384 => .string "sha384"
-  | .sha512 => .string "sha512"
-  | .sha512256 => .string "sha512-256"⟩
+/-- "blake2b256" -/
+@[match_pattern] abbrev CSRFAlgorithm.blake2b256 : CSRFAlgorithm := .unsafeOfString "blake2b256"
+/-- "blake2b512" -/
+@[match_pattern] abbrev CSRFAlgorithm.blake2b512 : CSRFAlgorithm := .unsafeOfString "blake2b512"
+/-- "sha256" -/
+@[match_pattern] abbrev CSRFAlgorithm.sha256 : CSRFAlgorithm := .unsafeOfString "sha256"
+/-- "sha384" -/
+@[match_pattern] abbrev CSRFAlgorithm.sha384 : CSRFAlgorithm := .unsafeOfString "sha384"
+/-- "sha512" -/
+@[match_pattern] abbrev CSRFAlgorithm.sha512 : CSRFAlgorithm := .unsafeOfString "sha512"
+/-- "sha512-256" -/
+@[match_pattern] abbrev CSRFAlgorithm.sha512256 : CSRFAlgorithm := .unsafeOfString "sha512-256"
+instance : ToJS CSRFAlgorithm := ⟨fun x => .string x.val⟩
 instance : FromJS CSRFAlgorithm where
   fromJS
-    | .string "blake2b256" => .ok .blake2b256
-    | .string "blake2b512" => .ok .blake2b512
-    | .string "sha256" => .ok .sha256
-    | .string "sha384" => .ok .sha384
-    | .string "sha512" => .ok .sha512
-    | .string "sha512-256" => .ok .sha512256
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.CSRFAlgorithm"
 
 /-- `enum CSRFVerifyOptionsEncoding` (Bun 1.4.4 type declarations): "base64", "base64url", "hex". -/
-inductive CSRFVerifyOptionsEncoding where
-  /-- "base64" -/
-  | base64
-  /-- "base64url" -/
-  | base64url
-  /-- "hex" -/
-  | hex
+structure CSRFVerifyOptionsEncoding where
+  /-- A value from its string, unchecked: the generated values (`.base64`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS CSRFVerifyOptionsEncoding := ⟨fun
-  | .base64 => .string "base64"
-  | .base64url => .string "base64url"
-  | .hex => .string "hex"⟩
+/-- "base64" -/
+@[match_pattern] abbrev CSRFVerifyOptionsEncoding.base64 : CSRFVerifyOptionsEncoding := .unsafeOfString "base64"
+/-- "base64url" -/
+@[match_pattern] abbrev CSRFVerifyOptionsEncoding.base64url : CSRFVerifyOptionsEncoding := .unsafeOfString "base64url"
+/-- "hex" -/
+@[match_pattern] abbrev CSRFVerifyOptionsEncoding.hex : CSRFVerifyOptionsEncoding := .unsafeOfString "hex"
+instance : ToJS CSRFVerifyOptionsEncoding := ⟨fun x => .string x.val⟩
 instance : FromJS CSRFVerifyOptionsEncoding where
   fromJS
-    | .string "base64" => .ok .base64
-    | .string "base64url" => .ok .base64url
-    | .string "hex" => .ok .hex
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Bun.CSRFVerifyOptionsEncoding"
 
 /-- `typedef DOMString or Uint8Array or ArrayBuffer DOMStringOrUint8ArrayOrArrayBuffer`: one constructor per member type. -/
@@ -1983,20 +1895,20 @@ def DOMStringOrUint8ArrayOrArrayBuffer.decode (d : Data) : IO DOMStringOrUint8Ar
   match d with
   | .string _ => do return .domString (← Lasm.JS.decodeAs String "DOMStringOrUint8ArrayOrArrayBuffer" d)
   | .bytes _ => do return .uint8Array (← Lasm.JS.decodeAs ByteArray "DOMStringOrUint8ArrayOrArrayBuffer" d)
-  | .ref _ _ => do return .arrayBuffer (← Support.arrayBufferBytes (← Lasm.JS.decodeAs Value "DOMStringOrUint8ArrayOrArrayBuffer" d))
+  | .ref _ _ => do return .arrayBuffer (← Internal.arrayBufferBytes (← Lasm.JS.decodeAs Value "DOMStringOrUint8ArrayOrArrayBuffer" d))
   | _ => throw (IO.userError s!"Lasm.JS.Bun: expected a DOMStringOrUint8ArrayOrArrayBuffer, received JavaScript {d.describe}")
 
 /-- `dictionary FileSinkStartOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure FileSinkStartOptions where
   /-- `double /* integer: Nat */ highWaterMark` -/
   highWaterMark : Option Nat := none
-instance : ToJS FileSinkStartOptions := ⟨fun d => Support.fields #[("highWaterMark", Support.optional d.highWaterMark)]⟩
+instance : ToJS FileSinkStartOptions := ⟨fun d => Internal.fields #[("highWaterMark", Internal.optional d.highWaterMark)]⟩
 
 /-- `dictionary BunFileWriterOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure BunFileWriterOptions where
   /-- `double /* integer: Nat */ highWaterMark` -/
   highWaterMark : Option Nat := none
-instance : ToJS BunFileWriterOptions := ⟨fun d => Support.fields #[("highWaterMark", Support.optional d.highWaterMark)]⟩
+instance : ToJS BunFileWriterOptions := ⟨fun d => Internal.fields #[("highWaterMark", Internal.optional d.highWaterMark)]⟩
 
 /-- `typedef DOMString or Uint8Array or ArrayBuffer or Request or Response or BunFile or ReadableStream DOMStringOrUint8ArrayOrArrayBufferOrRequestOrResponseOrBunFileOrReadableStream`: one constructor per member type. -/
 inductive DOMStringOrUint8ArrayOrArrayBufferOrRequestOrResponseOrBunFileOrReadableStream where
@@ -2032,7 +1944,7 @@ instance : Coe ReadableStream DOMStringOrUint8ArrayOrArrayBufferOrRequestOrRespo
 structure BunFileWriteOptions where
   /-- `double /* integer: Nat */ highWaterMark` -/
   highWaterMark : Option Nat := none
-instance : ToJS BunFileWriteOptions := ⟨fun d => Support.fields #[("highWaterMark", Support.optional d.highWaterMark)]⟩
+instance : ToJS BunFileWriteOptions := ⟨fun d => Internal.fields #[("highWaterMark", Internal.optional d.highWaterMark)]⟩
 
 /-- `typedef DOMString or Blob or Uint8Array BlobPart`: one constructor per member type. -/
 inductive BlobPart where
@@ -2072,8 +1984,8 @@ structure ArchiveOptions where
   compress : Option ArchiveCompression := none
   /-- `double level` -/
   level : Option Float := none
-instance : ToJS ArchiveOptions := ⟨fun d => Support.fields #[("compress", Support.optional d.compress),
-    ("level", Support.optional d.level)]⟩
+instance : ToJS ArchiveOptions := ⟨fun d => Internal.fields #[("compress", Internal.optional d.compress),
+    ("level", Internal.optional d.level)]⟩
 
 /-- `typedef record<DOMString, BlobPart> or Blob or Uint8Array or Archive ArchiveInputOrArchive`: one constructor per member type. -/
 inductive ArchiveInputOrArchive where
@@ -2111,7 +2023,7 @@ instance : Coe (Array String) DOMStringOrSequenceOfDOMString := ⟨.sequence⟩
 structure ArchiveExtractOptions where
   /-- `DOMStringOrSequenceOfDOMString glob` -/
   glob : Option DOMStringOrSequenceOfDOMString := none
-instance : ToJS ArchiveExtractOptions := ⟨fun d => Support.fields #[("glob", Support.optional d.glob)]⟩
+instance : ToJS ArchiveExtractOptions := ⟨fun d => Internal.fields #[("glob", Internal.optional d.glob)]⟩
 
 /-- `typedef DOMString or Uint8Array or ArrayBuffer or Request or Response or BunFile or S3File or Blob or Archive DOMStringOrUint8ArrayOrArrayBufferOrRequestOrResponseOrBunFileOrS3FileOrBlobOrArchive`: one constructor per member type. -/
 inductive DOMStringOrUint8ArrayOrArrayBufferOrRequestOrResponseOrBunFileOrS3FileOrBlobOrArchive where
@@ -2178,13 +2090,13 @@ instance : ToJS SocketHandlerOpen := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SocketHandlerOpen := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerOpen", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SocketHandlerOpen.ofFn (f : Socket → Async Unit) : IO SocketHandlerOpen := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Socket args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SocketHandlerOpen.ofSyncFn (f : Socket → IO Unit) : IO SocketHandlerOpen := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Socket args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -2198,13 +2110,13 @@ instance : ToJS SocketHandlerClose := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SocketHandlerClose := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerClose", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SocketHandlerClose.ofFn (f : Socket → Data → Async Unit) : IO SocketHandlerClose := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg Data args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Socket args 0) (← Internal.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SocketHandlerClose.ofSyncFn (f : Socket → Data → IO Unit) : IO SocketHandlerClose := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg Data args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Socket args 0) (← Internal.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -2218,13 +2130,13 @@ instance : ToJS SocketHandlerError := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SocketHandlerError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerError", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SocketHandlerError.ofFn (f : Socket → Data → Async Unit) : IO SocketHandlerError := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg Data args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Socket args 0) (← Internal.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SocketHandlerError.ofSyncFn (f : Socket → Data → IO Unit) : IO SocketHandlerError := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg Data args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Socket args 0) (← Internal.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -2238,13 +2150,13 @@ instance : ToJS SocketHandlerData := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SocketHandlerData := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerData", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SocketHandlerData.ofFn (f : Socket → ByteArray → Async Unit) : IO SocketHandlerData := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg ByteArray args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Socket args 0) (← Internal.arg ByteArray args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SocketHandlerData.ofSyncFn (f : Socket → ByteArray → IO Unit) : IO SocketHandlerData := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg ByteArray args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Socket args 0) (← Internal.arg ByteArray args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -2258,13 +2170,13 @@ instance : ToJS SocketHandlerDrain := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SocketHandlerDrain := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerDrain", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SocketHandlerDrain.ofFn (f : Socket → Async Unit) : IO SocketHandlerDrain := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Socket args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SocketHandlerDrain.ofSyncFn (f : Socket → IO Unit) : IO SocketHandlerDrain := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Socket args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -2278,13 +2190,13 @@ instance : ToJS SocketHandlerHandshake := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SocketHandlerHandshake := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerHandshake", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SocketHandlerHandshake.ofFn (f : Socket → Bool → (Option Data) → Async Unit) : IO SocketHandlerHandshake := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg Bool args 1) (← Support.arg (Option Data) args 2))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Socket args 0) (← Internal.arg Bool args 1) (← Internal.arg (Option Data) args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SocketHandlerHandshake.ofSyncFn (f : Socket → Bool → (Option Data) → IO Unit) : IO SocketHandlerHandshake := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg Bool args 1) (← Support.arg (Option Data) args 2))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Socket args 0) (← Internal.arg Bool args 1) (← Internal.arg (Option Data) args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
@@ -2298,13 +2210,13 @@ instance : ToJS SocketHandlerEnd := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SocketHandlerEnd := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerEnd", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SocketHandlerEnd.ofFn (f : Socket → Async Unit) : IO SocketHandlerEnd := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Socket args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SocketHandlerEnd.ofSyncFn (f : Socket → IO Unit) : IO SocketHandlerEnd := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Socket args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -2318,13 +2230,13 @@ instance : ToJS SocketHandlerConnectError := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SocketHandlerConnectError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerConnectError", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SocketHandlerConnectError.ofFn (f : Socket → Data → Async Unit) : IO SocketHandlerConnectError := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg Data args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Socket args 0) (← Internal.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SocketHandlerConnectError.ofSyncFn (f : Socket → Data → IO Unit) : IO SocketHandlerConnectError := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0) (← Support.arg Data args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Socket args 0) (← Internal.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -2338,13 +2250,13 @@ instance : ToJS SocketHandlerTimeout := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SocketHandlerTimeout := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerTimeout", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SocketHandlerTimeout.ofFn (f : Socket → Async Unit) : IO SocketHandlerTimeout := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Socket args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Socket args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SocketHandlerTimeout.ofSyncFn (f : Socket → IO Unit) : IO SocketHandlerTimeout := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Socket args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Socket args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -2371,16 +2283,16 @@ structure SocketHandler where
   timeout : Option SocketHandlerTimeout := none
   /-- `SocketHandlerBinaryType binaryType` -/
   binaryType : Option SocketHandlerBinaryType := none
-instance : ToJS SocketHandler := ⟨fun d => Support.fields #[("open", Support.optional d.«open»),
-    ("close", Support.optional d.close),
-    ("error", Support.optional d.error),
-    ("data", Support.optional d.data),
-    ("drain", Support.optional d.drain),
-    ("handshake", Support.optional d.handshake),
-    ("end", Support.optional d.«end»),
-    ("connectError", Support.optional d.connectError),
-    ("timeout", Support.optional d.timeout),
-    ("binaryType", Support.optional d.binaryType)]⟩
+instance : ToJS SocketHandler := ⟨fun d => Internal.fields #[("open", Internal.optional d.«open»),
+    ("close", Internal.optional d.close),
+    ("error", Internal.optional d.error),
+    ("data", Internal.optional d.data),
+    ("drain", Internal.optional d.drain),
+    ("handshake", Internal.optional d.handshake),
+    ("end", Internal.optional d.«end»),
+    ("connectError", Internal.optional d.connectError),
+    ("timeout", Internal.optional d.timeout),
+    ("binaryType", Internal.optional d.binaryType)]⟩
 
 /-- `dictionary SocketOptions` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SocketOptions where
@@ -2390,9 +2302,9 @@ structure SocketOptions where
   data : Option Unit := none
   /-- `boolean allowHalfOpen` -/
   allowHalfOpen : Option Bool := none
-instance : ToJS SocketOptions := ⟨fun d => Support.fields #[("socket", toJS d.socket),
-    ("data", Support.optional d.data),
-    ("allowHalfOpen", Support.optional d.allowHalfOpen)]⟩
+instance : ToJS SocketOptions := ⟨fun d => Internal.fields #[("socket", toJS d.socket),
+    ("data", Internal.optional d.data),
+    ("allowHalfOpen", Internal.optional d.allowHalfOpen)]⟩
 
 /-- `typedef DOMString or Uint8Array DOMStringOrUint8Array`: one constructor per member type. -/
 inductive DOMStringOrUint8Array where
@@ -2421,13 +2333,13 @@ instance : ToJS SocketHandlerUnknownBufferOpen := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SocketHandlerUnknownBufferOpen := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUnknownBufferOpen", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SocketHandlerUnknownBufferOpen.ofFn (f : SocketUnknown → Async Unit) : IO SocketHandlerUnknownBufferOpen := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg SocketUnknown args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SocketHandlerUnknownBufferOpen.ofSyncFn (f : SocketUnknown → IO Unit) : IO SocketHandlerUnknownBufferOpen := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg SocketUnknown args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -2441,13 +2353,13 @@ instance : ToJS SocketHandlerUnknownBufferClose := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SocketHandlerUnknownBufferClose := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUnknownBufferClose", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SocketHandlerUnknownBufferClose.ofFn (f : SocketUnknown → Data → Async Unit) : IO SocketHandlerUnknownBufferClose := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg Data args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg SocketUnknown args 0) (← Internal.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SocketHandlerUnknownBufferClose.ofSyncFn (f : SocketUnknown → Data → IO Unit) : IO SocketHandlerUnknownBufferClose := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg Data args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg SocketUnknown args 0) (← Internal.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -2461,13 +2373,13 @@ instance : ToJS SocketHandlerUnknownBufferError := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SocketHandlerUnknownBufferError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUnknownBufferError", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SocketHandlerUnknownBufferError.ofFn (f : SocketUnknown → Data → Async Unit) : IO SocketHandlerUnknownBufferError := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg Data args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg SocketUnknown args 0) (← Internal.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SocketHandlerUnknownBufferError.ofSyncFn (f : SocketUnknown → Data → IO Unit) : IO SocketHandlerUnknownBufferError := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg Data args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg SocketUnknown args 0) (← Internal.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -2481,13 +2393,13 @@ instance : ToJS SocketHandlerUnknownBufferData := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SocketHandlerUnknownBufferData := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUnknownBufferData", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SocketHandlerUnknownBufferData.ofFn (f : SocketUnknown → ByteArray → Async Unit) : IO SocketHandlerUnknownBufferData := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg ByteArray args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg SocketUnknown args 0) (← Internal.arg ByteArray args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SocketHandlerUnknownBufferData.ofSyncFn (f : SocketUnknown → ByteArray → IO Unit) : IO SocketHandlerUnknownBufferData := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg ByteArray args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg SocketUnknown args 0) (← Internal.arg ByteArray args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -2501,13 +2413,13 @@ instance : ToJS SocketHandlerUnknownBufferDrain := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SocketHandlerUnknownBufferDrain := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUnknownBufferDrain", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SocketHandlerUnknownBufferDrain.ofFn (f : SocketUnknown → Async Unit) : IO SocketHandlerUnknownBufferDrain := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg SocketUnknown args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SocketHandlerUnknownBufferDrain.ofSyncFn (f : SocketUnknown → IO Unit) : IO SocketHandlerUnknownBufferDrain := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg SocketUnknown args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -2521,13 +2433,13 @@ instance : ToJS SocketHandlerUnknownBufferHandshake := ⟨fun x => .ref x.val ""
 instance : FromJS SocketHandlerUnknownBufferHandshake := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUnknownBufferHandshake", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SocketHandlerUnknownBufferHandshake.ofFn (f : SocketUnknown → Bool → (Option Data) → Async Unit) : IO SocketHandlerUnknownBufferHandshake := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg Bool args 1) (← Support.arg (Option Data) args 2))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg SocketUnknown args 0) (← Internal.arg Bool args 1) (← Internal.arg (Option Data) args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SocketHandlerUnknownBufferHandshake.ofSyncFn (f : SocketUnknown → Bool → (Option Data) → IO Unit) : IO SocketHandlerUnknownBufferHandshake := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg Bool args 1) (← Support.arg (Option Data) args 2))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg SocketUnknown args 0) (← Internal.arg Bool args 1) (← Internal.arg (Option Data) args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
@@ -2541,13 +2453,13 @@ instance : ToJS SocketHandlerUnknownBufferEnd := ⟨fun x => .ref x.val ""⟩
 instance : FromJS SocketHandlerUnknownBufferEnd := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUnknownBufferEnd", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SocketHandlerUnknownBufferEnd.ofFn (f : SocketUnknown → Async Unit) : IO SocketHandlerUnknownBufferEnd := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg SocketUnknown args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SocketHandlerUnknownBufferEnd.ofSyncFn (f : SocketUnknown → IO Unit) : IO SocketHandlerUnknownBufferEnd := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg SocketUnknown args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -2561,13 +2473,13 @@ instance : ToJS SocketHandlerUnknownBufferConnectError := ⟨fun x => .ref x.val
 instance : FromJS SocketHandlerUnknownBufferConnectError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUnknownBufferConnectError", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SocketHandlerUnknownBufferConnectError.ofFn (f : SocketUnknown → Data → Async Unit) : IO SocketHandlerUnknownBufferConnectError := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg Data args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg SocketUnknown args 0) (← Internal.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SocketHandlerUnknownBufferConnectError.ofSyncFn (f : SocketUnknown → Data → IO Unit) : IO SocketHandlerUnknownBufferConnectError := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0) (← Support.arg Data args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg SocketUnknown args 0) (← Internal.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -2581,13 +2493,13 @@ instance : ToJS SocketHandlerUnknownBufferTimeout := ⟨fun x => .ref x.val ""�
 instance : FromJS SocketHandlerUnknownBufferTimeout := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SocketHandlerUnknownBufferTimeout", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SocketHandlerUnknownBufferTimeout.ofFn (f : SocketUnknown → Async Unit) : IO SocketHandlerUnknownBufferTimeout := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg SocketUnknown args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SocketHandlerUnknownBufferTimeout.ofSyncFn (f : SocketUnknown → IO Unit) : IO SocketHandlerUnknownBufferTimeout := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SocketUnknown args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg SocketUnknown args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -2614,16 +2526,16 @@ structure SocketHandlerUnknownBuffer where
   timeout : Option SocketHandlerUnknownBufferTimeout := none
   /-- `SocketHandlerUnknownBufferBinaryType binaryType` -/
   binaryType : Option SocketHandlerUnknownBufferBinaryType := none
-instance : ToJS SocketHandlerUnknownBuffer := ⟨fun d => Support.fields #[("open", Support.optional d.«open»),
-    ("close", Support.optional d.close),
-    ("error", Support.optional d.error),
-    ("data", Support.optional d.data),
-    ("drain", Support.optional d.drain),
-    ("handshake", Support.optional d.handshake),
-    ("end", Support.optional d.«end»),
-    ("connectError", Support.optional d.connectError),
-    ("timeout", Support.optional d.timeout),
-    ("binaryType", Support.optional d.binaryType)]⟩
+instance : ToJS SocketHandlerUnknownBuffer := ⟨fun d => Internal.fields #[("open", Internal.optional d.«open»),
+    ("close", Internal.optional d.close),
+    ("error", Internal.optional d.error),
+    ("data", Internal.optional d.data),
+    ("drain", Internal.optional d.drain),
+    ("handshake", Internal.optional d.handshake),
+    ("end", Internal.optional d.«end»),
+    ("connectError", Internal.optional d.connectError),
+    ("timeout", Internal.optional d.timeout),
+    ("binaryType", Internal.optional d.binaryType)]⟩
 
 /-- `dictionary SocketOptionsUnknown` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SocketOptionsUnknown where
@@ -2633,9 +2545,9 @@ structure SocketOptionsUnknown where
   data : Data := .undefined
   /-- `boolean allowHalfOpen` -/
   allowHalfOpen : Option Bool := none
-instance : ToJS SocketOptionsUnknown := ⟨fun d => Support.fields #[("socket", toJS d.socket),
+instance : ToJS SocketOptionsUnknown := ⟨fun d => Internal.fields #[("socket", toJS d.socket),
     ("data", d.data),
-    ("allowHalfOpen", Support.optional d.allowHalfOpen)]⟩
+    ("allowHalfOpen", Internal.optional d.allowHalfOpen)]⟩
 
 /-- `typedef DOMString or boolean DOMStringOrBoolean`: one constructor per member type. -/
 inductive DOMStringOrBoolean where
@@ -2720,22 +2632,22 @@ structure TLSOptions where
   clientRenegotiationLimit : Option Float := none
   /-- `double clientRenegotiationWindow` -/
   clientRenegotiationWindow : Option Float := none
-instance : ToJS TLSOptions := ⟨fun d => Support.fields #[("passphrase", Support.optional d.passphrase),
-    ("dhParamsFile", Support.optional d.dhParamsFile),
-    ("serverName", Support.optional d.serverName),
-    ("servername", Support.optional d.servername),
-    ("lowMemoryMode", Support.optional d.lowMemoryMode),
-    ("rejectUnauthorized", Support.optional d.rejectUnauthorized),
-    ("requestCert", Support.optional d.requestCert),
-    ("ca", Support.optional d.ca),
-    ("crl", Support.optional d.crl),
-    ("cert", Support.optional d.cert),
-    ("key", Support.optional d.key),
-    ("secureOptions", Support.optional d.secureOptions),
-    ("ALPNProtocols", Support.optional d.ALPNProtocols),
-    ("ciphers", Support.optional d.ciphers),
-    ("clientRenegotiationLimit", Support.optional d.clientRenegotiationLimit),
-    ("clientRenegotiationWindow", Support.optional d.clientRenegotiationWindow)]⟩
+instance : ToJS TLSOptions := ⟨fun d => Internal.fields #[("passphrase", Internal.optional d.passphrase),
+    ("dhParamsFile", Internal.optional d.dhParamsFile),
+    ("serverName", Internal.optional d.serverName),
+    ("servername", Internal.optional d.servername),
+    ("lowMemoryMode", Internal.optional d.lowMemoryMode),
+    ("rejectUnauthorized", Internal.optional d.rejectUnauthorized),
+    ("requestCert", Internal.optional d.requestCert),
+    ("ca", Internal.optional d.ca),
+    ("crl", Internal.optional d.crl),
+    ("cert", Internal.optional d.cert),
+    ("key", Internal.optional d.key),
+    ("secureOptions", Internal.optional d.secureOptions),
+    ("ALPNProtocols", Internal.optional d.ALPNProtocols),
+    ("ciphers", Internal.optional d.ciphers),
+    ("clientRenegotiationLimit", Internal.optional d.clientRenegotiationLimit),
+    ("clientRenegotiationWindow", Internal.optional d.clientRenegotiationWindow)]⟩
 
 /-- `typedef TLSOptions or boolean TLSOptionsOrBoolean`: one constructor per member type. -/
 inductive TLSOptionsOrBoolean where
@@ -2757,7 +2669,7 @@ structure TLSUpgradeOptionsUnknown where
   tls : TLSOptionsOrBoolean
   /-- `required SocketHandlerUnknownBuffer socket` -/
   socket : SocketHandlerUnknownBuffer
-instance : ToJS TLSUpgradeOptionsUnknown := ⟨fun d => Support.fields #[("data", d.data),
+instance : ToJS TLSUpgradeOptionsUnknown := ⟨fun d => Internal.fields #[("data", d.data),
     ("tls", toJS d.tls),
     ("socket", toJS d.socket)]⟩
 
@@ -2827,13 +2739,13 @@ instance : ToJS UdpSocketHandlerData := ⟨fun x => .ref x.val ""⟩
 instance : FromJS UdpSocketHandlerData := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.UdpSocketHandlerData", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def UdpSocketHandlerData.ofFn (f : UdpSocket → ByteArray → Nat → String → UdpReceiveFlags → Async Unit) : IO UdpSocketHandlerData := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg UdpSocket args 0) (← Support.arg ByteArray args 1) (← Support.arg Nat args 2) (← Support.arg String args 3) (← Support.arg UdpReceiveFlags args 4))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg UdpSocket args 0) (← Internal.arg ByteArray args 1) (← Internal.arg Nat args 2) (← Internal.arg String args 3) (← Internal.arg UdpReceiveFlags args 4))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 5)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def UdpSocketHandlerData.ofSyncFn (f : UdpSocket → ByteArray → Nat → String → UdpReceiveFlags → IO Unit) : IO UdpSocketHandlerData := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg UdpSocket args 0) (← Support.arg ByteArray args 1) (← Support.arg Nat args 2) (← Support.arg String args 3) (← Support.arg UdpReceiveFlags args 4))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg UdpSocket args 0) (← Internal.arg ByteArray args 1) (← Internal.arg Nat args 2) (← Internal.arg String args 3) (← Internal.arg UdpReceiveFlags args 4))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 5)]] Value
   return { val := fn }
@@ -2847,13 +2759,13 @@ instance : ToJS UdpSocketHandlerDrain := ⟨fun x => .ref x.val ""⟩
 instance : FromJS UdpSocketHandlerDrain := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.UdpSocketHandlerDrain", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def UdpSocketHandlerDrain.ofFn (f : UdpSocket → Async Unit) : IO UdpSocketHandlerDrain := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg UdpSocket args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg UdpSocket args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def UdpSocketHandlerDrain.ofSyncFn (f : UdpSocket → IO Unit) : IO UdpSocketHandlerDrain := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg UdpSocket args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg UdpSocket args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -2867,13 +2779,13 @@ instance : ToJS UdpSocketHandlerError := ⟨fun x => .ref x.val ""⟩
 instance : FromJS UdpSocketHandlerError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.UdpSocketHandlerError", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def UdpSocketHandlerError.ofFn (f : UdpSocket → Data → Async Unit) : IO UdpSocketHandlerError := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg UdpSocket args 0) (← Support.arg Data args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg UdpSocket args 0) (← Internal.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def UdpSocketHandlerError.ofSyncFn (f : UdpSocket → Data → IO Unit) : IO UdpSocketHandlerError := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg UdpSocket args 0) (← Support.arg Data args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg UdpSocket args 0) (← Internal.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -2886,9 +2798,9 @@ structure UdpSocketHandler where
   drain : Option UdpSocketHandlerDrain := none
   /-- `UdpSocketHandlerError error` -/
   error : Option UdpSocketHandlerError := none
-instance : ToJS UdpSocketHandler := ⟨fun d => Support.fields #[("data", Support.optional d.data),
-    ("drain", Support.optional d.drain),
-    ("error", Support.optional d.error)]⟩
+instance : ToJS UdpSocketHandler := ⟨fun d => Internal.fields #[("data", Internal.optional d.data),
+    ("drain", Internal.optional d.drain),
+    ("error", Internal.optional d.error)]⟩
 
 /-- `callback UdpConnectedSocketHandlerData = Promise<undefined> (UdpConnectedSocket socket, Uint8Array data, double /* integer: Nat */ port, DOMString address, UdpReceiveFlags flags)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure UdpConnectedSocketHandlerData where
@@ -2899,13 +2811,13 @@ instance : ToJS UdpConnectedSocketHandlerData := ⟨fun x => .ref x.val ""⟩
 instance : FromJS UdpConnectedSocketHandlerData := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.UdpConnectedSocketHandlerData", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def UdpConnectedSocketHandlerData.ofFn (f : UdpConnectedSocket → ByteArray → Nat → String → UdpReceiveFlags → Async Unit) : IO UdpConnectedSocketHandlerData := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg UdpConnectedSocket args 0) (← Support.arg ByteArray args 1) (← Support.arg Nat args 2) (← Support.arg String args 3) (← Support.arg UdpReceiveFlags args 4))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg UdpConnectedSocket args 0) (← Internal.arg ByteArray args 1) (← Internal.arg Nat args 2) (← Internal.arg String args 3) (← Internal.arg UdpReceiveFlags args 4))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 5)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def UdpConnectedSocketHandlerData.ofSyncFn (f : UdpConnectedSocket → ByteArray → Nat → String → UdpReceiveFlags → IO Unit) : IO UdpConnectedSocketHandlerData := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg UdpConnectedSocket args 0) (← Support.arg ByteArray args 1) (← Support.arg Nat args 2) (← Support.arg String args 3) (← Support.arg UdpReceiveFlags args 4))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg UdpConnectedSocket args 0) (← Internal.arg ByteArray args 1) (← Internal.arg Nat args 2) (← Internal.arg String args 3) (← Internal.arg UdpReceiveFlags args 4))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 5)]] Value
   return { val := fn }
@@ -2919,13 +2831,13 @@ instance : ToJS UdpConnectedSocketHandlerDrain := ⟨fun x => .ref x.val ""⟩
 instance : FromJS UdpConnectedSocketHandlerDrain := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.UdpConnectedSocketHandlerDrain", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def UdpConnectedSocketHandlerDrain.ofFn (f : UdpConnectedSocket → Async Unit) : IO UdpConnectedSocketHandlerDrain := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg UdpConnectedSocket args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg UdpConnectedSocket args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def UdpConnectedSocketHandlerDrain.ofSyncFn (f : UdpConnectedSocket → IO Unit) : IO UdpConnectedSocketHandlerDrain := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg UdpConnectedSocket args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg UdpConnectedSocket args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -2939,13 +2851,13 @@ instance : ToJS UdpConnectedSocketHandlerError := ⟨fun x => .ref x.val ""⟩
 instance : FromJS UdpConnectedSocketHandlerError := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.UdpConnectedSocketHandlerError", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def UdpConnectedSocketHandlerError.ofFn (f : UdpConnectedSocket → Data → Async Unit) : IO UdpConnectedSocketHandlerError := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg UdpConnectedSocket args 0) (← Support.arg Data args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg UdpConnectedSocket args 0) (← Internal.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def UdpConnectedSocketHandlerError.ofSyncFn (f : UdpConnectedSocket → Data → IO Unit) : IO UdpConnectedSocketHandlerError := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg UdpConnectedSocket args 0) (← Support.arg Data args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg UdpConnectedSocket args 0) (← Internal.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -2958,9 +2870,9 @@ structure UdpConnectedSocketHandler where
   drain : Option UdpConnectedSocketHandlerDrain := none
   /-- `UdpConnectedSocketHandlerError error` -/
   error : Option UdpConnectedSocketHandlerError := none
-instance : ToJS UdpConnectedSocketHandler := ⟨fun d => Support.fields #[("data", Support.optional d.data),
-    ("drain", Support.optional d.drain),
-    ("error", Support.optional d.error)]⟩
+instance : ToJS UdpConnectedSocketHandler := ⟨fun d => Internal.fields #[("data", Internal.optional d.data),
+    ("drain", Internal.optional d.drain),
+    ("error", Internal.optional d.error)]⟩
 
 /-- `callback TerminalOptionsData = undefined (Terminal terminal, Uint8Array data)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure TerminalOptionsData where
@@ -2971,13 +2883,13 @@ instance : ToJS TerminalOptionsData := ⟨fun x => .ref x.val ""⟩
 instance : FromJS TerminalOptionsData := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.TerminalOptionsData", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def TerminalOptionsData.ofFn (f : Terminal → ByteArray → Async Unit) : IO TerminalOptionsData := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Terminal args 0) (← Support.arg ByteArray args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Terminal args 0) (← Internal.arg ByteArray args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def TerminalOptionsData.ofSyncFn (f : Terminal → ByteArray → IO Unit) : IO TerminalOptionsData := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Terminal args 0) (← Support.arg ByteArray args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Terminal args 0) (← Internal.arg ByteArray args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -2991,13 +2903,13 @@ instance : ToJS TerminalOptionsExit := ⟨fun x => .ref x.val ""⟩
 instance : FromJS TerminalOptionsExit := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.TerminalOptionsExit", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def TerminalOptionsExit.ofFn (f : Terminal → Float → (Option String) → Async Unit) : IO TerminalOptionsExit := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Terminal args 0) (← Support.arg Float args 1) (← Support.arg (Option String) args 2))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Terminal args 0) (← Internal.arg Float args 1) (← Internal.arg (Option String) args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def TerminalOptionsExit.ofSyncFn (f : Terminal → Float → (Option String) → IO Unit) : IO TerminalOptionsExit := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Terminal args 0) (← Support.arg Float args 1) (← Support.arg (Option String) args 2))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Terminal args 0) (← Internal.arg Float args 1) (← Internal.arg (Option String) args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
@@ -3011,13 +2923,13 @@ instance : ToJS TerminalOptionsDrain := ⟨fun x => .ref x.val ""⟩
 instance : FromJS TerminalOptionsDrain := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.TerminalOptionsDrain", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def TerminalOptionsDrain.ofFn (f : Terminal → Async Unit) : IO TerminalOptionsDrain := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Terminal args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Terminal args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def TerminalOptionsDrain.ofSyncFn (f : Terminal → IO Unit) : IO TerminalOptionsDrain := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Terminal args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Terminal args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -3036,12 +2948,12 @@ structure TerminalOptions where
   exit : Option TerminalOptionsExit := none
   /-- `TerminalOptionsDrain drain` -/
   drain : Option TerminalOptionsDrain := none
-instance : ToJS TerminalOptions := ⟨fun d => Support.fields #[("cols", Support.optional d.cols),
-    ("rows", Support.optional d.rows),
-    ("name", Support.optional d.name),
-    ("data", Support.optional d.data),
-    ("exit", Support.optional d.exit),
-    ("drain", Support.optional d.drain)]⟩
+instance : ToJS TerminalOptions := ⟨fun d => Internal.fields #[("cols", Internal.optional d.cols),
+    ("rows", Internal.optional d.rows),
+    ("name", Internal.optional d.name),
+    ("data", Internal.optional d.data),
+    ("exit", Internal.optional d.exit),
+    ("drain", Internal.optional d.drain)]⟩
 
 /-- `dictionary ResourceUsageContextSwitches` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ResourceUsageContextSwitches where
@@ -3158,9 +3070,9 @@ structure ArrayBufferSinkStartOptions where
   highWaterMark : Option Nat := none
   /-- `boolean stream` -/
   stream : Option Bool := none
-instance : ToJS ArrayBufferSinkStartOptions := ⟨fun d => Support.fields #[("asUint8Array", Support.optional d.asUint8Array),
-    ("highWaterMark", Support.optional d.highWaterMark),
-    ("stream", Support.optional d.stream)]⟩
+instance : ToJS ArrayBufferSinkStartOptions := ⟨fun d => Internal.fields #[("asUint8Array", Internal.optional d.asUint8Array),
+    ("highWaterMark", Internal.optional d.highWaterMark),
+    ("stream", Internal.optional d.stream)]⟩
 
 /-- `typedef double or Uint8Array or ArrayBuffer DoubleOrUint8ArrayOrArrayBuffer`: one constructor per member type. -/
 inductive DoubleOrUint8ArrayOrArrayBuffer where
@@ -3175,7 +3087,7 @@ def DoubleOrUint8ArrayOrArrayBuffer.decode (d : Data) : IO DoubleOrUint8ArrayOrA
   match d with
   | .number _ => do return .double (← Lasm.JS.decodeAs Float "DoubleOrUint8ArrayOrArrayBuffer" d)
   | .bytes _ => do return .uint8Array (← Lasm.JS.decodeAs ByteArray "DoubleOrUint8ArrayOrArrayBuffer" d)
-  | .ref _ _ => do return .arrayBuffer (← Support.arrayBufferBytes (← Lasm.JS.decodeAs Value "DoubleOrUint8ArrayOrArrayBuffer" d))
+  | .ref _ _ => do return .arrayBuffer (← Internal.arrayBufferBytes (← Lasm.JS.decodeAs Value "DoubleOrUint8ArrayOrArrayBuffer" d))
   | _ => throw (IO.userError s!"Lasm.JS.Bun: expected a DoubleOrUint8ArrayOrArrayBuffer, received JavaScript {d.describe}")
 
 /-- `typedef ArrayBuffer or Uint8Array ArrayBufferOrUint8Array`: one constructor per member type. -/
@@ -3187,7 +3099,7 @@ inductive ArrayBufferOrUint8Array where
 /-- Reads a `ArrayBufferOrUint8Array` (one member is an ArrayBuffer, copied with one more host call). -/
 def ArrayBufferOrUint8Array.decode (d : Data) : IO ArrayBufferOrUint8Array :=
   match d with
-  | .ref _ _ => do return .arrayBuffer (← Support.arrayBufferBytes (← Lasm.JS.decodeAs Value "ArrayBufferOrUint8Array" d))
+  | .ref _ _ => do return .arrayBuffer (← Internal.arrayBufferBytes (← Lasm.JS.decodeAs Value "ArrayBufferOrUint8Array" d))
   | .bytes _ => do return .uint8Array (← Lasm.JS.decodeAs ByteArray "ArrayBufferOrUint8Array" d)
   | _ => throw (IO.userError s!"Lasm.JS.Bun: expected a ArrayBufferOrUint8Array, received JavaScript {d.describe}")
 
@@ -3211,14 +3123,14 @@ structure TSConfigCompilerOptions where
   importsNotUsedAsValues : Option TSConfigCompilerOptionsImportsNotUsedAsValues := none
   /-- `any moduleSuffixes` -/
   moduleSuffixes : Data := .undefined
-instance : ToJS TSConfigCompilerOptions := ⟨fun d => Support.fields #[("paths", Support.optional d.paths),
-    ("baseUrl", Support.optional d.baseUrl),
-    ("jsx", Support.optional d.jsx),
-    ("jsxFactory", Support.optional d.jsxFactory),
-    ("jsxFragmentFactory", Support.optional d.jsxFragmentFactory),
-    ("jsxImportSource", Support.optional d.jsxImportSource),
-    ("useDefineForClassFields", Support.optional d.useDefineForClassFields),
-    ("importsNotUsedAsValues", Support.optional d.importsNotUsedAsValues),
+instance : ToJS TSConfigCompilerOptions := ⟨fun d => Internal.fields #[("paths", Internal.optional d.paths),
+    ("baseUrl", Internal.optional d.baseUrl),
+    ("jsx", Internal.optional d.jsx),
+    ("jsxFactory", Internal.optional d.jsxFactory),
+    ("jsxFragmentFactory", Internal.optional d.jsxFragmentFactory),
+    ("jsxImportSource", Internal.optional d.jsxImportSource),
+    ("useDefineForClassFields", Internal.optional d.useDefineForClassFields),
+    ("importsNotUsedAsValues", Internal.optional d.importsNotUsedAsValues),
     ("moduleSuffixes", d.moduleSuffixes)]⟩
 
 /-- `dictionary TSConfig` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -3227,8 +3139,8 @@ structure TSConfig where
   «extends» : Option String := none
   /-- `TSConfigCompilerOptions compilerOptions` -/
   compilerOptions : Option TSConfigCompilerOptions := none
-instance : ToJS TSConfig := ⟨fun d => Support.fields #[("extends", Support.optional d.«extends»),
-    ("compilerOptions", Support.optional d.compilerOptions)]⟩
+instance : ToJS TSConfig := ⟨fun d => Internal.fields #[("extends", Internal.optional d.«extends»),
+    ("compilerOptions", Internal.optional d.compilerOptions)]⟩
 
 /-- `typedef DOMString or TSConfig DOMStringOrTSConfig`: one constructor per member type. -/
 inductive DOMStringOrTSConfig where
@@ -3248,8 +3160,8 @@ structure TranspilerOptionsExports where
   eliminate : Option (Array String) := none
   /-- `record<DOMString, DOMString> replace` -/
   replace : Option (Record String) := none
-instance : ToJS TranspilerOptionsExports := ⟨fun d => Support.fields #[("eliminate", Support.optional d.eliminate),
-    ("replace", Support.optional d.replace)]⟩
+instance : ToJS TranspilerOptionsExports := ⟨fun d => Internal.fields #[("eliminate", Internal.optional d.eliminate),
+    ("replace", Internal.optional d.replace)]⟩
 
 /-- `dictionary TranspilerOptions` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TranspilerOptions where
@@ -3283,21 +3195,21 @@ structure TranspilerOptions where
   logLevel : Option TranspilerOptionsLogLevel := none
   /-- `boolean replMode` -/
   replMode : Option Bool := none
-instance : ToJS TranspilerOptions := ⟨fun d => Support.fields #[("define", Support.optional d.define),
-    ("loader", Support.optional d.loader),
-    ("target", Support.optional d.target),
-    ("tsconfig", Support.optional d.tsconfig),
-    ("autoImportJSX", Support.optional d.autoImportJSX),
-    ("allowBunRuntime", Support.optional d.allowBunRuntime),
-    ("exports", Support.optional d.exports),
-    ("treeShaking", Support.optional d.treeShaking),
-    ("trimUnusedImports", Support.optional d.trimUnusedImports),
-    ("jsxOptimizationInline", Support.optional d.jsxOptimizationInline),
-    ("minifyWhitespace", Support.optional d.minifyWhitespace),
-    ("deadCodeElimination", Support.optional d.deadCodeElimination),
-    ("inline", Support.optional d.inline),
-    ("logLevel", Support.optional d.logLevel),
-    ("replMode", Support.optional d.replMode)]⟩
+instance : ToJS TranspilerOptions := ⟨fun d => Internal.fields #[("define", Internal.optional d.define),
+    ("loader", Internal.optional d.loader),
+    ("target", Internal.optional d.target),
+    ("tsconfig", Internal.optional d.tsconfig),
+    ("autoImportJSX", Internal.optional d.autoImportJSX),
+    ("allowBunRuntime", Internal.optional d.allowBunRuntime),
+    ("exports", Internal.optional d.exports),
+    ("treeShaking", Internal.optional d.treeShaking),
+    ("trimUnusedImports", Internal.optional d.trimUnusedImports),
+    ("jsxOptimizationInline", Internal.optional d.jsxOptimizationInline),
+    ("minifyWhitespace", Internal.optional d.minifyWhitespace),
+    ("deadCodeElimination", Internal.optional d.deadCodeElimination),
+    ("inline", Internal.optional d.inline),
+    ("logLevel", Internal.optional d.logLevel),
+    ("replMode", Internal.optional d.replMode)]⟩
 
 /-- `typedef DOMString or Uint8Array StringOrBuffer`: one constructor per member type. -/
 inductive StringOrBuffer where
@@ -3343,9 +3255,9 @@ structure PasswordArgon2Algorithm where
   memoryCost : Option Float := none
   /-- `double timeCost` -/
   timeCost : Option Float := none
-instance : ToJS PasswordArgon2Algorithm := ⟨fun d => Support.fields #[("algorithm", toJS d.algorithm),
-    ("memoryCost", Support.optional d.memoryCost),
-    ("timeCost", Support.optional d.timeCost)]⟩
+instance : ToJS PasswordArgon2Algorithm := ⟨fun d => Internal.fields #[("algorithm", toJS d.algorithm),
+    ("memoryCost", Internal.optional d.memoryCost),
+    ("timeCost", Internal.optional d.timeCost)]⟩
 
 /-- `dictionary PasswordBCryptAlgorithm` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PasswordBCryptAlgorithm where
@@ -3353,8 +3265,8 @@ structure PasswordBCryptAlgorithm where
   algorithm : PasswordBCryptAlgorithmAlgorithm
   /-- `double /* integer: Nat */ cost` -/
   cost : Option Nat := none
-instance : ToJS PasswordBCryptAlgorithm := ⟨fun d => Support.fields #[("algorithm", toJS d.algorithm),
-    ("cost", Support.optional d.cost)]⟩
+instance : ToJS PasswordBCryptAlgorithm := ⟨fun d => Internal.fields #[("algorithm", toJS d.algorithm),
+    ("cost", Internal.optional d.cost)]⟩
 
 /-- `typedef PasswordAlgorithmLabel or PasswordArgon2Algorithm or PasswordBCryptAlgorithm PasswordAlgorithmLabelOrPasswordArgon2AlgorithmOrPasswordBCryptAlgorithm`: one constructor per member type. -/
 inductive PasswordAlgorithmLabelOrPasswordArgon2AlgorithmOrPasswordBCryptAlgorithm where
@@ -3378,7 +3290,7 @@ structure SecretsGetOptions where
   service : String
   /-- `required DOMString name` -/
   name : String
-instance : ToJS SecretsGetOptions := ⟨fun d => Support.fields #[("service", toJS d.service),
+instance : ToJS SecretsGetOptions := ⟨fun d => Internal.fields #[("service", toJS d.service),
     ("name", toJS d.name)]⟩
 
 /-- `dictionary SecretsSetOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -3393,11 +3305,11 @@ structure SecretsSetOptions where
   allowUnrestrictedAccess : Option Bool := none
   /-- `SecretsSetOptionsPersist persist` -/
   persist : Option SecretsSetOptionsPersist := none
-instance : ToJS SecretsSetOptions := ⟨fun d => Support.fields #[("service", toJS d.service),
+instance : ToJS SecretsSetOptions := ⟨fun d => Internal.fields #[("service", toJS d.service),
     ("name", toJS d.name),
     ("value", toJS d.value),
-    ("allowUnrestrictedAccess", Support.optional d.allowUnrestrictedAccess),
-    ("persist", Support.optional d.persist)]⟩
+    ("allowUnrestrictedAccess", Internal.optional d.allowUnrestrictedAccess),
+    ("persist", Internal.optional d.persist)]⟩
 
 /-- `dictionary SecretsDeleteOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SecretsDeleteOptions where
@@ -3405,7 +3317,7 @@ structure SecretsDeleteOptions where
   service : String
   /-- `required DOMString name` -/
   name : String
-instance : ToJS SecretsDeleteOptions := ⟨fun d => Support.fields #[("service", toJS d.service),
+instance : ToJS SecretsDeleteOptions := ⟨fun d => Internal.fields #[("service", toJS d.service),
     ("name", toJS d.name)]⟩
 
 /-- `typedef DOMString or Uint8Array or Blob BlobOrStringOrBuffer`: one constructor per member type. -/
@@ -3444,9 +3356,9 @@ structure FetchProxyOption where
   headers : Option HeadersInit := none
   /-- `boolean respectNoProxy` -/
   respectNoProxy : Option Bool := none
-instance : ToJS FetchProxyOption := ⟨fun d => Support.fields #[("url", toJS d.url),
-    ("headers", Support.optional d.headers),
-    ("respectNoProxy", Support.optional d.respectNoProxy)]⟩
+instance : ToJS FetchProxyOption := ⟨fun d => Internal.fields #[("url", toJS d.url),
+    ("headers", Internal.optional d.headers),
+    ("respectNoProxy", Internal.optional d.respectNoProxy)]⟩
 
 /-- `typedef DOMString or URL or boolean or FetchProxyOption FetchProxyOptionUnion`: one constructor per member type. -/
 inductive FetchProxyOptionUnion where
@@ -3474,8 +3386,8 @@ structure FetchSessionInitKeepAlive where
   idleTimeout : Option Nat := none
   /-- `double maxIdleSockets` -/
   maxIdleSockets : Option Float := none
-instance : ToJS FetchSessionInitKeepAlive := ⟨fun d => Support.fields #[("idleTimeout", Support.optional d.idleTimeout),
-    ("maxIdleSockets", Support.optional d.maxIdleSockets)]⟩
+instance : ToJS FetchSessionInitKeepAlive := ⟨fun d => Internal.fields #[("idleTimeout", Internal.optional d.idleTimeout),
+    ("maxIdleSockets", Internal.optional d.maxIdleSockets)]⟩
 
 /-- `typedef boolean or FetchSessionInitKeepAlive BooleanOrFetchSessionInitKeepAlive`: one constructor per member type. -/
 inductive BooleanOrFetchSessionInitKeepAlive where
@@ -3499,10 +3411,10 @@ structure FetchSessionInit where
   keepAlive : Option BooleanOrFetchSessionInitKeepAlive := none
   /-- `DOMString unix` -/
   unix : Option String := none
-instance : ToJS FetchSessionInit := ⟨fun d => Support.fields #[("tls", d.tls),
-    ("proxy", Support.optional d.proxy),
-    ("keepAlive", Support.optional d.keepAlive),
-    ("unix", Support.optional d.unix)]⟩
+instance : ToJS FetchSessionInit := ⟨fun d => Internal.fields #[("tls", d.tls),
+    ("proxy", Internal.optional d.proxy),
+    ("keepAlive", Internal.optional d.keepAlive),
+    ("unix", Internal.optional d.unix)]⟩
 
 /-- `callback FetchSessionFetch = Promise<Response> (DOMStringOrURLOrRequest input, optional object init)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure FetchSessionFetch where
@@ -3513,13 +3425,13 @@ instance : ToJS FetchSessionFetch := ⟨fun x => .ref x.val ""⟩
 instance : FromJS FetchSessionFetch := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.FetchSessionFetch", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def FetchSessionFetch.ofFn (f : Data → Data → Async Response) : IO FetchSessionFetch := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Data args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def FetchSessionFetch.ofSyncFn (f : Data → Data → IO Response) : IO FetchSessionFetch := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Data args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -3536,11 +3448,11 @@ structure FileSystemRouterOptions where
   origin : Option String := none
   /-- `sequence<DOMString> fileExtensions` -/
   fileExtensions : Option (Array String) := none
-instance : ToJS FileSystemRouterOptions := ⟨fun d => Support.fields #[("dir", toJS d.dir),
+instance : ToJS FileSystemRouterOptions := ⟨fun d => Internal.fields #[("dir", toJS d.dir),
     ("style", toJS d.style),
-    ("assetPrefix", Support.optional d.assetPrefix),
-    ("origin", Support.optional d.origin),
-    ("fileExtensions", Support.optional d.fileExtensions)]⟩
+    ("assetPrefix", Internal.optional d.assetPrefix),
+    ("origin", Internal.optional d.origin),
+    ("fileExtensions", Internal.optional d.fileExtensions)]⟩
 
 /-- `typedef DOMString or Request or Response DOMStringOrRequestOrResponse`: one constructor per member type. -/
 inductive DOMStringOrRequestOrResponse where
@@ -3599,12 +3511,12 @@ structure GlobScanOptions where
   throwErrorOnBrokenSymlink : Option Bool := none
   /-- `boolean onlyFiles` -/
   onlyFiles : Option Bool := none
-instance : ToJS GlobScanOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
-    ("dot", Support.optional d.dot),
-    ("absolute", Support.optional d.absolute),
-    ("followSymlinks", Support.optional d.followSymlinks),
-    ("throwErrorOnBrokenSymlink", Support.optional d.throwErrorOnBrokenSymlink),
-    ("onlyFiles", Support.optional d.onlyFiles)]⟩
+instance : ToJS GlobScanOptions := ⟨fun d => Internal.fields #[("cwd", Internal.optional d.cwd),
+    ("dot", Internal.optional d.dot),
+    ("absolute", Internal.optional d.absolute),
+    ("followSymlinks", Internal.optional d.followSymlinks),
+    ("throwErrorOnBrokenSymlink", Internal.optional d.throwErrorOnBrokenSymlink),
+    ("onlyFiles", Internal.optional d.onlyFiles)]⟩
 
 /-- `typedef DOMString or GlobScanOptions DOMStringOrGlobScanOptions`: one constructor per member type. -/
 inductive DOMStringOrGlobScanOptions where
@@ -3642,8 +3554,8 @@ structure ImageConstructorOptions where
   maxPixels : Option Float := none
   /-- `boolean autoOrient` -/
   autoOrient : Option Bool := none
-instance : ToJS ImageConstructorOptions := ⟨fun d => Support.fields #[("maxPixels", Support.optional d.maxPixels),
-    ("autoOrient", Support.optional d.autoOrient)]⟩
+instance : ToJS ImageConstructorOptions := ⟨fun d => Internal.fields #[("maxPixels", Internal.optional d.maxPixels),
+    ("autoOrient", Internal.optional d.autoOrient)]⟩
 
 /-- `dictionary ImageResizeOptions` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ImageResizeOptions where
@@ -3653,9 +3565,9 @@ structure ImageResizeOptions where
   fit : Option ImageResizeOptionsFit := none
   /-- `boolean withoutEnlargement` -/
   withoutEnlargement : Option Bool := none
-instance : ToJS ImageResizeOptions := ⟨fun d => Support.fields #[("filter", Support.optional d.filter),
-    ("fit", Support.optional d.fit),
-    ("withoutEnlargement", Support.optional d.withoutEnlargement)]⟩
+instance : ToJS ImageResizeOptions := ⟨fun d => Internal.fields #[("filter", Internal.optional d.filter),
+    ("fit", Internal.optional d.fit),
+    ("withoutEnlargement", Internal.optional d.withoutEnlargement)]⟩
 
 /-- `dictionary ImageModulateOptions` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ImageModulateOptions where
@@ -3663,8 +3575,8 @@ structure ImageModulateOptions where
   brightness : Option Float := none
   /-- `double saturation` -/
   saturation : Option Float := none
-instance : ToJS ImageModulateOptions := ⟨fun d => Support.fields #[("brightness", Support.optional d.brightness),
-    ("saturation", Support.optional d.saturation)]⟩
+instance : ToJS ImageModulateOptions := ⟨fun d => Internal.fields #[("brightness", Internal.optional d.brightness),
+    ("saturation", Internal.optional d.saturation)]⟩
 
 /-- `dictionary ImageJpegOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ImageJpegOptions where
@@ -3672,8 +3584,8 @@ structure ImageJpegOptions where
   quality : Option Float := none
   /-- `boolean progressive` -/
   progressive : Option Bool := none
-instance : ToJS ImageJpegOptions := ⟨fun d => Support.fields #[("quality", Support.optional d.quality),
-    ("progressive", Support.optional d.progressive)]⟩
+instance : ToJS ImageJpegOptions := ⟨fun d => Internal.fields #[("quality", Internal.optional d.quality),
+    ("progressive", Internal.optional d.progressive)]⟩
 
 /-- `dictionary ImagePngOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ImagePngOptions where
@@ -3685,10 +3597,10 @@ structure ImagePngOptions where
   colors : Option Float := none
   /-- `boolean dither` -/
   dither : Option Bool := none
-instance : ToJS ImagePngOptions := ⟨fun d => Support.fields #[("compressionLevel", Support.optional d.compressionLevel),
-    ("palette", Support.optional d.palette),
-    ("colors", Support.optional d.colors),
-    ("dither", Support.optional d.dither)]⟩
+instance : ToJS ImagePngOptions := ⟨fun d => Internal.fields #[("compressionLevel", Internal.optional d.compressionLevel),
+    ("palette", Internal.optional d.palette),
+    ("colors", Internal.optional d.colors),
+    ("dither", Internal.optional d.dither)]⟩
 
 /-- `dictionary ImageWebpOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ImageWebpOptions where
@@ -3696,20 +3608,20 @@ structure ImageWebpOptions where
   quality : Option Float := none
   /-- `boolean lossless` -/
   lossless : Option Bool := none
-instance : ToJS ImageWebpOptions := ⟨fun d => Support.fields #[("quality", Support.optional d.quality),
-    ("lossless", Support.optional d.lossless)]⟩
+instance : ToJS ImageWebpOptions := ⟨fun d => Internal.fields #[("quality", Internal.optional d.quality),
+    ("lossless", Internal.optional d.lossless)]⟩
 
 /-- `dictionary ImageHeicOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ImageHeicOptions where
   /-- `double quality` -/
   quality : Option Float := none
-instance : ToJS ImageHeicOptions := ⟨fun d => Support.fields #[("quality", Support.optional d.quality)]⟩
+instance : ToJS ImageHeicOptions := ⟨fun d => Internal.fields #[("quality", Internal.optional d.quality)]⟩
 
 /-- `dictionary ImageAvifOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ImageAvifOptions where
   /-- `double quality` -/
   quality : Option Float := none
-instance : ToJS ImageAvifOptions := ⟨fun d => Support.fields #[("quality", Support.optional d.quality)]⟩
+instance : ToJS ImageAvifOptions := ⟨fun d => Internal.fields #[("quality", Internal.optional d.quality)]⟩
 
 /-- `typedef BunFile or S3File or DOMString or Uint8Array or URL or double BunFileOrS3FileOrPathLikeOrDouble`: one constructor per member type. -/
 inductive BunFileOrS3FileOrPathLikeOrDouble where
@@ -3776,16 +3688,16 @@ structure CookieInit where
   partitioned : Option Bool := none
   /-- `double maxAge` -/
   maxAge : Option Float := none
-instance : ToJS CookieInit := ⟨fun d => Support.fields #[("name", Support.optional d.name),
-    ("value", Support.optional d.value),
-    ("domain", Support.optional d.domain),
-    ("path", Support.optional d.path),
+instance : ToJS CookieInit := ⟨fun d => Internal.fields #[("name", Internal.optional d.name),
+    ("value", Internal.optional d.value),
+    ("domain", Internal.optional d.domain),
+    ("path", Internal.optional d.path),
     ("expires", d.expires),
-    ("secure", Support.optional d.secure),
-    ("sameSite", Support.optional d.sameSite),
-    ("httpOnly", Support.optional d.httpOnly),
-    ("partitioned", Support.optional d.partitioned),
-    ("maxAge", Support.optional d.maxAge)]⟩
+    ("secure", Internal.optional d.secure),
+    ("sameSite", Internal.optional d.sameSite),
+    ("httpOnly", Internal.optional d.httpOnly),
+    ("partitioned", Internal.optional d.partitioned),
+    ("maxAge", Internal.optional d.maxAge)]⟩
 instance : FromJS CookieInit where
   fromJS d := do return {
     name := ← Lasm.JS.readField (Option String) d "name",
@@ -3824,9 +3736,9 @@ structure CookieStoreDeleteOptions where
   domain : Option String := none
   /-- `DOMString path` -/
   path : Option String := none
-instance : ToJS CookieStoreDeleteOptions := ⟨fun d => Support.fields #[("name", toJS d.name),
-    ("domain", Support.optional d.domain),
-    ("path", Support.optional d.path)]⟩
+instance : ToJS CookieStoreDeleteOptions := ⟨fun d => Internal.fields #[("name", toJS d.name),
+    ("domain", Internal.optional d.domain),
+    ("path", Internal.optional d.path)]⟩
 
 /-- `callback CookieMapForEachCallback = undefined (DOMString value, DOMString key, CookieMap map)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure CookieMapForEachCallback where
@@ -3837,13 +3749,13 @@ instance : ToJS CookieMapForEachCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS CookieMapForEachCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.CookieMapForEachCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def CookieMapForEachCallback.ofFn (f : String → String → CookieMap → Async Unit) : IO CookieMapForEachCallback := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg String args 1) (← Support.arg CookieMap args 2))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg String args 1) (← Internal.arg CookieMap args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def CookieMapForEachCallback.ofSyncFn (f : String → String → CookieMap → IO Unit) : IO CookieMapForEachCallback := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg String args 1) (← Support.arg CookieMap args 2))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg String args 1) (← Internal.arg CookieMap args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
@@ -3854,8 +3766,8 @@ structure WhichOptions where
   PATH : Option String := none
   /-- `DOMString cwd` -/
   cwd : Option String := none
-instance : ToJS WhichOptions := ⟨fun d => Support.fields #[("PATH", Support.optional d.PATH),
-    ("cwd", Support.optional d.cwd)]⟩
+instance : ToJS WhichOptions := ⟨fun d => Internal.fields #[("PATH", Internal.optional d.PATH),
+    ("cwd", Internal.optional d.cwd)]⟩
 
 /-- `dictionary StringWidthOptions` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure StringWidthOptions where
@@ -3865,9 +3777,9 @@ structure StringWidthOptions where
   ambiguousIsNarrow : Option Bool := none
   /-- `boolean perCodePoint` -/
   perCodePoint : Option Bool := none
-instance : ToJS StringWidthOptions := ⟨fun d => Support.fields #[("countAnsiEscapeCodes", Support.optional d.countAnsiEscapeCodes),
-    ("ambiguousIsNarrow", Support.optional d.ambiguousIsNarrow),
-    ("perCodePoint", Support.optional d.perCodePoint)]⟩
+instance : ToJS StringWidthOptions := ⟨fun d => Internal.fields #[("countAnsiEscapeCodes", Internal.optional d.countAnsiEscapeCodes),
+    ("ambiguousIsNarrow", Internal.optional d.ambiguousIsNarrow),
+    ("perCodePoint", Internal.optional d.perCodePoint)]⟩
 
 /-- `dictionary SliceAnsiOptions` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure SliceAnsiOptions where
@@ -3875,8 +3787,8 @@ structure SliceAnsiOptions where
   ellipsis : Option String := none
   /-- `boolean ambiguousIsNarrow` -/
   ambiguousIsNarrow : Option Bool := none
-instance : ToJS SliceAnsiOptions := ⟨fun d => Support.fields #[("ellipsis", Support.optional d.ellipsis),
-    ("ambiguousIsNarrow", Support.optional d.ambiguousIsNarrow)]⟩
+instance : ToJS SliceAnsiOptions := ⟨fun d => Internal.fields #[("ellipsis", Internal.optional d.ellipsis),
+    ("ambiguousIsNarrow", Internal.optional d.ambiguousIsNarrow)]⟩
 
 /-- `typedef DOMString or boolean or SliceAnsiOptions DOMStringOrBooleanOrSliceAnsiOptions`: one constructor per member type. -/
 inductive DOMStringOrBooleanOrSliceAnsiOptions where
@@ -3904,10 +3816,10 @@ structure WrapAnsiOptions where
   trim : Option Bool := none
   /-- `boolean ambiguousIsNarrow` -/
   ambiguousIsNarrow : Option Bool := none
-instance : ToJS WrapAnsiOptions := ⟨fun d => Support.fields #[("hard", Support.optional d.hard),
-    ("wordWrap", Support.optional d.wordWrap),
-    ("trim", Support.optional d.trim),
-    ("ambiguousIsNarrow", Support.optional d.ambiguousIsNarrow)]⟩
+instance : ToJS WrapAnsiOptions := ⟨fun d => Internal.fields #[("hard", Internal.optional d.hard),
+    ("wordWrap", Internal.optional d.wordWrap),
+    ("trim", Internal.optional d.trim),
+    ("ambiguousIsNarrow", Internal.optional d.ambiguousIsNarrow)]⟩
 
 /-- `typedef BunFile or S3File or DOMString or Uint8Array or URL BunFileOrS3FileOrPathLike`: one constructor per member type. -/
 inductive BunFileOrS3FileOrPathLike where
@@ -3967,8 +3879,8 @@ structure WriteOptions where
   mode : Option Float := none
   /-- `boolean createPath` -/
   createPath : Option Bool := none
-instance : ToJS WriteOptions := ⟨fun d => Support.fields #[("mode", Support.optional d.mode),
-    ("createPath", Support.optional d.createPath)]⟩
+instance : ToJS WriteOptions := ⟨fun d => Internal.fields #[("mode", Internal.optional d.mode),
+    ("createPath", Internal.optional d.createPath)]⟩
 
 /-- `typedef Response or Request ResponseOrRequest`: one constructor per member type. -/
 inductive ResponseOrRequest where
@@ -3986,7 +3898,7 @@ instance : Coe Request ResponseOrRequest := ⟨.request⟩
 structure WriteResponseOptions where
   /-- `boolean createPath` -/
   createPath : Option Bool := none
-instance : ToJS WriteResponseOptions := ⟨fun d => Support.fields #[("createPath", Support.optional d.createPath)]⟩
+instance : ToJS WriteResponseOptions := ⟨fun d => Internal.fields #[("createPath", Internal.optional d.createPath)]⟩
 
 /-- `typedef DOMString or Uint8Array or URL PathLike`: one constructor per member type. -/
 inductive PathLike where
@@ -4008,7 +3920,7 @@ instance : Coe URL PathLike := ⟨.url⟩
 structure WritePathResponseOptions where
   /-- `boolean createPath` -/
   createPath : Option Bool := none
-instance : ToJS WritePathResponseOptions := ⟨fun d => Support.fields #[("createPath", Support.optional d.createPath)]⟩
+instance : ToJS WritePathResponseOptions := ⟨fun d => Internal.fields #[("createPath", Internal.optional d.createPath)]⟩
 
 /-- `dictionary WriteFileOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WriteFileOptions where
@@ -4016,8 +3928,8 @@ structure WriteFileOptions where
   mode : Option Float := none
   /-- `boolean createPath` -/
   createPath : Option Bool := none
-instance : ToJS WriteFileOptions := ⟨fun d => Support.fields #[("mode", Support.optional d.mode),
-    ("createPath", Support.optional d.createPath)]⟩
+instance : ToJS WriteFileOptions := ⟨fun d => Internal.fields #[("mode", Internal.optional d.mode),
+    ("createPath", Internal.optional d.createPath)]⟩
 
 /-- `dictionary WritePathFileOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WritePathFileOptions where
@@ -4025,8 +3937,8 @@ structure WritePathFileOptions where
   mode : Option Float := none
   /-- `boolean createPath` -/
   createPath : Option Bool := none
-instance : ToJS WritePathFileOptions := ⟨fun d => Support.fields #[("mode", Support.optional d.mode),
-    ("createPath", Support.optional d.createPath)]⟩
+instance : ToJS WritePathFileOptions := ⟨fun d => Internal.fields #[("mode", Internal.optional d.mode),
+    ("createPath", Internal.optional d.createPath)]⟩
 
 /-- `typedef URL or DOMString URLOrDOMString`: one constructor per member type. -/
 inductive URLOrDOMString where
@@ -4050,10 +3962,10 @@ structure BunInspectOptions where
   sorted : Option Bool := none
   /-- `boolean compact` -/
   compact : Option Bool := none
-instance : ToJS BunInspectOptions := ⟨fun d => Support.fields #[("colors", Support.optional d.colors),
-    ("depth", Support.optional d.depth),
-    ("sorted", Support.optional d.sorted),
-    ("compact", Support.optional d.compact)]⟩
+instance : ToJS BunInspectOptions := ⟨fun d => Internal.fields #[("colors", Internal.optional d.colors),
+    ("depth", Internal.optional d.depth),
+    ("sorted", Internal.optional d.sorted),
+    ("compact", Internal.optional d.compact)]⟩
 
 /-- `typedef double or bigint DoubleOrBigint`: one constructor per member type. -/
 inductive DoubleOrBigint where
@@ -4083,10 +3995,10 @@ structure MMapOptions where
   offset : Option DoubleOrBigint := none
   /-- `DoubleOrBigint size` -/
   size : Option DoubleOrBigint := none
-instance : ToJS MMapOptions := ⟨fun d => Support.fields #[("sync", Support.optional d.sync),
-    ("shared", Support.optional d.shared),
-    ("offset", Support.optional d.offset),
-    ("size", Support.optional d.size)]⟩
+instance : ToJS MMapOptions := ⟨fun d => Internal.fields #[("sync", Internal.optional d.sync),
+    ("shared", Internal.optional d.shared),
+    ("offset", Internal.optional d.offset),
+    ("size", Internal.optional d.size)]⟩
 
 /-- `dictionary ColorWithRgbResult` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ColorWithRgbResult where
@@ -4156,9 +4068,9 @@ structure EditorOptions where
   line : Option Float := none
   /-- `double column` -/
   column : Option Float := none
-instance : ToJS EditorOptions := ⟨fun d => Support.fields #[("editor", Support.optional d.editor),
-    ("line", Support.optional d.line),
-    ("column", Support.optional d.column)]⟩
+instance : ToJS EditorOptions := ⟨fun d => Internal.fields #[("editor", Internal.optional d.editor),
+    ("line", Internal.optional d.line),
+    ("column", Internal.optional d.column)]⟩
 
 /-- `typedef Uint8Array or DOMString or ArrayBuffer Uint8ArrayOrDOMStringOrArrayBuffer`: one constructor per member type. -/
 inductive Uint8ArrayOrDOMStringOrArrayBuffer where
@@ -4186,11 +4098,11 @@ structure DeflateSyncOptions where
   strategy : Option Float := none
   /-- `DeflateSyncOptionsLibrary library` -/
   library : Option DeflateSyncOptionsLibrary := none
-instance : ToJS DeflateSyncOptions := ⟨fun d => Support.fields #[("level", Support.optional d.level),
-    ("memLevel", Support.optional d.memLevel),
-    ("windowBits", Support.optional d.windowBits),
-    ("strategy", Support.optional d.strategy),
-    ("library", Support.optional d.library)]⟩
+instance : ToJS DeflateSyncOptions := ⟨fun d => Internal.fields #[("level", Internal.optional d.level),
+    ("memLevel", Internal.optional d.memLevel),
+    ("windowBits", Internal.optional d.windowBits),
+    ("strategy", Internal.optional d.strategy),
+    ("library", Internal.optional d.library)]⟩
 
 /-- `dictionary GzipSyncOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GzipSyncOptions where
@@ -4204,11 +4116,11 @@ structure GzipSyncOptions where
   strategy : Option Float := none
   /-- `GzipSyncOptionsLibrary library` -/
   library : Option GzipSyncOptionsLibrary := none
-instance : ToJS GzipSyncOptions := ⟨fun d => Support.fields #[("level", Support.optional d.level),
-    ("memLevel", Support.optional d.memLevel),
-    ("windowBits", Support.optional d.windowBits),
-    ("strategy", Support.optional d.strategy),
-    ("library", Support.optional d.library)]⟩
+instance : ToJS GzipSyncOptions := ⟨fun d => Internal.fields #[("level", Internal.optional d.level),
+    ("memLevel", Internal.optional d.memLevel),
+    ("windowBits", Internal.optional d.windowBits),
+    ("strategy", Internal.optional d.strategy),
+    ("library", Internal.optional d.library)]⟩
 
 /-- `dictionary InflateSyncOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure InflateSyncOptions where
@@ -4222,11 +4134,11 @@ structure InflateSyncOptions where
   strategy : Option Float := none
   /-- `InflateSyncOptionsLibrary library` -/
   library : Option InflateSyncOptionsLibrary := none
-instance : ToJS InflateSyncOptions := ⟨fun d => Support.fields #[("level", Support.optional d.level),
-    ("memLevel", Support.optional d.memLevel),
-    ("windowBits", Support.optional d.windowBits),
-    ("strategy", Support.optional d.strategy),
-    ("library", Support.optional d.library)]⟩
+instance : ToJS InflateSyncOptions := ⟨fun d => Internal.fields #[("level", Internal.optional d.level),
+    ("memLevel", Internal.optional d.memLevel),
+    ("windowBits", Internal.optional d.windowBits),
+    ("strategy", Internal.optional d.strategy),
+    ("library", Internal.optional d.library)]⟩
 
 /-- `dictionary GunzipSyncOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure GunzipSyncOptions where
@@ -4240,23 +4152,23 @@ structure GunzipSyncOptions where
   strategy : Option Float := none
   /-- `GunzipSyncOptionsLibrary library` -/
   library : Option GunzipSyncOptionsLibrary := none
-instance : ToJS GunzipSyncOptions := ⟨fun d => Support.fields #[("level", Support.optional d.level),
-    ("memLevel", Support.optional d.memLevel),
-    ("windowBits", Support.optional d.windowBits),
-    ("strategy", Support.optional d.strategy),
-    ("library", Support.optional d.library)]⟩
+instance : ToJS GunzipSyncOptions := ⟨fun d => Internal.fields #[("level", Internal.optional d.level),
+    ("memLevel", Internal.optional d.memLevel),
+    ("windowBits", Internal.optional d.windowBits),
+    ("strategy", Internal.optional d.strategy),
+    ("library", Internal.optional d.library)]⟩
 
 /-- `dictionary ZstdCompressSyncOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ZstdCompressSyncOptions where
   /-- `double level` -/
   level : Option Float := none
-instance : ToJS ZstdCompressSyncOptions := ⟨fun d => Support.fields #[("level", Support.optional d.level)]⟩
+instance : ToJS ZstdCompressSyncOptions := ⟨fun d => Internal.fields #[("level", Internal.optional d.level)]⟩
 
 /-- `dictionary ZstdCompressOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure ZstdCompressOptions where
   /-- `double level` -/
   level : Option Float := none
-instance : ToJS ZstdCompressOptions := ⟨fun d => Support.fields #[("level", Support.optional d.level)]⟩
+instance : ToJS ZstdCompressOptions := ⟨fun d => Internal.fields #[("level", Internal.optional d.level)]⟩
 
 /-- `dictionary TCPSocketConnectOptions : SocketOptions` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TCPSocketConnectOptions where
@@ -4278,15 +4190,15 @@ structure TCPSocketConnectOptions where
   reusePort : Option Bool := none
   /-- `boolean ipv6Only` -/
   ipv6Only : Option Bool := none
-instance : ToJS TCPSocketConnectOptions := ⟨fun d => Support.fields #[("socket", toJS d.socket),
-    ("data", Support.optional d.data),
-    ("allowHalfOpen", Support.optional d.allowHalfOpen),
+instance : ToJS TCPSocketConnectOptions := ⟨fun d => Internal.fields #[("socket", toJS d.socket),
+    ("data", Internal.optional d.data),
+    ("allowHalfOpen", Internal.optional d.allowHalfOpen),
     ("hostname", toJS d.hostname),
     ("port", toJS d.port),
-    ("tls", Support.optional d.tls),
-    ("exclusive", Support.optional d.exclusive),
-    ("reusePort", Support.optional d.reusePort),
-    ("ipv6Only", Support.optional d.ipv6Only)]⟩
+    ("tls", Internal.optional d.tls),
+    ("exclusive", Internal.optional d.exclusive),
+    ("reusePort", Internal.optional d.reusePort),
+    ("ipv6Only", Internal.optional d.ipv6Only)]⟩
 
 /-- `dictionary UnixSocketOptions : SocketOptions` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure UnixSocketOptions where
@@ -4300,11 +4212,11 @@ structure UnixSocketOptions where
   unix : String
   /-- `TLSOptionsOrBoolean tls` -/
   tls : Option TLSOptionsOrBoolean := none
-instance : ToJS UnixSocketOptions := ⟨fun d => Support.fields #[("socket", toJS d.socket),
-    ("data", Support.optional d.data),
-    ("allowHalfOpen", Support.optional d.allowHalfOpen),
+instance : ToJS UnixSocketOptions := ⟨fun d => Internal.fields #[("socket", toJS d.socket),
+    ("data", Internal.optional d.data),
+    ("allowHalfOpen", Internal.optional d.allowHalfOpen),
     ("unix", toJS d.unix),
-    ("tls", Support.optional d.tls)]⟩
+    ("tls", Internal.optional d.tls)]⟩
 
 /-- `dictionary TCPSocketListenOptions : SocketOptions` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TCPSocketListenOptions where
@@ -4322,13 +4234,13 @@ structure TCPSocketListenOptions where
   tls : Option TLSOptionsOrBoolean := none
   /-- `boolean exclusive` -/
   exclusive : Option Bool := none
-instance : ToJS TCPSocketListenOptions := ⟨fun d => Support.fields #[("socket", toJS d.socket),
-    ("data", Support.optional d.data),
-    ("allowHalfOpen", Support.optional d.allowHalfOpen),
+instance : ToJS TCPSocketListenOptions := ⟨fun d => Internal.fields #[("socket", toJS d.socket),
+    ("data", Internal.optional d.data),
+    ("allowHalfOpen", Internal.optional d.allowHalfOpen),
     ("hostname", toJS d.hostname),
     ("port", toJS d.port),
-    ("tls", Support.optional d.tls),
-    ("exclusive", Support.optional d.exclusive)]⟩
+    ("tls", Internal.optional d.tls),
+    ("exclusive", Internal.optional d.exclusive)]⟩
 
 /-- `dictionary UdpSocketOptions` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure UdpSocketOptions where
@@ -4340,10 +4252,10 @@ structure UdpSocketOptions where
   binaryType : Option UdpSocketOptionsBinaryType := none
   /-- `UdpSocketHandler socket` -/
   socket : Option UdpSocketHandler := none
-instance : ToJS UdpSocketOptions := ⟨fun d => Support.fields #[("hostname", Support.optional d.hostname),
-    ("port", Support.optional d.port),
-    ("binaryType", Support.optional d.binaryType),
-    ("socket", Support.optional d.socket)]⟩
+instance : ToJS UdpSocketOptions := ⟨fun d => Internal.fields #[("hostname", Internal.optional d.hostname),
+    ("port", Internal.optional d.port),
+    ("binaryType", Internal.optional d.binaryType),
+    ("socket", Internal.optional d.socket)]⟩
 
 /-- `dictionary UdpConnectSocketOptionsConnect` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure UdpConnectSocketOptionsConnect where
@@ -4351,7 +4263,7 @@ structure UdpConnectSocketOptionsConnect where
   hostname : String
   /-- `required double /* integer: Nat */ port` -/
   port : Nat
-instance : ToJS UdpConnectSocketOptionsConnect := ⟨fun d => Support.fields #[("hostname", toJS d.hostname),
+instance : ToJS UdpConnectSocketOptionsConnect := ⟨fun d => Internal.fields #[("hostname", toJS d.hostname),
     ("port", toJS d.port)]⟩
 
 /-- `dictionary UdpConnectSocketOptions` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -4366,10 +4278,10 @@ structure UdpConnectSocketOptions where
   socket : Option UdpConnectedSocketHandler := none
   /-- `required UdpConnectSocketOptionsConnect connect` -/
   connect : UdpConnectSocketOptionsConnect
-instance : ToJS UdpConnectSocketOptions := ⟨fun d => Support.fields #[("hostname", Support.optional d.hostname),
-    ("port", Support.optional d.port),
-    ("binaryType", Support.optional d.binaryType),
-    ("socket", Support.optional d.socket),
+instance : ToJS UdpConnectSocketOptions := ⟨fun d => Internal.fields #[("hostname", Internal.optional d.hostname),
+    ("port", Internal.optional d.port),
+    ("binaryType", Internal.optional d.binaryType),
+    ("socket", Internal.optional d.socket),
     ("connect", toJS d.connect)]⟩
 
 /-- `callback SpawnBaseOptionsIgnorePipeInheritOnExit = Promise<undefined> (Subprocess subprocess, double? exitCode, DOMStringOrDouble? signalCode, optional any error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
@@ -4381,13 +4293,13 @@ instance : ToJS SpawnBaseOptionsIgnorePipeInheritOnExit := ⟨fun x => .ref x.va
 instance : FromJS SpawnBaseOptionsIgnorePipeInheritOnExit := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipeInheritOnExit", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SpawnBaseOptionsIgnorePipeInheritOnExit.ofFn (f : Subprocess → (Option Float) → (Option DOMStringOrDouble) → Data → Async Unit) : IO SpawnBaseOptionsIgnorePipeInheritOnExit := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Subprocess args 0) (← Support.arg (Option Float) args 1) (← Support.arg (Option DOMStringOrDouble) args 2) (← Support.arg Data args 3))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Subprocess args 0) (← Internal.arg (Option Float) args 1) (← Internal.arg (Option DOMStringOrDouble) args 2) (← Internal.arg Data args 3))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 4)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SpawnBaseOptionsIgnorePipeInheritOnExit.ofSyncFn (f : Subprocess → (Option Float) → (Option DOMStringOrDouble) → Data → IO Unit) : IO SpawnBaseOptionsIgnorePipeInheritOnExit := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Subprocess args 0) (← Support.arg (Option Float) args 1) (← Support.arg (Option DOMStringOrDouble) args 2) (← Support.arg Data args 3))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Subprocess args 0) (← Internal.arg (Option Float) args 1) (← Internal.arg (Option DOMStringOrDouble) args 2) (← Internal.arg Data args 3))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 4)]] Value
   return { val := fn }
@@ -4421,13 +4333,13 @@ instance : ToJS SpawnBaseOptionsIgnorePipeInheritIpc := ⟨fun x => .ref x.val "
 instance : FromJS SpawnBaseOptionsIgnorePipeInheritIpc := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipeInheritIpc", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SpawnBaseOptionsIgnorePipeInheritIpc.ofFn (f : Data → Subprocess → Data → Async Unit) : IO SpawnBaseOptionsIgnorePipeInheritIpc := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Subprocess args 1) (← Support.arg Data args 2))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Subprocess args 1) (← Internal.arg Data args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SpawnBaseOptionsIgnorePipeInheritIpc.ofSyncFn (f : Data → Subprocess → Data → IO Unit) : IO SpawnBaseOptionsIgnorePipeInheritIpc := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg Subprocess args 1) (← Support.arg Data args 2))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg Subprocess args 1) (← Internal.arg Data args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
@@ -4494,29 +4406,29 @@ structure SpawnCmdOptions where
   terminal : Option TerminalOptionsOrTerminal := none
   /-- `required sequence<DOMString> cmd` -/
   cmd : Array String
-instance : ToJS SpawnCmdOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
-    ("detached", Support.optional d.detached),
-    ("uid", Support.optional d.uid),
-    ("gid", Support.optional d.gid),
-    ("cgroup", Support.optional d.cgroup),
-    ("env", Support.optional d.env),
-    ("stdio", Support.optional d.stdio),
-    ("stdin", Support.optional d.stdin),
-    ("stdout", Support.optional d.stdout),
-    ("stderr", Support.optional d.stderr),
-    ("onExit", Support.optional d.onExit),
-    ("onDisconnect", Support.optional d.onDisconnect),
-    ("ipc", Support.optional d.ipc),
-    ("serialization", Support.optional d.serialization),
-    ("windowsHide", Support.optional d.windowsHide),
-    ("windowsVerbatimArguments", Support.optional d.windowsVerbatimArguments),
-    ("argv0", Support.optional d.argv0),
-    ("signal", Support.optional d.signal),
-    ("timeout", Support.optional d.timeout),
-    ("killSignal", Support.optional d.killSignal),
-    ("maxBuffer", Support.optional d.maxBuffer),
-    ("lazy", Support.optional d.lazy),
-    ("terminal", Support.optional d.terminal),
+instance : ToJS SpawnCmdOptions := ⟨fun d => Internal.fields #[("cwd", Internal.optional d.cwd),
+    ("detached", Internal.optional d.detached),
+    ("uid", Internal.optional d.uid),
+    ("gid", Internal.optional d.gid),
+    ("cgroup", Internal.optional d.cgroup),
+    ("env", Internal.optional d.env),
+    ("stdio", Internal.optional d.stdio),
+    ("stdin", Internal.optional d.stdin),
+    ("stdout", Internal.optional d.stdout),
+    ("stderr", Internal.optional d.stderr),
+    ("onExit", Internal.optional d.onExit),
+    ("onDisconnect", Internal.optional d.onDisconnect),
+    ("ipc", Internal.optional d.ipc),
+    ("serialization", Internal.optional d.serialization),
+    ("windowsHide", Internal.optional d.windowsHide),
+    ("windowsVerbatimArguments", Internal.optional d.windowsVerbatimArguments),
+    ("argv0", Internal.optional d.argv0),
+    ("signal", Internal.optional d.signal),
+    ("timeout", Internal.optional d.timeout),
+    ("killSignal", Internal.optional d.killSignal),
+    ("maxBuffer", Internal.optional d.maxBuffer),
+    ("lazy", Internal.optional d.lazy),
+    ("terminal", Internal.optional d.terminal),
     ("cmd", toJS d.cmd)]⟩
 
 /-- `dictionary SpawnSpawnOptionsIgnorePipeInherit : SpawnBaseOptionsIgnorePipeInherit` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -4567,29 +4479,29 @@ structure SpawnSpawnOptionsIgnorePipeInherit where
   lazy : Option Bool := none
   /-- `TerminalOptionsOrTerminal terminal` -/
   terminal : Option TerminalOptionsOrTerminal := none
-instance : ToJS SpawnSpawnOptionsIgnorePipeInherit := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
-    ("detached", Support.optional d.detached),
-    ("uid", Support.optional d.uid),
-    ("gid", Support.optional d.gid),
-    ("cgroup", Support.optional d.cgroup),
-    ("env", Support.optional d.env),
-    ("stdio", Support.optional d.stdio),
-    ("stdin", Support.optional d.stdin),
-    ("stdout", Support.optional d.stdout),
-    ("stderr", Support.optional d.stderr),
-    ("onExit", Support.optional d.onExit),
-    ("onDisconnect", Support.optional d.onDisconnect),
-    ("ipc", Support.optional d.ipc),
-    ("serialization", Support.optional d.serialization),
-    ("windowsHide", Support.optional d.windowsHide),
-    ("windowsVerbatimArguments", Support.optional d.windowsVerbatimArguments),
-    ("argv0", Support.optional d.argv0),
-    ("signal", Support.optional d.signal),
-    ("timeout", Support.optional d.timeout),
-    ("killSignal", Support.optional d.killSignal),
-    ("maxBuffer", Support.optional d.maxBuffer),
-    ("lazy", Support.optional d.lazy),
-    ("terminal", Support.optional d.terminal)]⟩
+instance : ToJS SpawnSpawnOptionsIgnorePipeInherit := ⟨fun d => Internal.fields #[("cwd", Internal.optional d.cwd),
+    ("detached", Internal.optional d.detached),
+    ("uid", Internal.optional d.uid),
+    ("gid", Internal.optional d.gid),
+    ("cgroup", Internal.optional d.cgroup),
+    ("env", Internal.optional d.env),
+    ("stdio", Internal.optional d.stdio),
+    ("stdin", Internal.optional d.stdin),
+    ("stdout", Internal.optional d.stdout),
+    ("stderr", Internal.optional d.stderr),
+    ("onExit", Internal.optional d.onExit),
+    ("onDisconnect", Internal.optional d.onDisconnect),
+    ("ipc", Internal.optional d.ipc),
+    ("serialization", Internal.optional d.serialization),
+    ("windowsHide", Internal.optional d.windowsHide),
+    ("windowsVerbatimArguments", Internal.optional d.windowsVerbatimArguments),
+    ("argv0", Internal.optional d.argv0),
+    ("signal", Internal.optional d.signal),
+    ("timeout", Internal.optional d.timeout),
+    ("killSignal", Internal.optional d.killSignal),
+    ("maxBuffer", Internal.optional d.maxBuffer),
+    ("lazy", Internal.optional d.lazy),
+    ("terminal", Internal.optional d.terminal)]⟩
 
 /-- `callback SpawnBaseOptionsIgnorePipePipeOnExit = Promise<undefined> (SubprocessIgnorePipePipe subprocess, double? exitCode, DOMStringOrDouble? signalCode, optional any error)` (Bun 1.4.4 type declarations): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure SpawnBaseOptionsIgnorePipePipeOnExit where
@@ -4600,13 +4512,13 @@ instance : ToJS SpawnBaseOptionsIgnorePipePipeOnExit := ⟨fun x => .ref x.val "
 instance : FromJS SpawnBaseOptionsIgnorePipePipeOnExit := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipePipeOnExit", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SpawnBaseOptionsIgnorePipePipeOnExit.ofFn (f : SubprocessIgnorePipePipe → (Option Float) → (Option DOMStringOrDouble) → Data → Async Unit) : IO SpawnBaseOptionsIgnorePipePipeOnExit := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg SubprocessIgnorePipePipe args 0) (← Support.arg (Option Float) args 1) (← Support.arg (Option DOMStringOrDouble) args 2) (← Support.arg Data args 3))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg SubprocessIgnorePipePipe args 0) (← Internal.arg (Option Float) args 1) (← Internal.arg (Option DOMStringOrDouble) args 2) (← Internal.arg Data args 3))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 4)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SpawnBaseOptionsIgnorePipePipeOnExit.ofSyncFn (f : SubprocessIgnorePipePipe → (Option Float) → (Option DOMStringOrDouble) → Data → IO Unit) : IO SpawnBaseOptionsIgnorePipePipeOnExit := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg SubprocessIgnorePipePipe args 0) (← Support.arg (Option Float) args 1) (← Support.arg (Option DOMStringOrDouble) args 2) (← Support.arg Data args 3))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg SubprocessIgnorePipePipe args 0) (← Internal.arg (Option Float) args 1) (← Internal.arg (Option DOMStringOrDouble) args 2) (← Internal.arg Data args 3))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 4)]] Value
   return { val := fn }
@@ -4640,13 +4552,13 @@ instance : ToJS SpawnBaseOptionsIgnorePipePipeIpc := ⟨fun x => .ref x.val ""�
 instance : FromJS SpawnBaseOptionsIgnorePipePipeIpc := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.SpawnBaseOptionsIgnorePipePipeIpc", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def SpawnBaseOptionsIgnorePipePipeIpc.ofFn (f : Data → SubprocessIgnorePipePipe → Data → Async Unit) : IO SpawnBaseOptionsIgnorePipePipeIpc := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg SubprocessIgnorePipePipe args 1) (← Support.arg Data args 2))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg SubprocessIgnorePipePipe args 1) (← Internal.arg Data args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def SpawnBaseOptionsIgnorePipePipeIpc.ofSyncFn (f : Data → SubprocessIgnorePipePipe → Data → IO Unit) : IO SpawnBaseOptionsIgnorePipePipeIpc := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg SubprocessIgnorePipePipe args 1) (← Support.arg Data args 2))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg SubprocessIgnorePipePipe args 1) (← Internal.arg Data args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
@@ -4697,27 +4609,27 @@ structure SpawnSyncCmdOptions where
   maxBuffer : Option Nat := none
   /-- `required sequence<DOMString> cmd` -/
   cmd : Array String
-instance : ToJS SpawnSyncCmdOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
-    ("detached", Support.optional d.detached),
-    ("uid", Support.optional d.uid),
-    ("gid", Support.optional d.gid),
-    ("cgroup", Support.optional d.cgroup),
-    ("env", Support.optional d.env),
-    ("stdio", Support.optional d.stdio),
-    ("stdin", Support.optional d.stdin),
-    ("stdout", Support.optional d.stdout),
-    ("stderr", Support.optional d.stderr),
-    ("onExit", Support.optional d.onExit),
-    ("onDisconnect", Support.optional d.onDisconnect),
-    ("ipc", Support.optional d.ipc),
-    ("serialization", Support.optional d.serialization),
-    ("windowsHide", Support.optional d.windowsHide),
-    ("windowsVerbatimArguments", Support.optional d.windowsVerbatimArguments),
-    ("argv0", Support.optional d.argv0),
-    ("signal", Support.optional d.signal),
-    ("timeout", Support.optional d.timeout),
-    ("killSignal", Support.optional d.killSignal),
-    ("maxBuffer", Support.optional d.maxBuffer),
+instance : ToJS SpawnSyncCmdOptions := ⟨fun d => Internal.fields #[("cwd", Internal.optional d.cwd),
+    ("detached", Internal.optional d.detached),
+    ("uid", Internal.optional d.uid),
+    ("gid", Internal.optional d.gid),
+    ("cgroup", Internal.optional d.cgroup),
+    ("env", Internal.optional d.env),
+    ("stdio", Internal.optional d.stdio),
+    ("stdin", Internal.optional d.stdin),
+    ("stdout", Internal.optional d.stdout),
+    ("stderr", Internal.optional d.stderr),
+    ("onExit", Internal.optional d.onExit),
+    ("onDisconnect", Internal.optional d.onDisconnect),
+    ("ipc", Internal.optional d.ipc),
+    ("serialization", Internal.optional d.serialization),
+    ("windowsHide", Internal.optional d.windowsHide),
+    ("windowsVerbatimArguments", Internal.optional d.windowsVerbatimArguments),
+    ("argv0", Internal.optional d.argv0),
+    ("signal", Internal.optional d.signal),
+    ("timeout", Internal.optional d.timeout),
+    ("killSignal", Internal.optional d.killSignal),
+    ("maxBuffer", Internal.optional d.maxBuffer),
     ("cmd", toJS d.cmd)]⟩
 
 /-- `dictionary ReadableSyncSubprocess` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -4797,27 +4709,27 @@ structure SpawnSpawnSyncOptionsIgnorePipePipe where
   killSignal : Option DOMStringOrDouble := none
   /-- `double /* integer: Nat */ maxBuffer` -/
   maxBuffer : Option Nat := none
-instance : ToJS SpawnSpawnSyncOptionsIgnorePipePipe := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
-    ("detached", Support.optional d.detached),
-    ("uid", Support.optional d.uid),
-    ("gid", Support.optional d.gid),
-    ("cgroup", Support.optional d.cgroup),
-    ("env", Support.optional d.env),
-    ("stdio", Support.optional d.stdio),
-    ("stdin", Support.optional d.stdin),
-    ("stdout", Support.optional d.stdout),
-    ("stderr", Support.optional d.stderr),
-    ("onExit", Support.optional d.onExit),
-    ("onDisconnect", Support.optional d.onDisconnect),
-    ("ipc", Support.optional d.ipc),
-    ("serialization", Support.optional d.serialization),
-    ("windowsHide", Support.optional d.windowsHide),
-    ("windowsVerbatimArguments", Support.optional d.windowsVerbatimArguments),
-    ("argv0", Support.optional d.argv0),
-    ("signal", Support.optional d.signal),
-    ("timeout", Support.optional d.timeout),
-    ("killSignal", Support.optional d.killSignal),
-    ("maxBuffer", Support.optional d.maxBuffer)]⟩
+instance : ToJS SpawnSpawnSyncOptionsIgnorePipePipe := ⟨fun d => Internal.fields #[("cwd", Internal.optional d.cwd),
+    ("detached", Internal.optional d.detached),
+    ("uid", Internal.optional d.uid),
+    ("gid", Internal.optional d.gid),
+    ("cgroup", Internal.optional d.cgroup),
+    ("env", Internal.optional d.env),
+    ("stdio", Internal.optional d.stdio),
+    ("stdin", Internal.optional d.stdin),
+    ("stdout", Internal.optional d.stdout),
+    ("stderr", Internal.optional d.stderr),
+    ("onExit", Internal.optional d.onExit),
+    ("onDisconnect", Internal.optional d.onDisconnect),
+    ("ipc", Internal.optional d.ipc),
+    ("serialization", Internal.optional d.serialization),
+    ("windowsHide", Internal.optional d.windowsHide),
+    ("windowsVerbatimArguments", Internal.optional d.windowsVerbatimArguments),
+    ("argv0", Internal.optional d.argv0),
+    ("signal", Internal.optional d.signal),
+    ("timeout", Internal.optional d.timeout),
+    ("killSignal", Internal.optional d.killSignal),
+    ("maxBuffer", Internal.optional d.maxBuffer)]⟩
 
 /-- `typedef RandomUUIDv5NamespaceLiteral or DOMString or Uint8Array RandomUUIDv5NamespaceLiteralOrDOMStringOrUint8Array`: one constructor per member type. -/
 inductive RandomUUIDv5NamespaceLiteralOrDOMStringOrUint8Array where
@@ -4860,13 +4772,13 @@ instance : ToJS HashWyhash := ⟨fun x => .ref x.val ""⟩
 instance : FromJS HashWyhash := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.HashWyhash", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def HashWyhash.ofFn (f : DOMStringOrUint8ArrayOrArrayBuffer → (Option Int) → Async Int) : IO HashWyhash := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Support.arg Data args 0)) (← Support.arg (Option Int) args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Internal.arg Data args 0)) (← Internal.arg (Option Int) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def HashWyhash.ofSyncFn (f : DOMStringOrUint8ArrayOrArrayBuffer → (Option Int) → IO Int) : IO HashWyhash := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Support.arg Data args 0)) (← Support.arg (Option Int) args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Internal.arg Data args 0)) (← Internal.arg (Option Int) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -4880,13 +4792,13 @@ instance : ToJS HashAdler32 := ⟨fun x => .ref x.val ""⟩
 instance : FromJS HashAdler32 := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.HashAdler32", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def HashAdler32.ofFn (f : DOMStringOrUint8ArrayOrArrayBuffer → Async Float) : IO HashAdler32 := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Support.arg Data args 0)))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Internal.arg Data args 0)))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def HashAdler32.ofSyncFn (f : DOMStringOrUint8ArrayOrArrayBuffer → IO Float) : IO HashAdler32 := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Support.arg Data args 0)))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Internal.arg Data args 0)))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -4900,13 +4812,13 @@ instance : ToJS HashCrc32 := ⟨fun x => .ref x.val ""⟩
 instance : FromJS HashCrc32 := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.HashCrc32", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def HashCrc32.ofFn (f : DOMStringOrUint8ArrayOrArrayBuffer → (Option Float) → Async Float) : IO HashCrc32 := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Support.arg Data args 0)) (← Support.arg (Option Float) args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Internal.arg Data args 0)) (← Internal.arg (Option Float) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def HashCrc32.ofSyncFn (f : DOMStringOrUint8ArrayOrArrayBuffer → (Option Float) → IO Float) : IO HashCrc32 := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Support.arg Data args 0)) (← Support.arg (Option Float) args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Internal.arg Data args 0)) (← Internal.arg (Option Float) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -4920,13 +4832,13 @@ instance : ToJS HashCityHash32 := ⟨fun x => .ref x.val ""⟩
 instance : FromJS HashCityHash32 := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.HashCityHash32", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def HashCityHash32.ofFn (f : DOMStringOrUint8ArrayOrArrayBuffer → Async Float) : IO HashCityHash32 := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Support.arg Data args 0)))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Internal.arg Data args 0)))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def HashCityHash32.ofSyncFn (f : DOMStringOrUint8ArrayOrArrayBuffer → IO Float) : IO HashCityHash32 := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Support.arg Data args 0)))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Internal.arg Data args 0)))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -4940,13 +4852,13 @@ instance : ToJS HashCityHash64 := ⟨fun x => .ref x.val ""⟩
 instance : FromJS HashCityHash64 := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.HashCityHash64", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def HashCityHash64.ofFn (f : DOMStringOrUint8ArrayOrArrayBuffer → (Option Int) → Async Int) : IO HashCityHash64 := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Support.arg Data args 0)) (← Support.arg (Option Int) args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Internal.arg Data args 0)) (← Internal.arg (Option Int) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def HashCityHash64.ofSyncFn (f : DOMStringOrUint8ArrayOrArrayBuffer → (Option Int) → IO Int) : IO HashCityHash64 := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Support.arg Data args 0)) (← Support.arg (Option Int) args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Internal.arg Data args 0)) (← Internal.arg (Option Int) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -4960,13 +4872,13 @@ instance : ToJS HashXxHash32 := ⟨fun x => .ref x.val ""⟩
 instance : FromJS HashXxHash32 := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.HashXxHash32", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def HashXxHash32.ofFn (f : DOMStringOrUint8ArrayOrArrayBuffer → (Option Float) → Async Float) : IO HashXxHash32 := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Support.arg Data args 0)) (← Support.arg (Option Float) args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Internal.arg Data args 0)) (← Internal.arg (Option Float) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def HashXxHash32.ofSyncFn (f : DOMStringOrUint8ArrayOrArrayBuffer → (Option Float) → IO Float) : IO HashXxHash32 := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Support.arg Data args 0)) (← Support.arg (Option Float) args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Internal.arg Data args 0)) (← Internal.arg (Option Float) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -4980,13 +4892,13 @@ instance : ToJS HashXxHash64 := ⟨fun x => .ref x.val ""⟩
 instance : FromJS HashXxHash64 := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.HashXxHash64", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def HashXxHash64.ofFn (f : DOMStringOrUint8ArrayOrArrayBuffer → (Option Int) → Async Int) : IO HashXxHash64 := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Support.arg Data args 0)) (← Support.arg (Option Int) args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Internal.arg Data args 0)) (← Internal.arg (Option Int) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def HashXxHash64.ofSyncFn (f : DOMStringOrUint8ArrayOrArrayBuffer → (Option Int) → IO Int) : IO HashXxHash64 := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Support.arg Data args 0)) (← Support.arg (Option Int) args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Internal.arg Data args 0)) (← Internal.arg (Option Int) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -5000,13 +4912,13 @@ instance : ToJS HashXxHash3 := ⟨fun x => .ref x.val ""⟩
 instance : FromJS HashXxHash3 := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.HashXxHash3", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def HashXxHash3.ofFn (f : DOMStringOrUint8ArrayOrArrayBuffer → (Option Int) → Async Int) : IO HashXxHash3 := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Support.arg Data args 0)) (← Support.arg (Option Int) args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Internal.arg Data args 0)) (← Internal.arg (Option Int) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def HashXxHash3.ofSyncFn (f : DOMStringOrUint8ArrayOrArrayBuffer → (Option Int) → IO Int) : IO HashXxHash3 := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Support.arg Data args 0)) (← Support.arg (Option Int) args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Internal.arg Data args 0)) (← Internal.arg (Option Int) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -5020,13 +4932,13 @@ instance : ToJS HashMurmur32v3 := ⟨fun x => .ref x.val ""⟩
 instance : FromJS HashMurmur32v3 := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.HashMurmur32v3", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def HashMurmur32v3.ofFn (f : DOMStringOrUint8ArrayOrArrayBuffer → (Option Float) → Async Float) : IO HashMurmur32v3 := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Support.arg Data args 0)) (← Support.arg (Option Float) args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Internal.arg Data args 0)) (← Internal.arg (Option Float) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def HashMurmur32v3.ofSyncFn (f : DOMStringOrUint8ArrayOrArrayBuffer → (Option Float) → IO Float) : IO HashMurmur32v3 := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Support.arg Data args 0)) (← Support.arg (Option Float) args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Internal.arg Data args 0)) (← Internal.arg (Option Float) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -5040,13 +4952,13 @@ instance : ToJS HashMurmur32v2 := ⟨fun x => .ref x.val ""⟩
 instance : FromJS HashMurmur32v2 := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.HashMurmur32v2", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def HashMurmur32v2.ofFn (f : DOMStringOrUint8ArrayOrArrayBuffer → (Option Float) → Async Float) : IO HashMurmur32v2 := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Support.arg Data args 0)) (← Support.arg (Option Float) args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Internal.arg Data args 0)) (← Internal.arg (Option Float) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def HashMurmur32v2.ofSyncFn (f : DOMStringOrUint8ArrayOrArrayBuffer → (Option Float) → IO Float) : IO HashMurmur32v2 := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Support.arg Data args 0)) (← Support.arg (Option Float) args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Internal.arg Data args 0)) (← Internal.arg (Option Float) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -5060,13 +4972,13 @@ instance : ToJS HashMurmur64v2 := ⟨fun x => .ref x.val ""⟩
 instance : FromJS HashMurmur64v2 := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.HashMurmur64v2", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def HashMurmur64v2.ofFn (f : DOMStringOrUint8ArrayOrArrayBuffer → (Option Int) → Async Int) : IO HashMurmur64v2 := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Support.arg Data args 0)) (← Support.arg (Option Int) args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Internal.arg Data args 0)) (← Internal.arg (Option Int) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def HashMurmur64v2.ofSyncFn (f : DOMStringOrUint8ArrayOrArrayBuffer → (Option Int) → IO Int) : IO HashMurmur64v2 := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Support.arg Data args 0)) (← Support.arg (Option Int) args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Internal.arg Data args 0)) (← Internal.arg (Option Int) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -5080,13 +4992,13 @@ instance : ToJS HashRapidhash := ⟨fun x => .ref x.val ""⟩
 instance : FromJS HashRapidhash := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.HashRapidhash", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def HashRapidhash.ofFn (f : DOMStringOrUint8ArrayOrArrayBuffer → (Option Int) → Async Int) : IO HashRapidhash := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Support.arg Data args 0)) (← Support.arg (Option Int) args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Internal.arg Data args 0)) (← Internal.arg (Option Int) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def HashRapidhash.ofSyncFn (f : DOMStringOrUint8ArrayOrArrayBuffer → (Option Int) → IO Int) : IO HashRapidhash := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Support.arg Data args 0)) (← Support.arg (Option Int) args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← DOMStringOrUint8ArrayOrArrayBuffer.decode (← Internal.arg Data args 0)) (← Internal.arg (Option Int) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -5153,19 +5065,19 @@ instance : Coe Blob DOMStringOrUint8ArrayOrBlob := ⟨.blob⟩
 structure XMLCompactParseOptions where
   /-- `boolean compact` -/
   compact : Option Bool := none
-instance : ToJS XMLCompactParseOptions := ⟨fun d => Support.fields #[("compact", Support.optional d.compact)]⟩
+instance : ToJS XMLCompactParseOptions := ⟨fun d => Internal.fields #[("compact", Internal.optional d.compact)]⟩
 
 /-- `dictionary XMLFullParseOptions : XMLParseOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure XMLFullParseOptions where
   /-- `boolean compact` -/
   compact : Option Bool := none
-instance : ToJS XMLFullParseOptions := ⟨fun d => Support.fields #[("compact", Support.optional d.compact)]⟩
+instance : ToJS XMLFullParseOptions := ⟨fun d => Internal.fields #[("compact", Internal.optional d.compact)]⟩
 
 /-- `dictionary XMLParseOptions` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure XMLParseOptions where
   /-- `boolean compact` -/
   compact : Option Bool := none
-instance : ToJS XMLParseOptions := ⟨fun d => Support.fields #[("compact", Support.optional d.compact)]⟩
+instance : ToJS XMLParseOptions := ⟨fun d => Internal.fields #[("compact", Internal.optional d.compact)]⟩
 
 /-- `dictionary JSONLParseChunkResult` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure JSONLParseChunkResult where
@@ -5193,9 +5105,9 @@ structure MarkdownOptionsAutolinks where
   www : Option Bool := none
   /-- `boolean email` -/
   email : Option Bool := none
-instance : ToJS MarkdownOptionsAutolinks := ⟨fun d => Support.fields #[("url", Support.optional d.url),
-    ("www", Support.optional d.www),
-    ("email", Support.optional d.email)]⟩
+instance : ToJS MarkdownOptionsAutolinks := ⟨fun d => Internal.fields #[("url", Internal.optional d.url),
+    ("www", Internal.optional d.www),
+    ("email", Internal.optional d.email)]⟩
 
 /-- `typedef boolean or MarkdownOptionsAutolinks BooleanOrMarkdownOptionsAutolinks`: one constructor per member type. -/
 inductive BooleanOrMarkdownOptionsAutolinks where
@@ -5215,8 +5127,8 @@ structure MarkdownOptionsHeadings where
   ids : Option Bool := none
   /-- `boolean autolink` -/
   autolink : Option Bool := none
-instance : ToJS MarkdownOptionsHeadings := ⟨fun d => Support.fields #[("ids", Support.optional d.ids),
-    ("autolink", Support.optional d.autolink)]⟩
+instance : ToJS MarkdownOptionsHeadings := ⟨fun d => Internal.fields #[("ids", Internal.optional d.ids),
+    ("autolink", Internal.optional d.autolink)]⟩
 
 /-- `typedef boolean or MarkdownOptionsHeadings BooleanOrMarkdownOptionsHeadings`: one constructor per member type. -/
 inductive BooleanOrMarkdownOptionsHeadings where
@@ -5262,21 +5174,21 @@ structure MarkdownOptions where
   autolinks : Option BooleanOrMarkdownOptionsAutolinks := none
   /-- `BooleanOrMarkdownOptionsHeadings headings` -/
   headings : Option BooleanOrMarkdownOptionsHeadings := none
-instance : ToJS MarkdownOptions := ⟨fun d => Support.fields #[("tables", Support.optional d.tables),
-    ("strikethrough", Support.optional d.strikethrough),
-    ("tasklists", Support.optional d.tasklists),
-    ("hardSoftBreaks", Support.optional d.hardSoftBreaks),
-    ("wikiLinks", Support.optional d.wikiLinks),
-    ("underline", Support.optional d.underline),
-    ("latexMath", Support.optional d.latexMath),
-    ("collapseWhitespace", Support.optional d.collapseWhitespace),
-    ("permissiveAtxHeaders", Support.optional d.permissiveAtxHeaders),
-    ("noIndentedCodeBlocks", Support.optional d.noIndentedCodeBlocks),
-    ("noHtmlBlocks", Support.optional d.noHtmlBlocks),
-    ("noHtmlSpans", Support.optional d.noHtmlSpans),
-    ("tagFilter", Support.optional d.tagFilter),
-    ("autolinks", Support.optional d.autolinks),
-    ("headings", Support.optional d.headings)]⟩
+instance : ToJS MarkdownOptions := ⟨fun d => Internal.fields #[("tables", Internal.optional d.tables),
+    ("strikethrough", Internal.optional d.strikethrough),
+    ("tasklists", Internal.optional d.tasklists),
+    ("hardSoftBreaks", Internal.optional d.hardSoftBreaks),
+    ("wikiLinks", Internal.optional d.wikiLinks),
+    ("underline", Internal.optional d.underline),
+    ("latexMath", Internal.optional d.latexMath),
+    ("collapseWhitespace", Internal.optional d.collapseWhitespace),
+    ("permissiveAtxHeaders", Internal.optional d.permissiveAtxHeaders),
+    ("noIndentedCodeBlocks", Internal.optional d.noIndentedCodeBlocks),
+    ("noHtmlBlocks", Internal.optional d.noHtmlBlocks),
+    ("noHtmlSpans", Internal.optional d.noHtmlSpans),
+    ("tagFilter", Internal.optional d.tagFilter),
+    ("autolinks", Internal.optional d.autolinks),
+    ("headings", Internal.optional d.headings)]⟩
 
 /-- `dictionary MarkdownAnsiTheme` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MarkdownAnsiTheme where
@@ -5290,11 +5202,11 @@ structure MarkdownAnsiTheme where
   columns : Option Float := none
   /-- `boolean kittyGraphics` -/
   kittyGraphics : Option Bool := none
-instance : ToJS MarkdownAnsiTheme := ⟨fun d => Support.fields #[("colors", Support.optional d.colors),
-    ("hyperlinks", Support.optional d.hyperlinks),
-    ("light", Support.optional d.light),
-    ("columns", Support.optional d.columns),
-    ("kittyGraphics", Support.optional d.kittyGraphics)]⟩
+instance : ToJS MarkdownAnsiTheme := ⟨fun d => Internal.fields #[("colors", Internal.optional d.colors),
+    ("hyperlinks", Internal.optional d.hyperlinks),
+    ("light", Internal.optional d.light),
+    ("columns", Internal.optional d.columns),
+    ("kittyGraphics", Internal.optional d.kittyGraphics)]⟩
 
 /-- `dictionary MarkdownHeadingMeta` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure MarkdownHeadingMeta where
@@ -5317,13 +5229,13 @@ instance : ToJS MarkdownRenderCallbacksHeading := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MarkdownRenderCallbacksHeading := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksHeading", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MarkdownRenderCallbacksHeading.ofFn (f : String → MarkdownHeadingMeta → Async (Option String)) : IO MarkdownRenderCallbacksHeading := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg MarkdownHeadingMeta args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg MarkdownHeadingMeta args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MarkdownRenderCallbacksHeading.ofSyncFn (f : String → MarkdownHeadingMeta → IO (Option String)) : IO MarkdownRenderCallbacksHeading := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg MarkdownHeadingMeta args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg MarkdownHeadingMeta args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -5337,13 +5249,13 @@ instance : ToJS MarkdownRenderCallbacksParagraph := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MarkdownRenderCallbacksParagraph := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksParagraph", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MarkdownRenderCallbacksParagraph.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksParagraph := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MarkdownRenderCallbacksParagraph.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksParagraph := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -5357,13 +5269,13 @@ instance : ToJS MarkdownRenderCallbacksBlockquote := ⟨fun x => .ref x.val ""�
 instance : FromJS MarkdownRenderCallbacksBlockquote := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksBlockquote", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MarkdownRenderCallbacksBlockquote.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksBlockquote := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MarkdownRenderCallbacksBlockquote.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksBlockquote := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -5386,13 +5298,13 @@ instance : ToJS MarkdownRenderCallbacksCode := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MarkdownRenderCallbacksCode := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksCode", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MarkdownRenderCallbacksCode.ofFn (f : String → (Option MarkdownCodeBlockMeta) → Async (Option String)) : IO MarkdownRenderCallbacksCode := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg (Option MarkdownCodeBlockMeta) args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg (Option MarkdownCodeBlockMeta) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MarkdownRenderCallbacksCode.ofSyncFn (f : String → (Option MarkdownCodeBlockMeta) → IO (Option String)) : IO MarkdownRenderCallbacksCode := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg (Option MarkdownCodeBlockMeta) args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg (Option MarkdownCodeBlockMeta) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -5421,13 +5333,13 @@ instance : ToJS MarkdownRenderCallbacksList := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MarkdownRenderCallbacksList := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksList", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MarkdownRenderCallbacksList.ofFn (f : String → MarkdownListMeta → Async (Option String)) : IO MarkdownRenderCallbacksList := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg MarkdownListMeta args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg MarkdownListMeta args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MarkdownRenderCallbacksList.ofSyncFn (f : String → MarkdownListMeta → IO (Option String)) : IO MarkdownRenderCallbacksList := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg MarkdownListMeta args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg MarkdownListMeta args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -5462,13 +5374,13 @@ instance : ToJS MarkdownRenderCallbacksListItem := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MarkdownRenderCallbacksListItem := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksListItem", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MarkdownRenderCallbacksListItem.ofFn (f : String → MarkdownListItemMeta → Async (Option String)) : IO MarkdownRenderCallbacksListItem := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg MarkdownListItemMeta args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg MarkdownListItemMeta args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MarkdownRenderCallbacksListItem.ofSyncFn (f : String → MarkdownListItemMeta → IO (Option String)) : IO MarkdownRenderCallbacksListItem := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg MarkdownListItemMeta args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg MarkdownListItemMeta args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -5482,13 +5394,13 @@ instance : ToJS MarkdownRenderCallbacksHr := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MarkdownRenderCallbacksHr := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksHr", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MarkdownRenderCallbacksHr.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksHr := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MarkdownRenderCallbacksHr.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksHr := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -5502,13 +5414,13 @@ instance : ToJS MarkdownRenderCallbacksTable := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MarkdownRenderCallbacksTable := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksTable", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MarkdownRenderCallbacksTable.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksTable := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MarkdownRenderCallbacksTable.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksTable := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -5522,13 +5434,13 @@ instance : ToJS MarkdownRenderCallbacksThead := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MarkdownRenderCallbacksThead := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksThead", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MarkdownRenderCallbacksThead.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksThead := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MarkdownRenderCallbacksThead.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksThead := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -5542,13 +5454,13 @@ instance : ToJS MarkdownRenderCallbacksTbody := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MarkdownRenderCallbacksTbody := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksTbody", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MarkdownRenderCallbacksTbody.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksTbody := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MarkdownRenderCallbacksTbody.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksTbody := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -5562,13 +5474,13 @@ instance : ToJS MarkdownRenderCallbacksTr := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MarkdownRenderCallbacksTr := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksTr", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MarkdownRenderCallbacksTr.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksTr := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MarkdownRenderCallbacksTr.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksTr := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -5591,13 +5503,13 @@ instance : ToJS MarkdownRenderCallbacksTh := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MarkdownRenderCallbacksTh := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksTh", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MarkdownRenderCallbacksTh.ofFn (f : String → (Option MarkdownCellMeta) → Async (Option String)) : IO MarkdownRenderCallbacksTh := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg (Option MarkdownCellMeta) args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg (Option MarkdownCellMeta) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MarkdownRenderCallbacksTh.ofSyncFn (f : String → (Option MarkdownCellMeta) → IO (Option String)) : IO MarkdownRenderCallbacksTh := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg (Option MarkdownCellMeta) args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg (Option MarkdownCellMeta) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -5611,13 +5523,13 @@ instance : ToJS MarkdownRenderCallbacksTd := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MarkdownRenderCallbacksTd := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksTd", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MarkdownRenderCallbacksTd.ofFn (f : String → (Option MarkdownCellMeta) → Async (Option String)) : IO MarkdownRenderCallbacksTd := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg (Option MarkdownCellMeta) args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg (Option MarkdownCellMeta) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MarkdownRenderCallbacksTd.ofSyncFn (f : String → (Option MarkdownCellMeta) → IO (Option String)) : IO MarkdownRenderCallbacksTd := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg (Option MarkdownCellMeta) args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg (Option MarkdownCellMeta) args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -5631,13 +5543,13 @@ instance : ToJS MarkdownRenderCallbacksHtml := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MarkdownRenderCallbacksHtml := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksHtml", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MarkdownRenderCallbacksHtml.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksHtml := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MarkdownRenderCallbacksHtml.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksHtml := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -5651,13 +5563,13 @@ instance : ToJS MarkdownRenderCallbacksStrong := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MarkdownRenderCallbacksStrong := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksStrong", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MarkdownRenderCallbacksStrong.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksStrong := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MarkdownRenderCallbacksStrong.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksStrong := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -5671,13 +5583,13 @@ instance : ToJS MarkdownRenderCallbacksEmphasis := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MarkdownRenderCallbacksEmphasis := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksEmphasis", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MarkdownRenderCallbacksEmphasis.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksEmphasis := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MarkdownRenderCallbacksEmphasis.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksEmphasis := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -5703,13 +5615,13 @@ instance : ToJS MarkdownRenderCallbacksLink := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MarkdownRenderCallbacksLink := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksLink", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MarkdownRenderCallbacksLink.ofFn (f : String → MarkdownLinkMeta → Async (Option String)) : IO MarkdownRenderCallbacksLink := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg MarkdownLinkMeta args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg MarkdownLinkMeta args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MarkdownRenderCallbacksLink.ofSyncFn (f : String → MarkdownLinkMeta → IO (Option String)) : IO MarkdownRenderCallbacksLink := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg MarkdownLinkMeta args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg MarkdownLinkMeta args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -5735,13 +5647,13 @@ instance : ToJS MarkdownRenderCallbacksImage := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MarkdownRenderCallbacksImage := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksImage", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MarkdownRenderCallbacksImage.ofFn (f : String → MarkdownImageMeta → Async (Option String)) : IO MarkdownRenderCallbacksImage := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg MarkdownImageMeta args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg MarkdownImageMeta args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MarkdownRenderCallbacksImage.ofSyncFn (f : String → MarkdownImageMeta → IO (Option String)) : IO MarkdownRenderCallbacksImage := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0) (← Support.arg MarkdownImageMeta args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0) (← Internal.arg MarkdownImageMeta args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -5755,13 +5667,13 @@ instance : ToJS MarkdownRenderCallbacksCodespan := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MarkdownRenderCallbacksCodespan := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksCodespan", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MarkdownRenderCallbacksCodespan.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksCodespan := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MarkdownRenderCallbacksCodespan.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksCodespan := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -5775,13 +5687,13 @@ instance : ToJS MarkdownRenderCallbacksStrikethrough := ⟨fun x => .ref x.val "
 instance : FromJS MarkdownRenderCallbacksStrikethrough := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksStrikethrough", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MarkdownRenderCallbacksStrikethrough.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksStrikethrough := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MarkdownRenderCallbacksStrikethrough.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksStrikethrough := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -5795,13 +5707,13 @@ instance : ToJS MarkdownRenderCallbacksText := ⟨fun x => .ref x.val ""⟩
 instance : FromJS MarkdownRenderCallbacksText := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Bun.MarkdownRenderCallbacksText", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def MarkdownRenderCallbacksText.ofFn (f : String → Async (Option String)) : IO MarkdownRenderCallbacksText := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def MarkdownRenderCallbacksText.ofSyncFn (f : String → IO (Option String)) : IO MarkdownRenderCallbacksText := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg String args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg String args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -5850,27 +5762,27 @@ structure MarkdownRenderCallbacks where
   strikethrough : Option MarkdownRenderCallbacksStrikethrough := none
   /-- `MarkdownRenderCallbacksText text` -/
   text : Option MarkdownRenderCallbacksText := none
-instance : ToJS MarkdownRenderCallbacks := ⟨fun d => Support.fields #[("heading", Support.optional d.heading),
-    ("paragraph", Support.optional d.paragraph),
-    ("blockquote", Support.optional d.blockquote),
-    ("code", Support.optional d.code),
-    ("list", Support.optional d.list),
-    ("listItem", Support.optional d.listItem),
-    ("hr", Support.optional d.hr),
-    ("table", Support.optional d.table),
-    ("thead", Support.optional d.thead),
-    ("tbody", Support.optional d.tbody),
-    ("tr", Support.optional d.tr),
-    ("th", Support.optional d.th),
-    ("td", Support.optional d.td),
-    ("html", Support.optional d.html),
-    ("strong", Support.optional d.strong),
-    ("emphasis", Support.optional d.emphasis),
-    ("link", Support.optional d.link),
-    ("image", Support.optional d.image),
-    ("codespan", Support.optional d.codespan),
-    ("strikethrough", Support.optional d.strikethrough),
-    ("text", Support.optional d.text)]⟩
+instance : ToJS MarkdownRenderCallbacks := ⟨fun d => Internal.fields #[("heading", Internal.optional d.heading),
+    ("paragraph", Internal.optional d.paragraph),
+    ("blockquote", Internal.optional d.blockquote),
+    ("code", Internal.optional d.code),
+    ("list", Internal.optional d.list),
+    ("listItem", Internal.optional d.listItem),
+    ("hr", Internal.optional d.hr),
+    ("table", Internal.optional d.table),
+    ("thead", Internal.optional d.thead),
+    ("tbody", Internal.optional d.tbody),
+    ("tr", Internal.optional d.tr),
+    ("th", Internal.optional d.th),
+    ("td", Internal.optional d.td),
+    ("html", Internal.optional d.html),
+    ("strong", Internal.optional d.strong),
+    ("emphasis", Internal.optional d.emphasis),
+    ("link", Internal.optional d.link),
+    ("image", Internal.optional d.image),
+    ("codespan", Internal.optional d.codespan),
+    ("strikethrough", Internal.optional d.strikethrough),
+    ("text", Internal.optional d.text)]⟩
 
 /-- `typedef DnsLookupOptionsFamilyLiteral or double DnsLookupOptionsFamilyLiteralOrDouble`: one constructor per member type. -/
 inductive DnsLookupOptionsFamilyLiteralOrDouble where
@@ -5896,11 +5808,11 @@ structure DnsLookupOptions where
   port : Option Nat := none
   /-- `DnsLookupOptionsBackend backend` -/
   backend : Option DnsLookupOptionsBackend := none
-instance : ToJS DnsLookupOptions := ⟨fun d => Support.fields #[("family", Support.optional d.family),
-    ("socketType", Support.optional d.socketType),
-    ("flags", Support.optional d.flags),
-    ("port", Support.optional d.port),
-    ("backend", Support.optional d.backend)]⟩
+instance : ToJS DnsLookupOptions := ⟨fun d => Internal.fields #[("family", Internal.optional d.family),
+    ("socketType", Internal.optional d.socketType),
+    ("flags", Internal.optional d.flags),
+    ("port", Internal.optional d.port),
+    ("backend", Internal.optional d.backend)]⟩
 
 /-- `dictionary DNSLookup` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DNSLookup where
@@ -5951,10 +5863,10 @@ structure CSRFGenerateOptions where
   algorithm : Option CSRFAlgorithm := none
   /-- `DOMString sessionId` -/
   sessionId : Option String := none
-instance : ToJS CSRFGenerateOptions := ⟨fun d => Support.fields #[("expiresIn", Support.optional d.expiresIn),
-    ("encoding", Support.optional d.encoding),
-    ("algorithm", Support.optional d.algorithm),
-    ("sessionId", Support.optional d.sessionId)]⟩
+instance : ToJS CSRFGenerateOptions := ⟨fun d => Internal.fields #[("expiresIn", Internal.optional d.expiresIn),
+    ("encoding", Internal.optional d.encoding),
+    ("algorithm", Internal.optional d.algorithm),
+    ("sessionId", Internal.optional d.sessionId)]⟩
 
 /-- `dictionary CSRFVerifyOptions` (Bun 1.4.4 type declarations, bun.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CSRFVerifyOptions where
@@ -5968,23 +5880,23 @@ structure CSRFVerifyOptions where
   maxAge : Option Float := none
   /-- `DOMString sessionId` -/
   sessionId : Option String := none
-instance : ToJS CSRFVerifyOptions := ⟨fun d => Support.fields #[("secret", Support.optional d.secret),
-    ("encoding", Support.optional d.encoding),
-    ("algorithm", Support.optional d.algorithm),
-    ("maxAge", Support.optional d.maxAge),
-    ("sessionId", Support.optional d.sessionId)]⟩
+instance : ToJS CSRFVerifyOptions := ⟨fun d => Internal.fields #[("secret", Internal.optional d.secret),
+    ("encoding", Internal.optional d.encoding),
+    ("algorithm", Internal.optional d.algorithm),
+    ("maxAge", Internal.optional d.maxAge),
+    ("sessionId", Internal.optional d.sessionId)]⟩
 
 /-- `dictionary InspectTableOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure InspectTableOptions where
   /-- `boolean colors` -/
   colors : Option Bool := none
-instance : ToJS InspectTableOptions := ⟨fun d => Support.fields #[("colors", Support.optional d.colors)]⟩
+instance : ToJS InspectTableOptions := ⟨fun d => Internal.fields #[("colors", Internal.optional d.colors)]⟩
 
 /-- `dictionary InspectTableWithOptionsOptions` (Bun 1.4.4 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure InspectTableWithOptionsOptions where
   /-- `boolean colors` -/
   colors : Option Bool := none
-instance : ToJS InspectTableWithOptionsOptions := ⟨fun d => Support.fields #[("colors", Support.optional d.colors)]⟩
+instance : ToJS InspectTableWithOptionsOptions := ⟨fun d => Internal.fields #[("colors", Internal.optional d.colors)]⟩
 
 /-- `typedef DOMString or StringLike StringLikeUnion`: one constructor per member type. -/
 inductive StringLikeUnion where
@@ -5999,1404 +5911,1518 @@ instance : Coe String StringLikeUnion := ⟨.domString⟩
 instance : Coe StringLike StringLikeUnion := ⟨.stringLike⟩
 
 /-- `write(chunk: string | ArrayBufferView | ArrayBuffer | SharedArrayBuffer): number | Promise<number>`: `Promise<double> write(DOMStringOrUint8ArrayOrArrayBuffer chunk)` -/
-def FileSink.write (self : FileSink) (chunk : DOMStringOrUint8ArrayOrArrayBuffer) : Async Float :=
-  self.val.callMethodAwait "write" (Support.args #[toJS chunk]) Float
+@[macro_inline] def FileSink.write (self : FileSink) (chunk : DOMStringOrUint8ArrayOrArrayBuffer) : Async Float := Internal.api "Lasm.JS.Bun.FileSink.write" do
+  self.val.callMethodAwait "write" (Internal.args #[toJS chunk]) Float
 
 /-- `flush(): number | Promise<number>`: `Promise<double> flush()` -/
-def FileSink.flush (self : FileSink) : Async Float :=
-  self.val.callMethodAwait "flush" (Support.args #[]) Float
+@[macro_inline] def FileSink.flush (self : FileSink) : Async Float := Internal.api "Lasm.JS.Bun.FileSink.flush" do
+  self.val.callMethodAwait "flush" (Internal.args #[]) Float
 
 /-- `end(error?: Error): number | Promise<number>`: `Promise<double> end(optional object error)` -/
-def FileSink.«end» (self : FileSink) (error : Data := .undefined) : Async Float :=
-  self.val.callMethodAwait "end" (Support.args #[error]) Float
+@[macro_inline] def FileSink.«end» (self : FileSink) (error : Data := .undefined) : Async Float := Internal.api "Lasm.JS.Bun.FileSink.end" do
+  self.val.callMethodAwait "end" (Internal.args #[error]) Float
 
 /-- `start(options?: { highWaterMark?: number; }): void`: `undefined start(optional FileSinkStartOptions options)` -/
-def FileSink.start (self : FileSink) (options : Option FileSinkStartOptions := none) : IO Unit :=
-  self.val.callMethod "start" (Support.args #[Support.optional options]) Unit
+@[macro_inline] def FileSink.start (self : FileSink) (options : Option FileSinkStartOptions := none) : IO Unit := Internal.api "Lasm.JS.Bun.FileSink.start" do
+  self.val.callMethod "start" (Internal.args #[Internal.optional options]) Unit
 
 /-- `ref(): void`: `undefined ref()` -/
-def FileSink.ref (self : FileSink) : IO Unit :=
-  self.val.callMethod "ref" (Support.args #[]) Unit
+@[macro_inline] def FileSink.ref (self : FileSink) : IO Unit := Internal.api "Lasm.JS.Bun.FileSink.ref" do
+  self.val.callMethod "ref" (Internal.args #[]) Unit
 
 /-- `unref(): void`: `undefined unref()` -/
-def FileSink.unref (self : FileSink) : IO Unit :=
-  self.val.callMethod "unref" (Support.args #[]) Unit
+@[macro_inline] def FileSink.unref (self : FileSink) : IO Unit := Internal.api "Lasm.JS.Bun.FileSink.unref" do
+  self.val.callMethod "unref" (Internal.args #[]) Unit
 
 /-- `lastModified: number`: `readonly attribute double lastModified` -/
-def BunFile.lastModified (self : BunFile) : IO Float := self.val.get "lastModified" Float
+@[macro_inline] def BunFile.lastModified (self : BunFile) : IO Float := Internal.api "Lasm.JS.Bun.BunFile.lastModified" do
+  self.val.get "lastModified" Float
 
 /-- `readonly name?: string`: `readonly attribute DOMString? name` -/
-def BunFile.name (self : BunFile) : IO (Option String) := self.val.get "name" (Option String)
+@[macro_inline] def BunFile.name (self : BunFile) : IO (Option String) := Internal.api "Lasm.JS.Bun.BunFile.name" do
+  self.val.get "name" (Option String)
 
 /-- `slice(begin?: number, end?: number, contentType?: string): BunFile`: `BunFile slice(optional double begin, optional double end, optional DOMString contentType)` -/
-def BunFile.slice (self : BunFile) (begin : Option Float := none) («end» : Option Float := none) (contentType : Option String := none) : IO BunFile := do
-  let r ← self.val.callMethod "slice" (Support.args #[Support.optional begin, Support.optional «end», Support.optional contentType]) Value
+@[macro_inline] def BunFile.slice (self : BunFile) (begin : Option Float := none) («end» : Option Float := none) (contentType : Option String := none) : IO BunFile := Internal.api "Lasm.JS.Bun.BunFile.slice" do
+  let r ← self.val.callMethod "slice" (Internal.args #[Internal.optional begin, Internal.optional «end», Internal.optional contentType]) Value
   pure { val := r }
 
 /-- `slice(begin?: number, contentType?: string): BunFile`: `BunFile slice(optional double begin, optional DOMString contentType)` -/
-def BunFile.sliceFrom (self : BunFile) (begin : Option Float := none) (contentType : Option String := none) : IO BunFile := do
-  let r ← self.val.callMethod "slice" (Support.args #[Support.optional begin, Support.optional contentType]) Value
+@[macro_inline] def BunFile.sliceFrom (self : BunFile) (begin : Option Float := none) (contentType : Option String := none) : IO BunFile := Internal.api "Lasm.JS.Bun.BunFile.sliceFrom" do
+  let r ← self.val.callMethod "slice" (Internal.args #[Internal.optional begin, Internal.optional contentType]) Value
   pure { val := r }
 
 /-- `slice(contentType?: string): BunFile`: `BunFile slice(optional DOMString contentType)` -/
-def BunFile.sliceWithType (self : BunFile) (contentType : Option String := none) : IO BunFile := do
-  let r ← self.val.callMethod "slice" (Support.args #[Support.optional contentType]) Value
+@[macro_inline] def BunFile.sliceWithType (self : BunFile) (contentType : Option String := none) : IO BunFile := Internal.api "Lasm.JS.Bun.BunFile.sliceWithType" do
+  let r ← self.val.callMethod "slice" (Internal.args #[Internal.optional contentType]) Value
   pure { val := r }
 
 /-- `writer(options?: { highWaterMark?: number }): FileSink`: `FileSink writer(optional BunFileWriterOptions options)` -/
-def BunFile.writer (self : BunFile) (options : Option BunFileWriterOptions := none) : IO FileSink := do
-  let r ← self.val.callMethod "writer" (Support.args #[Support.optional options]) Value
+@[macro_inline] def BunFile.writer (self : BunFile) (options : Option BunFileWriterOptions := none) : IO FileSink := Internal.api "Lasm.JS.Bun.BunFile.writer" do
+  let r ← self.val.callMethod "writer" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `exists(): Promise<boolean>`: `Promise<boolean> exists()` -/
-def BunFile.«exists» (self : BunFile) : Async Bool :=
-  self.val.callMethodAwait "exists" (Support.args #[]) Bool
+@[macro_inline] def BunFile.«exists» (self : BunFile) : Async Bool := Internal.api "Lasm.JS.Bun.BunFile.exists" do
+  self.val.callMethodAwait "exists" (Internal.args #[]) Bool
 
 /-- `write(data: string | ArrayBufferView | ArrayBuffer | SharedArrayBuffer | Request | Response | BunFile | ReadableStream, options?: { highWaterMark?: number }): Promise<number>`: `Promise<double> write(DOMStringOrUint8ArrayOrArrayBufferOrRequestOrResponseOrBunFileOrReadableStream data, optional BunFileWriteOptions options)` -/
-def BunFile.write (self : BunFile) (data : DOMStringOrUint8ArrayOrArrayBufferOrRequestOrResponseOrBunFileOrReadableStream) (options : Option BunFileWriteOptions := none) : Async Float :=
-  self.val.callMethodAwait "write" (Support.args #[toJS data, Support.optional options]) Float
+@[macro_inline] def BunFile.write (self : BunFile) (data : DOMStringOrUint8ArrayOrArrayBufferOrRequestOrResponseOrBunFileOrReadableStream) (options : Option BunFileWriteOptions := none) : Async Float := Internal.api "Lasm.JS.Bun.BunFile.write" do
+  self.val.callMethodAwait "write" (Internal.args #[toJS data, Internal.optional options]) Float
 
 /-- `unlink(): Promise<void>`: `Promise<undefined> unlink()` -/
-def BunFile.unlink (self : BunFile) : Async Unit :=
-  self.val.callMethodAwait "unlink" (Support.args #[]) Unit
+@[macro_inline] def BunFile.unlink (self : BunFile) : Async Unit := Internal.api "Lasm.JS.Bun.BunFile.unlink" do
+  self.val.callMethodAwait "unlink" (Internal.args #[]) Unit
 
 /-- `delete(): Promise<void>`: `Promise<undefined> delete()` -/
-def BunFile.delete (self : BunFile) : Async Unit :=
-  self.val.callMethodAwait "delete" (Support.args #[]) Unit
+@[macro_inline] def BunFile.delete (self : BunFile) : Async Unit := Internal.api "Lasm.JS.Bun.BunFile.delete" do
+  self.val.callMethodAwait "delete" (Internal.args #[]) Unit
 
 /-- `stat(): Promise<import('node:fs').Stats>`: `Promise<object> stat()` -/
-def BunFile.stat (self : BunFile) : Async Data :=
-  self.val.callMethodAwait "stat" (Support.args #[]) Data
+@[macro_inline] def BunFile.stat (self : BunFile) : Async Data := Internal.api "Lasm.JS.Bun.BunFile.stat" do
+  self.val.callMethodAwait "stat" (Internal.args #[]) Data
 
 /-- `acl?: | 'private' | 'public-read' | 'public-read-write' | 'aws-exec-read' | 'authenticated-read' | 'bucket-owner-read' | 'bucket-owner-full-control' | 'log-delivery-write'`: `readonly attribute S3OptionsAcl? acl` -/
-def S3Options.acl (self : S3Options) : IO (Option S3OptionsAcl) := self.val.get "acl" (Option S3OptionsAcl)
+@[macro_inline] def S3Options.acl (self : S3Options) : IO (Option S3OptionsAcl) := Internal.api "Lasm.JS.Bun.S3Options.acl" do
+  self.val.get "acl" (Option S3OptionsAcl)
 
 /-- `bucket?: string`: `readonly attribute DOMString? bucket` -/
-def S3Options.bucket (self : S3Options) : IO (Option String) := self.val.get "bucket" (Option String)
+@[macro_inline] def S3Options.bucket (self : S3Options) : IO (Option String) := Internal.api "Lasm.JS.Bun.S3Options.bucket" do
+  self.val.get "bucket" (Option String)
 
 /-- `region?: string`: `readonly attribute DOMString? region` -/
-def S3Options.region (self : S3Options) : IO (Option String) := self.val.get "region" (Option String)
+@[macro_inline] def S3Options.region (self : S3Options) : IO (Option String) := Internal.api "Lasm.JS.Bun.S3Options.region" do
+  self.val.get "region" (Option String)
 
 /-- `accessKeyId?: string`: `readonly attribute DOMString? accessKeyId` -/
-def S3Options.accessKeyId (self : S3Options) : IO (Option String) := self.val.get "accessKeyId" (Option String)
+@[macro_inline] def S3Options.accessKeyId (self : S3Options) : IO (Option String) := Internal.api "Lasm.JS.Bun.S3Options.accessKeyId" do
+  self.val.get "accessKeyId" (Option String)
 
 /-- `secretAccessKey?: string`: `readonly attribute DOMString? secretAccessKey` -/
-def S3Options.secretAccessKey (self : S3Options) : IO (Option String) := self.val.get "secretAccessKey" (Option String)
+@[macro_inline] def S3Options.secretAccessKey (self : S3Options) : IO (Option String) := Internal.api "Lasm.JS.Bun.S3Options.secretAccessKey" do
+  self.val.get "secretAccessKey" (Option String)
 
 /-- `sessionToken?: string`: `readonly attribute DOMString? sessionToken` -/
-def S3Options.sessionToken (self : S3Options) : IO (Option String) := self.val.get "sessionToken" (Option String)
+@[macro_inline] def S3Options.sessionToken (self : S3Options) : IO (Option String) := Internal.api "Lasm.JS.Bun.S3Options.sessionToken" do
+  self.val.get "sessionToken" (Option String)
 
 /-- `endpoint?: string`: `readonly attribute DOMString? endpoint` -/
-def S3Options.endpoint (self : S3Options) : IO (Option String) := self.val.get "endpoint" (Option String)
+@[macro_inline] def S3Options.endpoint (self : S3Options) : IO (Option String) := Internal.api "Lasm.JS.Bun.S3Options.endpoint" do
+  self.val.get "endpoint" (Option String)
 
 /-- `virtualHostedStyle?: boolean`: `readonly attribute boolean? virtualHostedStyle` -/
-def S3Options.virtualHostedStyle (self : S3Options) : IO (Option Bool) := self.val.get "virtualHostedStyle" (Option Bool)
+@[macro_inline] def S3Options.virtualHostedStyle (self : S3Options) : IO (Option Bool) := Internal.api "Lasm.JS.Bun.S3Options.virtualHostedStyle" do
+  self.val.get "virtualHostedStyle" (Option Bool)
 
 /-- `partSize?: number`: `readonly attribute double? partSize` -/
-def S3Options.partSize (self : S3Options) : IO (Option Float) := self.val.get "partSize" (Option Float)
+@[macro_inline] def S3Options.partSize (self : S3Options) : IO (Option Float) := Internal.api "Lasm.JS.Bun.S3Options.partSize" do
+  self.val.get "partSize" (Option Float)
 
 /-- `queueSize?: number`: `readonly attribute double? queueSize` -/
-def S3Options.queueSize (self : S3Options) : IO (Option Float) := self.val.get "queueSize" (Option Float)
+@[macro_inline] def S3Options.queueSize (self : S3Options) : IO (Option Float) := Internal.api "Lasm.JS.Bun.S3Options.queueSize" do
+  self.val.get "queueSize" (Option Float)
 
 /-- `retry?: number`: `readonly attribute double? retry` -/
-def S3Options.retry (self : S3Options) : IO (Option Float) := self.val.get "retry" (Option Float)
+@[macro_inline] def S3Options.retry (self : S3Options) : IO (Option Float) := Internal.api "Lasm.JS.Bun.S3Options.retry" do
+  self.val.get "retry" (Option Float)
 
 /-- `type?: string`: `readonly attribute DOMString? type` -/
-def S3Options.type (self : S3Options) : IO (Option String) := self.val.get "type" (Option String)
+@[macro_inline] def S3Options.type (self : S3Options) : IO (Option String) := Internal.api "Lasm.JS.Bun.S3Options.type" do
+  self.val.get "type" (Option String)
 
 /-- `contentDisposition?: string | undefined`: `readonly attribute DOMString? contentDisposition` -/
-def S3Options.contentDisposition (self : S3Options) : IO (Option String) := self.val.get "contentDisposition" (Option String)
+@[macro_inline] def S3Options.contentDisposition (self : S3Options) : IO (Option String) := Internal.api "Lasm.JS.Bun.S3Options.contentDisposition" do
+  self.val.get "contentDisposition" (Option String)
 
 /-- `contentEncoding?: string | undefined`: `readonly attribute DOMString? contentEncoding` -/
-def S3Options.contentEncoding (self : S3Options) : IO (Option String) := self.val.get "contentEncoding" (Option String)
+@[macro_inline] def S3Options.contentEncoding (self : S3Options) : IO (Option String) := Internal.api "Lasm.JS.Bun.S3Options.contentEncoding" do
+  self.val.get "contentEncoding" (Option String)
 
 /-- `storageClass?: | 'STANDARD' | 'DEEP_ARCHIVE' | 'EXPRESS_ONEZONE' | 'GLACIER' | 'GLACIER_IR' | 'INTELLIGENT_TIERING' | 'ONEZONE_IA' | 'OUTPOSTS' | 'REDUCED_REDUNDANCY' | 'SNOW' | 'STANDARD_IA'`: `readonly attribute S3OptionsStorageClass? storageClass` -/
-def S3Options.storageClass (self : S3Options) : IO (Option S3OptionsStorageClass) := self.val.get "storageClass" (Option S3OptionsStorageClass)
+@[macro_inline] def S3Options.storageClass (self : S3Options) : IO (Option S3OptionsStorageClass) := Internal.api "Lasm.JS.Bun.S3Options.storageClass" do
+  self.val.get "storageClass" (Option S3OptionsStorageClass)
 
 /-- `requestPayer?: boolean`: `readonly attribute boolean? requestPayer` -/
-def S3Options.requestPayer (self : S3Options) : IO (Option Bool) := self.val.get "requestPayer" (Option Bool)
+@[macro_inline] def S3Options.requestPayer (self : S3Options) : IO (Option Bool) := Internal.api "Lasm.JS.Bun.S3Options.requestPayer" do
+  self.val.get "requestPayer" (Option Bool)
 
 /-- `write(chunk: string | ArrayBufferView | ArrayBuffer | SharedArrayBuffer): number | Promise<number>`: `Promise<double> write(DOMStringOrUint8ArrayOrArrayBuffer chunk)` -/
-def NetworkSink.write (self : NetworkSink) (chunk : DOMStringOrUint8ArrayOrArrayBuffer) : Async Float :=
-  self.val.callMethodAwait "write" (Support.args #[toJS chunk]) Float
+@[macro_inline] def NetworkSink.write (self : NetworkSink) (chunk : DOMStringOrUint8ArrayOrArrayBuffer) : Async Float := Internal.api "Lasm.JS.Bun.NetworkSink.write" do
+  self.val.callMethodAwait "write" (Internal.args #[toJS chunk]) Float
 
 /-- `flush(): number | Promise<number>`: `Promise<double> flush()` -/
-def NetworkSink.flush (self : NetworkSink) : Async Float :=
-  self.val.callMethodAwait "flush" (Support.args #[]) Float
+@[macro_inline] def NetworkSink.flush (self : NetworkSink) : Async Float := Internal.api "Lasm.JS.Bun.NetworkSink.flush" do
+  self.val.callMethodAwait "flush" (Internal.args #[]) Float
 
 /-- `end(error?: Error): number | Promise<number>`: `Promise<double> end(optional object error)` -/
-def NetworkSink.«end» (self : NetworkSink) (error : Data := .undefined) : Async Float :=
-  self.val.callMethodAwait "end" (Support.args #[error]) Float
+@[macro_inline] def NetworkSink.«end» (self : NetworkSink) (error : Data := .undefined) : Async Float := Internal.api "Lasm.JS.Bun.NetworkSink.end" do
+  self.val.callMethodAwait "end" (Internal.args #[error]) Float
 
 /-- `stat(): Promise<import('node:fs').Stats>`: `Promise<object> stat()` -/
-def NetworkSink.stat (self : NetworkSink) : Async Data :=
-  self.val.callMethodAwait "stat" (Support.args #[]) Data
+@[macro_inline] def NetworkSink.stat (self : NetworkSink) : Async Data := Internal.api "Lasm.JS.Bun.NetworkSink.stat" do
+  self.val.callMethodAwait "stat" (Internal.args #[]) Data
 
 /-- `constructor(data: ArchiveInput, options?: ArchiveOptions)`: `constructor(ArchiveInput data, optional ArchiveOptions options)` -/
-def Archive.new (data : ArchiveInput) (options : Option ArchiveOptions := none) : IO Archive :=
+@[macro_inline] def Archive.new (data : ArchiveInput) (options : Option ArchiveOptions := none) : IO Archive := Internal.api "Lasm.JS.Bun.Archive.new" do
   Lasm.JS.Binding.invoke Archive { name := "Lasm.JS.Bun.Archive.new", module := "globalThis", path := "Bun.Archive", construct := true, arity := 2 }
-    (Support.args #[toJS data, Support.optional options]) (await := false)
+    (Internal.args #[toJS data, Internal.optional options]) (await := false)
 
 /-- `static write(path: string, data: ArchiveInput | Archive, options?: ArchiveOptions): Promise<void>`: `static Promise<undefined> write(DOMString path, ArchiveInputOrArchive data, optional ArchiveOptions options)` -/
-def Archive.write (path : String) (data : ArchiveInputOrArchive) (options : Option ArchiveOptions := none) : Async Unit :=
+@[macro_inline] def Archive.write (path : String) (data : ArchiveInputOrArchive) (options : Option ArchiveOptions := none) : Async Unit := Internal.api "Lasm.JS.Bun.Archive.write" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Bun.Archive.write", module := "globalThis", path := "Bun.Archive.write", construct := false, arity := 3 }
-    (Support.args #[toJS path, toJS data, Support.optional options])
+    (Internal.args #[toJS path, toJS data, Internal.optional options])
 
 /-- `extract(path: string, options?: ArchiveExtractOptions): Promise<number>`: `Promise<double> extract(DOMString path, optional ArchiveExtractOptions options)` -/
-def Archive.extract (self : Archive) (path : String) (options : Option ArchiveExtractOptions := none) : Async Float :=
-  self.val.callMethodAwait "extract" (Support.args #[toJS path, Support.optional options]) Float
+@[macro_inline] def Archive.extract (self : Archive) (path : String) (options : Option ArchiveExtractOptions := none) : Async Float := Internal.api "Lasm.JS.Bun.Archive.extract" do
+  self.val.callMethodAwait "extract" (Internal.args #[toJS path, Internal.optional options]) Float
 
 /-- `blob(): Promise<Blob>`: `Promise<Blob> blob()` -/
-def Archive.blob (self : Archive) : Async Blob := do
-  let r ← self.val.callMethodAwait "blob" (Support.args #[]) Value
+@[macro_inline] def Archive.blob (self : Archive) : Async Blob := Internal.api "Lasm.JS.Bun.Archive.blob" do
+  let r ← self.val.callMethodAwait "blob" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `bytes(): Promise<Uint8Array<ArrayBuffer>>`: `Promise<Uint8Array> bytes()` -/
-def Archive.bytes (self : Archive) : Async ByteArray :=
-  self.val.callMethodAwait "bytes" (Support.args #[]) ByteArray
+@[macro_inline] def Archive.bytes (self : Archive) : Async ByteArray := Internal.api "Lasm.JS.Bun.Archive.bytes" do
+  self.val.callMethodAwait "bytes" (Internal.args #[]) ByteArray
 
 /-- `files(glob?: string | readonly string[]): Promise<Map<string, File>>`: `Promise<object> files(optional DOMStringOrSequenceOfDOMString glob)` -/
-def Archive.files (self : Archive) (glob : Option DOMStringOrSequenceOfDOMString := none) : Async Data :=
-  self.val.callMethodAwait "files" (Support.args #[Support.optional glob]) Data
+@[macro_inline] def Archive.files (self : Archive) (glob : Option DOMStringOrSequenceOfDOMString := none) : Async Data := Internal.api "Lasm.JS.Bun.Archive.files" do
+  self.val.callMethodAwait "files" (Internal.args #[Internal.optional glob]) Data
 
 /-- `expiresIn?: number`: `readonly attribute double? expiresIn` -/
-def S3FilePresignOptions.expiresIn (self : S3FilePresignOptions) : IO (Option Float) := self.val.get "expiresIn" (Option Float)
+@[macro_inline] def S3FilePresignOptions.expiresIn (self : S3FilePresignOptions) : IO (Option Float) := Internal.api "Lasm.JS.Bun.S3FilePresignOptions.expiresIn" do
+  self.val.get "expiresIn" (Option Float)
 
 /-- `method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD'`: `readonly attribute S3FilePresignOptionsMethod? method` -/
-def S3FilePresignOptions.method (self : S3FilePresignOptions) : IO (Option S3FilePresignOptionsMethod) := self.val.get "method" (Option S3FilePresignOptionsMethod)
+@[macro_inline] def S3FilePresignOptions.method (self : S3FilePresignOptions) : IO (Option S3FilePresignOptionsMethod) := Internal.api "Lasm.JS.Bun.S3FilePresignOptions.method" do
+  self.val.get "method" (Option S3FilePresignOptionsMethod)
 
 /-- `readonly readable: ReadableStream<Uint8Array<ArrayBuffer>>`: `readonly attribute ReadableStream readable` -/
-def S3File.readable (self : S3File) : IO ReadableStream := do
+@[macro_inline] def S3File.readable (self : S3File) : IO ReadableStream := Internal.api "Lasm.JS.Bun.S3File.readable" do
   let r ← self.val.get "readable" Value
   pure { val := r }
 
 /-- `readonly name?: string`: `readonly attribute DOMString? name` -/
-def S3File.name (self : S3File) : IO (Option String) := self.val.get "name" (Option String)
+@[macro_inline] def S3File.name (self : S3File) : IO (Option String) := Internal.api "Lasm.JS.Bun.S3File.name" do
+  self.val.get "name" (Option String)
 
 /-- `readonly bucket?: string`: `readonly attribute DOMString? bucket` -/
-def S3File.bucket (self : S3File) : IO (Option String) := self.val.get "bucket" (Option String)
+@[macro_inline] def S3File.bucket (self : S3File) : IO (Option String) := Internal.api "Lasm.JS.Bun.S3File.bucket" do
+  self.val.get "bucket" (Option String)
 
 /-- `slice(begin?: number, end?: number, contentType?: string): S3File`: `S3File slice(optional double begin, optional double end, optional DOMString contentType)` -/
-def S3File.slice (self : S3File) (begin : Option Float := none) («end» : Option Float := none) (contentType : Option String := none) : IO S3File := do
-  let r ← self.val.callMethod "slice" (Support.args #[Support.optional begin, Support.optional «end», Support.optional contentType]) Value
+@[macro_inline] def S3File.slice (self : S3File) (begin : Option Float := none) («end» : Option Float := none) (contentType : Option String := none) : IO S3File := Internal.api "Lasm.JS.Bun.S3File.slice" do
+  let r ← self.val.callMethod "slice" (Internal.args #[Internal.optional begin, Internal.optional «end», Internal.optional contentType]) Value
   pure { val := r }
 
 /-- `slice(begin?: number, contentType?: string): S3File`: `S3File slice(optional double begin, optional DOMString contentType)` -/
-def S3File.sliceFrom (self : S3File) (begin : Option Float := none) (contentType : Option String := none) : IO S3File := do
-  let r ← self.val.callMethod "slice" (Support.args #[Support.optional begin, Support.optional contentType]) Value
+@[macro_inline] def S3File.sliceFrom (self : S3File) (begin : Option Float := none) (contentType : Option String := none) : IO S3File := Internal.api "Lasm.JS.Bun.S3File.sliceFrom" do
+  let r ← self.val.callMethod "slice" (Internal.args #[Internal.optional begin, Internal.optional contentType]) Value
   pure { val := r }
 
 /-- `slice(contentType?: string): S3File`: `S3File slice(optional DOMString contentType)` -/
-def S3File.sliceWithType (self : S3File) (contentType : Option String := none) : IO S3File := do
-  let r ← self.val.callMethod "slice" (Support.args #[Support.optional contentType]) Value
+@[macro_inline] def S3File.sliceWithType (self : S3File) (contentType : Option String := none) : IO S3File := Internal.api "Lasm.JS.Bun.S3File.sliceWithType" do
+  let r ← self.val.callMethod "slice" (Internal.args #[Internal.optional contentType]) Value
   pure { val := r }
 
 /-- `writer(options?: S3Options): NetworkSink`: `NetworkSink writer(optional S3Options options)` -/
-def S3File.writer (self : S3File) (options : Option S3Options := none) : IO NetworkSink := do
-  let r ← self.val.callMethod "writer" (Support.args #[Support.optional options]) Value
+@[macro_inline] def S3File.writer (self : S3File) (options : Option S3Options := none) : IO NetworkSink := Internal.api "Lasm.JS.Bun.S3File.writer" do
+  let r ← self.val.callMethod "writer" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `stream(): ReadableStream<Uint8Array<ArrayBuffer>>`: `ReadableStream stream()` -/
-def S3File.stream (self : S3File) : IO ReadableStream := do
-  let r ← self.val.callMethod "stream" (Support.args #[]) Value
+@[macro_inline] def S3File.stream (self : S3File) : IO ReadableStream := Internal.api "Lasm.JS.Bun.S3File.stream" do
+  let r ← self.val.callMethod "stream" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `exists(): Promise<boolean>`: `Promise<boolean> exists()` -/
-def S3File.«exists» (self : S3File) : Async Bool :=
-  self.val.callMethodAwait "exists" (Support.args #[]) Bool
+@[macro_inline] def S3File.«exists» (self : S3File) : Async Bool := Internal.api "Lasm.JS.Bun.S3File.exists" do
+  self.val.callMethodAwait "exists" (Internal.args #[]) Bool
 
 /-- `write(data: | string | ArrayBufferView | ArrayBuffer | SharedArrayBuffer | Request | Response | BunFile | S3File | Blob | Archive, options?: S3Options): Promise<number>`: `Promise<double> write(DOMStringOrUint8ArrayOrArrayBufferOrRequestOrResponseOrBunFileOrS3FileOrBlobOrArchive data, optional S3Options options)` -/
-def S3File.write (self : S3File) (data : DOMStringOrUint8ArrayOrArrayBufferOrRequestOrResponseOrBunFileOrS3FileOrBlobOrArchive) (options : Option S3Options := none) : Async Float :=
-  self.val.callMethodAwait "write" (Support.args #[toJS data, Support.optional options]) Float
+@[macro_inline] def S3File.write (self : S3File) (data : DOMStringOrUint8ArrayOrArrayBufferOrRequestOrResponseOrBunFileOrS3FileOrBlobOrArchive) (options : Option S3Options := none) : Async Float := Internal.api "Lasm.JS.Bun.S3File.write" do
+  self.val.callMethodAwait "write" (Internal.args #[toJS data, Internal.optional options]) Float
 
 /-- `presign(options?: S3FilePresignOptions): string`: `DOMString presign(optional S3FilePresignOptions options)` -/
-def S3File.presign (self : S3File) (options : Option S3FilePresignOptions := none) : IO String :=
-  self.val.callMethod "presign" (Support.args #[Support.optional options]) String
+@[macro_inline] def S3File.presign (self : S3File) (options : Option S3FilePresignOptions := none) : IO String := Internal.api "Lasm.JS.Bun.S3File.presign" do
+  self.val.callMethod "presign" (Internal.args #[Internal.optional options]) String
 
 /-- `delete(): Promise<void>`: `Promise<undefined> delete()` -/
-def S3File.delete (self : S3File) : Async Unit :=
-  self.val.callMethodAwait "delete" (Support.args #[]) Unit
+@[macro_inline] def S3File.delete (self : S3File) : Async Unit := Internal.api "Lasm.JS.Bun.S3File.delete" do
+  self.val.callMethodAwait "delete" (Internal.args #[]) Unit
 
 /-- `stat(): Promise<S3Stats>`: `Promise<S3Stats> stat()` -/
-def S3File.stat (self : S3File) : Async S3Stats :=
-  self.val.callMethodAwait "stat" (Support.args #[]) S3Stats
+@[macro_inline] def S3File.stat (self : S3File) : Async S3Stats := Internal.api "Lasm.JS.Bun.S3File.stat" do
+  self.val.callMethodAwait "stat" (Internal.args #[]) S3Stats
 
 /-- `toString(): string`: `DOMString toString()` -/
-def StringLikeObject.toString (self : StringLikeObject) : IO String :=
-  self.val.callMethod "toString" (Support.args #[]) String
+@[macro_inline] def StringLikeObject.toString (self : StringLikeObject) : IO String := Internal.api "Lasm.JS.Bun.StringLikeObject.toString" do
+  self.val.callMethod "toString" (Internal.args #[]) String
 
 /-- `toString(): string`: `DOMString toString()` -/
-def StringLike.toString (self : StringLike) : IO String :=
-  self.val.callMethod "toString" (Support.args #[]) String
+@[macro_inline] def StringLike.toString (self : StringLike) : IO String := Internal.api "Lasm.JS.Bun.StringLike.toString" do
+  self.val.callMethod "toString" (Internal.args #[]) String
 
 /-- `data: Data`: `readonly attribute undefined data` -/
-def SocketListener.data (self : SocketListener) : IO Unit := self.val.get "data" Unit
+@[macro_inline] def SocketListener.data (self : SocketListener) : IO Unit := Internal.api "Lasm.JS.Bun.SocketListener.data" do
+  self.val.get "data" Unit
 
 /-- `stop(closeActiveConnections?: boolean): void`: `undefined stop(optional boolean closeActiveConnections)` -/
-def SocketListener.stop (self : SocketListener) (closeActiveConnections : Option Bool := none) : IO Unit :=
-  self.val.callMethod "stop" (Support.args #[Support.optional closeActiveConnections]) Unit
+@[macro_inline] def SocketListener.stop (self : SocketListener) (closeActiveConnections : Option Bool := none) : IO Unit := Internal.api "Lasm.JS.Bun.SocketListener.stop" do
+  self.val.callMethod "stop" (Internal.args #[Internal.optional closeActiveConnections]) Unit
 
 /-- `ref(): void`: `undefined ref()` -/
-def SocketListener.ref (self : SocketListener) : IO Unit :=
-  self.val.callMethod "ref" (Support.args #[]) Unit
+@[macro_inline] def SocketListener.ref (self : SocketListener) : IO Unit := Internal.api "Lasm.JS.Bun.SocketListener.ref" do
+  self.val.callMethod "ref" (Internal.args #[]) Unit
 
 /-- `unref(): void`: `undefined unref()` -/
-def SocketListener.unref (self : SocketListener) : IO Unit :=
-  self.val.callMethod "unref" (Support.args #[]) Unit
+@[macro_inline] def SocketListener.unref (self : SocketListener) : IO Unit := Internal.api "Lasm.JS.Bun.SocketListener.unref" do
+  self.val.callMethod "unref" (Internal.args #[]) Unit
 
 /-- `reload(options: Pick<SocketOptions<Data>, 'socket'>): void`: `undefined reload(SocketOptions options)` -/
-def SocketListener.reload (self : SocketListener) (options : SocketOptions) : IO Unit :=
-  self.val.callMethod "reload" (Support.args #[toJS options]) Unit
+@[macro_inline] def SocketListener.reload (self : SocketListener) (options : SocketOptions) : IO Unit := Internal.api "Lasm.JS.Bun.SocketListener.reload" do
+  self.val.callMethod "reload" (Internal.args #[toJS options]) Unit
 
 /-- `data: Data`: `readonly attribute any data` -/
-def SocketUnknown.data (self : SocketUnknown) : IO Data := self.val.get "data" Data
+@[macro_inline] def SocketUnknown.data (self : SocketUnknown) : IO Data := Internal.api "Lasm.JS.Bun.SocketUnknown.data" do
+  self.val.get "data" Data
 
 /-- `readonly readyState: -2 | -1 | 0 | 1 | 2`: `readonly attribute double readyState` -/
-def SocketUnknown.readyState (self : SocketUnknown) : IO Float := self.val.get "readyState" Float
+@[macro_inline] def SocketUnknown.readyState (self : SocketUnknown) : IO Float := Internal.api "Lasm.JS.Bun.SocketUnknown.readyState" do
+  self.val.get "readyState" Float
 
 /-- `readonly listener?: SocketListener`: `readonly attribute SocketListener? listener` -/
-def SocketUnknown.listener (self : SocketUnknown) : IO (Option SocketListener) := self.val.get "listener" (Option SocketListener)
+@[macro_inline] def SocketUnknown.listener (self : SocketUnknown) : IO (Option SocketListener) := Internal.api "Lasm.JS.Bun.SocketUnknown.listener" do
+  self.val.get "listener" (Option SocketListener)
 
 /-- `readonly remoteFamily: 'IPv4' | 'IPv6'`: `readonly attribute SocketUnknownRemoteFamily remoteFamily` -/
-def SocketUnknown.remoteFamily (self : SocketUnknown) : IO SocketUnknownRemoteFamily := self.val.get "remoteFamily" SocketUnknownRemoteFamily
+@[macro_inline] def SocketUnknown.remoteFamily (self : SocketUnknown) : IO SocketUnknownRemoteFamily := Internal.api "Lasm.JS.Bun.SocketUnknown.remoteFamily" do
+  self.val.get "remoteFamily" SocketUnknownRemoteFamily
 
 /-- `readonly remoteAddress: string`: `readonly attribute DOMString remoteAddress` -/
-def SocketUnknown.remoteAddress (self : SocketUnknown) : IO String := self.val.get "remoteAddress" String
+@[macro_inline] def SocketUnknown.remoteAddress (self : SocketUnknown) : IO String := Internal.api "Lasm.JS.Bun.SocketUnknown.remoteAddress" do
+  self.val.get "remoteAddress" String
 
 /-- `readonly remotePort: number`: `readonly attribute double remotePort` -/
-def SocketUnknown.remotePort (self : SocketUnknown) : IO Float := self.val.get "remotePort" Float
+@[macro_inline] def SocketUnknown.remotePort (self : SocketUnknown) : IO Float := Internal.api "Lasm.JS.Bun.SocketUnknown.remotePort" do
+  self.val.get "remotePort" Float
 
 /-- `readonly localFamily: 'IPv4' | 'IPv6'`: `readonly attribute SocketUnknownLocalFamily localFamily` -/
-def SocketUnknown.localFamily (self : SocketUnknown) : IO SocketUnknownLocalFamily := self.val.get "localFamily" SocketUnknownLocalFamily
+@[macro_inline] def SocketUnknown.localFamily (self : SocketUnknown) : IO SocketUnknownLocalFamily := Internal.api "Lasm.JS.Bun.SocketUnknown.localFamily" do
+  self.val.get "localFamily" SocketUnknownLocalFamily
 
 /-- `readonly localAddress: string`: `readonly attribute DOMString localAddress` -/
-def SocketUnknown.localAddress (self : SocketUnknown) : IO String := self.val.get "localAddress" String
+@[macro_inline] def SocketUnknown.localAddress (self : SocketUnknown) : IO String := Internal.api "Lasm.JS.Bun.SocketUnknown.localAddress" do
+  self.val.get "localAddress" String
 
 /-- `readonly localPort: number`: `readonly attribute double localPort` -/
-def SocketUnknown.localPort (self : SocketUnknown) : IO Float := self.val.get "localPort" Float
+@[macro_inline] def SocketUnknown.localPort (self : SocketUnknown) : IO Float := Internal.api "Lasm.JS.Bun.SocketUnknown.localPort" do
+  self.val.get "localPort" Float
 
 /-- `readonly authorized: boolean`: `readonly attribute boolean authorized` -/
-def SocketUnknown.authorized (self : SocketUnknown) : IO Bool := self.val.get "authorized" Bool
+@[macro_inline] def SocketUnknown.authorized (self : SocketUnknown) : IO Bool := Internal.api "Lasm.JS.Bun.SocketUnknown.authorized" do
+  self.val.get "authorized" Bool
 
 /-- `readonly alpnProtocol: string | false | null`: `readonly attribute DOMStringOrBoolean? alpnProtocol` -/
-def SocketUnknown.alpnProtocol (self : SocketUnknown) : IO (Option DOMStringOrBoolean) := self.val.get "alpnProtocol" (Option DOMStringOrBoolean)
+@[macro_inline] def SocketUnknown.alpnProtocol (self : SocketUnknown) : IO (Option DOMStringOrBoolean) := Internal.api "Lasm.JS.Bun.SocketUnknown.alpnProtocol" do
+  self.val.get "alpnProtocol" (Option DOMStringOrBoolean)
 
 /-- `readonly bytesWritten: number`: `readonly attribute double bytesWritten` -/
-def SocketUnknown.bytesWritten (self : SocketUnknown) : IO Float := self.val.get "bytesWritten" Float
+@[macro_inline] def SocketUnknown.bytesWritten (self : SocketUnknown) : IO Float := Internal.api "Lasm.JS.Bun.SocketUnknown.bytesWritten" do
+  self.val.get "bytesWritten" Float
 
 /-- `write(data: string | BufferSource, byteOffset?: number, byteLength?: number): number`: `double write(DOMStringOrUint8Array data, optional double byteOffset, optional double /* integer: Nat */ byteLength)` -/
-def SocketUnknown.write (self : SocketUnknown) (data : DOMStringOrUint8Array) (byteOffset : Option Float := none) (byteLength : Option Nat := none) : IO Float :=
-  self.val.callMethod "write" (Support.args #[toJS data, Support.optional byteOffset, Support.optional byteLength]) Float
+@[macro_inline] def SocketUnknown.write (self : SocketUnknown) (data : DOMStringOrUint8Array) (byteOffset : Option Float := none) (byteLength : Option Nat := none) : IO Float := Internal.api "Lasm.JS.Bun.SocketUnknown.write" do
+  self.val.callMethod "write" (Internal.args #[toJS data, Internal.optional byteOffset, Internal.optional byteLength]) Float
 
 /-- `end(data?: string | BufferSource, byteOffset?: number, byteLength?: number): number`: `double end(optional DOMStringOrUint8Array data, optional double byteOffset, optional double /* integer: Nat */ byteLength)` -/
-def SocketUnknown.«end» (self : SocketUnknown) (data : Option DOMStringOrUint8Array := none) (byteOffset : Option Float := none) (byteLength : Option Nat := none) : IO Float :=
-  self.val.callMethod "end" (Support.args #[Support.optional data, Support.optional byteOffset, Support.optional byteLength]) Float
+@[macro_inline] def SocketUnknown.«end» (self : SocketUnknown) (data : Option DOMStringOrUint8Array := none) (byteOffset : Option Float := none) (byteLength : Option Nat := none) : IO Float := Internal.api "Lasm.JS.Bun.SocketUnknown.end" do
+  self.val.callMethod "end" (Internal.args #[Internal.optional data, Internal.optional byteOffset, Internal.optional byteLength]) Float
 
 /-- `end(): void`: `undefined end()` -/
-def SocketUnknown.end0 (self : SocketUnknown) : IO Unit :=
-  self.val.callMethod "end" (Support.args #[]) Unit
+@[macro_inline] def SocketUnknown.end0 (self : SocketUnknown) : IO Unit := Internal.api "Lasm.JS.Bun.SocketUnknown.end0" do
+  self.val.callMethod "end" (Internal.args #[]) Unit
 
 /-- `ref(): void`: `undefined ref()` -/
-def SocketUnknown.ref (self : SocketUnknown) : IO Unit :=
-  self.val.callMethod "ref" (Support.args #[]) Unit
+@[macro_inline] def SocketUnknown.ref (self : SocketUnknown) : IO Unit := Internal.api "Lasm.JS.Bun.SocketUnknown.ref" do
+  self.val.callMethod "ref" (Internal.args #[]) Unit
 
 /-- `timeout(seconds: number): void`: `undefined timeout(double seconds)` -/
-def SocketUnknown.timeout (self : SocketUnknown) (seconds : Float) : IO Unit :=
-  self.val.callMethod "timeout" (Support.args #[toJS seconds]) Unit
+@[macro_inline] def SocketUnknown.timeout (self : SocketUnknown) (seconds : Float) : IO Unit := Internal.api "Lasm.JS.Bun.SocketUnknown.timeout" do
+  self.val.callMethod "timeout" (Internal.args #[toJS seconds]) Unit
 
 /-- `terminate(): void`: `undefined terminate()` -/
-def SocketUnknown.terminate (self : SocketUnknown) : IO Unit :=
-  self.val.callMethod "terminate" (Support.args #[]) Unit
+@[macro_inline] def SocketUnknown.terminate (self : SocketUnknown) : IO Unit := Internal.api "Lasm.JS.Bun.SocketUnknown.terminate" do
+  self.val.callMethod "terminate" (Internal.args #[]) Unit
 
 /-- `shutdown(halfClose?: boolean): void`: `undefined shutdown(optional boolean halfClose)` -/
-def SocketUnknown.shutdown (self : SocketUnknown) (halfClose : Option Bool := none) : IO Unit :=
-  self.val.callMethod "shutdown" (Support.args #[Support.optional halfClose]) Unit
+@[macro_inline] def SocketUnknown.shutdown (self : SocketUnknown) (halfClose : Option Bool := none) : IO Unit := Internal.api "Lasm.JS.Bun.SocketUnknown.shutdown" do
+  self.val.callMethod "shutdown" (Internal.args #[Internal.optional halfClose]) Unit
 
 /-- `unref(): void`: `undefined unref()` -/
-def SocketUnknown.unref (self : SocketUnknown) : IO Unit :=
-  self.val.callMethod "unref" (Support.args #[]) Unit
+@[macro_inline] def SocketUnknown.unref (self : SocketUnknown) : IO Unit := Internal.api "Lasm.JS.Bun.SocketUnknown.unref" do
+  self.val.callMethod "unref" (Internal.args #[]) Unit
 
 /-- `flush(): void`: `undefined flush()` -/
-def SocketUnknown.flush (self : SocketUnknown) : IO Unit :=
-  self.val.callMethod "flush" (Support.args #[]) Unit
+@[macro_inline] def SocketUnknown.flush (self : SocketUnknown) : IO Unit := Internal.api "Lasm.JS.Bun.SocketUnknown.flush" do
+  self.val.callMethod "flush" (Internal.args #[]) Unit
 
 /-- `reload(options: Pick<SocketOptions<Data>, 'socket'>): void`: `undefined reload(SocketOptionsUnknown options)` -/
-def SocketUnknown.reload (self : SocketUnknown) (options : SocketOptionsUnknown) : IO Unit :=
-  self.val.callMethod "reload" (Support.args #[toJS options]) Unit
+@[macro_inline] def SocketUnknown.reload (self : SocketUnknown) (options : SocketOptionsUnknown) : IO Unit := Internal.api "Lasm.JS.Bun.SocketUnknown.reload" do
+  self.val.callMethod "reload" (Internal.args #[toJS options]) Unit
 
 /-- `disableRenegotiation(): void`: `undefined disableRenegotiation()` -/
-def SocketUnknown.disableRenegotiation (self : SocketUnknown) : IO Unit :=
-  self.val.callMethod "disableRenegotiation" (Support.args #[]) Unit
+@[macro_inline] def SocketUnknown.disableRenegotiation (self : SocketUnknown) : IO Unit := Internal.api "Lasm.JS.Bun.SocketUnknown.disableRenegotiation" do
+  self.val.callMethod "disableRenegotiation" (Internal.args #[]) Unit
 
 /-- `exportKeyingMaterial(length: number, label: string, context: Buffer): Buffer`: `Uint8Array exportKeyingMaterial(double /* integer: Nat */ length, DOMString label, Uint8Array context)` -/
-def SocketUnknown.exportKeyingMaterial (self : SocketUnknown) (length : Nat) (label : String) (context : ByteArray) : IO ByteArray :=
-  self.val.callMethod "exportKeyingMaterial" (Support.args #[toJS length, toJS label, toJS context]) ByteArray
+@[macro_inline] def SocketUnknown.exportKeyingMaterial (self : SocketUnknown) (length : Nat) (label : String) (context : ByteArray) : IO ByteArray := Internal.api "Lasm.JS.Bun.SocketUnknown.exportKeyingMaterial" do
+  self.val.callMethod "exportKeyingMaterial" (Internal.args #[toJS length, toJS label, toJS context]) ByteArray
 
 /-- `exportKeyingMaterial(length: number, label: string, context?: string | BufferSource): void`: `undefined exportKeyingMaterial(double /* integer: Nat */ length, DOMString label, optional DOMStringOrUint8Array context)` -/
-def SocketUnknown.exportKeyingMaterialWithStringBufferSource (self : SocketUnknown) (length : Nat) (label : String) (context : Option DOMStringOrUint8Array := none) : IO Unit :=
-  self.val.callMethod "exportKeyingMaterial" (Support.args #[toJS length, toJS label, Support.optional context]) Unit
+@[macro_inline] def SocketUnknown.exportKeyingMaterialWithStringBufferSource (self : SocketUnknown) (length : Nat) (label : String) (context : Option DOMStringOrUint8Array := none) : IO Unit := Internal.api "Lasm.JS.Bun.SocketUnknown.exportKeyingMaterialWithStringBufferSource" do
+  self.val.callMethod "exportKeyingMaterial" (Internal.args #[toJS length, toJS label, Internal.optional context]) Unit
 
 /-- `getAuthorizationError(): Error | null`: `object? getAuthorizationError()` -/
-def SocketUnknown.getAuthorizationError (self : SocketUnknown) : IO (Option Data) :=
-  self.val.callMethod "getAuthorizationError" (Support.args #[]) (Option Data)
+@[macro_inline] def SocketUnknown.getAuthorizationError (self : SocketUnknown) : IO (Option Data) := Internal.api "Lasm.JS.Bun.SocketUnknown.getAuthorizationError" do
+  self.val.callMethod "getAuthorizationError" (Internal.args #[]) (Option Data)
 
 /-- `getCertificate(): import('tls').PeerCertificate | object | null`: `any getCertificate()` -/
-def SocketUnknown.getCertificate (self : SocketUnknown) : IO Data :=
-  self.val.callMethod "getCertificate" (Support.args #[]) Data
+@[macro_inline] def SocketUnknown.getCertificate (self : SocketUnknown) : IO Data := Internal.api "Lasm.JS.Bun.SocketUnknown.getCertificate" do
+  self.val.callMethod "getCertificate" (Internal.args #[]) Data
 
 /-- `getX509Certificate(): import('node:crypto').X509Certificate | undefined`: `object? getX509Certificate()` -/
-def SocketUnknown.getX509Certificate (self : SocketUnknown) : IO (Option Data) :=
-  self.val.callMethod "getX509Certificate" (Support.args #[]) (Option Data)
+@[macro_inline] def SocketUnknown.getX509Certificate (self : SocketUnknown) : IO (Option Data) := Internal.api "Lasm.JS.Bun.SocketUnknown.getX509Certificate" do
+  self.val.callMethod "getX509Certificate" (Internal.args #[]) (Option Data)
 
 /-- `getCipher(): import('tls').CipherNameAndProtocol`: `object getCipher()` -/
-def SocketUnknown.getCipher (self : SocketUnknown) : IO Data :=
-  self.val.callMethod "getCipher" (Support.args #[]) Data
+@[macro_inline] def SocketUnknown.getCipher (self : SocketUnknown) : IO Data := Internal.api "Lasm.JS.Bun.SocketUnknown.getCipher" do
+  self.val.callMethod "getCipher" (Internal.args #[]) Data
 
 /-- `getEphemeralKeyInfo(): import('tls').EphemeralKeyInfo | object | null`: `any getEphemeralKeyInfo()` -/
-def SocketUnknown.getEphemeralKeyInfo (self : SocketUnknown) : IO Data :=
-  self.val.callMethod "getEphemeralKeyInfo" (Support.args #[]) Data
+@[macro_inline] def SocketUnknown.getEphemeralKeyInfo (self : SocketUnknown) : IO Data := Internal.api "Lasm.JS.Bun.SocketUnknown.getEphemeralKeyInfo" do
+  self.val.callMethod "getEphemeralKeyInfo" (Internal.args #[]) Data
 
 /-- `getPeerCertificate(): import('node:tls').PeerCertificate`: `object getPeerCertificate()` -/
-def SocketUnknown.getPeerCertificate (self : SocketUnknown) : IO Data :=
-  self.val.callMethod "getPeerCertificate" (Support.args #[]) Data
+@[macro_inline] def SocketUnknown.getPeerCertificate (self : SocketUnknown) : IO Data := Internal.api "Lasm.JS.Bun.SocketUnknown.getPeerCertificate" do
+  self.val.callMethod "getPeerCertificate" (Internal.args #[]) Data
 
 /-- `getPeerX509Certificate(): import('node:crypto').X509Certificate`: `object getPeerX509Certificate()` -/
-def SocketUnknown.getPeerX509Certificate (self : SocketUnknown) : IO Data :=
-  self.val.callMethod "getPeerX509Certificate" (Support.args #[]) Data
+@[macro_inline] def SocketUnknown.getPeerX509Certificate (self : SocketUnknown) : IO Data := Internal.api "Lasm.JS.Bun.SocketUnknown.getPeerX509Certificate" do
+  self.val.callMethod "getPeerX509Certificate" (Internal.args #[]) Data
 
 /-- `getSharedSigalgs(): string[]`: `sequence<DOMString> getSharedSigalgs()` -/
-def SocketUnknown.getSharedSigalgs (self : SocketUnknown) : IO (Array String) :=
-  self.val.callMethod "getSharedSigalgs" (Support.args #[]) (Array String)
+@[macro_inline] def SocketUnknown.getSharedSigalgs (self : SocketUnknown) : IO (Array String) := Internal.api "Lasm.JS.Bun.SocketUnknown.getSharedSigalgs" do
+  self.val.callMethod "getSharedSigalgs" (Internal.args #[]) (Array String)
 
 /-- `getTLSFinishedMessage(): Buffer | undefined`: `Uint8Array? getTLSFinishedMessage()` -/
-def SocketUnknown.getTLSFinishedMessage (self : SocketUnknown) : IO (Option ByteArray) :=
-  self.val.callMethod "getTLSFinishedMessage" (Support.args #[]) (Option ByteArray)
+@[macro_inline] def SocketUnknown.getTLSFinishedMessage (self : SocketUnknown) : IO (Option ByteArray) := Internal.api "Lasm.JS.Bun.SocketUnknown.getTLSFinishedMessage" do
+  self.val.callMethod "getTLSFinishedMessage" (Internal.args #[]) (Option ByteArray)
 
 /-- `getTLSPeerFinishedMessage(): Buffer | undefined`: `Uint8Array? getTLSPeerFinishedMessage()` -/
-def SocketUnknown.getTLSPeerFinishedMessage (self : SocketUnknown) : IO (Option ByteArray) :=
-  self.val.callMethod "getTLSPeerFinishedMessage" (Support.args #[]) (Option ByteArray)
+@[macro_inline] def SocketUnknown.getTLSPeerFinishedMessage (self : SocketUnknown) : IO (Option ByteArray) := Internal.api "Lasm.JS.Bun.SocketUnknown.getTLSPeerFinishedMessage" do
+  self.val.callMethod "getTLSPeerFinishedMessage" (Internal.args #[]) (Option ByteArray)
 
 /-- `getTLSTicket(): Buffer | undefined`: `Uint8Array? getTLSTicket()` -/
-def SocketUnknown.getTLSTicket (self : SocketUnknown) : IO (Option ByteArray) :=
-  self.val.callMethod "getTLSTicket" (Support.args #[]) (Option ByteArray)
+@[macro_inline] def SocketUnknown.getTLSTicket (self : SocketUnknown) : IO (Option ByteArray) := Internal.api "Lasm.JS.Bun.SocketUnknown.getTLSTicket" do
+  self.val.callMethod "getTLSTicket" (Internal.args #[]) (Option ByteArray)
 
 /-- `getTLSVersion(): string`: `DOMString getTLSVersion()` -/
-def SocketUnknown.getTLSVersion (self : SocketUnknown) : IO String :=
-  self.val.callMethod "getTLSVersion" (Support.args #[]) String
+@[macro_inline] def SocketUnknown.getTLSVersion (self : SocketUnknown) : IO String := Internal.api "Lasm.JS.Bun.SocketUnknown.getTLSVersion" do
+  self.val.callMethod "getTLSVersion" (Internal.args #[]) String
 
 /-- `isSessionReused(): boolean`: `boolean isSessionReused()` -/
-def SocketUnknown.isSessionReused (self : SocketUnknown) : IO Bool :=
-  self.val.callMethod "isSessionReused" (Support.args #[]) Bool
+@[macro_inline] def SocketUnknown.isSessionReused (self : SocketUnknown) : IO Bool := Internal.api "Lasm.JS.Bun.SocketUnknown.isSessionReused" do
+  self.val.callMethod "isSessionReused" (Internal.args #[]) Bool
 
 /-- `setMaxSendFragment(size: number): boolean`: `boolean setMaxSendFragment(double /* integer: Nat */ size)` -/
-def SocketUnknown.setMaxSendFragment (self : SocketUnknown) (size : Nat) : IO Bool :=
-  self.val.callMethod "setMaxSendFragment" (Support.args #[toJS size]) Bool
+@[macro_inline] def SocketUnknown.setMaxSendFragment (self : SocketUnknown) (size : Nat) : IO Bool := Internal.api "Lasm.JS.Bun.SocketUnknown.setMaxSendFragment" do
+  self.val.callMethod "setMaxSendFragment" (Internal.args #[toJS size]) Bool
 
 /-- `setNoDelay(noDelay?: boolean): boolean`: `boolean setNoDelay(optional boolean noDelay)` -/
-def SocketUnknown.setNoDelay (self : SocketUnknown) (noDelay : Option Bool := none) : IO Bool :=
-  self.val.callMethod "setNoDelay" (Support.args #[Support.optional noDelay]) Bool
+@[macro_inline] def SocketUnknown.setNoDelay (self : SocketUnknown) (noDelay : Option Bool := none) : IO Bool := Internal.api "Lasm.JS.Bun.SocketUnknown.setNoDelay" do
+  self.val.callMethod "setNoDelay" (Internal.args #[Internal.optional noDelay]) Bool
 
 /-- `setKeepAlive(enable?: boolean, initialDelay?: number): boolean`: `boolean setKeepAlive(optional boolean enable, optional double initialDelay)` -/
-def SocketUnknown.setKeepAlive (self : SocketUnknown) (enable : Option Bool := none) (initialDelay : Option Float := none) : IO Bool :=
-  self.val.callMethod "setKeepAlive" (Support.args #[Support.optional enable, Support.optional initialDelay]) Bool
+@[macro_inline] def SocketUnknown.setKeepAlive (self : SocketUnknown) (enable : Option Bool := none) (initialDelay : Option Float := none) : IO Bool := Internal.api "Lasm.JS.Bun.SocketUnknown.setKeepAlive" do
+  self.val.callMethod "setKeepAlive" (Internal.args #[Internal.optional enable, Internal.optional initialDelay]) Bool
 
 /-- `resume(): void`: `undefined resume()` -/
-def SocketUnknown.resume (self : SocketUnknown) : IO Unit :=
-  self.val.callMethod "resume" (Support.args #[]) Unit
+@[macro_inline] def SocketUnknown.resume (self : SocketUnknown) : IO Unit := Internal.api "Lasm.JS.Bun.SocketUnknown.resume" do
+  self.val.callMethod "resume" (Internal.args #[]) Unit
 
 /-- `pause(): void`: `undefined pause()` -/
-def SocketUnknown.pause (self : SocketUnknown) : IO Unit :=
-  self.val.callMethod "pause" (Support.args #[]) Unit
+@[macro_inline] def SocketUnknown.pause (self : SocketUnknown) : IO Unit := Internal.api "Lasm.JS.Bun.SocketUnknown.pause" do
+  self.val.callMethod "pause" (Internal.args #[]) Unit
 
 /-- `renegotiate(): void`: `undefined renegotiate()` -/
-def SocketUnknown.renegotiate (self : SocketUnknown) : IO Unit :=
-  self.val.callMethod "renegotiate" (Support.args #[]) Unit
+@[macro_inline] def SocketUnknown.renegotiate (self : SocketUnknown) : IO Unit := Internal.api "Lasm.JS.Bun.SocketUnknown.renegotiate" do
+  self.val.callMethod "renegotiate" (Internal.args #[]) Unit
 
 /-- `setVerifyMode(requestCert: boolean, rejectUnauthorized: boolean): void`: `undefined setVerifyMode(boolean requestCert, boolean rejectUnauthorized)` -/
-def SocketUnknown.setVerifyMode (self : SocketUnknown) (requestCert : Bool) (rejectUnauthorized : Bool) : IO Unit :=
-  self.val.callMethod "setVerifyMode" (Support.args #[toJS requestCert, toJS rejectUnauthorized]) Unit
+@[macro_inline] def SocketUnknown.setVerifyMode (self : SocketUnknown) (requestCert : Bool) (rejectUnauthorized : Bool) : IO Unit := Internal.api "Lasm.JS.Bun.SocketUnknown.setVerifyMode" do
+  self.val.callMethod "setVerifyMode" (Internal.args #[toJS requestCert, toJS rejectUnauthorized]) Unit
 
 /-- `getSession(): void`: `undefined getSession()` -/
-def SocketUnknown.getSession (self : SocketUnknown) : IO Unit :=
-  self.val.callMethod "getSession" (Support.args #[]) Unit
+@[macro_inline] def SocketUnknown.getSession (self : SocketUnknown) : IO Unit := Internal.api "Lasm.JS.Bun.SocketUnknown.getSession" do
+  self.val.callMethod "getSession" (Internal.args #[]) Unit
 
 /-- `setSession(session: string | Buffer | BufferSource): void`: `undefined setSession(DOMStringOrUint8Array session)` -/
-def SocketUnknown.setSession (self : SocketUnknown) (session : DOMStringOrUint8Array) : IO Unit :=
-  self.val.callMethod "setSession" (Support.args #[toJS session]) Unit
+@[macro_inline] def SocketUnknown.setSession (self : SocketUnknown) (session : DOMStringOrUint8Array) : IO Unit := Internal.api "Lasm.JS.Bun.SocketUnknown.setSession" do
+  self.val.callMethod "setSession" (Internal.args #[toJS session]) Unit
 
 /-- `upgradeTLS<Data>(options: TLSUpgradeOptions<Data>): [raw: Socket<Data>, tls: Socket<Data>]`: `sequence<SocketUnknown> upgradeTLS(TLSUpgradeOptionsUnknown options)` -/
-def SocketUnknown.upgradeTLS (self : SocketUnknown) (options : TLSUpgradeOptionsUnknown) : IO (Array SocketUnknown) :=
-  self.val.callMethod "upgradeTLS" (Support.args #[toJS options]) (Array SocketUnknown)
+@[macro_inline] def SocketUnknown.upgradeTLS (self : SocketUnknown) (options : TLSUpgradeOptionsUnknown) : IO (Array SocketUnknown) := Internal.api "Lasm.JS.Bun.SocketUnknown.upgradeTLS" do
+  self.val.callMethod "upgradeTLS" (Internal.args #[toJS options]) (Array SocketUnknown)
 
 /-- `close(): void`: `undefined close()` -/
-def SocketUnknown.close (self : SocketUnknown) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def SocketUnknown.close (self : SocketUnknown) : IO Unit := Internal.api "Lasm.JS.Bun.SocketUnknown.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `getServername(): string`: `DOMString getServername()` -/
-def SocketUnknown.getServername (self : SocketUnknown) : IO String :=
-  self.val.callMethod "getServername" (Support.args #[]) String
+@[macro_inline] def SocketUnknown.getServername (self : SocketUnknown) : IO String := Internal.api "Lasm.JS.Bun.SocketUnknown.getServername" do
+  self.val.callMethod "getServername" (Internal.args #[]) String
 
 /-- `setServername(name: string): void`: `undefined setServername(DOMString name)` -/
-def SocketUnknown.setServername (self : SocketUnknown) (name : String) : IO Unit :=
-  self.val.callMethod "setServername" (Support.args #[toJS name]) Unit
+@[macro_inline] def SocketUnknown.setServername (self : SocketUnknown) (name : String) : IO Unit := Internal.api "Lasm.JS.Bun.SocketUnknown.setServername" do
+  self.val.callMethod "setServername" (Internal.args #[toJS name]) Unit
 
 /-- `data: Data`: `readonly attribute undefined data` -/
-def Socket.data (self : Socket) : IO Unit := self.val.get "data" Unit
+@[macro_inline] def Socket.data (self : Socket) : IO Unit := Internal.api "Lasm.JS.Bun.Socket.data" do
+  self.val.get "data" Unit
 
 /-- `readonly readyState: -2 | -1 | 0 | 1 | 2`: `readonly attribute double readyState` -/
-def Socket.readyState (self : Socket) : IO Float := self.val.get "readyState" Float
+@[macro_inline] def Socket.readyState (self : Socket) : IO Float := Internal.api "Lasm.JS.Bun.Socket.readyState" do
+  self.val.get "readyState" Float
 
 /-- `readonly listener?: SocketListener`: `readonly attribute SocketListener? listener` -/
-def Socket.listener (self : Socket) : IO (Option SocketListener) := self.val.get "listener" (Option SocketListener)
+@[macro_inline] def Socket.listener (self : Socket) : IO (Option SocketListener) := Internal.api "Lasm.JS.Bun.Socket.listener" do
+  self.val.get "listener" (Option SocketListener)
 
 /-- `readonly remoteFamily: 'IPv4' | 'IPv6'`: `readonly attribute SocketRemoteFamily remoteFamily` -/
-def Socket.remoteFamily (self : Socket) : IO SocketRemoteFamily := self.val.get "remoteFamily" SocketRemoteFamily
+@[macro_inline] def Socket.remoteFamily (self : Socket) : IO SocketRemoteFamily := Internal.api "Lasm.JS.Bun.Socket.remoteFamily" do
+  self.val.get "remoteFamily" SocketRemoteFamily
 
 /-- `readonly remoteAddress: string`: `readonly attribute DOMString remoteAddress` -/
-def Socket.remoteAddress (self : Socket) : IO String := self.val.get "remoteAddress" String
+@[macro_inline] def Socket.remoteAddress (self : Socket) : IO String := Internal.api "Lasm.JS.Bun.Socket.remoteAddress" do
+  self.val.get "remoteAddress" String
 
 /-- `readonly remotePort: number`: `readonly attribute double remotePort` -/
-def Socket.remotePort (self : Socket) : IO Float := self.val.get "remotePort" Float
+@[macro_inline] def Socket.remotePort (self : Socket) : IO Float := Internal.api "Lasm.JS.Bun.Socket.remotePort" do
+  self.val.get "remotePort" Float
 
 /-- `readonly localFamily: 'IPv4' | 'IPv6'`: `readonly attribute SocketLocalFamily localFamily` -/
-def Socket.localFamily (self : Socket) : IO SocketLocalFamily := self.val.get "localFamily" SocketLocalFamily
+@[macro_inline] def Socket.localFamily (self : Socket) : IO SocketLocalFamily := Internal.api "Lasm.JS.Bun.Socket.localFamily" do
+  self.val.get "localFamily" SocketLocalFamily
 
 /-- `readonly localAddress: string`: `readonly attribute DOMString localAddress` -/
-def Socket.localAddress (self : Socket) : IO String := self.val.get "localAddress" String
+@[macro_inline] def Socket.localAddress (self : Socket) : IO String := Internal.api "Lasm.JS.Bun.Socket.localAddress" do
+  self.val.get "localAddress" String
 
 /-- `readonly localPort: number`: `readonly attribute double localPort` -/
-def Socket.localPort (self : Socket) : IO Float := self.val.get "localPort" Float
+@[macro_inline] def Socket.localPort (self : Socket) : IO Float := Internal.api "Lasm.JS.Bun.Socket.localPort" do
+  self.val.get "localPort" Float
 
 /-- `readonly authorized: boolean`: `readonly attribute boolean authorized` -/
-def Socket.authorized (self : Socket) : IO Bool := self.val.get "authorized" Bool
+@[macro_inline] def Socket.authorized (self : Socket) : IO Bool := Internal.api "Lasm.JS.Bun.Socket.authorized" do
+  self.val.get "authorized" Bool
 
 /-- `readonly alpnProtocol: string | false | null`: `readonly attribute DOMStringOrBoolean? alpnProtocol` -/
-def Socket.alpnProtocol (self : Socket) : IO (Option DOMStringOrBoolean) := self.val.get "alpnProtocol" (Option DOMStringOrBoolean)
+@[macro_inline] def Socket.alpnProtocol (self : Socket) : IO (Option DOMStringOrBoolean) := Internal.api "Lasm.JS.Bun.Socket.alpnProtocol" do
+  self.val.get "alpnProtocol" (Option DOMStringOrBoolean)
 
 /-- `readonly bytesWritten: number`: `readonly attribute double bytesWritten` -/
-def Socket.bytesWritten (self : Socket) : IO Float := self.val.get "bytesWritten" Float
+@[macro_inline] def Socket.bytesWritten (self : Socket) : IO Float := Internal.api "Lasm.JS.Bun.Socket.bytesWritten" do
+  self.val.get "bytesWritten" Float
 
 /-- `write(data: string | BufferSource, byteOffset?: number, byteLength?: number): number`: `double write(DOMStringOrUint8Array data, optional double byteOffset, optional double /* integer: Nat */ byteLength)` -/
-def Socket.write (self : Socket) (data : DOMStringOrUint8Array) (byteOffset : Option Float := none) (byteLength : Option Nat := none) : IO Float :=
-  self.val.callMethod "write" (Support.args #[toJS data, Support.optional byteOffset, Support.optional byteLength]) Float
+@[macro_inline] def Socket.write (self : Socket) (data : DOMStringOrUint8Array) (byteOffset : Option Float := none) (byteLength : Option Nat := none) : IO Float := Internal.api "Lasm.JS.Bun.Socket.write" do
+  self.val.callMethod "write" (Internal.args #[toJS data, Internal.optional byteOffset, Internal.optional byteLength]) Float
 
 /-- `end(data?: string | BufferSource, byteOffset?: number, byteLength?: number): number`: `double end(optional DOMStringOrUint8Array data, optional double byteOffset, optional double /* integer: Nat */ byteLength)` -/
-def Socket.«end» (self : Socket) (data : Option DOMStringOrUint8Array := none) (byteOffset : Option Float := none) (byteLength : Option Nat := none) : IO Float :=
-  self.val.callMethod "end" (Support.args #[Support.optional data, Support.optional byteOffset, Support.optional byteLength]) Float
+@[macro_inline] def Socket.«end» (self : Socket) (data : Option DOMStringOrUint8Array := none) (byteOffset : Option Float := none) (byteLength : Option Nat := none) : IO Float := Internal.api "Lasm.JS.Bun.Socket.end" do
+  self.val.callMethod "end" (Internal.args #[Internal.optional data, Internal.optional byteOffset, Internal.optional byteLength]) Float
 
 /-- `end(): void`: `undefined end()` -/
-def Socket.end0 (self : Socket) : IO Unit :=
-  self.val.callMethod "end" (Support.args #[]) Unit
+@[macro_inline] def Socket.end0 (self : Socket) : IO Unit := Internal.api "Lasm.JS.Bun.Socket.end0" do
+  self.val.callMethod "end" (Internal.args #[]) Unit
 
 /-- `ref(): void`: `undefined ref()` -/
-def Socket.ref (self : Socket) : IO Unit :=
-  self.val.callMethod "ref" (Support.args #[]) Unit
+@[macro_inline] def Socket.ref (self : Socket) : IO Unit := Internal.api "Lasm.JS.Bun.Socket.ref" do
+  self.val.callMethod "ref" (Internal.args #[]) Unit
 
 /-- `timeout(seconds: number): void`: `undefined timeout(double seconds)` -/
-def Socket.timeout (self : Socket) (seconds : Float) : IO Unit :=
-  self.val.callMethod "timeout" (Support.args #[toJS seconds]) Unit
+@[macro_inline] def Socket.timeout (self : Socket) (seconds : Float) : IO Unit := Internal.api "Lasm.JS.Bun.Socket.timeout" do
+  self.val.callMethod "timeout" (Internal.args #[toJS seconds]) Unit
 
 /-- `terminate(): void`: `undefined terminate()` -/
-def Socket.terminate (self : Socket) : IO Unit :=
-  self.val.callMethod "terminate" (Support.args #[]) Unit
+@[macro_inline] def Socket.terminate (self : Socket) : IO Unit := Internal.api "Lasm.JS.Bun.Socket.terminate" do
+  self.val.callMethod "terminate" (Internal.args #[]) Unit
 
 /-- `shutdown(halfClose?: boolean): void`: `undefined shutdown(optional boolean halfClose)` -/
-def Socket.shutdown (self : Socket) (halfClose : Option Bool := none) : IO Unit :=
-  self.val.callMethod "shutdown" (Support.args #[Support.optional halfClose]) Unit
+@[macro_inline] def Socket.shutdown (self : Socket) (halfClose : Option Bool := none) : IO Unit := Internal.api "Lasm.JS.Bun.Socket.shutdown" do
+  self.val.callMethod "shutdown" (Internal.args #[Internal.optional halfClose]) Unit
 
 /-- `unref(): void`: `undefined unref()` -/
-def Socket.unref (self : Socket) : IO Unit :=
-  self.val.callMethod "unref" (Support.args #[]) Unit
+@[macro_inline] def Socket.unref (self : Socket) : IO Unit := Internal.api "Lasm.JS.Bun.Socket.unref" do
+  self.val.callMethod "unref" (Internal.args #[]) Unit
 
 /-- `flush(): void`: `undefined flush()` -/
-def Socket.flush (self : Socket) : IO Unit :=
-  self.val.callMethod "flush" (Support.args #[]) Unit
+@[macro_inline] def Socket.flush (self : Socket) : IO Unit := Internal.api "Lasm.JS.Bun.Socket.flush" do
+  self.val.callMethod "flush" (Internal.args #[]) Unit
 
 /-- `reload(options: Pick<SocketOptions<Data>, 'socket'>): void`: `undefined reload(SocketOptions options)` -/
-def Socket.reload (self : Socket) (options : SocketOptions) : IO Unit :=
-  self.val.callMethod "reload" (Support.args #[toJS options]) Unit
+@[macro_inline] def Socket.reload (self : Socket) (options : SocketOptions) : IO Unit := Internal.api "Lasm.JS.Bun.Socket.reload" do
+  self.val.callMethod "reload" (Internal.args #[toJS options]) Unit
 
 /-- `disableRenegotiation(): void`: `undefined disableRenegotiation()` -/
-def Socket.disableRenegotiation (self : Socket) : IO Unit :=
-  self.val.callMethod "disableRenegotiation" (Support.args #[]) Unit
+@[macro_inline] def Socket.disableRenegotiation (self : Socket) : IO Unit := Internal.api "Lasm.JS.Bun.Socket.disableRenegotiation" do
+  self.val.callMethod "disableRenegotiation" (Internal.args #[]) Unit
 
 /-- `exportKeyingMaterial(length: number, label: string, context: Buffer): Buffer`: `Uint8Array exportKeyingMaterial(double /* integer: Nat */ length, DOMString label, Uint8Array context)` -/
-def Socket.exportKeyingMaterial (self : Socket) (length : Nat) (label : String) (context : ByteArray) : IO ByteArray :=
-  self.val.callMethod "exportKeyingMaterial" (Support.args #[toJS length, toJS label, toJS context]) ByteArray
+@[macro_inline] def Socket.exportKeyingMaterial (self : Socket) (length : Nat) (label : String) (context : ByteArray) : IO ByteArray := Internal.api "Lasm.JS.Bun.Socket.exportKeyingMaterial" do
+  self.val.callMethod "exportKeyingMaterial" (Internal.args #[toJS length, toJS label, toJS context]) ByteArray
 
 /-- `exportKeyingMaterial(length: number, label: string, context?: string | BufferSource): void`: `undefined exportKeyingMaterial(double /* integer: Nat */ length, DOMString label, optional DOMStringOrUint8Array context)` -/
-def Socket.exportKeyingMaterialWithStringBufferSource (self : Socket) (length : Nat) (label : String) (context : Option DOMStringOrUint8Array := none) : IO Unit :=
-  self.val.callMethod "exportKeyingMaterial" (Support.args #[toJS length, toJS label, Support.optional context]) Unit
+@[macro_inline] def Socket.exportKeyingMaterialWithStringBufferSource (self : Socket) (length : Nat) (label : String) (context : Option DOMStringOrUint8Array := none) : IO Unit := Internal.api "Lasm.JS.Bun.Socket.exportKeyingMaterialWithStringBufferSource" do
+  self.val.callMethod "exportKeyingMaterial" (Internal.args #[toJS length, toJS label, Internal.optional context]) Unit
 
 /-- `getAuthorizationError(): Error | null`: `object? getAuthorizationError()` -/
-def Socket.getAuthorizationError (self : Socket) : IO (Option Data) :=
-  self.val.callMethod "getAuthorizationError" (Support.args #[]) (Option Data)
+@[macro_inline] def Socket.getAuthorizationError (self : Socket) : IO (Option Data) := Internal.api "Lasm.JS.Bun.Socket.getAuthorizationError" do
+  self.val.callMethod "getAuthorizationError" (Internal.args #[]) (Option Data)
 
 /-- `getCertificate(): import('tls').PeerCertificate | object | null`: `any getCertificate()` -/
-def Socket.getCertificate (self : Socket) : IO Data :=
-  self.val.callMethod "getCertificate" (Support.args #[]) Data
+@[macro_inline] def Socket.getCertificate (self : Socket) : IO Data := Internal.api "Lasm.JS.Bun.Socket.getCertificate" do
+  self.val.callMethod "getCertificate" (Internal.args #[]) Data
 
 /-- `getX509Certificate(): import('node:crypto').X509Certificate | undefined`: `object? getX509Certificate()` -/
-def Socket.getX509Certificate (self : Socket) : IO (Option Data) :=
-  self.val.callMethod "getX509Certificate" (Support.args #[]) (Option Data)
+@[macro_inline] def Socket.getX509Certificate (self : Socket) : IO (Option Data) := Internal.api "Lasm.JS.Bun.Socket.getX509Certificate" do
+  self.val.callMethod "getX509Certificate" (Internal.args #[]) (Option Data)
 
 /-- `getCipher(): import('tls').CipherNameAndProtocol`: `object getCipher()` -/
-def Socket.getCipher (self : Socket) : IO Data :=
-  self.val.callMethod "getCipher" (Support.args #[]) Data
+@[macro_inline] def Socket.getCipher (self : Socket) : IO Data := Internal.api "Lasm.JS.Bun.Socket.getCipher" do
+  self.val.callMethod "getCipher" (Internal.args #[]) Data
 
 /-- `getEphemeralKeyInfo(): import('tls').EphemeralKeyInfo | object | null`: `any getEphemeralKeyInfo()` -/
-def Socket.getEphemeralKeyInfo (self : Socket) : IO Data :=
-  self.val.callMethod "getEphemeralKeyInfo" (Support.args #[]) Data
+@[macro_inline] def Socket.getEphemeralKeyInfo (self : Socket) : IO Data := Internal.api "Lasm.JS.Bun.Socket.getEphemeralKeyInfo" do
+  self.val.callMethod "getEphemeralKeyInfo" (Internal.args #[]) Data
 
 /-- `getPeerCertificate(): import('node:tls').PeerCertificate`: `object getPeerCertificate()` -/
-def Socket.getPeerCertificate (self : Socket) : IO Data :=
-  self.val.callMethod "getPeerCertificate" (Support.args #[]) Data
+@[macro_inline] def Socket.getPeerCertificate (self : Socket) : IO Data := Internal.api "Lasm.JS.Bun.Socket.getPeerCertificate" do
+  self.val.callMethod "getPeerCertificate" (Internal.args #[]) Data
 
 /-- `getPeerX509Certificate(): import('node:crypto').X509Certificate`: `object getPeerX509Certificate()` -/
-def Socket.getPeerX509Certificate (self : Socket) : IO Data :=
-  self.val.callMethod "getPeerX509Certificate" (Support.args #[]) Data
+@[macro_inline] def Socket.getPeerX509Certificate (self : Socket) : IO Data := Internal.api "Lasm.JS.Bun.Socket.getPeerX509Certificate" do
+  self.val.callMethod "getPeerX509Certificate" (Internal.args #[]) Data
 
 /-- `getSharedSigalgs(): string[]`: `sequence<DOMString> getSharedSigalgs()` -/
-def Socket.getSharedSigalgs (self : Socket) : IO (Array String) :=
-  self.val.callMethod "getSharedSigalgs" (Support.args #[]) (Array String)
+@[macro_inline] def Socket.getSharedSigalgs (self : Socket) : IO (Array String) := Internal.api "Lasm.JS.Bun.Socket.getSharedSigalgs" do
+  self.val.callMethod "getSharedSigalgs" (Internal.args #[]) (Array String)
 
 /-- `getTLSFinishedMessage(): Buffer | undefined`: `Uint8Array? getTLSFinishedMessage()` -/
-def Socket.getTLSFinishedMessage (self : Socket) : IO (Option ByteArray) :=
-  self.val.callMethod "getTLSFinishedMessage" (Support.args #[]) (Option ByteArray)
+@[macro_inline] def Socket.getTLSFinishedMessage (self : Socket) : IO (Option ByteArray) := Internal.api "Lasm.JS.Bun.Socket.getTLSFinishedMessage" do
+  self.val.callMethod "getTLSFinishedMessage" (Internal.args #[]) (Option ByteArray)
 
 /-- `getTLSPeerFinishedMessage(): Buffer | undefined`: `Uint8Array? getTLSPeerFinishedMessage()` -/
-def Socket.getTLSPeerFinishedMessage (self : Socket) : IO (Option ByteArray) :=
-  self.val.callMethod "getTLSPeerFinishedMessage" (Support.args #[]) (Option ByteArray)
+@[macro_inline] def Socket.getTLSPeerFinishedMessage (self : Socket) : IO (Option ByteArray) := Internal.api "Lasm.JS.Bun.Socket.getTLSPeerFinishedMessage" do
+  self.val.callMethod "getTLSPeerFinishedMessage" (Internal.args #[]) (Option ByteArray)
 
 /-- `getTLSTicket(): Buffer | undefined`: `Uint8Array? getTLSTicket()` -/
-def Socket.getTLSTicket (self : Socket) : IO (Option ByteArray) :=
-  self.val.callMethod "getTLSTicket" (Support.args #[]) (Option ByteArray)
+@[macro_inline] def Socket.getTLSTicket (self : Socket) : IO (Option ByteArray) := Internal.api "Lasm.JS.Bun.Socket.getTLSTicket" do
+  self.val.callMethod "getTLSTicket" (Internal.args #[]) (Option ByteArray)
 
 /-- `getTLSVersion(): string`: `DOMString getTLSVersion()` -/
-def Socket.getTLSVersion (self : Socket) : IO String :=
-  self.val.callMethod "getTLSVersion" (Support.args #[]) String
+@[macro_inline] def Socket.getTLSVersion (self : Socket) : IO String := Internal.api "Lasm.JS.Bun.Socket.getTLSVersion" do
+  self.val.callMethod "getTLSVersion" (Internal.args #[]) String
 
 /-- `isSessionReused(): boolean`: `boolean isSessionReused()` -/
-def Socket.isSessionReused (self : Socket) : IO Bool :=
-  self.val.callMethod "isSessionReused" (Support.args #[]) Bool
+@[macro_inline] def Socket.isSessionReused (self : Socket) : IO Bool := Internal.api "Lasm.JS.Bun.Socket.isSessionReused" do
+  self.val.callMethod "isSessionReused" (Internal.args #[]) Bool
 
 /-- `setMaxSendFragment(size: number): boolean`: `boolean setMaxSendFragment(double /* integer: Nat */ size)` -/
-def Socket.setMaxSendFragment (self : Socket) (size : Nat) : IO Bool :=
-  self.val.callMethod "setMaxSendFragment" (Support.args #[toJS size]) Bool
+@[macro_inline] def Socket.setMaxSendFragment (self : Socket) (size : Nat) : IO Bool := Internal.api "Lasm.JS.Bun.Socket.setMaxSendFragment" do
+  self.val.callMethod "setMaxSendFragment" (Internal.args #[toJS size]) Bool
 
 /-- `setNoDelay(noDelay?: boolean): boolean`: `boolean setNoDelay(optional boolean noDelay)` -/
-def Socket.setNoDelay (self : Socket) (noDelay : Option Bool := none) : IO Bool :=
-  self.val.callMethod "setNoDelay" (Support.args #[Support.optional noDelay]) Bool
+@[macro_inline] def Socket.setNoDelay (self : Socket) (noDelay : Option Bool := none) : IO Bool := Internal.api "Lasm.JS.Bun.Socket.setNoDelay" do
+  self.val.callMethod "setNoDelay" (Internal.args #[Internal.optional noDelay]) Bool
 
 /-- `setKeepAlive(enable?: boolean, initialDelay?: number): boolean`: `boolean setKeepAlive(optional boolean enable, optional double initialDelay)` -/
-def Socket.setKeepAlive (self : Socket) (enable : Option Bool := none) (initialDelay : Option Float := none) : IO Bool :=
-  self.val.callMethod "setKeepAlive" (Support.args #[Support.optional enable, Support.optional initialDelay]) Bool
+@[macro_inline] def Socket.setKeepAlive (self : Socket) (enable : Option Bool := none) (initialDelay : Option Float := none) : IO Bool := Internal.api "Lasm.JS.Bun.Socket.setKeepAlive" do
+  self.val.callMethod "setKeepAlive" (Internal.args #[Internal.optional enable, Internal.optional initialDelay]) Bool
 
 /-- `resume(): void`: `undefined resume()` -/
-def Socket.resume (self : Socket) : IO Unit :=
-  self.val.callMethod "resume" (Support.args #[]) Unit
+@[macro_inline] def Socket.resume (self : Socket) : IO Unit := Internal.api "Lasm.JS.Bun.Socket.resume" do
+  self.val.callMethod "resume" (Internal.args #[]) Unit
 
 /-- `pause(): void`: `undefined pause()` -/
-def Socket.pause (self : Socket) : IO Unit :=
-  self.val.callMethod "pause" (Support.args #[]) Unit
+@[macro_inline] def Socket.pause (self : Socket) : IO Unit := Internal.api "Lasm.JS.Bun.Socket.pause" do
+  self.val.callMethod "pause" (Internal.args #[]) Unit
 
 /-- `renegotiate(): void`: `undefined renegotiate()` -/
-def Socket.renegotiate (self : Socket) : IO Unit :=
-  self.val.callMethod "renegotiate" (Support.args #[]) Unit
+@[macro_inline] def Socket.renegotiate (self : Socket) : IO Unit := Internal.api "Lasm.JS.Bun.Socket.renegotiate" do
+  self.val.callMethod "renegotiate" (Internal.args #[]) Unit
 
 /-- `setVerifyMode(requestCert: boolean, rejectUnauthorized: boolean): void`: `undefined setVerifyMode(boolean requestCert, boolean rejectUnauthorized)` -/
-def Socket.setVerifyMode (self : Socket) (requestCert : Bool) (rejectUnauthorized : Bool) : IO Unit :=
-  self.val.callMethod "setVerifyMode" (Support.args #[toJS requestCert, toJS rejectUnauthorized]) Unit
+@[macro_inline] def Socket.setVerifyMode (self : Socket) (requestCert : Bool) (rejectUnauthorized : Bool) : IO Unit := Internal.api "Lasm.JS.Bun.Socket.setVerifyMode" do
+  self.val.callMethod "setVerifyMode" (Internal.args #[toJS requestCert, toJS rejectUnauthorized]) Unit
 
 /-- `getSession(): void`: `undefined getSession()` -/
-def Socket.getSession (self : Socket) : IO Unit :=
-  self.val.callMethod "getSession" (Support.args #[]) Unit
+@[macro_inline] def Socket.getSession (self : Socket) : IO Unit := Internal.api "Lasm.JS.Bun.Socket.getSession" do
+  self.val.callMethod "getSession" (Internal.args #[]) Unit
 
 /-- `setSession(session: string | Buffer | BufferSource): void`: `undefined setSession(DOMStringOrUint8Array session)` -/
-def Socket.setSession (self : Socket) (session : DOMStringOrUint8Array) : IO Unit :=
-  self.val.callMethod "setSession" (Support.args #[toJS session]) Unit
+@[macro_inline] def Socket.setSession (self : Socket) (session : DOMStringOrUint8Array) : IO Unit := Internal.api "Lasm.JS.Bun.Socket.setSession" do
+  self.val.callMethod "setSession" (Internal.args #[toJS session]) Unit
 
 /-- `upgradeTLS<Data>(options: TLSUpgradeOptions<Data>): [raw: Socket<Data>, tls: Socket<Data>]`: `sequence<SocketUnknown> upgradeTLS(TLSUpgradeOptionsUnknown options)` -/
-def Socket.upgradeTLS (self : Socket) (options : TLSUpgradeOptionsUnknown) : IO (Array SocketUnknown) :=
-  self.val.callMethod "upgradeTLS" (Support.args #[toJS options]) (Array SocketUnknown)
+@[macro_inline] def Socket.upgradeTLS (self : Socket) (options : TLSUpgradeOptionsUnknown) : IO (Array SocketUnknown) := Internal.api "Lasm.JS.Bun.Socket.upgradeTLS" do
+  self.val.callMethod "upgradeTLS" (Internal.args #[toJS options]) (Array SocketUnknown)
 
 /-- `close(): void`: `undefined close()` -/
-def Socket.close (self : Socket) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def Socket.close (self : Socket) : IO Unit := Internal.api "Lasm.JS.Bun.Socket.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `getServername(): string`: `DOMString getServername()` -/
-def Socket.getServername (self : Socket) : IO String :=
-  self.val.callMethod "getServername" (Support.args #[]) String
+@[macro_inline] def Socket.getServername (self : Socket) : IO String := Internal.api "Lasm.JS.Bun.Socket.getServername" do
+  self.val.callMethod "getServername" (Internal.args #[]) String
 
 /-- `setServername(name: string): void`: `undefined setServername(DOMString name)` -/
-def Socket.setServername (self : Socket) (name : String) : IO Unit :=
-  self.val.callMethod "setServername" (Support.args #[toJS name]) Unit
+@[macro_inline] def Socket.setServername (self : Socket) (name : String) : IO Unit := Internal.api "Lasm.JS.Bun.Socket.setServername" do
+  self.val.callMethod "setServername" (Internal.args #[toJS name]) Unit
 
 /-- `readonly port: number`: `readonly attribute double /* integer: Nat */ port` -/
-def TCPSocketListener.port (self : TCPSocketListener) : IO Nat := self.val.get "port" Nat
+@[macro_inline] def TCPSocketListener.port (self : TCPSocketListener) : IO Nat := Internal.api "Lasm.JS.Bun.TCPSocketListener.port" do
+  self.val.get "port" Nat
 
 /-- `readonly hostname: string`: `readonly attribute DOMString hostname` -/
-def TCPSocketListener.hostname (self : TCPSocketListener) : IO String := self.val.get "hostname" String
+@[macro_inline] def TCPSocketListener.hostname (self : TCPSocketListener) : IO String := Internal.api "Lasm.JS.Bun.TCPSocketListener.hostname" do
+  self.val.get "hostname" String
 
 /-- `readonly unix: string`: `readonly attribute DOMString unix` -/
-def UnixSocketListener.unix (self : UnixSocketListener) : IO String := self.val.get "unix" String
+@[macro_inline] def UnixSocketListener.unix (self : UnixSocketListener) : IO String := Internal.api "Lasm.JS.Bun.UnixSocketListener.unix" do
+  self.val.get "unix" String
 
 /-- `readonly hostname: string`: `readonly attribute DOMString hostname` -/
-def UdpBaseUDPSocket.hostname (self : UdpBaseUDPSocket) : IO String := self.val.get "hostname" String
+@[macro_inline] def UdpBaseUDPSocket.hostname (self : UdpBaseUDPSocket) : IO String := Internal.api "Lasm.JS.Bun.UdpBaseUDPSocket.hostname" do
+  self.val.get "hostname" String
 
 /-- `readonly port: number`: `readonly attribute double /* integer: Nat */ port` -/
-def UdpBaseUDPSocket.port (self : UdpBaseUDPSocket) : IO Nat := self.val.get "port" Nat
+@[macro_inline] def UdpBaseUDPSocket.port (self : UdpBaseUDPSocket) : IO Nat := Internal.api "Lasm.JS.Bun.UdpBaseUDPSocket.port" do
+  self.val.get "port" Nat
 
 /-- `readonly address: SocketAddress`: `readonly attribute SocketAddress address` -/
-def UdpBaseUDPSocket.address (self : UdpBaseUDPSocket) : IO SocketAddress := self.val.get "address" SocketAddress
+@[macro_inline] def UdpBaseUDPSocket.address (self : UdpBaseUDPSocket) : IO SocketAddress := Internal.api "Lasm.JS.Bun.UdpBaseUDPSocket.address" do
+  self.val.get "address" SocketAddress
 
 /-- `readonly binaryType: BinaryType (read as 'arraybuffer' | 'buffer' | 'uint8array': keyof BinaryTypeList)`: `readonly attribute UdpBaseUDPSocketBinaryType binaryType` -/
-def UdpBaseUDPSocket.binaryType (self : UdpBaseUDPSocket) : IO UdpBaseUDPSocketBinaryType := self.val.get "binaryType" UdpBaseUDPSocketBinaryType
+@[macro_inline] def UdpBaseUDPSocket.binaryType (self : UdpBaseUDPSocket) : IO UdpBaseUDPSocketBinaryType := Internal.api "Lasm.JS.Bun.UdpBaseUDPSocket.binaryType" do
+  self.val.get "binaryType" UdpBaseUDPSocketBinaryType
 
 /-- `readonly closed: boolean`: `readonly attribute boolean closed` -/
-def UdpBaseUDPSocket.closed (self : UdpBaseUDPSocket) : IO Bool := self.val.get "closed" Bool
+@[macro_inline] def UdpBaseUDPSocket.closed (self : UdpBaseUDPSocket) : IO Bool := Internal.api "Lasm.JS.Bun.UdpBaseUDPSocket.closed" do
+  self.val.get "closed" Bool
 
 /-- `ref(): void`: `undefined ref()` -/
-def UdpBaseUDPSocket.ref (self : UdpBaseUDPSocket) : IO Unit :=
-  self.val.callMethod "ref" (Support.args #[]) Unit
+@[macro_inline] def UdpBaseUDPSocket.ref (self : UdpBaseUDPSocket) : IO Unit := Internal.api "Lasm.JS.Bun.UdpBaseUDPSocket.ref" do
+  self.val.callMethod "ref" (Internal.args #[]) Unit
 
 /-- `unref(): void`: `undefined unref()` -/
-def UdpBaseUDPSocket.unref (self : UdpBaseUDPSocket) : IO Unit :=
-  self.val.callMethod "unref" (Support.args #[]) Unit
+@[macro_inline] def UdpBaseUDPSocket.unref (self : UdpBaseUDPSocket) : IO Unit := Internal.api "Lasm.JS.Bun.UdpBaseUDPSocket.unref" do
+  self.val.callMethod "unref" (Internal.args #[]) Unit
 
 /-- `close(): void`: `undefined close()` -/
-def UdpBaseUDPSocket.close (self : UdpBaseUDPSocket) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def UdpBaseUDPSocket.close (self : UdpBaseUDPSocket) : IO Unit := Internal.api "Lasm.JS.Bun.UdpBaseUDPSocket.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `setBroadcast(enabled: boolean): boolean`: `boolean setBroadcast(boolean enabled)` -/
-def UdpBaseUDPSocket.setBroadcast (self : UdpBaseUDPSocket) (enabled : Bool) : IO Bool :=
-  self.val.callMethod "setBroadcast" (Support.args #[toJS enabled]) Bool
+@[macro_inline] def UdpBaseUDPSocket.setBroadcast (self : UdpBaseUDPSocket) (enabled : Bool) : IO Bool := Internal.api "Lasm.JS.Bun.UdpBaseUDPSocket.setBroadcast" do
+  self.val.callMethod "setBroadcast" (Internal.args #[toJS enabled]) Bool
 
 /-- `setTTL(ttl: number): number`: `double setTTL(double ttl)` -/
-def UdpBaseUDPSocket.setTTL (self : UdpBaseUDPSocket) (ttl : Float) : IO Float :=
-  self.val.callMethod "setTTL" (Support.args #[toJS ttl]) Float
+@[macro_inline] def UdpBaseUDPSocket.setTTL (self : UdpBaseUDPSocket) (ttl : Float) : IO Float := Internal.api "Lasm.JS.Bun.UdpBaseUDPSocket.setTTL" do
+  self.val.callMethod "setTTL" (Internal.args #[toJS ttl]) Float
 
 /-- `setMulticastTTL(ttl: number): number`: `double setMulticastTTL(double ttl)` -/
-def UdpBaseUDPSocket.setMulticastTTL (self : UdpBaseUDPSocket) (ttl : Float) : IO Float :=
-  self.val.callMethod "setMulticastTTL" (Support.args #[toJS ttl]) Float
+@[macro_inline] def UdpBaseUDPSocket.setMulticastTTL (self : UdpBaseUDPSocket) (ttl : Float) : IO Float := Internal.api "Lasm.JS.Bun.UdpBaseUDPSocket.setMulticastTTL" do
+  self.val.callMethod "setMulticastTTL" (Internal.args #[toJS ttl]) Float
 
 /-- `setMulticastLoopback(enabled: boolean): boolean`: `boolean setMulticastLoopback(boolean enabled)` -/
-def UdpBaseUDPSocket.setMulticastLoopback (self : UdpBaseUDPSocket) (enabled : Bool) : IO Bool :=
-  self.val.callMethod "setMulticastLoopback" (Support.args #[toJS enabled]) Bool
+@[macro_inline] def UdpBaseUDPSocket.setMulticastLoopback (self : UdpBaseUDPSocket) (enabled : Bool) : IO Bool := Internal.api "Lasm.JS.Bun.UdpBaseUDPSocket.setMulticastLoopback" do
+  self.val.callMethod "setMulticastLoopback" (Internal.args #[toJS enabled]) Bool
 
 /-- `setMulticastInterface(interfaceAddress: string): boolean`: `boolean setMulticastInterface(DOMString interfaceAddress)` -/
-def UdpBaseUDPSocket.setMulticastInterface (self : UdpBaseUDPSocket) (interfaceAddress : String) : IO Bool :=
-  self.val.callMethod "setMulticastInterface" (Support.args #[toJS interfaceAddress]) Bool
+@[macro_inline] def UdpBaseUDPSocket.setMulticastInterface (self : UdpBaseUDPSocket) (interfaceAddress : String) : IO Bool := Internal.api "Lasm.JS.Bun.UdpBaseUDPSocket.setMulticastInterface" do
+  self.val.callMethod "setMulticastInterface" (Internal.args #[toJS interfaceAddress]) Bool
 
 /-- `addMembership(multicastAddress: string, interfaceAddress?: string): boolean`: `boolean addMembership(DOMString multicastAddress, optional DOMString interfaceAddress)` -/
-def UdpBaseUDPSocket.addMembership (self : UdpBaseUDPSocket) (multicastAddress : String) (interfaceAddress : Option String := none) : IO Bool :=
-  self.val.callMethod "addMembership" (Support.args #[toJS multicastAddress, Support.optional interfaceAddress]) Bool
+@[macro_inline] def UdpBaseUDPSocket.addMembership (self : UdpBaseUDPSocket) (multicastAddress : String) (interfaceAddress : Option String := none) : IO Bool := Internal.api "Lasm.JS.Bun.UdpBaseUDPSocket.addMembership" do
+  self.val.callMethod "addMembership" (Internal.args #[toJS multicastAddress, Internal.optional interfaceAddress]) Bool
 
 /-- `dropMembership(multicastAddress: string, interfaceAddress?: string): boolean`: `boolean dropMembership(DOMString multicastAddress, optional DOMString interfaceAddress)` -/
-def UdpBaseUDPSocket.dropMembership (self : UdpBaseUDPSocket) (multicastAddress : String) (interfaceAddress : Option String := none) : IO Bool :=
-  self.val.callMethod "dropMembership" (Support.args #[toJS multicastAddress, Support.optional interfaceAddress]) Bool
+@[macro_inline] def UdpBaseUDPSocket.dropMembership (self : UdpBaseUDPSocket) (multicastAddress : String) (interfaceAddress : Option String := none) : IO Bool := Internal.api "Lasm.JS.Bun.UdpBaseUDPSocket.dropMembership" do
+  self.val.callMethod "dropMembership" (Internal.args #[toJS multicastAddress, Internal.optional interfaceAddress]) Bool
 
 /-- `addSourceSpecificMembership(sourceAddress: string, groupAddress: string, interfaceAddress?: string): boolean`: `boolean addSourceSpecificMembership(DOMString sourceAddress, DOMString groupAddress, optional DOMString interfaceAddress)` -/
-def UdpBaseUDPSocket.addSourceSpecificMembership (self : UdpBaseUDPSocket) (sourceAddress : String) (groupAddress : String) (interfaceAddress : Option String := none) : IO Bool :=
-  self.val.callMethod "addSourceSpecificMembership" (Support.args #[toJS sourceAddress, toJS groupAddress, Support.optional interfaceAddress]) Bool
+@[macro_inline] def UdpBaseUDPSocket.addSourceSpecificMembership (self : UdpBaseUDPSocket) (sourceAddress : String) (groupAddress : String) (interfaceAddress : Option String := none) : IO Bool := Internal.api "Lasm.JS.Bun.UdpBaseUDPSocket.addSourceSpecificMembership" do
+  self.val.callMethod "addSourceSpecificMembership" (Internal.args #[toJS sourceAddress, toJS groupAddress, Internal.optional interfaceAddress]) Bool
 
 /-- `dropSourceSpecificMembership(sourceAddress: string, groupAddress: string, interfaceAddress?: string): boolean`: `boolean dropSourceSpecificMembership(DOMString sourceAddress, DOMString groupAddress, optional DOMString interfaceAddress)` -/
-def UdpBaseUDPSocket.dropSourceSpecificMembership (self : UdpBaseUDPSocket) (sourceAddress : String) (groupAddress : String) (interfaceAddress : Option String := none) : IO Bool :=
-  self.val.callMethod "dropSourceSpecificMembership" (Support.args #[toJS sourceAddress, toJS groupAddress, Support.optional interfaceAddress]) Bool
+@[macro_inline] def UdpBaseUDPSocket.dropSourceSpecificMembership (self : UdpBaseUDPSocket) (sourceAddress : String) (groupAddress : String) (interfaceAddress : Option String := none) : IO Bool := Internal.api "Lasm.JS.Bun.UdpBaseUDPSocket.dropSourceSpecificMembership" do
+  self.val.callMethod "dropSourceSpecificMembership" (Internal.args #[toJS sourceAddress, toJS groupAddress, Internal.optional interfaceAddress]) Bool
 
 /-- `sendMany(packets: readonly (Data | string | number)[]): number`: `double sendMany(sequence<UdpDataOrDOMStringOrDouble> packets)` -/
-def UdpSocket.sendMany (self : UdpSocket) (packets : Array UdpDataOrDOMStringOrDouble) : IO Float :=
-  self.val.callMethod "sendMany" (Support.args #[toJS packets]) Float
+@[macro_inline] def UdpSocket.sendMany (self : UdpSocket) (packets : Array UdpDataOrDOMStringOrDouble) : IO Float := Internal.api "Lasm.JS.Bun.UdpSocket.sendMany" do
+  self.val.callMethod "sendMany" (Internal.args #[toJS packets]) Float
 
 /-- `send(data: Data, port: number, address: string): boolean`: `boolean send(UdpData data, double /* integer: Nat */ port, DOMString address)` -/
-def UdpSocket.send (self : UdpSocket) (data : UdpData) (port : Nat) (address : String) : IO Bool :=
-  self.val.callMethod "send" (Support.args #[toJS data, toJS port, toJS address]) Bool
+@[macro_inline] def UdpSocket.send (self : UdpSocket) (data : UdpData) (port : Nat) (address : String) : IO Bool := Internal.api "Lasm.JS.Bun.UdpSocket.send" do
+  self.val.callMethod "send" (Internal.args #[toJS data, toJS port, toJS address]) Bool
 
 /-- `reload(handler: SocketHandler<DataBinaryType>): void`: `undefined reload(UdpSocketHandler handler)` -/
-def UdpSocket.reload (self : UdpSocket) (handler : UdpSocketHandler) : IO Unit :=
-  self.val.callMethod "reload" (Support.args #[toJS handler]) Unit
+@[macro_inline] def UdpSocket.reload (self : UdpSocket) (handler : UdpSocketHandler) : IO Unit := Internal.api "Lasm.JS.Bun.UdpSocket.reload" do
+  self.val.callMethod "reload" (Internal.args #[toJS handler]) Unit
 
 /-- `readonly remoteAddress: SocketAddress`: `readonly attribute SocketAddress remoteAddress` -/
-def UdpConnectedSocket.remoteAddress (self : UdpConnectedSocket) : IO SocketAddress := self.val.get "remoteAddress" SocketAddress
+@[macro_inline] def UdpConnectedSocket.remoteAddress (self : UdpConnectedSocket) : IO SocketAddress := Internal.api "Lasm.JS.Bun.UdpConnectedSocket.remoteAddress" do
+  self.val.get "remoteAddress" SocketAddress
 
 /-- `sendMany(packets: readonly Data[]): number`: `double sendMany(sequence<UdpData> packets)` -/
-def UdpConnectedSocket.sendMany (self : UdpConnectedSocket) (packets : Array UdpData) : IO Float :=
-  self.val.callMethod "sendMany" (Support.args #[toJS packets]) Float
+@[macro_inline] def UdpConnectedSocket.sendMany (self : UdpConnectedSocket) (packets : Array UdpData) : IO Float := Internal.api "Lasm.JS.Bun.UdpConnectedSocket.sendMany" do
+  self.val.callMethod "sendMany" (Internal.args #[toJS packets]) Float
 
 /-- `send(data: Data): boolean`: `boolean send(UdpData data)` -/
-def UdpConnectedSocket.send (self : UdpConnectedSocket) (data : UdpData) : IO Bool :=
-  self.val.callMethod "send" (Support.args #[toJS data]) Bool
+@[macro_inline] def UdpConnectedSocket.send (self : UdpConnectedSocket) (data : UdpData) : IO Bool := Internal.api "Lasm.JS.Bun.UdpConnectedSocket.send" do
+  self.val.callMethod "send" (Internal.args #[toJS data]) Bool
 
 /-- `reload(handler: ConnectedSocketHandler<DataBinaryType>): void`: `undefined reload(UdpConnectedSocketHandler handler)` -/
-def UdpConnectedSocket.reload (self : UdpConnectedSocket) (handler : UdpConnectedSocketHandler) : IO Unit :=
-  self.val.callMethod "reload" (Support.args #[toJS handler]) Unit
+@[macro_inline] def UdpConnectedSocket.reload (self : UdpConnectedSocket) (handler : UdpConnectedSocketHandler) : IO Unit := Internal.api "Lasm.JS.Bun.UdpConnectedSocket.reload" do
+  self.val.callMethod "reload" (Internal.args #[toJS handler]) Unit
 
 /-- `constructor(options: TerminalOptions)`: `constructor(TerminalOptions options)` -/
-def Terminal.new (options : TerminalOptions) : IO Terminal :=
+@[macro_inline] def Terminal.new (options : TerminalOptions) : IO Terminal := Internal.api "Lasm.JS.Bun.Terminal.new" do
   Lasm.JS.Binding.invoke Terminal { name := "Lasm.JS.Bun.Terminal.new", module := "globalThis", path := "Bun.Terminal", construct := true, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
 
 /-- `readonly closed: boolean`: `readonly attribute boolean closed` -/
-def Terminal.closed (self : Terminal) : IO Bool := self.val.get "closed" Bool
+@[macro_inline] def Terminal.closed (self : Terminal) : IO Bool := Internal.api "Lasm.JS.Bun.Terminal.closed" do
+  self.val.get "closed" Bool
 
 /-- `inputFlags: number`: `attribute double inputFlags` -/
-def Terminal.inputFlags (self : Terminal) : IO Float := self.val.get "inputFlags" Float
+@[macro_inline] def Terminal.inputFlags (self : Terminal) : IO Float := Internal.api "Lasm.JS.Bun.Terminal.inputFlags" do
+  self.val.get "inputFlags" Float
 
 /-- Sets `inputFlags`: `attribute double inputFlags` -/
-def Terminal.setInputFlags (self : Terminal) (value : Float) : IO Unit :=
+@[macro_inline] def Terminal.setInputFlags (self : Terminal) (value : Float) : IO Unit := Internal.api "Lasm.JS.Bun.Terminal.setInputFlags" do
   self.val.set "inputFlags" (toJS value)
 
 /-- `outputFlags: number`: `attribute double outputFlags` -/
-def Terminal.outputFlags (self : Terminal) : IO Float := self.val.get "outputFlags" Float
+@[macro_inline] def Terminal.outputFlags (self : Terminal) : IO Float := Internal.api "Lasm.JS.Bun.Terminal.outputFlags" do
+  self.val.get "outputFlags" Float
 
 /-- Sets `outputFlags`: `attribute double outputFlags` -/
-def Terminal.setOutputFlags (self : Terminal) (value : Float) : IO Unit :=
+@[macro_inline] def Terminal.setOutputFlags (self : Terminal) (value : Float) : IO Unit := Internal.api "Lasm.JS.Bun.Terminal.setOutputFlags" do
   self.val.set "outputFlags" (toJS value)
 
 /-- `localFlags: number`: `attribute double localFlags` -/
-def Terminal.localFlags (self : Terminal) : IO Float := self.val.get "localFlags" Float
+@[macro_inline] def Terminal.localFlags (self : Terminal) : IO Float := Internal.api "Lasm.JS.Bun.Terminal.localFlags" do
+  self.val.get "localFlags" Float
 
 /-- Sets `localFlags`: `attribute double localFlags` -/
-def Terminal.setLocalFlags (self : Terminal) (value : Float) : IO Unit :=
+@[macro_inline] def Terminal.setLocalFlags (self : Terminal) (value : Float) : IO Unit := Internal.api "Lasm.JS.Bun.Terminal.setLocalFlags" do
   self.val.set "localFlags" (toJS value)
 
 /-- `controlFlags: number`: `attribute double controlFlags` -/
-def Terminal.controlFlags (self : Terminal) : IO Float := self.val.get "controlFlags" Float
+@[macro_inline] def Terminal.controlFlags (self : Terminal) : IO Float := Internal.api "Lasm.JS.Bun.Terminal.controlFlags" do
+  self.val.get "controlFlags" Float
 
 /-- Sets `controlFlags`: `attribute double controlFlags` -/
-def Terminal.setControlFlags (self : Terminal) (value : Float) : IO Unit :=
+@[macro_inline] def Terminal.setControlFlags (self : Terminal) (value : Float) : IO Unit := Internal.api "Lasm.JS.Bun.Terminal.setControlFlags" do
   self.val.set "controlFlags" (toJS value)
 
 /-- `write(data: string | BufferSource): number`: `double write(DOMStringOrUint8Array data)` -/
-def Terminal.write (self : Terminal) (data : DOMStringOrUint8Array) : IO Float :=
-  self.val.callMethod "write" (Support.args #[toJS data]) Float
+@[macro_inline] def Terminal.write (self : Terminal) (data : DOMStringOrUint8Array) : IO Float := Internal.api "Lasm.JS.Bun.Terminal.write" do
+  self.val.callMethod "write" (Internal.args #[toJS data]) Float
 
 /-- `resize(cols: number, rows: number): void`: `undefined resize(double cols, double rows)` -/
-def Terminal.resize (self : Terminal) (cols : Float) (rows : Float) : IO Unit :=
-  self.val.callMethod "resize" (Support.args #[toJS cols, toJS rows]) Unit
+@[macro_inline] def Terminal.resize (self : Terminal) (cols : Float) (rows : Float) : IO Unit := Internal.api "Lasm.JS.Bun.Terminal.resize" do
+  self.val.callMethod "resize" (Internal.args #[toJS cols, toJS rows]) Unit
 
 /-- `setRawMode(enabled: boolean): void`: `undefined setRawMode(boolean enabled)` -/
-def Terminal.setRawMode (self : Terminal) (enabled : Bool) : IO Unit :=
-  self.val.callMethod "setRawMode" (Support.args #[toJS enabled]) Unit
+@[macro_inline] def Terminal.setRawMode (self : Terminal) (enabled : Bool) : IO Unit := Internal.api "Lasm.JS.Bun.Terminal.setRawMode" do
+  self.val.callMethod "setRawMode" (Internal.args #[toJS enabled]) Unit
 
 /-- `ref(): void`: `undefined ref()` -/
-def Terminal.ref (self : Terminal) : IO Unit :=
-  self.val.callMethod "ref" (Support.args #[]) Unit
+@[macro_inline] def Terminal.ref (self : Terminal) : IO Unit := Internal.api "Lasm.JS.Bun.Terminal.ref" do
+  self.val.callMethod "ref" (Internal.args #[]) Unit
 
 /-- `unref(): void`: `undefined unref()` -/
-def Terminal.unref (self : Terminal) : IO Unit :=
-  self.val.callMethod "unref" (Support.args #[]) Unit
+@[macro_inline] def Terminal.unref (self : Terminal) : IO Unit := Internal.api "Lasm.JS.Bun.Terminal.unref" do
+  self.val.callMethod "unref" (Internal.args #[]) Unit
 
 /-- `close(): void`: `undefined close()` -/
-def Terminal.close (self : Terminal) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def Terminal.close (self : Terminal) : IO Unit := Internal.api "Lasm.JS.Bun.Terminal.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `contextSwitches: { voluntary: number; involuntary: number; }`: `readonly attribute ResourceUsageContextSwitches contextSwitches` -/
-def ResourceUsage.contextSwitches (self : ResourceUsage) : IO ResourceUsageContextSwitches := self.val.get "contextSwitches" ResourceUsageContextSwitches
+@[macro_inline] def ResourceUsage.contextSwitches (self : ResourceUsage) : IO ResourceUsageContextSwitches := Internal.api "Lasm.JS.Bun.ResourceUsage.contextSwitches" do
+  self.val.get "contextSwitches" ResourceUsageContextSwitches
 
 /-- `cpuTime: { user: bigint; system: bigint; total: bigint; }`: `readonly attribute ResourceUsageCpuTime cpuTime` -/
-def ResourceUsage.cpuTime (self : ResourceUsage) : IO ResourceUsageCpuTime := self.val.get "cpuTime" ResourceUsageCpuTime
+@[macro_inline] def ResourceUsage.cpuTime (self : ResourceUsage) : IO ResourceUsageCpuTime := Internal.api "Lasm.JS.Bun.ResourceUsage.cpuTime" do
+  self.val.get "cpuTime" ResourceUsageCpuTime
 
 /-- `maxRSS: number`: `readonly attribute double maxRSS` -/
-def ResourceUsage.maxRSS (self : ResourceUsage) : IO Float := self.val.get "maxRSS" Float
+@[macro_inline] def ResourceUsage.maxRSS (self : ResourceUsage) : IO Float := Internal.api "Lasm.JS.Bun.ResourceUsage.maxRSS" do
+  self.val.get "maxRSS" Float
 
 /-- `messages: { sent: number; received: number; }`: `readonly attribute ResourceUsageMessages messages` -/
-def ResourceUsage.messages (self : ResourceUsage) : IO ResourceUsageMessages := self.val.get "messages" ResourceUsageMessages
+@[macro_inline] def ResourceUsage.messages (self : ResourceUsage) : IO ResourceUsageMessages := Internal.api "Lasm.JS.Bun.ResourceUsage.messages" do
+  self.val.get "messages" ResourceUsageMessages
 
 /-- `ops: { in: number; out: number; }`: `readonly attribute ResourceUsageOps ops` -/
-def ResourceUsage.ops (self : ResourceUsage) : IO ResourceUsageOps := self.val.get "ops" ResourceUsageOps
+@[macro_inline] def ResourceUsage.ops (self : ResourceUsage) : IO ResourceUsageOps := Internal.api "Lasm.JS.Bun.ResourceUsage.ops" do
+  self.val.get "ops" ResourceUsageOps
 
 /-- `shmSize: number`: `readonly attribute double shmSize` -/
-def ResourceUsage.shmSize (self : ResourceUsage) : IO Float := self.val.get "shmSize" Float
+@[macro_inline] def ResourceUsage.shmSize (self : ResourceUsage) : IO Float := Internal.api "Lasm.JS.Bun.ResourceUsage.shmSize" do
+  self.val.get "shmSize" Float
 
 /-- `signalCount: number`: `readonly attribute double signalCount` -/
-def ResourceUsage.signalCount (self : ResourceUsage) : IO Float := self.val.get "signalCount" Float
+@[macro_inline] def ResourceUsage.signalCount (self : ResourceUsage) : IO Float := Internal.api "Lasm.JS.Bun.ResourceUsage.signalCount" do
+  self.val.get "signalCount" Float
 
 /-- `swapCount: number`: `readonly attribute double swapCount` -/
-def ResourceUsage.swapCount (self : ResourceUsage) : IO Float := self.val.get "swapCount" Float
+@[macro_inline] def ResourceUsage.swapCount (self : ResourceUsage) : IO Float := Internal.api "Lasm.JS.Bun.ResourceUsage.swapCount" do
+  self.val.get "swapCount" Float
 
 /-- `readonly stdin: SpawnOptions.WritableToIO<In> (read as FileSink | number | undefined: conditional on the stdin option (a FileSink when 'pipe'))`: `readonly attribute FileSinkOrDouble? stdin` -/
-def Subprocess.stdin (self : Subprocess) : IO (Option FileSinkOrDouble) := self.val.get "stdin" (Option FileSinkOrDouble)
+@[macro_inline] def Subprocess.stdin (self : Subprocess) : IO (Option FileSinkOrDouble) := Internal.api "Lasm.JS.Bun.Subprocess.stdin" do
+  self.val.get "stdin" (Option FileSinkOrDouble)
 
 /-- `readonly stdout: SpawnOptions.ReadableToIO<Out> (read as ReadableStream<Uint8Array> | number | undefined: conditional on the stdout option (a stream when 'pipe'))`: `readonly attribute ReadableStreamOrDouble? stdout` -/
-def Subprocess.stdout (self : Subprocess) : IO (Option ReadableStreamOrDouble) := self.val.get "stdout" (Option ReadableStreamOrDouble)
+@[macro_inline] def Subprocess.stdout (self : Subprocess) : IO (Option ReadableStreamOrDouble) := Internal.api "Lasm.JS.Bun.Subprocess.stdout" do
+  self.val.get "stdout" (Option ReadableStreamOrDouble)
 
 /-- `readonly stderr: SpawnOptions.ReadableToIO<Err> (read as ReadableStream<Uint8Array> | number | undefined: conditional on the stderr option (a stream when 'pipe'))`: `readonly attribute ReadableStreamOrDouble? stderr` -/
-def Subprocess.stderr (self : Subprocess) : IO (Option ReadableStreamOrDouble) := self.val.get "stderr" (Option ReadableStreamOrDouble)
+@[macro_inline] def Subprocess.stderr (self : Subprocess) : IO (Option ReadableStreamOrDouble) := Internal.api "Lasm.JS.Bun.Subprocess.stderr" do
+  self.val.get "stderr" (Option ReadableStreamOrDouble)
 
 /-- `readonly terminal: Terminal | undefined`: `readonly attribute Terminal? terminal` -/
-def Subprocess.terminal (self : Subprocess) : IO (Option Terminal) := self.val.get "terminal" (Option Terminal)
+@[macro_inline] def Subprocess.terminal (self : Subprocess) : IO (Option Terminal) := Internal.api "Lasm.JS.Bun.Subprocess.terminal" do
+  self.val.get "terminal" (Option Terminal)
 
 /-- `readonly stdio: [null, null, null, ...(number | null)[]]`: `readonly attribute sequence<any> stdio` -/
-def Subprocess.stdio (self : Subprocess) : IO (Array Data) := self.val.get "stdio" (Array Data)
+@[macro_inline] def Subprocess.stdio (self : Subprocess) : IO (Array Data) := Internal.api "Lasm.JS.Bun.Subprocess.stdio" do
+  self.val.get "stdio" (Array Data)
 
 /-- `readonly readable: SpawnOptions.ReadableToIO<Out> (read as ReadableStream<Uint8Array> | number | undefined: conditional on the stdout option)`: `readonly attribute ReadableStreamOrDouble? readable` -/
-def Subprocess.readable (self : Subprocess) : IO (Option ReadableStreamOrDouble) := self.val.get "readable" (Option ReadableStreamOrDouble)
+@[macro_inline] def Subprocess.readable (self : Subprocess) : IO (Option ReadableStreamOrDouble) := Internal.api "Lasm.JS.Bun.Subprocess.readable" do
+  self.val.get "readable" (Option ReadableStreamOrDouble)
 
 /-- `readonly pid: number`: `readonly attribute double /* integer: Int */ pid` -/
-def Subprocess.pid (self : Subprocess) : IO Int := self.val.get "pid" Int
+@[macro_inline] def Subprocess.pid (self : Subprocess) : IO Int := Internal.api "Lasm.JS.Bun.Subprocess.pid" do
+  self.val.get "pid" Int
 
 /-- `readonly exited: Promise<number>`: `readonly attribute Promise<double> exited` -/
-def Subprocess.exited (self : Subprocess) : Async Float := do
+@[macro_inline] def Subprocess.exited (self : Subprocess) : Async Float := Internal.api "Lasm.JS.Bun.Subprocess.exited" do
   let p ← self.val.get "exited" Value
   p.await Float
 
 /-- `readonly exitCode: number | null`: `readonly attribute double? exitCode` -/
-def Subprocess.exitCode (self : Subprocess) : IO (Option Float) := self.val.get "exitCode" (Option Float)
+@[macro_inline] def Subprocess.exitCode (self : Subprocess) : IO (Option Float) := Internal.api "Lasm.JS.Bun.Subprocess.exitCode" do
+  self.val.get "exitCode" (Option Float)
 
 /-- `readonly signalCode: NodeJS.Signals | number | null`: `readonly attribute DOMStringOrDouble? signalCode` -/
-def Subprocess.signalCode (self : Subprocess) : IO (Option DOMStringOrDouble) := self.val.get "signalCode" (Option DOMStringOrDouble)
+@[macro_inline] def Subprocess.signalCode (self : Subprocess) : IO (Option DOMStringOrDouble) := Internal.api "Lasm.JS.Bun.Subprocess.signalCode" do
+  self.val.get "signalCode" (Option DOMStringOrDouble)
 
 /-- `readonly killed: boolean`: `readonly attribute boolean killed` -/
-def Subprocess.killed (self : Subprocess) : IO Bool := self.val.get "killed" Bool
+@[macro_inline] def Subprocess.killed (self : Subprocess) : IO Bool := Internal.api "Lasm.JS.Bun.Subprocess.killed" do
+  self.val.get "killed" Bool
 
 /-- `kill(exitCode?: number | NodeJS.Signals): void`: `undefined kill(optional DoubleOrDOMString exitCode)` -/
-def Subprocess.kill (self : Subprocess) (exitCode : Option DoubleOrDOMString := none) : IO Unit :=
-  self.val.callMethod "kill" (Support.args #[Support.optional exitCode]) Unit
+@[macro_inline] def Subprocess.kill (self : Subprocess) (exitCode : Option DoubleOrDOMString := none) : IO Unit := Internal.api "Lasm.JS.Bun.Subprocess.kill" do
+  self.val.callMethod "kill" (Internal.args #[Internal.optional exitCode]) Unit
 
 /-- `ref(): void`: `undefined ref()` -/
-def Subprocess.ref (self : Subprocess) : IO Unit :=
-  self.val.callMethod "ref" (Support.args #[]) Unit
+@[macro_inline] def Subprocess.ref (self : Subprocess) : IO Unit := Internal.api "Lasm.JS.Bun.Subprocess.ref" do
+  self.val.callMethod "ref" (Internal.args #[]) Unit
 
 /-- `unref(): void`: `undefined unref()` -/
-def Subprocess.unref (self : Subprocess) : IO Unit :=
-  self.val.callMethod "unref" (Support.args #[]) Unit
+@[macro_inline] def Subprocess.unref (self : Subprocess) : IO Unit := Internal.api "Lasm.JS.Bun.Subprocess.unref" do
+  self.val.callMethod "unref" (Internal.args #[]) Unit
 
 /-- `send(message: any): void`: `undefined send(any message)` -/
-def Subprocess.send (self : Subprocess) (message : Data) : IO Unit :=
-  self.val.callMethod "send" (Support.args #[toJS message]) Unit
+@[macro_inline] def Subprocess.send (self : Subprocess) (message : Data) : IO Unit := Internal.api "Lasm.JS.Bun.Subprocess.send" do
+  self.val.callMethod "send" (Internal.args #[toJS message]) Unit
 
 /-- `disconnect(): void`: `undefined disconnect()` -/
-def Subprocess.disconnect (self : Subprocess) : IO Unit :=
-  self.val.callMethod "disconnect" (Support.args #[]) Unit
+@[macro_inline] def Subprocess.disconnect (self : Subprocess) : IO Unit := Internal.api "Lasm.JS.Bun.Subprocess.disconnect" do
+  self.val.callMethod "disconnect" (Internal.args #[]) Unit
 
 /-- `resourceUsage(): ResourceUsage | undefined`: `ResourceUsage? resourceUsage()` -/
-def Subprocess.resourceUsage (self : Subprocess) : IO (Option ResourceUsage) :=
-  self.val.callMethod "resourceUsage" (Support.args #[]) (Option ResourceUsage)
+@[macro_inline] def Subprocess.resourceUsage (self : Subprocess) : IO (Option ResourceUsage) := Internal.api "Lasm.JS.Bun.Subprocess.resourceUsage" do
+  self.val.callMethod "resourceUsage" (Internal.args #[]) (Option ResourceUsage)
 
 /-- `readonly stdin: SpawnOptions.WritableToIO<In> (read as FileSink | number | undefined: conditional on the stdin option (a FileSink when 'pipe'))`: `readonly attribute FileSinkOrDouble? stdin` -/
-def SubprocessIgnorePipePipe.stdin (self : SubprocessIgnorePipePipe) : IO (Option FileSinkOrDouble) := self.val.get "stdin" (Option FileSinkOrDouble)
+@[macro_inline] def SubprocessIgnorePipePipe.stdin (self : SubprocessIgnorePipePipe) : IO (Option FileSinkOrDouble) := Internal.api "Lasm.JS.Bun.SubprocessIgnorePipePipe.stdin" do
+  self.val.get "stdin" (Option FileSinkOrDouble)
 
 /-- `readonly stdout: SpawnOptions.ReadableToIO<Out> (read as ReadableStream<Uint8Array> | number | undefined: conditional on the stdout option (a stream when 'pipe'))`: `readonly attribute ReadableStreamOrDouble? stdout` -/
-def SubprocessIgnorePipePipe.stdout (self : SubprocessIgnorePipePipe) : IO (Option ReadableStreamOrDouble) := self.val.get "stdout" (Option ReadableStreamOrDouble)
+@[macro_inline] def SubprocessIgnorePipePipe.stdout (self : SubprocessIgnorePipePipe) : IO (Option ReadableStreamOrDouble) := Internal.api "Lasm.JS.Bun.SubprocessIgnorePipePipe.stdout" do
+  self.val.get "stdout" (Option ReadableStreamOrDouble)
 
 /-- `readonly stderr: SpawnOptions.ReadableToIO<Err> (read as ReadableStream<Uint8Array> | number | undefined: conditional on the stderr option (a stream when 'pipe'))`: `readonly attribute ReadableStreamOrDouble? stderr` -/
-def SubprocessIgnorePipePipe.stderr (self : SubprocessIgnorePipePipe) : IO (Option ReadableStreamOrDouble) := self.val.get "stderr" (Option ReadableStreamOrDouble)
+@[macro_inline] def SubprocessIgnorePipePipe.stderr (self : SubprocessIgnorePipePipe) : IO (Option ReadableStreamOrDouble) := Internal.api "Lasm.JS.Bun.SubprocessIgnorePipePipe.stderr" do
+  self.val.get "stderr" (Option ReadableStreamOrDouble)
 
 /-- `readonly terminal: Terminal | undefined`: `readonly attribute Terminal? terminal` -/
-def SubprocessIgnorePipePipe.terminal (self : SubprocessIgnorePipePipe) : IO (Option Terminal) := self.val.get "terminal" (Option Terminal)
+@[macro_inline] def SubprocessIgnorePipePipe.terminal (self : SubprocessIgnorePipePipe) : IO (Option Terminal) := Internal.api "Lasm.JS.Bun.SubprocessIgnorePipePipe.terminal" do
+  self.val.get "terminal" (Option Terminal)
 
 /-- `readonly stdio: [null, null, null, ...(number | null)[]]`: `readonly attribute sequence<any> stdio` -/
-def SubprocessIgnorePipePipe.stdio (self : SubprocessIgnorePipePipe) : IO (Array Data) := self.val.get "stdio" (Array Data)
+@[macro_inline] def SubprocessIgnorePipePipe.stdio (self : SubprocessIgnorePipePipe) : IO (Array Data) := Internal.api "Lasm.JS.Bun.SubprocessIgnorePipePipe.stdio" do
+  self.val.get "stdio" (Array Data)
 
 /-- `readonly readable: SpawnOptions.ReadableToIO<Out> (read as ReadableStream<Uint8Array> | number | undefined: conditional on the stdout option)`: `readonly attribute ReadableStreamOrDouble? readable` -/
-def SubprocessIgnorePipePipe.readable (self : SubprocessIgnorePipePipe) : IO (Option ReadableStreamOrDouble) := self.val.get "readable" (Option ReadableStreamOrDouble)
+@[macro_inline] def SubprocessIgnorePipePipe.readable (self : SubprocessIgnorePipePipe) : IO (Option ReadableStreamOrDouble) := Internal.api "Lasm.JS.Bun.SubprocessIgnorePipePipe.readable" do
+  self.val.get "readable" (Option ReadableStreamOrDouble)
 
 /-- `readonly pid: number`: `readonly attribute double /* integer: Int */ pid` -/
-def SubprocessIgnorePipePipe.pid (self : SubprocessIgnorePipePipe) : IO Int := self.val.get "pid" Int
+@[macro_inline] def SubprocessIgnorePipePipe.pid (self : SubprocessIgnorePipePipe) : IO Int := Internal.api "Lasm.JS.Bun.SubprocessIgnorePipePipe.pid" do
+  self.val.get "pid" Int
 
 /-- `readonly exited: Promise<number>`: `readonly attribute Promise<double> exited` -/
-def SubprocessIgnorePipePipe.exited (self : SubprocessIgnorePipePipe) : Async Float := do
+@[macro_inline] def SubprocessIgnorePipePipe.exited (self : SubprocessIgnorePipePipe) : Async Float := Internal.api "Lasm.JS.Bun.SubprocessIgnorePipePipe.exited" do
   let p ← self.val.get "exited" Value
   p.await Float
 
 /-- `readonly exitCode: number | null`: `readonly attribute double? exitCode` -/
-def SubprocessIgnorePipePipe.exitCode (self : SubprocessIgnorePipePipe) : IO (Option Float) := self.val.get "exitCode" (Option Float)
+@[macro_inline] def SubprocessIgnorePipePipe.exitCode (self : SubprocessIgnorePipePipe) : IO (Option Float) := Internal.api "Lasm.JS.Bun.SubprocessIgnorePipePipe.exitCode" do
+  self.val.get "exitCode" (Option Float)
 
 /-- `readonly signalCode: NodeJS.Signals | number | null`: `readonly attribute DOMStringOrDouble? signalCode` -/
-def SubprocessIgnorePipePipe.signalCode (self : SubprocessIgnorePipePipe) : IO (Option DOMStringOrDouble) := self.val.get "signalCode" (Option DOMStringOrDouble)
+@[macro_inline] def SubprocessIgnorePipePipe.signalCode (self : SubprocessIgnorePipePipe) : IO (Option DOMStringOrDouble) := Internal.api "Lasm.JS.Bun.SubprocessIgnorePipePipe.signalCode" do
+  self.val.get "signalCode" (Option DOMStringOrDouble)
 
 /-- `readonly killed: boolean`: `readonly attribute boolean killed` -/
-def SubprocessIgnorePipePipe.killed (self : SubprocessIgnorePipePipe) : IO Bool := self.val.get "killed" Bool
+@[macro_inline] def SubprocessIgnorePipePipe.killed (self : SubprocessIgnorePipePipe) : IO Bool := Internal.api "Lasm.JS.Bun.SubprocessIgnorePipePipe.killed" do
+  self.val.get "killed" Bool
 
 /-- `kill(exitCode?: number | NodeJS.Signals): void`: `undefined kill(optional DoubleOrDOMString exitCode)` -/
-def SubprocessIgnorePipePipe.kill (self : SubprocessIgnorePipePipe) (exitCode : Option DoubleOrDOMString := none) : IO Unit :=
-  self.val.callMethod "kill" (Support.args #[Support.optional exitCode]) Unit
+@[macro_inline] def SubprocessIgnorePipePipe.kill (self : SubprocessIgnorePipePipe) (exitCode : Option DoubleOrDOMString := none) : IO Unit := Internal.api "Lasm.JS.Bun.SubprocessIgnorePipePipe.kill" do
+  self.val.callMethod "kill" (Internal.args #[Internal.optional exitCode]) Unit
 
 /-- `ref(): void`: `undefined ref()` -/
-def SubprocessIgnorePipePipe.ref (self : SubprocessIgnorePipePipe) : IO Unit :=
-  self.val.callMethod "ref" (Support.args #[]) Unit
+@[macro_inline] def SubprocessIgnorePipePipe.ref (self : SubprocessIgnorePipePipe) : IO Unit := Internal.api "Lasm.JS.Bun.SubprocessIgnorePipePipe.ref" do
+  self.val.callMethod "ref" (Internal.args #[]) Unit
 
 /-- `unref(): void`: `undefined unref()` -/
-def SubprocessIgnorePipePipe.unref (self : SubprocessIgnorePipePipe) : IO Unit :=
-  self.val.callMethod "unref" (Support.args #[]) Unit
+@[macro_inline] def SubprocessIgnorePipePipe.unref (self : SubprocessIgnorePipePipe) : IO Unit := Internal.api "Lasm.JS.Bun.SubprocessIgnorePipePipe.unref" do
+  self.val.callMethod "unref" (Internal.args #[]) Unit
 
 /-- `send(message: any): void`: `undefined send(any message)` -/
-def SubprocessIgnorePipePipe.send (self : SubprocessIgnorePipePipe) (message : Data) : IO Unit :=
-  self.val.callMethod "send" (Support.args #[toJS message]) Unit
+@[macro_inline] def SubprocessIgnorePipePipe.send (self : SubprocessIgnorePipePipe) (message : Data) : IO Unit := Internal.api "Lasm.JS.Bun.SubprocessIgnorePipePipe.send" do
+  self.val.callMethod "send" (Internal.args #[toJS message]) Unit
 
 /-- `disconnect(): void`: `undefined disconnect()` -/
-def SubprocessIgnorePipePipe.disconnect (self : SubprocessIgnorePipePipe) : IO Unit :=
-  self.val.callMethod "disconnect" (Support.args #[]) Unit
+@[macro_inline] def SubprocessIgnorePipePipe.disconnect (self : SubprocessIgnorePipePipe) : IO Unit := Internal.api "Lasm.JS.Bun.SubprocessIgnorePipePipe.disconnect" do
+  self.val.callMethod "disconnect" (Internal.args #[]) Unit
 
 /-- `resourceUsage(): ResourceUsage | undefined`: `ResourceUsage? resourceUsage()` -/
-def SubprocessIgnorePipePipe.resourceUsage (self : SubprocessIgnorePipePipe) : IO (Option ResourceUsage) :=
-  self.val.callMethod "resourceUsage" (Support.args #[]) (Option ResourceUsage)
+@[macro_inline] def SubprocessIgnorePipePipe.resourceUsage (self : SubprocessIgnorePipePipe) : IO (Option ResourceUsage) := Internal.api "Lasm.JS.Bun.SubprocessIgnorePipePipe.resourceUsage" do
+  self.val.callMethod "resourceUsage" (Internal.args #[]) (Option ResourceUsage)
 
 /-- `start(options?: { asUint8Array?: boolean; highWaterMark?: number; stream?: boolean; }): void`: `undefined start(optional ArrayBufferSinkStartOptions options)` -/
-def ArrayBufferSink.start (self : ArrayBufferSink) (options : Option ArrayBufferSinkStartOptions := none) : IO Unit :=
-  self.val.callMethod "start" (Support.args #[Support.optional options]) Unit
+@[macro_inline] def ArrayBufferSink.start (self : ArrayBufferSink) (options : Option ArrayBufferSinkStartOptions := none) : IO Unit := Internal.api "Lasm.JS.Bun.ArrayBufferSink.start" do
+  self.val.callMethod "start" (Internal.args #[Internal.optional options]) Unit
 
 /-- `write(chunk: string | ArrayBufferView | ArrayBuffer | SharedArrayBuffer): number`: `double write(DOMStringOrUint8ArrayOrArrayBuffer chunk)` -/
-def ArrayBufferSink.write (self : ArrayBufferSink) (chunk : DOMStringOrUint8ArrayOrArrayBuffer) : IO Float :=
-  self.val.callMethod "write" (Support.args #[toJS chunk]) Float
+@[macro_inline] def ArrayBufferSink.write (self : ArrayBufferSink) (chunk : DOMStringOrUint8ArrayOrArrayBuffer) : IO Float := Internal.api "Lasm.JS.Bun.ArrayBufferSink.write" do
+  self.val.callMethod "write" (Internal.args #[toJS chunk]) Float
 
 /-- `flush(): number | Uint8Array<ArrayBuffer> | ArrayBuffer`: `DoubleOrUint8ArrayOrArrayBuffer flush()` -/
-def ArrayBufferSink.flush (self : ArrayBufferSink) : IO DoubleOrUint8ArrayOrArrayBuffer := do
-  let r ← self.val.callMethod "flush" (Support.args #[]) Data
+@[macro_inline] def ArrayBufferSink.flush (self : ArrayBufferSink) : IO DoubleOrUint8ArrayOrArrayBuffer := Internal.api "Lasm.JS.Bun.ArrayBufferSink.flush" do
+  let r ← self.val.callMethod "flush" (Internal.args #[]) Data
   DoubleOrUint8ArrayOrArrayBuffer.decode r
 
 /-- `end(): ArrayBuffer | Uint8Array<ArrayBuffer>`: `ArrayBufferOrUint8Array end()` -/
-def ArrayBufferSink.«end» (self : ArrayBufferSink) : IO ArrayBufferOrUint8Array := do
-  let r ← self.val.callMethod "end" (Support.args #[]) Data
+@[macro_inline] def ArrayBufferSink.«end» (self : ArrayBufferSink) : IO ArrayBufferOrUint8Array := Internal.api "Lasm.JS.Bun.ArrayBufferSink.end" do
+  let r ← self.val.callMethod "end" (Internal.args #[]) Data
   ArrayBufferOrUint8Array.decode r
 
 /-- `constructor(options?: TranspilerOptions)`: `constructor(optional TranspilerOptions options)` -/
-def Transpiler.new (options : Option TranspilerOptions := none) : IO Transpiler :=
+@[macro_inline] def Transpiler.new (options : Option TranspilerOptions := none) : IO Transpiler := Internal.api "Lasm.JS.Bun.Transpiler.new" do
   Lasm.JS.Binding.invoke Transpiler { name := "Lasm.JS.Bun.Transpiler.new", module := "globalThis", path := "Bun.Transpiler", construct := true, arity := 1 }
-    (Support.args #[Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- `transform(code: Bun.StringOrBuffer, loader?: JavaScriptLoader): Promise<string>`: `Promise<DOMString> transform(StringOrBuffer code, optional JavaScriptLoader loader)` -/
-def Transpiler.transform (self : Transpiler) (code : StringOrBuffer) (loader : Option JavaScriptLoader := none) : Async String :=
-  self.val.callMethodAwait "transform" (Support.args #[toJS code, Support.optional loader]) String
+@[macro_inline] def Transpiler.transform (self : Transpiler) (code : StringOrBuffer) (loader : Option JavaScriptLoader := none) : Async String := Internal.api "Lasm.JS.Bun.Transpiler.transform" do
+  self.val.callMethodAwait "transform" (Internal.args #[toJS code, Internal.optional loader]) String
 
 /-- `transformSync(code: Bun.StringOrBuffer, loader: JavaScriptLoader, ctx: object): string`: `DOMString transformSync(StringOrBuffer code, JavaScriptLoader loader, object ctx)` -/
-def Transpiler.transformSync (self : Transpiler) (code : StringOrBuffer) (loader : JavaScriptLoader) (ctx : Data) : IO String :=
-  self.val.callMethod "transformSync" (Support.args #[toJS code, toJS loader, toJS ctx]) String
+@[macro_inline] def Transpiler.transformSync (self : Transpiler) (code : StringOrBuffer) (loader : JavaScriptLoader) (ctx : Data) : IO String := Internal.api "Lasm.JS.Bun.Transpiler.transformSync" do
+  self.val.callMethod "transformSync" (Internal.args #[toJS code, toJS loader, toJS ctx]) String
 
 /-- `transformSync(code: Bun.StringOrBuffer, ctx: object): string`: `DOMString transformSync(StringOrBuffer code, object ctx)` -/
-def Transpiler.transformSyncWithCtx (self : Transpiler) (code : StringOrBuffer) (ctx : Data) : IO String :=
-  self.val.callMethod "transformSync" (Support.args #[toJS code, toJS ctx]) String
+@[macro_inline] def Transpiler.transformSyncWithCtx (self : Transpiler) (code : StringOrBuffer) (ctx : Data) : IO String := Internal.api "Lasm.JS.Bun.Transpiler.transformSyncWithCtx" do
+  self.val.callMethod "transformSync" (Internal.args #[toJS code, toJS ctx]) String
 
 /-- `transformSync(code: Bun.StringOrBuffer, loader?: JavaScriptLoader): string`: `DOMString transformSync(StringOrBuffer code, optional JavaScriptLoader loader)` -/
-def Transpiler.transformSync2 (self : Transpiler) (code : StringOrBuffer) (loader : Option JavaScriptLoader := none) : IO String :=
-  self.val.callMethod "transformSync" (Support.args #[toJS code, Support.optional loader]) String
+@[macro_inline] def Transpiler.transformSync2 (self : Transpiler) (code : StringOrBuffer) (loader : Option JavaScriptLoader := none) : IO String := Internal.api "Lasm.JS.Bun.Transpiler.transformSync2" do
+  self.val.callMethod "transformSync" (Internal.args #[toJS code, Internal.optional loader]) String
 
 /-- `scan(code: Bun.StringOrBuffer): { exports: string[]; imports: Import[] }`: `TranspilerScan scan(StringOrBuffer code)` -/
-def Transpiler.scan (self : Transpiler) (code : StringOrBuffer) : IO TranspilerScan :=
-  self.val.callMethod "scan" (Support.args #[toJS code]) TranspilerScan
+@[macro_inline] def Transpiler.scan (self : Transpiler) (code : StringOrBuffer) : IO TranspilerScan := Internal.api "Lasm.JS.Bun.Transpiler.scan" do
+  self.val.callMethod "scan" (Internal.args #[toJS code]) TranspilerScan
 
 /-- `scanImports(code: Bun.StringOrBuffer): Import[]`: `sequence<Import> scanImports(StringOrBuffer code)` -/
-def Transpiler.scanImports (self : Transpiler) (code : StringOrBuffer) : IO (Array Import) :=
-  self.val.callMethod "scanImports" (Support.args #[toJS code]) (Array Import)
+@[macro_inline] def Transpiler.scanImports (self : Transpiler) (code : StringOrBuffer) : IO (Array Import) := Internal.api "Lasm.JS.Bun.Transpiler.scanImports" do
+  self.val.callMethod "scanImports" (Internal.args #[toJS code]) (Array Import)
 
 /-- `verify(password: Bun.StringOrBuffer, hash: Bun.StringOrBuffer, algorithm?: Password.AlgorithmLabel): Promise<boolean>`: `Promise<boolean> verify(StringOrBuffer password, StringOrBuffer hash, optional PasswordAlgorithmLabel algorithm)` -/
-def Password.verify (self : Password) (password : StringOrBuffer) (hash : StringOrBuffer) (algorithm : Option PasswordAlgorithmLabel := none) : Async Bool :=
-  self.val.callMethodAwait "verify" (Support.args #[toJS password, toJS hash, Support.optional algorithm]) Bool
+@[macro_inline] def Password.verify (self : Password) (password : StringOrBuffer) (hash : StringOrBuffer) (algorithm : Option PasswordAlgorithmLabel := none) : Async Bool := Internal.api "Lasm.JS.Bun.Password.verify" do
+  self.val.callMethodAwait "verify" (Internal.args #[toJS password, toJS hash, Internal.optional algorithm]) Bool
 
 /-- `hash(password: Bun.StringOrBuffer, algorithm?: Password.AlgorithmLabel | Password.Argon2Algorithm | Password.BCryptAlgorithm): Promise<string>`: `Promise<DOMString> hash(StringOrBuffer password, optional PasswordAlgorithmLabelOrPasswordArgon2AlgorithmOrPasswordBCryptAlgorithm algorithm)` -/
-def Password.hash (self : Password) (password : StringOrBuffer) (algorithm : Option PasswordAlgorithmLabelOrPasswordArgon2AlgorithmOrPasswordBCryptAlgorithm := none) : Async String :=
-  self.val.callMethodAwait "hash" (Support.args #[toJS password, Support.optional algorithm]) String
+@[macro_inline] def Password.hash (self : Password) (password : StringOrBuffer) (algorithm : Option PasswordAlgorithmLabelOrPasswordArgon2AlgorithmOrPasswordBCryptAlgorithm := none) : Async String := Internal.api "Lasm.JS.Bun.Password.hash" do
+  self.val.callMethodAwait "hash" (Internal.args #[toJS password, Internal.optional algorithm]) String
 
 /-- `verifySync(password: Bun.StringOrBuffer, hash: Bun.StringOrBuffer, algorithm?: Password.AlgorithmLabel): boolean`: `boolean verifySync(StringOrBuffer password, StringOrBuffer hash, optional PasswordAlgorithmLabel algorithm)` -/
-def Password.verifySync (self : Password) (password : StringOrBuffer) (hash : StringOrBuffer) (algorithm : Option PasswordAlgorithmLabel := none) : IO Bool :=
-  self.val.callMethod "verifySync" (Support.args #[toJS password, toJS hash, Support.optional algorithm]) Bool
+@[macro_inline] def Password.verifySync (self : Password) (password : StringOrBuffer) (hash : StringOrBuffer) (algorithm : Option PasswordAlgorithmLabel := none) : IO Bool := Internal.api "Lasm.JS.Bun.Password.verifySync" do
+  self.val.callMethod "verifySync" (Internal.args #[toJS password, toJS hash, Internal.optional algorithm]) Bool
 
 /-- `hashSync(password: Bun.StringOrBuffer, algorithm?: Password.AlgorithmLabel | Password.Argon2Algorithm | Password.BCryptAlgorithm): string`: `DOMString hashSync(StringOrBuffer password, optional PasswordAlgorithmLabelOrPasswordArgon2AlgorithmOrPasswordBCryptAlgorithm algorithm)` -/
-def Password.hashSync (self : Password) (password : StringOrBuffer) (algorithm : Option PasswordAlgorithmLabelOrPasswordArgon2AlgorithmOrPasswordBCryptAlgorithm := none) : IO String :=
-  self.val.callMethod "hashSync" (Support.args #[toJS password, Support.optional algorithm]) String
+@[macro_inline] def Password.hashSync (self : Password) (password : StringOrBuffer) (algorithm : Option PasswordAlgorithmLabelOrPasswordArgon2AlgorithmOrPasswordBCryptAlgorithm := none) : IO String := Internal.api "Lasm.JS.Bun.Password.hashSync" do
+  self.val.callMethod "hashSync" (Internal.args #[toJS password, Internal.optional algorithm]) String
 
 /-- `get(options: { service: string; name: string; }): Promise<string | null>`: `Promise<DOMString?> get(SecretsGetOptions options)` -/
-def Secrets.get (self : Secrets) (options : SecretsGetOptions) : Async (Option String) :=
-  self.val.callMethodAwait "get" (Support.args #[toJS options]) (Option String)
+@[macro_inline] def Secrets.get (self : Secrets) (options : SecretsGetOptions) : Async (Option String) := Internal.api "Lasm.JS.Bun.Secrets.get" do
+  self.val.callMethodAwait "get" (Internal.args #[toJS options]) (Option String)
 
 /-- `set(options: { service: string; name: string; value: string; allowUnrestrictedAccess?: boolean; persist?: 'local' | 'enterprise' | undefined; }): Promise<void>`: `Promise<undefined> set(SecretsSetOptions options)` -/
-def Secrets.set (self : Secrets) (options : SecretsSetOptions) : Async Unit :=
-  self.val.callMethodAwait "set" (Support.args #[toJS options]) Unit
+@[macro_inline] def Secrets.set (self : Secrets) (options : SecretsSetOptions) : Async Unit := Internal.api "Lasm.JS.Bun.Secrets.set" do
+  self.val.callMethodAwait "set" (Internal.args #[toJS options]) Unit
 
 /-- `delete(options: { service: string; name: string; }): Promise<boolean>`: `Promise<boolean> delete(SecretsDeleteOptions options)` -/
-def Secrets.delete (self : Secrets) (options : SecretsDeleteOptions) : Async Bool :=
-  self.val.callMethodAwait "delete" (Support.args #[toJS options]) Bool
+@[macro_inline] def Secrets.delete (self : Secrets) (options : SecretsDeleteOptions) : Async Bool := Internal.api "Lasm.JS.Bun.Secrets.delete" do
+  self.val.callMethodAwait "delete" (Internal.args #[toJS options]) Bool
 
 /-- `readonly byteLength: number`: `readonly attribute double /* integer: Nat */ byteLength` -/
-def CryptoHashInterface.byteLength (self : CryptoHashInterface) : IO Nat := self.val.get "byteLength" Nat
+@[macro_inline] def CryptoHashInterface.byteLength (self : CryptoHashInterface) : IO Nat := Internal.api "Lasm.JS.Bun.CryptoHashInterface.byteLength" do
+  self.val.get "byteLength" Nat
 
 /-- `update(data: Bun.BlobOrStringOrBuffer): T`: `any update(BlobOrStringOrBuffer data)` -/
-def CryptoHashInterface.update (self : CryptoHashInterface) (data : BlobOrStringOrBuffer) : IO Data :=
-  self.val.callMethod "update" (Support.args #[toJS data]) Data
+@[macro_inline] def CryptoHashInterface.update (self : CryptoHashInterface) (data : BlobOrStringOrBuffer) : IO Data := Internal.api "Lasm.JS.Bun.CryptoHashInterface.update" do
+  self.val.callMethod "update" (Internal.args #[toJS data]) Data
 
 /-- `digest(encoding: DigestEncoding): string`: `DOMString digest(DigestEncoding encoding)` -/
-def CryptoHashInterface.digest (self : CryptoHashInterface) (encoding : DigestEncoding) : IO String :=
-  self.val.callMethod "digest" (Support.args #[toJS encoding]) String
+@[macro_inline] def CryptoHashInterface.digest (self : CryptoHashInterface) (encoding : DigestEncoding) : IO String := Internal.api "Lasm.JS.Bun.CryptoHashInterface.digest" do
+  self.val.callMethod "digest" (Internal.args #[toJS encoding]) String
 
 /-- `digest(hashInto?: NodeJS.TypedArray): NodeJS.TypedArray`: `Uint8Array digest(optional Uint8Array hashInto)` -/
-def CryptoHashInterface.digestWithHashInto (self : CryptoHashInterface) (hashInto : Option ByteArray := none) : IO ByteArray :=
-  self.val.callMethod "digest" (Support.args #[Support.optional hashInto]) ByteArray
+@[macro_inline] def CryptoHashInterface.digestWithHashInto (self : CryptoHashInterface) (hashInto : Option ByteArray := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.CryptoHashInterface.digestWithHashInto" do
+  self.val.callMethod "digest" (Internal.args #[Internal.optional hashInto]) ByteArray
 
 /-- `static hash(input: Bun.BlobOrStringOrBuffer, hashInto?: NodeJS.TypedArray): NodeJS.TypedArray`: `static Uint8Array hash(BlobOrStringOrBuffer input, optional Uint8Array hashInto)` -/
-def CryptoHashInterface.hash (input : BlobOrStringOrBuffer) (hashInto : Option ByteArray := none) : IO ByteArray :=
+@[macro_inline] def CryptoHashInterface.hash (input : BlobOrStringOrBuffer) (hashInto : Option ByteArray := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.CryptoHashInterface.hash" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Bun.CryptoHashInterface.hash", module := "globalThis", path := "Bun.CryptoHashInterface.hash", construct := false, arity := 2 }
-    (Support.args #[toJS input, Support.optional hashInto]) (await := false)
+    (Internal.args #[toJS input, Internal.optional hashInto]) (await := false)
 
 /-- `static hash(input: Bun.BlobOrStringOrBuffer, encoding: DigestEncoding): string`: `static DOMString hash(BlobOrStringOrBuffer input, DigestEncoding encoding)` -/
-def CryptoHashInterface.hashWithEncoding (input : BlobOrStringOrBuffer) (encoding : DigestEncoding) : IO String :=
+@[macro_inline] def CryptoHashInterface.hashWithEncoding (input : BlobOrStringOrBuffer) (encoding : DigestEncoding) : IO String := Internal.api "Lasm.JS.Bun.CryptoHashInterface.hashWithEncoding" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.CryptoHashInterface.hashWithEncoding", module := "globalThis", path := "Bun.CryptoHashInterface.hash", construct := false, arity := 2 }
-    (Support.args #[toJS input, toJS encoding]) (await := false)
+    (Internal.args #[toJS input, toJS encoding]) (await := false)
 
 /-- `constructor(algorithm: SupportedCryptoAlgorithms, hmacKey?: string | NodeJS.TypedArray)`: `constructor(SupportedCryptoAlgorithms algorithm, optional DOMStringOrUint8Array hmacKey)` -/
-def CryptoHasher.new (algorithm : SupportedCryptoAlgorithms) (hmacKey : Option DOMStringOrUint8Array := none) : IO CryptoHasher :=
+@[macro_inline] def CryptoHasher.new (algorithm : SupportedCryptoAlgorithms) (hmacKey : Option DOMStringOrUint8Array := none) : IO CryptoHasher := Internal.api "Lasm.JS.Bun.CryptoHasher.new" do
   Lasm.JS.Binding.invoke CryptoHasher { name := "Lasm.JS.Bun.CryptoHasher.new", module := "globalThis", path := "Bun.CryptoHasher", construct := true, arity := 2 }
-    (Support.args #[toJS algorithm, Support.optional hmacKey]) (await := false)
+    (Internal.args #[toJS algorithm, Internal.optional hmacKey]) (await := false)
 
 /-- `readonly algorithm: SupportedCryptoAlgorithms`: `readonly attribute SupportedCryptoAlgorithms algorithm` -/
-def CryptoHasher.algorithm (self : CryptoHasher) : IO SupportedCryptoAlgorithms := self.val.get "algorithm" SupportedCryptoAlgorithms
+@[macro_inline] def CryptoHasher.algorithm (self : CryptoHasher) : IO SupportedCryptoAlgorithms := Internal.api "Lasm.JS.Bun.CryptoHasher.algorithm" do
+  self.val.get "algorithm" SupportedCryptoAlgorithms
 
 /-- `readonly byteLength: number`: `readonly attribute double /* integer: Nat */ byteLength` -/
-def CryptoHasher.byteLength (self : CryptoHasher) : IO Nat := self.val.get "byteLength" Nat
+@[macro_inline] def CryptoHasher.byteLength (self : CryptoHasher) : IO Nat := Internal.api "Lasm.JS.Bun.CryptoHasher.byteLength" do
+  self.val.get "byteLength" Nat
 
 /-- `static readonly algorithms: SupportedCryptoAlgorithms[]`: `static readonly attribute sequence<SupportedCryptoAlgorithms> algorithms` -/
-def CryptoHasher.algorithms : IO (Array SupportedCryptoAlgorithms) := Support.getGlobal ["Bun", "CryptoHasher", "algorithms"] (Array SupportedCryptoAlgorithms)
+@[macro_inline] def CryptoHasher.algorithms : IO (Array SupportedCryptoAlgorithms) := Internal.api "Lasm.JS.Bun.CryptoHasher.algorithms" do
+  Internal.getGlobal ["Bun", "CryptoHasher", "algorithms"] (Array SupportedCryptoAlgorithms)
 
 /-- `update(input: Bun.BlobOrStringOrBuffer, inputEncoding?: import('crypto').Encoding): CryptoHasher`: `CryptoHasher update(BlobOrStringOrBuffer input, optional object inputEncoding)` -/
-def CryptoHasher.update (self : CryptoHasher) (input : BlobOrStringOrBuffer) (inputEncoding : Data := .undefined) : IO CryptoHasher := do
-  let r ← self.val.callMethod "update" (Support.args #[toJS input, inputEncoding]) Value
+@[macro_inline] def CryptoHasher.update (self : CryptoHasher) (input : BlobOrStringOrBuffer) (inputEncoding : Data := .undefined) : IO CryptoHasher := Internal.api "Lasm.JS.Bun.CryptoHasher.update" do
+  let r ← self.val.callMethod "update" (Internal.args #[toJS input, inputEncoding]) Value
   pure { val := r }
 
 /-- `copy(): CryptoHasher`: `CryptoHasher copy()` -/
-def CryptoHasher.copy (self : CryptoHasher) : IO CryptoHasher := do
-  let r ← self.val.callMethod "copy" (Support.args #[]) Value
+@[macro_inline] def CryptoHasher.copy (self : CryptoHasher) : IO CryptoHasher := Internal.api "Lasm.JS.Bun.CryptoHasher.copy" do
+  let r ← self.val.callMethod "copy" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `digest(encoding: DigestEncoding): string`: `DOMString digest(DigestEncoding encoding)` -/
-def CryptoHasher.digest (self : CryptoHasher) (encoding : DigestEncoding) : IO String :=
-  self.val.callMethod "digest" (Support.args #[toJS encoding]) String
+@[macro_inline] def CryptoHasher.digest (self : CryptoHasher) (encoding : DigestEncoding) : IO String := Internal.api "Lasm.JS.Bun.CryptoHasher.digest" do
+  self.val.callMethod "digest" (Internal.args #[toJS encoding]) String
 
 /-- `digest(): Buffer`: `Uint8Array digest()` -/
-def CryptoHasher.digest0 (self : CryptoHasher) : IO ByteArray :=
-  self.val.callMethod "digest" (Support.args #[]) ByteArray
+@[macro_inline] def CryptoHasher.digest0 (self : CryptoHasher) : IO ByteArray := Internal.api "Lasm.JS.Bun.CryptoHasher.digest0" do
+  self.val.callMethod "digest" (Internal.args #[]) ByteArray
 
 /-- `digest(hashInto: NodeJS.TypedArray): NodeJS.TypedArray`: `Uint8Array digest(Uint8Array hashInto)` -/
-def CryptoHasher.digestWithHashInto (self : CryptoHasher) (hashInto : ByteArray) : IO ByteArray :=
-  self.val.callMethod "digest" (Support.args #[toJS hashInto]) ByteArray
+@[macro_inline] def CryptoHasher.digestWithHashInto (self : CryptoHasher) (hashInto : ByteArray) : IO ByteArray := Internal.api "Lasm.JS.Bun.CryptoHasher.digestWithHashInto" do
+  self.val.callMethod "digest" (Internal.args #[toJS hashInto]) ByteArray
 
 /-- `static hash(algorithm: SupportedCryptoAlgorithms, input: Bun.BlobOrStringOrBuffer): Buffer`: `static Uint8Array hash(SupportedCryptoAlgorithms algorithm, BlobOrStringOrBuffer input)` -/
-def CryptoHasher.hash (algorithm : SupportedCryptoAlgorithms) (input : BlobOrStringOrBuffer) : IO ByteArray :=
+@[macro_inline] def CryptoHasher.hash (algorithm : SupportedCryptoAlgorithms) (input : BlobOrStringOrBuffer) : IO ByteArray := Internal.api "Lasm.JS.Bun.CryptoHasher.hash" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Bun.CryptoHasher.hash", module := "globalThis", path := "Bun.CryptoHasher.hash", construct := false, arity := 2 }
-    (Support.args #[toJS algorithm, toJS input]) (await := false)
+    (Internal.args #[toJS algorithm, toJS input]) (await := false)
 
 /-- `static hash(algorithm: SupportedCryptoAlgorithms, input: Bun.BlobOrStringOrBuffer, hashInto: NodeJS.TypedArray): NodeJS.TypedArray`: `static Uint8Array hash(SupportedCryptoAlgorithms algorithm, BlobOrStringOrBuffer input, Uint8Array hashInto)` -/
-def CryptoHasher.hashWithHashInto (algorithm : SupportedCryptoAlgorithms) (input : BlobOrStringOrBuffer) (hashInto : ByteArray) : IO ByteArray :=
+@[macro_inline] def CryptoHasher.hashWithHashInto (algorithm : SupportedCryptoAlgorithms) (input : BlobOrStringOrBuffer) (hashInto : ByteArray) : IO ByteArray := Internal.api "Lasm.JS.Bun.CryptoHasher.hashWithHashInto" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Bun.CryptoHasher.hashWithHashInto", module := "globalThis", path := "Bun.CryptoHasher.hash", construct := false, arity := 3 }
-    (Support.args #[toJS algorithm, toJS input, toJS hashInto]) (await := false)
+    (Internal.args #[toJS algorithm, toJS input, toJS hashInto]) (await := false)
 
 /-- `static hash(algorithm: SupportedCryptoAlgorithms, input: Bun.BlobOrStringOrBuffer, encoding: DigestEncoding): string`: `static DOMString hash(SupportedCryptoAlgorithms algorithm, BlobOrStringOrBuffer input, DigestEncoding encoding)` -/
-def CryptoHasher.hashWithEncoding (algorithm : SupportedCryptoAlgorithms) (input : BlobOrStringOrBuffer) (encoding : DigestEncoding) : IO String :=
+@[macro_inline] def CryptoHasher.hashWithEncoding (algorithm : SupportedCryptoAlgorithms) (input : BlobOrStringOrBuffer) (encoding : DigestEncoding) : IO String := Internal.api "Lasm.JS.Bun.CryptoHasher.hashWithEncoding" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.CryptoHasher.hashWithEncoding", module := "globalThis", path := "Bun.CryptoHasher.hash", construct := false, arity := 3 }
-    (Support.args #[toJS algorithm, toJS input, toJS encoding]) (await := false)
+    (Internal.args #[toJS algorithm, toJS input, toJS encoding]) (await := false)
 
 /-- `readonly byteLength: number`: `readonly attribute double /* integer: Nat */ byteLength` -/
-def CryptoHashInterfaceSHA1.byteLength (self : CryptoHashInterfaceSHA1) : IO Nat := self.val.get "byteLength" Nat
+@[macro_inline] def CryptoHashInterfaceSHA1.byteLength (self : CryptoHashInterfaceSHA1) : IO Nat := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA1.byteLength" do
+  self.val.get "byteLength" Nat
 
 /-- `update(data: Bun.BlobOrStringOrBuffer): T`: `SHA1 update(BlobOrStringOrBuffer data)` -/
-def CryptoHashInterfaceSHA1.update (self : CryptoHashInterfaceSHA1) (data : BlobOrStringOrBuffer) : IO SHA1 := do
-  let r ← self.val.callMethod "update" (Support.args #[toJS data]) Value
+@[macro_inline] def CryptoHashInterfaceSHA1.update (self : CryptoHashInterfaceSHA1) (data : BlobOrStringOrBuffer) : IO SHA1 := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA1.update" do
+  let r ← self.val.callMethod "update" (Internal.args #[toJS data]) Value
   pure { val := r }
 
 /-- `digest(encoding: DigestEncoding): string`: `DOMString digest(DigestEncoding encoding)` -/
-def CryptoHashInterfaceSHA1.digest (self : CryptoHashInterfaceSHA1) (encoding : DigestEncoding) : IO String :=
-  self.val.callMethod "digest" (Support.args #[toJS encoding]) String
+@[macro_inline] def CryptoHashInterfaceSHA1.digest (self : CryptoHashInterfaceSHA1) (encoding : DigestEncoding) : IO String := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA1.digest" do
+  self.val.callMethod "digest" (Internal.args #[toJS encoding]) String
 
 /-- `digest(hashInto?: NodeJS.TypedArray): NodeJS.TypedArray`: `Uint8Array digest(optional Uint8Array hashInto)` -/
-def CryptoHashInterfaceSHA1.digestWithHashInto (self : CryptoHashInterfaceSHA1) (hashInto : Option ByteArray := none) : IO ByteArray :=
-  self.val.callMethod "digest" (Support.args #[Support.optional hashInto]) ByteArray
+@[macro_inline] def CryptoHashInterfaceSHA1.digestWithHashInto (self : CryptoHashInterfaceSHA1) (hashInto : Option ByteArray := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA1.digestWithHashInto" do
+  self.val.callMethod "digest" (Internal.args #[Internal.optional hashInto]) ByteArray
 
 /-- `static hash(input: Bun.BlobOrStringOrBuffer, hashInto?: NodeJS.TypedArray): NodeJS.TypedArray`: `static Uint8Array hash(BlobOrStringOrBuffer input, optional Uint8Array hashInto)` -/
-def CryptoHashInterfaceSHA1.hash (input : BlobOrStringOrBuffer) (hashInto : Option ByteArray := none) : IO ByteArray :=
+@[macro_inline] def CryptoHashInterfaceSHA1.hash (input : BlobOrStringOrBuffer) (hashInto : Option ByteArray := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA1.hash" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Bun.CryptoHashInterfaceSHA1.hash", module := "globalThis", path := "Bun.CryptoHashInterface.hash", construct := false, arity := 2 }
-    (Support.args #[toJS input, Support.optional hashInto]) (await := false)
+    (Internal.args #[toJS input, Internal.optional hashInto]) (await := false)
 
 /-- `static hash(input: Bun.BlobOrStringOrBuffer, encoding: DigestEncoding): string`: `static DOMString hash(BlobOrStringOrBuffer input, DigestEncoding encoding)` -/
-def CryptoHashInterfaceSHA1.hashWithEncoding (input : BlobOrStringOrBuffer) (encoding : DigestEncoding) : IO String :=
+@[macro_inline] def CryptoHashInterfaceSHA1.hashWithEncoding (input : BlobOrStringOrBuffer) (encoding : DigestEncoding) : IO String := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA1.hashWithEncoding" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.CryptoHashInterfaceSHA1.hashWithEncoding", module := "globalThis", path := "Bun.CryptoHashInterface.hash", construct := false, arity := 2 }
-    (Support.args #[toJS input, toJS encoding]) (await := false)
+    (Internal.args #[toJS input, toJS encoding]) (await := false)
 
 /-- `constructor()`: `constructor()` -/
-def SHA1.new : IO SHA1 :=
+@[macro_inline] def SHA1.new : IO SHA1 := Internal.api "Lasm.JS.Bun.SHA1.new" do
   Lasm.JS.Binding.invoke SHA1 { name := "Lasm.JS.Bun.SHA1.new", module := "globalThis", path := "Bun.SHA1", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `static readonly byteLength: 20`: `static readonly attribute double /* integer: Nat */ byteLength` -/
-def SHA1.byteLength : IO Nat := Support.getGlobal ["Bun", "SHA1", "byteLength"] Nat
+@[macro_inline] def SHA1.byteLength : IO Nat := Internal.api "Lasm.JS.Bun.SHA1.byteLength" do
+  Internal.getGlobal ["Bun", "SHA1", "byteLength"] Nat
 
 /-- `readonly byteLength: number`: `readonly attribute double /* integer: Nat */ byteLength` -/
-def CryptoHashInterfaceMD5.byteLength (self : CryptoHashInterfaceMD5) : IO Nat := self.val.get "byteLength" Nat
+@[macro_inline] def CryptoHashInterfaceMD5.byteLength (self : CryptoHashInterfaceMD5) : IO Nat := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceMD5.byteLength" do
+  self.val.get "byteLength" Nat
 
 /-- `update(data: Bun.BlobOrStringOrBuffer): T`: `MD5 update(BlobOrStringOrBuffer data)` -/
-def CryptoHashInterfaceMD5.update (self : CryptoHashInterfaceMD5) (data : BlobOrStringOrBuffer) : IO MD5 := do
-  let r ← self.val.callMethod "update" (Support.args #[toJS data]) Value
+@[macro_inline] def CryptoHashInterfaceMD5.update (self : CryptoHashInterfaceMD5) (data : BlobOrStringOrBuffer) : IO MD5 := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceMD5.update" do
+  let r ← self.val.callMethod "update" (Internal.args #[toJS data]) Value
   pure { val := r }
 
 /-- `digest(encoding: DigestEncoding): string`: `DOMString digest(DigestEncoding encoding)` -/
-def CryptoHashInterfaceMD5.digest (self : CryptoHashInterfaceMD5) (encoding : DigestEncoding) : IO String :=
-  self.val.callMethod "digest" (Support.args #[toJS encoding]) String
+@[macro_inline] def CryptoHashInterfaceMD5.digest (self : CryptoHashInterfaceMD5) (encoding : DigestEncoding) : IO String := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceMD5.digest" do
+  self.val.callMethod "digest" (Internal.args #[toJS encoding]) String
 
 /-- `digest(hashInto?: NodeJS.TypedArray): NodeJS.TypedArray`: `Uint8Array digest(optional Uint8Array hashInto)` -/
-def CryptoHashInterfaceMD5.digestWithHashInto (self : CryptoHashInterfaceMD5) (hashInto : Option ByteArray := none) : IO ByteArray :=
-  self.val.callMethod "digest" (Support.args #[Support.optional hashInto]) ByteArray
+@[macro_inline] def CryptoHashInterfaceMD5.digestWithHashInto (self : CryptoHashInterfaceMD5) (hashInto : Option ByteArray := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceMD5.digestWithHashInto" do
+  self.val.callMethod "digest" (Internal.args #[Internal.optional hashInto]) ByteArray
 
 /-- `static hash(input: Bun.BlobOrStringOrBuffer, hashInto?: NodeJS.TypedArray): NodeJS.TypedArray`: `static Uint8Array hash(BlobOrStringOrBuffer input, optional Uint8Array hashInto)` -/
-def CryptoHashInterfaceMD5.hash (input : BlobOrStringOrBuffer) (hashInto : Option ByteArray := none) : IO ByteArray :=
+@[macro_inline] def CryptoHashInterfaceMD5.hash (input : BlobOrStringOrBuffer) (hashInto : Option ByteArray := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceMD5.hash" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Bun.CryptoHashInterfaceMD5.hash", module := "globalThis", path := "Bun.CryptoHashInterface.hash", construct := false, arity := 2 }
-    (Support.args #[toJS input, Support.optional hashInto]) (await := false)
+    (Internal.args #[toJS input, Internal.optional hashInto]) (await := false)
 
 /-- `static hash(input: Bun.BlobOrStringOrBuffer, encoding: DigestEncoding): string`: `static DOMString hash(BlobOrStringOrBuffer input, DigestEncoding encoding)` -/
-def CryptoHashInterfaceMD5.hashWithEncoding (input : BlobOrStringOrBuffer) (encoding : DigestEncoding) : IO String :=
+@[macro_inline] def CryptoHashInterfaceMD5.hashWithEncoding (input : BlobOrStringOrBuffer) (encoding : DigestEncoding) : IO String := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceMD5.hashWithEncoding" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.CryptoHashInterfaceMD5.hashWithEncoding", module := "globalThis", path := "Bun.CryptoHashInterface.hash", construct := false, arity := 2 }
-    (Support.args #[toJS input, toJS encoding]) (await := false)
+    (Internal.args #[toJS input, toJS encoding]) (await := false)
 
 /-- `constructor()`: `constructor()` -/
-def MD5.new : IO MD5 :=
+@[macro_inline] def MD5.new : IO MD5 := Internal.api "Lasm.JS.Bun.MD5.new" do
   Lasm.JS.Binding.invoke MD5 { name := "Lasm.JS.Bun.MD5.new", module := "globalThis", path := "Bun.MD5", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `static readonly byteLength: 16`: `static readonly attribute double /* integer: Nat */ byteLength` -/
-def MD5.byteLength : IO Nat := Support.getGlobal ["Bun", "MD5", "byteLength"] Nat
+@[macro_inline] def MD5.byteLength : IO Nat := Internal.api "Lasm.JS.Bun.MD5.byteLength" do
+  Internal.getGlobal ["Bun", "MD5", "byteLength"] Nat
 
 /-- `readonly byteLength: number`: `readonly attribute double /* integer: Nat */ byteLength` -/
-def CryptoHashInterfaceMD4.byteLength (self : CryptoHashInterfaceMD4) : IO Nat := self.val.get "byteLength" Nat
+@[macro_inline] def CryptoHashInterfaceMD4.byteLength (self : CryptoHashInterfaceMD4) : IO Nat := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceMD4.byteLength" do
+  self.val.get "byteLength" Nat
 
 /-- `update(data: Bun.BlobOrStringOrBuffer): T`: `MD4 update(BlobOrStringOrBuffer data)` -/
-def CryptoHashInterfaceMD4.update (self : CryptoHashInterfaceMD4) (data : BlobOrStringOrBuffer) : IO MD4 := do
-  let r ← self.val.callMethod "update" (Support.args #[toJS data]) Value
+@[macro_inline] def CryptoHashInterfaceMD4.update (self : CryptoHashInterfaceMD4) (data : BlobOrStringOrBuffer) : IO MD4 := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceMD4.update" do
+  let r ← self.val.callMethod "update" (Internal.args #[toJS data]) Value
   pure { val := r }
 
 /-- `digest(encoding: DigestEncoding): string`: `DOMString digest(DigestEncoding encoding)` -/
-def CryptoHashInterfaceMD4.digest (self : CryptoHashInterfaceMD4) (encoding : DigestEncoding) : IO String :=
-  self.val.callMethod "digest" (Support.args #[toJS encoding]) String
+@[macro_inline] def CryptoHashInterfaceMD4.digest (self : CryptoHashInterfaceMD4) (encoding : DigestEncoding) : IO String := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceMD4.digest" do
+  self.val.callMethod "digest" (Internal.args #[toJS encoding]) String
 
 /-- `digest(hashInto?: NodeJS.TypedArray): NodeJS.TypedArray`: `Uint8Array digest(optional Uint8Array hashInto)` -/
-def CryptoHashInterfaceMD4.digestWithHashInto (self : CryptoHashInterfaceMD4) (hashInto : Option ByteArray := none) : IO ByteArray :=
-  self.val.callMethod "digest" (Support.args #[Support.optional hashInto]) ByteArray
+@[macro_inline] def CryptoHashInterfaceMD4.digestWithHashInto (self : CryptoHashInterfaceMD4) (hashInto : Option ByteArray := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceMD4.digestWithHashInto" do
+  self.val.callMethod "digest" (Internal.args #[Internal.optional hashInto]) ByteArray
 
 /-- `static hash(input: Bun.BlobOrStringOrBuffer, hashInto?: NodeJS.TypedArray): NodeJS.TypedArray`: `static Uint8Array hash(BlobOrStringOrBuffer input, optional Uint8Array hashInto)` -/
-def CryptoHashInterfaceMD4.hash (input : BlobOrStringOrBuffer) (hashInto : Option ByteArray := none) : IO ByteArray :=
+@[macro_inline] def CryptoHashInterfaceMD4.hash (input : BlobOrStringOrBuffer) (hashInto : Option ByteArray := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceMD4.hash" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Bun.CryptoHashInterfaceMD4.hash", module := "globalThis", path := "Bun.CryptoHashInterface.hash", construct := false, arity := 2 }
-    (Support.args #[toJS input, Support.optional hashInto]) (await := false)
+    (Internal.args #[toJS input, Internal.optional hashInto]) (await := false)
 
 /-- `static hash(input: Bun.BlobOrStringOrBuffer, encoding: DigestEncoding): string`: `static DOMString hash(BlobOrStringOrBuffer input, DigestEncoding encoding)` -/
-def CryptoHashInterfaceMD4.hashWithEncoding (input : BlobOrStringOrBuffer) (encoding : DigestEncoding) : IO String :=
+@[macro_inline] def CryptoHashInterfaceMD4.hashWithEncoding (input : BlobOrStringOrBuffer) (encoding : DigestEncoding) : IO String := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceMD4.hashWithEncoding" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.CryptoHashInterfaceMD4.hashWithEncoding", module := "globalThis", path := "Bun.CryptoHashInterface.hash", construct := false, arity := 2 }
-    (Support.args #[toJS input, toJS encoding]) (await := false)
+    (Internal.args #[toJS input, toJS encoding]) (await := false)
 
 /-- `constructor()`: `constructor()` -/
-def MD4.new : IO MD4 :=
+@[macro_inline] def MD4.new : IO MD4 := Internal.api "Lasm.JS.Bun.MD4.new" do
   Lasm.JS.Binding.invoke MD4 { name := "Lasm.JS.Bun.MD4.new", module := "globalThis", path := "Bun.MD4", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `static readonly byteLength: 16`: `static readonly attribute double /* integer: Nat */ byteLength` -/
-def MD4.byteLength : IO Nat := Support.getGlobal ["Bun", "MD4", "byteLength"] Nat
+@[macro_inline] def MD4.byteLength : IO Nat := Internal.api "Lasm.JS.Bun.MD4.byteLength" do
+  Internal.getGlobal ["Bun", "MD4", "byteLength"] Nat
 
 /-- `readonly byteLength: number`: `readonly attribute double /* integer: Nat */ byteLength` -/
-def CryptoHashInterfaceSHA224.byteLength (self : CryptoHashInterfaceSHA224) : IO Nat := self.val.get "byteLength" Nat
+@[macro_inline] def CryptoHashInterfaceSHA224.byteLength (self : CryptoHashInterfaceSHA224) : IO Nat := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA224.byteLength" do
+  self.val.get "byteLength" Nat
 
 /-- `update(data: Bun.BlobOrStringOrBuffer): T`: `SHA224 update(BlobOrStringOrBuffer data)` -/
-def CryptoHashInterfaceSHA224.update (self : CryptoHashInterfaceSHA224) (data : BlobOrStringOrBuffer) : IO SHA224 := do
-  let r ← self.val.callMethod "update" (Support.args #[toJS data]) Value
+@[macro_inline] def CryptoHashInterfaceSHA224.update (self : CryptoHashInterfaceSHA224) (data : BlobOrStringOrBuffer) : IO SHA224 := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA224.update" do
+  let r ← self.val.callMethod "update" (Internal.args #[toJS data]) Value
   pure { val := r }
 
 /-- `digest(encoding: DigestEncoding): string`: `DOMString digest(DigestEncoding encoding)` -/
-def CryptoHashInterfaceSHA224.digest (self : CryptoHashInterfaceSHA224) (encoding : DigestEncoding) : IO String :=
-  self.val.callMethod "digest" (Support.args #[toJS encoding]) String
+@[macro_inline] def CryptoHashInterfaceSHA224.digest (self : CryptoHashInterfaceSHA224) (encoding : DigestEncoding) : IO String := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA224.digest" do
+  self.val.callMethod "digest" (Internal.args #[toJS encoding]) String
 
 /-- `digest(hashInto?: NodeJS.TypedArray): NodeJS.TypedArray`: `Uint8Array digest(optional Uint8Array hashInto)` -/
-def CryptoHashInterfaceSHA224.digestWithHashInto (self : CryptoHashInterfaceSHA224) (hashInto : Option ByteArray := none) : IO ByteArray :=
-  self.val.callMethod "digest" (Support.args #[Support.optional hashInto]) ByteArray
+@[macro_inline] def CryptoHashInterfaceSHA224.digestWithHashInto (self : CryptoHashInterfaceSHA224) (hashInto : Option ByteArray := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA224.digestWithHashInto" do
+  self.val.callMethod "digest" (Internal.args #[Internal.optional hashInto]) ByteArray
 
 /-- `static hash(input: Bun.BlobOrStringOrBuffer, hashInto?: NodeJS.TypedArray): NodeJS.TypedArray`: `static Uint8Array hash(BlobOrStringOrBuffer input, optional Uint8Array hashInto)` -/
-def CryptoHashInterfaceSHA224.hash (input : BlobOrStringOrBuffer) (hashInto : Option ByteArray := none) : IO ByteArray :=
+@[macro_inline] def CryptoHashInterfaceSHA224.hash (input : BlobOrStringOrBuffer) (hashInto : Option ByteArray := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA224.hash" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Bun.CryptoHashInterfaceSHA224.hash", module := "globalThis", path := "Bun.CryptoHashInterface.hash", construct := false, arity := 2 }
-    (Support.args #[toJS input, Support.optional hashInto]) (await := false)
+    (Internal.args #[toJS input, Internal.optional hashInto]) (await := false)
 
 /-- `static hash(input: Bun.BlobOrStringOrBuffer, encoding: DigestEncoding): string`: `static DOMString hash(BlobOrStringOrBuffer input, DigestEncoding encoding)` -/
-def CryptoHashInterfaceSHA224.hashWithEncoding (input : BlobOrStringOrBuffer) (encoding : DigestEncoding) : IO String :=
+@[macro_inline] def CryptoHashInterfaceSHA224.hashWithEncoding (input : BlobOrStringOrBuffer) (encoding : DigestEncoding) : IO String := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA224.hashWithEncoding" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.CryptoHashInterfaceSHA224.hashWithEncoding", module := "globalThis", path := "Bun.CryptoHashInterface.hash", construct := false, arity := 2 }
-    (Support.args #[toJS input, toJS encoding]) (await := false)
+    (Internal.args #[toJS input, toJS encoding]) (await := false)
 
 /-- `constructor()`: `constructor()` -/
-def SHA224.new : IO SHA224 :=
+@[macro_inline] def SHA224.new : IO SHA224 := Internal.api "Lasm.JS.Bun.SHA224.new" do
   Lasm.JS.Binding.invoke SHA224 { name := "Lasm.JS.Bun.SHA224.new", module := "globalThis", path := "Bun.SHA224", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `static readonly byteLength: 28`: `static readonly attribute double /* integer: Nat */ byteLength` -/
-def SHA224.byteLength : IO Nat := Support.getGlobal ["Bun", "SHA224", "byteLength"] Nat
+@[macro_inline] def SHA224.byteLength : IO Nat := Internal.api "Lasm.JS.Bun.SHA224.byteLength" do
+  Internal.getGlobal ["Bun", "SHA224", "byteLength"] Nat
 
 /-- `readonly byteLength: number`: `readonly attribute double /* integer: Nat */ byteLength` -/
-def CryptoHashInterfaceSHA512.byteLength (self : CryptoHashInterfaceSHA512) : IO Nat := self.val.get "byteLength" Nat
+@[macro_inline] def CryptoHashInterfaceSHA512.byteLength (self : CryptoHashInterfaceSHA512) : IO Nat := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA512.byteLength" do
+  self.val.get "byteLength" Nat
 
 /-- `update(data: Bun.BlobOrStringOrBuffer): T`: `SHA512 update(BlobOrStringOrBuffer data)` -/
-def CryptoHashInterfaceSHA512.update (self : CryptoHashInterfaceSHA512) (data : BlobOrStringOrBuffer) : IO SHA512 := do
-  let r ← self.val.callMethod "update" (Support.args #[toJS data]) Value
+@[macro_inline] def CryptoHashInterfaceSHA512.update (self : CryptoHashInterfaceSHA512) (data : BlobOrStringOrBuffer) : IO SHA512 := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA512.update" do
+  let r ← self.val.callMethod "update" (Internal.args #[toJS data]) Value
   pure { val := r }
 
 /-- `digest(encoding: DigestEncoding): string`: `DOMString digest(DigestEncoding encoding)` -/
-def CryptoHashInterfaceSHA512.digest (self : CryptoHashInterfaceSHA512) (encoding : DigestEncoding) : IO String :=
-  self.val.callMethod "digest" (Support.args #[toJS encoding]) String
+@[macro_inline] def CryptoHashInterfaceSHA512.digest (self : CryptoHashInterfaceSHA512) (encoding : DigestEncoding) : IO String := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA512.digest" do
+  self.val.callMethod "digest" (Internal.args #[toJS encoding]) String
 
 /-- `digest(hashInto?: NodeJS.TypedArray): NodeJS.TypedArray`: `Uint8Array digest(optional Uint8Array hashInto)` -/
-def CryptoHashInterfaceSHA512.digestWithHashInto (self : CryptoHashInterfaceSHA512) (hashInto : Option ByteArray := none) : IO ByteArray :=
-  self.val.callMethod "digest" (Support.args #[Support.optional hashInto]) ByteArray
+@[macro_inline] def CryptoHashInterfaceSHA512.digestWithHashInto (self : CryptoHashInterfaceSHA512) (hashInto : Option ByteArray := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA512.digestWithHashInto" do
+  self.val.callMethod "digest" (Internal.args #[Internal.optional hashInto]) ByteArray
 
 /-- `static hash(input: Bun.BlobOrStringOrBuffer, hashInto?: NodeJS.TypedArray): NodeJS.TypedArray`: `static Uint8Array hash(BlobOrStringOrBuffer input, optional Uint8Array hashInto)` -/
-def CryptoHashInterfaceSHA512.hash (input : BlobOrStringOrBuffer) (hashInto : Option ByteArray := none) : IO ByteArray :=
+@[macro_inline] def CryptoHashInterfaceSHA512.hash (input : BlobOrStringOrBuffer) (hashInto : Option ByteArray := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA512.hash" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Bun.CryptoHashInterfaceSHA512.hash", module := "globalThis", path := "Bun.CryptoHashInterface.hash", construct := false, arity := 2 }
-    (Support.args #[toJS input, Support.optional hashInto]) (await := false)
+    (Internal.args #[toJS input, Internal.optional hashInto]) (await := false)
 
 /-- `static hash(input: Bun.BlobOrStringOrBuffer, encoding: DigestEncoding): string`: `static DOMString hash(BlobOrStringOrBuffer input, DigestEncoding encoding)` -/
-def CryptoHashInterfaceSHA512.hashWithEncoding (input : BlobOrStringOrBuffer) (encoding : DigestEncoding) : IO String :=
+@[macro_inline] def CryptoHashInterfaceSHA512.hashWithEncoding (input : BlobOrStringOrBuffer) (encoding : DigestEncoding) : IO String := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA512.hashWithEncoding" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.CryptoHashInterfaceSHA512.hashWithEncoding", module := "globalThis", path := "Bun.CryptoHashInterface.hash", construct := false, arity := 2 }
-    (Support.args #[toJS input, toJS encoding]) (await := false)
+    (Internal.args #[toJS input, toJS encoding]) (await := false)
 
 /-- `constructor()`: `constructor()` -/
-def SHA512.new : IO SHA512 :=
+@[macro_inline] def SHA512.new : IO SHA512 := Internal.api "Lasm.JS.Bun.SHA512.new" do
   Lasm.JS.Binding.invoke SHA512 { name := "Lasm.JS.Bun.SHA512.new", module := "globalThis", path := "Bun.SHA512", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `static readonly byteLength: 64`: `static readonly attribute double /* integer: Nat */ byteLength` -/
-def SHA512.byteLength : IO Nat := Support.getGlobal ["Bun", "SHA512", "byteLength"] Nat
+@[macro_inline] def SHA512.byteLength : IO Nat := Internal.api "Lasm.JS.Bun.SHA512.byteLength" do
+  Internal.getGlobal ["Bun", "SHA512", "byteLength"] Nat
 
 /-- `readonly byteLength: number`: `readonly attribute double /* integer: Nat */ byteLength` -/
-def CryptoHashInterfaceSHA384.byteLength (self : CryptoHashInterfaceSHA384) : IO Nat := self.val.get "byteLength" Nat
+@[macro_inline] def CryptoHashInterfaceSHA384.byteLength (self : CryptoHashInterfaceSHA384) : IO Nat := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA384.byteLength" do
+  self.val.get "byteLength" Nat
 
 /-- `update(data: Bun.BlobOrStringOrBuffer): T`: `SHA384 update(BlobOrStringOrBuffer data)` -/
-def CryptoHashInterfaceSHA384.update (self : CryptoHashInterfaceSHA384) (data : BlobOrStringOrBuffer) : IO SHA384 := do
-  let r ← self.val.callMethod "update" (Support.args #[toJS data]) Value
+@[macro_inline] def CryptoHashInterfaceSHA384.update (self : CryptoHashInterfaceSHA384) (data : BlobOrStringOrBuffer) : IO SHA384 := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA384.update" do
+  let r ← self.val.callMethod "update" (Internal.args #[toJS data]) Value
   pure { val := r }
 
 /-- `digest(encoding: DigestEncoding): string`: `DOMString digest(DigestEncoding encoding)` -/
-def CryptoHashInterfaceSHA384.digest (self : CryptoHashInterfaceSHA384) (encoding : DigestEncoding) : IO String :=
-  self.val.callMethod "digest" (Support.args #[toJS encoding]) String
+@[macro_inline] def CryptoHashInterfaceSHA384.digest (self : CryptoHashInterfaceSHA384) (encoding : DigestEncoding) : IO String := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA384.digest" do
+  self.val.callMethod "digest" (Internal.args #[toJS encoding]) String
 
 /-- `digest(hashInto?: NodeJS.TypedArray): NodeJS.TypedArray`: `Uint8Array digest(optional Uint8Array hashInto)` -/
-def CryptoHashInterfaceSHA384.digestWithHashInto (self : CryptoHashInterfaceSHA384) (hashInto : Option ByteArray := none) : IO ByteArray :=
-  self.val.callMethod "digest" (Support.args #[Support.optional hashInto]) ByteArray
+@[macro_inline] def CryptoHashInterfaceSHA384.digestWithHashInto (self : CryptoHashInterfaceSHA384) (hashInto : Option ByteArray := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA384.digestWithHashInto" do
+  self.val.callMethod "digest" (Internal.args #[Internal.optional hashInto]) ByteArray
 
 /-- `static hash(input: Bun.BlobOrStringOrBuffer, hashInto?: NodeJS.TypedArray): NodeJS.TypedArray`: `static Uint8Array hash(BlobOrStringOrBuffer input, optional Uint8Array hashInto)` -/
-def CryptoHashInterfaceSHA384.hash (input : BlobOrStringOrBuffer) (hashInto : Option ByteArray := none) : IO ByteArray :=
+@[macro_inline] def CryptoHashInterfaceSHA384.hash (input : BlobOrStringOrBuffer) (hashInto : Option ByteArray := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA384.hash" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Bun.CryptoHashInterfaceSHA384.hash", module := "globalThis", path := "Bun.CryptoHashInterface.hash", construct := false, arity := 2 }
-    (Support.args #[toJS input, Support.optional hashInto]) (await := false)
+    (Internal.args #[toJS input, Internal.optional hashInto]) (await := false)
 
 /-- `static hash(input: Bun.BlobOrStringOrBuffer, encoding: DigestEncoding): string`: `static DOMString hash(BlobOrStringOrBuffer input, DigestEncoding encoding)` -/
-def CryptoHashInterfaceSHA384.hashWithEncoding (input : BlobOrStringOrBuffer) (encoding : DigestEncoding) : IO String :=
+@[macro_inline] def CryptoHashInterfaceSHA384.hashWithEncoding (input : BlobOrStringOrBuffer) (encoding : DigestEncoding) : IO String := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA384.hashWithEncoding" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.CryptoHashInterfaceSHA384.hashWithEncoding", module := "globalThis", path := "Bun.CryptoHashInterface.hash", construct := false, arity := 2 }
-    (Support.args #[toJS input, toJS encoding]) (await := false)
+    (Internal.args #[toJS input, toJS encoding]) (await := false)
 
 /-- `constructor()`: `constructor()` -/
-def SHA384.new : IO SHA384 :=
+@[macro_inline] def SHA384.new : IO SHA384 := Internal.api "Lasm.JS.Bun.SHA384.new" do
   Lasm.JS.Binding.invoke SHA384 { name := "Lasm.JS.Bun.SHA384.new", module := "globalThis", path := "Bun.SHA384", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `static readonly byteLength: 48`: `static readonly attribute double /* integer: Nat */ byteLength` -/
-def SHA384.byteLength : IO Nat := Support.getGlobal ["Bun", "SHA384", "byteLength"] Nat
+@[macro_inline] def SHA384.byteLength : IO Nat := Internal.api "Lasm.JS.Bun.SHA384.byteLength" do
+  Internal.getGlobal ["Bun", "SHA384", "byteLength"] Nat
 
 /-- `readonly byteLength: number`: `readonly attribute double /* integer: Nat */ byteLength` -/
-def CryptoHashInterfaceSHA256.byteLength (self : CryptoHashInterfaceSHA256) : IO Nat := self.val.get "byteLength" Nat
+@[macro_inline] def CryptoHashInterfaceSHA256.byteLength (self : CryptoHashInterfaceSHA256) : IO Nat := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA256.byteLength" do
+  self.val.get "byteLength" Nat
 
 /-- `update(data: Bun.BlobOrStringOrBuffer): T`: `SHA256 update(BlobOrStringOrBuffer data)` -/
-def CryptoHashInterfaceSHA256.update (self : CryptoHashInterfaceSHA256) (data : BlobOrStringOrBuffer) : IO SHA256 := do
-  let r ← self.val.callMethod "update" (Support.args #[toJS data]) Value
+@[macro_inline] def CryptoHashInterfaceSHA256.update (self : CryptoHashInterfaceSHA256) (data : BlobOrStringOrBuffer) : IO SHA256 := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA256.update" do
+  let r ← self.val.callMethod "update" (Internal.args #[toJS data]) Value
   pure { val := r }
 
 /-- `digest(encoding: DigestEncoding): string`: `DOMString digest(DigestEncoding encoding)` -/
-def CryptoHashInterfaceSHA256.digest (self : CryptoHashInterfaceSHA256) (encoding : DigestEncoding) : IO String :=
-  self.val.callMethod "digest" (Support.args #[toJS encoding]) String
+@[macro_inline] def CryptoHashInterfaceSHA256.digest (self : CryptoHashInterfaceSHA256) (encoding : DigestEncoding) : IO String := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA256.digest" do
+  self.val.callMethod "digest" (Internal.args #[toJS encoding]) String
 
 /-- `digest(hashInto?: NodeJS.TypedArray): NodeJS.TypedArray`: `Uint8Array digest(optional Uint8Array hashInto)` -/
-def CryptoHashInterfaceSHA256.digestWithHashInto (self : CryptoHashInterfaceSHA256) (hashInto : Option ByteArray := none) : IO ByteArray :=
-  self.val.callMethod "digest" (Support.args #[Support.optional hashInto]) ByteArray
+@[macro_inline] def CryptoHashInterfaceSHA256.digestWithHashInto (self : CryptoHashInterfaceSHA256) (hashInto : Option ByteArray := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA256.digestWithHashInto" do
+  self.val.callMethod "digest" (Internal.args #[Internal.optional hashInto]) ByteArray
 
 /-- `static hash(input: Bun.BlobOrStringOrBuffer, hashInto?: NodeJS.TypedArray): NodeJS.TypedArray`: `static Uint8Array hash(BlobOrStringOrBuffer input, optional Uint8Array hashInto)` -/
-def CryptoHashInterfaceSHA256.hash (input : BlobOrStringOrBuffer) (hashInto : Option ByteArray := none) : IO ByteArray :=
+@[macro_inline] def CryptoHashInterfaceSHA256.hash (input : BlobOrStringOrBuffer) (hashInto : Option ByteArray := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA256.hash" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Bun.CryptoHashInterfaceSHA256.hash", module := "globalThis", path := "Bun.CryptoHashInterface.hash", construct := false, arity := 2 }
-    (Support.args #[toJS input, Support.optional hashInto]) (await := false)
+    (Internal.args #[toJS input, Internal.optional hashInto]) (await := false)
 
 /-- `static hash(input: Bun.BlobOrStringOrBuffer, encoding: DigestEncoding): string`: `static DOMString hash(BlobOrStringOrBuffer input, DigestEncoding encoding)` -/
-def CryptoHashInterfaceSHA256.hashWithEncoding (input : BlobOrStringOrBuffer) (encoding : DigestEncoding) : IO String :=
+@[macro_inline] def CryptoHashInterfaceSHA256.hashWithEncoding (input : BlobOrStringOrBuffer) (encoding : DigestEncoding) : IO String := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA256.hashWithEncoding" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.CryptoHashInterfaceSHA256.hashWithEncoding", module := "globalThis", path := "Bun.CryptoHashInterface.hash", construct := false, arity := 2 }
-    (Support.args #[toJS input, toJS encoding]) (await := false)
+    (Internal.args #[toJS input, toJS encoding]) (await := false)
 
 /-- `constructor()`: `constructor()` -/
-def SHA256.new : IO SHA256 :=
+@[macro_inline] def SHA256.new : IO SHA256 := Internal.api "Lasm.JS.Bun.SHA256.new" do
   Lasm.JS.Binding.invoke SHA256 { name := "Lasm.JS.Bun.SHA256.new", module := "globalThis", path := "Bun.SHA256", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `static readonly byteLength: 32`: `static readonly attribute double /* integer: Nat */ byteLength` -/
-def SHA256.byteLength : IO Nat := Support.getGlobal ["Bun", "SHA256", "byteLength"] Nat
+@[macro_inline] def SHA256.byteLength : IO Nat := Internal.api "Lasm.JS.Bun.SHA256.byteLength" do
+  Internal.getGlobal ["Bun", "SHA256", "byteLength"] Nat
 
 /-- `readonly byteLength: number`: `readonly attribute double /* integer: Nat */ byteLength` -/
-def CryptoHashInterfaceSHA512256.byteLength (self : CryptoHashInterfaceSHA512256) : IO Nat := self.val.get "byteLength" Nat
+@[macro_inline] def CryptoHashInterfaceSHA512256.byteLength (self : CryptoHashInterfaceSHA512256) : IO Nat := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA512256.byteLength" do
+  self.val.get "byteLength" Nat
 
 /-- `update(data: Bun.BlobOrStringOrBuffer): T`: `SHA512_256 update(BlobOrStringOrBuffer data)` -/
-def CryptoHashInterfaceSHA512256.update (self : CryptoHashInterfaceSHA512256) (data : BlobOrStringOrBuffer) : IO SHA512_256 := do
-  let r ← self.val.callMethod "update" (Support.args #[toJS data]) Value
+@[macro_inline] def CryptoHashInterfaceSHA512256.update (self : CryptoHashInterfaceSHA512256) (data : BlobOrStringOrBuffer) : IO SHA512_256 := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA512256.update" do
+  let r ← self.val.callMethod "update" (Internal.args #[toJS data]) Value
   pure { val := r }
 
 /-- `digest(encoding: DigestEncoding): string`: `DOMString digest(DigestEncoding encoding)` -/
-def CryptoHashInterfaceSHA512256.digest (self : CryptoHashInterfaceSHA512256) (encoding : DigestEncoding) : IO String :=
-  self.val.callMethod "digest" (Support.args #[toJS encoding]) String
+@[macro_inline] def CryptoHashInterfaceSHA512256.digest (self : CryptoHashInterfaceSHA512256) (encoding : DigestEncoding) : IO String := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA512256.digest" do
+  self.val.callMethod "digest" (Internal.args #[toJS encoding]) String
 
 /-- `digest(hashInto?: NodeJS.TypedArray): NodeJS.TypedArray`: `Uint8Array digest(optional Uint8Array hashInto)` -/
-def CryptoHashInterfaceSHA512256.digestWithHashInto (self : CryptoHashInterfaceSHA512256) (hashInto : Option ByteArray := none) : IO ByteArray :=
-  self.val.callMethod "digest" (Support.args #[Support.optional hashInto]) ByteArray
+@[macro_inline] def CryptoHashInterfaceSHA512256.digestWithHashInto (self : CryptoHashInterfaceSHA512256) (hashInto : Option ByteArray := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA512256.digestWithHashInto" do
+  self.val.callMethod "digest" (Internal.args #[Internal.optional hashInto]) ByteArray
 
 /-- `static hash(input: Bun.BlobOrStringOrBuffer, hashInto?: NodeJS.TypedArray): NodeJS.TypedArray`: `static Uint8Array hash(BlobOrStringOrBuffer input, optional Uint8Array hashInto)` -/
-def CryptoHashInterfaceSHA512256.hash (input : BlobOrStringOrBuffer) (hashInto : Option ByteArray := none) : IO ByteArray :=
+@[macro_inline] def CryptoHashInterfaceSHA512256.hash (input : BlobOrStringOrBuffer) (hashInto : Option ByteArray := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA512256.hash" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Bun.CryptoHashInterfaceSHA512256.hash", module := "globalThis", path := "Bun.CryptoHashInterface.hash", construct := false, arity := 2 }
-    (Support.args #[toJS input, Support.optional hashInto]) (await := false)
+    (Internal.args #[toJS input, Internal.optional hashInto]) (await := false)
 
 /-- `static hash(input: Bun.BlobOrStringOrBuffer, encoding: DigestEncoding): string`: `static DOMString hash(BlobOrStringOrBuffer input, DigestEncoding encoding)` -/
-def CryptoHashInterfaceSHA512256.hashWithEncoding (input : BlobOrStringOrBuffer) (encoding : DigestEncoding) : IO String :=
+@[macro_inline] def CryptoHashInterfaceSHA512256.hashWithEncoding (input : BlobOrStringOrBuffer) (encoding : DigestEncoding) : IO String := Internal.api "Lasm.JS.Bun.CryptoHashInterfaceSHA512256.hashWithEncoding" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.CryptoHashInterfaceSHA512256.hashWithEncoding", module := "globalThis", path := "Bun.CryptoHashInterface.hash", construct := false, arity := 2 }
-    (Support.args #[toJS input, toJS encoding]) (await := false)
+    (Internal.args #[toJS input, toJS encoding]) (await := false)
 
 /-- `constructor()`: `constructor()` -/
-def SHA512_256.new : IO SHA512_256 :=
+@[macro_inline] def SHA512_256.new : IO SHA512_256 := Internal.api "Lasm.JS.Bun.SHA512_256.new" do
   Lasm.JS.Binding.invoke SHA512_256 { name := "Lasm.JS.Bun.SHA512_256.new", module := "globalThis", path := "Bun.SHA512_256", construct := true, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `static readonly byteLength: 32`: `static readonly attribute double /* integer: Nat */ byteLength` -/
-def SHA512_256.byteLength : IO Nat := Support.getGlobal ["Bun", "SHA512_256", "byteLength"] Nat
+@[macro_inline] def SHA512_256.byteLength : IO Nat := Internal.api "Lasm.JS.Bun.SHA512_256.byteLength" do
+  Internal.getGlobal ["Bun", "SHA512_256", "byteLength"] Nat
 
 /-- `remove(title: string): Promise<void>`: `Promise<undefined> remove(DOMString title)` -/
-def Cron.remove (self : Cron) (title : String) : Async Unit :=
-  self.val.callMethodAwait "remove" (Support.args #[toJS title]) Unit
+@[macro_inline] def Cron.remove (self : Cron) (title : String) : Async Unit := Internal.api "Lasm.JS.Bun.Cron.remove" do
+  self.val.callMethodAwait "remove" (Internal.args #[toJS title]) Unit
 
 /-- `constructor(init?: FetchSessionInit)`: `constructor(optional FetchSessionInit init)` -/
-def FetchSession.new (init : Option FetchSessionInit := none) : IO FetchSession :=
+@[macro_inline] def FetchSession.new (init : Option FetchSessionInit := none) : IO FetchSession := Internal.api "Lasm.JS.Bun.FetchSession.new" do
   Lasm.JS.Binding.invoke FetchSession { name := "Lasm.JS.Bun.FetchSession.new", module := "globalThis", path := "Bun.FetchSession", construct := true, arity := 1 }
-    (Support.args #[Support.optional init]) (await := false)
+    (Internal.args #[Internal.optional init]) (await := false)
 
 /-- `readonly fetch: (input: string | URL | Request, init?: BunFetchRequestInit) => Promise<Response>`: `readonly attribute FetchSessionFetch fetch` -/
-def FetchSession.fetch (self : FetchSession) : IO FetchSessionFetch := self.val.get "fetch" FetchSessionFetch
+@[macro_inline] def FetchSession.fetch (self : FetchSession) : IO FetchSessionFetch := Internal.api "Lasm.JS.Bun.FetchSession.fetch" do
+  self.val.get "fetch" FetchSessionFetch
 
 /-- `close(): void`: `undefined close()` -/
-def FetchSession.close (self : FetchSession) : IO Unit :=
-  self.val.callMethod "close" (Support.args #[]) Unit
+@[macro_inline] def FetchSession.close (self : FetchSession) : IO Unit := Internal.api "Lasm.JS.Bun.FetchSession.close" do
+  self.val.callMethod "close" (Internal.args #[]) Unit
 
 /-- `constructor(options: FileSystemRouterOptions)`: `constructor(FileSystemRouterOptions options)` -/
-def FileSystemRouter.new (options : FileSystemRouterOptions) : IO FileSystemRouter :=
+@[macro_inline] def FileSystemRouter.new (options : FileSystemRouterOptions) : IO FileSystemRouter := Internal.api "Lasm.JS.Bun.FileSystemRouter.new" do
   Lasm.JS.Binding.invoke FileSystemRouter { name := "Lasm.JS.Bun.FileSystemRouter.new", module := "globalThis", path := "Bun.FileSystemRouter", construct := true, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
 
 /-- `readonly assetPrefix: string | null`: `readonly attribute DOMString? assetPrefix` -/
-def FileSystemRouter.assetPrefix (self : FileSystemRouter) : IO (Option String) := self.val.get "assetPrefix" (Option String)
+@[macro_inline] def FileSystemRouter.assetPrefix (self : FileSystemRouter) : IO (Option String) := Internal.api "Lasm.JS.Bun.FileSystemRouter.assetPrefix" do
+  self.val.get "assetPrefix" (Option String)
 
 /-- `readonly origin: string | null`: `readonly attribute DOMString? origin` -/
-def FileSystemRouter.origin (self : FileSystemRouter) : IO (Option String) := self.val.get "origin" (Option String)
+@[macro_inline] def FileSystemRouter.origin (self : FileSystemRouter) : IO (Option String) := Internal.api "Lasm.JS.Bun.FileSystemRouter.origin" do
+  self.val.get "origin" (Option String)
 
 /-- `readonly style: 'nextjs'`: `readonly attribute FileSystemRouterStyle style` -/
-def FileSystemRouter.style (self : FileSystemRouter) : IO FileSystemRouterStyle := self.val.get "style" FileSystemRouterStyle
+@[macro_inline] def FileSystemRouter.style (self : FileSystemRouter) : IO FileSystemRouterStyle := Internal.api "Lasm.JS.Bun.FileSystemRouter.style" do
+  self.val.get "style" FileSystemRouterStyle
 
 /-- `readonly routes: Record<string, string>`: `readonly attribute record<DOMString, DOMString> routes` -/
-def FileSystemRouter.routes (self : FileSystemRouter) : IO (Record String) := self.val.get "routes" (Record String)
+@[macro_inline] def FileSystemRouter.routes (self : FileSystemRouter) : IO (Record String) := Internal.api "Lasm.JS.Bun.FileSystemRouter.routes" do
+  self.val.get "routes" (Record String)
 
 /-- `match(input: string | Request | Response): MatchedRoute | null`: `MatchedRoute? match(DOMStringOrRequestOrResponse input)` -/
-def FileSystemRouter.«match» (self : FileSystemRouter) (input : DOMStringOrRequestOrResponse) : IO (Option MatchedRoute) := do
-  let r ← self.val.callMethod "match" (Support.args #[toJS input]) Value
-  Support.cloneAs (Option MatchedRoute) r
+@[macro_inline] def FileSystemRouter.«match» (self : FileSystemRouter) (input : DOMStringOrRequestOrResponse) : IO (Option MatchedRoute) := Internal.api "Lasm.JS.Bun.FileSystemRouter.match" do
+  let r ← self.val.callMethod "match" (Internal.args #[toJS input]) Value
+  Internal.cloneAs (Option MatchedRoute) r
 
 /-- `reload(): this`: `FileSystemRouter reload()` -/
-def FileSystemRouter.reload (self : FileSystemRouter) : IO FileSystemRouter := do
-  let r ← self.val.callMethod "reload" (Support.args #[]) Value
+@[macro_inline] def FileSystemRouter.reload (self : FileSystemRouter) : IO FileSystemRouter := Internal.api "Lasm.JS.Bun.FileSystemRouter.reload" do
+  let r ← self.val.callMethod "reload" (Internal.args #[]) Value
   pure { val := r }
 
 /-- An iterator of `async iterable<DOMString>` (the object's `[Symbol.asyncIterator]()`). -/
@@ -7426,887 +7452,916 @@ partial def DOMStringAsyncIterable.values (self : DOMStringAsyncIterable) : Asyn
   loop #[]
 
 /-- `constructor(pattern: string)`: `constructor(DOMString pattern)` -/
-def Glob.new (pattern : String) : IO Glob :=
+@[macro_inline] def Glob.new (pattern : String) : IO Glob := Internal.api "Lasm.JS.Bun.Glob.new" do
   Lasm.JS.Binding.invoke Glob { name := "Lasm.JS.Bun.Glob.new", module := "globalThis", path := "Bun.Glob", construct := true, arity := 1 }
-    (Support.args #[toJS pattern]) (await := false)
+    (Internal.args #[toJS pattern]) (await := false)
 
 /-- `scan(optionsOrCwd?: string | GlobScanOptions): AsyncIterableIterator<string>`: `DOMStringAsyncIterable scan(optional DOMStringOrGlobScanOptions optionsOrCwd)` -/
-def Glob.scan (self : Glob) (optionsOrCwd : Option DOMStringOrGlobScanOptions := none) : IO DOMStringAsyncIterable := do
-  let r ← self.val.callMethod "scan" (Support.args #[Support.optional optionsOrCwd]) Value
+@[macro_inline] def Glob.scan (self : Glob) (optionsOrCwd : Option DOMStringOrGlobScanOptions := none) : IO DOMStringAsyncIterable := Internal.api "Lasm.JS.Bun.Glob.scan" do
+  let r ← self.val.callMethod "scan" (Internal.args #[Internal.optional optionsOrCwd]) Value
   pure { val := r }
 
 /-- `match(str: string): boolean`: `boolean match(DOMString str)` -/
-def Glob.«match» (self : Glob) (str : String) : IO Bool :=
-  self.val.callMethod "match" (Support.args #[toJS str]) Bool
+@[macro_inline] def Glob.«match» (self : Glob) (str : String) : IO Bool := Internal.api "Lasm.JS.Bun.Glob.match" do
+  self.val.callMethod "match" (Internal.args #[toJS str]) Bool
 
 /-- `constructor(input: string | ArrayBuffer | NodeJS.TypedArray | Blob, options?: Image.ConstructorOptions)`: `constructor(DOMStringOrArrayBufferOrUint8ArrayOrBlob input, optional ImageConstructorOptions options)` -/
-def Image.new (input : DOMStringOrArrayBufferOrUint8ArrayOrBlob) (options : Option ImageConstructorOptions := none) : IO Image :=
+@[macro_inline] def Image.new (input : DOMStringOrArrayBufferOrUint8ArrayOrBlob) (options : Option ImageConstructorOptions := none) : IO Image := Internal.api "Lasm.JS.Bun.Image.new" do
   Lasm.JS.Binding.invoke Image { name := "Lasm.JS.Bun.Image.new", module := "globalThis", path := "Bun.Image", construct := true, arity := 2 }
-    (Support.args #[toJS input, Support.optional options]) (await := false)
+    (Internal.args #[toJS input, Internal.optional options]) (await := false)
 
 /-- `static backend: 'system' | 'bun'`: `static attribute ImageBackend backend` -/
-def Image.backend : IO ImageBackend := Support.getGlobal ["Bun", "Image", "backend"] ImageBackend
+@[macro_inline] def Image.backend : IO ImageBackend := Internal.api "Lasm.JS.Bun.Image.backend" do
+  Internal.getGlobal ["Bun", "Image", "backend"] ImageBackend
 
 /-- `readonly width: number`: `readonly attribute double width` -/
-def Image.width (self : Image) : IO Float := self.val.get "width" Float
+@[macro_inline] def Image.width (self : Image) : IO Float := Internal.api "Lasm.JS.Bun.Image.width" do
+  self.val.get "width" Float
 
 /-- `readonly height: number`: `readonly attribute double height` -/
-def Image.height (self : Image) : IO Float := self.val.get "height" Float
+@[macro_inline] def Image.height (self : Image) : IO Float := Internal.api "Lasm.JS.Bun.Image.height" do
+  self.val.get "height" Float
 
 /-- `static fromClipboard(): Image | null`: `static Image? fromClipboard()` -/
-def Image.fromClipboard : IO (Option Image) :=
+@[macro_inline] def Image.fromClipboard : IO (Option Image) := Internal.api "Lasm.JS.Bun.Image.fromClipboard" do
   Lasm.JS.Binding.invoke (Option Image) { name := "Lasm.JS.Bun.Image.fromClipboard", module := "globalThis", path := "Bun.Image.fromClipboard", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `static hasClipboardImage(): boolean`: `static boolean hasClipboardImage()` -/
-def Image.hasClipboardImage : IO Bool :=
+@[macro_inline] def Image.hasClipboardImage : IO Bool := Internal.api "Lasm.JS.Bun.Image.hasClipboardImage" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Bun.Image.hasClipboardImage", module := "globalThis", path := "Bun.Image.hasClipboardImage", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `static clipboardChangeCount(): number`: `static double clipboardChangeCount()` -/
-def Image.clipboardChangeCount : IO Float :=
+@[macro_inline] def Image.clipboardChangeCount : IO Float := Internal.api "Lasm.JS.Bun.Image.clipboardChangeCount" do
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Bun.Image.clipboardChangeCount", module := "globalThis", path := "Bun.Image.clipboardChangeCount", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `resize(width: number, height?: number, options?: Image.ResizeOptions): this`: `Image resize(double width, optional double height, optional ImageResizeOptions options)` -/
-def Image.resize (self : Image) (width : Float) (height : Option Float := none) (options : Option ImageResizeOptions := none) : IO Image := do
-  let r ← self.val.callMethod "resize" (Support.args #[toJS width, Support.optional height, Support.optional options]) Value
+@[macro_inline] def Image.resize (self : Image) (width : Float) (height : Option Float := none) (options : Option ImageResizeOptions := none) : IO Image := Internal.api "Lasm.JS.Bun.Image.resize" do
+  let r ← self.val.callMethod "resize" (Internal.args #[toJS width, Internal.optional height, Internal.optional options]) Value
   pure { val := r }
 
 /-- `rotate(degrees: number): this`: `Image rotate(double degrees)` -/
-def Image.rotate (self : Image) (degrees : Float) : IO Image := do
-  let r ← self.val.callMethod "rotate" (Support.args #[toJS degrees]) Value
+@[macro_inline] def Image.rotate (self : Image) (degrees : Float) : IO Image := Internal.api "Lasm.JS.Bun.Image.rotate" do
+  let r ← self.val.callMethod "rotate" (Internal.args #[toJS degrees]) Value
   pure { val := r }
 
 /-- `flip(): this`: `Image flip()` -/
-def Image.flip (self : Image) : IO Image := do
-  let r ← self.val.callMethod "flip" (Support.args #[]) Value
+@[macro_inline] def Image.flip (self : Image) : IO Image := Internal.api "Lasm.JS.Bun.Image.flip" do
+  let r ← self.val.callMethod "flip" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `flop(): this`: `Image flop()` -/
-def Image.flop (self : Image) : IO Image := do
-  let r ← self.val.callMethod "flop" (Support.args #[]) Value
+@[macro_inline] def Image.flop (self : Image) : IO Image := Internal.api "Lasm.JS.Bun.Image.flop" do
+  let r ← self.val.callMethod "flop" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `modulate(options: Image.ModulateOptions): this`: `Image modulate(ImageModulateOptions options)` -/
-def Image.modulate (self : Image) (options : ImageModulateOptions) : IO Image := do
-  let r ← self.val.callMethod "modulate" (Support.args #[toJS options]) Value
+@[macro_inline] def Image.modulate (self : Image) (options : ImageModulateOptions) : IO Image := Internal.api "Lasm.JS.Bun.Image.modulate" do
+  let r ← self.val.callMethod "modulate" (Internal.args #[toJS options]) Value
   pure { val := r }
 
 /-- `jpeg(options?: { quality?: number; progressive?: boolean; }): this`: `Image jpeg(optional ImageJpegOptions options)` -/
-def Image.jpeg (self : Image) (options : Option ImageJpegOptions := none) : IO Image := do
-  let r ← self.val.callMethod "jpeg" (Support.args #[Support.optional options]) Value
+@[macro_inline] def Image.jpeg (self : Image) (options : Option ImageJpegOptions := none) : IO Image := Internal.api "Lasm.JS.Bun.Image.jpeg" do
+  let r ← self.val.callMethod "jpeg" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `png(options?: { compressionLevel?: number; palette?: boolean; colors?: number; dither?: boolean; }): this`: `Image png(optional ImagePngOptions options)` -/
-def Image.png (self : Image) (options : Option ImagePngOptions := none) : IO Image := do
-  let r ← self.val.callMethod "png" (Support.args #[Support.optional options]) Value
+@[macro_inline] def Image.png (self : Image) (options : Option ImagePngOptions := none) : IO Image := Internal.api "Lasm.JS.Bun.Image.png" do
+  let r ← self.val.callMethod "png" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `webp(options?: { quality?: number; lossless?: boolean }): this`: `Image webp(optional ImageWebpOptions options)` -/
-def Image.webp (self : Image) (options : Option ImageWebpOptions := none) : IO Image := do
-  let r ← self.val.callMethod "webp" (Support.args #[Support.optional options]) Value
+@[macro_inline] def Image.webp (self : Image) (options : Option ImageWebpOptions := none) : IO Image := Internal.api "Lasm.JS.Bun.Image.webp" do
+  let r ← self.val.callMethod "webp" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `heic(options?: { quality?: number }): this`: `Image heic(optional ImageHeicOptions options)` -/
-def Image.heic (self : Image) (options : Option ImageHeicOptions := none) : IO Image := do
-  let r ← self.val.callMethod "heic" (Support.args #[Support.optional options]) Value
+@[macro_inline] def Image.heic (self : Image) (options : Option ImageHeicOptions := none) : IO Image := Internal.api "Lasm.JS.Bun.Image.heic" do
+  let r ← self.val.callMethod "heic" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `avif(options?: { quality?: number }): this`: `Image avif(optional ImageAvifOptions options)` -/
-def Image.avif (self : Image) (options : Option ImageAvifOptions := none) : IO Image := do
-  let r ← self.val.callMethod "avif" (Support.args #[Support.optional options]) Value
+@[macro_inline] def Image.avif (self : Image) (options : Option ImageAvifOptions := none) : IO Image := Internal.api "Lasm.JS.Bun.Image.avif" do
+  let r ← self.val.callMethod "avif" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
 
 /-- `bytes(): Promise<Uint8Array>`: `Promise<Uint8Array> bytes()` -/
-def Image.bytes (self : Image) : Async ByteArray :=
-  self.val.callMethodAwait "bytes" (Support.args #[]) ByteArray
+@[macro_inline] def Image.bytes (self : Image) : Async ByteArray := Internal.api "Lasm.JS.Bun.Image.bytes" do
+  self.val.callMethodAwait "bytes" (Internal.args #[]) ByteArray
 
 /-- `buffer(): Promise<Buffer>`: `Promise<Uint8Array> buffer()` -/
-def Image.buffer (self : Image) : Async ByteArray :=
-  self.val.callMethodAwait "buffer" (Support.args #[]) ByteArray
+@[macro_inline] def Image.buffer (self : Image) : Async ByteArray := Internal.api "Lasm.JS.Bun.Image.buffer" do
+  self.val.callMethodAwait "buffer" (Internal.args #[]) ByteArray
 
 /-- `toBuffer(): Promise<Buffer>`: `Promise<Uint8Array> toBuffer()` -/
-def Image.toBuffer (self : Image) : Async ByteArray :=
-  self.val.callMethodAwait "toBuffer" (Support.args #[]) ByteArray
+@[macro_inline] def Image.toBuffer (self : Image) : Async ByteArray := Internal.api "Lasm.JS.Bun.Image.toBuffer" do
+  self.val.callMethodAwait "toBuffer" (Internal.args #[]) ByteArray
 
 /-- `write(dest: BunFile | S3File | Bun.PathLike | number): Promise<number>`: `Promise<double> write(BunFileOrS3FileOrPathLikeOrDouble dest)` -/
-def Image.write (self : Image) (dest : BunFileOrS3FileOrPathLikeOrDouble) : Async Float :=
-  self.val.callMethodAwait "write" (Support.args #[toJS dest]) Float
+@[macro_inline] def Image.write (self : Image) (dest : BunFileOrS3FileOrPathLikeOrDouble) : Async Float := Internal.api "Lasm.JS.Bun.Image.write" do
+  self.val.callMethodAwait "write" (Internal.args #[toJS dest]) Float
 
 /-- `dataurl(): Promise<string>`: `Promise<DOMString> dataurl()` -/
-def Image.dataurl (self : Image) : Async String :=
-  self.val.callMethodAwait "dataurl" (Support.args #[]) String
+@[macro_inline] def Image.dataurl (self : Image) : Async String := Internal.api "Lasm.JS.Bun.Image.dataurl" do
+  self.val.callMethodAwait "dataurl" (Internal.args #[]) String
 
 /-- `placeholder(as?: 'dataurl'): Promise<string>`: `Promise<DOMString> placeholder(optional ImagePlaceholderAs as)` -/
-def Image.placeholder (self : Image) (as : Option ImagePlaceholderAs := none) : Async String :=
-  self.val.callMethodAwait "placeholder" (Support.args #[Support.optional as]) String
+@[macro_inline] def Image.placeholder (self : Image) (as : Option ImagePlaceholderAs := none) : Async String := Internal.api "Lasm.JS.Bun.Image.placeholder" do
+  self.val.callMethodAwait "placeholder" (Internal.args #[Internal.optional as]) String
 
 /-- `blob(): Promise<Blob>`: `Promise<Blob> blob()` -/
-def Image.blob (self : Image) : Async Blob := do
-  let r ← self.val.callMethodAwait "blob" (Support.args #[]) Value
+@[macro_inline] def Image.blob (self : Image) : Async Blob := Internal.api "Lasm.JS.Bun.Image.blob" do
+  let r ← self.val.callMethodAwait "blob" (Internal.args #[]) Value
   pure { val := r }
 
 /-- `toBase64(): Promise<string>`: `Promise<DOMString> toBase64()` -/
-def Image.toBase64 (self : Image) : Async String :=
-  self.val.callMethodAwait "toBase64" (Support.args #[]) String
+@[macro_inline] def Image.toBase64 (self : Image) : Async String := Internal.api "Lasm.JS.Bun.Image.toBase64" do
+  self.val.callMethodAwait "toBase64" (Internal.args #[]) String
 
 /-- `metadata(): Promise<Image.Metadata>`: `Promise<ImageMetadata> metadata()` -/
-def Image.metadata (self : Image) : Async ImageMetadata :=
-  self.val.callMethodAwait "metadata" (Support.args #[]) ImageMetadata
+@[macro_inline] def Image.metadata (self : Image) : Async ImageMetadata := Internal.api "Lasm.JS.Bun.Image.metadata" do
+  self.val.callMethodAwait "metadata" (Internal.args #[]) ImageMetadata
 
 /-- `constructor(name: string, value: string, options?: CookieInit)`: `constructor(DOMString name, DOMString value, optional CookieInit options)` -/
-def Cookie.new (name : String) (value : String) (options : Option CookieInit := none) : IO Cookie :=
+@[macro_inline] def Cookie.new (name : String) (value : String) (options : Option CookieInit := none) : IO Cookie := Internal.api "Lasm.JS.Bun.Cookie.new" do
   Lasm.JS.Binding.invoke Cookie { name := "Lasm.JS.Bun.Cookie.new", module := "globalThis", path := "Bun.Cookie", construct := true, arity := 3 }
-    (Support.args #[toJS name, toJS value, Support.optional options]) (await := false)
+    (Internal.args #[toJS name, toJS value, Internal.optional options]) (await := false)
 
 /-- `constructor(cookieString: string)`: `constructor(DOMString cookieString)` -/
-def Cookie.newWithCookieString (cookieString : String) : IO Cookie :=
+@[macro_inline] def Cookie.newWithCookieString (cookieString : String) : IO Cookie := Internal.api "Lasm.JS.Bun.Cookie.newWithCookieString" do
   Lasm.JS.Binding.invoke Cookie { name := "Lasm.JS.Bun.Cookie.newWithCookieString", module := "globalThis", path := "Bun.Cookie", construct := true, arity := 1 }
-    (Support.args #[toJS cookieString]) (await := false)
+    (Internal.args #[toJS cookieString]) (await := false)
 
 /-- `constructor(cookieObject?: CookieInit)`: `constructor(optional CookieInit cookieObject)` -/
-def Cookie.newWithCookieObject (cookieObject : Option CookieInit := none) : IO Cookie :=
+@[macro_inline] def Cookie.newWithCookieObject (cookieObject : Option CookieInit := none) : IO Cookie := Internal.api "Lasm.JS.Bun.Cookie.newWithCookieObject" do
   Lasm.JS.Binding.invoke Cookie { name := "Lasm.JS.Bun.Cookie.newWithCookieObject", module := "globalThis", path := "Bun.Cookie", construct := true, arity := 1 }
-    (Support.args #[Support.optional cookieObject]) (await := false)
+    (Internal.args #[Internal.optional cookieObject]) (await := false)
 
 /-- `readonly name: string`: `readonly attribute DOMString name` -/
-def Cookie.name (self : Cookie) : IO String := self.val.get "name" String
+@[macro_inline] def Cookie.name (self : Cookie) : IO String := Internal.api "Lasm.JS.Bun.Cookie.name" do
+  self.val.get "name" String
 
 /-- `value: string`: `attribute DOMString value` -/
-def Cookie.value (self : Cookie) : IO String := self.val.get "value" String
+@[macro_inline] def Cookie.value (self : Cookie) : IO String := Internal.api "Lasm.JS.Bun.Cookie.value" do
+  self.val.get "value" String
 
 /-- Sets `value`: `attribute DOMString value` -/
-def Cookie.setValue (self : Cookie) (value : String) : IO Unit :=
+@[macro_inline] def Cookie.setValue (self : Cookie) (value : String) : IO Unit := Internal.api "Lasm.JS.Bun.Cookie.setValue" do
   self.val.set "value" (toJS value)
 
 /-- `domain?: string`: `attribute DOMString? domain` -/
-def Cookie.domain (self : Cookie) : IO (Option String) := self.val.get "domain" (Option String)
+@[macro_inline] def Cookie.domain (self : Cookie) : IO (Option String) := Internal.api "Lasm.JS.Bun.Cookie.domain" do
+  self.val.get "domain" (Option String)
 
 /-- Sets `domain`: `attribute DOMString? domain` -/
-def Cookie.setDomain (self : Cookie) (value : Option String) : IO Unit :=
+@[macro_inline] def Cookie.setDomain (self : Cookie) (value : Option String) : IO Unit := Internal.api "Lasm.JS.Bun.Cookie.setDomain" do
   self.val.set "domain" (toJS value)
 
 /-- `path: string`: `attribute DOMString path` -/
-def Cookie.path (self : Cookie) : IO String := self.val.get "path" String
+@[macro_inline] def Cookie.path (self : Cookie) : IO String := Internal.api "Lasm.JS.Bun.Cookie.path" do
+  self.val.get "path" String
 
 /-- Sets `path`: `attribute DOMString path` -/
-def Cookie.setPath (self : Cookie) (value : String) : IO Unit :=
+@[macro_inline] def Cookie.setPath (self : Cookie) (value : String) : IO Unit := Internal.api "Lasm.JS.Bun.Cookie.setPath" do
   self.val.set "path" (toJS value)
 
 /-- `expires?: Date`: `attribute object? expires` -/
-def Cookie.expires (self : Cookie) : IO (Option Data) := self.val.get "expires" (Option Data)
+@[macro_inline] def Cookie.expires (self : Cookie) : IO (Option Data) := Internal.api "Lasm.JS.Bun.Cookie.expires" do
+  self.val.get "expires" (Option Data)
 
 /-- Sets `expires`: `attribute object? expires` -/
-def Cookie.setExpires (self : Cookie) (value : Option Data) : IO Unit :=
+@[macro_inline] def Cookie.setExpires (self : Cookie) (value : Option Data) : IO Unit := Internal.api "Lasm.JS.Bun.Cookie.setExpires" do
   self.val.set "expires" (toJS value)
 
 /-- `secure: boolean`: `attribute boolean secure` -/
-def Cookie.secure (self : Cookie) : IO Bool := self.val.get "secure" Bool
+@[macro_inline] def Cookie.secure (self : Cookie) : IO Bool := Internal.api "Lasm.JS.Bun.Cookie.secure" do
+  self.val.get "secure" Bool
 
 /-- Sets `secure`: `attribute boolean secure` -/
-def Cookie.setSecure (self : Cookie) (value : Bool) : IO Unit :=
+@[macro_inline] def Cookie.setSecure (self : Cookie) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Bun.Cookie.setSecure" do
   self.val.set "secure" (toJS value)
 
 /-- `sameSite: CookieSameSite`: `attribute CookieSameSite sameSite` -/
-def Cookie.sameSite (self : Cookie) : IO CookieSameSite := self.val.get "sameSite" CookieSameSite
+@[macro_inline] def Cookie.sameSite (self : Cookie) : IO CookieSameSite := Internal.api "Lasm.JS.Bun.Cookie.sameSite" do
+  self.val.get "sameSite" CookieSameSite
 
 /-- Sets `sameSite`: `attribute CookieSameSite sameSite` -/
-def Cookie.setSameSite (self : Cookie) (value : CookieSameSite) : IO Unit :=
+@[macro_inline] def Cookie.setSameSite (self : Cookie) (value : CookieSameSite) : IO Unit := Internal.api "Lasm.JS.Bun.Cookie.setSameSite" do
   self.val.set "sameSite" (toJS value)
 
 /-- `partitioned: boolean`: `attribute boolean partitioned` -/
-def Cookie.partitioned (self : Cookie) : IO Bool := self.val.get "partitioned" Bool
+@[macro_inline] def Cookie.partitioned (self : Cookie) : IO Bool := Internal.api "Lasm.JS.Bun.Cookie.partitioned" do
+  self.val.get "partitioned" Bool
 
 /-- Sets `partitioned`: `attribute boolean partitioned` -/
-def Cookie.setPartitioned (self : Cookie) (value : Bool) : IO Unit :=
+@[macro_inline] def Cookie.setPartitioned (self : Cookie) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Bun.Cookie.setPartitioned" do
   self.val.set "partitioned" (toJS value)
 
 /-- `maxAge?: number`: `attribute double? maxAge` -/
-def Cookie.maxAge (self : Cookie) : IO (Option Float) := self.val.get "maxAge" (Option Float)
+@[macro_inline] def Cookie.maxAge (self : Cookie) : IO (Option Float) := Internal.api "Lasm.JS.Bun.Cookie.maxAge" do
+  self.val.get "maxAge" (Option Float)
 
 /-- Sets `maxAge`: `attribute double? maxAge` -/
-def Cookie.setMaxAge (self : Cookie) (value : Option Float) : IO Unit :=
+@[macro_inline] def Cookie.setMaxAge (self : Cookie) (value : Option Float) : IO Unit := Internal.api "Lasm.JS.Bun.Cookie.setMaxAge" do
   self.val.set "maxAge" (toJS value)
 
 /-- `httpOnly: boolean`: `attribute boolean httpOnly` -/
-def Cookie.httpOnly (self : Cookie) : IO Bool := self.val.get "httpOnly" Bool
+@[macro_inline] def Cookie.httpOnly (self : Cookie) : IO Bool := Internal.api "Lasm.JS.Bun.Cookie.httpOnly" do
+  self.val.get "httpOnly" Bool
 
 /-- Sets `httpOnly`: `attribute boolean httpOnly` -/
-def Cookie.setHttpOnly (self : Cookie) (value : Bool) : IO Unit :=
+@[macro_inline] def Cookie.setHttpOnly (self : Cookie) (value : Bool) : IO Unit := Internal.api "Lasm.JS.Bun.Cookie.setHttpOnly" do
   self.val.set "httpOnly" (toJS value)
 
 /-- `isExpired(): boolean`: `boolean isExpired()` -/
-def Cookie.isExpired (self : Cookie) : IO Bool :=
-  self.val.callMethod "isExpired" (Support.args #[]) Bool
+@[macro_inline] def Cookie.isExpired (self : Cookie) : IO Bool := Internal.api "Lasm.JS.Bun.Cookie.isExpired" do
+  self.val.callMethod "isExpired" (Internal.args #[]) Bool
 
 /-- `serialize(): string`: `DOMString serialize()` -/
-def Cookie.serialize (self : Cookie) : IO String :=
-  self.val.callMethod "serialize" (Support.args #[]) String
+@[macro_inline] def Cookie.serialize (self : Cookie) : IO String := Internal.api "Lasm.JS.Bun.Cookie.serialize" do
+  self.val.callMethod "serialize" (Internal.args #[]) String
 
 /-- `toString(): string`: `DOMString toString()` -/
-def Cookie.toString (self : Cookie) : IO String :=
-  self.val.callMethod "toString" (Support.args #[]) String
+@[macro_inline] def Cookie.toString (self : Cookie) : IO String := Internal.api "Lasm.JS.Bun.Cookie.toString" do
+  self.val.callMethod "toString" (Internal.args #[]) String
 
 /-- `toJSON(): CookieInit`: `CookieInit toJSON()` -/
-def Cookie.toJSON (self : Cookie) : IO CookieInit :=
-  self.val.callMethod "toJSON" (Support.args #[]) CookieInit
+@[macro_inline] def Cookie.toJSON (self : Cookie) : IO CookieInit := Internal.api "Lasm.JS.Bun.Cookie.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) CookieInit
 
 /-- `static parse(cookieString: string): Cookie`: `static Cookie parse(DOMString cookieString)` -/
-def Cookie.parse (cookieString : String) : IO Cookie := do
+@[macro_inline] def Cookie.parse (cookieString : String) : IO Cookie := Internal.api "Lasm.JS.Bun.Cookie.parse" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Bun.Cookie.parse", module := "globalThis", path := "Bun.Cookie.parse", construct := false, arity := 1 }
-    (Support.args #[toJS cookieString]) (await := false)
+    (Internal.args #[toJS cookieString]) (await := false)
   pure { val := r }
 
 /-- `static from(name: string, value: string, options?: CookieInit): Cookie`: `static Cookie from(DOMString name, DOMString value, optional CookieInit options)` -/
-def Cookie.«from» (name : String) (value : String) (options : Option CookieInit := none) : IO Cookie := do
+@[macro_inline] def Cookie.«from» (name : String) (value : String) (options : Option CookieInit := none) : IO Cookie := Internal.api "Lasm.JS.Bun.Cookie.from" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Bun.Cookie.from", module := "globalThis", path := "Bun.Cookie.from", construct := false, arity := 3 }
-    (Support.args #[toJS name, toJS value, Support.optional options]) (await := false)
+    (Internal.args #[toJS name, toJS value, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `constructor(init?: string[][] | Record<string, string> | string)`: `constructor(optional SequenceOfSequenceOfDOMStringOrRecordOfDOMStringOrDOMString init)` -/
-def CookieMap.new (init : Option SequenceOfSequenceOfDOMStringOrRecordOfDOMStringOrDOMString := none) : IO CookieMap :=
+@[macro_inline] def CookieMap.new (init : Option SequenceOfSequenceOfDOMStringOrRecordOfDOMStringOrDOMString := none) : IO CookieMap := Internal.api "Lasm.JS.Bun.CookieMap.new" do
   Lasm.JS.Binding.invoke CookieMap { name := "Lasm.JS.Bun.CookieMap.new", module := "globalThis", path := "Bun.CookieMap", construct := true, arity := 1 }
-    (Support.args #[Support.optional init]) (await := false)
+    (Internal.args #[Internal.optional init]) (await := false)
 
 /-- `readonly size: number`: `readonly attribute double /* integer: Nat */ size` -/
-def CookieMap.size (self : CookieMap) : IO Nat := self.val.get "size" Nat
+@[macro_inline] def CookieMap.size (self : CookieMap) : IO Nat := Internal.api "Lasm.JS.Bun.CookieMap.size" do
+  self.val.get "size" Nat
 
 /-- `get(name: string): string | null`: `DOMString? get(DOMString name)` -/
-def CookieMap.get (self : CookieMap) (name : String) : IO (Option String) :=
-  self.val.callMethod "get" (Support.args #[toJS name]) (Option String)
+@[macro_inline] def CookieMap.get (self : CookieMap) (name : String) : IO (Option String) := Internal.api "Lasm.JS.Bun.CookieMap.get" do
+  self.val.callMethod "get" (Internal.args #[toJS name]) (Option String)
 
 /-- `toSetCookieHeaders(): string[]`: `sequence<DOMString> toSetCookieHeaders()` -/
-def CookieMap.toSetCookieHeaders (self : CookieMap) : IO (Array String) :=
-  self.val.callMethod "toSetCookieHeaders" (Support.args #[]) (Array String)
+@[macro_inline] def CookieMap.toSetCookieHeaders (self : CookieMap) : IO (Array String) := Internal.api "Lasm.JS.Bun.CookieMap.toSetCookieHeaders" do
+  self.val.callMethod "toSetCookieHeaders" (Internal.args #[]) (Array String)
 
 /-- `has(name: string): boolean`: `boolean has(DOMString name)` -/
-def CookieMap.has (self : CookieMap) (name : String) : IO Bool :=
-  self.val.callMethod "has" (Support.args #[toJS name]) Bool
+@[macro_inline] def CookieMap.has (self : CookieMap) (name : String) : IO Bool := Internal.api "Lasm.JS.Bun.CookieMap.has" do
+  self.val.callMethod "has" (Internal.args #[toJS name]) Bool
 
 /-- `set(name: string, value: string, options?: CookieInit): void`: `undefined set(DOMString name, DOMString value, optional CookieInit options)` -/
-def CookieMap.set (self : CookieMap) (name : String) (value : String) (options : Option CookieInit := none) : IO Unit :=
-  self.val.callMethod "set" (Support.args #[toJS name, toJS value, Support.optional options]) Unit
+@[macro_inline] def CookieMap.set (self : CookieMap) (name : String) (value : String) (options : Option CookieInit := none) : IO Unit := Internal.api "Lasm.JS.Bun.CookieMap.set" do
+  self.val.callMethod "set" (Internal.args #[toJS name, toJS value, Internal.optional options]) Unit
 
 /-- `set(options: CookieInit): void`: `undefined set(CookieInit options)` -/
-def CookieMap.setWithOptions (self : CookieMap) (options : CookieInit) : IO Unit :=
-  self.val.callMethod "set" (Support.args #[toJS options]) Unit
+@[macro_inline] def CookieMap.setWithOptions (self : CookieMap) (options : CookieInit) : IO Unit := Internal.api "Lasm.JS.Bun.CookieMap.setWithOptions" do
+  self.val.callMethod "set" (Internal.args #[toJS options]) Unit
 
 /-- `delete(name: string): void`: `undefined delete(DOMString name)` -/
-def CookieMap.delete (self : CookieMap) (name : String) : IO Unit :=
-  self.val.callMethod "delete" (Support.args #[toJS name]) Unit
+@[macro_inline] def CookieMap.delete (self : CookieMap) (name : String) : IO Unit := Internal.api "Lasm.JS.Bun.CookieMap.delete" do
+  self.val.callMethod "delete" (Internal.args #[toJS name]) Unit
 
 /-- `delete(options: CookieStoreDeleteOptions): void`: `undefined delete(CookieStoreDeleteOptions options)` -/
-def CookieMap.deleteWithOptions (self : CookieMap) (options : CookieStoreDeleteOptions) : IO Unit :=
-  self.val.callMethod "delete" (Support.args #[toJS options]) Unit
+@[macro_inline] def CookieMap.deleteWithOptions (self : CookieMap) (options : CookieStoreDeleteOptions) : IO Unit := Internal.api "Lasm.JS.Bun.CookieMap.deleteWithOptions" do
+  self.val.callMethod "delete" (Internal.args #[toJS options]) Unit
 
 /-- `delete(name: string, options: Omit<CookieStoreDeleteOptions, 'name'>): void`: `undefined delete(DOMString name, CookieStoreDeleteOptions options)` -/
-def CookieMap.deleteNamed (self : CookieMap) (name : String) (options : CookieStoreDeleteOptions) : IO Unit :=
-  self.val.callMethod "delete" (Support.args #[toJS name, toJS options]) Unit
+@[macro_inline] def CookieMap.deleteNamed (self : CookieMap) (name : String) (options : CookieStoreDeleteOptions) : IO Unit := Internal.api "Lasm.JS.Bun.CookieMap.deleteNamed" do
+  self.val.callMethod "delete" (Internal.args #[toJS name, toJS options]) Unit
 
 /-- `toJSON(): Record<string, string>`: `record<DOMString, DOMString> toJSON()` -/
-def CookieMap.toJSON (self : CookieMap) : IO (Record String) :=
-  self.val.callMethod "toJSON" (Support.args #[]) (Record String)
+@[macro_inline] def CookieMap.toJSON (self : CookieMap) : IO (Record String) := Internal.api "Lasm.JS.Bun.CookieMap.toJSON" do
+  self.val.callMethod "toJSON" (Internal.args #[]) (Record String)
 
 /-- `forEach(callback: (value: string, key: string, map: CookieMap) => void): void`: `undefined forEach(CookieMapForEachCallback callback)` -/
-def CookieMap.forEach (self : CookieMap) (callback : CookieMapForEachCallback) : IO Unit :=
-  self.val.callMethod "forEach" (Support.args #[toJS callback]) Unit
+@[macro_inline] def CookieMap.forEach (self : CookieMap) (callback : CookieMapForEachCallback) : IO Unit := Internal.api "Lasm.JS.Bun.CookieMap.forEach" do
+  self.val.callMethod "forEach" (Internal.args #[toJS callback]) Unit
 
 /-- `const Bun.env: Env & NodeJS.ProcessEnv & ImportMetaEnv`: `readonly attribute record<DOMString, DOMString> env` (Bun 1.4.4 type declarations) -/
-def env : IO (Record String) := Support.getGlobal ["Bun", "env"] (Record String)
+@[macro_inline] def env : IO (Record String) := Internal.api "Lasm.JS.Bun.env" do
+  Internal.getGlobal ["Bun", "env"] (Record String)
 
 /-- `const Bun.argv: string[]`: `readonly attribute sequence<DOMString> argv` (Bun 1.4.4 type declarations) -/
-def argv : IO (Array String) := Support.getGlobal ["Bun", "argv"] (Array String)
+@[macro_inline] def argv : IO (Array String) := Internal.api "Lasm.JS.Bun.argv" do
+  Internal.getGlobal ["Bun", "argv"] (Array String)
 
 /-- `const Bun.hash: ((data: string | ArrayBufferView | ArrayBuffer | SharedArrayBuffer, seed?: number | bigint) => bigint) & Hash`: `readonly attribute Hash hash` (Bun 1.4.4 type declarations) -/
-def hash : IO Hash := Support.getGlobal ["Bun", "hash"] Hash
+@[macro_inline] def hash : IO Hash := Internal.api "Lasm.JS.Bun.hash" do
+  Internal.getGlobal ["Bun", "hash"] Hash
 
 /-- `const Bun.password: { verify(password: Bun.StringOrBuffer, hash: Bun.StringOrBuffer, algorithm?: Password.AlgorithmLabel): Promise<boolean>; hash(password: Bun.StringOrBuffer, algorithm?: Password.AlgorithmLabel | Password.Argon2Algorithm | Password.BCryptAlgorithm): Promise<string>; verifySync(password: Bun.StringOrBuffer, hash: Bun.StringOrBuffer, algorithm?: Password.AlgorithmLabel): boolean; hashSync(password: Bun.StringOrBuffer, algorithm?: Password.AlgorithmLabel | Password.Argon2Algorithm | Password.BCryptAlgorithm): string; }`: `readonly attribute Password password` (Bun 1.4.4 type declarations) -/
-def password : IO Password := do
-  let r ← Support.getGlobal ["Bun", "password"] Value
+@[macro_inline] def password : IO Password := Internal.api "Lasm.JS.Bun.password" do
+  let r ← Internal.getGlobal ["Bun", "password"] Value
   pure { val := r }
 
 /-- `const Bun.secrets: { get(options: { service: string; name: string; }): Promise<string | null>; set(options: { service: string; name: string; value: string; allowUnrestrictedAccess?: boolean; persist?: 'local' | 'enterprise' | undefined; }): Promise<void>; delete(options: { service: string; name: string; }): Promise<boolean>; }`: `readonly attribute Secrets secrets` (Bun 1.4.4 type declarations) -/
-def secrets : IO Secrets := do
-  let r ← Support.getGlobal ["Bun", "secrets"] Value
+@[macro_inline] def secrets : IO Secrets := Internal.api "Lasm.JS.Bun.secrets" do
+  let r ← Internal.getGlobal ["Bun", "secrets"] Value
   pure { val := r }
 
 /-- `const Bun.embeddedFiles: ReadonlyArray<Blob>`: `readonly attribute sequence<Blob> embeddedFiles` (Bun 1.4.4 type declarations) -/
-def embeddedFiles : IO (Array Blob) := Support.getGlobal ["Bun", "embeddedFiles"] (Array Blob)
+@[macro_inline] def embeddedFiles : IO (Array Blob) := Internal.api "Lasm.JS.Bun.embeddedFiles" do
+  Internal.getGlobal ["Bun", "embeddedFiles"] (Array Blob)
 
 /-- `const Bun.isStandaloneExecutable: boolean`: `readonly attribute boolean isStandaloneExecutable` (Bun 1.4.4 type declarations) -/
-def isStandaloneExecutable : IO Bool := Support.getGlobal ["Bun", "isStandaloneExecutable"] Bool
+@[macro_inline] def isStandaloneExecutable : IO Bool := Internal.api "Lasm.JS.Bun.isStandaloneExecutable" do
+  Internal.getGlobal ["Bun", "isStandaloneExecutable"] Bool
 
 /-- `const Bun.stdout: BunFile`: `readonly attribute BunFile stdout` (Bun 1.4.4 type declarations) -/
-def stdout : IO BunFile := do
-  let r ← Support.getGlobal ["Bun", "stdout"] Value
+@[macro_inline] def stdout : IO BunFile := Internal.api "Lasm.JS.Bun.stdout" do
+  let r ← Internal.getGlobal ["Bun", "stdout"] Value
   pure { val := r }
 
 /-- `const Bun.stderr: BunFile`: `readonly attribute BunFile stderr` (Bun 1.4.4 type declarations) -/
-def stderr : IO BunFile := do
-  let r ← Support.getGlobal ["Bun", "stderr"] Value
+@[macro_inline] def stderr : IO BunFile := Internal.api "Lasm.JS.Bun.stderr" do
+  let r ← Internal.getGlobal ["Bun", "stderr"] Value
   pure { val := r }
 
 /-- `const Bun.stdin: BunFile`: `readonly attribute BunFile stdin` (Bun 1.4.4 type declarations) -/
-def stdin : IO BunFile := do
-  let r ← Support.getGlobal ["Bun", "stdin"] Value
+@[macro_inline] def stdin : IO BunFile := Internal.api "Lasm.JS.Bun.stdin" do
+  let r ← Internal.getGlobal ["Bun", "stdin"] Value
   pure { val := r }
 
 /-- `const Bun.enableANSIColors: boolean`: `readonly attribute boolean enableANSIColors` (Bun 1.4.4 type declarations) -/
-def enableANSIColors : IO Bool := Support.getGlobal ["Bun", "enableANSIColors"] Bool
+@[macro_inline] def enableANSIColors : IO Bool := Internal.api "Lasm.JS.Bun.enableANSIColors" do
+  Internal.getGlobal ["Bun", "enableANSIColors"] Bool
 
 /-- `const Bun.main: string`: `readonly attribute DOMString main` (Bun 1.4.4 type declarations) -/
-def main : IO String := Support.getGlobal ["Bun", "main"] String
+@[macro_inline] def main : IO String := Internal.api "Lasm.JS.Bun.main" do
+  Internal.getGlobal ["Bun", "main"] String
 
 /-- `const Bun.isMainThread: boolean`: `readonly attribute boolean isMainThread` (Bun 1.4.4 type declarations) -/
-def isMainThread : IO Bool := Support.getGlobal ["Bun", "isMainThread"] Bool
+@[macro_inline] def isMainThread : IO Bool := Internal.api "Lasm.JS.Bun.isMainThread" do
+  Internal.getGlobal ["Bun", "isMainThread"] Bool
 
 /-- `const Bun.cron: { (schedule: CronWithAutocomplete, handler: (this: CronJob) => unknown, options?: CronOptions): CronJob; (path: string, schedule: CronWithAutocomplete, title: string): Promise<void>; remove(title: string): Promise<void>; parse(expression: CronWithAutocomplete, relativeDate?: Date | number, options?: CronOptions): Date | null; }`: `readonly attribute Cron cron` (Bun 1.4.4 type declarations) -/
-def cron : IO Cron := do
-  let r ← Support.getGlobal ["Bun", "cron"] Value
+@[macro_inline] def cron : IO Cron := Internal.api "Lasm.JS.Bun.cron" do
+  let r ← Internal.getGlobal ["Bun", "cron"] Value
   pure { val := r }
 
 /-- `const Bun.version: string`: `readonly attribute DOMString version` (Bun 1.4.4 type declarations) -/
-def version : IO String := Support.getGlobal ["Bun", "version"] String
+@[macro_inline] def version : IO String := Internal.api "Lasm.JS.Bun.version" do
+  Internal.getGlobal ["Bun", "version"] String
 
 /-- `const Bun.version_with_sha: string`: `readonly attribute DOMString version_with_sha` (Bun 1.4.4 type declarations) -/
-def version_with_sha : IO String := Support.getGlobal ["Bun", "version_with_sha"] String
+@[macro_inline] def version_with_sha : IO String := Internal.api "Lasm.JS.Bun.version_with_sha" do
+  Internal.getGlobal ["Bun", "version_with_sha"] String
 
 /-- `const Bun.revision: string`: `readonly attribute DOMString revision` (Bun 1.4.4 type declarations) -/
-def revision : IO String := Support.getGlobal ["Bun", "revision"] String
+@[macro_inline] def revision : IO String := Internal.api "Lasm.JS.Bun.revision" do
+  Internal.getGlobal ["Bun", "revision"] String
 
 /-- `Bun.which(command: string, options?: WhichOptions): string | null`: `DOMString? which(DOMString command, optional WhichOptions options)` (Bun 1.4.4 type declarations) -/
-def which (command : String) (options : Option WhichOptions := none) : IO (Option String) :=
+@[macro_inline] def which (command : String) (options : Option WhichOptions := none) : IO (Option String) := Internal.api "Lasm.JS.Bun.which" do
   Lasm.JS.Binding.invoke (Option String) { name := "Lasm.JS.Bun.which", module := "globalThis", path := "Bun.which", construct := false, arity := 2 }
-    (Support.args #[toJS command, Support.optional options]) (await := false)
+    (Internal.args #[toJS command, Internal.optional options]) (await := false)
 
 /-- `Bun.stringWidth(input: string, options?: StringWidthOptions): number`: `double stringWidth(DOMString input, optional StringWidthOptions options)` (Bun 1.4.4 type declarations) -/
-def stringWidth (input : String) (options : Option StringWidthOptions := none) : IO Float :=
+@[macro_inline] def stringWidth (input : String) (options : Option StringWidthOptions := none) : IO Float := Internal.api "Lasm.JS.Bun.stringWidth" do
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Bun.stringWidth", module := "globalThis", path := "Bun.stringWidth", construct := false, arity := 2 }
-    (Support.args #[toJS input, Support.optional options]) (await := false)
+    (Internal.args #[toJS input, Internal.optional options]) (await := false)
 
 /-- `Bun.stripANSI(input: string): string`: `DOMString stripANSI(DOMString input)` (Bun 1.4.4 type declarations) -/
-def stripANSI (input : String) : IO String :=
+@[macro_inline] def stripANSI (input : String) : IO String := Internal.api "Lasm.JS.Bun.stripANSI" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.stripANSI", module := "globalThis", path := "Bun.stripANSI", construct := false, arity := 1 }
-    (Support.args #[toJS input]) (await := false)
+    (Internal.args #[toJS input]) (await := false)
 
 /-- `Bun.sliceAnsi(input: string, start?: number, end?: number, options?: string | boolean | SliceAnsiOptions, ambiguousIsNarrow?: boolean): string`: `DOMString sliceAnsi(DOMString input, optional double start, optional double end, optional DOMStringOrBooleanOrSliceAnsiOptions options, optional boolean ambiguousIsNarrow)` (Bun 1.4.4 type declarations) -/
-def sliceAnsi (input : String) (start : Option Float := none) («end» : Option Float := none) (options : Option DOMStringOrBooleanOrSliceAnsiOptions := none) (ambiguousIsNarrow : Option Bool := none) : IO String :=
+@[macro_inline] def sliceAnsi (input : String) (start : Option Float := none) («end» : Option Float := none) (options : Option DOMStringOrBooleanOrSliceAnsiOptions := none) (ambiguousIsNarrow : Option Bool := none) : IO String := Internal.api "Lasm.JS.Bun.sliceAnsi" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.sliceAnsi", module := "globalThis", path := "Bun.sliceAnsi", construct := false, arity := 5 }
-    (Support.args #[toJS input, Support.optional start, Support.optional «end», Support.optional options, Support.optional ambiguousIsNarrow]) (await := false)
+    (Internal.args #[toJS input, Internal.optional start, Internal.optional «end», Internal.optional options, Internal.optional ambiguousIsNarrow]) (await := false)
 
 /-- `Bun.wrapAnsi(input: string, columns: number, options?: WrapAnsiOptions): string`: `DOMString wrapAnsi(DOMString input, double columns, optional WrapAnsiOptions options)` (Bun 1.4.4 type declarations) -/
-def wrapAnsi (input : String) (columns : Float) (options : Option WrapAnsiOptions := none) : IO String :=
+@[macro_inline] def wrapAnsi (input : String) (columns : Float) (options : Option WrapAnsiOptions := none) : IO String := Internal.api "Lasm.JS.Bun.wrapAnsi" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.wrapAnsi", module := "globalThis", path := "Bun.wrapAnsi", construct := false, arity := 3 }
-    (Support.args #[toJS input, toJS columns, Support.optional options]) (await := false)
+    (Internal.args #[toJS input, toJS columns, Internal.optional options]) (await := false)
 
 /-- `Bun.resolveSync(moduleId: string, parent: string): string`: `DOMString resolveSync(DOMString moduleId, DOMString parent)` (Bun 1.4.4 type declarations) -/
-def resolveSync (moduleId : String) (parent : String) : IO String :=
+@[macro_inline] def resolveSync (moduleId : String) (parent : String) : IO String := Internal.api "Lasm.JS.Bun.resolveSync" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.resolveSync", module := "globalThis", path := "Bun.resolveSync", construct := false, arity := 2 }
-    (Support.args #[toJS moduleId, toJS parent]) (await := false)
+    (Internal.args #[toJS moduleId, toJS parent]) (await := false)
 
 /-- `Bun.resolve(moduleId: string, parent: string): Promise<string>`: `Promise<DOMString> resolve(DOMString moduleId, DOMString parent)` (Bun 1.4.4 type declarations) -/
-def resolve (moduleId : String) (parent : String) : Async String :=
+@[macro_inline] def resolve (moduleId : String) (parent : String) : Async String := Internal.api "Lasm.JS.Bun.resolve" do
   Lasm.JS.Binding.invokeAsync String { name := "Lasm.JS.Bun.resolve", module := "globalThis", path := "Bun.resolve", construct := false, arity := 2 }
-    (Support.args #[toJS moduleId, toJS parent])
+    (Internal.args #[toJS moduleId, toJS parent])
 
 /-- `Bun.write(destination: BunFile | S3File | PathLike, input: Blob | NodeJS.TypedArray | ArrayBufferLike | string | BlobPart[] | Archive | ReadableStream, options?: { mode?: number; createPath?: boolean; }): Promise<number>`: `Promise<double> write(BunFileOrS3FileOrPathLike destination, BlobOrUint8ArrayOrDOMStringOrSequenceOfBlobPartOrArchiveOrReadableStream input, optional WriteOptions options)` (Bun 1.4.4 type declarations) -/
-def write (destination : BunFileOrS3FileOrPathLike) (input : BlobOrUint8ArrayOrDOMStringOrSequenceOfBlobPartOrArchiveOrReadableStream) (options : Option WriteOptions := none) : Async Float :=
+@[macro_inline] def write (destination : BunFileOrS3FileOrPathLike) (input : BlobOrUint8ArrayOrDOMStringOrSequenceOfBlobPartOrArchiveOrReadableStream) (options : Option WriteOptions := none) : Async Float := Internal.api "Lasm.JS.Bun.write" do
   Lasm.JS.Binding.invokeAsync Float { name := "Lasm.JS.Bun.write", module := "globalThis", path := "Bun.write", construct := false, arity := 3 }
-    (Support.args #[toJS destination, toJS input, Support.optional options])
+    (Internal.args #[toJS destination, toJS input, Internal.optional options])
 
 /-- `Bun.write(destination: BunFile, input: Response | Request, options?: { createPath?: boolean; }): Promise<number>`: `Promise<double> write(BunFile destination, ResponseOrRequest input, optional WriteResponseOptions options)` (Bun 1.4.4 type declarations) -/
-def writeResponse (destination : BunFile) (input : ResponseOrRequest) (options : Option WriteResponseOptions := none) : Async Float :=
+@[macro_inline] def writeResponse (destination : BunFile) (input : ResponseOrRequest) (options : Option WriteResponseOptions := none) : Async Float := Internal.api "Lasm.JS.Bun.writeResponse" do
   Lasm.JS.Binding.invokeAsync Float { name := "Lasm.JS.Bun.writeResponse", module := "globalThis", path := "Bun.write", construct := false, arity := 3 }
-    (Support.args #[toJS destination, toJS input, Support.optional options])
+    (Internal.args #[toJS destination, toJS input, Internal.optional options])
 
 /-- `Bun.write(destinationPath: PathLike, input: Response | Request, options?: { createPath?: boolean; }): Promise<number>`: `Promise<double> write(PathLike destinationPath, ResponseOrRequest input, optional WritePathResponseOptions options)` (Bun 1.4.4 type declarations) -/
-def writePathResponse (destinationPath : PathLike) (input : ResponseOrRequest) (options : Option WritePathResponseOptions := none) : Async Float :=
+@[macro_inline] def writePathResponse (destinationPath : PathLike) (input : ResponseOrRequest) (options : Option WritePathResponseOptions := none) : Async Float := Internal.api "Lasm.JS.Bun.writePathResponse" do
   Lasm.JS.Binding.invokeAsync Float { name := "Lasm.JS.Bun.writePathResponse", module := "globalThis", path := "Bun.write", construct := false, arity := 3 }
-    (Support.args #[toJS destinationPath, toJS input, Support.optional options])
+    (Internal.args #[toJS destinationPath, toJS input, Internal.optional options])
 
 /-- `Bun.write(destination: BunFile, input: BunFile, options?: { mode?: number; createPath?: boolean; }): Promise<number>`: `Promise<double> write(BunFile destination, BunFile input, optional WriteFileOptions options)` (Bun 1.4.4 type declarations) -/
-def writeFile (destination : BunFile) (input : BunFile) (options : Option WriteFileOptions := none) : Async Float :=
+@[macro_inline] def writeFile (destination : BunFile) (input : BunFile) (options : Option WriteFileOptions := none) : Async Float := Internal.api "Lasm.JS.Bun.writeFile" do
   Lasm.JS.Binding.invokeAsync Float { name := "Lasm.JS.Bun.writeFile", module := "globalThis", path := "Bun.write", construct := false, arity := 3 }
-    (Support.args #[toJS destination, toJS input, Support.optional options])
+    (Internal.args #[toJS destination, toJS input, Internal.optional options])
 
 /-- `Bun.write(destinationPath: PathLike, input: BunFile, options?: { mode?: number; createPath?: boolean; }): Promise<number>`: `Promise<double> write(PathLike destinationPath, BunFile input, optional WritePathFileOptions options)` (Bun 1.4.4 type declarations) -/
-def writePathFile (destinationPath : PathLike) (input : BunFile) (options : Option WritePathFileOptions := none) : Async Float :=
+@[macro_inline] def writePathFile (destinationPath : PathLike) (input : BunFile) (options : Option WritePathFileOptions := none) : Async Float := Internal.api "Lasm.JS.Bun.writePathFile" do
   Lasm.JS.Binding.invokeAsync Float { name := "Lasm.JS.Bun.writePathFile", module := "globalThis", path := "Bun.write", construct := false, arity := 3 }
-    (Support.args #[toJS destinationPath, toJS input, Support.optional options])
+    (Internal.args #[toJS destinationPath, toJS input, Internal.optional options])
 
 /-- `Bun.concatArrayBuffers(buffers: Array<ArrayBufferView | ArrayBufferLike>, maxLength?: number): ArrayBuffer`: `ArrayBuffer concatArrayBuffers(sequence<Uint8Array> buffers, optional double maxLength)` (Bun 1.4.4 type declarations) -/
-def concatArrayBuffers (buffers : Array ByteArray) (maxLength : Option Float := none) : IO ByteArray := do
+@[macro_inline] def concatArrayBuffers (buffers : Array ByteArray) (maxLength : Option Float := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.concatArrayBuffers" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Bun.concatArrayBuffers", module := "globalThis", path := "Bun.concatArrayBuffers", construct := false, arity := 2 }
-    (Support.args #[toJS buffers, Support.optional maxLength]) (await := false)
-  Support.arrayBufferBytes r
+    (Internal.args #[toJS buffers, Internal.optional maxLength]) (await := false)
+  Internal.arrayBufferBytes r
 
 /-- `Bun.concatArrayBuffers(buffers: Array<ArrayBufferView | ArrayBufferLike>, maxLength: number, asUint8Array: false): ArrayBuffer`: `ArrayBuffer concatArrayBuffers(sequence<Uint8Array> buffers, double maxLength, boolean asUint8Array)` (Bun 1.4.4 type declarations) -/
-def concatArrayBuffersToArrayBuffer (buffers : Array ByteArray) (maxLength : Float) (asUint8Array : Bool) : IO ByteArray := do
+@[macro_inline] def concatArrayBuffersToArrayBuffer (buffers : Array ByteArray) (maxLength : Float) (asUint8Array : Bool) : IO ByteArray := Internal.api "Lasm.JS.Bun.concatArrayBuffersToArrayBuffer" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Bun.concatArrayBuffersToArrayBuffer", module := "globalThis", path := "Bun.concatArrayBuffers", construct := false, arity := 3 }
-    (Support.args #[toJS buffers, toJS maxLength, toJS asUint8Array]) (await := false)
-  Support.arrayBufferBytes r
+    (Internal.args #[toJS buffers, toJS maxLength, toJS asUint8Array]) (await := false)
+  Internal.arrayBufferBytes r
 
 /-- `Bun.concatArrayBuffers(buffers: Array<ArrayBufferView | ArrayBufferLike>, maxLength: number, asUint8Array: true): Uint8Array<ArrayBuffer>`: `Uint8Array concatArrayBuffers(sequence<Uint8Array> buffers, double maxLength, boolean asUint8Array)` (Bun 1.4.4 type declarations) -/
-def concatArrayBuffersToUint8Array (buffers : Array ByteArray) (maxLength : Float) (asUint8Array : Bool) : IO ByteArray :=
+@[macro_inline] def concatArrayBuffersToUint8Array (buffers : Array ByteArray) (maxLength : Float) (asUint8Array : Bool) : IO ByteArray := Internal.api "Lasm.JS.Bun.concatArrayBuffersToUint8Array" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Bun.concatArrayBuffersToUint8Array", module := "globalThis", path := "Bun.concatArrayBuffers", construct := false, arity := 3 }
-    (Support.args #[toJS buffers, toJS maxLength, toJS asUint8Array]) (await := false)
+    (Internal.args #[toJS buffers, toJS maxLength, toJS asUint8Array]) (await := false)
 
 /-- `Bun.readableStreamToArrayBuffer(stream: ReadableStream<ArrayBufferView | ArrayBufferLike>): Promise<ArrayBuffer> | ArrayBuffer`: `Promise<ArrayBuffer> readableStreamToArrayBuffer(ReadableStream stream)` (Bun 1.4.4 type declarations) -/
-def readableStreamToArrayBuffer (stream : ReadableStream) : Async ByteArray := do
+@[macro_inline] def readableStreamToArrayBuffer (stream : ReadableStream) : Async ByteArray := Internal.api "Lasm.JS.Bun.readableStreamToArrayBuffer" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Bun.readableStreamToArrayBuffer", module := "globalThis", path := "Bun.readableStreamToArrayBuffer", construct := false, arity := 1 }
-    (Support.args #[toJS stream])
-  Support.arrayBufferBytes r
+    (Internal.args #[toJS stream])
+  Internal.arrayBufferBytes r
 
 /-- `Bun.readableStreamToFormData(stream: ReadableStream<string | NodeJS.TypedArray | ArrayBufferView>, multipartBoundaryExcludingDashes?: string | NodeJS.TypedArray | ArrayBufferView): Promise<FormData>`: `Promise<FormData> readableStreamToFormData(ReadableStream stream, optional DOMStringOrUint8Array multipartBoundaryExcludingDashes)` (Bun 1.4.4 type declarations) -/
-def readableStreamToFormData (stream : ReadableStream) (multipartBoundaryExcludingDashes : Option DOMStringOrUint8Array := none) : Async FormData := do
+@[macro_inline] def readableStreamToFormData (stream : ReadableStream) (multipartBoundaryExcludingDashes : Option DOMStringOrUint8Array := none) : Async FormData := Internal.api "Lasm.JS.Bun.readableStreamToFormData" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Bun.readableStreamToFormData", module := "globalThis", path := "Bun.readableStreamToFormData", construct := false, arity := 2 }
-    (Support.args #[toJS stream, Support.optional multipartBoundaryExcludingDashes])
+    (Internal.args #[toJS stream, Internal.optional multipartBoundaryExcludingDashes])
   pure { val := r }
 
 /-- `Bun.readableStreamToArray<T>(stream: ReadableStream<T>): Promise<T[]> | T[]`: `Promise<sequence<any>> readableStreamToArray(ReadableStream stream)` (Bun 1.4.4 type declarations) -/
-def readableStreamToArray (stream : ReadableStream) : Async (Array Data) :=
+@[macro_inline] def readableStreamToArray (stream : ReadableStream) : Async (Array Data) := Internal.api "Lasm.JS.Bun.readableStreamToArray" do
   Lasm.JS.Binding.invokeAsync (Array Data) { name := "Lasm.JS.Bun.readableStreamToArray", module := "globalThis", path := "Bun.readableStreamToArray", construct := false, arity := 1 }
-    (Support.args #[toJS stream])
+    (Internal.args #[toJS stream])
 
 /-- `Bun.escapeHTML(input: string | object | number | boolean): string`: `DOMString escapeHTML(any input)` (Bun 1.4.4 type declarations) -/
-def escapeHTML (input : Data) : IO String :=
+@[macro_inline] def escapeHTML (input : Data) : IO String := Internal.api "Lasm.JS.Bun.escapeHTML" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.escapeHTML", module := "globalThis", path := "Bun.escapeHTML", construct := false, arity := 1 }
-    (Support.args #[toJS input]) (await := false)
+    (Internal.args #[toJS input]) (await := false)
 
 /-- `Bun.pathToFileURL(path: string): URL`: `URL pathToFileURL(DOMString path)` (Bun 1.4.4 type declarations) -/
-def pathToFileURL (path : String) : IO URL := do
+@[macro_inline] def pathToFileURL (path : String) : IO URL := Internal.api "Lasm.JS.Bun.pathToFileURL" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Bun.pathToFileURL", module := "globalThis", path := "Bun.pathToFileURL", construct := false, arity := 1 }
-    (Support.args #[toJS path]) (await := false)
+    (Internal.args #[toJS path]) (await := false)
   pure { val := r }
 
 /-- `Bun.peek<T = undefined>(promise: T | Promise<T>): Promise<T> | T`: `Promise<undefined?> peek(Promise<undefined?> promise)` (Bun 1.4.4 type declarations) -/
-def peek (promise : Value) : Async (Option Unit) :=
+@[macro_inline] def peek (promise : Value) : Async (Option Unit) := Internal.api "Lasm.JS.Bun.peek" do
   Lasm.JS.Binding.invokeAsync (Option Unit) { name := "Lasm.JS.Bun.peek", module := "globalThis", path := "Bun.peek", construct := false, arity := 1 }
-    (Support.args #[toJS promise])
+    (Internal.args #[toJS promise])
 
 /-- `Bun.fileURLToPath(url: URL | string): string`: `DOMString fileURLToPath(URLOrDOMString url)` (Bun 1.4.4 type declarations) -/
-def fileURLToPath (url : URLOrDOMString) : IO String :=
+@[macro_inline] def fileURLToPath (url : URLOrDOMString) : IO String := Internal.api "Lasm.JS.Bun.fileURLToPath" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.fileURLToPath", module := "globalThis", path := "Bun.fileURLToPath", construct := false, arity := 1 }
-    (Support.args #[toJS url]) (await := false)
+    (Internal.args #[toJS url]) (await := false)
 
 /-- `Bun.deepEquals(a: any, b: any, strict?: boolean): boolean`: `boolean deepEquals(any a, any b, optional boolean strict)` (Bun 1.4.4 type declarations) -/
-def deepEquals (a : Data) (b : Data) (strict : Option Bool := none) : IO Bool :=
+@[macro_inline] def deepEquals (a : Data) (b : Data) (strict : Option Bool := none) : IO Bool := Internal.api "Lasm.JS.Bun.deepEquals" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Bun.deepEquals", module := "globalThis", path := "Bun.deepEquals", construct := false, arity := 3 }
-    (Support.args #[toJS a, toJS b, Support.optional strict]) (await := false)
+    (Internal.args #[toJS a, toJS b, Internal.optional strict]) (await := false)
 
 /-- `Bun.deepMatch(subset: unknown, a: unknown): boolean`: `boolean deepMatch(any subset, any a)` (Bun 1.4.4 type declarations) -/
-def deepMatch (subset : Data) (a : Data) : IO Bool :=
+@[macro_inline] def deepMatch (subset : Data) (a : Data) : IO Bool := Internal.api "Lasm.JS.Bun.deepMatch" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Bun.deepMatch", module := "globalThis", path := "Bun.deepMatch", construct := false, arity := 2 }
-    (Support.args #[toJS subset, toJS a]) (await := false)
+    (Internal.args #[toJS subset, toJS a]) (await := false)
 
 /-- `Bun.file(path: string | URL, options?: BlobPropertyBag): BunFile`: `BunFile file(DOMStringOrURL path, optional BlobPropertyBag options)` (Bun 1.4.4 type declarations) -/
-def file (path : DOMStringOrURL) (options : Option BlobPropertyBag := none) : IO BunFile := do
+@[macro_inline] def file (path : DOMStringOrURL) (options : Option BlobPropertyBag := none) : IO BunFile := Internal.api "Lasm.JS.Bun.file" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Bun.file", module := "globalThis", path := "Bun.file", construct := false, arity := 2 }
-    (Support.args #[toJS path, Support.optional options]) (await := false)
+    (Internal.args #[toJS path, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `Bun.file(path: ArrayBufferLike | Uint8Array<ArrayBuffer>, options?: BlobPropertyBag): BunFile`: `BunFile file(Uint8Array path, optional BlobPropertyBag options)` (Bun 1.4.4 type declarations) -/
-def fileWithArrayBufferLikeUint8Array (path : ByteArray) (options : Option BlobPropertyBag := none) : IO BunFile := do
+@[macro_inline] def fileWithArrayBufferLikeUint8Array (path : ByteArray) (options : Option BlobPropertyBag := none) : IO BunFile := Internal.api "Lasm.JS.Bun.fileWithArrayBufferLikeUint8Array" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Bun.fileWithArrayBufferLikeUint8Array", module := "globalThis", path := "Bun.file", construct := false, arity := 2 }
-    (Support.args #[toJS path, Support.optional options]) (await := false)
+    (Internal.args #[toJS path, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `Bun.file(fileDescriptor: number, options?: BlobPropertyBag): BunFile`: `BunFile file(double fileDescriptor, optional BlobPropertyBag options)` (Bun 1.4.4 type declarations) -/
-def fileWithFileDescriptor (fileDescriptor : Float) (options : Option BlobPropertyBag := none) : IO BunFile := do
+@[macro_inline] def fileWithFileDescriptor (fileDescriptor : Float) (options : Option BlobPropertyBag := none) : IO BunFile := Internal.api "Lasm.JS.Bun.fileWithFileDescriptor" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Bun.fileWithFileDescriptor", module := "globalThis", path := "Bun.file", construct := false, arity := 2 }
-    (Support.args #[toJS fileDescriptor, Support.optional options]) (await := false)
+    (Internal.args #[toJS fileDescriptor, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `Bun.allocUnsafe(size: number): Uint8Array<ArrayBuffer>`: `Uint8Array allocUnsafe(double /* integer: Nat */ size)` (Bun 1.4.4 type declarations) -/
-def allocUnsafe (size : Nat) : IO ByteArray :=
+@[macro_inline] def allocUnsafe (size : Nat) : IO ByteArray := Internal.api "Lasm.JS.Bun.allocUnsafe" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Bun.allocUnsafe", module := "globalThis", path := "Bun.allocUnsafe", construct := false, arity := 1 }
-    (Support.args #[toJS size]) (await := false)
+    (Internal.args #[toJS size]) (await := false)
 
 /-- `Bun.inspect(arg: any, options?: BunInspectOptions): string`: `DOMString inspect(any arg, optional BunInspectOptions options)` (Bun 1.4.4 type declarations) -/
-def inspect (arg : Data) (options : Option BunInspectOptions := none) : IO String :=
+@[macro_inline] def inspect (arg : Data) (options : Option BunInspectOptions := none) : IO String := Internal.api "Lasm.JS.Bun.inspect" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.inspect", module := "globalThis", path := "Bun.inspect", construct := false, arity := 2 }
-    (Support.args #[toJS arg, Support.optional options]) (await := false)
+    (Internal.args #[toJS arg, Internal.optional options]) (await := false)
 
 /-- `Bun.mmap(path: string, opts?: MMapOptions): Uint8Array<ArrayBuffer>`: `Uint8Array mmap(DOMString path, optional MMapOptions opts)` (Bun 1.4.4 type declarations) -/
-def mmap (path : String) (opts : Option MMapOptions := none) : IO ByteArray :=
+@[macro_inline] def mmap (path : String) (opts : Option MMapOptions := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.mmap" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Bun.mmap", module := "globalThis", path := "Bun.mmap", construct := false, arity := 2 }
-    (Support.args #[toJS path, Support.optional opts]) (await := false)
+    (Internal.args #[toJS path, Internal.optional opts]) (await := false)
 
 /-- `Bun.color(input: ColorInput, outputFormat?: | 'ansi' | 'ansi-16' | 'ansi-16m' | 'ansi-256' | 'css' | 'hex' | 'HEX' | 'hsl' | 'lab' | 'number' | 'rgb' | 'rgba'): string | null`: `DOMString? color(any input, optional ColorOutputFormat outputFormat)` (Bun 1.4.4 type declarations) -/
-def color (input : Data) (outputFormat : Option ColorOutputFormat := none) : IO (Option String) :=
+@[macro_inline] def color (input : Data) (outputFormat : Option ColorOutputFormat := none) : IO (Option String) := Internal.api "Lasm.JS.Bun.color" do
   Lasm.JS.Binding.invoke (Option String) { name := "Lasm.JS.Bun.color", module := "globalThis", path := "Bun.color", construct := false, arity := 2 }
-    (Support.args #[toJS input, Support.optional outputFormat]) (await := false)
+    (Internal.args #[toJS input, Internal.optional outputFormat]) (await := false)
 
 /-- `Bun.color(input: ColorInput, outputFormat: '[rgb]'): [number, number, number] | null`: `sequence<double>? color(any input, ColorRgbOutputFormat outputFormat)` (Bun 1.4.4 type declarations) -/
-def colorRgb (input : Data) (outputFormat : ColorRgbOutputFormat) : IO (Option (Array Float)) :=
+@[macro_inline] def colorRgb (input : Data) (outputFormat : ColorRgbOutputFormat) : IO (Option (Array Float)) := Internal.api "Lasm.JS.Bun.colorRgb" do
   Lasm.JS.Binding.invoke (Option (Array Float)) { name := "Lasm.JS.Bun.colorRgb", module := "globalThis", path := "Bun.color", construct := false, arity := 2 }
-    (Support.args #[toJS input, toJS outputFormat]) (await := false)
+    (Internal.args #[toJS input, toJS outputFormat]) (await := false)
 
 /-- `Bun.color(input: ColorInput, outputFormat: '[rgba]'): [number, number, number, number] | null`: `sequence<double>? color(any input, ColorRgbaOutputFormat outputFormat)` (Bun 1.4.4 type declarations) -/
-def colorRgba (input : Data) (outputFormat : ColorRgbaOutputFormat) : IO (Option (Array Float)) :=
+@[macro_inline] def colorRgba (input : Data) (outputFormat : ColorRgbaOutputFormat) : IO (Option (Array Float)) := Internal.api "Lasm.JS.Bun.colorRgba" do
   Lasm.JS.Binding.invoke (Option (Array Float)) { name := "Lasm.JS.Bun.colorRgba", module := "globalThis", path := "Bun.color", construct := false, arity := 2 }
-    (Support.args #[toJS input, toJS outputFormat]) (await := false)
+    (Internal.args #[toJS input, toJS outputFormat]) (await := false)
 
 /-- `Bun.color(input: ColorInput, outputFormat: '{rgb}'): { r: number; g: number; b: number } | null`: `ColorWithRgbResult? color(any input, ColorWithRgbOutputFormat outputFormat)` (Bun 1.4.4 type declarations) -/
-def colorWithRgb (input : Data) (outputFormat : ColorWithRgbOutputFormat) : IO (Option ColorWithRgbResult) :=
+@[macro_inline] def colorWithRgb (input : Data) (outputFormat : ColorWithRgbOutputFormat) : IO (Option ColorWithRgbResult) := Internal.api "Lasm.JS.Bun.colorWithRgb" do
   Lasm.JS.Binding.invoke (Option ColorWithRgbResult) { name := "Lasm.JS.Bun.colorWithRgb", module := "globalThis", path := "Bun.color", construct := false, arity := 2 }
-    (Support.args #[toJS input, toJS outputFormat]) (await := false)
+    (Internal.args #[toJS input, toJS outputFormat]) (await := false)
 
 /-- `Bun.color(input: ColorInput, outputFormat: '{rgba}'): { r: number; g: number; b: number; a: number } | null`: `ColorWithRgbaResult? color(any input, ColorWithRgbaOutputFormat outputFormat)` (Bun 1.4.4 type declarations) -/
-def colorWithRgba (input : Data) (outputFormat : ColorWithRgbaOutputFormat) : IO (Option ColorWithRgbaResult) :=
+@[macro_inline] def colorWithRgba (input : Data) (outputFormat : ColorWithRgbaOutputFormat) : IO (Option ColorWithRgbaResult) := Internal.api "Lasm.JS.Bun.colorWithRgba" do
   Lasm.JS.Binding.invoke (Option ColorWithRgbaResult) { name := "Lasm.JS.Bun.colorWithRgba", module := "globalThis", path := "Bun.color", construct := false, arity := 2 }
-    (Support.args #[toJS input, toJS outputFormat]) (await := false)
+    (Internal.args #[toJS input, toJS outputFormat]) (await := false)
 
 /-- `Bun.color(input: ColorInput, outputFormat: 'number'): number | null`: `double? color(any input, ColorWithNumberOutputFormat outputFormat)` (Bun 1.4.4 type declarations) -/
-def colorWithNumber (input : Data) (outputFormat : ColorWithNumberOutputFormat) : IO (Option Float) :=
+@[macro_inline] def colorWithNumber (input : Data) (outputFormat : ColorWithNumberOutputFormat) : IO (Option Float) := Internal.api "Lasm.JS.Bun.colorWithNumber" do
   Lasm.JS.Binding.invoke (Option Float) { name := "Lasm.JS.Bun.colorWithNumber", module := "globalThis", path := "Bun.color", construct := false, arity := 2 }
-    (Support.args #[toJS input, toJS outputFormat]) (await := false)
+    (Internal.args #[toJS input, toJS outputFormat]) (await := false)
 
 /-- `Bun.gc(force?: boolean): void`: `undefined gc(optional boolean force)` (Bun 1.4.4 type declarations) -/
-def gc (force : Option Bool := none) : IO Unit :=
+@[macro_inline] def gc (force : Option Bool := none) : IO Unit := Internal.api "Lasm.JS.Bun.gc" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Bun.gc", module := "globalThis", path := "Bun.gc", construct := false, arity := 1 }
-    (Support.args #[Support.optional force]) (await := false)
+    (Internal.args #[Internal.optional force]) (await := false)
 
 /-- `Bun.nanoseconds(): number`: `double nanoseconds()` (Bun 1.4.4 type declarations) -/
-def nanoseconds : IO Float :=
+@[macro_inline] def nanoseconds : IO Float := Internal.api "Lasm.JS.Bun.nanoseconds" do
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Bun.nanoseconds", module := "globalThis", path := "Bun.nanoseconds", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `Bun.generateHeapSnapshot(format?: 'jsc'): HeapSnapshot`: `HeapSnapshot generateHeapSnapshot(optional GenerateHeapSnapshotFormat format)` (Bun 1.4.4 type declarations) -/
-def generateHeapSnapshot (format : Option GenerateHeapSnapshotFormat := none) : IO HeapSnapshot :=
+@[macro_inline] def generateHeapSnapshot (format : Option GenerateHeapSnapshotFormat := none) : IO HeapSnapshot := Internal.api "Lasm.JS.Bun.generateHeapSnapshot" do
   Lasm.JS.Binding.invoke HeapSnapshot { name := "Lasm.JS.Bun.generateHeapSnapshot", module := "globalThis", path := "Bun.generateHeapSnapshot", construct := false, arity := 1 }
-    (Support.args #[Support.optional format]) (await := false)
+    (Internal.args #[Internal.optional format]) (await := false)
 
 /-- `Bun.generateHeapSnapshot(format: 'v8'): string`: `DOMString generateHeapSnapshot(GenerateHeapSnapshotWithV8Format format)` (Bun 1.4.4 type declarations) -/
-def generateHeapSnapshotWithV8 (format : GenerateHeapSnapshotWithV8Format) : IO String :=
+@[macro_inline] def generateHeapSnapshotWithV8 (format : GenerateHeapSnapshotWithV8Format) : IO String := Internal.api "Lasm.JS.Bun.generateHeapSnapshotWithV8" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.generateHeapSnapshotWithV8", module := "globalThis", path := "Bun.generateHeapSnapshot", construct := false, arity := 1 }
-    (Support.args #[toJS format]) (await := false)
+    (Internal.args #[toJS format]) (await := false)
 
 /-- `Bun.generateHeapSnapshot(format: 'v8', encoding: 'arraybuffer'): ArrayBuffer`: `ArrayBuffer generateHeapSnapshot(GenerateHeapSnapshotWithEncodingFormat format, GenerateHeapSnapshotWithEncodingEncoding encoding)` (Bun 1.4.4 type declarations) -/
-def generateHeapSnapshotWithEncoding (format : GenerateHeapSnapshotWithEncodingFormat) (encoding : GenerateHeapSnapshotWithEncodingEncoding) : IO ByteArray := do
+@[macro_inline] def generateHeapSnapshotWithEncoding (format : GenerateHeapSnapshotWithEncodingFormat) (encoding : GenerateHeapSnapshotWithEncodingEncoding) : IO ByteArray := Internal.api "Lasm.JS.Bun.generateHeapSnapshotWithEncoding" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Bun.generateHeapSnapshotWithEncoding", module := "globalThis", path := "Bun.generateHeapSnapshot", construct := false, arity := 2 }
-    (Support.args #[toJS format, toJS encoding]) (await := false)
-  Support.arrayBufferBytes r
+    (Internal.args #[toJS format, toJS encoding]) (await := false)
+  Internal.arrayBufferBytes r
 
 /-- `Bun.openInEditor(path: string, options?: EditorOptions): void`: `undefined openInEditor(DOMString path, optional EditorOptions options)` (Bun 1.4.4 type declarations) -/
-def openInEditor (path : String) (options : Option EditorOptions := none) : IO Unit :=
+@[macro_inline] def openInEditor (path : String) (options : Option EditorOptions := none) : IO Unit := Internal.api "Lasm.JS.Bun.openInEditor" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Bun.openInEditor", module := "globalThis", path := "Bun.openInEditor", construct := false, arity := 2 }
-    (Support.args #[toJS path, Support.optional options]) (await := false)
+    (Internal.args #[toJS path, Internal.optional options]) (await := false)
 
 /-- `Bun.sleep(ms: number | Date): Promise<void>`: `Promise<undefined> sleep(any ms)` (Bun 1.4.4 type declarations) -/
-def sleep (ms : Data) : Async Unit :=
+@[macro_inline] def sleep (ms : Data) : Async Unit := Internal.api "Lasm.JS.Bun.sleep" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Bun.sleep", module := "globalThis", path := "Bun.sleep", construct := false, arity := 1 }
-    (Support.args #[toJS ms])
+    (Internal.args #[toJS ms])
 
 /-- `Bun.sleepSync(ms: number): void`: `undefined sleepSync(double ms)` (Bun 1.4.4 type declarations) -/
-def sleepSync (ms : Float) : IO Unit :=
+@[macro_inline] def sleepSync (ms : Float) : IO Unit := Internal.api "Lasm.JS.Bun.sleepSync" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Bun.sleepSync", module := "globalThis", path := "Bun.sleepSync", construct := false, arity := 1 }
-    (Support.args #[toJS ms]) (await := false)
+    (Internal.args #[toJS ms]) (await := false)
 
 /-- `Bun.sha(input: Bun.StringOrBuffer, hashInto?: NodeJS.TypedArray): NodeJS.TypedArray`: `Uint8Array sha(StringOrBuffer input, optional Uint8Array hashInto)` (Bun 1.4.4 type declarations) -/
-def sha (input : StringOrBuffer) (hashInto : Option ByteArray := none) : IO ByteArray :=
+@[macro_inline] def sha (input : StringOrBuffer) (hashInto : Option ByteArray := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.sha" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Bun.sha", module := "globalThis", path := "Bun.sha", construct := false, arity := 2 }
-    (Support.args #[toJS input, Support.optional hashInto]) (await := false)
+    (Internal.args #[toJS input, Internal.optional hashInto]) (await := false)
 
 /-- `Bun.sha(input: Bun.StringOrBuffer, encoding: DigestEncoding): string`: `DOMString sha(StringOrBuffer input, DigestEncoding encoding)` (Bun 1.4.4 type declarations) -/
-def shaWithEncoding (input : StringOrBuffer) (encoding : DigestEncoding) : IO String :=
+@[macro_inline] def shaWithEncoding (input : StringOrBuffer) (encoding : DigestEncoding) : IO String := Internal.api "Lasm.JS.Bun.shaWithEncoding" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.shaWithEncoding", module := "globalThis", path := "Bun.sha", construct := false, arity := 2 }
-    (Support.args #[toJS input, toJS encoding]) (await := false)
+    (Internal.args #[toJS input, toJS encoding]) (await := false)
 
 /-- `Bun.deflateSync(data: Uint8Array<ArrayBuffer> | string | ArrayBuffer, options?: ZlibCompressionOptions | LibdeflateCompressionOptions): Uint8Array<ArrayBuffer>`: `Uint8Array deflateSync(Uint8ArrayOrDOMStringOrArrayBuffer data, optional DeflateSyncOptions options)` (Bun 1.4.4 type declarations) -/
-def deflateSync (data : Uint8ArrayOrDOMStringOrArrayBuffer) (options : Option DeflateSyncOptions := none) : IO ByteArray :=
+@[macro_inline] def deflateSync (data : Uint8ArrayOrDOMStringOrArrayBuffer) (options : Option DeflateSyncOptions := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.deflateSync" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Bun.deflateSync", module := "globalThis", path := "Bun.deflateSync", construct := false, arity := 2 }
-    (Support.args #[toJS data, Support.optional options]) (await := false)
+    (Internal.args #[toJS data, Internal.optional options]) (await := false)
 
 /-- `Bun.gzipSync(data: Uint8Array<ArrayBuffer> | string | ArrayBuffer, options?: ZlibCompressionOptions | LibdeflateCompressionOptions): Uint8Array<ArrayBuffer>`: `Uint8Array gzipSync(Uint8ArrayOrDOMStringOrArrayBuffer data, optional GzipSyncOptions options)` (Bun 1.4.4 type declarations) -/
-def gzipSync (data : Uint8ArrayOrDOMStringOrArrayBuffer) (options : Option GzipSyncOptions := none) : IO ByteArray :=
+@[macro_inline] def gzipSync (data : Uint8ArrayOrDOMStringOrArrayBuffer) (options : Option GzipSyncOptions := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.gzipSync" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Bun.gzipSync", module := "globalThis", path := "Bun.gzipSync", construct := false, arity := 2 }
-    (Support.args #[toJS data, Support.optional options]) (await := false)
+    (Internal.args #[toJS data, Internal.optional options]) (await := false)
 
 /-- `Bun.inflateSync(data: Uint8Array<ArrayBuffer> | string | ArrayBuffer, options?: ZlibCompressionOptions | LibdeflateCompressionOptions): Uint8Array<ArrayBuffer>`: `Uint8Array inflateSync(Uint8ArrayOrDOMStringOrArrayBuffer data, optional InflateSyncOptions options)` (Bun 1.4.4 type declarations) -/
-def inflateSync (data : Uint8ArrayOrDOMStringOrArrayBuffer) (options : Option InflateSyncOptions := none) : IO ByteArray :=
+@[macro_inline] def inflateSync (data : Uint8ArrayOrDOMStringOrArrayBuffer) (options : Option InflateSyncOptions := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.inflateSync" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Bun.inflateSync", module := "globalThis", path := "Bun.inflateSync", construct := false, arity := 2 }
-    (Support.args #[toJS data, Support.optional options]) (await := false)
+    (Internal.args #[toJS data, Internal.optional options]) (await := false)
 
 /-- `Bun.gunzipSync(data: Uint8Array<ArrayBuffer> | string | ArrayBuffer, options?: ZlibCompressionOptions | LibdeflateCompressionOptions): Uint8Array<ArrayBuffer>`: `Uint8Array gunzipSync(Uint8ArrayOrDOMStringOrArrayBuffer data, optional GunzipSyncOptions options)` (Bun 1.4.4 type declarations) -/
-def gunzipSync (data : Uint8ArrayOrDOMStringOrArrayBuffer) (options : Option GunzipSyncOptions := none) : IO ByteArray :=
+@[macro_inline] def gunzipSync (data : Uint8ArrayOrDOMStringOrArrayBuffer) (options : Option GunzipSyncOptions := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.gunzipSync" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Bun.gunzipSync", module := "globalThis", path := "Bun.gunzipSync", construct := false, arity := 2 }
-    (Support.args #[toJS data, Support.optional options]) (await := false)
+    (Internal.args #[toJS data, Internal.optional options]) (await := false)
 
 /-- `Bun.zstdCompressSync(data: NodeJS.TypedArray | Buffer | string | ArrayBuffer, options?: { level?: number }): Buffer`: `Uint8Array zstdCompressSync(Uint8ArrayOrDOMStringOrArrayBuffer data, optional ZstdCompressSyncOptions options)` (Bun 1.4.4 type declarations) -/
-def zstdCompressSync (data : Uint8ArrayOrDOMStringOrArrayBuffer) (options : Option ZstdCompressSyncOptions := none) : IO ByteArray :=
+@[macro_inline] def zstdCompressSync (data : Uint8ArrayOrDOMStringOrArrayBuffer) (options : Option ZstdCompressSyncOptions := none) : IO ByteArray := Internal.api "Lasm.JS.Bun.zstdCompressSync" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Bun.zstdCompressSync", module := "globalThis", path := "Bun.zstdCompressSync", construct := false, arity := 2 }
-    (Support.args #[toJS data, Support.optional options]) (await := false)
+    (Internal.args #[toJS data, Internal.optional options]) (await := false)
 
 /-- `Bun.zstdCompress(data: NodeJS.TypedArray | Buffer | string | ArrayBuffer, options?: { level?: number }): Promise<Buffer>`: `Promise<Uint8Array> zstdCompress(Uint8ArrayOrDOMStringOrArrayBuffer data, optional ZstdCompressOptions options)` (Bun 1.4.4 type declarations) -/
-def zstdCompress (data : Uint8ArrayOrDOMStringOrArrayBuffer) (options : Option ZstdCompressOptions := none) : Async ByteArray :=
+@[macro_inline] def zstdCompress (data : Uint8ArrayOrDOMStringOrArrayBuffer) (options : Option ZstdCompressOptions := none) : Async ByteArray := Internal.api "Lasm.JS.Bun.zstdCompress" do
   Lasm.JS.Binding.invokeAsync ByteArray { name := "Lasm.JS.Bun.zstdCompress", module := "globalThis", path := "Bun.zstdCompress", construct := false, arity := 2 }
-    (Support.args #[toJS data, Support.optional options])
+    (Internal.args #[toJS data, Internal.optional options])
 
 /-- `Bun.zstdDecompressSync(data: NodeJS.TypedArray | Buffer | string | ArrayBuffer): Buffer`: `Uint8Array zstdDecompressSync(Uint8ArrayOrDOMStringOrArrayBuffer data)` (Bun 1.4.4 type declarations) -/
-def zstdDecompressSync (data : Uint8ArrayOrDOMStringOrArrayBuffer) : IO ByteArray :=
+@[macro_inline] def zstdDecompressSync (data : Uint8ArrayOrDOMStringOrArrayBuffer) : IO ByteArray := Internal.api "Lasm.JS.Bun.zstdDecompressSync" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Bun.zstdDecompressSync", module := "globalThis", path := "Bun.zstdDecompressSync", construct := false, arity := 1 }
-    (Support.args #[toJS data]) (await := false)
+    (Internal.args #[toJS data]) (await := false)
 
 /-- `Bun.zstdDecompress(data: NodeJS.TypedArray | Buffer | string | ArrayBuffer): Promise<Buffer>`: `Promise<Uint8Array> zstdDecompress(Uint8ArrayOrDOMStringOrArrayBuffer data)` (Bun 1.4.4 type declarations) -/
-def zstdDecompress (data : Uint8ArrayOrDOMStringOrArrayBuffer) : Async ByteArray :=
+@[macro_inline] def zstdDecompress (data : Uint8ArrayOrDOMStringOrArrayBuffer) : Async ByteArray := Internal.api "Lasm.JS.Bun.zstdDecompress" do
   Lasm.JS.Binding.invokeAsync ByteArray { name := "Lasm.JS.Bun.zstdDecompress", module := "globalThis", path := "Bun.zstdDecompress", construct := false, arity := 1 }
-    (Support.args #[toJS data])
+    (Internal.args #[toJS data])
 
 /-- `Bun.connect<Data = undefined>(options: TCPSocketConnectOptions<Data>): Promise<Socket<Data>>`: `Promise<Socket> connect(TCPSocketConnectOptions options)` (Bun 1.4.4 type declarations) -/
-def connect (options : TCPSocketConnectOptions) : Async Socket := do
+@[macro_inline] def connect (options : TCPSocketConnectOptions) : Async Socket := Internal.api "Lasm.JS.Bun.connect" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Bun.connect", module := "globalThis", path := "Bun.connect", construct := false, arity := 1 }
-    (Support.args #[toJS options])
+    (Internal.args #[toJS options])
   pure { val := r }
 
 /-- `Bun.connect<Data = undefined>(options: UnixSocketOptions<Data>): Promise<Socket<Data>>`: `Promise<Socket> connect(UnixSocketOptions options)` (Bun 1.4.4 type declarations) -/
-def connectWithUnixSocketOptions (options : UnixSocketOptions) : Async Socket := do
+@[macro_inline] def connectWithUnixSocketOptions (options : UnixSocketOptions) : Async Socket := Internal.api "Lasm.JS.Bun.connectWithUnixSocketOptions" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Bun.connectWithUnixSocketOptions", module := "globalThis", path := "Bun.connect", construct := false, arity := 1 }
-    (Support.args #[toJS options])
+    (Internal.args #[toJS options])
   pure { val := r }
 
 /-- `Bun.listen<Data = undefined>(options: TCPSocketListenOptions<Data>): TCPSocketListener<Data>`: `TCPSocketListener listen(TCPSocketListenOptions options)` (Bun 1.4.4 type declarations) -/
-def listen (options : TCPSocketListenOptions) : IO TCPSocketListener := do
+@[macro_inline] def listen (options : TCPSocketListenOptions) : IO TCPSocketListener := Internal.api "Lasm.JS.Bun.listen" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Bun.listen", module := "globalThis", path := "Bun.listen", construct := false, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
   pure { val := r }
 
 /-- `Bun.listen<Data = undefined>(options: UnixSocketOptions<Data>): UnixSocketListener<Data>`: `UnixSocketListener listen(UnixSocketOptions options)` (Bun 1.4.4 type declarations) -/
-def listenWithUnixSocketOptions (options : UnixSocketOptions) : IO UnixSocketListener := do
+@[macro_inline] def listenWithUnixSocketOptions (options : UnixSocketOptions) : IO UnixSocketListener := Internal.api "Lasm.JS.Bun.listenWithUnixSocketOptions" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Bun.listenWithUnixSocketOptions", module := "globalThis", path := "Bun.listen", construct := false, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
   pure { val := r }
 
 /-- `Bun.udpSocket<DataBinaryType extends BinaryType = 'buffer'>(options: udp.SocketOptions<DataBinaryType>): Promise<udp.Socket<DataBinaryType>>`: `Promise<UdpSocket> udpSocket(UdpSocketOptions options)` (Bun 1.4.4 type declarations) -/
-def udpSocket (options : UdpSocketOptions) : Async UdpSocket := do
+@[macro_inline] def udpSocket (options : UdpSocketOptions) : Async UdpSocket := Internal.api "Lasm.JS.Bun.udpSocket" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Bun.udpSocket", module := "globalThis", path := "Bun.udpSocket", construct := false, arity := 1 }
-    (Support.args #[toJS options])
+    (Internal.args #[toJS options])
   pure { val := r }
 
 /-- `Bun.udpSocket<DataBinaryType extends BinaryType = 'buffer'>(options: udp.ConnectSocketOptions<DataBinaryType>): Promise<udp.ConnectedSocket<DataBinaryType>>`: `Promise<UdpConnectedSocket> udpSocket(UdpConnectSocketOptions options)` (Bun 1.4.4 type declarations) -/
-def udpSocketWithUdpConnectSocketOptions (options : UdpConnectSocketOptions) : Async UdpConnectedSocket := do
+@[macro_inline] def udpSocketWithUdpConnectSocketOptions (options : UdpConnectSocketOptions) : Async UdpConnectedSocket := Internal.api "Lasm.JS.Bun.udpSocketWithUdpConnectSocketOptions" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Bun.udpSocketWithUdpConnectSocketOptions", module := "globalThis", path := "Bun.udpSocket", construct := false, arity := 1 }
-    (Support.args #[toJS options])
+    (Internal.args #[toJS options])
   pure { val := r }
 
 /-- `Bun.spawn<const In extends SpawnOptions.Writable = 'ignore', const Out extends SpawnOptions.Readable = 'pipe', const Err extends SpawnOptions.Readable = 'inherit'>(options: SpawnOptions.SpawnOptions<In, Out, Err> & { cmd: string[]; }): Subprocess<In, Out, Err>`: `Subprocess spawn(SpawnCmdOptions options)` (Bun 1.4.4 type declarations) -/
-def spawn (options : SpawnCmdOptions) : IO Subprocess := do
+@[macro_inline] def spawn (options : SpawnCmdOptions) : IO Subprocess := Internal.api "Lasm.JS.Bun.spawn" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Bun.spawn", module := "globalThis", path := "Bun.spawn", construct := false, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
   pure { val := r }
 
 /-- `Bun.spawn<const In extends SpawnOptions.Writable = 'ignore', const Out extends SpawnOptions.Readable = 'pipe', const Err extends SpawnOptions.Readable = 'inherit'>(cmds: string[], options?: SpawnOptions.SpawnOptions<In, Out, Err>): Subprocess<In, Out, Err>`: `Subprocess spawn(sequence<DOMString> cmds, optional SpawnSpawnOptionsIgnorePipeInherit options)` (Bun 1.4.4 type declarations) -/
-def spawnWithCmds (cmds : Array String) (options : Option SpawnSpawnOptionsIgnorePipeInherit := none) : IO Subprocess := do
+@[macro_inline] def spawnWithCmds (cmds : Array String) (options : Option SpawnSpawnOptionsIgnorePipeInherit := none) : IO Subprocess := Internal.api "Lasm.JS.Bun.spawnWithCmds" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Bun.spawnWithCmds", module := "globalThis", path := "Bun.spawn", construct := false, arity := 2 }
-    (Support.args #[toJS cmds, Support.optional options]) (await := false)
+    (Internal.args #[toJS cmds, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `Bun.spawnSync<const In extends SpawnOptions.Writable = 'ignore', const Out extends SpawnOptions.Readable = 'pipe', const Err extends SpawnOptions.Readable = 'pipe'>(options: SpawnOptions.SpawnSyncOptions<In, Out, Err> & { cmd: string[]; onExit?: never; }): SyncSubprocess<Out, Err>`: `ReadableSyncSubprocess spawnSync(SpawnSyncCmdOptions options)` (Bun 1.4.4 type declarations) -/
-def spawnSync (options : SpawnSyncCmdOptions) : IO ReadableSyncSubprocess :=
+@[macro_inline] def spawnSync (options : SpawnSyncCmdOptions) : IO ReadableSyncSubprocess := Internal.api "Lasm.JS.Bun.spawnSync" do
   Lasm.JS.Binding.invoke ReadableSyncSubprocess { name := "Lasm.JS.Bun.spawnSync", module := "globalThis", path := "Bun.spawnSync", construct := false, arity := 1 }
-    (Support.args #[toJS options]) (await := false)
+    (Internal.args #[toJS options]) (await := false)
 
 /-- `Bun.spawnSync<const In extends SpawnOptions.Writable = 'ignore', const Out extends SpawnOptions.Readable = 'pipe', const Err extends SpawnOptions.Readable = 'pipe'>(cmds: string[], options?: SpawnOptions.SpawnSyncOptions<In, Out, Err>): SyncSubprocess<Out, Err>`: `ReadableSyncSubprocess spawnSync(sequence<DOMString> cmds, optional SpawnSpawnSyncOptionsIgnorePipePipe options)` (Bun 1.4.4 type declarations) -/
-def spawnSyncWithCmds (cmds : Array String) (options : Option SpawnSpawnSyncOptionsIgnorePipePipe := none) : IO ReadableSyncSubprocess :=
+@[macro_inline] def spawnSyncWithCmds (cmds : Array String) (options : Option SpawnSpawnSyncOptionsIgnorePipePipe := none) : IO ReadableSyncSubprocess := Internal.api "Lasm.JS.Bun.spawnSyncWithCmds" do
   Lasm.JS.Binding.invoke ReadableSyncSubprocess { name := "Lasm.JS.Bun.spawnSyncWithCmds", module := "globalThis", path := "Bun.spawnSync", construct := false, arity := 2 }
-    (Support.args #[toJS cmds, Support.optional options]) (await := false)
+    (Internal.args #[toJS cmds, Internal.optional options]) (await := false)
 
 /-- `Bun.indexOfLine(buffer: ArrayBufferView | ArrayBufferLike, offset?: number | bigint): number`: `double indexOfLine(Uint8Array buffer, optional DoubleOrBigint offset)` (Bun 1.4.4 type declarations) -/
-def indexOfLine (buffer : ByteArray) (offset : Option DoubleOrBigint := none) : IO Float :=
+@[macro_inline] def indexOfLine (buffer : ByteArray) (offset : Option DoubleOrBigint := none) : IO Float := Internal.api "Lasm.JS.Bun.indexOfLine" do
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Bun.indexOfLine", module := "globalThis", path := "Bun.indexOfLine", construct := false, arity := 2 }
-    (Support.args #[toJS buffer, Support.optional offset]) (await := false)
+    (Internal.args #[toJS buffer, Internal.optional offset]) (await := false)
 
 /-- `Bun.randomUUIDv7(encoding?: 'hex' | 'base64' | 'base64url', timestamp?: number | Date): string`: `DOMString randomUUIDv7(optional RandomUUIDv7Encoding encoding, optional any timestamp)` (Bun 1.4.4 type declarations) -/
-def randomUUIDv7 (encoding : Option RandomUUIDv7Encoding := none) (timestamp : Data := .undefined) : IO String :=
+@[macro_inline] def randomUUIDv7 (encoding : Option RandomUUIDv7Encoding := none) (timestamp : Data := .undefined) : IO String := Internal.api "Lasm.JS.Bun.randomUUIDv7" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.randomUUIDv7", module := "globalThis", path := "Bun.randomUUIDv7", construct := false, arity := 2 }
-    (Support.args #[Support.optional encoding, timestamp]) (await := false)
+    (Internal.args #[Internal.optional encoding, timestamp]) (await := false)
 
 /-- `Bun.randomUUIDv7(encoding: 'buffer', timestamp?: number | Date): Buffer`: `Uint8Array randomUUIDv7(RandomUUIDv7WithBufferEncoding encoding, optional any timestamp)` (Bun 1.4.4 type declarations) -/
-def randomUUIDv7WithBuffer (encoding : RandomUUIDv7WithBufferEncoding) (timestamp : Data := .undefined) : IO ByteArray :=
+@[macro_inline] def randomUUIDv7WithBuffer (encoding : RandomUUIDv7WithBufferEncoding) (timestamp : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Bun.randomUUIDv7WithBuffer" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Bun.randomUUIDv7WithBuffer", module := "globalThis", path := "Bun.randomUUIDv7", construct := false, arity := 2 }
-    (Support.args #[toJS encoding, timestamp]) (await := false)
+    (Internal.args #[toJS encoding, timestamp]) (await := false)
 
 /-- `Bun.randomUUIDv5(name: string | BufferSource, namespace: string | BufferSource | 'dns' | 'url' | 'oid' | 'x500', encoding?: 'hex' | 'base64' | 'base64url'): string`: `DOMString randomUUIDv5(DOMStringOrUint8Array name, RandomUUIDv5NamespaceLiteralOrDOMStringOrUint8Array namespace, optional RandomUUIDv5Encoding encoding)` (Bun 1.4.4 type declarations) -/
-def randomUUIDv5 (name : DOMStringOrUint8Array) («namespace» : RandomUUIDv5NamespaceLiteralOrDOMStringOrUint8Array) (encoding : Option RandomUUIDv5Encoding := none) : IO String :=
+@[macro_inline] def randomUUIDv5 (name : DOMStringOrUint8Array) («namespace» : RandomUUIDv5NamespaceLiteralOrDOMStringOrUint8Array) (encoding : Option RandomUUIDv5Encoding := none) : IO String := Internal.api "Lasm.JS.Bun.randomUUIDv5" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.randomUUIDv5", module := "globalThis", path := "Bun.randomUUIDv5", construct := false, arity := 3 }
-    (Support.args #[toJS name, toJS «namespace», Support.optional encoding]) (await := false)
+    (Internal.args #[toJS name, toJS «namespace», Internal.optional encoding]) (await := false)
 
 /-- `Bun.randomUUIDv5(name: string | BufferSource, namespace: string | BufferSource | 'dns' | 'url' | 'oid' | 'x500', encoding: 'buffer'): Buffer`: `Uint8Array randomUUIDv5(DOMStringOrUint8Array name, RandomUUIDv5WithBufferNamespaceLiteralOrDOMStringOrUint8Array namespace, RandomUUIDv5WithBufferEncoding encoding)` (Bun 1.4.4 type declarations) -/
-def randomUUIDv5WithBuffer (name : DOMStringOrUint8Array) («namespace» : RandomUUIDv5WithBufferNamespaceLiteralOrDOMStringOrUint8Array) (encoding : RandomUUIDv5WithBufferEncoding) : IO ByteArray :=
+@[macro_inline] def randomUUIDv5WithBuffer (name : DOMStringOrUint8Array) («namespace» : RandomUUIDv5WithBufferNamespaceLiteralOrDOMStringOrUint8Array) (encoding : RandomUUIDv5WithBufferEncoding) : IO ByteArray := Internal.api "Lasm.JS.Bun.randomUUIDv5WithBuffer" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Bun.randomUUIDv5WithBuffer", module := "globalThis", path := "Bun.randomUUIDv5", construct := false, arity := 3 }
-    (Support.args #[toJS name, toJS «namespace», toJS encoding]) (await := false)
+    (Internal.args #[toJS name, toJS «namespace», toJS encoding]) (await := false)
 
 /-- `Bun.parse(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike | Blob): object`: `object parse(DOMStringOrUint8ArrayOrBlob input)` (Bun 1.4.4 type declarations) -/
-def TOML.parse (input : DOMStringOrUint8ArrayOrBlob) : IO Data :=
+@[macro_inline] def TOML.parse (input : DOMStringOrUint8ArrayOrBlob) : IO Data := Internal.api "Lasm.JS.Bun.TOML.parse" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Bun.TOML.parse", module := "globalThis", path := "Bun.TOML.parse", construct := false, arity := 1 }
-    (Support.args #[toJS input]) (await := false)
+    (Internal.args #[toJS input]) (await := false)
 
 /-- `Bun.stringify<T>(input: T, replacer?: undefined | null, space?: string | number): T extends Function | symbol | undefined ? undefined : T extends object ? string : string | undefined (read as string | undefined: a conditional type of the value; a string, or undefined for a function or symbol)`: `DOMString? stringify(any input, optional any replacer, optional DOMStringOrDouble space)` (Bun 1.4.4 type declarations) -/
-def TOML.stringify (input : Data) (replacer : Data := .undefined) (space : Option DOMStringOrDouble := none) : IO (Option String) :=
+@[macro_inline] def TOML.stringify (input : Data) (replacer : Data := .undefined) (space : Option DOMStringOrDouble := none) : IO (Option String) := Internal.api "Lasm.JS.Bun.TOML.stringify" do
   Lasm.JS.Binding.invoke (Option String) { name := "Lasm.JS.Bun.TOML.stringify", module := "globalThis", path := "Bun.TOML.stringify", construct := false, arity := 3 }
-    (Support.args #[toJS input, replacer, Support.optional space]) (await := false)
+    (Internal.args #[toJS input, replacer, Internal.optional space]) (await := false)
 
 /-- `Bun.parse(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike | Blob, options?: ParseOptions & { compact?: true }): Document (read as unknown: the document is a recursive tree of nodes, read as Data (a Lean structure cannot contain itself through the node union))`: `any parse(DOMStringOrUint8ArrayOrBlob input, optional XMLCompactParseOptions options)` (Bun 1.4.4 type declarations) -/
-def XML.parse (input : DOMStringOrUint8ArrayOrBlob) (options : Option XMLCompactParseOptions := none) : IO Data :=
+@[macro_inline] def XML.parse (input : DOMStringOrUint8ArrayOrBlob) (options : Option XMLCompactParseOptions := none) : IO Data := Internal.api "Lasm.JS.Bun.XML.parse" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Bun.XML.parse", module := "globalThis", path := "Bun.XML.parse", construct := false, arity := 2 }
-    (Support.args #[toJS input, Support.optional options]) (await := false)
+    (Internal.args #[toJS input, Internal.optional options]) (await := false)
 
 /-- `Bun.parse(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike | Blob, options: ParseOptions & { compact: false }): Node (read as unknown: the document is a recursive tree of nodes, read as Data (a Lean structure cannot contain itself through the node union))`: `any parse(DOMStringOrUint8ArrayOrBlob input, XMLFullParseOptions options)` (Bun 1.4.4 type declarations) -/
-def XML.parseWithParseOptionsCompactFalse (input : DOMStringOrUint8ArrayOrBlob) (options : XMLFullParseOptions) : IO Data :=
+@[macro_inline] def XML.parseWithParseOptionsCompactFalse (input : DOMStringOrUint8ArrayOrBlob) (options : XMLFullParseOptions) : IO Data := Internal.api "Lasm.JS.Bun.XML.parseWithParseOptionsCompactFalse" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Bun.XML.parseWithParseOptionsCompactFalse", module := "globalThis", path := "Bun.XML.parse", construct := false, arity := 2 }
-    (Support.args #[toJS input, toJS options]) (await := false)
+    (Internal.args #[toJS input, toJS options]) (await := false)
 
 /-- `Bun.parse(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike | Blob, options?: ParseOptions): Document | Node (read as unknown: the document is a recursive tree of nodes, read as Data (a Lean structure cannot contain itself through the node union))`: `any parse(DOMStringOrUint8ArrayOrBlob input, optional XMLParseOptions options)` (Bun 1.4.4 type declarations) -/
-def XML.parseWithParseOptions (input : DOMStringOrUint8ArrayOrBlob) (options : Option XMLParseOptions := none) : IO Data :=
+@[macro_inline] def XML.parseWithParseOptions (input : DOMStringOrUint8ArrayOrBlob) (options : Option XMLParseOptions := none) : IO Data := Internal.api "Lasm.JS.Bun.XML.parseWithParseOptions" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Bun.XML.parseWithParseOptions", module := "globalThis", path := "Bun.XML.parse", construct := false, arity := 2 }
-    (Support.args #[toJS input, Support.optional options]) (await := false)
+    (Internal.args #[toJS input, Internal.optional options]) (await := false)
 
 /-- `Bun.stringify(value: NodeInput | Document, replacer?: undefined | null, space?: string | number): string (read as {'value':'unknown'}: the recursive document tree, passed as Data)`: `DOMString stringify(any value, optional any replacer, optional DOMStringOrDouble space)` (Bun 1.4.4 type declarations) -/
-def XML.stringify (value : Data) (replacer : Data := .undefined) (space : Option DOMStringOrDouble := none) : IO String :=
+@[macro_inline] def XML.stringify (value : Data) (replacer : Data := .undefined) (space : Option DOMStringOrDouble := none) : IO String := Internal.api "Lasm.JS.Bun.XML.stringify" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.XML.stringify", module := "globalThis", path := "Bun.XML.stringify", construct := false, arity := 3 }
-    (Support.args #[toJS value, replacer, Support.optional space]) (await := false)
+    (Internal.args #[toJS value, replacer, Internal.optional space]) (await := false)
 
 /-- `Bun.stringify(value: unknown, replacer?: undefined | null, space?: string | number): string | undefined (read as {'value':'unknown'}: the recursive document tree, passed as Data)`: `DOMString? stringify(any value, optional any replacer, optional DOMStringOrDouble space)` (Bun 1.4.4 type declarations) -/
-def XML.stringify3 (value : Data) (replacer : Data := .undefined) (space : Option DOMStringOrDouble := none) : IO (Option String) :=
+@[macro_inline] def XML.stringify3 (value : Data) (replacer : Data := .undefined) (space : Option DOMStringOrDouble := none) : IO (Option String) := Internal.api "Lasm.JS.Bun.XML.stringify3" do
   Lasm.JS.Binding.invoke (Option String) { name := "Lasm.JS.Bun.XML.stringify3", module := "globalThis", path := "Bun.XML.stringify", construct := false, arity := 3 }
-    (Support.args #[toJS value, replacer, Support.optional space]) (await := false)
+    (Internal.args #[toJS value, replacer, Internal.optional space]) (await := false)
 
 /-- `Bun.parse(input: string): unknown`: `any parse(DOMString input)` (Bun 1.4.4 type declarations) -/
-def JSONC.parse (input : String) : IO Data :=
+@[macro_inline] def JSONC.parse (input : String) : IO Data := Internal.api "Lasm.JS.Bun.JSONC.parse" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Bun.JSONC.parse", module := "globalThis", path := "Bun.JSONC.parse", construct := false, arity := 1 }
-    (Support.args #[toJS input]) (await := false)
+    (Internal.args #[toJS input]) (await := false)
 
 /-- `Bun.parse(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike): unknown[]`: `sequence<any> parse(DOMStringOrUint8Array input)` (Bun 1.4.4 type declarations) -/
-def JSONL.parse (input : DOMStringOrUint8Array) : IO (Array Data) :=
+@[macro_inline] def JSONL.parse (input : DOMStringOrUint8Array) : IO (Array Data) := Internal.api "Lasm.JS.Bun.JSONL.parse" do
   Lasm.JS.Binding.invoke (Array Data) { name := "Lasm.JS.Bun.JSONL.parse", module := "globalThis", path := "Bun.JSONL.parse", construct := false, arity := 1 }
-    (Support.args #[toJS input]) (await := false)
+    (Internal.args #[toJS input]) (await := false)
 
 /-- `Bun.parseChunk(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike, start?: number, end?: number): ParseChunkResult`: `JSONLParseChunkResult parseChunk(DOMStringOrUint8Array input, optional double start, optional double end)` (Bun 1.4.4 type declarations) -/
-def JSONL.parseChunk (input : DOMStringOrUint8Array) (start : Option Float := none) («end» : Option Float := none) : IO JSONLParseChunkResult :=
+@[macro_inline] def JSONL.parseChunk (input : DOMStringOrUint8Array) (start : Option Float := none) («end» : Option Float := none) : IO JSONLParseChunkResult := Internal.api "Lasm.JS.Bun.JSONL.parseChunk" do
   Lasm.JS.Binding.invoke JSONLParseChunkResult { name := "Lasm.JS.Bun.JSONL.parseChunk", module := "globalThis", path := "Bun.JSONL.parseChunk", construct := false, arity := 3 }
-    (Support.args #[toJS input, Support.optional start, Support.optional «end»]) (await := false)
+    (Internal.args #[toJS input, Internal.optional start, Internal.optional «end»]) (await := false)
 
 /-- `Bun.parse(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike | Blob): unknown`: `any parse(DOMStringOrUint8ArrayOrBlob input)` (Bun 1.4.4 type declarations) -/
-def YAML.parse (input : DOMStringOrUint8ArrayOrBlob) : IO Data :=
+@[macro_inline] def YAML.parse (input : DOMStringOrUint8ArrayOrBlob) : IO Data := Internal.api "Lasm.JS.Bun.YAML.parse" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Bun.YAML.parse", module := "globalThis", path := "Bun.YAML.parse", construct := false, arity := 1 }
-    (Support.args #[toJS input]) (await := false)
+    (Internal.args #[toJS input]) (await := false)
 
 /-- `Bun.stringify(input: unknown, replacer?: undefined | null, space?: string | number): string`: `DOMString stringify(any input, optional any replacer, optional DOMStringOrDouble space)` (Bun 1.4.4 type declarations) -/
-def YAML.stringify (input : Data) (replacer : Data := .undefined) (space : Option DOMStringOrDouble := none) : IO String :=
+@[macro_inline] def YAML.stringify (input : Data) (replacer : Data := .undefined) (space : Option DOMStringOrDouble := none) : IO String := Internal.api "Lasm.JS.Bun.YAML.stringify" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.YAML.stringify", module := "globalThis", path := "Bun.YAML.stringify", construct := false, arity := 3 }
-    (Support.args #[toJS input, replacer, Support.optional space]) (await := false)
+    (Internal.args #[toJS input, replacer, Internal.optional space]) (await := false)
 
 /-- `Bun.html(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike, options?: Options): string`: `DOMString html(DOMStringOrUint8Array input, optional MarkdownOptions options)` (Bun 1.4.4 type declarations) -/
-def markdown.html (input : DOMStringOrUint8Array) (options : Option MarkdownOptions := none) : IO String :=
+@[macro_inline] def markdown.html (input : DOMStringOrUint8Array) (options : Option MarkdownOptions := none) : IO String := Internal.api "Lasm.JS.Bun.markdown.html" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.markdown.html", module := "globalThis", path := "Bun.markdown.html", construct := false, arity := 2 }
-    (Support.args #[toJS input, Support.optional options]) (await := false)
+    (Internal.args #[toJS input, Internal.optional options]) (await := false)
 
 /-- `Bun.ansi(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike, theme?: AnsiTheme): string`: `DOMString ansi(DOMStringOrUint8Array input, optional MarkdownAnsiTheme theme)` (Bun 1.4.4 type declarations) -/
-def markdown.ansi (input : DOMStringOrUint8Array) (theme : Option MarkdownAnsiTheme := none) : IO String :=
+@[macro_inline] def markdown.ansi (input : DOMStringOrUint8Array) (theme : Option MarkdownAnsiTheme := none) : IO String := Internal.api "Lasm.JS.Bun.markdown.ansi" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.markdown.ansi", module := "globalThis", path := "Bun.markdown.ansi", construct := false, arity := 2 }
-    (Support.args #[toJS input, Support.optional theme]) (await := false)
+    (Internal.args #[toJS input, Internal.optional theme]) (await := false)
 
 /-- `Bun.render(input: string | NodeJS.TypedArray | DataView<ArrayBufferLike> | ArrayBufferLike, callbacks?: RenderCallbacks, options?: Options): string`: `DOMString render(DOMStringOrUint8Array input, optional MarkdownRenderCallbacks callbacks, optional MarkdownOptions options)` (Bun 1.4.4 type declarations) -/
-def markdown.render (input : DOMStringOrUint8Array) (callbacks : Option MarkdownRenderCallbacks := none) (options : Option MarkdownOptions := none) : IO String :=
+@[macro_inline] def markdown.render (input : DOMStringOrUint8Array) (callbacks : Option MarkdownRenderCallbacks := none) (options : Option MarkdownOptions := none) : IO String := Internal.api "Lasm.JS.Bun.markdown.render" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.markdown.render", module := "globalThis", path := "Bun.markdown.render", construct := false, arity := 3 }
-    (Support.args #[toJS input, Support.optional callbacks, Support.optional options]) (await := false)
+    (Internal.args #[toJS input, Internal.optional callbacks, Internal.optional options]) (await := false)
 
 /-- `Bun.parse(input: string): unknown`: `any parse(DOMString input)` (Bun 1.4.4 type declarations) -/
-def JSON5.parse (input : String) : IO Data :=
+@[macro_inline] def JSON5.parse (input : String) : IO Data := Internal.api "Lasm.JS.Bun.JSON5.parse" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Bun.JSON5.parse", module := "globalThis", path := "Bun.JSON5.parse", construct := false, arity := 1 }
-    (Support.args #[toJS input]) (await := false)
+    (Internal.args #[toJS input]) (await := false)
 
 /-- `Bun.stringify(input: unknown, replacer?: undefined | null, space?: string | number): string | undefined`: `DOMString? stringify(any input, optional any replacer, optional DOMStringOrDouble space)` (Bun 1.4.4 type declarations) -/
-def JSON5.stringify (input : Data) (replacer : Data := .undefined) (space : Option DOMStringOrDouble := none) : IO (Option String) :=
+@[macro_inline] def JSON5.stringify (input : Data) (replacer : Data := .undefined) (space : Option DOMStringOrDouble := none) : IO (Option String) := Internal.api "Lasm.JS.Bun.JSON5.stringify" do
   Lasm.JS.Binding.invoke (Option String) { name := "Lasm.JS.Bun.JSON5.stringify", module := "globalThis", path := "Bun.JSON5.stringify", construct := false, arity := 3 }
-    (Support.args #[toJS input, replacer, Support.optional space]) (await := false)
+    (Internal.args #[toJS input, replacer, Internal.optional space]) (await := false)
 
 /-- `Bun.status<T = undefined>(promise: T | Promise<T>): 'pending' | 'fulfilled' | 'rejected'`: `PeekStatusResult status(Promise<undefined?> promise)` (Bun 1.4.4 type declarations) -/
-def peek.status (promise : Value) : IO PeekStatusResult :=
+@[macro_inline] def peek.status (promise : Value) : IO PeekStatusResult := Internal.api "Lasm.JS.Bun.peek.status" do
   Lasm.JS.Binding.invoke PeekStatusResult { name := "Lasm.JS.Bun.peek.status", module := "globalThis", path := "Bun.peek.status", construct := false, arity := 1 }
-    (Support.args #[toJS promise]) (await := false)
+    (Internal.args #[toJS promise]) (await := false)
 
 /-- `const Bun.dns.ADDRCONFIG: number`: `readonly attribute double ADDRCONFIG` (Bun 1.4.4 type declarations) -/
-def dns.ADDRCONFIG : IO Float := Support.getGlobal ["Bun", "dns", "ADDRCONFIG"] Float
+@[macro_inline] def dns.ADDRCONFIG : IO Float := Internal.api "Lasm.JS.Bun.dns.ADDRCONFIG" do
+  Internal.getGlobal ["Bun", "dns", "ADDRCONFIG"] Float
 
 /-- `const Bun.dns.ALL: number`: `readonly attribute double ALL` (Bun 1.4.4 type declarations) -/
-def dns.ALL : IO Float := Support.getGlobal ["Bun", "dns", "ALL"] Float
+@[macro_inline] def dns.ALL : IO Float := Internal.api "Lasm.JS.Bun.dns.ALL" do
+  Internal.getGlobal ["Bun", "dns", "ALL"] Float
 
 /-- `const Bun.dns.V4MAPPED: number`: `readonly attribute double V4MAPPED` (Bun 1.4.4 type declarations) -/
-def dns.V4MAPPED : IO Float := Support.getGlobal ["Bun", "dns", "V4MAPPED"] Float
+@[macro_inline] def dns.V4MAPPED : IO Float := Internal.api "Lasm.JS.Bun.dns.V4MAPPED" do
+  Internal.getGlobal ["Bun", "dns", "V4MAPPED"] Float
 
 /-- `Bun.lookup(hostname: string, options?: { family?: 4 | 6 | 0 | 'IPv4' | 'IPv6' | 'any'; socketType?: 'udp' | 'tcp'; flags?: number; port?: number; backend?: 'libc' | 'c-ares' | 'system' | 'getaddrinfo'; }): Promise<DNSLookup[]>`: `Promise<sequence<DNSLookup>> lookup(DOMString hostname, optional DnsLookupOptions options)` (Bun 1.4.4 type declarations) -/
-def dns.lookup (hostname : String) (options : Option DnsLookupOptions := none) : Async (Array DNSLookup) :=
+@[macro_inline] def dns.lookup (hostname : String) (options : Option DnsLookupOptions := none) : Async (Array DNSLookup) := Internal.api "Lasm.JS.Bun.dns.lookup" do
   Lasm.JS.Binding.invokeAsync (Array DNSLookup) { name := "Lasm.JS.Bun.dns.lookup", module := "globalThis", path := "Bun.dns.lookup", construct := false, arity := 2 }
-    (Support.args #[toJS hostname, Support.optional options])
+    (Internal.args #[toJS hostname, Internal.optional options])
 
 /-- `Bun.prefetch(hostname: string, port?: number): void`: `undefined prefetch(DOMString hostname, optional double /* integer: Nat */ port)` (Bun 1.4.4 type declarations) -/
-def dns.prefetch (hostname : String) (port : Option Nat := none) : IO Unit :=
+@[macro_inline] def dns.prefetch (hostname : String) (port : Option Nat := none) : IO Unit := Internal.api "Lasm.JS.Bun.dns.prefetch" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Bun.dns.prefetch", module := "globalThis", path := "Bun.dns.prefetch", construct := false, arity := 2 }
-    (Support.args #[toJS hostname, Support.optional port]) (await := false)
+    (Internal.args #[toJS hostname, Internal.optional port]) (await := false)
 
 /-- `Bun.getCacheStats(): { cacheHitsCompleted: number; cacheHitsInflight: number; cacheMisses: number; size: number; errors: number; totalCount: number; }`: `DnsGetCacheStatsResult getCacheStats()` (Bun 1.4.4 type declarations) -/
-def dns.getCacheStats : IO DnsGetCacheStatsResult :=
+@[macro_inline] def dns.getCacheStats : IO DnsGetCacheStatsResult := Internal.api "Lasm.JS.Bun.dns.getCacheStats" do
   Lasm.JS.Binding.invoke DnsGetCacheStatsResult { name := "Lasm.JS.Bun.dns.getCacheStats", module := "globalThis", path := "Bun.dns.getCacheStats", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `Bun.generate(secret?: string, options?: CSRFGenerateOptions): string`: `DOMString generate(optional DOMString secret, optional CSRFGenerateOptions options)` (Bun 1.4.4 type declarations) -/
-def CSRF.generate (secret : Option String := none) (options : Option CSRFGenerateOptions := none) : IO String :=
+@[macro_inline] def CSRF.generate (secret : Option String := none) (options : Option CSRFGenerateOptions := none) : IO String := Internal.api "Lasm.JS.Bun.CSRF.generate" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.CSRF.generate", module := "globalThis", path := "Bun.CSRF.generate", construct := false, arity := 2 }
-    (Support.args #[Support.optional secret, Support.optional options]) (await := false)
+    (Internal.args #[Internal.optional secret, Internal.optional options]) (await := false)
 
 /-- `Bun.verify(token: string, options?: CSRFVerifyOptions): boolean`: `boolean verify(DOMString token, optional CSRFVerifyOptions options)` (Bun 1.4.4 type declarations) -/
-def CSRF.verify (token : String) (options : Option CSRFVerifyOptions := none) : IO Bool :=
+@[macro_inline] def CSRF.verify (token : String) (options : Option CSRFVerifyOptions := none) : IO Bool := Internal.api "Lasm.JS.Bun.CSRF.verify" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Bun.CSRF.verify", module := "globalThis", path := "Bun.CSRF.verify", construct := false, arity := 2 }
-    (Support.args #[toJS token, Support.optional options]) (await := false)
+    (Internal.args #[toJS token, Internal.optional options]) (await := false)
 
 /-- `const Bun.inspect.custom: typeof import('util').inspect.custom`: `readonly attribute object custom` (Bun 1.4.4 type declarations) -/
-def inspect.custom : IO Data := Support.getGlobal ["Bun", "inspect", "custom"] Data
+@[macro_inline] def inspect.custom : IO Data := Internal.api "Lasm.JS.Bun.inspect.custom" do
+  Internal.getGlobal ["Bun", "inspect", "custom"] Data
 
 /-- `Bun.table(tabularData: object | unknown[], properties?: string[], options?: { colors?: boolean }): string`: `DOMString table(any tabularData, optional sequence<DOMString> properties, optional InspectTableOptions options)` (Bun 1.4.4 type declarations) -/
-def inspect.table (tabularData : Data) (properties : Option (Array String) := none) (options : Option InspectTableOptions := none) : IO String :=
+@[macro_inline] def inspect.table (tabularData : Data) (properties : Option (Array String) := none) (options : Option InspectTableOptions := none) : IO String := Internal.api "Lasm.JS.Bun.inspect.table" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.inspect.table", module := "globalThis", path := "Bun.inspect.table", construct := false, arity := 3 }
-    (Support.args #[toJS tabularData, Support.optional properties, Support.optional options]) (await := false)
+    (Internal.args #[toJS tabularData, Internal.optional properties, Internal.optional options]) (await := false)
 
 /-- `Bun.table(tabularData: object | unknown[], options?: { colors?: boolean }): string`: `DOMString table(any tabularData, optional InspectTableWithOptionsOptions options)` (Bun 1.4.4 type declarations) -/
-def inspect.tableWithOptions (tabularData : Data) (options : Option InspectTableWithOptionsOptions := none) : IO String :=
+@[macro_inline] def inspect.tableWithOptions (tabularData : Data) (options : Option InspectTableWithOptionsOptions := none) : IO String := Internal.api "Lasm.JS.Bun.inspect.tableWithOptions" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.inspect.tableWithOptions", module := "globalThis", path := "Bun.inspect.table", construct := false, arity := 2 }
-    (Support.args #[toJS tabularData, Support.optional options]) (await := false)
+    (Internal.args #[toJS tabularData, Internal.optional options]) (await := false)
 
 /-- `Bun.satisfies(version: StringLike, range: StringLike): boolean`: `boolean satisfies(StringLikeUnion version, StringLikeUnion range)` (Bun 1.4.4 type declarations) -/
-def semver.satisfies (version : StringLikeUnion) (range : StringLikeUnion) : IO Bool :=
+@[macro_inline] def semver.satisfies (version : StringLikeUnion) (range : StringLikeUnion) : IO Bool := Internal.api "Lasm.JS.Bun.semver.satisfies" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Bun.semver.satisfies", module := "globalThis", path := "Bun.semver.satisfies", construct := false, arity := 2 }
-    (Support.args #[toJS version, toJS range]) (await := false)
+    (Internal.args #[toJS version, toJS range]) (await := false)
 
 /-- `Bun.order(v1: StringLike, v2: StringLike): -1 | 0 | 1`: `double order(StringLikeUnion v1, StringLikeUnion v2)` (Bun 1.4.4 type declarations) -/
-def semver.order (v1 : StringLikeUnion) (v2 : StringLikeUnion) : IO Float :=
+@[macro_inline] def semver.order (v1 : StringLikeUnion) (v2 : StringLikeUnion) : IO Float := Internal.api "Lasm.JS.Bun.semver.order" do
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Bun.semver.order", module := "globalThis", path := "Bun.semver.order", construct := false, arity := 2 }
-    (Support.args #[toJS v1, toJS v2]) (await := false)
+    (Internal.args #[toJS v1, toJS v2]) (await := false)
 
 /-- `Bun.arrayBufferToString(buffer: Uint8Array<ArrayBuffer> | ArrayBufferLike): string`: `DOMString arrayBufferToString(Uint8Array buffer)` (Bun 1.4.4 type declarations) -/
-def unsafe.arrayBufferToString (buffer : ByteArray) : IO String :=
+@[macro_inline] def unsafe.arrayBufferToString (buffer : ByteArray) : IO String := Internal.api "Lasm.JS.Bun.unsafe.arrayBufferToString" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Bun.unsafe.arrayBufferToString", module := "globalThis", path := "Bun.unsafe.arrayBufferToString", construct := false, arity := 1 }
-    (Support.args #[toJS buffer]) (await := false)
+    (Internal.args #[toJS buffer]) (await := false)
 
 /-- `Bun.gcAggressionLevel(level?: 0 | 1 | 2): 0 | 1 | 2`: `double gcAggressionLevel(optional double level)` (Bun 1.4.4 type declarations) -/
-def unsafe.gcAggressionLevel (level : Option Float := none) : IO Float :=
+@[macro_inline] def unsafe.gcAggressionLevel (level : Option Float := none) : IO Float := Internal.api "Lasm.JS.Bun.unsafe.gcAggressionLevel" do
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Bun.unsafe.gcAggressionLevel", module := "globalThis", path := "Bun.unsafe.gcAggressionLevel", construct := false, arity := 1 }
-    (Support.args #[Support.optional level]) (await := false)
+    (Internal.args #[Internal.optional level]) (await := false)
 
 /-- `Bun.mimallocDump(): void`: `undefined mimallocDump()` (Bun 1.4.4 type declarations) -/
-def unsafe.mimallocDump : IO Unit :=
+@[macro_inline] def unsafe.mimallocDump : IO Unit := Internal.api "Lasm.JS.Bun.unsafe.mimallocDump" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Bun.unsafe.mimallocDump", module := "globalThis", path := "Bun.unsafe.mimallocDump", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 /-- `Bun.setJITPolicy(scale: number): void`: `undefined setJITPolicy(double scale)` (Bun 1.4.4 type declarations) -/
-def unsafe.setJITPolicy (scale : Float) : IO Unit :=
+@[macro_inline] def unsafe.setJITPolicy (scale : Float) : IO Unit := Internal.api "Lasm.JS.Bun.unsafe.setJITPolicy" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Bun.unsafe.setJITPolicy", module := "globalThis", path := "Bun.unsafe.setJITPolicy", construct := false, arity := 1 }
-    (Support.args #[toJS scale]) (await := false)
+    (Internal.args #[toJS scale]) (await := false)
 
 /-- `Bun.memoryFootprint(): number | undefined`: `double? memoryFootprint()` (Bun 1.4.4 type declarations) -/
-def unsafe.memoryFootprint : IO (Option Float) :=
+@[macro_inline] def unsafe.memoryFootprint : IO (Option Float) := Internal.api "Lasm.JS.Bun.unsafe.memoryFootprint" do
   Lasm.JS.Binding.invoke (Option Float) { name := "Lasm.JS.Bun.unsafe.memoryFootprint", module := "globalThis", path := "Bun.unsafe.memoryFootprint", construct := false, arity := 0 }
-    (Support.args #[]) (await := false)
+    (Internal.args #[]) (await := false)
 
 end Lasm.JS.Bun

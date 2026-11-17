@@ -5,7 +5,7 @@ not sent, and the message arrives with `Error.invalid` at once.
 -/
 import Lasm.RPC.Core
 import Lasm.UI.Cmd
-import Lasm.JS.Web
+import Lasm.JS.Web.Fetch
 
 namespace Lasm.RPC
 open Lean Lasm.UI
