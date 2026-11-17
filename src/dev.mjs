@@ -11,6 +11,7 @@ import { existsSync, readdirSync, readFileSync, statSync, watch } from 'node:fs'
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { jsRuntime } from './js-runtime.mjs';
 import { targetHintAmong } from './cli-arguments.mjs';
+import { missingImportHints } from './import-hints.mjs';
 
 const runtimeTargets = ['node', 'bun', 'deno'];
 const edgeOnlyTargets = ['workers', 'vercel-edge', 'netlify-edge', 'deno-deploy', 'supabase-edge'];
@@ -214,6 +215,8 @@ export function formatLeanDiagnostics(text, directory) {
         frames++;
       }
     }
+    // A name a generated Lasm.JS module defines, without its import (0.3-20): the import to add.
+    if (severity === 'error') out.push(...missingImportHints(message).map(hint => color('36', hint)));
   }
   return out.join('\n').replace(/\n{3,}/g, '\n\n').trim();
 }

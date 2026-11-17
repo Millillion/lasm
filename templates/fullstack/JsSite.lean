@@ -4,7 +4,7 @@ and `Response` (Lasm.JS.Web): Server.lean serves it on Node with
 `Node.serve`, and Export.lean publishes it as the program's default export
 for Cloudflare Workers, the other edge targets, Bun and Deno.
 -/
-import Lasm.JS.Web
+import Lasm.JS.Web.Fetch
 import Site
 open Lasm.JS
 
