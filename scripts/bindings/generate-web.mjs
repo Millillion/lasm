@@ -1706,7 +1706,9 @@ const webPlan = plan.filter(m => m.ns === NS);
   for (const a of apiDecls) {
     const where = compat.availability(a.paths, rcd);
     const path = Object.values(where).find(w => w.path)?.path ?? a.paths[0].join('.');
-    for (const o of overrides) if (o.api === a.lean || o.api === path) {
+    // An entry names a binding (its Lean name), a compatibility path, or a path and everything under it (`api.URLPattern.*`).
+    const matches = o => o.api === a.lean || o.api === path || o.api.endsWith('.*') && (path === o.api.slice(0, -2) || path.startsWith(o.api.slice(0, -1)));
+    for (const o of overrides) if (matches(o)) {
       used.add(o.api);
       for (const r of o.runtimes) { if (!where[r]) fail(`availability-overrides.json: unknown runtime ${r}`); where[r].ok = o.available; }
     }
