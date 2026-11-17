@@ -493,6 +493,14 @@ it compiles it once into Lasm's cache: `[lasm] Compiling
 Lasm.JS.Web.IndexedDB (first use)…` (decision 0.3-6). For that reason there
 is no umbrella `import Lasm.JS.Web`: it would compile every spec (0.3-18).
 
+**Forgot an import?** The build says which: a name a generated module defines,
+used without its import, gets the import to add under Lean's error (decision 0.3-20):
+
+```
+Main.lean:4:12: error: Unknown identifier `fetch`
+hint: fetch is defined in Lasm.JS.Web.Fetch; add: import Lasm.JS.Web.Fetch
+```
+
 ```lean
 import Lasm.JS.Web.Fetch
 import Lasm.JS.Web.Url

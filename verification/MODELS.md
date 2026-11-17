@@ -34,7 +34,7 @@ How a module moves from pending to modelled:
 <!-- BEGIN MODELS -->
 <!-- Generated from verification/models.json by `node scripts/models.mjs --write`; do not edit by hand. -->
 
-**179 shipped modules**: 19 modelled, 26 pending, 134 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 26 modules still need a model.
+**180 shipped modules**: 19 modelled, 27 pending, 134 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 27 modules still need a model.
 
 ### Modelled (19)
 
@@ -60,7 +60,7 @@ How a module moves from pending to modelled:
 | [`src/wasi/lower-atomics.mjs`](../src/wasi/lower-atomics.mjs) | [LowerAtomics.lean](../verification/cli/Lasm/Cli/Model/LowerAtomics.lean) (`lowerAtomics`, `moduleImports`, `keepExports`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the whole module is modelled (lowerAtomics with its readers, moduleImports, keepExports); candidates lowering_rewrites_atomics, lowering_leaves_no_atomics and lowering_keeps_runs are stated over the model, the last two also over WebAssembly validation and execution (outside semantics) |
 | [`src/wasi/wasi-component.mjs`](../src/wasi/wasi-component.mjs) | [WasiComponent.lean](../verification/cli/Lasm/Cli/Model/WasiComponent.lean) (`replaceCoreModule`, `placeholderModule`, `componentize`, `makeTemplate`, `extractCore`, `withoutComponentType`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | every function runs as its Lean model, compiled by Lasm into the CLI's glue program (src/glue/glue.mjs, docs/proposals/M6_GLUE.md) through proved fast versions over byte arrays (verification/cli/Lasm/Cli/Fast/WasiComponent.lean, csimp theorems); what remains here is reading the template (component/proxy-template.wasm, an argument of the model) and taking any array of bytes, which the differential checks together with the compiled program; replace_one_core_module, drops_only_component_type and componentize_inverse proved |
 
-### Pending (26)
+### Pending (27)
 
 | Module | Models (and their differentials) | Reason |
 | --- | --- | --- |
@@ -74,6 +74,7 @@ How a module moves from pending to modelled:
 | [`src/dev.mjs`](../src/dev.mjs) | [Dev.lean](../verification/cli/Lasm/Cli/Model/Dev.lean) (`changedFiles`, `parseDevArguments`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | `lasm dev`: argument parsing and changedFiles are modelled; build scheduling remains to model; the rest watches files and runs builds |
 | [`src/edge/edge-js.mjs`](../src/edge/edge-js.mjs) | [JsFraming.lean](../verification/cli/Lasm/Cli/Model/JsFraming.lean) (`encodeEvents`, `splitRequest`, `intoPrefix`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | Lasm.JS host operations and the value codec's JavaScript half for the edge profile; the codec is checked against Lean's proved codec (Wire, the lasm-js-wire fuzz target, which also checks it reads and writes as the Node copy does, byte for byte) and the framing against its model (JsFraming.lean); the host operations (calls, properties, callbacks, references) are not modelled (IRREDUCIBLE.md M4) |
 | [`src/edge/lasm_js_edge.c`](../src/edge/lasm_js_edge.c) | — | Lasm.JS C glue for the edge profile, as library/c/lasm_js.c: its request and event framing is library/c/lasm_js_framing.h (modelled); the operations are not modelled (IRREDUCIBLE.md M4) |
+| [`src/import-hints.mjs`](../src/import-hints.mjs) | — | missing-import hints: reading the declarations, the index and the lookup are pure; model them (reading the index file is I/O) |
 | [`src/init.mjs`](../src/init.mjs) | [Init.lean](../verification/cli/Lasm/Cli/Model/Init.lean) (`parseInitArguments`, packageName (after basename, resolve and toLowerCase), `lakeName`, supabaseFunctionNameOf (after toLowerCase); [cli-differential.mjs](../test/models/cli-differential.mjs)) | `lasm init`: argument parsing is modelled (parse_known_or_refused proved) and so are the generated names (generated_names_valid proved); the template texts (golden-tested, test/init-golden.test.mjs) and writing them remain |
 | [`src/lasm-modules/node-serve.mjs`](../src/lasm-modules/node-serve.mjs) | — | Node.serve's node:http server and its req/res ↔ Request/Response translation (the plain-Host rule, joined Cookie lines, hop-by-hop fields, null-body statuses): a model of the translation is still due; tested by test/node-serve.test.mjs and the node-serve mutation module |
 | [`src/lazy-library.mjs`](../src/lazy-library.mjs) | — | library modules compiled on first import: import resolution, dependency order, identity stamps and the parallel schedule are pure; model them (the compiles themselves are I/O) |

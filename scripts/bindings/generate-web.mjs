@@ -25,6 +25,7 @@ import * as nodeTier from './node-tier2.mjs';
 import * as serveTier from './serve-tier2.mjs';
 import * as cloudflareTier from './cloudflare-tier3.mjs';
 import * as overrides from './overrides.mjs';
+import { buildImportIndex } from '../../src/import-hints.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const require = createRequire(import.meta.url);
@@ -1838,6 +1839,18 @@ end Surface
 `);
 const unusedOverrides = ov.unused();
 if (unusedOverrides.length) fail(`scripts/bindings/overrides.json entries match no generated declaration: ${unusedOverrides.join(', ')}`);
+
+// Missing-import hints (src/import-hints.mjs, 0.3-20): every declaration of the generated namespaces and the module
+// that defines it, Lasm.JS.Node.Serve (hand-written) included.
+{
+  const sources = new Map();
+  const libraryRoot = join(root, 'library') + (process.platform === 'win32' ? '\\' : '/');
+  for (const [file, text] of files)
+    if (file.endsWith('.lean') && file.startsWith(join(root, 'library', 'Lasm', 'JS'))) sources.set(file.slice(libraryRoot.length, -5).split(/[\\/]/).join('.'), text);
+  sources.set('Lasm.JS.Node.Serve', readFileSync(join(nodeOutDir, 'Serve.lean'), 'utf8'));
+  files.set(join(root, 'library', 'Lasm', 'JS', 'import-index.json'),
+    JSON.stringify(buildImportIndex(sources, { generatedBy: 'scripts/bindings/generate-web.mjs' })) + '\n');
+}
 
 let stale = [];
 for (const [file, text] of files) {
