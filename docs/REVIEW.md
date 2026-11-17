@@ -695,7 +695,7 @@ docstrings, the propositions and the names.
   [scripts/bindings/web-browser.mjs](../scripts/bindings/web-browser.mjs)).
   `Lasm.Web` was removed on 2026-11-10.
 - [ ] `Lasm.Fastly` (generated): [Fastly/](../library/Lasm/Fastly), the generator [generate-fastly.mjs](../scripts/bindings/generate-fastly.mjs), the mapping rules [WASI_FASTLY_BINDINGS.md](WASI_FASTLY_BINDINGS.md), the conformance checks [Conformance.lean](../test/fixtures/fastly-abi/Fixture/Conformance.lean), the example [examples/fastly](../examples/fastly/Main.lean)
-- [ ] `Lasm.Serverless` has proofs only, with no runtime API. Its propositions about the function-platform shims are in [Serverless/Spec.lean](../library/Lasm/Serverless/Spec.lean).
+- [ ] `Lasm.Serverless` has proofs only, with no runtime API. Its propositions about the function-platform shims are in [Serverless/Spec.lean](../verification/cli/Lasm/Serverless/Spec.lean).
 
 ### Example apps: code and propositions
 - [ ] Conduit:

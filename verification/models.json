@@ -977,7 +977,7 @@
       "status": "modelled",
       "models": [
         {
-          "lean": "library/Lasm/Serverless/Proofs/Model.lean",
+          "lean": "verification/cli/Lasm/Serverless/Proofs/Model.lean",
           "functions": [
             "requestTarget",
             "plainHost",
@@ -1002,7 +1002,7 @@
       "status": "modelled",
       "models": [
         {
-          "lean": "library/Lasm/Serverless/Proofs/Model.lean",
+          "lean": "verification/cli/Lasm/Serverless/Proofs/Model.lean",
           "functions": [
             "query",
             "rawQuery",

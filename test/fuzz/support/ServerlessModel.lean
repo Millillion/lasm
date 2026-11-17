@@ -1,6 +1,6 @@
 /-
 The Lean model of the function platforms' HTTP mapping
-(library/Lasm/Serverless/Proofs/Model.lean) as an oracle for the
+(verification/cli/Lasm/Serverless/Proofs/Model.lean) as an oracle for the
 serverless-http fuzz target: one JSON case per line on stdin (an event of one
 kind, the server's reply, the `Date.parse`-valid strings of its Set-Cookie
 values), one JSON line of what the model says on stdout. Run by
