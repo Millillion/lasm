@@ -749,8 +749,8 @@ def availability (record : Record) (root : Element) : IO Unit := do
   for (path, info) in entries do
     if ← reflectHas g path then
       let v ← g.get path Value
-      -- A global that is not an object or a function has none of its members.
-      unless ← isObjectLike v do missing := missing.push s!"{path} (not an object)"
+      -- A global that is not an object or a function (Window's attributes: `name`,
+      -- `onclick`, `innerWidth`) is present; it lacks only the members expected on it.
       for m in names info "static" do
         unless ← hasMember v m do missing := missing.push s!"{path}.{m}"
       let proto := names info "prototype"
