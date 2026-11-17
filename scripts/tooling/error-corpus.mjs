@@ -113,10 +113,8 @@ export const cases = [
   { id: 'output-twice', kind: 'parse', args: ['build', 'Main.lean', '--output', 'a', '--output', 'b'], files: { 'Main.lean': main }, expect: /Specify --output only once/ },
   { id: 'suspend-twice', kind: 'parse', args: ['build', 'Main.lean', '--target', 'browser', '--suspend', 'jspi', '--suspend', 'none'], files: { 'Main.lean': main }, expect: /Specify --suspend only once/ },
   { id: 'output-for-vercel-edge', kind: 'parse', args: ['build', 'Main.lean', '--target', 'vercel-edge', '--output', 'x'], files: { 'Main.lean': main }, expect: /--output does not apply to --target vercel-edge: the platform fixes its layout/ },
-  // Binding configurations (.json), which the CLI no longer builds.
-  { id: 'binding-configuration', kind: 'parse', args: ['build', 'lasm.json'], files: { 'lasm.json': '{}\n' }, expect: /This Lasm candidate builds ordinary \.lean applications for Node/ },
-  { id: 'binding-configuration-dev', kind: 'parse', args: ['build', 'lasm.json', '--dev'], files: { 'lasm.json': '{}\n' }, expect: /--dev and --release apply to Lean applications/ },
-  { id: 'binding-configuration-target', kind: 'parse', args: ['build', 'lasm.json', '--target', 'wasi'], files: { 'lasm.json': '{}\n' }, expect: /--target applies to Lean applications, not binding configurations/ },
+  // Binding configurations (.json), which the CLI no longer builds: not a source (0.7-15).
+  { id: 'binding-configuration', kind: 'parse', args: ['build', 'lasm.json'], files: { 'lasm.json': '{}\n' }, expect: /Expected a Lean source file \(Main\.lean\), not lasm\.json/, fixedIn: '0.9.0' },
   // Lasm's environment settings.
   { id: 'download-idle-too-small', kind: 'network', args: ['build', 'Main.lean'], files: { 'Main.lean': main },
     env: dir => ({ LASM_ARTIFACT_SOURCE: 'https', LASM_TOOLCHAIN_CACHE: join(dir, 'empty-cache'), LASM_DOWNLOAD_IDLE_MS: '5' }), expect: /LASM_DOWNLOAD_IDLE_MS must be an integer from 1000 to 1800000/ },
@@ -127,6 +125,11 @@ export const cases = [
 
   // Lean, Lake and toolchain errors (each is a build that fails).
   { id: 'lean-unknown-identifier', kind: 'build', args: ['build', 'Main.lean'], files: { 'Main.lean': 'def main : IO Unit := IO.println (foo 1)\n' }, expect: /Main\.lean:1:\d+: error: Unknown identifier `foo`[\s\S]*Build failed\. Fix the error above/ },
+  // Missing-import hints (0.3-20): a name a generated Lasm.JS module defines, used without its import.
+  { id: 'missing-web-import', kind: 'build', args: ['build', 'Main.lean'], files: { 'Main.lean': 'import Lasm.JS\nopen Lasm.JS\ndef main : IO Unit := do\n  let _r := fetch\n  pure ()\n' },
+    expect: /Unknown identifier `fetch`[\s\S]*hint: fetch is defined in Lasm\.JS\.Web\.Fetch; add: import Lasm\.JS\.Web\.Fetch/, fixedIn: '0.10.0' },
+  { id: 'missing-node-import', kind: 'build', args: ['build', 'Main.lean'], files: { 'Main.lean': 'import Lasm.JS\nopen Lasm.JS\ndef main : IO Unit := do\n  let _r := path.basename\n  pure ()\n' },
+    expect: /Unknown identifier `path\.basename`[\s\S]*hint: path\.basename is defined in Lasm\.JS\.Node\.Path; add: import Lasm\.JS\.Node\.Path/, fixedIn: '0.10.0' },
   // A web API the target lacks, used without its availability guard (0.3-10, 0.3-11): refused, with the guard to use.
   { id: 'web-api-unguarded', kind: 'build', args: ['build', 'Main.lean'], files: { 'Main.lean': 'import Lasm.JS\nimport Lasm.JS.Web.Html\nimport Lasm.JS.Web.Webgpu\nopen Lasm.JS Lasm.JS.Web\ndef main : IO Unit := do\n  let gpu ← (← navigator).gpu\n  IO.println (← gpu.getPreferredCanvasFormat).val\n' },
     expect: /Lasm\.JS\.Web\.Navigator\.gpu \(api\.Navigator\.gpu\) is not available on --target node[\s\S]*availability guard/, fixedIn: '0.10.0' },

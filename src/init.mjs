@@ -70,9 +70,9 @@ export const templates = {
   // on the edge, Bun, Deno and the function platforms; with --deploy, the same
   // routes on Fastly's (Lasm.Fastly) and wasi:http's (Lasm.WASI.Http) own interfaces.
   fetch: { summary: 'an HTTP handler on the web\'s Request and Response (Lasm.JS.Web) for Node, the edge, Bun, Deno and the function platforms, and on Fastly Compute and wasi-http (Spin) through their own interfaces', server: true, interop: false, library: 'Lasm.JS.Web', portable: true, handler: 'Handler' },
-  // The whole stack in Lean (docs/RPC.md): shared types, API and validation; a
+  // The whole stack in Lean (templates/fullstack): shared types, API and validation; a
   // Lasm.Fetch server with server-side rendering; a Lasm.UI app that hydrates it.
-  fullstack: { summary: 'a full-stack Lean app: shared API and validation (Lasm.RPC), a server (Lasm.Fetch) that renders the first page, a browser app (Lasm.UI) that hydrates it; Node, Workers, Bun, Deno, and every edge --deploy target', server: true, interop: false, fullstack: true },
+  fullstack: { summary: 'a full-stack Lean app: shared types and validation, a REST server that renders the first page, a browser app (Lasm.UI) that hydrates it; Node, Workers, Bun, Deno, and every edge --deploy target', server: true, interop: false, fullstack: true },
 };
 
 export const initUsage = `Usage: lasm init <directory> [--template ${Object.keys(templates).join('|')}] [--deploy TARGET]…
@@ -756,10 +756,13 @@ function writeFiles(target, name, files) {
   return { directory: target, name, files: Object.keys(files) };
 }
 
-/** The fullstack template (docs/RPC.md): one Lake project with shared, server
+/** The fullstack template (templates/fullstack): one Lake project with shared, server
  * and client modules; the client is built for the browser into
  * dist/public/client, which the Node server serves and Workers serves as
  * static assets. */
+/** The fullstack template's programs for Fastly and wasi:http (their own interfaces). */
+const fullstackEntries = { fastly: 'Fastly.lean', 'wasi-http': 'WasiHttp.lean' };
+
 function fullstackFiles(name, deploy) {
   const lasm = lasmPackage();
   const read = file => readFileSync(join(templateRoot, 'fullstack', file), 'utf8');
@@ -778,12 +781,27 @@ name = "Shared"
 [[lean_lib]]
 name = "View"
 
-# Server.lean and Client.lean are the two programs: lasm builds them
+# The server's site (routes, first page, embedded files) and HTTP as plain data,
+# shared by the server programs.
+[[lean_lib]]
+name = "Http"
+
+[[lean_lib]]
+name = "Embed"
+
+[[lean_lib]]
+name = "Site"
+
+[[lean_lib]]
+name = "JsSite"
+
+# Server.lean (Node), Export.lean (the edge, Bun, Deno), Fastly.lean,
+# WasiHttp.lean and Client.lean (the browser) are the programs: lasm builds them
 # (npm run build). They are not Lake targets.
 ${lasmRequire}`,
     'package.json': JSON.stringify({
       name, version: '0.1.0', private: true, type: 'module',
-      description: 'A full-stack Lean app (Lasm.RPC, Lasm.Fetch, Lasm.UI), compiled to WebAssembly by Lasm',
+      description: 'A full-stack Lean app (a REST server and a Lasm.UI browser app), compiled to WebAssembly by Lasm',
       scripts: {
         // The server on http://localhost:3000, rebuilt with the browser app on every change.
         dev: 'lasm dev --target node=Server.lean,browser=Client.lean --output dist/public/client',
@@ -792,18 +810,18 @@ ${lasmRequire}`,
         'build:server': 'lasm build Server.lean --output dist/server',
         start: 'node dist/server/main.mjs',
         // Every other target: the browser app is embedded in the server program
-        // (embed_dir! in Server.lean), so the same build serves everything.
+        // (embed_dir! in Site.lean), so the same build serves everything.
         // Cloudflare Workers (wrangler.toml; Workers also serve dist/public as static assets).
-        'build:workers': 'npm run build:client && lasm build Server.lean --target workers',
+        'build:workers': 'npm run build:client && lasm build Export.lean --target workers',
         // Bun and Deno: bun bun/main.mjs, deno run -A --unstable-kv deno/main.mjs (on $PORT; Deno KV keeps the todos).
-        'build:bun': 'npm run build:client && lasm build Server.lean --target bun',
+        'build:bun': 'npm run build:client && lasm build Export.lean --target bun',
         'start:bun': 'bun bun/main.mjs',
-        'build:deno': 'npm run build:client && lasm build Server.lean --target deno',
+        'build:deno': 'npm run build:client && lasm build Export.lean --target deno',
         'start:deno': 'deno run -A --unstable-kv deno/main.mjs',
         ...Object.fromEntries(deploy.filter(t => !['workers'].includes(t)).map(t => [`build:${deployTargets[t].package}`,
           // A function platform packages the Node server in dist/server; a
           // platform target writes its own directory (bin/, wasi-http/, …).
-          `npm run build:client && lasm build Server.lean --target ${deployTargets[t].package}${packageTargets[deployTargets[t].package] ? ' --output dist/server' : ''}`])),
+          `npm run build:client && lasm build ${fullstackEntries[deployTargets[t].package] ?? 'Export.lean'} --target ${deployTargets[t].package}${packageTargets[deployTargets[t].package] ? ' --output dist/server' : ''}`])),
         ...(deploy.includes('fastly') ? { 'start:fastly': 'fastly compute serve' } : {}),
         ...(deploy.includes('spin') ? { 'start:spin': 'spin up' } : {}),
         ...(deploy.includes('wasi-http') ? { 'start:wasi-http': 'wasmtime serve wasi-http/main.wasm' } : {}),
@@ -813,8 +831,8 @@ ${lasmRequire}`,
     }, null, 2) + '\n',
     'Shared.lean': read('Shared.lean'),
     'View.lean': read('View.lean'),
-    'Server.lean': read('Server.lean'),
-    'Client.lean': read('Client.lean'),
+    ...Object.fromEntries(['Http.lean', 'Embed.lean', 'Site.lean', 'JsSite.lean', 'Server.lean', 'Export.lean', 'Client.lean'].map(file => [file, read(file)])),
+    ...Object.fromEntries([...new Set(deploy.map(t => fullstackEntries[deployTargets[t].package]).filter(Boolean))].map(file => [file, read(file)])),
     'public/style.css': read('public/style.css'),
     'wrangler.toml': `# Cloudflare Workers: npm run build:workers writes workers/ (the server) and
 # dist/public (the browser app); test with npx wrangler dev, deploy with npx wrangler deploy.
@@ -853,10 +871,13 @@ the API between them, whose types and validation are written once.
 
 | File | What it is |
 | --- | --- |
-| \`Shared.lean\` | The data (\`Todo\`), the API (\`Lasm.RPC\` endpoints) and its validation, with a theorem about it. Imported by both sides. |
+| \`Shared.lean\` | The data (\`Todo\`), the REST API's routes and bodies, and the validation, with a theorem about it. Imported by both sides. |
 | \`View.lean\` | The page (\`Lasm.UI\`): rendered to HTML by the server for the first visit, kept up to date by the browser. |
-| \`Server.lean\` | The server (\`Lasm.Fetch\`): serves the API and the first page. Its \`addTodo\` handler can only store titles that passed the shared check: the type asks for the proof. |
-| \`Client.lean\` | The browser app (\`Lasm.UI\`): hydrates the server's page and calls the API. A theorem shows it never sends an invalid title. |
+| \`Site.lean\` | The server's routes (\`GET\`, \`POST\`, \`PATCH\`, \`DELETE\` on \`/api/todos\`), the first page and the embedded files. It can only store titles that passed the shared check: the store takes a \`ValidTitle\`, a title with its proof. |
+| \`Http.lean\`, \`Embed.lean\` | HTTP as plain Lean data, and \`embed_dir!\`, which embeds the browser app's files. |
+| \`Server.lean\`, \`JsSite.lean\` | The server on Node (\`Node.serve\`), on the web's \`Request\` and \`Response\`. |
+| \`Export.lean\` | The server as the program's default export: Cloudflare Workers, the other edge targets, Bun and Deno. |
+| \`Client.lean\` | The browser app (\`Lasm.UI\`): hydrates the server's page and calls the API with \`fetch\` (\`Cmd.task\`). A theorem shows it never sends an invalid title. |
 | \`public/style.css\` | Copied next to the browser app. |
 | \`wrangler.toml\` | Cloudflare Workers: the server as a Worker, the browser app as static assets. |
 
@@ -876,7 +897,7 @@ the first build (a few hundred MB, cached for later builds).
 npm install
 npm run dev        # one URL, http://127.0.0.1:3000: rebuilds what an edit affects, reloads the page
 npm run build      # dist/public (the browser app), then dist/server (Node) with it embedded
-npm start          # serves the release build on http://localhost:3000 (PORT, HOST)
+npm start          # serves the release build on http://localhost:3000 (PORT)
 \`\`\`
 
 The Lean editor resolves \`import Lasm.*\` once \`npx lasm editor\` (also run by \`npm run dev\`)
@@ -899,9 +920,8 @@ command makes: on a fresh clone, run any lasm command once (\`npm run dev\`, \`n
   \`build:<platform>\` script (\`vercel-edge\`, \`netlify-edge\`, \`deno-deploy\`,
   \`fastly\` with a \`TODOS\` KV Store, \`wasi-http\`, \`spin\`).
 
-Guides: [Lasm.RPC](https://github.com/Millillion/lasm/blob/main/docs/RPC.md),
-[Lasm.UI](https://github.com/Millillion/lasm/blob/main/docs/UI.md),
-[Lasm.Fetch](https://github.com/Millillion/lasm/blob/main/docs/FETCH.md).
+Guides: [Lasm.UI](https://github.com/Millillion/lasm/blob/main/docs/UI.md),
+[serving HTTP](https://github.com/Millillion/lasm/blob/main/docs/JS_BINDINGS.md#serving-http-on-node-nodeserve).
 `;
 }
 

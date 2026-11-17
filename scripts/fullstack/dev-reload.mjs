@@ -68,8 +68,8 @@ try {
   expect('dev.reload-client', html.includes('/__lasm/events'));
   const script = /src="(\/client\/[^"]+\.js)"/.exec(html)?.[1] ?? '/client/app.js';
   expect('dev.client-served', (await fetch(base + script)).ok, script);
-  const rpc = await fetch(`${base}/rpc/listTodos`, { method: 'POST', body: 'null' });
-  expect('dev.rpc', rpc.ok && (await rpc.text()).includes('"ok"'));
+  const api = await fetch(`${base}/api/todos`);
+  expect('dev.api', api.ok && Array.isArray(await api.json()));
   expect('dev.no-5173', !/5173/.test(output));
   await listen();
 

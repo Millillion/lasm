@@ -24,8 +24,9 @@ const results = { label, url: base, checks: {} };
 let failed = false;
 const expect = (name, ok, detail = '') => { results.checks[name] = ok; if (!ok) failed = true; console.log(`${ok ? 'ok  ' : 'FAIL'} ${label} ${name}${!ok && detail ? ` — ${detail}` : ''}`); };
 const url = path => new URL(path, base);
-const rpc = async (name, body) => {
-  const response = await fetch(url(`/rpc/${name}`), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+// The template's REST API (Shared.lean).
+const api = async (method, path, body) => {
+  const response = await fetch(url(path), { method, headers: { 'content-type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) });
   return { status: response.status, text: await response.text() };
 };
 
@@ -62,22 +63,22 @@ try {
   expect('public-file', css.ok && /text\/css/.test(css.headers.get('content-type') ?? ''), `${css.status} ${css.headers.get('content-type')}`);
   expect('not-found', (await fetch(url('/no/such/page'))).status === 404);
   expect('no-traversal', ![200].includes((await fetch(url('/client/%2e%2e/%2e%2e/package.json'))).status));
-  const refused = await rpc('addTodo', { title: '   ' });
-  expect('rpc-validates', refused.status === 400 && refused.text.includes('Write something first'), `${refused.status} ${refused.text}`);
-  const list = await rpc('listTodos', null);
-  expect('rpc-list', list.status === 200 && list.text.includes('"ok"'), `${list.status} ${list.text}`);
+  const refused = await api('POST', '/api/todos', { title: '   ' });
+  expect('api-validates', refused.status === 400 && refused.text.includes('Write something first'), `${refused.status} ${refused.text}`);
+  const list = await api('GET', '/api/todos');
+  expect('api-list', list.status === 200 && Array.isArray(JSON.parse(list.text)), `${list.status} ${list.text}`);
   if (add) {
-    const added = await rpc('addTodo', { title: add });
-    expect('rpc-add', added.status === 200 && added.text.includes(add), `${added.status} ${added.text}`);
+    const added = await api('POST', '/api/todos', { title: add });
+    expect('api-add', added.status === 201 && added.text.includes(add), `${added.status} ${added.text}`);
     if (persist) {
-      const after = await rpc('listTodos', null);
+      const after = await api('GET', '/api/todos');
       expect('kv-across-requests', after.text.includes(add), after.text);
       const page = await (await fetch(base)).text();
       expect('ssr-from-kv', page.includes(add), page.slice(0, 400));
     }
   }
   if (expected) {
-    const after = await rpc('listTodos', null);
+    const after = await api('GET', '/api/todos');
     expect('kv-across-restart', after.text.includes(expected), after.text);
   }
 } catch (error) {

@@ -30,7 +30,7 @@ export const packageTargets = {
     shim: 'lasm-gcf.mjs', dependency: '@google-cloud/functions-framework' },
 };
 
-export const packageUsage = `Usage: lasm package [dist] --target ${Object.keys(packageTargets).join('|')} [--output PATH] [--allow-dev]
+export const packageUsage = `Usage: lasm package [dist] --target ${Object.keys(packageTargets).join('|')}|browser [--output PATH] [--allow-dev]
 
 Packages a built Lasm program (lasm build output, default dist/) for a
 function platform. Its main publishes a fetch handler with

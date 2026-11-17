@@ -6,7 +6,6 @@ import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { createInterface } from 'node:readline/promises';
-import { pathToFileURL } from 'node:url';
 
 export const usage = 'Usage: npm create @lasm@latest <directory> -- [--template NAME] [--deploy TARGET]…\nnpx @lasm/cli init --help lists the templates and deploy targets.';
 
@@ -32,14 +31,13 @@ export function locateCli(from = import.meta.url) {
   return { directory: dirname(manifest), bin: join(dirname(manifest), bin), version: pkg.version };
 }
 
-async function templateNames(cli) {
-  try { return Object.keys((await import(pathToFileURL(join(cli.directory, 'src/init.mjs')).href)).templates); }
-  catch { return ['plain', 'express', 'hono', 'fastify', 'std-http', 'web', 'fetch', 'fullstack']; }
-}
+/** The templates of the @lasm/cli this package pins (released together; test/create-lasm.test.mjs
+ * checks the list against src/init.mjs), so nothing reads the CLI's files. */
+export const templateNames = ['plain', 'express', 'hono', 'fastify', 'std-http', 'web', 'fetch', 'fullstack'];
 
 /** Ask for the directory (and the template unless one was given) on an interactive terminal. */
-export async function prompt(args, { cli, input = process.stdin, output = process.stdout } = {}) {
-  const names = await templateNames(cli);
+export async function prompt(args, { input = process.stdin, output = process.stdout } = {}) {
+  const names = templateNames;
   const rl = createInterface({ input, output });
   try {
     let directory = '';
@@ -60,7 +58,7 @@ export async function prompt(args, { cli, input = process.stdin, output = proces
 export async function main(args = process.argv.slice(2), { stdin = process.stdin, stderr = process.stderr, cli = locateCli(), run = runCli } = {}) {
   if (!hasDirectory(args)) {
     if (!stdin.isTTY) { stderr.write(usage + '\n'); return 1; }
-    args = await prompt(args, { cli, input: stdin });
+    args = await prompt(args, { input: stdin });
   }
   return run(cli, ['init', ...args]);
 }
