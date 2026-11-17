@@ -189,6 +189,15 @@ test('in a Lake project that requires Lasm\'s package, the editor links it and l
     // Without the require (an older project), the link is still made; the cached-only mode compiles nothing.
     writeFileSync(join(project, 'lakefile.toml'), 'name = "app"\n');
     assert.deepEqual(await compileProjectLibrary(project, { prefix }, () => {}, { ...options, compile: false }), { compiled: [], lake: false });
+    // By default Lasm compiles them (ensureProgramLibrary's result, with its time), with the given library list;
+    // here the program imports only prebuilt modules, so nothing.
+    writeFileSync(join(project, 'Main.lean'), 'import Lasm.JS\n');
+    assert.deepEqual(await compileProjectLibrary(project, { prefix }, () => {}, options), { compiled: [], ms: 0, lake: false });
+    // A module of the given library compiled on first import: Lasm compiles it (with the prefix's Lean, absent here).
+    writeFileSync(join(project, 'Main.lean'), 'import Lasm.JS.Web.IndexedDB\n');
+    const logs = [];
+    await assert.rejects(compileProjectLibrary(project, { prefix }, line => logs.push(line), options));
+    assert.match(logs[0], /^\[lasm\] Compiling 1 Lasm library module on first use \(Lasm\.JS\.Web\.IndexedDB\)/);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 

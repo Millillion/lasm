@@ -222,7 +222,7 @@ export function importsLibrary(sources) {
  * and the C glue, for the link; `modules` are those modules, `oleans` their
  * module data (for the binding check: library bindings name their JS modules). `supplied`: library modules
  * the program's own sources already compile (Lake built them, src/lake-library.mjs), linked from there only. */
-export function librarySources(lean, programSources, { supplied = [] } = {}) {
+export function librarySources(lean, programSources, { supplied } = {}) {
   const missing = module => !existsSync(libraryC(lean, module));
   if (libraryModules.some(missing)) throw new Error(`This program imports Lasm's library (Lasm.JS, Lasm.Fetch, Lasm.UI), which needs Lean ${libraryLeanVersions.join(' or ')} with Lean's elaborator libraries (the extended tier); it is missing from ${lean.prefix}`);
   const cache = new Map();
