@@ -321,6 +321,14 @@ instance : ToJS Transformer := ⟨fun d => Internal.fields #[("start", Internal.
   Lasm.JS.Binding.invoke ByteLengthQueuingStrategy { name := "Lasm.JS.Web.ByteLengthQueuingStrategy.new", module := "globalThis", path := "ByteLengthQueuingStrategy", construct := true, arity := 1 }
     (Internal.args #[toJS init]) (await := false)
 
+/-- `constructor(QueuingStrategyInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ByteLengthQueuingStrategy.new? (init : QueuingStrategyInit) : IO (Option ByteLengthQueuingStrategy) := Internal.api "Lasm.JS.Web.ByteLengthQueuingStrategy.new?" do
+  if !(← Internal.hasGlobal ["ByteLengthQueuingStrategy"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ByteLengthQueuingStrategy { name := "Lasm.JS.Web.ByteLengthQueuingStrategy.new?", module := "globalThis", path := "ByteLengthQueuingStrategy", construct := true, arity := 1 }
+      (Internal.args #[toJS init]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute unrestricted double highWaterMark` -/
 @[macro_inline] def ByteLengthQueuingStrategy.highWaterMark (self : ByteLengthQueuingStrategy) : IO Float := Internal.api "Lasm.JS.Web.ByteLengthQueuingStrategy.highWaterMark" do
   self.val.get "highWaterMark" Float
@@ -337,6 +345,14 @@ instance : ToJS Transformer := ⟨fun d => Internal.fields #[("start", Internal.
 @[macro_inline] def CountQueuingStrategy.new (init : QueuingStrategyInit) : IO CountQueuingStrategy := Internal.api "Lasm.JS.Web.CountQueuingStrategy.new" do
   Lasm.JS.Binding.invoke CountQueuingStrategy { name := "Lasm.JS.Web.CountQueuingStrategy.new", module := "globalThis", path := "CountQueuingStrategy", construct := true, arity := 1 }
     (Internal.args #[toJS init]) (await := false)
+
+/-- `constructor(QueuingStrategyInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CountQueuingStrategy.new? (init : QueuingStrategyInit) : IO (Option CountQueuingStrategy) := Internal.api "Lasm.JS.Web.CountQueuingStrategy.new?" do
+  if !(← Internal.hasGlobal ["CountQueuingStrategy"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CountQueuingStrategy { name := "Lasm.JS.Web.CountQueuingStrategy.new?", module := "globalThis", path := "CountQueuingStrategy", construct := true, arity := 1 }
+      (Internal.args #[toJS init]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute unrestricted double highWaterMark` -/
 @[macro_inline] def CountQueuingStrategy.highWaterMark (self : CountQueuingStrategy) : IO Float := Internal.api "Lasm.JS.Web.CountQueuingStrategy.highWaterMark" do
@@ -379,6 +395,14 @@ instance : ToJS Transformer := ⟨fun d => Internal.fields #[("start", Internal.
   Lasm.JS.Binding.invoke ReadableStream { name := "Lasm.JS.Web.ReadableStream.new", module := "globalThis", path := "ReadableStream", construct := true, arity := 2 }
     (Internal.args #[underlyingSource, Internal.optional strategy]) (await := false)
 
+/-- `constructor(optional object underlyingSource, optional QueuingStrategy strategy)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ReadableStream.new? (underlyingSource : Data := .undefined) (strategy : Option QueuingStrategy := none) : IO (Option ReadableStream) := Internal.api "Lasm.JS.Web.ReadableStream.new?" do
+  if !(← Internal.hasGlobal ["ReadableStream"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ReadableStream { name := "Lasm.JS.Web.ReadableStream.new?", module := "globalThis", path := "ReadableStream", construct := true, arity := 2 }
+      (Internal.args #[underlyingSource, Internal.optional strategy]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute boolean locked` -/
 @[macro_inline] def ReadableStream.locked (self : ReadableStream) : IO Bool := Internal.api "Lasm.JS.Web.ReadableStream.locked" do
   self.val.get "locked" Bool
@@ -388,6 +412,15 @@ instance : ToJS Transformer := ⟨fun d => Internal.fields #[("start", Internal.
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.ReadableStream.from", module := "globalThis", path := "ReadableStream.from", construct := false, arity := 1 }
     (Internal.args #[toJS asyncIterable]) (await := false)
   pure { val := r }
+
+/-- `static ReadableStream from(async_sequence<any> asyncIterable)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ReadableStream.«from?» (asyncIterable : Data) : IO (Option ReadableStream) := Internal.api "Lasm.JS.Web.ReadableStream.from?" do
+  if !(← Internal.hasGlobal ["ReadableStream", "from"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.ReadableStream.from?", module := "globalThis", path := "ReadableStream.from", construct := false, arity := 1 }
+      (Internal.args #[toJS asyncIterable]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `Promise<undefined> cancel(optional any reason)` -/
 @[macro_inline] def ReadableStream.cancel (self : ReadableStream) (reason : Data := .undefined) : Async Unit := Internal.api "Lasm.JS.Web.ReadableStream.cancel" do
@@ -418,6 +451,14 @@ instance : ToJS Transformer := ⟨fun d => Internal.fields #[("start", Internal.
 @[macro_inline] def ReadableStreamBYOBReader.new (stream : ReadableStream) : IO ReadableStreamBYOBReader := Internal.api "Lasm.JS.Web.ReadableStreamBYOBReader.new" do
   Lasm.JS.Binding.invoke ReadableStreamBYOBReader { name := "Lasm.JS.Web.ReadableStreamBYOBReader.new", module := "globalThis", path := "ReadableStreamBYOBReader", construct := true, arity := 1 }
     (Internal.args #[toJS stream]) (await := false)
+
+/-- `constructor(ReadableStream stream)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ReadableStreamBYOBReader.new? (stream : ReadableStream) : IO (Option ReadableStreamBYOBReader) := Internal.api "Lasm.JS.Web.ReadableStreamBYOBReader.new?" do
+  if !(← Internal.hasGlobal ["ReadableStreamBYOBReader"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ReadableStreamBYOBReader { name := "Lasm.JS.Web.ReadableStreamBYOBReader.new?", module := "globalThis", path := "ReadableStreamBYOBReader", construct := true, arity := 1 }
+      (Internal.args #[toJS stream]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute Promise<undefined> closed` -/
 @[macro_inline] def ReadableStreamBYOBReader.closed (self : ReadableStreamBYOBReader) : Async Unit := Internal.api "Lasm.JS.Web.ReadableStreamBYOBReader.closed" do
@@ -481,6 +522,14 @@ instance : ToJS Transformer := ⟨fun d => Internal.fields #[("start", Internal.
   Lasm.JS.Binding.invoke ReadableStreamDefaultReader { name := "Lasm.JS.Web.ReadableStreamDefaultReader.new", module := "globalThis", path := "ReadableStreamDefaultReader", construct := true, arity := 1 }
     (Internal.args #[toJS stream]) (await := false)
 
+/-- `constructor(ReadableStream stream)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ReadableStreamDefaultReader.new? (stream : ReadableStream) : IO (Option ReadableStreamDefaultReader) := Internal.api "Lasm.JS.Web.ReadableStreamDefaultReader.new?" do
+  if !(← Internal.hasGlobal ["ReadableStreamDefaultReader"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ReadableStreamDefaultReader { name := "Lasm.JS.Web.ReadableStreamDefaultReader.new?", module := "globalThis", path := "ReadableStreamDefaultReader", construct := true, arity := 1 }
+      (Internal.args #[toJS stream]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute Promise<undefined> closed` -/
 @[macro_inline] def ReadableStreamDefaultReader.closed (self : ReadableStreamDefaultReader) : Async Unit := Internal.api "Lasm.JS.Web.ReadableStreamDefaultReader.closed" do
   let p ← self.val.get "closed" Value
@@ -506,6 +555,14 @@ instance : ToJS Transformer := ⟨fun d => Internal.fields #[("start", Internal.
 @[macro_inline] def TransformStream.new (transformer : Data := .undefined) (writableStrategy : Option QueuingStrategy := none) (readableStrategy : Option QueuingStrategy := none) : IO TransformStream := Internal.api "Lasm.JS.Web.TransformStream.new" do
   Lasm.JS.Binding.invoke TransformStream { name := "Lasm.JS.Web.TransformStream.new", module := "globalThis", path := "TransformStream", construct := true, arity := 3 }
     (Internal.args #[transformer, Internal.optional writableStrategy, Internal.optional readableStrategy]) (await := false)
+
+/-- `constructor(optional object transformer, optional QueuingStrategy writableStrategy, optional QueuingStrategy readableStrategy)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def TransformStream.new? (transformer : Data := .undefined) (writableStrategy : Option QueuingStrategy := none) (readableStrategy : Option QueuingStrategy := none) : IO (Option TransformStream) := Internal.api "Lasm.JS.Web.TransformStream.new?" do
+  if !(← Internal.hasGlobal ["TransformStream"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke TransformStream { name := "Lasm.JS.Web.TransformStream.new?", module := "globalThis", path := "TransformStream", construct := true, arity := 3 }
+      (Internal.args #[transformer, Internal.optional writableStrategy, Internal.optional readableStrategy]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute ReadableStream readable` -/
 @[macro_inline] def TransformStream.readable (self : TransformStream) : IO ReadableStream := Internal.api "Lasm.JS.Web.TransformStream.readable" do
@@ -546,6 +603,14 @@ instance : ToJS Transformer := ⟨fun d => Internal.fields #[("start", Internal.
   Lasm.JS.Binding.invoke WritableStream { name := "Lasm.JS.Web.WritableStream.new", module := "globalThis", path := "WritableStream", construct := true, arity := 2 }
     (Internal.args #[underlyingSink, Internal.optional strategy]) (await := false)
 
+/-- `constructor(optional object underlyingSink, optional QueuingStrategy strategy)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def WritableStream.new? (underlyingSink : Data := .undefined) (strategy : Option QueuingStrategy := none) : IO (Option WritableStream) := Internal.api "Lasm.JS.Web.WritableStream.new?" do
+  if !(← Internal.hasGlobal ["WritableStream"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke WritableStream { name := "Lasm.JS.Web.WritableStream.new?", module := "globalThis", path := "WritableStream", construct := true, arity := 2 }
+      (Internal.args #[underlyingSink, Internal.optional strategy]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute boolean locked` -/
 @[macro_inline] def WritableStream.locked (self : WritableStream) : IO Bool := Internal.api "Lasm.JS.Web.WritableStream.locked" do
   self.val.get "locked" Bool
@@ -572,6 +637,15 @@ instance : ToJS Transformer := ⟨fun d => Internal.fields #[("start", Internal.
   let r ← self.val.get "signal" Value
   pure { val := r }
 
+/-- `readonly attribute AbortSignal signal` where the platform has it (`'signal' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WritableStreamDefaultController.signal? (self' : WritableStreamDefaultController) : IO (Option AbortSignal) := Internal.api "Lasm.JS.Web.WritableStreamDefaultController.signal?" do
+  let self := self'
+  if !(← Internal.has self.val "signal") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "signal" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `undefined error(optional any e)` -/
 @[macro_inline] def WritableStreamDefaultController.error (self : WritableStreamDefaultController) (e : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Web.WritableStreamDefaultController.error" do
   self.val.callMethod "error" (Internal.args #[e]) Unit
@@ -584,6 +658,14 @@ instance : ToJS Transformer := ⟨fun d => Internal.fields #[("start", Internal.
 @[macro_inline] def WritableStreamDefaultWriter.new (stream : WritableStream) : IO WritableStreamDefaultWriter := Internal.api "Lasm.JS.Web.WritableStreamDefaultWriter.new" do
   Lasm.JS.Binding.invoke WritableStreamDefaultWriter { name := "Lasm.JS.Web.WritableStreamDefaultWriter.new", module := "globalThis", path := "WritableStreamDefaultWriter", construct := true, arity := 1 }
     (Internal.args #[toJS stream]) (await := false)
+
+/-- `constructor(WritableStream stream)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def WritableStreamDefaultWriter.new? (stream : WritableStream) : IO (Option WritableStreamDefaultWriter) := Internal.api "Lasm.JS.Web.WritableStreamDefaultWriter.new?" do
+  if !(← Internal.hasGlobal ["WritableStreamDefaultWriter"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke WritableStreamDefaultWriter { name := "Lasm.JS.Web.WritableStreamDefaultWriter.new?", module := "globalThis", path := "WritableStreamDefaultWriter", construct := true, arity := 1 }
+      (Internal.args #[toJS stream]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute Promise<undefined> closed` -/
 @[macro_inline] def WritableStreamDefaultWriter.closed (self : WritableStreamDefaultWriter) : Async Unit := Internal.api "Lasm.JS.Web.WritableStreamDefaultWriter.closed" do

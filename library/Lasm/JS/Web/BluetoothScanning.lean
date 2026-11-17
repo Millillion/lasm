@@ -53,6 +53,14 @@ instance : ToJS BluetoothLEScanPermissionDescriptor := ⟨fun d => Internal.fiel
   Lasm.JS.Binding.invoke BluetoothDataFilter { name := "Lasm.JS.Web.BluetoothDataFilter.new", module := "globalThis", path := "BluetoothDataFilter", construct := true, arity := 1 }
     (Internal.args #[Internal.optional init]) (await := false)
 
+/-- `constructor(optional BluetoothDataFilterInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def BluetoothDataFilter.new? (init : Option BluetoothDataFilterInit := none) : IO (Option BluetoothDataFilter) := Internal.api "Lasm.JS.Web.BluetoothDataFilter.new?" do
+  if !(← Internal.hasGlobal ["BluetoothDataFilter"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke BluetoothDataFilter { name := "Lasm.JS.Web.BluetoothDataFilter.new?", module := "globalThis", path := "BluetoothDataFilter", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional init]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute ArrayBuffer dataPrefix` -/
 @[macro_inline] def BluetoothDataFilter.dataPrefix (self : BluetoothDataFilter) : IO ByteArray := Internal.api "Lasm.JS.Web.BluetoothDataFilter.dataPrefix" do
   let r ← self.val.get "dataPrefix" Value
@@ -95,6 +103,14 @@ instance : ToJS BluetoothLEScanPermissionDescriptor := ⟨fun d => Internal.fiel
 @[macro_inline] def BluetoothLEScanFilter.new (init : Option BluetoothLEScanFilterInit := none) : IO BluetoothLEScanFilter := Internal.api "Lasm.JS.Web.BluetoothLEScanFilter.new" do
   Lasm.JS.Binding.invoke BluetoothLEScanFilter { name := "Lasm.JS.Web.BluetoothLEScanFilter.new", module := "globalThis", path := "BluetoothLEScanFilter", construct := true, arity := 1 }
     (Internal.args #[Internal.optional init]) (await := false)
+
+/-- `constructor(optional BluetoothLEScanFilterInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def BluetoothLEScanFilter.new? (init : Option BluetoothLEScanFilterInit := none) : IO (Option BluetoothLEScanFilter) := Internal.api "Lasm.JS.Web.BluetoothLEScanFilter.new?" do
+  if !(← Internal.hasGlobal ["BluetoothLEScanFilter"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke BluetoothLEScanFilter { name := "Lasm.JS.Web.BluetoothLEScanFilter.new?", module := "globalThis", path := "BluetoothLEScanFilter", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional init]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString? name` -/
 @[macro_inline] def BluetoothLEScanFilter.name (self : BluetoothLEScanFilter) : IO (Option String) := Internal.api "Lasm.JS.Web.BluetoothLEScanFilter.name" do
@@ -139,6 +155,14 @@ instance : ToJS BluetoothLEScanPermissionDescriptor := ⟨fun d => Internal.fiel
   Lasm.JS.Binding.invoke BluetoothManufacturerDataFilter { name := "Lasm.JS.Web.BluetoothManufacturerDataFilter.new", module := "globalThis", path := "BluetoothManufacturerDataFilter", construct := true, arity := 1 }
     (Internal.args #[init]) (await := false)
 
+/-- `constructor(optional object init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def BluetoothManufacturerDataFilter.new? (init : Data := .undefined) : IO (Option BluetoothManufacturerDataFilter) := Internal.api "Lasm.JS.Web.BluetoothManufacturerDataFilter.new?" do
+  if !(← Internal.hasGlobal ["BluetoothManufacturerDataFilter"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke BluetoothManufacturerDataFilter { name := "Lasm.JS.Web.BluetoothManufacturerDataFilter.new?", module := "globalThis", path := "BluetoothManufacturerDataFilter", construct := true, arity := 1 }
+      (Internal.args #[init]) (await := false)
+  return some lasmGuarded
+
 /-- `v instanceof BluetoothServiceDataFilter`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BluetoothServiceDataFilter`). -/
 @[macro_inline] def BluetoothServiceDataFilter.cast? (v : Value) : IO (Option BluetoothServiceDataFilter) := Internal.api "Lasm.JS.Web.BluetoothServiceDataFilter.cast?" do
   Internal.cast (Internal.getGlobal ["BluetoothServiceDataFilter"] Value) (fun x => { val := x }) v
@@ -147,6 +171,14 @@ instance : ToJS BluetoothLEScanPermissionDescriptor := ⟨fun d => Internal.fiel
 @[macro_inline] def BluetoothServiceDataFilter.new (init : Data := .undefined) : IO BluetoothServiceDataFilter := Internal.api "Lasm.JS.Web.BluetoothServiceDataFilter.new" do
   Lasm.JS.Binding.invoke BluetoothServiceDataFilter { name := "Lasm.JS.Web.BluetoothServiceDataFilter.new", module := "globalThis", path := "BluetoothServiceDataFilter", construct := true, arity := 1 }
     (Internal.args #[init]) (await := false)
+
+/-- `constructor(optional object init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def BluetoothServiceDataFilter.new? (init : Data := .undefined) : IO (Option BluetoothServiceDataFilter) := Internal.api "Lasm.JS.Web.BluetoothServiceDataFilter.new?" do
+  if !(← Internal.hasGlobal ["BluetoothServiceDataFilter"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke BluetoothServiceDataFilter { name := "Lasm.JS.Web.BluetoothServiceDataFilter.new?", module := "globalThis", path := "BluetoothServiceDataFilter", construct := true, arity := 1 }
+      (Internal.args #[init]) (await := false)
+  return some lasmGuarded
 
 /-- `Promise<BluetoothLEScan> requestLEScan(optional BluetoothLEScanOptions options)` -/
 @[macro_inline] def Bluetooth.requestLEScan (self : Bluetooth) (options : Option BluetoothLEScanOptions := none) : Async BluetoothLEScan := Internal.api "Lasm.JS.Web.Bluetooth.requestLEScan" do

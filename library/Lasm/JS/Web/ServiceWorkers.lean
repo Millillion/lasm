@@ -242,13 +242,37 @@ instance : Coe (Array RouterRule) RouterRuleOrSequenceOfRouterRule := ⟨.sequen
 @[macro_inline] def Cache.matchAll (self : Cache) (request : Option RequestInfo := none) (options : Option CacheQueryOptions := none) : Async (Array Response) := Internal.api "Lasm.JS.Web.Cache.matchAll" do
   self.val.callMethodAwait "matchAll" (Internal.args #[Internal.optional request, Internal.optional options]) (Array Response)
 
+/-- `Promise<FrozenArray<Response>> matchAll(optional RequestInfo request, optional CacheQueryOptions options)` where the platform has it (`'matchAll' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Cache.matchAll? (self' : Cache) (request : Option RequestInfo := none) (options : Option CacheQueryOptions := none) : Async (Option (Array Response)) := Internal.api "Lasm.JS.Web.Cache.matchAll?" do
+  let self := self'
+  if !(← Internal.has self.val "matchAll") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "matchAll" (Internal.args #[Internal.optional request, Internal.optional options]) (Array Response)
+  return some lasmGuarded
+
 /-- `Promise<undefined> add(RequestInfo request)` -/
 @[macro_inline] def Cache.add (self : Cache) (request : RequestInfo) : Async Unit := Internal.api "Lasm.JS.Web.Cache.add" do
   self.val.callMethodAwait "add" (Internal.args #[toJS request]) Unit
 
+/-- `Promise<undefined> add(RequestInfo request)` where the platform has it (`'add' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Cache.add? (self' : Cache) (request : RequestInfo) : Async (Option Unit) := Internal.api "Lasm.JS.Web.Cache.add?" do
+  let self := self'
+  if !(← Internal.has self.val "add") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "add" (Internal.args #[toJS request]) Unit
+  return some lasmGuarded
+
 /-- `Promise<undefined> addAll(sequence<RequestInfo> requests)` -/
 @[macro_inline] def Cache.addAll (self : Cache) (requests : Array RequestInfo) : Async Unit := Internal.api "Lasm.JS.Web.Cache.addAll" do
   self.val.callMethodAwait "addAll" (Internal.args #[toJS requests]) Unit
+
+/-- `Promise<undefined> addAll(sequence<RequestInfo> requests)` where the platform has it (`'addAll' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Cache.addAll? (self' : Cache) (requests : Array RequestInfo) : Async (Option Unit) := Internal.api "Lasm.JS.Web.Cache.addAll?" do
+  let self := self'
+  if !(← Internal.has self.val "addAll") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "addAll" (Internal.args #[toJS requests]) Unit
+  return some lasmGuarded
 
 /-- `Promise<undefined> put(RequestInfo request, Response response)` -/
 @[macro_inline] def Cache.put (self : Cache) (request : RequestInfo) (response : Response) : Async Unit := Internal.api "Lasm.JS.Web.Cache.put" do
@@ -262,6 +286,14 @@ instance : Coe (Array RouterRule) RouterRuleOrSequenceOfRouterRule := ⟨.sequen
 @[macro_inline] def Cache.keys (self : Cache) (request : Option RequestInfo := none) (options : Option CacheQueryOptions := none) : Async (Array Request) := Internal.api "Lasm.JS.Web.Cache.keys" do
   self.val.callMethodAwait "keys" (Internal.args #[Internal.optional request, Internal.optional options]) (Array Request)
 
+/-- `Promise<FrozenArray<Request>> keys(optional RequestInfo request, optional CacheQueryOptions options)` where the platform has it (`'keys' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Cache.keys? (self' : Cache) (request : Option RequestInfo := none) (options : Option CacheQueryOptions := none) : Async (Option (Array Request)) := Internal.api "Lasm.JS.Web.Cache.keys?" do
+  let self := self'
+  if !(← Internal.has self.val "keys") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "keys" (Internal.args #[Internal.optional request, Internal.optional options]) (Array Request)
+  return some lasmGuarded
+
 /-- `v instanceof CacheStorage`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CacheStorage`). -/
 @[macro_inline] def CacheStorage.cast? (v : Value) : IO (Option CacheStorage) := Internal.api "Lasm.JS.Web.CacheStorage.cast?" do
   Internal.cast (Internal.getGlobal ["CacheStorage"] Value) (fun x => { val := x }) v
@@ -269,6 +301,14 @@ instance : Coe (Array RouterRule) RouterRuleOrSequenceOfRouterRule := ⟨.sequen
 /-- `Promise<(Response or undefined)> match(RequestInfo request, optional MultiCacheQueryOptions options)` -/
 @[macro_inline] def CacheStorage.«match» (self : CacheStorage) (request : RequestInfo) (options : Option MultiCacheQueryOptions := none) : Async (Option Response) := Internal.api "Lasm.JS.Web.CacheStorage.match" do
   self.val.callMethodAwait "match" (Internal.args #[toJS request, Internal.optional options]) (Option Response)
+
+/-- `Promise<(Response or undefined)> match(RequestInfo request, optional MultiCacheQueryOptions options)` where the platform has it (`'match' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CacheStorage.«match?» (self' : CacheStorage) (request : RequestInfo) (options : Option MultiCacheQueryOptions := none) : Async (Option (Option Response)) := Internal.api "Lasm.JS.Web.CacheStorage.match?" do
+  let self := self'
+  if !(← Internal.has self.val "match") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "match" (Internal.args #[toJS request, Internal.optional options]) (Option Response)
+  return some lasmGuarded
 
 /-- `Promise<boolean> has(DOMString cacheName)` -/
 @[macro_inline] def CacheStorage.has (self : CacheStorage) (cacheName : String) : Async Bool := Internal.api "Lasm.JS.Web.CacheStorage.has" do
@@ -343,6 +383,14 @@ instance : Coe (Array RouterRule) RouterRuleOrSequenceOfRouterRule := ⟨.sequen
 @[macro_inline] def ExtendableEvent.new (type : String) (eventInitDict : Option ExtendableEventInit := none) : IO ExtendableEvent := Internal.api "Lasm.JS.Web.ExtendableEvent.new" do
   Lasm.JS.Binding.invoke ExtendableEvent { name := "Lasm.JS.Web.ExtendableEvent.new", module := "globalThis", path := "ExtendableEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, optional ExtendableEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ExtendableEvent.new? (type : String) (eventInitDict : Option ExtendableEventInit := none) : IO (Option ExtendableEvent) := Internal.api "Lasm.JS.Web.ExtendableEvent.new?" do
+  if !(← Internal.hasGlobal ["ExtendableEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ExtendableEvent { name := "Lasm.JS.Web.ExtendableEvent.new?", module := "globalThis", path := "ExtendableEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `undefined waitUntil(Promise<any> f)` -/
 @[macro_inline] def ExtendableEvent.waitUntil (self : ExtendableEvent) (f : Value) : IO Unit := Internal.api "Lasm.JS.Web.ExtendableEvent.waitUntil" do
@@ -478,6 +526,15 @@ instance : Coe (Array RouterRule) RouterRuleOrSequenceOfRouterRule := ⟨.sequen
   let r ← self.val.get "serviceWorker" Value
   pure { val := r }
 
+/-- `readonly attribute ServiceWorker serviceWorker` where the platform has it (`'serviceWorker' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ServiceWorkerGlobalScope.serviceWorker? (self' : ServiceWorkerGlobalScope) : IO (Option ServiceWorker) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.serviceWorker?" do
+  let self := self'
+  if !(← Internal.has self.val "serviceWorker") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "serviceWorker" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `attribute EventHandler oninstall` -/
 @[macro_inline] def ServiceWorkerGlobalScope.oninstall (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.oninstall" do
   self.val.get "oninstall" (Option EventHandlerNonNull)
@@ -577,6 +634,14 @@ instance : Coe (Array RouterRule) RouterRuleOrSequenceOfRouterRule := ⟨.sequen
   Lasm.JS.Binding.invoke ExtendableMessageEvent { name := "Lasm.JS.Web.ExtendableMessageEvent.new", module := "globalThis", path := "ExtendableMessageEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional ExtendableMessageEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ExtendableMessageEvent.new? (type : String) (eventInitDict : Option ExtendableMessageEventInit := none) : IO (Option ExtendableMessageEvent) := Internal.api "Lasm.JS.Web.ExtendableMessageEvent.new?" do
+  if !(← Internal.hasGlobal ["ExtendableMessageEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ExtendableMessageEvent { name := "Lasm.JS.Web.ExtendableMessageEvent.new?", module := "globalThis", path := "ExtendableMessageEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute any data` -/
 @[macro_inline] def ExtendableMessageEvent.data (self : ExtendableMessageEvent) : IO Data := Internal.api "Lasm.JS.Web.ExtendableMessageEvent.data" do
   self.val.get "data" Data
@@ -606,6 +671,14 @@ instance : Coe (Array RouterRule) RouterRuleOrSequenceOfRouterRule := ⟨.sequen
 @[macro_inline] def FetchEvent.new (type : String) (eventInitDict : FetchEventInit) : IO FetchEvent := Internal.api "Lasm.JS.Web.FetchEvent.new" do
   Lasm.JS.Binding.invoke FetchEvent { name := "Lasm.JS.Web.FetchEvent.new", module := "globalThis", path := "FetchEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, FetchEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def FetchEvent.new? (type : String) (eventInitDict : FetchEventInit) : IO (Option FetchEvent) := Internal.api "Lasm.JS.Web.FetchEvent.new?" do
+  if !(← Internal.hasGlobal ["FetchEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke FetchEvent { name := "Lasm.JS.Web.FetchEvent.new?", module := "globalThis", path := "FetchEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute Request request` -/
 @[macro_inline] def FetchEvent.request (self : FetchEvent) : IO Request := Internal.api "Lasm.JS.Web.FetchEvent.request" do
@@ -647,6 +720,14 @@ instance : Coe (Array RouterRule) RouterRuleOrSequenceOfRouterRule := ⟨.sequen
   Lasm.JS.Binding.invoke InstallEvent { name := "Lasm.JS.Web.InstallEvent.new", module := "globalThis", path := "InstallEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional ExtendableEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def InstallEvent.new? (type : String) (eventInitDict : Option ExtendableEventInit := none) : IO (Option InstallEvent) := Internal.api "Lasm.JS.Web.InstallEvent.new?" do
+  if !(← Internal.hasGlobal ["InstallEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke InstallEvent { name := "Lasm.JS.Web.InstallEvent.new?", module := "globalThis", path := "InstallEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `Promise<undefined> addRoutes((RouterRule or sequence<RouterRule>) rules)` -/
 @[macro_inline] def InstallEvent.addRoutes (self : InstallEvent) (rules : RouterRuleOrSequenceOfRouterRule) : Async Unit := Internal.api "Lasm.JS.Web.InstallEvent.addRoutes" do
   self.val.callMethodAwait "addRoutes" (Internal.args #[toJS rules]) Unit
@@ -667,6 +748,14 @@ instance : Coe (Array RouterRule) RouterRuleOrSequenceOfRouterRule := ⟨.sequen
 @[macro_inline] def WindowClient.ancestorOrigins (self : WindowClient) : IO (Array String) := Internal.api "Lasm.JS.Web.WindowClient.ancestorOrigins" do
   self.val.get "ancestorOrigins" (Array String)
 
+/-- `readonly attribute FrozenArray<USVString> ancestorOrigins` where the platform has it (`'ancestorOrigins' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WindowClient.ancestorOrigins? (self' : WindowClient) : IO (Option (Array String)) := Internal.api "Lasm.JS.Web.WindowClient.ancestorOrigins?" do
+  let self := self'
+  if !(← Internal.has self.val "ancestorOrigins") then return none
+  let lasmGuarded ← do
+    self.val.get "ancestorOrigins" (Array String)
+  return some lasmGuarded
+
 /-- `Promise<WindowClient> focus()` -/
 @[macro_inline] def WindowClient.focus (self : WindowClient) : Async WindowClient := Internal.api "Lasm.JS.Web.WindowClient.focus" do
   let r ← self.val.callMethodAwait "focus" (Internal.args #[]) Value
@@ -680,6 +769,15 @@ instance : Coe (Array RouterRule) RouterRuleOrSequenceOfRouterRule := ⟨.sequen
 @[macro_inline] def Navigator.serviceWorker (self : Navigator) : IO ServiceWorkerContainer := Internal.api "Lasm.JS.Web.Navigator.serviceWorker" do
   let r ← self.val.get "serviceWorker" Value
   pure { val := r }
+
+/-- `readonly attribute ServiceWorkerContainer serviceWorker` where the platform has it (`'serviceWorker' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.serviceWorker? (self' : Navigator) : IO (Option ServiceWorkerContainer) := Internal.api "Lasm.JS.Web.Navigator.serviceWorker?" do
+  let self := self'
+  if !(← Internal.has self.val "serviceWorker") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "serviceWorker" Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `readonly attribute CacheStorage caches` -/
 @[macro_inline] def Window.caches (self : Window) : IO CacheStorage := Internal.api "Lasm.JS.Web.Window.caches" do
@@ -696,9 +794,26 @@ instance : Coe (Array RouterRule) RouterRuleOrSequenceOfRouterRule := ⟨.sequen
   let r ← self.val.get "serviceWorker" Value
   pure { val := r }
 
+/-- `readonly attribute ServiceWorkerContainer serviceWorker` where the platform has it (`'serviceWorker' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerNavigator.serviceWorker? (self' : WorkerNavigator) : IO (Option ServiceWorkerContainer) := Internal.api "Lasm.JS.Web.WorkerNavigator.serviceWorker?" do
+  let self := self'
+  if !(← Internal.has self.val "serviceWorker") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "serviceWorker" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute CacheStorage caches` (Service Workers Nightly (https://w3c.github.io/ServiceWorker/)) -/
 @[macro_inline] def caches : IO CacheStorage := Internal.api "Lasm.JS.Web.caches" do
   let r ← Internal.getGlobal ["caches"] Value
   pure { val := r }
+
+/-- `readonly attribute CacheStorage caches` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def caches? : IO (Option CacheStorage) := Internal.api "Lasm.JS.Web.caches?" do
+  if !(← Internal.hasGlobal ["caches"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["caches"] Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

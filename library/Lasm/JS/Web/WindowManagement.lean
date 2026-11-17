@@ -87,9 +87,25 @@ set_option compiler.extract_closed false
 @[macro_inline] def Screen.isExtended (self : Screen) : IO Bool := Internal.api "Lasm.JS.Web.Screen.isExtended" do
   self.val.get "isExtended" Bool
 
+/-- `readonly attribute boolean isExtended` where the platform has it (`'isExtended' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Screen.isExtended? (self' : Screen) : IO (Option Bool) := Internal.api "Lasm.JS.Web.Screen.isExtended?" do
+  let self := self'
+  if !(← Internal.has self.val "isExtended") then return none
+  let lasmGuarded ← do
+    self.val.get "isExtended" Bool
+  return some lasmGuarded
+
 /-- `attribute EventHandler onchange` -/
 @[macro_inline] def Screen.onchange (self : Screen) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Screen.onchange" do
   self.val.get "onchange" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onchange` where the platform has it (`'onchange' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Screen.onchange? (self' : Screen) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Screen.onchange?" do
+  let self := self'
+  if !(← Internal.has self.val "onchange") then return none
+  let lasmGuarded ← do
+    self.val.get "onchange" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onchange`: `attribute EventHandler onchange` -/
 @[macro_inline] def Screen.setOnchange (self : Screen) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Screen.setOnchange" do
@@ -100,21 +116,62 @@ set_option compiler.extract_closed false
   let r ← self.val.callMethodAwait "getScreenDetails" (Internal.args #[]) Value
   pure { val := r }
 
+/-- `Promise<ScreenDetails> getScreenDetails()` where the platform has it (`'getScreenDetails' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.getScreenDetails? (self' : Window) : Async (Option ScreenDetails) := Internal.api "Lasm.JS.Web.Window.getScreenDetails?" do
+  let self := self'
+  if !(← Internal.has self.val "getScreenDetails") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethodAwait "getScreenDetails" (Internal.args #[]) Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `Promise<undefined> minimize()` -/
 @[macro_inline] def Window.minimize (self : Window) : Async Unit := Internal.api "Lasm.JS.Web.Window.minimize" do
   self.val.callMethodAwait "minimize" (Internal.args #[]) Unit
+
+/-- `Promise<undefined> minimize()` where the platform has it (`'minimize' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.minimize? (self' : Window) : Async (Option Unit) := Internal.api "Lasm.JS.Web.Window.minimize?" do
+  let self := self'
+  if !(← Internal.has self.val "minimize") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "minimize" (Internal.args #[]) Unit
+  return some lasmGuarded
 
 /-- `Promise<undefined> maximize()` -/
 @[macro_inline] def Window.maximize (self : Window) : Async Unit := Internal.api "Lasm.JS.Web.Window.maximize" do
   self.val.callMethodAwait "maximize" (Internal.args #[]) Unit
 
+/-- `Promise<undefined> maximize()` where the platform has it (`'maximize' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.maximize? (self' : Window) : Async (Option Unit) := Internal.api "Lasm.JS.Web.Window.maximize?" do
+  let self := self'
+  if !(← Internal.has self.val "maximize") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "maximize" (Internal.args #[]) Unit
+  return some lasmGuarded
+
 /-- `Promise<undefined> restore()` -/
 @[macro_inline] def Window.restore (self : Window) : Async Unit := Internal.api "Lasm.JS.Web.Window.restore" do
   self.val.callMethodAwait "restore" (Internal.args #[]) Unit
 
+/-- `Promise<undefined> restore()` where the platform has it (`'restore' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.restore? (self' : Window) : Async (Option Unit) := Internal.api "Lasm.JS.Web.Window.restore?" do
+  let self := self'
+  if !(← Internal.has self.val "restore") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "restore" (Internal.args #[]) Unit
+  return some lasmGuarded
+
 /-- `Promise<undefined> setResizable(boolean resizable)` -/
 @[macro_inline] def Window.setResizable (self : Window) (resizable : Bool) : Async Unit := Internal.api "Lasm.JS.Web.Window.setResizable" do
   self.val.callMethodAwait "setResizable" (Internal.args #[toJS resizable]) Unit
+
+/-- `Promise<undefined> setResizable(boolean resizable)` where the platform has it (`'setResizable' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.setResizable? (self' : Window) (resizable : Bool) : Async (Option Unit) := Internal.api "Lasm.JS.Web.Window.setResizable?" do
+  let self := self'
+  if !(← Internal.has self.val "setResizable") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "setResizable" (Internal.args #[toJS resizable]) Unit
+  return some lasmGuarded
 
 /-- `Promise<ScreenDetails> getScreenDetails()` (Window Management (https://w3c.github.io/window-management/)) -/
 @[macro_inline] def getScreenDetails : Async ScreenDetails := Internal.api "Lasm.JS.Web.getScreenDetails" do
@@ -122,24 +179,65 @@ set_option compiler.extract_closed false
     (Internal.args #[])
   pure { val := r }
 
+/-- `Promise<ScreenDetails> getScreenDetails()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def getScreenDetails? : Async (Option ScreenDetails) := Internal.api "Lasm.JS.Web.getScreenDetails?" do
+  if !(← Internal.hasGlobal ["getScreenDetails"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.getScreenDetails?", module := "globalThis", path := "getScreenDetails", construct := false, arity := 0 }
+      (Internal.args #[])
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `Promise<undefined> minimize()` (Window Management (https://w3c.github.io/window-management/)) -/
 @[macro_inline] def minimize : Async Unit := Internal.api "Lasm.JS.Web.minimize" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.minimize", module := "globalThis", path := "minimize", construct := false, arity := 0 }
     (Internal.args #[])
+
+/-- `Promise<undefined> minimize()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def minimize? : Async (Option Unit) := Internal.api "Lasm.JS.Web.minimize?" do
+  if !(← Internal.hasGlobal ["minimize"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.minimize?", module := "globalThis", path := "minimize", construct := false, arity := 0 }
+      (Internal.args #[])
+  return some lasmGuarded
 
 /-- `Promise<undefined> maximize()` (Window Management (https://w3c.github.io/window-management/)) -/
 @[macro_inline] def maximize : Async Unit := Internal.api "Lasm.JS.Web.maximize" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.maximize", module := "globalThis", path := "maximize", construct := false, arity := 0 }
     (Internal.args #[])
 
+/-- `Promise<undefined> maximize()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def maximize? : Async (Option Unit) := Internal.api "Lasm.JS.Web.maximize?" do
+  if !(← Internal.hasGlobal ["maximize"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.maximize?", module := "globalThis", path := "maximize", construct := false, arity := 0 }
+      (Internal.args #[])
+  return some lasmGuarded
+
 /-- `Promise<undefined> restore()` (Window Management (https://w3c.github.io/window-management/)) -/
 @[macro_inline] def restore : Async Unit := Internal.api "Lasm.JS.Web.restore" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.restore", module := "globalThis", path := "restore", construct := false, arity := 0 }
     (Internal.args #[])
 
+/-- `Promise<undefined> restore()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def restore? : Async (Option Unit) := Internal.api "Lasm.JS.Web.restore?" do
+  if !(← Internal.hasGlobal ["restore"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.restore?", module := "globalThis", path := "restore", construct := false, arity := 0 }
+      (Internal.args #[])
+  return some lasmGuarded
+
 /-- `Promise<undefined> setResizable(boolean resizable)` (Window Management (https://w3c.github.io/window-management/)) -/
 @[macro_inline] def setResizable (resizable : Bool) : Async Unit := Internal.api "Lasm.JS.Web.setResizable" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.setResizable", module := "globalThis", path := "setResizable", construct := false, arity := 1 }
     (Internal.args #[toJS resizable])
+
+/-- `Promise<undefined> setResizable(boolean resizable)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def setResizable? (resizable : Bool) : Async (Option Unit) := Internal.api "Lasm.JS.Web.setResizable?" do
+  if !(← Internal.hasGlobal ["setResizable"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.setResizable?", module := "globalThis", path := "setResizable", construct := false, arity := 1 }
+      (Internal.args #[toJS resizable])
+  return some lasmGuarded
 
 end Lasm.JS.Web

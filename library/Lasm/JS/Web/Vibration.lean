@@ -30,4 +30,12 @@ instance : Coe (Array Nat) VibratePattern := ⟨.sequence⟩
 @[macro_inline] def Navigator.vibrate (self : Navigator) (pattern : VibratePattern) : IO Bool := Internal.api "Lasm.JS.Web.Navigator.vibrate" do
   self.val.callMethod "vibrate" (Internal.args #[toJS pattern]) Bool
 
+/-- `boolean vibrate(VibratePattern pattern)` where the platform has it (`'vibrate' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.vibrate? (self' : Navigator) (pattern : VibratePattern) : IO (Option Bool) := Internal.api "Lasm.JS.Web.Navigator.vibrate?" do
+  let self := self'
+  if !(← Internal.has self.val "vibrate") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "vibrate" (Internal.args #[toJS pattern]) Bool
+  return some lasmGuarded
+
 end Lasm.JS.Web

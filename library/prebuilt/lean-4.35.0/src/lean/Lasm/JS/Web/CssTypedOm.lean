@@ -252,10 +252,27 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS property, toJS cssText]) (await := false)
   pure { val := r }
 
+/-- `static CSSStyleValue parse(USVString property, USVString cssText)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSStyleValue.parse? (property : String) (cssText : String) : IO (Option CSSStyleValue) := Internal.api "Lasm.JS.Web.CSSStyleValue.parse?" do
+  if !(← Internal.hasGlobal ["CSSStyleValue", "parse"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSSStyleValue.parse?", module := "globalThis", path := "CSSStyleValue.parse", construct := false, arity := 2 }
+      (Internal.args #[toJS property, toJS cssText]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `static sequence<CSSStyleValue> parseAll(USVString property, USVString cssText)` -/
 @[macro_inline] def CSSStyleValue.parseAll (property : String) (cssText : String) : IO (Array CSSStyleValue) := Internal.api "Lasm.JS.Web.CSSStyleValue.parseAll" do
   Lasm.JS.Binding.invoke (Array CSSStyleValue) { name := "Lasm.JS.Web.CSSStyleValue.parseAll", module := "globalThis", path := "CSSStyleValue.parseAll", construct := false, arity := 2 }
     (Internal.args #[toJS property, toJS cssText]) (await := false)
+
+/-- `static sequence<CSSStyleValue> parseAll(USVString property, USVString cssText)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSStyleValue.parseAll? (property : String) (cssText : String) : IO (Option (Array CSSStyleValue)) := Internal.api "Lasm.JS.Web.CSSStyleValue.parseAll?" do
+  if !(← Internal.hasGlobal ["CSSStyleValue", "parseAll"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke (Array CSSStyleValue) { name := "Lasm.JS.Web.CSSStyleValue.parseAll?", module := "globalThis", path := "CSSStyleValue.parseAll", construct := false, arity := 2 }
+      (Internal.args #[toJS property, toJS cssText]) (await := false)
+  return some lasmGuarded
 
 /-- `v instanceof CSSTransformComponent`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSTransformComponent`). -/
 @[macro_inline] def CSSTransformComponent.cast? (v : Value) : IO (Option CSSTransformComponent) := Internal.api "Lasm.JS.Web.CSSTransformComponent.cast?" do
@@ -286,6 +303,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
 @[macro_inline] def CSSVariableReferenceValue.new («variable» : String) (fallback : Option CSSUnparsedValue := none) : IO CSSVariableReferenceValue := Internal.api "Lasm.JS.Web.CSSVariableReferenceValue.new" do
   Lasm.JS.Binding.invoke CSSVariableReferenceValue { name := "Lasm.JS.Web.CSSVariableReferenceValue.new", module := "globalThis", path := "CSSVariableReferenceValue", construct := true, arity := 2 }
     (Internal.args #[toJS «variable», Internal.optional fallback]) (await := false)
+
+/-- `constructor(USVString variable, optional CSSUnparsedValue? fallback)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSVariableReferenceValue.new? («variable» : String) (fallback : Option CSSUnparsedValue := none) : IO (Option CSSVariableReferenceValue) := Internal.api "Lasm.JS.Web.CSSVariableReferenceValue.new?" do
+  if !(← Internal.hasGlobal ["CSSVariableReferenceValue"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSVariableReferenceValue { name := "Lasm.JS.Web.CSSVariableReferenceValue.new?", module := "globalThis", path := "CSSVariableReferenceValue", construct := true, arity := 2 }
+      (Internal.args #[toJS «variable», Internal.optional fallback]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute USVString variable` -/
 @[macro_inline] def CSSVariableReferenceValue.«variable» (self : CSSVariableReferenceValue) : IO String := Internal.api "Lasm.JS.Web.CSSVariableReferenceValue.variable" do
@@ -340,6 +365,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
   Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSSColorValue.parse", module := "globalThis", path := "CSSColorValue.parse", construct := false, arity := 1 }
     (Internal.args #[toJS cssText]) (await := false)
 
+/-- `static (CSSColorValue or CSSStyleValue) parse(USVString cssText)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSColorValue.parse? (cssText : String) : IO (Option Value) := Internal.api "Lasm.JS.Web.CSSColorValue.parse?" do
+  if !(← Internal.hasGlobal ["CSSColorValue", "parse"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSSColorValue.parse?", module := "globalThis", path := "CSSColorValue.parse", construct := false, arity := 1 }
+      (Internal.args #[toJS cssText]) (await := false)
+  return some lasmGuarded
+
 /-- `v instanceof CSSImageValue`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSImageValue`). -/
 @[macro_inline] def CSSImageValue.cast? (v : Value) : IO (Option CSSImageValue) := Internal.api "Lasm.JS.Web.CSSImageValue.cast?" do
   Internal.cast (Internal.getGlobal ["CSSImageValue"] Value) (fun x => { val := x }) v
@@ -352,6 +385,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
 @[macro_inline] def CSSKeywordValue.new (value : String) : IO CSSKeywordValue := Internal.api "Lasm.JS.Web.CSSKeywordValue.new" do
   Lasm.JS.Binding.invoke CSSKeywordValue { name := "Lasm.JS.Web.CSSKeywordValue.new", module := "globalThis", path := "CSSKeywordValue", construct := true, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
+
+/-- `constructor(USVString value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSKeywordValue.new? (value : String) : IO (Option CSSKeywordValue) := Internal.api "Lasm.JS.Web.CSSKeywordValue.new?" do
+  if !(← Internal.hasGlobal ["CSSKeywordValue"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSKeywordValue { name := "Lasm.JS.Web.CSSKeywordValue.new?", module := "globalThis", path := "CSSKeywordValue", construct := true, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute USVString value` -/
 @[macro_inline] def CSSKeywordValue.value (self : CSSKeywordValue) : IO String := Internal.api "Lasm.JS.Web.CSSKeywordValue.value" do
@@ -369,6 +410,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
 @[macro_inline] def CSSMatrixComponent.new (matrix : DOMMatrixReadOnly) (options : Option CSSMatrixComponentOptions := none) : IO CSSMatrixComponent := Internal.api "Lasm.JS.Web.CSSMatrixComponent.new" do
   Lasm.JS.Binding.invoke CSSMatrixComponent { name := "Lasm.JS.Web.CSSMatrixComponent.new", module := "globalThis", path := "CSSMatrixComponent", construct := true, arity := 2 }
     (Internal.args #[toJS matrix, Internal.optional options]) (await := false)
+
+/-- `constructor(DOMMatrixReadOnly matrix, optional CSSMatrixComponentOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSMatrixComponent.new? (matrix : DOMMatrixReadOnly) (options : Option CSSMatrixComponentOptions := none) : IO (Option CSSMatrixComponent) := Internal.api "Lasm.JS.Web.CSSMatrixComponent.new?" do
+  if !(← Internal.hasGlobal ["CSSMatrixComponent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSMatrixComponent { name := "Lasm.JS.Web.CSSMatrixComponent.new?", module := "globalThis", path := "CSSMatrixComponent", construct := true, arity := 2 }
+      (Internal.args #[toJS matrix, Internal.optional options]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute DOMMatrix matrix` -/
 @[macro_inline] def CSSMatrixComponent.matrix (self : CSSMatrixComponent) : IO DOMMatrix := Internal.api "Lasm.JS.Web.CSSMatrixComponent.matrix" do
@@ -437,6 +486,15 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS cssText]) (await := false)
   pure { val := r }
 
+/-- `static CSSNumericValue parse(USVString cssText)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSNumericValue.parse? (cssText : String) : IO (Option CSSNumericValue) := Internal.api "Lasm.JS.Web.CSSNumericValue.parse?" do
+  if !(← Internal.hasGlobal ["CSSNumericValue", "parse"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSSNumericValue.parse?", module := "globalThis", path := "CSSNumericValue.parse", construct := false, arity := 1 }
+      (Internal.args #[toJS cssText]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `v instanceof CSSPerspective`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSPerspective`). -/
 @[macro_inline] def CSSPerspective.cast? (v : Value) : IO (Option CSSPerspective) := Internal.api "Lasm.JS.Web.CSSPerspective.cast?" do
   Internal.cast (Internal.getGlobal ["CSSPerspective"] Value) (fun x => { val := x }) v
@@ -445,6 +503,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
 @[macro_inline] def CSSPerspective.new (length : CSSPerspectiveValue) : IO CSSPerspective := Internal.api "Lasm.JS.Web.CSSPerspective.new" do
   Lasm.JS.Binding.invoke CSSPerspective { name := "Lasm.JS.Web.CSSPerspective.new", module := "globalThis", path := "CSSPerspective", construct := true, arity := 1 }
     (Internal.args #[toJS length]) (await := false)
+
+/-- `constructor(CSSPerspectiveValue length)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSPerspective.new? (length : CSSPerspectiveValue) : IO (Option CSSPerspective) := Internal.api "Lasm.JS.Web.CSSPerspective.new?" do
+  if !(← Internal.hasGlobal ["CSSPerspective"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSPerspective { name := "Lasm.JS.Web.CSSPerspective.new?", module := "globalThis", path := "CSSPerspective", construct := true, arity := 1 }
+      (Internal.args #[toJS length]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute CSSPerspectiveValue length` -/
 @[macro_inline] def CSSPerspective.length (self : CSSPerspective) : IO Data := Internal.api "Lasm.JS.Web.CSSPerspective.length" do
@@ -463,10 +529,26 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
   Lasm.JS.Binding.invoke CSSRotate { name := "Lasm.JS.Web.CSSRotate.new", module := "globalThis", path := "CSSRotate", construct := true, arity := 1 }
     (Internal.args #[toJS angle]) (await := false)
 
+/-- `constructor(CSSNumericValue angle)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSRotate.new? (angle : CSSNumericValue) : IO (Option CSSRotate) := Internal.api "Lasm.JS.Web.CSSRotate.new?" do
+  if !(← Internal.hasGlobal ["CSSRotate"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSRotate { name := "Lasm.JS.Web.CSSRotate.new?", module := "globalThis", path := "CSSRotate", construct := true, arity := 1 }
+      (Internal.args #[toJS angle]) (await := false)
+  return some lasmGuarded
+
 /-- `constructor(CSSNumberish x, CSSNumberish y, CSSNumberish z, CSSNumericValue angle)` -/
 @[macro_inline] def CSSRotate.newWithX (x : CSSNumberish) (y : CSSNumberish) (z : CSSNumberish) (angle : CSSNumericValue) : IO CSSRotate := Internal.api "Lasm.JS.Web.CSSRotate.newWithX" do
   Lasm.JS.Binding.invoke CSSRotate { name := "Lasm.JS.Web.CSSRotate.newWithX", module := "globalThis", path := "CSSRotate", construct := true, arity := 4 }
     (Internal.args #[toJS x, toJS y, toJS z, toJS angle]) (await := false)
+
+/-- `constructor(CSSNumberish x, CSSNumberish y, CSSNumberish z, CSSNumericValue angle)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSRotate.newWithX? (x : CSSNumberish) (y : CSSNumberish) (z : CSSNumberish) (angle : CSSNumericValue) : IO (Option CSSRotate) := Internal.api "Lasm.JS.Web.CSSRotate.newWithX?" do
+  if !(← Internal.hasGlobal ["CSSRotate"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSRotate { name := "Lasm.JS.Web.CSSRotate.newWithX?", module := "globalThis", path := "CSSRotate", construct := true, arity := 4 }
+      (Internal.args #[toJS x, toJS y, toJS z, toJS angle]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute CSSNumberish x` -/
 @[macro_inline] def CSSRotate.x (self : CSSRotate) : IO CSSNumberish := Internal.api "Lasm.JS.Web.CSSRotate.x" do
@@ -510,6 +592,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
   Lasm.JS.Binding.invoke CSSScale { name := "Lasm.JS.Web.CSSScale.new", module := "globalThis", path := "CSSScale", construct := true, arity := 3 }
     (Internal.args #[toJS x, toJS y, Internal.optional z]) (await := false)
 
+/-- `constructor(CSSNumberish x, CSSNumberish y, optional CSSNumberish z)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSScale.new? (x : CSSNumberish) (y : CSSNumberish) (z : Option CSSNumberish := none) : IO (Option CSSScale) := Internal.api "Lasm.JS.Web.CSSScale.new?" do
+  if !(← Internal.hasGlobal ["CSSScale"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSScale { name := "Lasm.JS.Web.CSSScale.new?", module := "globalThis", path := "CSSScale", construct := true, arity := 3 }
+      (Internal.args #[toJS x, toJS y, Internal.optional z]) (await := false)
+  return some lasmGuarded
+
 /-- `attribute CSSNumberish x` -/
 @[macro_inline] def CSSScale.x (self : CSSScale) : IO CSSNumberish := Internal.api "Lasm.JS.Web.CSSScale.x" do
   self.val.get "x" CSSNumberish
@@ -543,6 +633,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
   Lasm.JS.Binding.invoke CSSSkew { name := "Lasm.JS.Web.CSSSkew.new", module := "globalThis", path := "CSSSkew", construct := true, arity := 2 }
     (Internal.args #[toJS ax, toJS ay]) (await := false)
 
+/-- `constructor(CSSNumericValue ax, CSSNumericValue ay)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSSkew.new? (ax : CSSNumericValue) (ay : CSSNumericValue) : IO (Option CSSSkew) := Internal.api "Lasm.JS.Web.CSSSkew.new?" do
+  if !(← Internal.hasGlobal ["CSSSkew"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSSkew { name := "Lasm.JS.Web.CSSSkew.new?", module := "globalThis", path := "CSSSkew", construct := true, arity := 2 }
+      (Internal.args #[toJS ax, toJS ay]) (await := false)
+  return some lasmGuarded
+
 /-- `attribute CSSNumericValue ax` -/
 @[macro_inline] def CSSSkew.ax (self : CSSSkew) : IO CSSNumericValue := Internal.api "Lasm.JS.Web.CSSSkew.ax" do
   let r ← self.val.get "ax" Value
@@ -570,6 +668,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
   Lasm.JS.Binding.invoke CSSSkewX { name := "Lasm.JS.Web.CSSSkewX.new", module := "globalThis", path := "CSSSkewX", construct := true, arity := 1 }
     (Internal.args #[toJS ax]) (await := false)
 
+/-- `constructor(CSSNumericValue ax)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSSkewX.new? (ax : CSSNumericValue) : IO (Option CSSSkewX) := Internal.api "Lasm.JS.Web.CSSSkewX.new?" do
+  if !(← Internal.hasGlobal ["CSSSkewX"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSSkewX { name := "Lasm.JS.Web.CSSSkewX.new?", module := "globalThis", path := "CSSSkewX", construct := true, arity := 1 }
+      (Internal.args #[toJS ax]) (await := false)
+  return some lasmGuarded
+
 /-- `attribute CSSNumericValue ax` -/
 @[macro_inline] def CSSSkewX.ax (self : CSSSkewX) : IO CSSNumericValue := Internal.api "Lasm.JS.Web.CSSSkewX.ax" do
   let r ← self.val.get "ax" Value
@@ -588,6 +694,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
   Lasm.JS.Binding.invoke CSSSkewY { name := "Lasm.JS.Web.CSSSkewY.new", module := "globalThis", path := "CSSSkewY", construct := true, arity := 1 }
     (Internal.args #[toJS ay]) (await := false)
 
+/-- `constructor(CSSNumericValue ay)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSSkewY.new? (ay : CSSNumericValue) : IO (Option CSSSkewY) := Internal.api "Lasm.JS.Web.CSSSkewY.new?" do
+  if !(← Internal.hasGlobal ["CSSSkewY"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSSkewY { name := "Lasm.JS.Web.CSSSkewY.new?", module := "globalThis", path := "CSSSkewY", construct := true, arity := 1 }
+      (Internal.args #[toJS ay]) (await := false)
+  return some lasmGuarded
+
 /-- `attribute CSSNumericValue ay` -/
 @[macro_inline] def CSSSkewY.ay (self : CSSSkewY) : IO CSSNumericValue := Internal.api "Lasm.JS.Web.CSSSkewY.ay" do
   let r ← self.val.get "ay" Value
@@ -605,6 +719,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
 @[macro_inline] def CSSTransformValue.new (transforms : Array CSSTransformComponent) : IO CSSTransformValue := Internal.api "Lasm.JS.Web.CSSTransformValue.new" do
   Lasm.JS.Binding.invoke CSSTransformValue { name := "Lasm.JS.Web.CSSTransformValue.new", module := "globalThis", path := "CSSTransformValue", construct := true, arity := 1 }
     (Internal.args #[toJS transforms]) (await := false)
+
+/-- `constructor(sequence<CSSTransformComponent> transforms)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSTransformValue.new? (transforms : Array CSSTransformComponent) : IO (Option CSSTransformValue) := Internal.api "Lasm.JS.Web.CSSTransformValue.new?" do
+  if !(← Internal.hasGlobal ["CSSTransformValue"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSTransformValue { name := "Lasm.JS.Web.CSSTransformValue.new?", module := "globalThis", path := "CSSTransformValue", construct := true, arity := 1 }
+      (Internal.args #[toJS transforms]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute unsigned long length` -/
 @[macro_inline] def CSSTransformValue.length (self : CSSTransformValue) : IO Nat := Internal.api "Lasm.JS.Web.CSSTransformValue.length" do
@@ -631,6 +753,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
 @[macro_inline] def CSSTranslate.new (x : CSSNumericValue) (y : CSSNumericValue) (z : Option CSSNumericValue := none) : IO CSSTranslate := Internal.api "Lasm.JS.Web.CSSTranslate.new" do
   Lasm.JS.Binding.invoke CSSTranslate { name := "Lasm.JS.Web.CSSTranslate.new", module := "globalThis", path := "CSSTranslate", construct := true, arity := 3 }
     (Internal.args #[toJS x, toJS y, Internal.optional z]) (await := false)
+
+/-- `constructor(CSSNumericValue x, CSSNumericValue y, optional CSSNumericValue z)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSTranslate.new? (x : CSSNumericValue) (y : CSSNumericValue) (z : Option CSSNumericValue := none) : IO (Option CSSTranslate) := Internal.api "Lasm.JS.Web.CSSTranslate.new?" do
+  if !(← Internal.hasGlobal ["CSSTranslate"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSTranslate { name := "Lasm.JS.Web.CSSTranslate.new?", module := "globalThis", path := "CSSTranslate", construct := true, arity := 3 }
+      (Internal.args #[toJS x, toJS y, Internal.optional z]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute CSSNumericValue x` -/
 @[macro_inline] def CSSTranslate.x (self : CSSTranslate) : IO CSSNumericValue := Internal.api "Lasm.JS.Web.CSSTranslate.x" do
@@ -667,6 +797,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
 @[macro_inline] def CSSUnparsedValue.new (members : Array CSSUnparsedSegment) : IO CSSUnparsedValue := Internal.api "Lasm.JS.Web.CSSUnparsedValue.new" do
   Lasm.JS.Binding.invoke CSSUnparsedValue { name := "Lasm.JS.Web.CSSUnparsedValue.new", module := "globalThis", path := "CSSUnparsedValue", construct := true, arity := 1 }
     (Internal.args #[toJS members]) (await := false)
+
+/-- `constructor(sequence<CSSUnparsedSegment> members)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSUnparsedValue.new? (members : Array CSSUnparsedSegment) : IO (Option CSSUnparsedValue) := Internal.api "Lasm.JS.Web.CSSUnparsedValue.new?" do
+  if !(← Internal.hasGlobal ["CSSUnparsedValue"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSUnparsedValue { name := "Lasm.JS.Web.CSSUnparsedValue.new?", module := "globalThis", path := "CSSUnparsedValue", construct := true, arity := 1 }
+      (Internal.args #[toJS members]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute unsigned long length` -/
 @[macro_inline] def CSSUnparsedValue.length (self : CSSUnparsedValue) : IO Nat := Internal.api "Lasm.JS.Web.CSSUnparsedValue.length" do
@@ -705,6 +843,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
   Lasm.JS.Binding.invoke CSSColor { name := "Lasm.JS.Web.CSSColor.new", module := "globalThis", path := "CSSColor", construct := true, arity := 3 }
     (Internal.args #[toJS colorSpace, toJS channels, Internal.optional alpha]) (await := false)
 
+/-- `constructor(CSSKeywordish colorSpace, sequence<CSSColorPercent> channels, optional CSSNumberish alpha)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSColor.new? (colorSpace : CSSKeywordish) (channels : Array CSSColorPercent) (alpha : Option CSSNumberish := none) : IO (Option CSSColor) := Internal.api "Lasm.JS.Web.CSSColor.new?" do
+  if !(← Internal.hasGlobal ["CSSColor"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSColor { name := "Lasm.JS.Web.CSSColor.new?", module := "globalThis", path := "CSSColor", construct := true, arity := 3 }
+      (Internal.args #[toJS colorSpace, toJS channels, Internal.optional alpha]) (await := false)
+  return some lasmGuarded
+
 /-- `attribute CSSKeywordish colorSpace` -/
 @[macro_inline] def CSSColor.colorSpace (self : CSSColor) : IO CSSKeywordish := Internal.api "Lasm.JS.Web.CSSColor.colorSpace" do
   self.val.get "colorSpace" CSSKeywordish
@@ -737,6 +883,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
 @[macro_inline] def CSSHSL.new (h : CSSColorAngle) (s : CSSColorPercent) (l : CSSColorPercent) (alpha : Option CSSColorPercent := none) : IO CSSHSL := Internal.api "Lasm.JS.Web.CSSHSL.new" do
   Lasm.JS.Binding.invoke CSSHSL { name := "Lasm.JS.Web.CSSHSL.new", module := "globalThis", path := "CSSHSL", construct := true, arity := 4 }
     (Internal.args #[toJS h, toJS s, toJS l, Internal.optional alpha]) (await := false)
+
+/-- `constructor(CSSColorAngle h, CSSColorPercent s, CSSColorPercent l, optional CSSColorPercent alpha)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSHSL.new? (h : CSSColorAngle) (s : CSSColorPercent) (l : CSSColorPercent) (alpha : Option CSSColorPercent := none) : IO (Option CSSHSL) := Internal.api "Lasm.JS.Web.CSSHSL.new?" do
+  if !(← Internal.hasGlobal ["CSSHSL"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSHSL { name := "Lasm.JS.Web.CSSHSL.new?", module := "globalThis", path := "CSSHSL", construct := true, arity := 4 }
+      (Internal.args #[toJS h, toJS s, toJS l, Internal.optional alpha]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute CSSColorAngle h` -/
 @[macro_inline] def CSSHSL.h (self : CSSHSL) : IO Data := Internal.api "Lasm.JS.Web.CSSHSL.h" do
@@ -778,6 +932,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
 @[macro_inline] def CSSHWB.new (h : CSSNumericValue) (w : CSSNumberish) (b : CSSNumberish) (alpha : Option CSSNumberish := none) : IO CSSHWB := Internal.api "Lasm.JS.Web.CSSHWB.new" do
   Lasm.JS.Binding.invoke CSSHWB { name := "Lasm.JS.Web.CSSHWB.new", module := "globalThis", path := "CSSHWB", construct := true, arity := 4 }
     (Internal.args #[toJS h, toJS w, toJS b, Internal.optional alpha]) (await := false)
+
+/-- `constructor(CSSNumericValue h, CSSNumberish w, CSSNumberish b, optional CSSNumberish alpha)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSHWB.new? (h : CSSNumericValue) (w : CSSNumberish) (b : CSSNumberish) (alpha : Option CSSNumberish := none) : IO (Option CSSHWB) := Internal.api "Lasm.JS.Web.CSSHWB.new?" do
+  if !(← Internal.hasGlobal ["CSSHWB"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSHWB { name := "Lasm.JS.Web.CSSHWB.new?", module := "globalThis", path := "CSSHWB", construct := true, arity := 4 }
+      (Internal.args #[toJS h, toJS w, toJS b, Internal.optional alpha]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute CSSNumericValue h` -/
 @[macro_inline] def CSSHWB.h (self : CSSHWB) : IO CSSNumericValue := Internal.api "Lasm.JS.Web.CSSHWB.h" do
@@ -821,6 +983,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
   Lasm.JS.Binding.invoke CSSLCH { name := "Lasm.JS.Web.CSSLCH.new", module := "globalThis", path := "CSSLCH", construct := true, arity := 4 }
     (Internal.args #[toJS l, toJS c, toJS h, Internal.optional alpha]) (await := false)
 
+/-- `constructor(CSSColorPercent l, CSSColorPercent c, CSSColorAngle h, optional CSSColorPercent alpha)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSLCH.new? (l : CSSColorPercent) (c : CSSColorPercent) (h : CSSColorAngle) (alpha : Option CSSColorPercent := none) : IO (Option CSSLCH) := Internal.api "Lasm.JS.Web.CSSLCH.new?" do
+  if !(← Internal.hasGlobal ["CSSLCH"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSLCH { name := "Lasm.JS.Web.CSSLCH.new?", module := "globalThis", path := "CSSLCH", construct := true, arity := 4 }
+      (Internal.args #[toJS l, toJS c, toJS h, Internal.optional alpha]) (await := false)
+  return some lasmGuarded
+
 /-- `attribute CSSColorPercent l` -/
 @[macro_inline] def CSSLCH.l (self : CSSLCH) : IO Data := Internal.api "Lasm.JS.Web.CSSLCH.l" do
   self.val.get "l" Data
@@ -861,6 +1031,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
 @[macro_inline] def CSSLab.new (l : CSSColorPercent) (a : CSSColorNumber) (b : CSSColorNumber) (alpha : Option CSSColorPercent := none) : IO CSSLab := Internal.api "Lasm.JS.Web.CSSLab.new" do
   Lasm.JS.Binding.invoke CSSLab { name := "Lasm.JS.Web.CSSLab.new", module := "globalThis", path := "CSSLab", construct := true, arity := 4 }
     (Internal.args #[toJS l, toJS a, toJS b, Internal.optional alpha]) (await := false)
+
+/-- `constructor(CSSColorPercent l, CSSColorNumber a, CSSColorNumber b, optional CSSColorPercent alpha)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSLab.new? (l : CSSColorPercent) (a : CSSColorNumber) (b : CSSColorNumber) (alpha : Option CSSColorPercent := none) : IO (Option CSSLab) := Internal.api "Lasm.JS.Web.CSSLab.new?" do
+  if !(← Internal.hasGlobal ["CSSLab"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSLab { name := "Lasm.JS.Web.CSSLab.new?", module := "globalThis", path := "CSSLab", construct := true, arity := 4 }
+      (Internal.args #[toJS l, toJS a, toJS b, Internal.optional alpha]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute CSSColorPercent l` -/
 @[macro_inline] def CSSLab.l (self : CSSLab) : IO Data := Internal.api "Lasm.JS.Web.CSSLab.l" do
@@ -911,6 +1089,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
   Lasm.JS.Binding.invoke CSSOKLCH { name := "Lasm.JS.Web.CSSOKLCH.new", module := "globalThis", path := "CSSOKLCH", construct := true, arity := 4 }
     (Internal.args #[toJS l, toJS c, toJS h, Internal.optional alpha]) (await := false)
 
+/-- `constructor(CSSColorPercent l, CSSColorPercent c, CSSColorAngle h, optional CSSColorPercent alpha)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSOKLCH.new? (l : CSSColorPercent) (c : CSSColorPercent) (h : CSSColorAngle) (alpha : Option CSSColorPercent := none) : IO (Option CSSOKLCH) := Internal.api "Lasm.JS.Web.CSSOKLCH.new?" do
+  if !(← Internal.hasGlobal ["CSSOKLCH"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSOKLCH { name := "Lasm.JS.Web.CSSOKLCH.new?", module := "globalThis", path := "CSSOKLCH", construct := true, arity := 4 }
+      (Internal.args #[toJS l, toJS c, toJS h, Internal.optional alpha]) (await := false)
+  return some lasmGuarded
+
 /-- `attribute CSSColorPercent l` -/
 @[macro_inline] def CSSOKLCH.l (self : CSSOKLCH) : IO Data := Internal.api "Lasm.JS.Web.CSSOKLCH.l" do
   self.val.get "l" Data
@@ -951,6 +1137,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
 @[macro_inline] def CSSOKLab.new (l : CSSColorPercent) (a : CSSColorNumber) (b : CSSColorNumber) (alpha : Option CSSColorPercent := none) : IO CSSOKLab := Internal.api "Lasm.JS.Web.CSSOKLab.new" do
   Lasm.JS.Binding.invoke CSSOKLab { name := "Lasm.JS.Web.CSSOKLab.new", module := "globalThis", path := "CSSOKLab", construct := true, arity := 4 }
     (Internal.args #[toJS l, toJS a, toJS b, Internal.optional alpha]) (await := false)
+
+/-- `constructor(CSSColorPercent l, CSSColorNumber a, CSSColorNumber b, optional CSSColorPercent alpha)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSOKLab.new? (l : CSSColorPercent) (a : CSSColorNumber) (b : CSSColorNumber) (alpha : Option CSSColorPercent := none) : IO (Option CSSOKLab) := Internal.api "Lasm.JS.Web.CSSOKLab.new?" do
+  if !(← Internal.hasGlobal ["CSSOKLab"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSOKLab { name := "Lasm.JS.Web.CSSOKLab.new?", module := "globalThis", path := "CSSOKLab", construct := true, arity := 4 }
+      (Internal.args #[toJS l, toJS a, toJS b, Internal.optional alpha]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute CSSColorPercent l` -/
 @[macro_inline] def CSSOKLab.l (self : CSSOKLab) : IO Data := Internal.api "Lasm.JS.Web.CSSOKLab.l" do
@@ -993,6 +1187,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
   Lasm.JS.Binding.invoke CSSRGB { name := "Lasm.JS.Web.CSSRGB.new", module := "globalThis", path := "CSSRGB", construct := true, arity := 4 }
     (Internal.args #[toJS r, toJS g, toJS b, Internal.optional alpha]) (await := false)
 
+/-- `constructor(CSSColorRGBComp r, CSSColorRGBComp g, CSSColorRGBComp b, optional CSSColorPercent alpha)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSRGB.new? (r : CSSColorRGBComp) (g : CSSColorRGBComp) (b : CSSColorRGBComp) (alpha : Option CSSColorPercent := none) : IO (Option CSSRGB) := Internal.api "Lasm.JS.Web.CSSRGB.new?" do
+  if !(← Internal.hasGlobal ["CSSRGB"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSRGB { name := "Lasm.JS.Web.CSSRGB.new?", module := "globalThis", path := "CSSRGB", construct := true, arity := 4 }
+      (Internal.args #[toJS r, toJS g, toJS b, Internal.optional alpha]) (await := false)
+  return some lasmGuarded
+
 /-- `attribute CSSColorRGBComp r` -/
 @[macro_inline] def CSSRGB.r (self : CSSRGB) : IO Data := Internal.api "Lasm.JS.Web.CSSRGB.r" do
   self.val.get "r" Data
@@ -1034,6 +1236,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
   Lasm.JS.Binding.invoke CSSUnitValue { name := "Lasm.JS.Web.CSSUnitValue.new", module := "globalThis", path := "CSSUnitValue", construct := true, arity := 2 }
     (Internal.args #[toJS value, toJS unit]) (await := false)
 
+/-- `constructor(double value, USVString unit)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSUnitValue.new? (value : Float) (unit : String) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSSUnitValue.new?" do
+  if !(← Internal.hasGlobal ["CSSUnitValue"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSUnitValue { name := "Lasm.JS.Web.CSSUnitValue.new?", module := "globalThis", path := "CSSUnitValue", construct := true, arity := 2 }
+      (Internal.args #[toJS value, toJS unit]) (await := false)
+  return some lasmGuarded
+
 /-- `attribute double value` -/
 @[macro_inline] def CSSUnitValue.value (self : CSSUnitValue) : IO Float := Internal.api "Lasm.JS.Web.CSSUnitValue.value" do
   self.val.get "value" Float
@@ -1054,6 +1264,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
 @[macro_inline] def CSSMathClamp.new (lower : CSSNumberish) (value : CSSNumberish) (upper : CSSNumberish) : IO CSSMathClamp := Internal.api "Lasm.JS.Web.CSSMathClamp.new" do
   Lasm.JS.Binding.invoke CSSMathClamp { name := "Lasm.JS.Web.CSSMathClamp.new", module := "globalThis", path := "CSSMathClamp", construct := true, arity := 3 }
     (Internal.args #[toJS lower, toJS value, toJS upper]) (await := false)
+
+/-- `constructor(CSSNumberish lower, CSSNumberish value, CSSNumberish upper)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSMathClamp.new? (lower : CSSNumberish) (value : CSSNumberish) (upper : CSSNumberish) : IO (Option CSSMathClamp) := Internal.api "Lasm.JS.Web.CSSMathClamp.new?" do
+  if !(← Internal.hasGlobal ["CSSMathClamp"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSMathClamp { name := "Lasm.JS.Web.CSSMathClamp.new?", module := "globalThis", path := "CSSMathClamp", construct := true, arity := 3 }
+      (Internal.args #[toJS lower, toJS value, toJS upper]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute CSSNumericValue lower` -/
 @[macro_inline] def CSSMathClamp.lower (self : CSSMathClamp) : IO CSSNumericValue := Internal.api "Lasm.JS.Web.CSSMathClamp.lower" do
@@ -1079,6 +1297,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
   Lasm.JS.Binding.invoke CSSMathInvert { name := "Lasm.JS.Web.CSSMathInvert.new", module := "globalThis", path := "CSSMathInvert", construct := true, arity := 1 }
     (Internal.args #[toJS arg]) (await := false)
 
+/-- `constructor(CSSNumberish arg)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSMathInvert.new? (arg : CSSNumberish) : IO (Option CSSMathInvert) := Internal.api "Lasm.JS.Web.CSSMathInvert.new?" do
+  if !(← Internal.hasGlobal ["CSSMathInvert"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSMathInvert { name := "Lasm.JS.Web.CSSMathInvert.new?", module := "globalThis", path := "CSSMathInvert", construct := true, arity := 1 }
+      (Internal.args #[toJS arg]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute CSSNumericValue value` -/
 @[macro_inline] def CSSMathInvert.value (self : CSSMathInvert) : IO CSSNumericValue := Internal.api "Lasm.JS.Web.CSSMathInvert.value" do
   let r ← self.val.get "value" Value
@@ -1092,6 +1318,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
 @[macro_inline] def CSSMathMax.new (args : Array CSSNumberish := #[]) : IO CSSMathMax := Internal.api "Lasm.JS.Web.CSSMathMax.new" do
   Lasm.JS.Binding.invoke CSSMathMax { name := "Lasm.JS.Web.CSSMathMax.new", module := "globalThis", path := "CSSMathMax", construct := true, arity := 1 }
     (Internal.argsWith #[] (args.map toJS)) (await := false)
+
+/-- `constructor(CSSNumberish... args)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSMathMax.new? (args : Array CSSNumberish := #[]) : IO (Option CSSMathMax) := Internal.api "Lasm.JS.Web.CSSMathMax.new?" do
+  if !(← Internal.hasGlobal ["CSSMathMax"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSMathMax { name := "Lasm.JS.Web.CSSMathMax.new?", module := "globalThis", path := "CSSMathMax", construct := true, arity := 1 }
+      (Internal.argsWith #[] (args.map toJS)) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute CSSNumericArray values` -/
 @[macro_inline] def CSSMathMax.values (self : CSSMathMax) : IO CSSNumericArray := Internal.api "Lasm.JS.Web.CSSMathMax.values" do
@@ -1107,6 +1341,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
   Lasm.JS.Binding.invoke CSSMathMin { name := "Lasm.JS.Web.CSSMathMin.new", module := "globalThis", path := "CSSMathMin", construct := true, arity := 1 }
     (Internal.argsWith #[] (args.map toJS)) (await := false)
 
+/-- `constructor(CSSNumberish... args)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSMathMin.new? (args : Array CSSNumberish := #[]) : IO (Option CSSMathMin) := Internal.api "Lasm.JS.Web.CSSMathMin.new?" do
+  if !(← Internal.hasGlobal ["CSSMathMin"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSMathMin { name := "Lasm.JS.Web.CSSMathMin.new?", module := "globalThis", path := "CSSMathMin", construct := true, arity := 1 }
+      (Internal.argsWith #[] (args.map toJS)) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute CSSNumericArray values` -/
 @[macro_inline] def CSSMathMin.values (self : CSSMathMin) : IO CSSNumericArray := Internal.api "Lasm.JS.Web.CSSMathMin.values" do
   let r ← self.val.get "values" Value
@@ -1120,6 +1362,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
 @[macro_inline] def CSSMathNegate.new (arg : CSSNumberish) : IO CSSMathNegate := Internal.api "Lasm.JS.Web.CSSMathNegate.new" do
   Lasm.JS.Binding.invoke CSSMathNegate { name := "Lasm.JS.Web.CSSMathNegate.new", module := "globalThis", path := "CSSMathNegate", construct := true, arity := 1 }
     (Internal.args #[toJS arg]) (await := false)
+
+/-- `constructor(CSSNumberish arg)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSMathNegate.new? (arg : CSSNumberish) : IO (Option CSSMathNegate) := Internal.api "Lasm.JS.Web.CSSMathNegate.new?" do
+  if !(← Internal.hasGlobal ["CSSMathNegate"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSMathNegate { name := "Lasm.JS.Web.CSSMathNegate.new?", module := "globalThis", path := "CSSMathNegate", construct := true, arity := 1 }
+      (Internal.args #[toJS arg]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute CSSNumericValue value` -/
 @[macro_inline] def CSSMathNegate.value (self : CSSMathNegate) : IO CSSNumericValue := Internal.api "Lasm.JS.Web.CSSMathNegate.value" do
@@ -1135,6 +1385,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
   Lasm.JS.Binding.invoke CSSMathProduct { name := "Lasm.JS.Web.CSSMathProduct.new", module := "globalThis", path := "CSSMathProduct", construct := true, arity := 1 }
     (Internal.argsWith #[] (args.map toJS)) (await := false)
 
+/-- `constructor(CSSNumberish... args)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSMathProduct.new? (args : Array CSSNumberish := #[]) : IO (Option CSSMathProduct) := Internal.api "Lasm.JS.Web.CSSMathProduct.new?" do
+  if !(← Internal.hasGlobal ["CSSMathProduct"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSMathProduct { name := "Lasm.JS.Web.CSSMathProduct.new?", module := "globalThis", path := "CSSMathProduct", construct := true, arity := 1 }
+      (Internal.argsWith #[] (args.map toJS)) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute CSSNumericArray values` -/
 @[macro_inline] def CSSMathProduct.values (self : CSSMathProduct) : IO CSSNumericArray := Internal.api "Lasm.JS.Web.CSSMathProduct.values" do
   let r ← self.val.get "values" Value
@@ -1149,6 +1407,14 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
   Lasm.JS.Binding.invoke CSSMathSum { name := "Lasm.JS.Web.CSSMathSum.new", module := "globalThis", path := "CSSMathSum", construct := true, arity := 1 }
     (Internal.argsWith #[] (args.map toJS)) (await := false)
 
+/-- `constructor(CSSNumberish... args)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSMathSum.new? (args : Array CSSNumberish := #[]) : IO (Option CSSMathSum) := Internal.api "Lasm.JS.Web.CSSMathSum.new?" do
+  if !(← Internal.hasGlobal ["CSSMathSum"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CSSMathSum { name := "Lasm.JS.Web.CSSMathSum.new?", module := "globalThis", path := "CSSMathSum", construct := true, arity := 1 }
+      (Internal.argsWith #[] (args.map toJS)) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute CSSNumericArray values` -/
 @[macro_inline] def CSSMathSum.values (self : CSSMathSum) : IO CSSNumericArray := Internal.api "Lasm.JS.Web.CSSMathSum.values" do
   let r ← self.val.get "values" Value
@@ -1159,25 +1425,70 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
   let r ← self.val.get "styleMap" Value
   pure { val := r }
 
+/-- `readonly attribute StylePropertyMap styleMap` where the platform has it (`'styleMap' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSStyleRule.styleMap? (self' : CSSStyleRule) : IO (Option StylePropertyMap) := Internal.api "Lasm.JS.Web.CSSStyleRule.styleMap?" do
+  let self := self'
+  if !(← Internal.has self.val "styleMap") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "styleMap" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `StylePropertyMapReadOnly computedStyleMap()` -/
 @[macro_inline] def Element.computedStyleMap (self : Element) : IO StylePropertyMapReadOnly := Internal.api "Lasm.JS.Web.Element.computedStyleMap" do
   let r ← self.val.callMethod "computedStyleMap" (Internal.args #[]) Value
   pure { val := r }
+
+/-- `StylePropertyMapReadOnly computedStyleMap()` where the platform has it (`'computedStyleMap' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Element.computedStyleMap? (self' : Element) : IO (Option StylePropertyMapReadOnly) := Internal.api "Lasm.JS.Web.Element.computedStyleMap?" do
+  let self := self'
+  if !(← Internal.has self.val "computedStyleMap") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethod "computedStyleMap" (Internal.args #[]) Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `readonly attribute StylePropertyMap attributeStyleMap` -/
 @[macro_inline] def HTMLElement.attributeStyleMap (self : HTMLElement) : IO StylePropertyMap := Internal.api "Lasm.JS.Web.HTMLElement.attributeStyleMap" do
   let r ← self.val.get "attributeStyleMap" Value
   pure { val := r }
 
+/-- `readonly attribute StylePropertyMap attributeStyleMap` where the platform has it (`'attributeStyleMap' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLElement.attributeStyleMap? (self' : HTMLElement) : IO (Option StylePropertyMap) := Internal.api "Lasm.JS.Web.HTMLElement.attributeStyleMap?" do
+  let self := self'
+  if !(← Internal.has self.val "attributeStyleMap") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "attributeStyleMap" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute StylePropertyMap attributeStyleMap` -/
 @[macro_inline] def MathMLElement.attributeStyleMap (self : MathMLElement) : IO StylePropertyMap := Internal.api "Lasm.JS.Web.MathMLElement.attributeStyleMap" do
   let r ← self.val.get "attributeStyleMap" Value
   pure { val := r }
 
+/-- `readonly attribute StylePropertyMap attributeStyleMap` where the platform has it (`'attributeStyleMap' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def MathMLElement.attributeStyleMap? (self' : MathMLElement) : IO (Option StylePropertyMap) := Internal.api "Lasm.JS.Web.MathMLElement.attributeStyleMap?" do
+  let self := self'
+  if !(← Internal.has self.val "attributeStyleMap") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "attributeStyleMap" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute StylePropertyMap attributeStyleMap` -/
 @[macro_inline] def SVGElement.attributeStyleMap (self : SVGElement) : IO StylePropertyMap := Internal.api "Lasm.JS.Web.SVGElement.attributeStyleMap" do
   let r ← self.val.get "attributeStyleMap" Value
   pure { val := r }
+
+/-- `readonly attribute StylePropertyMap attributeStyleMap` where the platform has it (`'attributeStyleMap' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGElement.attributeStyleMap? (self' : SVGElement) : IO (Option StylePropertyMap) := Internal.api "Lasm.JS.Web.SVGElement.attributeStyleMap?" do
+  let self := self'
+  if !(← Internal.has self.val "attributeStyleMap") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "attributeStyleMap" Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue number(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.number (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.number" do
@@ -1185,11 +1496,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue number(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.number? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.number?" do
+  if !(← Internal.hasGlobal ["CSS", "number"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.number?", module := "globalThis", path := "CSS.number", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue percent(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.percent (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.percent" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.percent", module := "globalThis", path := "CSS.percent", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue percent(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.percent? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.percent?" do
+  if !(← Internal.hasGlobal ["CSS", "percent"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.percent?", module := "globalThis", path := "CSS.percent", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue cap(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.cap (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.cap" do
@@ -1197,11 +1526,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue cap(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.cap? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.cap?" do
+  if !(← Internal.hasGlobal ["CSS", "cap"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.cap?", module := "globalThis", path := "CSS.cap", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue ch(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.ch (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.ch" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.ch", module := "globalThis", path := "CSS.ch", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue ch(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.ch? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.ch?" do
+  if !(← Internal.hasGlobal ["CSS", "ch"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.ch?", module := "globalThis", path := "CSS.ch", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue em(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.em (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.em" do
@@ -1209,11 +1556,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue em(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.em? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.em?" do
+  if !(← Internal.hasGlobal ["CSS", "em"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.em?", module := "globalThis", path := "CSS.em", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue ex(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.ex (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.ex" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.ex", module := "globalThis", path := "CSS.ex", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue ex(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.ex? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.ex?" do
+  if !(← Internal.hasGlobal ["CSS", "ex"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.ex?", module := "globalThis", path := "CSS.ex", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue ic(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.ic (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.ic" do
@@ -1221,11 +1586,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue ic(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.ic? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.ic?" do
+  if !(← Internal.hasGlobal ["CSS", "ic"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.ic?", module := "globalThis", path := "CSS.ic", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue lh(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.lh (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.lh" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.lh", module := "globalThis", path := "CSS.lh", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue lh(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.lh? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.lh?" do
+  if !(← Internal.hasGlobal ["CSS", "lh"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.lh?", module := "globalThis", path := "CSS.lh", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue rcap(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.rcap (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.rcap" do
@@ -1233,11 +1616,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue rcap(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.rcap? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.rcap?" do
+  if !(← Internal.hasGlobal ["CSS", "rcap"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.rcap?", module := "globalThis", path := "CSS.rcap", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue rch(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.rch (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.rch" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.rch", module := "globalThis", path := "CSS.rch", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue rch(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.rch? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.rch?" do
+  if !(← Internal.hasGlobal ["CSS", "rch"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.rch?", module := "globalThis", path := "CSS.rch", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue rem(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.rem (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.rem" do
@@ -1245,11 +1646,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue rem(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.rem? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.rem?" do
+  if !(← Internal.hasGlobal ["CSS", "rem"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.rem?", module := "globalThis", path := "CSS.rem", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue rex(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.rex (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.rex" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.rex", module := "globalThis", path := "CSS.rex", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue rex(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.rex? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.rex?" do
+  if !(← Internal.hasGlobal ["CSS", "rex"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.rex?", module := "globalThis", path := "CSS.rex", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue ric(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.ric (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.ric" do
@@ -1257,11 +1676,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue ric(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.ric? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.ric?" do
+  if !(← Internal.hasGlobal ["CSS", "ric"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.ric?", module := "globalThis", path := "CSS.ric", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue rlh(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.rlh (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.rlh" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.rlh", module := "globalThis", path := "CSS.rlh", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue rlh(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.rlh? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.rlh?" do
+  if !(← Internal.hasGlobal ["CSS", "rlh"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.rlh?", module := "globalThis", path := "CSS.rlh", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue vw(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.vw (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.vw" do
@@ -1269,11 +1706,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue vw(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.vw? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.vw?" do
+  if !(← Internal.hasGlobal ["CSS", "vw"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.vw?", module := "globalThis", path := "CSS.vw", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue vh(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.vh (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.vh" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.vh", module := "globalThis", path := "CSS.vh", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue vh(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.vh? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.vh?" do
+  if !(← Internal.hasGlobal ["CSS", "vh"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.vh?", module := "globalThis", path := "CSS.vh", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue vi(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.vi (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.vi" do
@@ -1281,11 +1736,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue vi(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.vi? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.vi?" do
+  if !(← Internal.hasGlobal ["CSS", "vi"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.vi?", module := "globalThis", path := "CSS.vi", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue vb(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.vb (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.vb" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.vb", module := "globalThis", path := "CSS.vb", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue vb(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.vb? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.vb?" do
+  if !(← Internal.hasGlobal ["CSS", "vb"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.vb?", module := "globalThis", path := "CSS.vb", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue vmin(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.vmin (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.vmin" do
@@ -1293,11 +1766,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue vmin(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.vmin? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.vmin?" do
+  if !(← Internal.hasGlobal ["CSS", "vmin"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.vmin?", module := "globalThis", path := "CSS.vmin", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue vmax(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.vmax (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.vmax" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.vmax", module := "globalThis", path := "CSS.vmax", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue vmax(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.vmax? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.vmax?" do
+  if !(← Internal.hasGlobal ["CSS", "vmax"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.vmax?", module := "globalThis", path := "CSS.vmax", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue svw(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.svw (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.svw" do
@@ -1305,11 +1796,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue svw(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.svw? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.svw?" do
+  if !(← Internal.hasGlobal ["CSS", "svw"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.svw?", module := "globalThis", path := "CSS.svw", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue svh(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.svh (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.svh" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.svh", module := "globalThis", path := "CSS.svh", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue svh(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.svh? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.svh?" do
+  if !(← Internal.hasGlobal ["CSS", "svh"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.svh?", module := "globalThis", path := "CSS.svh", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue svi(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.svi (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.svi" do
@@ -1317,11 +1826,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue svi(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.svi? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.svi?" do
+  if !(← Internal.hasGlobal ["CSS", "svi"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.svi?", module := "globalThis", path := "CSS.svi", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue svb(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.svb (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.svb" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.svb", module := "globalThis", path := "CSS.svb", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue svb(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.svb? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.svb?" do
+  if !(← Internal.hasGlobal ["CSS", "svb"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.svb?", module := "globalThis", path := "CSS.svb", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue svmin(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.svmin (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.svmin" do
@@ -1329,11 +1856,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue svmin(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.svmin? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.svmin?" do
+  if !(← Internal.hasGlobal ["CSS", "svmin"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.svmin?", module := "globalThis", path := "CSS.svmin", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue svmax(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.svmax (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.svmax" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.svmax", module := "globalThis", path := "CSS.svmax", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue svmax(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.svmax? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.svmax?" do
+  if !(← Internal.hasGlobal ["CSS", "svmax"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.svmax?", module := "globalThis", path := "CSS.svmax", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue lvw(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.lvw (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.lvw" do
@@ -1341,11 +1886,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue lvw(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.lvw? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.lvw?" do
+  if !(← Internal.hasGlobal ["CSS", "lvw"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.lvw?", module := "globalThis", path := "CSS.lvw", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue lvh(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.lvh (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.lvh" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.lvh", module := "globalThis", path := "CSS.lvh", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue lvh(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.lvh? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.lvh?" do
+  if !(← Internal.hasGlobal ["CSS", "lvh"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.lvh?", module := "globalThis", path := "CSS.lvh", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue lvi(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.lvi (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.lvi" do
@@ -1353,11 +1916,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue lvi(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.lvi? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.lvi?" do
+  if !(← Internal.hasGlobal ["CSS", "lvi"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.lvi?", module := "globalThis", path := "CSS.lvi", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue lvb(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.lvb (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.lvb" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.lvb", module := "globalThis", path := "CSS.lvb", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue lvb(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.lvb? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.lvb?" do
+  if !(← Internal.hasGlobal ["CSS", "lvb"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.lvb?", module := "globalThis", path := "CSS.lvb", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue lvmin(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.lvmin (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.lvmin" do
@@ -1365,11 +1946,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue lvmin(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.lvmin? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.lvmin?" do
+  if !(← Internal.hasGlobal ["CSS", "lvmin"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.lvmin?", module := "globalThis", path := "CSS.lvmin", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue lvmax(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.lvmax (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.lvmax" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.lvmax", module := "globalThis", path := "CSS.lvmax", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue lvmax(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.lvmax? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.lvmax?" do
+  if !(← Internal.hasGlobal ["CSS", "lvmax"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.lvmax?", module := "globalThis", path := "CSS.lvmax", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue dvw(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.dvw (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.dvw" do
@@ -1377,11 +1976,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue dvw(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.dvw? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.dvw?" do
+  if !(← Internal.hasGlobal ["CSS", "dvw"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.dvw?", module := "globalThis", path := "CSS.dvw", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue dvh(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.dvh (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.dvh" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.dvh", module := "globalThis", path := "CSS.dvh", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue dvh(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.dvh? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.dvh?" do
+  if !(← Internal.hasGlobal ["CSS", "dvh"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.dvh?", module := "globalThis", path := "CSS.dvh", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue dvi(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.dvi (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.dvi" do
@@ -1389,11 +2006,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue dvi(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.dvi? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.dvi?" do
+  if !(← Internal.hasGlobal ["CSS", "dvi"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.dvi?", module := "globalThis", path := "CSS.dvi", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue dvb(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.dvb (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.dvb" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.dvb", module := "globalThis", path := "CSS.dvb", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue dvb(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.dvb? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.dvb?" do
+  if !(← Internal.hasGlobal ["CSS", "dvb"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.dvb?", module := "globalThis", path := "CSS.dvb", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue dvmin(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.dvmin (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.dvmin" do
@@ -1401,11 +2036,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue dvmin(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.dvmin? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.dvmin?" do
+  if !(← Internal.hasGlobal ["CSS", "dvmin"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.dvmin?", module := "globalThis", path := "CSS.dvmin", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue dvmax(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.dvmax (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.dvmax" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.dvmax", module := "globalThis", path := "CSS.dvmax", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue dvmax(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.dvmax? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.dvmax?" do
+  if !(← Internal.hasGlobal ["CSS", "dvmax"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.dvmax?", module := "globalThis", path := "CSS.dvmax", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue cqw(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.cqw (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.cqw" do
@@ -1413,11 +2066,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue cqw(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.cqw? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.cqw?" do
+  if !(← Internal.hasGlobal ["CSS", "cqw"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.cqw?", module := "globalThis", path := "CSS.cqw", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue cqh(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.cqh (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.cqh" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.cqh", module := "globalThis", path := "CSS.cqh", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue cqh(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.cqh? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.cqh?" do
+  if !(← Internal.hasGlobal ["CSS", "cqh"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.cqh?", module := "globalThis", path := "CSS.cqh", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue cqi(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.cqi (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.cqi" do
@@ -1425,11 +2096,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue cqi(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.cqi? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.cqi?" do
+  if !(← Internal.hasGlobal ["CSS", "cqi"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.cqi?", module := "globalThis", path := "CSS.cqi", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue cqb(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.cqb (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.cqb" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.cqb", module := "globalThis", path := "CSS.cqb", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue cqb(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.cqb? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.cqb?" do
+  if !(← Internal.hasGlobal ["CSS", "cqb"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.cqb?", module := "globalThis", path := "CSS.cqb", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue cqmin(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.cqmin (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.cqmin" do
@@ -1437,11 +2126,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue cqmin(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.cqmin? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.cqmin?" do
+  if !(← Internal.hasGlobal ["CSS", "cqmin"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.cqmin?", module := "globalThis", path := "CSS.cqmin", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue cqmax(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.cqmax (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.cqmax" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.cqmax", module := "globalThis", path := "CSS.cqmax", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue cqmax(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.cqmax? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.cqmax?" do
+  if !(← Internal.hasGlobal ["CSS", "cqmax"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.cqmax?", module := "globalThis", path := "CSS.cqmax", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue cm(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.cm (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.cm" do
@@ -1449,11 +2156,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue cm(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.cm? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.cm?" do
+  if !(← Internal.hasGlobal ["CSS", "cm"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.cm?", module := "globalThis", path := "CSS.cm", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue mm(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.mm (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.mm" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.mm", module := "globalThis", path := "CSS.mm", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue mm(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.mm? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.mm?" do
+  if !(← Internal.hasGlobal ["CSS", "mm"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.mm?", module := "globalThis", path := "CSS.mm", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue Q(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.Q (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.Q" do
@@ -1461,11 +2186,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue Q(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.Q? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.Q?" do
+  if !(← Internal.hasGlobal ["CSS", "Q"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.Q?", module := "globalThis", path := "CSS.Q", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue in(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.«in» (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.in" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.in", module := "globalThis", path := "CSS.in", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue in(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.«in?» (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.in?" do
+  if !(← Internal.hasGlobal ["CSS", "in"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.in?", module := "globalThis", path := "CSS.in", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue pt(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.pt (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.pt" do
@@ -1473,11 +2216,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue pt(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.pt? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.pt?" do
+  if !(← Internal.hasGlobal ["CSS", "pt"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.pt?", module := "globalThis", path := "CSS.pt", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue pc(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.pc (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.pc" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.pc", module := "globalThis", path := "CSS.pc", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue pc(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.pc? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.pc?" do
+  if !(← Internal.hasGlobal ["CSS", "pc"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.pc?", module := "globalThis", path := "CSS.pc", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue px(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.px (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.px" do
@@ -1485,11 +2246,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue px(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.px? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.px?" do
+  if !(← Internal.hasGlobal ["CSS", "px"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.px?", module := "globalThis", path := "CSS.px", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue deg(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.deg (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.deg" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.deg", module := "globalThis", path := "CSS.deg", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue deg(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.deg? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.deg?" do
+  if !(← Internal.hasGlobal ["CSS", "deg"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.deg?", module := "globalThis", path := "CSS.deg", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue grad(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.grad (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.grad" do
@@ -1497,11 +2276,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue grad(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.grad? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.grad?" do
+  if !(← Internal.hasGlobal ["CSS", "grad"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.grad?", module := "globalThis", path := "CSS.grad", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue rad(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.rad (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.rad" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.rad", module := "globalThis", path := "CSS.rad", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue rad(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.rad? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.rad?" do
+  if !(← Internal.hasGlobal ["CSS", "rad"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.rad?", module := "globalThis", path := "CSS.rad", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue turn(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.turn (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.turn" do
@@ -1509,11 +2306,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue turn(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.turn? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.turn?" do
+  if !(← Internal.hasGlobal ["CSS", "turn"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.turn?", module := "globalThis", path := "CSS.turn", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue s(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.s (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.s" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.s", module := "globalThis", path := "CSS.s", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue s(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.s? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.s?" do
+  if !(← Internal.hasGlobal ["CSS", "s"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.s?", module := "globalThis", path := "CSS.s", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue ms(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.ms (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.ms" do
@@ -1521,11 +2336,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue ms(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.ms? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.ms?" do
+  if !(← Internal.hasGlobal ["CSS", "ms"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.ms?", module := "globalThis", path := "CSS.ms", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue Hz(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.Hz (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.Hz" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.Hz", module := "globalThis", path := "CSS.Hz", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue Hz(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.Hz? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.Hz?" do
+  if !(← Internal.hasGlobal ["CSS", "Hz"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.Hz?", module := "globalThis", path := "CSS.Hz", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue kHz(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.kHz (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.kHz" do
@@ -1533,11 +2366,29 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue kHz(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.kHz? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.kHz?" do
+  if !(← Internal.hasGlobal ["CSS", "kHz"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.kHz?", module := "globalThis", path := "CSS.kHz", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue dpi(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.dpi (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.dpi" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.dpi", module := "globalThis", path := "CSS.dpi", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue dpi(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.dpi? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.dpi?" do
+  if !(← Internal.hasGlobal ["CSS", "dpi"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.dpi?", module := "globalThis", path := "CSS.dpi", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `CSSUnitValue dpcm(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.dpcm (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.dpcm" do
@@ -1545,16 +2396,43 @@ instance : Coe CSSKeywordValue CSSColorRGBComp := ⟨.cssKeywordValue⟩
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue dpcm(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.dpcm? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.dpcm?" do
+  if !(← Internal.hasGlobal ["CSS", "dpcm"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.dpcm?", module := "globalThis", path := "CSS.dpcm", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue dppx(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.dppx (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.dppx" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.dppx", module := "globalThis", path := "CSS.dppx", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
 
+/-- `CSSUnitValue dppx(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.dppx? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.dppx?" do
+  if !(← Internal.hasGlobal ["CSS", "dppx"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.dppx?", module := "globalThis", path := "CSS.dppx", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `CSSUnitValue fr(double value)` (CSS Typed OM Level 1 (https://drafts.css-houdini.org/css-typed-om-1/)) -/
 @[macro_inline] def CSS.fr (value : Float) : IO CSSUnitValue := Internal.api "Lasm.JS.Web.CSS.fr" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.fr", module := "globalThis", path := "CSS.fr", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `CSSUnitValue fr(double value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.fr? (value : Float) : IO (Option CSSUnitValue) := Internal.api "Lasm.JS.Web.CSS.fr?" do
+  if !(← Internal.hasGlobal ["CSS", "fr"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.CSS.fr?", module := "globalThis", path := "CSS.fr", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

@@ -266,9 +266,27 @@ instance : ToJS MediaCapabilitiesInfo := ⟨fun d => Internal.fields #[("support
   let r ← self.val.get "mediaCapabilities" Value
   pure { val := r }
 
+/-- `readonly attribute MediaCapabilities mediaCapabilities` where the platform has it (`'mediaCapabilities' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.mediaCapabilities? (self' : Navigator) : IO (Option MediaCapabilities) := Internal.api "Lasm.JS.Web.Navigator.mediaCapabilities?" do
+  let self := self'
+  if !(← Internal.has self.val "mediaCapabilities") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "mediaCapabilities" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute MediaCapabilities mediaCapabilities` -/
 @[macro_inline] def WorkerNavigator.mediaCapabilities (self : WorkerNavigator) : IO MediaCapabilities := Internal.api "Lasm.JS.Web.WorkerNavigator.mediaCapabilities" do
   let r ← self.val.get "mediaCapabilities" Value
   pure { val := r }
+
+/-- `readonly attribute MediaCapabilities mediaCapabilities` where the platform has it (`'mediaCapabilities' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerNavigator.mediaCapabilities? (self' : WorkerNavigator) : IO (Option MediaCapabilities) := Internal.api "Lasm.JS.Web.WorkerNavigator.mediaCapabilities?" do
+  let self := self'
+  if !(← Internal.has self.val "mediaCapabilities") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "mediaCapabilities" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

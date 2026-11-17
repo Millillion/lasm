@@ -80,6 +80,14 @@ instance : ToJS GenerateTestReportParameters := ⟨fun d => Internal.fields #[("
   Lasm.JS.Binding.invoke ReportingObserver { name := "Lasm.JS.Web.ReportingObserver.new", module := "globalThis", path := "ReportingObserver", construct := true, arity := 2 }
     (Internal.args #[toJS callback, Internal.optional options]) (await := false)
 
+/-- `constructor(ReportingObserverCallback callback, optional ReportingObserverOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ReportingObserver.new? (callback : ReportingObserverCallback) (options : Option ReportingObserverOptions := none) : IO (Option ReportingObserver) := Internal.api "Lasm.JS.Web.ReportingObserver.new?" do
+  if !(← Internal.hasGlobal ["ReportingObserver"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ReportingObserver { name := "Lasm.JS.Web.ReportingObserver.new?", module := "globalThis", path := "ReportingObserver", construct := true, arity := 2 }
+      (Internal.args #[toJS callback, Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `undefined observe()` -/
 @[macro_inline] def ReportingObserver.observe (self : ReportingObserver) : IO Unit := Internal.api "Lasm.JS.Web.ReportingObserver.observe" do
   self.val.callMethod "observe" (Internal.args #[]) Unit

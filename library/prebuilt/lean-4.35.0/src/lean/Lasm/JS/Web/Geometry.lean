@@ -198,6 +198,14 @@ instance : ToJS DOMMatrix2DInit := ⟨fun d => Internal.fields #[("a", Internal.
   Lasm.JS.Binding.invoke DOMMatrixReadOnly { name := "Lasm.JS.Web.DOMMatrixReadOnly.new", module := "globalThis", path := "DOMMatrixReadOnly", construct := true, arity := 1 }
     (Internal.args #[Internal.optional init]) (await := false)
 
+/-- `constructor(optional (DOMString or sequence<unrestricted double>) init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DOMMatrixReadOnly.new? (init : Option DOMStringOrSequenceOfUnrestrictedDouble := none) : IO (Option DOMMatrixReadOnly) := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.new?" do
+  if !(← Internal.hasGlobal ["DOMMatrixReadOnly"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke DOMMatrixReadOnly { name := "Lasm.JS.Web.DOMMatrixReadOnly.new?", module := "globalThis", path := "DOMMatrixReadOnly", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional init]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute unrestricted double a` -/
 @[macro_inline] def DOMMatrixReadOnly.a (self : DOMMatrixReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.a" do
   self.val.get "a" Float
@@ -304,6 +312,15 @@ instance : ToJS DOMMatrix2DInit := ⟨fun d => Internal.fields #[("a", Internal.
     (Internal.args #[Internal.optional other]) (await := false)
   pure { val := r }
 
+/-- `static DOMMatrixReadOnly fromMatrix(optional DOMMatrixInit other)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DOMMatrixReadOnly.fromMatrix? (other : Option DOMMatrixInit := none) : IO (Option DOMMatrixReadOnly) := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.fromMatrix?" do
+  if !(← Internal.hasGlobal ["DOMMatrixReadOnly", "fromMatrix"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMMatrixReadOnly.fromMatrix?", module := "globalThis", path := "DOMMatrixReadOnly.fromMatrix", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional other]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `static DOMMatrixReadOnly fromFloat32Array(Float32Array array32)` -/
 @[macro_inline] def DOMMatrixReadOnly.fromFloat32Array (array32 : ByteArray) : IO DOMMatrixReadOnly := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.fromFloat32Array" do
   let array32View ← Internal.typedArray "Float32Array" array32
@@ -311,12 +328,32 @@ instance : ToJS DOMMatrix2DInit := ⟨fun d => Internal.fields #[("a", Internal.
     (Internal.args #[.ref array32View ""]) (await := false)
   pure { val := r }
 
+/-- `static DOMMatrixReadOnly fromFloat32Array(Float32Array array32)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DOMMatrixReadOnly.fromFloat32Array? (array32 : ByteArray) : IO (Option DOMMatrixReadOnly) := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.fromFloat32Array?" do
+  if !(← Internal.hasGlobal ["DOMMatrixReadOnly", "fromFloat32Array"]) then return none
+  let lasmGuarded ← do
+    let array32View ← Internal.typedArray "Float32Array" array32
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMMatrixReadOnly.fromFloat32Array?", module := "globalThis", path := "DOMMatrixReadOnly.fromFloat32Array", construct := false, arity := 1 }
+      (Internal.args #[.ref array32View ""]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `static DOMMatrixReadOnly fromFloat64Array(Float64Array array64)` -/
 @[macro_inline] def DOMMatrixReadOnly.fromFloat64Array (array64 : ByteArray) : IO DOMMatrixReadOnly := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.fromFloat64Array" do
   let array64View ← Internal.typedArray "Float64Array" array64
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMMatrixReadOnly.fromFloat64Array", module := "globalThis", path := "DOMMatrixReadOnly.fromFloat64Array", construct := false, arity := 1 }
     (Internal.args #[.ref array64View ""]) (await := false)
   pure { val := r }
+
+/-- `static DOMMatrixReadOnly fromFloat64Array(Float64Array array64)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DOMMatrixReadOnly.fromFloat64Array? (array64 : ByteArray) : IO (Option DOMMatrixReadOnly) := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.fromFloat64Array?" do
+  if !(← Internal.hasGlobal ["DOMMatrixReadOnly", "fromFloat64Array"]) then return none
+  let lasmGuarded ← do
+    let array64View ← Internal.typedArray "Float64Array" array64
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMMatrixReadOnly.fromFloat64Array?", module := "globalThis", path := "DOMMatrixReadOnly.fromFloat64Array", construct := false, arity := 1 }
+      (Internal.args #[.ref array64View ""]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `DOMMatrix translate(optional unrestricted double tx, optional unrestricted double ty, optional unrestricted double tz)` -/
 @[macro_inline] def DOMMatrixReadOnly.translate (self : DOMMatrixReadOnly) (tx : Option Float := none) (ty : Option Float := none) (tz : Option Float := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrixReadOnly.translate" do
@@ -411,6 +448,14 @@ instance : ToJS DOMMatrix2DInit := ⟨fun d => Internal.fields #[("a", Internal.
   Lasm.JS.Binding.invoke DOMPointReadOnly { name := "Lasm.JS.Web.DOMPointReadOnly.new", module := "globalThis", path := "DOMPointReadOnly", construct := true, arity := 4 }
     (Internal.args #[Internal.optional x, Internal.optional y, Internal.optional z, Internal.optional w]) (await := false)
 
+/-- `constructor(optional unrestricted double x, optional unrestricted double y, optional unrestricted double z, optional unrestricted double w)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DOMPointReadOnly.new? (x : Option Float := none) (y : Option Float := none) (z : Option Float := none) (w : Option Float := none) : IO (Option DOMPointReadOnly) := Internal.api "Lasm.JS.Web.DOMPointReadOnly.new?" do
+  if !(← Internal.hasGlobal ["DOMPointReadOnly"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke DOMPointReadOnly { name := "Lasm.JS.Web.DOMPointReadOnly.new?", module := "globalThis", path := "DOMPointReadOnly", construct := true, arity := 4 }
+      (Internal.args #[Internal.optional x, Internal.optional y, Internal.optional z, Internal.optional w]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute unrestricted double x` -/
 @[macro_inline] def DOMPointReadOnly.x (self : DOMPointReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMPointReadOnly.x" do
   self.val.get "x" Float
@@ -433,6 +478,15 @@ instance : ToJS DOMMatrix2DInit := ⟨fun d => Internal.fields #[("a", Internal.
     (Internal.args #[Internal.optional other]) (await := false)
   pure { val := r }
 
+/-- `static DOMPointReadOnly fromPoint(optional DOMPointInit other)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DOMPointReadOnly.fromPoint? (other : Option DOMPointInit := none) : IO (Option DOMPointReadOnly) := Internal.api "Lasm.JS.Web.DOMPointReadOnly.fromPoint?" do
+  if !(← Internal.hasGlobal ["DOMPointReadOnly", "fromPoint"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMPointReadOnly.fromPoint?", module := "globalThis", path := "DOMPointReadOnly.fromPoint", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional other]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `DOMPoint matrixTransform(optional DOMMatrixInit matrix)` -/
 @[macro_inline] def DOMPointReadOnly.matrixTransform (self : DOMPointReadOnly) (matrix : Option DOMMatrixInit := none) : IO DOMPoint := Internal.api "Lasm.JS.Web.DOMPointReadOnly.matrixTransform" do
   let r ← self.val.callMethod "matrixTransform" (Internal.args #[Internal.optional matrix]) Value
@@ -450,6 +504,14 @@ instance : ToJS DOMMatrix2DInit := ⟨fun d => Internal.fields #[("a", Internal.
 @[macro_inline] def DOMQuad.new (p1 : Option DOMPointInit := none) (p2 : Option DOMPointInit := none) (p3 : Option DOMPointInit := none) (p4 : Option DOMPointInit := none) : IO DOMQuad := Internal.api "Lasm.JS.Web.DOMQuad.new" do
   Lasm.JS.Binding.invoke DOMQuad { name := "Lasm.JS.Web.DOMQuad.new", module := "globalThis", path := "DOMQuad", construct := true, arity := 4 }
     (Internal.args #[Internal.optional p1, Internal.optional p2, Internal.optional p3, Internal.optional p4]) (await := false)
+
+/-- `constructor(optional DOMPointInit p1, optional DOMPointInit p2, optional DOMPointInit p3, optional DOMPointInit p4)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DOMQuad.new? (p1 : Option DOMPointInit := none) (p2 : Option DOMPointInit := none) (p3 : Option DOMPointInit := none) (p4 : Option DOMPointInit := none) : IO (Option DOMQuad) := Internal.api "Lasm.JS.Web.DOMQuad.new?" do
+  if !(← Internal.hasGlobal ["DOMQuad"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke DOMQuad { name := "Lasm.JS.Web.DOMQuad.new?", module := "globalThis", path := "DOMQuad", construct := true, arity := 4 }
+      (Internal.args #[Internal.optional p1, Internal.optional p2, Internal.optional p3, Internal.optional p4]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute DOMPoint p1` -/
 @[macro_inline] def DOMQuad.p1 (self : DOMQuad) : IO DOMPoint := Internal.api "Lasm.JS.Web.DOMQuad.p1" do
@@ -477,11 +539,29 @@ instance : ToJS DOMMatrix2DInit := ⟨fun d => Internal.fields #[("a", Internal.
     (Internal.args #[Internal.optional other]) (await := false)
   pure { val := r }
 
+/-- `static DOMQuad fromRect(optional DOMRectInit other)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DOMQuad.fromRect? (other : Option DOMRectInit := none) : IO (Option DOMQuad) := Internal.api "Lasm.JS.Web.DOMQuad.fromRect?" do
+  if !(← Internal.hasGlobal ["DOMQuad", "fromRect"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMQuad.fromRect?", module := "globalThis", path := "DOMQuad.fromRect", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional other]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `static DOMQuad fromQuad(optional DOMQuadInit other)` -/
 @[macro_inline] def DOMQuad.fromQuad (other : Option DOMQuadInit := none) : IO DOMQuad := Internal.api "Lasm.JS.Web.DOMQuad.fromQuad" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMQuad.fromQuad", module := "globalThis", path := "DOMQuad.fromQuad", construct := false, arity := 1 }
     (Internal.args #[Internal.optional other]) (await := false)
   pure { val := r }
+
+/-- `static DOMQuad fromQuad(optional DOMQuadInit other)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DOMQuad.fromQuad? (other : Option DOMQuadInit := none) : IO (Option DOMQuad) := Internal.api "Lasm.JS.Web.DOMQuad.fromQuad?" do
+  if !(← Internal.hasGlobal ["DOMQuad", "fromQuad"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMQuad.fromQuad?", module := "globalThis", path := "DOMQuad.fromQuad", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional other]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `DOMRect getBounds()` -/
 @[macro_inline] def DOMQuad.getBounds (self : DOMQuad) : IO DOMRect := Internal.api "Lasm.JS.Web.DOMQuad.getBounds" do
@@ -512,6 +592,14 @@ instance : ToJS DOMMatrix2DInit := ⟨fun d => Internal.fields #[("a", Internal.
 @[macro_inline] def DOMRectReadOnly.new (x : Option Float := none) (y : Option Float := none) (width : Option Float := none) (height : Option Float := none) : IO DOMRectReadOnly := Internal.api "Lasm.JS.Web.DOMRectReadOnly.new" do
   Lasm.JS.Binding.invoke DOMRectReadOnly { name := "Lasm.JS.Web.DOMRectReadOnly.new", module := "globalThis", path := "DOMRectReadOnly", construct := true, arity := 4 }
     (Internal.args #[Internal.optional x, Internal.optional y, Internal.optional width, Internal.optional height]) (await := false)
+
+/-- `constructor(optional unrestricted double x, optional unrestricted double y, optional unrestricted double width, optional unrestricted double height)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DOMRectReadOnly.new? (x : Option Float := none) (y : Option Float := none) (width : Option Float := none) (height : Option Float := none) : IO (Option DOMRectReadOnly) := Internal.api "Lasm.JS.Web.DOMRectReadOnly.new?" do
+  if !(← Internal.hasGlobal ["DOMRectReadOnly"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke DOMRectReadOnly { name := "Lasm.JS.Web.DOMRectReadOnly.new?", module := "globalThis", path := "DOMRectReadOnly", construct := true, arity := 4 }
+      (Internal.args #[Internal.optional x, Internal.optional y, Internal.optional width, Internal.optional height]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute unrestricted double x` -/
 @[macro_inline] def DOMRectReadOnly.x (self : DOMRectReadOnly) : IO Float := Internal.api "Lasm.JS.Web.DOMRectReadOnly.x" do
@@ -551,6 +639,15 @@ instance : ToJS DOMMatrix2DInit := ⟨fun d => Internal.fields #[("a", Internal.
     (Internal.args #[Internal.optional other]) (await := false)
   pure { val := r }
 
+/-- `static DOMRectReadOnly fromRect(optional DOMRectInit other)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DOMRectReadOnly.fromRect? (other : Option DOMRectInit := none) : IO (Option DOMRectReadOnly) := Internal.api "Lasm.JS.Web.DOMRectReadOnly.fromRect?" do
+  if !(← Internal.hasGlobal ["DOMRectReadOnly", "fromRect"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMRectReadOnly.fromRect?", module := "globalThis", path := "DOMRectReadOnly.fromRect", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional other]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `object toJSON()` -/
 @[macro_inline] def DOMRectReadOnly.toJSON (self : DOMRectReadOnly) : IO Data := Internal.api "Lasm.JS.Web.DOMRectReadOnly.toJSON" do
   self.val.callMethod "toJSON" (Internal.args #[]) Data
@@ -563,6 +660,14 @@ instance : ToJS DOMMatrix2DInit := ⟨fun d => Internal.fields #[("a", Internal.
 @[macro_inline] def DOMMatrix.new (init : Option DOMStringOrSequenceOfUnrestrictedDouble := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrix.new" do
   Lasm.JS.Binding.invoke DOMMatrix { name := "Lasm.JS.Web.DOMMatrix.new", module := "globalThis", path := "DOMMatrix", construct := true, arity := 1 }
     (Internal.args #[Internal.optional init]) (await := false)
+
+/-- `constructor(optional (DOMString or sequence<unrestricted double>) init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DOMMatrix.new? (init : Option DOMStringOrSequenceOfUnrestrictedDouble := none) : IO (Option DOMMatrix) := Internal.api "Lasm.JS.Web.DOMMatrix.new?" do
+  if !(← Internal.hasGlobal ["DOMMatrix"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke DOMMatrix { name := "Lasm.JS.Web.DOMMatrix.new?", module := "globalThis", path := "DOMMatrix", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional init]) (await := false)
+  return some lasmGuarded
 
 /-- `inherit attribute unrestricted double a` -/
 @[macro_inline] def DOMMatrix.a (self : DOMMatrix) : IO Float := Internal.api "Lasm.JS.Web.DOMMatrix.a" do
@@ -746,6 +851,15 @@ instance : ToJS DOMMatrix2DInit := ⟨fun d => Internal.fields #[("a", Internal.
     (Internal.args #[Internal.optional other]) (await := false)
   pure { val := r }
 
+/-- `static DOMMatrix fromMatrix(optional DOMMatrixInit other)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DOMMatrix.fromMatrix? (other : Option DOMMatrixInit := none) : IO (Option DOMMatrix) := Internal.api "Lasm.JS.Web.DOMMatrix.fromMatrix?" do
+  if !(← Internal.hasGlobal ["DOMMatrix", "fromMatrix"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMMatrix.fromMatrix?", module := "globalThis", path := "DOMMatrix.fromMatrix", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional other]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `static DOMMatrix fromFloat32Array(Float32Array array32)` -/
 @[macro_inline] def DOMMatrix.fromFloat32Array (array32 : ByteArray) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrix.fromFloat32Array" do
   let array32View ← Internal.typedArray "Float32Array" array32
@@ -753,12 +867,32 @@ instance : ToJS DOMMatrix2DInit := ⟨fun d => Internal.fields #[("a", Internal.
     (Internal.args #[.ref array32View ""]) (await := false)
   pure { val := r }
 
+/-- `static DOMMatrix fromFloat32Array(Float32Array array32)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DOMMatrix.fromFloat32Array? (array32 : ByteArray) : IO (Option DOMMatrix) := Internal.api "Lasm.JS.Web.DOMMatrix.fromFloat32Array?" do
+  if !(← Internal.hasGlobal ["DOMMatrix", "fromFloat32Array"]) then return none
+  let lasmGuarded ← do
+    let array32View ← Internal.typedArray "Float32Array" array32
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMMatrix.fromFloat32Array?", module := "globalThis", path := "DOMMatrix.fromFloat32Array", construct := false, arity := 1 }
+      (Internal.args #[.ref array32View ""]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `static DOMMatrix fromFloat64Array(Float64Array array64)` -/
 @[macro_inline] def DOMMatrix.fromFloat64Array (array64 : ByteArray) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrix.fromFloat64Array" do
   let array64View ← Internal.typedArray "Float64Array" array64
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMMatrix.fromFloat64Array", module := "globalThis", path := "DOMMatrix.fromFloat64Array", construct := false, arity := 1 }
     (Internal.args #[.ref array64View ""]) (await := false)
   pure { val := r }
+
+/-- `static DOMMatrix fromFloat64Array(Float64Array array64)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DOMMatrix.fromFloat64Array? (array64 : ByteArray) : IO (Option DOMMatrix) := Internal.api "Lasm.JS.Web.DOMMatrix.fromFloat64Array?" do
+  if !(← Internal.hasGlobal ["DOMMatrix", "fromFloat64Array"]) then return none
+  let lasmGuarded ← do
+    let array64View ← Internal.typedArray "Float64Array" array64
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMMatrix.fromFloat64Array?", module := "globalThis", path := "DOMMatrix.fromFloat64Array", construct := false, arity := 1 }
+      (Internal.args #[.ref array64View ""]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `DOMMatrix multiplySelf(optional DOMMatrixInit other)` -/
 @[macro_inline] def DOMMatrix.multiplySelf (self : DOMMatrix) (other : Option DOMMatrixInit := none) : IO DOMMatrix := Internal.api "Lasm.JS.Web.DOMMatrix.multiplySelf" do
@@ -829,6 +963,14 @@ instance : ToJS DOMMatrix2DInit := ⟨fun d => Internal.fields #[("a", Internal.
   Lasm.JS.Binding.invoke DOMPoint { name := "Lasm.JS.Web.DOMPoint.new", module := "globalThis", path := "DOMPoint", construct := true, arity := 4 }
     (Internal.args #[Internal.optional x, Internal.optional y, Internal.optional z, Internal.optional w]) (await := false)
 
+/-- `constructor(optional unrestricted double x, optional unrestricted double y, optional unrestricted double z, optional unrestricted double w)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DOMPoint.new? (x : Option Float := none) (y : Option Float := none) (z : Option Float := none) (w : Option Float := none) : IO (Option DOMPoint) := Internal.api "Lasm.JS.Web.DOMPoint.new?" do
+  if !(← Internal.hasGlobal ["DOMPoint"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke DOMPoint { name := "Lasm.JS.Web.DOMPoint.new?", module := "globalThis", path := "DOMPoint", construct := true, arity := 4 }
+      (Internal.args #[Internal.optional x, Internal.optional y, Internal.optional z, Internal.optional w]) (await := false)
+  return some lasmGuarded
+
 /-- `inherit attribute unrestricted double x` -/
 @[macro_inline] def DOMPoint.x (self : DOMPoint) : IO Float := Internal.api "Lasm.JS.Web.DOMPoint.x" do
   self.val.get "x" Float
@@ -867,6 +1009,15 @@ instance : ToJS DOMMatrix2DInit := ⟨fun d => Internal.fields #[("a", Internal.
     (Internal.args #[Internal.optional other]) (await := false)
   pure { val := r }
 
+/-- `static DOMPoint fromPoint(optional DOMPointInit other)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DOMPoint.fromPoint? (other : Option DOMPointInit := none) : IO (Option DOMPoint) := Internal.api "Lasm.JS.Web.DOMPoint.fromPoint?" do
+  if !(← Internal.hasGlobal ["DOMPoint", "fromPoint"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMPoint.fromPoint?", module := "globalThis", path := "DOMPoint.fromPoint", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional other]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `v instanceof DOMRect`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DOMRect`). -/
 @[macro_inline] def DOMRect.cast? (v : Value) : IO (Option DOMRect) := Internal.api "Lasm.JS.Web.DOMRect.cast?" do
   Internal.cast (Internal.getGlobal ["DOMRect"] Value) (fun x => { val := x }) v
@@ -875,6 +1026,14 @@ instance : ToJS DOMMatrix2DInit := ⟨fun d => Internal.fields #[("a", Internal.
 @[macro_inline] def DOMRect.new (x : Option Float := none) (y : Option Float := none) (width : Option Float := none) (height : Option Float := none) : IO DOMRect := Internal.api "Lasm.JS.Web.DOMRect.new" do
   Lasm.JS.Binding.invoke DOMRect { name := "Lasm.JS.Web.DOMRect.new", module := "globalThis", path := "DOMRect", construct := true, arity := 4 }
     (Internal.args #[Internal.optional x, Internal.optional y, Internal.optional width, Internal.optional height]) (await := false)
+
+/-- `constructor(optional unrestricted double x, optional unrestricted double y, optional unrestricted double width, optional unrestricted double height)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DOMRect.new? (x : Option Float := none) (y : Option Float := none) (width : Option Float := none) (height : Option Float := none) : IO (Option DOMRect) := Internal.api "Lasm.JS.Web.DOMRect.new?" do
+  if !(← Internal.hasGlobal ["DOMRect"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke DOMRect { name := "Lasm.JS.Web.DOMRect.new?", module := "globalThis", path := "DOMRect", construct := true, arity := 4 }
+      (Internal.args #[Internal.optional x, Internal.optional y, Internal.optional width, Internal.optional height]) (await := false)
+  return some lasmGuarded
 
 /-- `inherit attribute unrestricted double x` -/
 @[macro_inline] def DOMRect.x (self : DOMRect) : IO Float := Internal.api "Lasm.JS.Web.DOMRect.x" do
@@ -913,5 +1072,14 @@ instance : ToJS DOMMatrix2DInit := ⟨fun d => Internal.fields #[("a", Internal.
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMRect.fromRect", module := "globalThis", path := "DOMRect.fromRect", construct := false, arity := 1 }
     (Internal.args #[Internal.optional other]) (await := false)
   pure { val := r }
+
+/-- `static DOMRect fromRect(optional DOMRectInit other)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DOMRect.fromRect? (other : Option DOMRectInit := none) : IO (Option DOMRect) := Internal.api "Lasm.JS.Web.DOMRect.fromRect?" do
+  if !(← Internal.hasGlobal ["DOMRect", "fromRect"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.DOMRect.fromRect?", module := "globalThis", path := "DOMRect.fromRect", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional other]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

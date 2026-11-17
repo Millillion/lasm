@@ -41,9 +41,25 @@ set_option compiler.extract_closed false
 @[macro_inline] def ScreenOrientation.lock (self : ScreenOrientation) (orientation : OrientationLockType) : Async Unit := Internal.api "Lasm.JS.Web.ScreenOrientation.lock" do
   self.val.callMethodAwait "lock" (Internal.args #[toJS orientation]) Unit
 
+/-- `Promise<undefined> lock(OrientationLockType orientation)` where the platform has it (`'lock' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ScreenOrientation.lock? (self' : ScreenOrientation) (orientation : OrientationLockType) : Async (Option Unit) := Internal.api "Lasm.JS.Web.ScreenOrientation.lock?" do
+  let self := self'
+  if !(← Internal.has self.val "lock") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "lock" (Internal.args #[toJS orientation]) Unit
+  return some lasmGuarded
+
 /-- `undefined unlock()` -/
 @[macro_inline] def ScreenOrientation.unlock (self : ScreenOrientation) : IO Unit := Internal.api "Lasm.JS.Web.ScreenOrientation.unlock" do
   self.val.callMethod "unlock" (Internal.args #[]) Unit
+
+/-- `undefined unlock()` where the platform has it (`'unlock' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ScreenOrientation.unlock? (self' : ScreenOrientation) : IO (Option Unit) := Internal.api "Lasm.JS.Web.ScreenOrientation.unlock?" do
+  let self := self'
+  if !(← Internal.has self.val "unlock") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "unlock" (Internal.args #[]) Unit
+  return some lasmGuarded
 
 /-- `readonly attribute ScreenOrientation orientation` -/
 @[macro_inline] def Screen.orientation (self : Screen) : IO ScreenOrientation := Internal.api "Lasm.JS.Web.Screen.orientation" do

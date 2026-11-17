@@ -33,6 +33,14 @@ instance : ToJS MagnetometerSensorOptions := ⟨fun d => Internal.fields #[("fre
   Lasm.JS.Binding.invoke Magnetometer { name := "Lasm.JS.Web.Magnetometer.new", module := "globalThis", path := "Magnetometer", construct := true, arity := 1 }
     (Internal.args #[Internal.optional sensorOptions]) (await := false)
 
+/-- `constructor(optional MagnetometerSensorOptions sensorOptions)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Magnetometer.new? (sensorOptions : Option MagnetometerSensorOptions := none) : IO (Option Magnetometer) := Internal.api "Lasm.JS.Web.Magnetometer.new?" do
+  if !(← Internal.hasGlobal ["Magnetometer"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Magnetometer { name := "Lasm.JS.Web.Magnetometer.new?", module := "globalThis", path := "Magnetometer", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional sensorOptions]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute double? x` -/
 @[macro_inline] def Magnetometer.x (self : Magnetometer) : IO (Option Float) := Internal.api "Lasm.JS.Web.Magnetometer.x" do
   self.val.get "x" (Option Float)
@@ -53,6 +61,14 @@ instance : ToJS MagnetometerSensorOptions := ⟨fun d => Internal.fields #[("fre
 @[macro_inline] def UncalibratedMagnetometer.new (sensorOptions : Option MagnetometerSensorOptions := none) : IO UncalibratedMagnetometer := Internal.api "Lasm.JS.Web.UncalibratedMagnetometer.new" do
   Lasm.JS.Binding.invoke UncalibratedMagnetometer { name := "Lasm.JS.Web.UncalibratedMagnetometer.new", module := "globalThis", path := "UncalibratedMagnetometer", construct := true, arity := 1 }
     (Internal.args #[Internal.optional sensorOptions]) (await := false)
+
+/-- `constructor(optional MagnetometerSensorOptions sensorOptions)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def UncalibratedMagnetometer.new? (sensorOptions : Option MagnetometerSensorOptions := none) : IO (Option UncalibratedMagnetometer) := Internal.api "Lasm.JS.Web.UncalibratedMagnetometer.new?" do
+  if !(← Internal.hasGlobal ["UncalibratedMagnetometer"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke UncalibratedMagnetometer { name := "Lasm.JS.Web.UncalibratedMagnetometer.new?", module := "globalThis", path := "UncalibratedMagnetometer", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional sensorOptions]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute double? x` -/
 @[macro_inline] def UncalibratedMagnetometer.x (self : UncalibratedMagnetometer) : IO (Option Float) := Internal.api "Lasm.JS.Web.UncalibratedMagnetometer.x" do

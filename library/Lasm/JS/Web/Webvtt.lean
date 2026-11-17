@@ -43,9 +43,25 @@ instance : FromJS LineAndPositionSetting where
   Lasm.JS.Binding.invoke VTTCue { name := "Lasm.JS.Web.VTTCue.new", module := "globalThis", path := "VTTCue", construct := true, arity := 3 }
     (Internal.args #[toJS startTime, toJS endTime, toJS text]) (await := false)
 
+/-- `constructor(double startTime, unrestricted double endTime, DOMString text)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def VTTCue.new? (startTime : Float) (endTime : Float) (text : String) : IO (Option VTTCue) := Internal.api "Lasm.JS.Web.VTTCue.new?" do
+  if !(← Internal.hasGlobal ["VTTCue"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke VTTCue { name := "Lasm.JS.Web.VTTCue.new?", module := "globalThis", path := "VTTCue", construct := true, arity := 3 }
+      (Internal.args #[toJS startTime, toJS endTime, toJS text]) (await := false)
+  return some lasmGuarded
+
 /-- `attribute VTTRegion? region` -/
 @[macro_inline] def VTTCue.region (self : VTTCue) : IO (Option VTTRegion) := Internal.api "Lasm.JS.Web.VTTCue.region" do
   self.val.get "region" (Option VTTRegion)
+
+/-- `attribute VTTRegion? region` where the platform has it (`'region' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def VTTCue.region? (self' : VTTCue) : IO (Option (Option VTTRegion)) := Internal.api "Lasm.JS.Web.VTTCue.region?" do
+  let self := self'
+  if !(← Internal.has self.val "region") then return none
+  let lasmGuarded ← do
+    self.val.get "region" (Option VTTRegion)
+  return some lasmGuarded
 
 /-- Sets `region`: `attribute VTTRegion? region` -/
 @[macro_inline] def VTTCue.setRegion (self : VTTCue) (value : Option VTTRegion) : IO Unit := Internal.api "Lasm.JS.Web.VTTCue.setRegion" do
@@ -79,6 +95,14 @@ instance : FromJS LineAndPositionSetting where
 @[macro_inline] def VTTCue.lineAlign (self : VTTCue) : IO LineAlignSetting := Internal.api "Lasm.JS.Web.VTTCue.lineAlign" do
   self.val.get "lineAlign" LineAlignSetting
 
+/-- `attribute LineAlignSetting lineAlign` where the platform has it (`'lineAlign' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def VTTCue.lineAlign? (self' : VTTCue) : IO (Option LineAlignSetting) := Internal.api "Lasm.JS.Web.VTTCue.lineAlign?" do
+  let self := self'
+  if !(← Internal.has self.val "lineAlign") then return none
+  let lasmGuarded ← do
+    self.val.get "lineAlign" LineAlignSetting
+  return some lasmGuarded
+
 /-- Sets `lineAlign`: `attribute LineAlignSetting lineAlign` -/
 @[macro_inline] def VTTCue.setLineAlign (self : VTTCue) (value : LineAlignSetting) : IO Unit := Internal.api "Lasm.JS.Web.VTTCue.setLineAlign" do
   self.val.set "lineAlign" (toJS value)
@@ -94,6 +118,14 @@ instance : FromJS LineAndPositionSetting where
 /-- `attribute PositionAlignSetting positionAlign` -/
 @[macro_inline] def VTTCue.positionAlign (self : VTTCue) : IO PositionAlignSetting := Internal.api "Lasm.JS.Web.VTTCue.positionAlign" do
   self.val.get "positionAlign" PositionAlignSetting
+
+/-- `attribute PositionAlignSetting positionAlign` where the platform has it (`'positionAlign' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def VTTCue.positionAlign? (self' : VTTCue) : IO (Option PositionAlignSetting) := Internal.api "Lasm.JS.Web.VTTCue.positionAlign?" do
+  let self := self'
+  if !(← Internal.has self.val "positionAlign") then return none
+  let lasmGuarded ← do
+    self.val.get "positionAlign" PositionAlignSetting
+  return some lasmGuarded
 
 /-- Sets `positionAlign`: `attribute PositionAlignSetting positionAlign` -/
 @[macro_inline] def VTTCue.setPositionAlign (self : VTTCue) (value : PositionAlignSetting) : IO Unit := Internal.api "Lasm.JS.Web.VTTCue.setPositionAlign" do
@@ -136,6 +168,14 @@ instance : FromJS LineAndPositionSetting where
 @[macro_inline] def VTTRegion.new : IO VTTRegion := Internal.api "Lasm.JS.Web.VTTRegion.new" do
   Lasm.JS.Binding.invoke VTTRegion { name := "Lasm.JS.Web.VTTRegion.new", module := "globalThis", path := "VTTRegion", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
+
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def VTTRegion.new? : IO (Option VTTRegion) := Internal.api "Lasm.JS.Web.VTTRegion.new?" do
+  if !(← Internal.hasGlobal ["VTTRegion"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke VTTRegion { name := "Lasm.JS.Web.VTTRegion.new?", module := "globalThis", path := "VTTRegion", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute DOMString id` -/
 @[macro_inline] def VTTRegion.id (self : VTTRegion) : IO String := Internal.api "Lasm.JS.Web.VTTRegion.id" do

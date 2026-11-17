@@ -58,8 +58,25 @@ set_option compiler.extract_closed false
   let r ← self.val.get "eventCounts" Value
   pure { val := r }
 
+/-- `readonly attribute EventCounts eventCounts` where the platform has it (`'eventCounts' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Performance.eventCounts? (self' : Performance) : IO (Option EventCounts) := Internal.api "Lasm.JS.Web.Performance.eventCounts?" do
+  let self := self'
+  if !(← Internal.has self.val "eventCounts") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "eventCounts" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute unsigned long long interactionCount` -/
 @[macro_inline] def Performance.interactionCount (self : Performance) : IO Nat := Internal.api "Lasm.JS.Web.Performance.interactionCount" do
   self.val.get "interactionCount" Nat
+
+/-- `readonly attribute unsigned long long interactionCount` where the platform has it (`'interactionCount' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Performance.interactionCount? (self' : Performance) : IO (Option Nat) := Internal.api "Lasm.JS.Web.Performance.interactionCount?" do
+  let self := self'
+  if !(← Internal.has self.val "interactionCount") then return none
+  let lasmGuarded ← do
+    self.val.get "interactionCount" Nat
+  return some lasmGuarded
 
 end Lasm.JS.Web

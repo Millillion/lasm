@@ -133,6 +133,14 @@ instance : ToJS ExtendableCookieChangeEventInit := ⟨fun d => Internal.fields #
   Lasm.JS.Binding.invoke CookieChangeEvent { name := "Lasm.JS.Web.CookieChangeEvent.new", module := "globalThis", path := "CookieChangeEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional CookieChangeEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CookieChangeEvent.new? (type : String) (eventInitDict : Option CookieChangeEventInit := none) : IO (Option CookieChangeEvent) := Internal.api "Lasm.JS.Web.CookieChangeEvent.new?" do
+  if !(← Internal.hasGlobal ["CookieChangeEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CookieChangeEvent { name := "Lasm.JS.Web.CookieChangeEvent.new?", module := "globalThis", path := "CookieChangeEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute FrozenArray<CookieListItem> changed` -/
 @[macro_inline] def CookieChangeEvent.changed (self : CookieChangeEvent) : IO (Array CookieListItem) := Internal.api "Lasm.JS.Web.CookieChangeEvent.changed" do
   self.val.get "changed" (Array CookieListItem)
@@ -210,6 +218,14 @@ instance : ToJS ExtendableCookieChangeEventInit := ⟨fun d => Internal.fields #
   Lasm.JS.Binding.invoke ExtendableCookieChangeEvent { name := "Lasm.JS.Web.ExtendableCookieChangeEvent.new", module := "globalThis", path := "ExtendableCookieChangeEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional ExtendableCookieChangeEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ExtendableCookieChangeEvent.new? (type : String) (eventInitDict : Option ExtendableCookieChangeEventInit := none) : IO (Option ExtendableCookieChangeEvent) := Internal.api "Lasm.JS.Web.ExtendableCookieChangeEvent.new?" do
+  if !(← Internal.hasGlobal ["ExtendableCookieChangeEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ExtendableCookieChangeEvent { name := "Lasm.JS.Web.ExtendableCookieChangeEvent.new?", module := "globalThis", path := "ExtendableCookieChangeEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute FrozenArray<CookieListItem> changed` -/
 @[macro_inline] def ExtendableCookieChangeEvent.changed (self : ExtendableCookieChangeEvent) : IO (Array CookieListItem) := Internal.api "Lasm.JS.Web.ExtendableCookieChangeEvent.changed" do
   self.val.get "changed" (Array CookieListItem)
@@ -227,6 +243,14 @@ instance : ToJS ExtendableCookieChangeEventInit := ⟨fun d => Internal.fields #
 @[macro_inline] def ServiceWorkerGlobalScope.oncookiechange (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.oncookiechange" do
   self.val.get "oncookiechange" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler oncookiechange` where the platform has it (`'oncookiechange' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ServiceWorkerGlobalScope.oncookiechange? (self' : ServiceWorkerGlobalScope) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.oncookiechange?" do
+  let self := self'
+  if !(← Internal.has self.val "oncookiechange") then return none
+  let lasmGuarded ← do
+    self.val.get "oncookiechange" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `oncookiechange`: `attribute EventHandler oncookiechange` -/
 @[macro_inline] def ServiceWorkerGlobalScope.setOncookiechange (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOncookiechange" do
   self.val.set "oncookiechange" (toJS value)
@@ -236,14 +260,40 @@ instance : ToJS ExtendableCookieChangeEventInit := ⟨fun d => Internal.fields #
   let r ← self.val.get "cookies" Value
   pure { val := r }
 
+/-- `readonly attribute CookieStoreManager cookies` where the platform has it (`'cookies' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ServiceWorkerRegistration.cookies? (self' : ServiceWorkerRegistration) : IO (Option CookieStoreManager) := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.cookies?" do
+  let self := self'
+  if !(← Internal.has self.val "cookies") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "cookies" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute CookieStore cookieStore` -/
 @[macro_inline] def Window.cookieStore (self : Window) : IO CookieStore := Internal.api "Lasm.JS.Web.Window.cookieStore" do
   let r ← self.val.get "cookieStore" Value
   pure { val := r }
 
+/-- `readonly attribute CookieStore cookieStore` where the platform has it (`'cookieStore' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.cookieStore? (self' : Window) : IO (Option CookieStore) := Internal.api "Lasm.JS.Web.Window.cookieStore?" do
+  let self := self'
+  if !(← Internal.has self.val "cookieStore") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "cookieStore" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute CookieStore cookieStore` (Cookie Store API Standard (https://cookiestore.spec.whatwg.org/)) -/
 @[macro_inline] def cookieStore : IO CookieStore := Internal.api "Lasm.JS.Web.cookieStore" do
   let r ← Internal.getGlobal ["cookieStore"] Value
   pure { val := r }
+
+/-- `readonly attribute CookieStore cookieStore` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def cookieStore? : IO (Option CookieStore) := Internal.api "Lasm.JS.Web.cookieStore?" do
+  if !(← Internal.hasGlobal ["cookieStore"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["cookieStore"] Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

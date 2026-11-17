@@ -39,4 +39,12 @@ set_option compiler.extract_closed false
 @[macro_inline] def PerformanceResourceTiming.serverTiming (self : PerformanceResourceTiming) : IO (Array PerformanceServerTiming) := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.serverTiming" do
   self.val.get "serverTiming" (Array PerformanceServerTiming)
 
+/-- `readonly attribute FrozenArray<PerformanceServerTiming> serverTiming` where the platform has it (`'serverTiming' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformanceResourceTiming.serverTiming? (self' : PerformanceResourceTiming) : IO (Option (Array PerformanceServerTiming)) := Internal.api "Lasm.JS.Web.PerformanceResourceTiming.serverTiming?" do
+  let self := self'
+  if !(← Internal.has self.val "serverTiming") then return none
+  let lasmGuarded ← do
+    self.val.get "serverTiming" (Array PerformanceServerTiming)
+  return some lasmGuarded
+
 end Lasm.JS.Web

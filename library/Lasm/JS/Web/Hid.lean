@@ -280,6 +280,14 @@ instance : ToJS HIDInputReportEventInit := ⟨fun d => Internal.fields #[("bubbl
   Lasm.JS.Binding.invoke HIDConnectionEvent { name := "Lasm.JS.Web.HIDConnectionEvent.new", module := "globalThis", path := "HIDConnectionEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, HIDConnectionEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def HIDConnectionEvent.new? (type : String) (eventInitDict : HIDConnectionEventInit) : IO (Option HIDConnectionEvent) := Internal.api "Lasm.JS.Web.HIDConnectionEvent.new?" do
+  if !(← Internal.hasGlobal ["HIDConnectionEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke HIDConnectionEvent { name := "Lasm.JS.Web.HIDConnectionEvent.new?", module := "globalThis", path := "HIDConnectionEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute HIDDevice device` -/
 @[macro_inline] def HIDConnectionEvent.device (self : HIDConnectionEvent) : IO HIDDevice := Internal.api "Lasm.JS.Web.HIDConnectionEvent.device" do
   let r ← self.val.get "device" Value
@@ -351,6 +359,14 @@ instance : ToJS HIDInputReportEventInit := ⟨fun d => Internal.fields #[("bubbl
   Lasm.JS.Binding.invoke HIDInputReportEvent { name := "Lasm.JS.Web.HIDInputReportEvent.new", module := "globalThis", path := "HIDInputReportEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, HIDInputReportEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def HIDInputReportEvent.new? (type : String) (eventInitDict : HIDInputReportEventInit) : IO (Option HIDInputReportEvent) := Internal.api "Lasm.JS.Web.HIDInputReportEvent.new?" do
+  if !(← Internal.hasGlobal ["HIDInputReportEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke HIDInputReportEvent { name := "Lasm.JS.Web.HIDInputReportEvent.new?", module := "globalThis", path := "HIDInputReportEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute HIDDevice device` -/
 @[macro_inline] def HIDInputReportEvent.device (self : HIDInputReportEvent) : IO HIDDevice := Internal.api "Lasm.JS.Web.HIDInputReportEvent.device" do
   let r ← self.val.get "device" Value
@@ -370,9 +386,27 @@ instance : ToJS HIDInputReportEventInit := ⟨fun d => Internal.fields #[("bubbl
   let r ← self.val.get "hid" Value
   pure { val := r }
 
+/-- `readonly attribute HID hid` where the platform has it (`'hid' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.hid? (self' : Navigator) : IO (Option HID) := Internal.api "Lasm.JS.Web.Navigator.hid?" do
+  let self := self'
+  if !(← Internal.has self.val "hid") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "hid" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute HID hid` -/
 @[macro_inline] def WorkerNavigator.hid (self : WorkerNavigator) : IO HID := Internal.api "Lasm.JS.Web.WorkerNavigator.hid" do
   let r ← self.val.get "hid" Value
   pure { val := r }
+
+/-- `readonly attribute HID hid` where the platform has it (`'hid' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerNavigator.hid? (self' : WorkerNavigator) : IO (Option HID) := Internal.api "Lasm.JS.Web.WorkerNavigator.hid?" do
+  let self := self'
+  if !(← Internal.has self.val "hid") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "hid" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

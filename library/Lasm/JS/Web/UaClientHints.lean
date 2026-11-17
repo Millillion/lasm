@@ -126,9 +126,27 @@ instance : FromJS UALowEntropyJSON where
   let r ← self.val.get "userAgentData" Value
   pure { val := r }
 
+/-- `readonly attribute NavigatorUAData userAgentData` where the platform has it (`'userAgentData' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.userAgentData? (self' : Navigator) : IO (Option NavigatorUAData) := Internal.api "Lasm.JS.Web.Navigator.userAgentData?" do
+  let self := self'
+  if !(← Internal.has self.val "userAgentData") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "userAgentData" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute NavigatorUAData userAgentData` -/
 @[macro_inline] def WorkerNavigator.userAgentData (self : WorkerNavigator) : IO NavigatorUAData := Internal.api "Lasm.JS.Web.WorkerNavigator.userAgentData" do
   let r ← self.val.get "userAgentData" Value
   pure { val := r }
+
+/-- `readonly attribute NavigatorUAData userAgentData` where the platform has it (`'userAgentData' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerNavigator.userAgentData? (self' : WorkerNavigator) : IO (Option NavigatorUAData) := Internal.api "Lasm.JS.Web.WorkerNavigator.userAgentData?" do
+  let self := self'
+  if !(← Internal.has self.val "userAgentData") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "userAgentData" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

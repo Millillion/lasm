@@ -87,6 +87,14 @@ instance : ToJS ContentIndexEventInit := ⟨fun d => Internal.fields #[("bubbles
   Lasm.JS.Binding.invoke ContentIndexEvent { name := "Lasm.JS.Web.ContentIndexEvent.new", module := "globalThis", path := "ContentIndexEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS init]) (await := false)
 
+/-- `constructor(DOMString type, ContentIndexEventInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ContentIndexEvent.new? (type : String) (init : ContentIndexEventInit) : IO (Option ContentIndexEvent) := Internal.api "Lasm.JS.Web.ContentIndexEvent.new?" do
+  if !(← Internal.hasGlobal ["ContentIndexEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ContentIndexEvent { name := "Lasm.JS.Web.ContentIndexEvent.new?", module := "globalThis", path := "ContentIndexEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS init]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString id` -/
 @[macro_inline] def ContentIndexEvent.id (self : ContentIndexEvent) : IO String := Internal.api "Lasm.JS.Web.ContentIndexEvent.id" do
   self.val.get "id" String
@@ -94,6 +102,14 @@ instance : ToJS ContentIndexEventInit := ⟨fun d => Internal.fields #[("bubbles
 /-- `attribute EventHandler oncontentdelete` -/
 @[macro_inline] def ServiceWorkerGlobalScope.oncontentdelete (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.oncontentdelete" do
   self.val.get "oncontentdelete" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler oncontentdelete` where the platform has it (`'oncontentdelete' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ServiceWorkerGlobalScope.oncontentdelete? (self' : ServiceWorkerGlobalScope) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.oncontentdelete?" do
+  let self := self'
+  if !(← Internal.has self.val "oncontentdelete") then return none
+  let lasmGuarded ← do
+    self.val.get "oncontentdelete" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `oncontentdelete`: `attribute EventHandler oncontentdelete` -/
 @[macro_inline] def ServiceWorkerGlobalScope.setOncontentdelete (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOncontentdelete" do
@@ -103,5 +119,14 @@ instance : ToJS ContentIndexEventInit := ⟨fun d => Internal.fields #[("bubbles
 @[macro_inline] def ServiceWorkerRegistration.index (self : ServiceWorkerRegistration) : IO ContentIndex := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.index" do
   let r ← self.val.get "index" Value
   pure { val := r }
+
+/-- `readonly attribute ContentIndex index` where the platform has it (`'index' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ServiceWorkerRegistration.index? (self' : ServiceWorkerRegistration) : IO (Option ContentIndex) := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.index?" do
+  let self := self'
+  if !(← Internal.has self.val "index") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "index" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

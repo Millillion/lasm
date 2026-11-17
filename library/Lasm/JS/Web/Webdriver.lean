@@ -18,4 +18,12 @@ set_option compiler.extract_closed false
 @[macro_inline] def Navigator.webdriver (self : Navigator) : IO Bool := Internal.api "Lasm.JS.Web.Navigator.webdriver" do
   self.val.get "webdriver" Bool
 
+/-- `readonly attribute boolean webdriver` where the platform has it (`'webdriver' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.webdriver? (self' : Navigator) : IO (Option Bool) := Internal.api "Lasm.JS.Web.Navigator.webdriver?" do
+  let self := self'
+  if !(← Internal.has self.val "webdriver") then return none
+  let lasmGuarded ← do
+    self.val.get "webdriver" Bool
+  return some lasmGuarded
+
 end Lasm.JS.Web

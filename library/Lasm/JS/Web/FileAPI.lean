@@ -91,6 +91,14 @@ instance : Coe MediaSource BlobOrMediaSource := ⟨.mediaSource⟩
   Lasm.JS.Binding.invoke Blob { name := "Lasm.JS.Web.Blob.new", module := "globalThis", path := "Blob", construct := true, arity := 2 }
     (Internal.args #[Internal.optional blobParts, Internal.optional options]) (await := false)
 
+/-- `constructor(optional sequence<BlobPart> blobParts, optional BlobPropertyBag options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Blob.new? (blobParts : Option (Array BlobPart) := none) (options : Option BlobPropertyBag := none) : IO (Option Blob) := Internal.api "Lasm.JS.Web.Blob.new?" do
+  if !(← Internal.hasGlobal ["Blob"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Blob { name := "Lasm.JS.Web.Blob.new?", module := "globalThis", path := "Blob", construct := true, arity := 2 }
+      (Internal.args #[Internal.optional blobParts, Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute unsigned long long size` -/
 @[macro_inline] def Blob.size (self : Blob) : IO Nat := Internal.api "Lasm.JS.Web.Blob.size" do
   self.val.get "size" Nat
@@ -123,9 +131,26 @@ instance : Coe MediaSource BlobOrMediaSource := ⟨.mediaSource⟩
   let r ← self.val.callMethod "textStream" (Internal.args #[]) Value
   pure { val := r }
 
+/-- `ReadableStream textStream()` where the platform has it (`'textStream' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Blob.textStream? (self' : Blob) : IO (Option ReadableStream) := Internal.api "Lasm.JS.Web.Blob.textStream?" do
+  let self := self'
+  if !(← Internal.has self.val "textStream") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethod "textStream" (Internal.args #[]) Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `Promise<Uint8Array> bytes()` -/
 @[macro_inline] def Blob.bytes (self : Blob) : Async ByteArray := Internal.api "Lasm.JS.Web.Blob.bytes" do
   self.val.callMethodAwait "bytes" (Internal.args #[]) ByteArray
+
+/-- `Promise<Uint8Array> bytes()` where the platform has it (`'bytes' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Blob.bytes? (self' : Blob) : Async (Option ByteArray) := Internal.api "Lasm.JS.Web.Blob.bytes?" do
+  let self := self'
+  if !(← Internal.has self.val "bytes") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "bytes" (Internal.args #[]) ByteArray
+  return some lasmGuarded
 
 /-- `v instanceof FileList`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `FileList`). -/
 @[macro_inline] def FileList.cast? (v : Value) : IO (Option FileList) := Internal.api "Lasm.JS.Web.FileList.cast?" do
@@ -147,6 +172,14 @@ instance : Coe MediaSource BlobOrMediaSource := ⟨.mediaSource⟩
 @[macro_inline] def FileReader.new : IO FileReader := Internal.api "Lasm.JS.Web.FileReader.new" do
   Lasm.JS.Binding.invoke FileReader { name := "Lasm.JS.Web.FileReader.new", module := "globalThis", path := "FileReader", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
+
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def FileReader.new? : IO (Option FileReader) := Internal.api "Lasm.JS.Web.FileReader.new?" do
+  if !(← Internal.hasGlobal ["FileReader"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke FileReader { name := "Lasm.JS.Web.FileReader.new?", module := "globalThis", path := "FileReader", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
 
 /-- `const unsigned short EMPTY = 0` -/
 def FileReader.EMPTY : Nat := 0
@@ -247,6 +280,14 @@ def FileReader.DONE : Nat := 2
   Lasm.JS.Binding.invoke FileReaderSync { name := "Lasm.JS.Web.FileReaderSync.new", module := "globalThis", path := "FileReaderSync", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def FileReaderSync.new? : IO (Option FileReaderSync) := Internal.api "Lasm.JS.Web.FileReaderSync.new?" do
+  if !(← Internal.hasGlobal ["FileReaderSync"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke FileReaderSync { name := "Lasm.JS.Web.FileReaderSync.new?", module := "globalThis", path := "FileReaderSync", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `ArrayBuffer readAsArrayBuffer(Blob blob)` -/
 @[macro_inline] def FileReaderSync.readAsArrayBuffer (self : FileReaderSync) (blob : Blob) : IO ByteArray := Internal.api "Lasm.JS.Web.FileReaderSync.readAsArrayBuffer" do
   let r ← self.val.callMethod "readAsArrayBuffer" (Internal.args #[toJS blob]) Value
@@ -272,6 +313,14 @@ def FileReader.DONE : Nat := 2
 @[macro_inline] def File.new (fileBits : Array BlobPart) (fileName : String) (options : Option FilePropertyBag := none) : IO File := Internal.api "Lasm.JS.Web.File.new" do
   Lasm.JS.Binding.invoke File { name := "Lasm.JS.Web.File.new", module := "globalThis", path := "File", construct := true, arity := 3 }
     (Internal.args #[toJS fileBits, toJS fileName, Internal.optional options]) (await := false)
+
+/-- `constructor(sequence<BlobPart> fileBits, USVString fileName, optional FilePropertyBag options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def File.new? (fileBits : Array BlobPart) (fileName : String) (options : Option FilePropertyBag := none) : IO (Option File) := Internal.api "Lasm.JS.Web.File.new?" do
+  if !(← Internal.hasGlobal ["File"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke File { name := "Lasm.JS.Web.File.new?", module := "globalThis", path := "File", construct := true, arity := 3 }
+      (Internal.args #[toJS fileBits, toJS fileName, Internal.optional options]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString name` -/
 @[macro_inline] def File.name (self : File) : IO String := Internal.api "Lasm.JS.Web.File.name" do

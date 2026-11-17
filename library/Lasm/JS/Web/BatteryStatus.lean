@@ -74,4 +74,13 @@ set_option compiler.extract_closed false
   let r ← self.val.callMethodAwait "getBattery" (Internal.args #[]) Value
   pure { val := r }
 
+/-- `Promise<BatteryManager> getBattery()` where the platform has it (`'getBattery' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.getBattery? (self' : Navigator) : Async (Option BatteryManager) := Internal.api "Lasm.JS.Web.Navigator.getBattery?" do
+  let self := self'
+  if !(← Internal.has self.val "getBattery") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethodAwait "getBattery" (Internal.args #[]) Value
+    pure { val := r }
+  return some lasmGuarded
+
 end Lasm.JS.Web

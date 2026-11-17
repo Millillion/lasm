@@ -32,6 +32,7 @@ import Lasm.JS.Web.Url
 import Lasm.JS.Web.Urlpattern
 import Lasm.JS.Web.WasmJsApi
 import Lasm.JS.Web.Webcrypto
+import Lasm.JS.Web.Webgpu
 import Lasm.JS.Web.Webidl
 import Lasm.JS.Web.Xhr
 import Wpt
@@ -377,6 +378,16 @@ def globals (r : Checks) : Async Unit := do
   runSection r "globals.navigator" do
     let ua ← (← navigator).userAgent
     expect r "navigator.userAgent" (!ua.isEmpty) ""
+  runSection r "guards.available" do
+    -- The availability guard (0.3-11): `navigator.gpu?` agrees with `'gpu' in navigator`, and GPU's members are
+    -- used only where it gave a GPU. lasm build --target allows them here on targets without WebGPU.
+    let nav ← navigator
+    let present := match (← nav.val.get "gpu" Data) with | .undefined => false | _ => true
+    match ← nav.gpu? with
+    | some gpu =>
+      let format ← gpu.getPreferredCanvasFormat
+      expect r "guard: gpu present" (present && !format.val.isEmpty) format.val
+    | none => expect r "guard: gpu absent, the fallback runs" (!present) ""
   runSection r "globals.performance" do
     -- performance: 0 ≤ now₁ ≤ now₂, timeOrigin > 0, toJSON has timeOrigin
     let perf ← performance

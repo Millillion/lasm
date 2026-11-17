@@ -44,6 +44,14 @@ instance : ToJS CapturedMouseEventInit := ⟨fun d => Internal.fields #[("bubble
   Lasm.JS.Binding.invoke CapturedMouseEvent { name := "Lasm.JS.Web.CapturedMouseEvent.new", module := "globalThis", path := "CapturedMouseEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional CapturedMouseEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CapturedMouseEvent.new? (type : String) (eventInitDict : Option CapturedMouseEventInit := none) : IO (Option CapturedMouseEvent) := Internal.api "Lasm.JS.Web.CapturedMouseEvent.new?" do
+  if !(← Internal.hasGlobal ["CapturedMouseEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CapturedMouseEvent { name := "Lasm.JS.Web.CapturedMouseEvent.new?", module := "globalThis", path := "CapturedMouseEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute long surfaceX` -/
 @[macro_inline] def CapturedMouseEvent.surfaceX (self : CapturedMouseEvent) : IO Int := Internal.api "Lasm.JS.Web.CapturedMouseEvent.surfaceX" do
   self.val.get "surfaceX" Int

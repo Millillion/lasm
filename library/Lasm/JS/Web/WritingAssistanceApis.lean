@@ -271,10 +271,27 @@ instance : ToJS WriterWriteOptions := ⟨fun d => Internal.fields #[("context", 
     (Internal.args #[Internal.optional options])
   pure { val := r }
 
+/-- `static Promise<Rewriter> create(optional RewriterCreateOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Rewriter.create? (options : Option RewriterCreateOptions := none) : Async (Option Rewriter) := Internal.api "Lasm.JS.Web.Rewriter.create?" do
+  if !(← Internal.hasGlobal ["Rewriter", "create"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.Rewriter.create?", module := "globalThis", path := "Rewriter.create", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional options])
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `static Promise<Availability> availability(optional RewriterCreateCoreOptions options)` -/
 @[macro_inline] def Rewriter.availability (options : Option RewriterCreateCoreOptions := none) : Async Availability := Internal.api "Lasm.JS.Web.Rewriter.availability" do
   Lasm.JS.Binding.invokeAsync Availability { name := "Lasm.JS.Web.Rewriter.availability", module := "globalThis", path := "Rewriter.availability", construct := false, arity := 1 }
     (Internal.args #[Internal.optional options])
+
+/-- `static Promise<Availability> availability(optional RewriterCreateCoreOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Rewriter.availability? (options : Option RewriterCreateCoreOptions := none) : Async (Option Availability) := Internal.api "Lasm.JS.Web.Rewriter.availability?" do
+  if !(← Internal.hasGlobal ["Rewriter", "availability"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Availability { name := "Lasm.JS.Web.Rewriter.availability?", module := "globalThis", path := "Rewriter.availability", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional options])
+  return some lasmGuarded
 
 /-- `Promise<DOMString> rewrite(DOMString input, optional RewriterRewriteOptions options)` -/
 @[macro_inline] def Rewriter.rewrite (self : Rewriter) (input : String) (options : Option RewriterRewriteOptions := none) : Async String := Internal.api "Lasm.JS.Web.Rewriter.rewrite" do
@@ -339,10 +356,27 @@ instance : ToJS WriterWriteOptions := ⟨fun d => Internal.fields #[("context", 
     (Internal.args #[Internal.optional options])
   pure { val := r }
 
+/-- `static Promise<Summarizer> create(optional SummarizerCreateOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Summarizer.create? (options : Option SummarizerCreateOptions := none) : Async (Option Summarizer) := Internal.api "Lasm.JS.Web.Summarizer.create?" do
+  if !(← Internal.hasGlobal ["Summarizer", "create"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.Summarizer.create?", module := "globalThis", path := "Summarizer.create", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional options])
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `static Promise<Availability> availability(optional SummarizerCreateCoreOptions options)` -/
 @[macro_inline] def Summarizer.availability (options : Option SummarizerCreateCoreOptions := none) : Async Availability := Internal.api "Lasm.JS.Web.Summarizer.availability" do
   Lasm.JS.Binding.invokeAsync Availability { name := "Lasm.JS.Web.Summarizer.availability", module := "globalThis", path := "Summarizer.availability", construct := false, arity := 1 }
     (Internal.args #[Internal.optional options])
+
+/-- `static Promise<Availability> availability(optional SummarizerCreateCoreOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Summarizer.availability? (options : Option SummarizerCreateCoreOptions := none) : Async (Option Availability) := Internal.api "Lasm.JS.Web.Summarizer.availability?" do
+  if !(← Internal.hasGlobal ["Summarizer", "availability"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Availability { name := "Lasm.JS.Web.Summarizer.availability?", module := "globalThis", path := "Summarizer.availability", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional options])
+  return some lasmGuarded
 
 /-- `Promise<DOMString> summarize(DOMString input, optional SummarizerSummarizeOptions options)` -/
 @[macro_inline] def Summarizer.summarize (self : Summarizer) (input : String) (options : Option SummarizerSummarizeOptions := none) : Async String := Internal.api "Lasm.JS.Web.Summarizer.summarize" do
@@ -403,10 +437,27 @@ instance : ToJS WriterWriteOptions := ⟨fun d => Internal.fields #[("context", 
     (Internal.args #[Internal.optional options])
   pure { val := r }
 
+/-- `static Promise<Writer> create(optional WriterCreateOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Writer.create? (options : Option WriterCreateOptions := none) : Async (Option Writer) := Internal.api "Lasm.JS.Web.Writer.create?" do
+  if !(← Internal.hasGlobal ["Writer", "create"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.Writer.create?", module := "globalThis", path := "Writer.create", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional options])
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `static Promise<Availability> availability(optional WriterCreateCoreOptions options)` -/
 @[macro_inline] def Writer.availability (options : Option WriterCreateCoreOptions := none) : Async Availability := Internal.api "Lasm.JS.Web.Writer.availability" do
   Lasm.JS.Binding.invokeAsync Availability { name := "Lasm.JS.Web.Writer.availability", module := "globalThis", path := "Writer.availability", construct := false, arity := 1 }
     (Internal.args #[Internal.optional options])
+
+/-- `static Promise<Availability> availability(optional WriterCreateCoreOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Writer.availability? (options : Option WriterCreateCoreOptions := none) : Async (Option Availability) := Internal.api "Lasm.JS.Web.Writer.availability?" do
+  if !(← Internal.hasGlobal ["Writer", "availability"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Availability { name := "Lasm.JS.Web.Writer.availability?", module := "globalThis", path := "Writer.availability", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional options])
+  return some lasmGuarded
 
 /-- `Promise<DOMString> write(DOMString input, optional WriterWriteOptions options)` -/
 @[macro_inline] def Writer.write (self : Writer) (input : String) (options : Option WriterWriteOptions := none) : Async String := Internal.api "Lasm.JS.Web.Writer.write" do

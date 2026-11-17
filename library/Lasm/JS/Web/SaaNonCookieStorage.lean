@@ -125,4 +125,12 @@ instance : ToJS StorageAccessTypes := ⟨fun d => Internal.fields #[("all", Inte
 @[macro_inline] def Document.hasUnpartitionedCookieAccess (self : Document) : Async Bool := Internal.api "Lasm.JS.Web.Document.hasUnpartitionedCookieAccess" do
   self.val.callMethodAwait "hasUnpartitionedCookieAccess" (Internal.args #[]) Bool
 
+/-- `Promise<boolean> hasUnpartitionedCookieAccess()` where the platform has it (`'hasUnpartitionedCookieAccess' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Document.hasUnpartitionedCookieAccess? (self' : Document) : Async (Option Bool) := Internal.api "Lasm.JS.Web.Document.hasUnpartitionedCookieAccess?" do
+  let self := self'
+  if !(← Internal.has self.val "hasUnpartitionedCookieAccess") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "hasUnpartitionedCookieAccess" (Internal.args #[]) Bool
+  return some lasmGuarded
+
 end Lasm.JS.Web

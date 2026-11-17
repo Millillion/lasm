@@ -607,6 +607,37 @@ error: This program uses web APIs that --target workers does not provide:
 
 **Function platforms** (`lambda`, `vercel`, `netlify`, …) run on Node.
 
+**Feature detection: the availability guard** (decision 0.3-11). Where a
+target lacks an API, use its guard, `X?`: it is JavaScript's `'gpu' in
+navigator`, checked when the program runs, and it gives the typed value where
+the platform has the API and `none` where it does not:
+
+```lean
+import Lasm.JS.Web.Html
+import Lasm.JS.Web.Webgpu
+open Lasm.JS Lasm.JS.Web
+
+def describeGpu : IO String := do
+  if let some gpu ← (← navigator).gpu? then
+    return s!"WebGPU, preferred format {(← gpu.getPreferredCanvasFormat).val}"
+  else
+    return "no WebGPU: drawing with the 2D canvas"
+```
+
+- **Which bindings have one.** Every binding that some supported runtime lacks
+  and that a program reaches on its own: a global (`fetchLater?`), a namespace
+  member, a static member (`URL.parse?`), a constructor (`URLPattern.new?`),
+  or an instance member that some runtimes of its interface lack
+  (`Navigator.gpu?`). The members of an interface only a guard gives (GPU's,
+  GPUAdapter's, …) need none: the program has such a value only where the
+  guard found the API.
+- **What `lasm build --target` allows.** A guard is never refused. Neither is a
+  member of an interface the target lacks that the program gets only through a
+  guard: `gpu.getPreferredCanvasFormat` above builds for `--target node`, and
+  runs the `else` branch there. The same calls without the guard are refused.
+- **Checks:** the guard runs `Reflect.has` on the object (`'gpu' in
+  navigator`), or on each step of a global's path (`'parse' in URL`).
+
 **How an API is looked up.** The most specific path the data lists decides
 (`api.Element.append`, then `api.Element`). A path the data does not list is
 treated as unavailable.
@@ -623,7 +654,11 @@ names the binding in any error it raises. So the program's generated C holds
 that name as a string literal.
 [`src/web-availability.mjs`](../src/web-availability.mjs) finds those names
 and looks each up in `library/Lasm/JS/Web/availability.json`, which the
-generator writes from the data.
+generator writes from the data. A guard's name ends in `?`
+(`"Lasm.JS.Web.Navigator.gpu?"`), and its binding records are renamed too, so
+the C of a guarded call never holds the unguarded name. The table also records
+the interface each binding returns and the interfaces each runtime lacks, from
+which the check finds what only a guard gives.
 
 ### How a WebIDL declaration becomes Lean
 

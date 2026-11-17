@@ -130,6 +130,9 @@ export const cases = [
     expect: /Unknown identifier `fetch`[\s\S]*hint: fetch is defined in Lasm\.JS\.Web\.Fetch; add: import Lasm\.JS\.Web\.Fetch/, fixedIn: '0.10.0' },
   { id: 'missing-node-import', kind: 'build', args: ['build', 'Main.lean'], files: { 'Main.lean': 'import Lasm.JS\nopen Lasm.JS\ndef main : IO Unit := do\n  let _r := path.basename\n  pure ()\n' },
     expect: /Unknown identifier `path\.basename`[\s\S]*hint: path\.basename is defined in Lasm\.JS\.Node\.Path; add: import Lasm\.JS\.Node\.Path/, fixedIn: '0.10.0' },
+  // A web API the target lacks, used without its availability guard (0.3-10, 0.3-11): refused, with the guard to use.
+  { id: 'web-api-unguarded', kind: 'build', args: ['build', 'Main.lean'], files: { 'Main.lean': 'import Lasm.JS\nimport Lasm.JS.Web.Html\nimport Lasm.JS.Web.Webgpu\nopen Lasm.JS Lasm.JS.Web\ndef main : IO Unit := do\n  let gpu ← (← navigator).gpu\n  IO.println (← gpu.getPreferredCanvasFormat).val\n' },
+    expect: /Lasm\.JS\.Web\.Navigator\.gpu \(api\.Navigator\.gpu\) is not available on --target node[\s\S]*availability guard/, fixedIn: '0.10.0' },
   { id: 'lean-type-error', kind: 'build', args: ['build', 'Main.lean'], files: project({ 'Main.lean': 'def main : IO Unit := IO.println (1 + "x")\n' }), expect: /Main\.lean:1:\d+: error/ },
   { id: 'lean-syntax-error', kind: 'build', args: ['build', 'Main.lean'], files: { 'Main.lean': 'def main : IO Unit :=\n  IO.println "hi" (\n' }, expect: /Main\.lean:\d+:\d+: error/ },
   { id: 'lean-invalid-utf8', kind: 'build', args: ['build', 'Main.lean'], files: { 'Main.lean': Buffer.from([0xff, 0xfe, 0x20, 0x0a]) }, expect: /Main\.lean:1:0: error/ },

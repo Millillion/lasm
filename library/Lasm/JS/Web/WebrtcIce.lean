@@ -30,6 +30,14 @@ instance : ToJS RTCIceGatherOptions := ⟨fun d => Internal.fields #[("gatherPol
   Lasm.JS.Binding.invoke RTCIceTransport { name := "Lasm.JS.Web.RTCIceTransport.new", module := "globalThis", path := "RTCIceTransport", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCIceTransport.new? : IO (Option RTCIceTransport) := Internal.api "Lasm.JS.Web.RTCIceTransport.new?" do
+  if !(← Internal.hasGlobal ["RTCIceTransport"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke RTCIceTransport { name := "Lasm.JS.Web.RTCIceTransport.new?", module := "globalThis", path := "RTCIceTransport", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onerror` -/
 @[macro_inline] def RTCIceTransport.onerror (self : RTCIceTransport) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.RTCIceTransport.onerror" do
   self.val.get "onerror" (Option EventHandlerNonNull)

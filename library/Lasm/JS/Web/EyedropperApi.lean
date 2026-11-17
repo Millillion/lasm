@@ -40,6 +40,14 @@ instance : FromJS ColorSelectionResult where
   Lasm.JS.Binding.invoke EyeDropper { name := "Lasm.JS.Web.EyeDropper.new", module := "globalThis", path := "EyeDropper", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def EyeDropper.new? : IO (Option EyeDropper) := Internal.api "Lasm.JS.Web.EyeDropper.new?" do
+  if !(← Internal.hasGlobal ["EyeDropper"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke EyeDropper { name := "Lasm.JS.Web.EyeDropper.new?", module := "globalThis", path := "EyeDropper", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `Promise<ColorSelectionResult> open(optional ColorSelectionOptions options)` -/
 @[macro_inline] def EyeDropper.«open» (self : EyeDropper) (options : Option ColorSelectionOptions := none) : Async ColorSelectionResult := Internal.api "Lasm.JS.Web.EyeDropper.open" do
   self.val.callMethodAwait "open" (Internal.args #[Internal.optional options]) ColorSelectionResult

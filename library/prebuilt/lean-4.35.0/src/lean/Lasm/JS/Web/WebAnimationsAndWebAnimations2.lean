@@ -500,6 +500,14 @@ def EffectCallback.ofSyncFn (f : (Option Float) → Value → Animation → IO U
   Lasm.JS.Binding.invoke Animation { name := "Lasm.JS.Web.Animation.new", module := "globalThis", path := "Animation", construct := true, arity := 2 }
     (Internal.args #[Internal.optional effect, Internal.optional timeline]) (await := false)
 
+/-- `constructor(optional AnimationEffect? effect, optional AnimationTimeline? timeline)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Animation.new? (effect : Option AnimationEffect := none) (timeline : Option AnimationTimeline := none) : IO (Option Animation) := Internal.api "Lasm.JS.Web.Animation.new?" do
+  if !(← Internal.hasGlobal ["Animation"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Animation { name := "Lasm.JS.Web.Animation.new?", module := "globalThis", path := "Animation", construct := true, arity := 2 }
+      (Internal.args #[Internal.optional effect, Internal.optional timeline]) (await := false)
+  return some lasmGuarded
+
 /-- `attribute DOMString id` -/
 @[macro_inline] def Animation.id (self : Animation) : IO String := Internal.api "Lasm.JS.Web.Animation.id" do
   self.val.get "id" String
@@ -705,6 +713,14 @@ def EffectCallback.ofSyncFn (f : (Option Float) → Value → Animation → IO U
   Lasm.JS.Binding.invoke AnimationPlaybackEvent { name := "Lasm.JS.Web.AnimationPlaybackEvent.new", module := "globalThis", path := "AnimationPlaybackEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional AnimationPlaybackEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def AnimationPlaybackEvent.new? (type : String) (eventInitDict : Option AnimationPlaybackEventInit := none) : IO (Option AnimationPlaybackEvent) := Internal.api "Lasm.JS.Web.AnimationPlaybackEvent.new?" do
+  if !(← Internal.hasGlobal ["AnimationPlaybackEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke AnimationPlaybackEvent { name := "Lasm.JS.Web.AnimationPlaybackEvent.new?", module := "globalThis", path := "AnimationPlaybackEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute CSSNumberish? currentTime` -/
 @[macro_inline] def AnimationPlaybackEvent.currentTime (self : AnimationPlaybackEvent) : IO (Option CSSNumberish) := Internal.api "Lasm.JS.Web.AnimationPlaybackEvent.currentTime" do
   self.val.get "currentTime" (Option CSSNumberish)
@@ -725,6 +741,14 @@ def EffectCallback.ofSyncFn (f : (Option Float) → Value → Animation → IO U
 @[macro_inline] def AnimationTimeline.duration (self : AnimationTimeline) : IO (Option CSSNumberish) := Internal.api "Lasm.JS.Web.AnimationTimeline.duration" do
   self.val.get "duration" (Option CSSNumberish)
 
+/-- `readonly attribute CSSNumberish? duration` where the platform has it (`'duration' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def AnimationTimeline.duration? (self' : AnimationTimeline) : IO (Option (Option CSSNumberish)) := Internal.api "Lasm.JS.Web.AnimationTimeline.duration?" do
+  let self := self'
+  if !(← Internal.has self.val "duration") then return none
+  let lasmGuarded ← do
+    self.val.get "duration" (Option CSSNumberish)
+  return some lasmGuarded
+
 /-- `Animation play(optional AnimationEffect? effect)` -/
 @[macro_inline] def AnimationTimeline.play (self : AnimationTimeline) (effect : Option AnimationEffect := none) : IO Animation := Internal.api "Lasm.JS.Web.AnimationTimeline.play" do
   let r ← self.val.callMethod "play" (Internal.args #[Internal.optional effect]) Value
@@ -738,6 +762,14 @@ def EffectCallback.ofSyncFn (f : (Option Float) → Value → Animation → IO U
 @[macro_inline] def GroupEffect.new (children : Option (Array AnimationEffect)) (timing : Option UnrestrictedDoubleOrEffectTiming := none) : IO GroupEffect := Internal.api "Lasm.JS.Web.GroupEffect.new" do
   Lasm.JS.Binding.invoke GroupEffect { name := "Lasm.JS.Web.GroupEffect.new", module := "globalThis", path := "GroupEffect", construct := true, arity := 2 }
     (Internal.args #[toJS children, Internal.optional timing]) (await := false)
+
+/-- `constructor(sequence<AnimationEffect>? children, optional (unrestricted double or EffectTiming) timing)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def GroupEffect.new? (children : Option (Array AnimationEffect)) (timing : Option UnrestrictedDoubleOrEffectTiming := none) : IO (Option GroupEffect) := Internal.api "Lasm.JS.Web.GroupEffect.new?" do
+  if !(← Internal.hasGlobal ["GroupEffect"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke GroupEffect { name := "Lasm.JS.Web.GroupEffect.new?", module := "globalThis", path := "GroupEffect", construct := true, arity := 2 }
+      (Internal.args #[toJS children, Internal.optional timing]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute AnimationNodeList children` -/
 @[macro_inline] def GroupEffect.children (self : GroupEffect) : IO AnimationNodeList := Internal.api "Lasm.JS.Web.GroupEffect.children" do
@@ -774,6 +806,14 @@ def EffectCallback.ofSyncFn (f : (Option Float) → Value → Animation → IO U
   Lasm.JS.Binding.invoke DocumentTimeline { name := "Lasm.JS.Web.DocumentTimeline.new", module := "globalThis", path := "DocumentTimeline", construct := true, arity := 1 }
     (Internal.args #[Internal.optional options]) (await := false)
 
+/-- `constructor(optional DocumentTimelineOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DocumentTimeline.new? (options : Option DocumentTimelineOptions := none) : IO (Option DocumentTimeline) := Internal.api "Lasm.JS.Web.DocumentTimeline.new?" do
+  if !(← Internal.hasGlobal ["DocumentTimeline"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke DocumentTimeline { name := "Lasm.JS.Web.DocumentTimeline.new?", module := "globalThis", path := "DocumentTimeline", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `v instanceof KeyframeEffect`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `KeyframeEffect`). -/
 @[macro_inline] def KeyframeEffect.cast? (v : Value) : IO (Option KeyframeEffect) := Internal.api "Lasm.JS.Web.KeyframeEffect.cast?" do
   Internal.cast (Internal.getGlobal ["KeyframeEffect"] Value) (fun x => { val := x }) v
@@ -783,10 +823,26 @@ def EffectCallback.ofSyncFn (f : (Option Float) → Value → Animation → IO U
   Lasm.JS.Binding.invoke KeyframeEffect { name := "Lasm.JS.Web.KeyframeEffect.new", module := "globalThis", path := "KeyframeEffect", construct := true, arity := 3 }
     (Internal.args #[toJS target, toJS keyframes, Internal.optional options]) (await := false)
 
+/-- `constructor(Element? target, object? keyframes, optional (unrestricted double or KeyframeEffectOptions) options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def KeyframeEffect.new? (target : Option Element) (keyframes : Option Data) (options : Option UnrestrictedDoubleOrKeyframeEffectOptions := none) : IO (Option KeyframeEffect) := Internal.api "Lasm.JS.Web.KeyframeEffect.new?" do
+  if !(← Internal.hasGlobal ["KeyframeEffect"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke KeyframeEffect { name := "Lasm.JS.Web.KeyframeEffect.new?", module := "globalThis", path := "KeyframeEffect", construct := true, arity := 3 }
+      (Internal.args #[toJS target, toJS keyframes, Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `constructor(KeyframeEffect source)` -/
 @[macro_inline] def KeyframeEffect.newWithSource (source : KeyframeEffect) : IO KeyframeEffect := Internal.api "Lasm.JS.Web.KeyframeEffect.newWithSource" do
   Lasm.JS.Binding.invoke KeyframeEffect { name := "Lasm.JS.Web.KeyframeEffect.newWithSource", module := "globalThis", path := "KeyframeEffect", construct := true, arity := 1 }
     (Internal.args #[toJS source]) (await := false)
+
+/-- `constructor(KeyframeEffect source)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def KeyframeEffect.newWithSource? (source : KeyframeEffect) : IO (Option KeyframeEffect) := Internal.api "Lasm.JS.Web.KeyframeEffect.newWithSource?" do
+  if !(← Internal.hasGlobal ["KeyframeEffect"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke KeyframeEffect { name := "Lasm.JS.Web.KeyframeEffect.newWithSource?", module := "globalThis", path := "KeyframeEffect", construct := true, arity := 1 }
+      (Internal.args #[toJS source]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute Element? target` -/
 @[macro_inline] def KeyframeEffect.target (self : KeyframeEffect) : IO (Option Element) := Internal.api "Lasm.JS.Web.KeyframeEffect.target" do
@@ -816,6 +872,14 @@ def EffectCallback.ofSyncFn (f : (Option Float) → Value → Animation → IO U
 @[macro_inline] def KeyframeEffect.iterationComposite (self : KeyframeEffect) : IO IterationCompositeOperation := Internal.api "Lasm.JS.Web.KeyframeEffect.iterationComposite" do
   self.val.get "iterationComposite" IterationCompositeOperation
 
+/-- `attribute IterationCompositeOperation iterationComposite` where the platform has it (`'iterationComposite' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def KeyframeEffect.iterationComposite? (self' : KeyframeEffect) : IO (Option IterationCompositeOperation) := Internal.api "Lasm.JS.Web.KeyframeEffect.iterationComposite?" do
+  let self := self'
+  if !(← Internal.has self.val "iterationComposite") then return none
+  let lasmGuarded ← do
+    self.val.get "iterationComposite" IterationCompositeOperation
+  return some lasmGuarded
+
 /-- Sets `iterationComposite`: `attribute IterationCompositeOperation iterationComposite` -/
 @[macro_inline] def KeyframeEffect.setIterationComposite (self : KeyframeEffect) (value : IterationCompositeOperation) : IO Unit := Internal.api "Lasm.JS.Web.KeyframeEffect.setIterationComposite" do
   self.val.set "iterationComposite" (toJS value)
@@ -836,6 +900,14 @@ def EffectCallback.ofSyncFn (f : (Option Float) → Value → Animation → IO U
 @[macro_inline] def SequenceEffect.new (children : Option (Array AnimationEffect)) (timing : Option UnrestrictedDoubleOrEffectTiming := none) : IO SequenceEffect := Internal.api "Lasm.JS.Web.SequenceEffect.new" do
   Lasm.JS.Binding.invoke SequenceEffect { name := "Lasm.JS.Web.SequenceEffect.new", module := "globalThis", path := "SequenceEffect", construct := true, arity := 2 }
     (Internal.args #[toJS children, Internal.optional timing]) (await := false)
+
+/-- `constructor(sequence<AnimationEffect>? children, optional (unrestricted double or EffectTiming) timing)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def SequenceEffect.new? (children : Option (Array AnimationEffect)) (timing : Option UnrestrictedDoubleOrEffectTiming := none) : IO (Option SequenceEffect) := Internal.api "Lasm.JS.Web.SequenceEffect.new?" do
+  if !(← Internal.hasGlobal ["SequenceEffect"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke SequenceEffect { name := "Lasm.JS.Web.SequenceEffect.new?", module := "globalThis", path := "SequenceEffect", construct := true, arity := 2 }
+      (Internal.args #[toJS children, Internal.optional timing]) (await := false)
+  return some lasmGuarded
 
 /-- `SequenceEffect clone()` -/
 @[macro_inline] def SequenceEffect.clone (self : SequenceEffect) : IO SequenceEffect := Internal.api "Lasm.JS.Web.SequenceEffect.clone" do

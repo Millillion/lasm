@@ -155,6 +155,15 @@ instance : ToJS TrustedTypePolicyOptions := ⟨fun d => Internal.fields #[("crea
   let r ← self.val.callMethod "createParserOptions" (Internal.argsWith #[Internal.optional options] (arguments.map toJS)) Value
   pure { val := r }
 
+/-- `TrustedHTMLParserOptions createParserOptions(optional SetHTMLUnsafeOptions options, any... arguments)` where the platform has it (`'createParserOptions' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def TrustedTypePolicy.createParserOptions? (self' : TrustedTypePolicy) (options : Option SetHTMLUnsafeOptions := none) (arguments : Array Data := #[]) : IO (Option TrustedHTMLParserOptions) := Internal.api "Lasm.JS.Web.TrustedTypePolicy.createParserOptions?" do
+  let self := self'
+  if !(← Internal.has self.val "createParserOptions") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethod "createParserOptions" (Internal.argsWith #[Internal.optional options] (arguments.map toJS)) Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `v instanceof TrustedTypePolicyFactory`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TrustedTypePolicyFactory`). -/
 @[macro_inline] def TrustedTypePolicyFactory.cast? (v : Value) : IO (Option TrustedTypePolicyFactory) := Internal.api "Lasm.JS.Web.TrustedTypePolicyFactory.cast?" do
   Internal.cast (Internal.getGlobal ["TrustedTypePolicyFactory"] Value) (fun x => { val := x }) v
@@ -212,5 +221,13 @@ instance : ToJS TrustedTypePolicyOptions := ⟨fun d => Internal.fields #[("crea
 @[macro_inline] def trustedTypes : IO TrustedTypePolicyFactory := Internal.api "Lasm.JS.Web.trustedTypes" do
   let r ← Internal.getGlobal ["trustedTypes"] Value
   pure { val := r }
+
+/-- `readonly attribute TrustedTypePolicyFactory trustedTypes` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def trustedTypes? : IO (Option TrustedTypePolicyFactory) := Internal.api "Lasm.JS.Web.trustedTypes?" do
+  if !(← Internal.hasGlobal ["trustedTypes"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["trustedTypes"] Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

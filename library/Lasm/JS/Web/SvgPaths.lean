@@ -44,13 +44,37 @@ instance : ToJS SVGPathDataSettings := ⟨fun d => Internal.fields #[("normalize
 @[macro_inline] def SVGPathElement.getPathSegmentAtLength (self : SVGPathElement) (distance : Float) : IO (Option SVGPathSegment) := Internal.api "Lasm.JS.Web.SVGPathElement.getPathSegmentAtLength" do
   self.val.callMethod "getPathSegmentAtLength" (Internal.args #[toJS distance]) (Option SVGPathSegment)
 
+/-- `SVGPathSegment? getPathSegmentAtLength(float distance)` where the platform has it (`'getPathSegmentAtLength' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGPathElement.getPathSegmentAtLength? (self' : SVGPathElement) (distance : Float) : IO (Option (Option SVGPathSegment)) := Internal.api "Lasm.JS.Web.SVGPathElement.getPathSegmentAtLength?" do
+  let self := self'
+  if !(← Internal.has self.val "getPathSegmentAtLength") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getPathSegmentAtLength" (Internal.args #[toJS distance]) (Option SVGPathSegment)
+  return some lasmGuarded
+
 /-- `sequence<SVGPathSegment> getPathData(optional SVGPathDataSettings settings)` -/
 @[macro_inline] def SVGPathElement.getPathData (self : SVGPathElement) (settings : Option SVGPathDataSettings := none) : IO (Array SVGPathSegment) := Internal.api "Lasm.JS.Web.SVGPathElement.getPathData" do
   self.val.callMethod "getPathData" (Internal.args #[Internal.optional settings]) (Array SVGPathSegment)
 
+/-- `sequence<SVGPathSegment> getPathData(optional SVGPathDataSettings settings)` where the platform has it (`'getPathData' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGPathElement.getPathData? (self' : SVGPathElement) (settings : Option SVGPathDataSettings := none) : IO (Option (Array SVGPathSegment)) := Internal.api "Lasm.JS.Web.SVGPathElement.getPathData?" do
+  let self := self'
+  if !(← Internal.has self.val "getPathData") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getPathData" (Internal.args #[Internal.optional settings]) (Array SVGPathSegment)
+  return some lasmGuarded
+
 /-- `undefined setPathData(sequence<SVGPathSegment> pathData)` -/
 @[macro_inline] def SVGPathElement.setPathData (self : SVGPathElement) (pathData : Array SVGPathSegment) : IO Unit := Internal.api "Lasm.JS.Web.SVGPathElement.setPathData" do
   self.val.callMethod "setPathData" (Internal.args #[toJS pathData]) Unit
+
+/-- `undefined setPathData(sequence<SVGPathSegment> pathData)` where the platform has it (`'setPathData' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SVGPathElement.setPathData? (self' : SVGPathElement) (pathData : Array SVGPathSegment) : IO (Option Unit) := Internal.api "Lasm.JS.Web.SVGPathElement.setPathData?" do
+  let self := self'
+  if !(← Internal.has self.val "setPathData") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "setPathData" (Internal.args #[toJS pathData]) Unit
+  return some lasmGuarded
 
 /-- `attribute DOMString type` -/
 @[macro_inline] def SVGPathSegment.type (self : SVGPathSegment) : IO String := Internal.api "Lasm.JS.Web.SVGPathSegment.type" do

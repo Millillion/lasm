@@ -109,6 +109,14 @@ instance : ToJS RTCIdentityProvider := ⟨fun d => Internal.fields #[("generateA
   Lasm.JS.Binding.invoke RTCIdentityAssertion { name := "Lasm.JS.Web.RTCIdentityAssertion.new", module := "globalThis", path := "RTCIdentityAssertion", construct := true, arity := 2 }
     (Internal.args #[toJS idp, toJS name]) (await := false)
 
+/-- `constructor(DOMString idp, DOMString name)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCIdentityAssertion.new? (idp : String) (name : String) : IO (Option RTCIdentityAssertion) := Internal.api "Lasm.JS.Web.RTCIdentityAssertion.new?" do
+  if !(← Internal.hasGlobal ["RTCIdentityAssertion"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke RTCIdentityAssertion { name := "Lasm.JS.Web.RTCIdentityAssertion.new?", module := "globalThis", path := "RTCIdentityAssertion", construct := true, arity := 2 }
+      (Internal.args #[toJS idp, toJS name]) (await := false)
+  return some lasmGuarded
+
 /-- `attribute DOMString idp` -/
 @[macro_inline] def RTCIdentityAssertion.idp (self : RTCIdentityAssertion) : IO String := Internal.api "Lasm.JS.Web.RTCIdentityAssertion.idp" do
   self.val.get "idp" String
@@ -158,15 +166,41 @@ instance : ToJS RTCIdentityProvider := ⟨fun d => Internal.fields #[("generateA
 @[macro_inline] def RTCError.httpRequestStatusCode (self : RTCError) : IO (Option Int) := Internal.api "Lasm.JS.Web.RTCError.httpRequestStatusCode" do
   self.val.get "httpRequestStatusCode" (Option Int)
 
+/-- `readonly attribute long? httpRequestStatusCode` where the platform has it (`'httpRequestStatusCode' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCError.httpRequestStatusCode? (self' : RTCError) : IO (Option (Option Int)) := Internal.api "Lasm.JS.Web.RTCError.httpRequestStatusCode?" do
+  let self := self'
+  if !(← Internal.has self.val "httpRequestStatusCode") then return none
+  let lasmGuarded ← do
+    self.val.get "httpRequestStatusCode" (Option Int)
+  return some lasmGuarded
+
 /-- `readonly attribute Promise<RTCIdentityAssertion> peerIdentity` -/
 @[macro_inline] def RTCPeerConnection.peerIdentity (self : RTCPeerConnection) : Async RTCIdentityAssertion := Internal.api "Lasm.JS.Web.RTCPeerConnection.peerIdentity" do
   let p ← self.val.get "peerIdentity" Value
   let r ← p.await Value
   pure { val := r }
 
+/-- `readonly attribute Promise<RTCIdentityAssertion> peerIdentity` where the platform has it (`'peerIdentity' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCPeerConnection.peerIdentity? (self' : RTCPeerConnection) : Async (Option RTCIdentityAssertion) := Internal.api "Lasm.JS.Web.RTCPeerConnection.peerIdentity?" do
+  let self := self'
+  if !(← Internal.has self.val "peerIdentity") then return none
+  let lasmGuarded ← do
+    let p ← self.val.get "peerIdentity" Value
+    let r ← p.await Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString? idpLoginUrl` -/
 @[macro_inline] def RTCPeerConnection.idpLoginUrl (self : RTCPeerConnection) : IO (Option String) := Internal.api "Lasm.JS.Web.RTCPeerConnection.idpLoginUrl" do
   self.val.get "idpLoginUrl" (Option String)
+
+/-- `readonly attribute DOMString? idpLoginUrl` where the platform has it (`'idpLoginUrl' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCPeerConnection.idpLoginUrl? (self' : RTCPeerConnection) : IO (Option (Option String)) := Internal.api "Lasm.JS.Web.RTCPeerConnection.idpLoginUrl?" do
+  let self := self'
+  if !(← Internal.has self.val "idpLoginUrl") then return none
+  let lasmGuarded ← do
+    self.val.get "idpLoginUrl" (Option String)
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString? idpErrorInfo` -/
 @[macro_inline] def RTCPeerConnection.idpErrorInfo (self : RTCPeerConnection) : IO (Option String) := Internal.api "Lasm.JS.Web.RTCPeerConnection.idpErrorInfo" do
@@ -176,8 +210,24 @@ instance : ToJS RTCIdentityProvider := ⟨fun d => Internal.fields #[("generateA
 @[macro_inline] def RTCPeerConnection.setIdentityProvider (self : RTCPeerConnection) (provider : String) (options : Option RTCIdentityProviderOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.RTCPeerConnection.setIdentityProvider" do
   self.val.callMethod "setIdentityProvider" (Internal.args #[toJS provider, Internal.optional options]) Unit
 
+/-- `undefined setIdentityProvider(DOMString provider, optional RTCIdentityProviderOptions options)` where the platform has it (`'setIdentityProvider' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCPeerConnection.setIdentityProvider? (self' : RTCPeerConnection) (provider : String) (options : Option RTCIdentityProviderOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.RTCPeerConnection.setIdentityProvider?" do
+  let self := self'
+  if !(← Internal.has self.val "setIdentityProvider") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "setIdentityProvider" (Internal.args #[toJS provider, Internal.optional options]) Unit
+  return some lasmGuarded
+
 /-- `Promise<DOMString> getIdentityAssertion()` -/
 @[macro_inline] def RTCPeerConnection.getIdentityAssertion (self : RTCPeerConnection) : Async String := Internal.api "Lasm.JS.Web.RTCPeerConnection.getIdentityAssertion" do
   self.val.callMethodAwait "getIdentityAssertion" (Internal.args #[]) String
+
+/-- `Promise<DOMString> getIdentityAssertion()` where the platform has it (`'getIdentityAssertion' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def RTCPeerConnection.getIdentityAssertion? (self' : RTCPeerConnection) : Async (Option String) := Internal.api "Lasm.JS.Web.RTCPeerConnection.getIdentityAssertion?" do
+  let self := self'
+  if !(← Internal.has self.val "getIdentityAssertion") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "getIdentityAssertion" (Internal.args #[]) String
+  return some lasmGuarded
 
 end Lasm.JS.Web

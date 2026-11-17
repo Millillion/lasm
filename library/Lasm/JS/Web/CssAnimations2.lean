@@ -28,4 +28,12 @@ set_option compiler.extract_closed false
 @[macro_inline] def AnimationEvent.animation (self : AnimationEvent) : IO (Option CSSAnimation) := Internal.api "Lasm.JS.Web.AnimationEvent.animation" do
   self.val.get "animation" (Option CSSAnimation)
 
+/-- `readonly attribute CSSAnimation? animation` where the platform has it (`'animation' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def AnimationEvent.animation? (self' : AnimationEvent) : IO (Option (Option CSSAnimation)) := Internal.api "Lasm.JS.Web.AnimationEvent.animation?" do
+  let self := self'
+  if !(← Internal.has self.val "animation") then return none
+  let lasmGuarded ← do
+    self.val.get "animation" (Option CSSAnimation)
+  return some lasmGuarded
+
 end Lasm.JS.Web

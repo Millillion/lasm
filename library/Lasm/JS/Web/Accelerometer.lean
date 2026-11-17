@@ -33,6 +33,14 @@ instance : ToJS AccelerometerSensorOptions := ⟨fun d => Internal.fields #[("fr
   Lasm.JS.Binding.invoke Accelerometer { name := "Lasm.JS.Web.Accelerometer.new", module := "globalThis", path := "Accelerometer", construct := true, arity := 1 }
     (Internal.args #[Internal.optional options]) (await := false)
 
+/-- `constructor(optional AccelerometerSensorOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Accelerometer.new? (options : Option AccelerometerSensorOptions := none) : IO (Option Accelerometer) := Internal.api "Lasm.JS.Web.Accelerometer.new?" do
+  if !(← Internal.hasGlobal ["Accelerometer"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Accelerometer { name := "Lasm.JS.Web.Accelerometer.new?", module := "globalThis", path := "Accelerometer", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute double? x` -/
 @[macro_inline] def Accelerometer.x (self : Accelerometer) : IO (Option Float) := Internal.api "Lasm.JS.Web.Accelerometer.x" do
   self.val.get "x" (Option Float)
@@ -54,6 +62,14 @@ instance : ToJS AccelerometerSensorOptions := ⟨fun d => Internal.fields #[("fr
   Lasm.JS.Binding.invoke GravitySensor { name := "Lasm.JS.Web.GravitySensor.new", module := "globalThis", path := "GravitySensor", construct := true, arity := 1 }
     (Internal.args #[Internal.optional options]) (await := false)
 
+/-- `constructor(optional AccelerometerSensorOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def GravitySensor.new? (options : Option AccelerometerSensorOptions := none) : IO (Option GravitySensor) := Internal.api "Lasm.JS.Web.GravitySensor.new?" do
+  if !(← Internal.hasGlobal ["GravitySensor"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke GravitySensor { name := "Lasm.JS.Web.GravitySensor.new?", module := "globalThis", path := "GravitySensor", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `v instanceof LinearAccelerationSensor`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `LinearAccelerationSensor`). -/
 @[macro_inline] def LinearAccelerationSensor.cast? (v : Value) : IO (Option LinearAccelerationSensor) := Internal.api "Lasm.JS.Web.LinearAccelerationSensor.cast?" do
   Internal.cast (Internal.getGlobal ["LinearAccelerationSensor"] Value) (fun x => { val := x }) v
@@ -62,5 +78,13 @@ instance : ToJS AccelerometerSensorOptions := ⟨fun d => Internal.fields #[("fr
 @[macro_inline] def LinearAccelerationSensor.new (options : Option AccelerometerSensorOptions := none) : IO LinearAccelerationSensor := Internal.api "Lasm.JS.Web.LinearAccelerationSensor.new" do
   Lasm.JS.Binding.invoke LinearAccelerationSensor { name := "Lasm.JS.Web.LinearAccelerationSensor.new", module := "globalThis", path := "LinearAccelerationSensor", construct := true, arity := 1 }
     (Internal.args #[Internal.optional options]) (await := false)
+
+/-- `constructor(optional AccelerometerSensorOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def LinearAccelerationSensor.new? (options : Option AccelerometerSensorOptions := none) : IO (Option LinearAccelerationSensor) := Internal.api "Lasm.JS.Web.LinearAccelerationSensor.new?" do
+  if !(← Internal.hasGlobal ["LinearAccelerationSensor"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke LinearAccelerationSensor { name := "Lasm.JS.Web.LinearAccelerationSensor.new?", module := "globalThis", path := "LinearAccelerationSensor", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional options]) (await := false)
+  return some lasmGuarded
 
 end Lasm.JS.Web

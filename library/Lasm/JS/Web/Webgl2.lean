@@ -1727,6 +1727,14 @@ def WebGL2RenderingContext.MAX_CLIENT_WAIT_TIMEOUT_WEBGL : Nat := 0x9247
 @[macro_inline] def WebGL2RenderingContext.drawingBufferFormat (self : WebGL2RenderingContext) : IO Nat := Internal.api "Lasm.JS.Web.WebGL2RenderingContext.drawingBufferFormat" do
   self.val.get "drawingBufferFormat" Nat
 
+/-- `readonly attribute GLenum drawingBufferFormat` where the platform has it (`'drawingBufferFormat' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebGL2RenderingContext.drawingBufferFormat? (self' : WebGL2RenderingContext) : IO (Option Nat) := Internal.api "Lasm.JS.Web.WebGL2RenderingContext.drawingBufferFormat?" do
+  let self := self'
+  if !(← Internal.has self.val "drawingBufferFormat") then return none
+  let lasmGuarded ← do
+    self.val.get "drawingBufferFormat" Nat
+  return some lasmGuarded
+
 /-- `attribute PredefinedColorSpace drawingBufferColorSpace` -/
 @[macro_inline] def WebGL2RenderingContext.drawingBufferColorSpace (self : WebGL2RenderingContext) : IO PredefinedColorSpace := Internal.api "Lasm.JS.Web.WebGL2RenderingContext.drawingBufferColorSpace" do
   self.val.get "drawingBufferColorSpace" PredefinedColorSpace
@@ -1738,6 +1746,14 @@ def WebGL2RenderingContext.MAX_CLIENT_WAIT_TIMEOUT_WEBGL : Nat := 0x9247
 /-- `attribute PredefinedColorSpace unpackColorSpace` -/
 @[macro_inline] def WebGL2RenderingContext.unpackColorSpace (self : WebGL2RenderingContext) : IO PredefinedColorSpace := Internal.api "Lasm.JS.Web.WebGL2RenderingContext.unpackColorSpace" do
   self.val.get "unpackColorSpace" PredefinedColorSpace
+
+/-- `attribute PredefinedColorSpace unpackColorSpace` where the platform has it (`'unpackColorSpace' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebGL2RenderingContext.unpackColorSpace? (self' : WebGL2RenderingContext) : IO (Option PredefinedColorSpace) := Internal.api "Lasm.JS.Web.WebGL2RenderingContext.unpackColorSpace?" do
+  let self := self'
+  if !(← Internal.has self.val "unpackColorSpace") then return none
+  let lasmGuarded ← do
+    self.val.get "unpackColorSpace" PredefinedColorSpace
+  return some lasmGuarded
 
 /-- Sets `unpackColorSpace`: `attribute PredefinedColorSpace unpackColorSpace` -/
 @[macro_inline] def WebGL2RenderingContext.setUnpackColorSpace (self : WebGL2RenderingContext) (value : PredefinedColorSpace) : IO Unit := Internal.api "Lasm.JS.Web.WebGL2RenderingContext.setUnpackColorSpace" do
@@ -1762,6 +1778,14 @@ def WebGL2RenderingContext.MAX_CLIENT_WAIT_TIMEOUT_WEBGL : Nat := 0x9247
 /-- `undefined drawingBufferStorage(GLenum sizedFormat, unsigned long width, unsigned long height)` -/
 @[macro_inline] def WebGL2RenderingContext.drawingBufferStorage (self : WebGL2RenderingContext) (sizedFormat : Nat) (width : Nat) (height : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGL2RenderingContext.drawingBufferStorage" do
   self.val.callMethod "drawingBufferStorage" (Internal.args #[toJS sizedFormat, toJS width, toJS height]) Unit
+
+/-- `undefined drawingBufferStorage(GLenum sizedFormat, unsigned long width, unsigned long height)` where the platform has it (`'drawingBufferStorage' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebGL2RenderingContext.drawingBufferStorage? (self' : WebGL2RenderingContext) (sizedFormat : Nat) (width : Nat) (height : Nat) : IO (Option Unit) := Internal.api "Lasm.JS.Web.WebGL2RenderingContext.drawingBufferStorage?" do
+  let self := self'
+  if !(← Internal.has self.val "drawingBufferStorage") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "drawingBufferStorage" (Internal.args #[toJS sizedFormat, toJS width, toJS height]) Unit
+  return some lasmGuarded
 
 /-- `undefined activeTexture(GLenum texture)` -/
 @[macro_inline] def WebGL2RenderingContext.activeTexture (self : WebGL2RenderingContext) (texture : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebGL2RenderingContext.activeTexture" do

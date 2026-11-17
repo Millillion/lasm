@@ -44,6 +44,14 @@ instance : FromJS HighlightHitResult where
   Lasm.JS.Binding.invoke Highlight { name := "Lasm.JS.Web.Highlight.new", module := "globalThis", path := "Highlight", construct := true, arity := 1 }
     (Internal.argsWith #[] (initialRanges.map toJS)) (await := false)
 
+/-- `constructor(AbstractRange... initialRanges)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Highlight.new? (initialRanges : Array AbstractRange := #[]) : IO (Option Highlight) := Internal.api "Lasm.JS.Web.Highlight.new?" do
+  if !(← Internal.hasGlobal ["Highlight"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Highlight { name := "Lasm.JS.Web.Highlight.new?", module := "globalThis", path := "Highlight", construct := true, arity := 1 }
+      (Internal.argsWith #[] (initialRanges.map toJS)) (await := false)
+  return some lasmGuarded
+
 /-- `attribute long priority` -/
 @[macro_inline] def Highlight.priority (self : Highlight) : IO Int := Internal.api "Lasm.JS.Web.Highlight.priority" do
   self.val.get "priority" Int
@@ -68,9 +76,25 @@ instance : FromJS HighlightHitResult where
 @[macro_inline] def HighlightRegistry.highlightsFromPoint (self : HighlightRegistry) (x : Float) (y : Float) (options : Option HighlightsFromPointOptions := none) : IO (Array HighlightHitResult) := Internal.api "Lasm.JS.Web.HighlightRegistry.highlightsFromPoint" do
   self.val.callMethod "highlightsFromPoint" (Internal.args #[toJS x, toJS y, Internal.optional options]) (Array HighlightHitResult)
 
+/-- `sequence<HighlightHitResult> highlightsFromPoint(float x, float y, optional HighlightsFromPointOptions options)` where the platform has it (`'highlightsFromPoint' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HighlightRegistry.highlightsFromPoint? (self' : HighlightRegistry) (x : Float) (y : Float) (options : Option HighlightsFromPointOptions := none) : IO (Option (Array HighlightHitResult)) := Internal.api "Lasm.JS.Web.HighlightRegistry.highlightsFromPoint?" do
+  let self := self'
+  if !(← Internal.has self.val "highlightsFromPoint") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "highlightsFromPoint" (Internal.args #[toJS x, toJS y, Internal.optional options]) (Array HighlightHitResult)
+  return some lasmGuarded
+
 /-- `readonly attribute HighlightRegistry highlights` (CSS Custom Highlight API Module Level 1 (https://drafts.csswg.org/css-highlight-api-1/)) -/
 @[macro_inline] def CSS.highlights : IO HighlightRegistry := Internal.api "Lasm.JS.Web.CSS.highlights" do
   let r ← Internal.getGlobal ["CSS", "highlights"] Value
   pure { val := r }
+
+/-- `readonly attribute HighlightRegistry highlights` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.highlights? : IO (Option HighlightRegistry) := Internal.api "Lasm.JS.Web.CSS.highlights?" do
+  if !(← Internal.hasGlobal ["CSS", "highlights"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["CSS", "highlights"] Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

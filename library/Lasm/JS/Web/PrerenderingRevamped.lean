@@ -20,9 +20,25 @@ set_option compiler.extract_closed false
 @[macro_inline] def Document.prerendering (self : Document) : IO Bool := Internal.api "Lasm.JS.Web.Document.prerendering" do
   self.val.get "prerendering" Bool
 
+/-- `readonly attribute boolean prerendering` where the platform has it (`'prerendering' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Document.prerendering? (self' : Document) : IO (Option Bool) := Internal.api "Lasm.JS.Web.Document.prerendering?" do
+  let self := self'
+  if !(← Internal.has self.val "prerendering") then return none
+  let lasmGuarded ← do
+    self.val.get "prerendering" Bool
+  return some lasmGuarded
+
 /-- `attribute EventHandler onprerenderingchange` -/
 @[macro_inline] def Document.onprerenderingchange (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onprerenderingchange" do
   self.val.get "onprerenderingchange" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onprerenderingchange` where the platform has it (`'onprerenderingchange' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Document.onprerenderingchange? (self' : Document) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Document.onprerenderingchange?" do
+  let self := self'
+  if !(← Internal.has self.val "onprerenderingchange") then return none
+  let lasmGuarded ← do
+    self.val.get "onprerenderingchange" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onprerenderingchange`: `attribute EventHandler onprerenderingchange` -/
 @[macro_inline] def Document.setOnprerenderingchange (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnprerenderingchange" do
@@ -31,5 +47,13 @@ set_option compiler.extract_closed false
 /-- `readonly attribute DOMHighResTimeStamp activationStart` -/
 @[macro_inline] def PerformanceNavigationTiming.activationStart (self : PerformanceNavigationTiming) : IO Float := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.activationStart" do
   self.val.get "activationStart" Float
+
+/-- `readonly attribute DOMHighResTimeStamp activationStart` where the platform has it (`'activationStart' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformanceNavigationTiming.activationStart? (self' : PerformanceNavigationTiming) : IO (Option Float) := Internal.api "Lasm.JS.Web.PerformanceNavigationTiming.activationStart?" do
+  let self := self'
+  if !(← Internal.has self.val "activationStart") then return none
+  let lasmGuarded ← do
+    self.val.get "activationStart" Float
+  return some lasmGuarded
 
 end Lasm.JS.Web

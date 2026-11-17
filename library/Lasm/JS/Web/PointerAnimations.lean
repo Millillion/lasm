@@ -34,6 +34,14 @@ instance : ToJS PointerTimelineOptions := ⟨fun d => Internal.fields #[("source
   Lasm.JS.Binding.invoke PointerTimeline { name := "Lasm.JS.Web.PointerTimeline.new", module := "globalThis", path := "PointerTimeline", construct := true, arity := 1 }
     (Internal.args #[Internal.optional options]) (await := false)
 
+/-- `constructor(optional PointerTimelineOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PointerTimeline.new? (options : Option PointerTimelineOptions := none) : IO (Option PointerTimeline) := Internal.api "Lasm.JS.Web.PointerTimeline.new?" do
+  if !(← Internal.hasGlobal ["PointerTimeline"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PointerTimeline { name := "Lasm.JS.Web.PointerTimeline.new?", module := "globalThis", path := "PointerTimeline", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute Element? source` -/
 @[macro_inline] def PointerTimeline.source (self : PointerTimeline) : IO (Option Element) := Internal.api "Lasm.JS.Web.PointerTimeline.source" do
   self.val.get "source" (Option Element)

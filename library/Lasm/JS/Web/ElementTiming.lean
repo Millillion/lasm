@@ -74,6 +74,14 @@ set_option compiler.extract_closed false
 @[macro_inline] def Element.elementTiming (self : Element) : IO String := Internal.api "Lasm.JS.Web.Element.elementTiming" do
   self.val.get "elementTiming" String
 
+/-- `attribute DOMString elementTiming` where the platform has it (`'elementTiming' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Element.elementTiming? (self' : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.elementTiming?" do
+  let self := self'
+  if !(← Internal.has self.val "elementTiming") then return none
+  let lasmGuarded ← do
+    self.val.get "elementTiming" String
+  return some lasmGuarded
+
 /-- Sets `elementTiming`: `attribute DOMString elementTiming` -/
 @[macro_inline] def Element.setElementTiming (self : Element) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.Element.setElementTiming" do
   self.val.set "elementTiming" (toJS value)

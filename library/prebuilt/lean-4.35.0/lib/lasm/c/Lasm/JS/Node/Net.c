@@ -51,7 +51,7 @@ lean_object* l_Lasm_JS_Data_field(lean_object*, lean_object*);
 lean_object* l_Lasm_JS_readField___redArg(lean_object*, lean_object*, lean_object*);
 extern lean_object* l_Lasm_JS_instFromJSInt;
 extern lean_object* l_Lasm_JS_instFromJSString;
-lean_object* l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_Internal_isInstance_spec__0_spec__1_spec__2(lean_object*, lean_object*);
+lean_object* l_Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Web_Internal_has_spec__0_spec__0(lean_object*, lean_object*);
 lean_object* l_Lasm_JS_instToJSString___lam__0(lean_object*);
 lean_object* l_Lasm_JS_instToJSFloat___lam__0___boxed(lean_object*);
 lean_object* l_Lasm_JS_instToJSNat___lam__0(lean_object*);
@@ -5516,7 +5516,7 @@ if (v___x_1443_ == 0)
 {
 lean_object* v___x_1444_; lean_object* v___x_1445_; 
 v___x_1444_ = lean_box(0);
-v___x_1445_ = l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_Internal_isInstance_spec__0_spec__1_spec__2(v___x_1441_, v___x_1444_);
+v___x_1445_ = l_Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Web_Internal_has_spec__0_spec__0(v___x_1441_, v___x_1444_);
 lean_dec_ref(v___x_1441_);
 return v___x_1445_;
 }
@@ -5525,7 +5525,7 @@ else
 lean_object* v___x_1446_; lean_object* v___x_1447_; 
 v___x_1446_ = lean_array_fget_borrowed(v_args_1434_, v_i_1435_);
 lean_inc(v___x_1446_);
-v___x_1447_ = l_Lasm_JS_decodeAs___at___00__private_Lasm_JS_Core_0__Lasm_JS_receive___at___00Lasm_JS_Value_callMethod___at___00Lasm_JS_Web_Internal_isInstance_spec__0_spec__1_spec__2(v___x_1441_, v___x_1446_);
+v___x_1447_ = l_Lasm_JS_decodeAs___at___00Lasm_JS_Binding_invoke___at___00Lasm_JS_Web_Internal_has_spec__0_spec__0(v___x_1441_, v___x_1446_);
 lean_dec_ref(v___x_1441_);
 return v___x_1447_;
 }
