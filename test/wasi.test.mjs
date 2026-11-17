@@ -3,7 +3,7 @@
 // themselves are checked by .github/workflows/wasi.yml (scripts/wasi/wasi-ci.mjs).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { lowerAtomics, moduleImports } from '../src/wasi/lower-atomics.mjs';
@@ -140,7 +140,9 @@ test('lasm init --template fetch --deploy fastly|spin|workers', () => {
   assert.ok(deployTargets.workers.templates.includes('fetch'));
 });
 
-test('Lasm.Fetch is part of Lasm\'s Lean library', () => {
+// It reads the real library: where library/ is absent (the init mutation module's sandbox, which this test does not
+// serve), it is skipped; every unit run has it.
+test('Lasm.Fetch is part of Lasm\'s Lean library', { skip: !existsSync(new URL('../library/Lasm/JS/Web/modules.json', import.meta.url)) && 'no library/ here' }, () => {
   assert.ok(libraryModules.includes('Lasm.Fetch'));
   assert.ok(libraryOutputs().includes('lib/lasm/c/Lasm/Fetch.c'));
   const directory = mkdtempSync(join(tmpdir(), 'lasm-fetch-import-'));
