@@ -17,8 +17,8 @@ import Lasm.JS.Web.Dom
 import Lasm.JS.Web.Fetch
 import Lasm.JS.Web.Html
 import Lasm.JS.Web.Url
-import Lasm.JS.Deno
-import Lasm.JS.Bun
+import Lasm.JS.Deno.Serve
+import Lasm.JS.Bun.Serve
 import Lasm.JS.Node.Serve
 import App
 open Lasm.JS Lasm.JS.Web

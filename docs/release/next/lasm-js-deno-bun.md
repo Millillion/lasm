@@ -10,7 +10,7 @@
   `Deno.upgradeWebSocket`, `Deno.createHttpClient`, and **Deno KV** (`Deno.openKv`,
   `Kv`, `AtomicOperation`, `KvU64`) with `Deno.cron`. New modules:
   `Lasm.JS.Deno.Runtime`, `.Permissions`, `.Io`, `.Fs`, `.Subprocess`, `.Net`,
-  `.WebSockets`, `.Fetch`, `.Kv` (`import Lasm.JS.Deno` imports them all). Exclusions,
+  `.WebSockets`, `.Fetch`, `.Kv` (import the ones you use: there is no umbrella `Lasm.JS.Deno` module, 0.4-21). Exclusions,
   each with its reason, are in `scripts/bindings/deno-tier2.mjs` (FFI, `Deno.test`,
   experimental APIs, in-place buffer reads). docs/JS_BINDINGS.md, "Standard bindings
   for Deno"; docs/API_DECISIONS.md 0.4-5, 0.4-7, 0.4-9, 0.4-10 to 0.4-15.

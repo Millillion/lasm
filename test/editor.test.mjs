@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { autoSetupEditor, compileProjectLibrary, editorLean, editorToolchainName, findElan, setupEditor } from '../src/editor.mjs';
+import { autoSetupEditor, compileProjectLibrary, editorLean, linkProjectLibrary, editorToolchainName, findElan, setupEditor } from '../src/editor.mjs';
 import { lakeConfigurationKey } from '../src/application-sources.mjs';
 
 const scratch = () => mkdtempSync(join(tmpdir(), 'lasm-editor-'));
@@ -153,21 +153,61 @@ test('the editor compiles only the lazily compiled library modules the project i
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('automatic setup compiles the project\'s library imports after a build, and not in the cached-only mode (lasm init)', async () => {
+test('automatic setup prepares the project\'s library imports after a build; the cached-only mode (lasm init) compiles nothing', async () => {
   const dir = scratch();
   try {
     writeFileSync(join(dir, 'lakefile.toml'), 'name = "app"\n');
     writeFileSync(join(dir, 'Main.lean'), 'import Lasm.JS\n');
     const lean = { executionPrefix: join(dir, 'prefix'), prefix: join(dir, 'prefix'), version: '4.35.0' };
-    const compiled = [];
+    const calls = [];
     const logs = [];
     const options = cachedOnly => ({ env: { PATH: '', ELAN_HOME: join(dir, 'elan') }, log: line => logs.push(line), cachedOnly, lean: async () => ({ lean, native: [] }),
-      compileLibrary: async (...a) => { compiled.push(a); } });
+      compileLibrary: async (...a) => { calls.push(a); } });
     assert.equal((await autoSetupEditor(join(dir, 'Main.lean'), options(true))).status, 'no-elan', logs.join('\n'));
-    assert.deepEqual(compiled, []);
     assert.equal((await autoSetupEditor(join(dir, 'Main.lean'), options(false))).status, 'no-elan');
-    assert.equal(compiled.length, 1);
-    assert.equal(compiled[0][0], dir);
-    assert.equal(compiled[0][1], lean);
+    assert.deepEqual(calls.map(([project, l, , options]) => [project, l, options]), [[dir, lean, { compile: false }], [dir, lean, { compile: true }]]);
   } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('in a Lake project that requires Lasm\'s package, the editor links it and leaves the modules to Lake', async () => {
+  const dir = scratch();
+  try {
+    const project = join(dir, 'app'), prefix = join(dir, 'prefix');
+    mkdirSync(project); mkdirSync(join(prefix, 'lib', 'lean'), { recursive: true });
+    writeFileSync(join(project, 'lakefile.toml'), 'name = "app"\n\n[[require]]\nname = "lasm"\npath = ".lake/lasm-library"\n');
+    // The test's own library: Lasm.JS (prebuilt) and Lasm.JS.Web.IndexedDB (compiled on first import).
+    const root = join(dir, 'library'), eager = ['Lasm.JS'];
+    mkdirSync(join(root, 'Lasm', 'JS', 'Web'), { recursive: true });
+    writeFileSync(join(root, 'Lasm', 'JS.lean'), '');
+    writeFileSync(join(root, 'Lasm', 'JS', 'Web', 'IndexedDB.lean'), 'import Lasm.JS\n');
+    // A lazily compiled module: Lasm would have to compile it, but Lake does (no Lean here to compile it with).
+    writeFileSync(join(project, 'Main.lean'), 'import Lasm.JS.Web.IndexedDB\n');
+    const options = { cache: join(dir, 'cache'), eager, root };
+    const result = await compileProjectLibrary(project, { prefix }, () => {}, options);
+    assert.deepEqual(result, { compiled: [], lake: true });
+    assert.match(readFileSync(join(project, '.lake', 'lasm-library', 'lakefile.toml'), 'utf8'), /^roots = \["Lasm\.JS\.Web\.IndexedDB"\]$/m);
+    // Without the require (an older project), the link is still made; the cached-only mode compiles nothing.
+    writeFileSync(join(project, 'lakefile.toml'), 'name = "app"\n');
+    assert.deepEqual(await compileProjectLibrary(project, { prefix }, () => {}, { ...options, compile: false }), { compiled: [], lake: false });
+    // By default Lasm compiles them (ensureProgramLibrary's result, with its time), with the given library list;
+    // here the program imports only prebuilt modules, so nothing.
+    writeFileSync(join(project, 'Main.lean'), 'import Lasm.JS\n');
+    assert.deepEqual(await compileProjectLibrary(project, { prefix }, () => {}, options), { compiled: [], ms: 0, lake: false });
+    // A module of the given library compiled on first import: Lasm compiles it (with the prefix's Lean, absent here).
+    writeFileSync(join(project, 'Main.lean'), 'import Lasm.JS.Web.IndexedDB\n');
+    const logs = [];
+    await assert.rejects(compileProjectLibrary(project, { prefix }, line => logs.push(line), options));
+    assert.match(logs[0], /^\[lasm\] Compiling 1 Lasm library module on first use \(Lasm\.JS\.Web\.IndexedDB\)/);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('lasm init links Lasm\'s Lake package when Lasm\'s Lean is on this machine, and otherwise leaves it to the first build', async () => {
+  const lean = { prefix: '/prefix' };
+  const calls = [];
+  const compileLibrary = async (...args) => { calls.push(args); };
+  assert.equal(await linkProjectLibrary('/app', { lean: async (project, options) => { assert.equal(options.cachedOnly, true); return { lean }; }, compileLibrary }), true);
+  assert.deepEqual(calls.map(([project, l, , options]) => [project, l, options]), [['/app', lean, { compile: false }]]);
+  const notCached = async () => { throw Object.assign(new Error('Not in the tool cache yet'), { code: 'ERR_LASM_NOT_CACHED' }); };
+  assert.equal(await linkProjectLibrary('/app', { lean: notCached, compileLibrary }), false);
+  assert.equal(calls.length, 1);
 });

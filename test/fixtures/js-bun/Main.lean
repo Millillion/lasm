@@ -17,7 +17,13 @@ import Lasm.JS.Web.FileAPI
 import Lasm.JS.Web.Fetch
 import Lasm.JS.Web.Html
 import Lasm.JS.Web.Websockets
-import Lasm.JS.Bun
+import Lasm.JS.Bun.Core
+import Lasm.JS.Bun.Redis
+import Lasm.JS.Bun.S3
+import Lasm.JS.Bun.Serve
+import Lasm.JS.Bun.Shell
+import Lasm.JS.Bun.Sql
+import Lasm.JS.Bun.Sqlite
 import Surface
 open Lasm.JS Lasm.JS.Web
 

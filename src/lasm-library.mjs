@@ -23,28 +23,43 @@ const fastlyModules = ['Types', 'Cache', 'ConfigStore', 'HttpCache', 'Shielding'
 // with what they import (test/web-bindings.test.mjs checks the templates and examples need no other). Every other
 // module of the whole platform ships as source and is compiled on first import (src/lazy-library.mjs, 0.3-6).
 export const eagerWebRoots = ['Lasm.JS.Web.Dom', 'Lasm.JS.Web.Fetch', 'Lasm.JS.Web.Html', 'Lasm.JS.Web.Url', 'Lasm.JS.Web.Websockets'];
-const webModules = (() => {
-  const all = JSON.parse(readFileSync(join(root, 'Lasm', 'JS', 'Web', 'modules.json'), 'utf8')).modules;
+/** Lasm.JS.Web's prebuilt modules, read from the library at `library` (by default library/) on first use: the
+ * closure of eagerWebRoots and of what the host modules import, in modules.json's order. */
+export const eagerWebModules = (library = root) => {
+  const all = JSON.parse(readFileSync(join(library, 'Lasm', 'JS', 'Web', 'modules.json'), 'utf8')).modules;
   const need = new Set();
   const visit = module => {
     if (need.has(module) || !all.includes(module)) return;
     need.add(module);
-    for (const imported of importsOfSource(readFileSync(join(root, ...module.split('.')) + '.lean', 'utf8'))) visit(imported);
+    for (const imported of importsOfSource(readFileSync(join(library, ...module.split('.')) + '.lean', 'utf8'))) visit(imported);
   };
   // And whatever Lasm.JS.Node, Deno and Bun (compiled with the prefix) import of it.
   const hostRoots = ['Node', 'Deno', 'Bun'].flatMap(host => {
-    const dir = join(root, 'Lasm', 'JS', host);
+    const dir = join(library, 'Lasm', 'JS', host);
     const files = [`${dir}.lean`, ...(existsSync(dir) ? readdirSync(dir).filter(f => f.endsWith('.lean')).map(f => join(dir, f)) : [])];
     return files.filter(existsSync).flatMap(file => importsOfSource(readFileSync(file, 'utf8')));
   });
   [...eagerWebRoots, ...hostRoots].forEach(visit);
   return all.filter(module => need.has(module));
-})();
+};
 // The generated Lasm.WASI.Http modules: one per WIT interface, then the umbrella module.
 // Http.Respond is hand-written (whole bodies and respond), imported by the umbrella module.
 const wasiHttpModules = ['Io.Error', 'Io.Poll', 'Io.Streams', 'Clocks.MonotonicClock', 'Http.Types', 'Http.OutgoingHandler',
   'Http.IncomingHandler', 'Http.Respond', 'Http'].map(name => `Lasm.WASI.${name}`);
-export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS',
+/** An array computed on first use and kept: every array operation (`includes`, spread, `indexOf`) reads it. */
+export function lazyArray(compute) {
+  let value;
+  const array = () => (value ??= compute());
+  return new Proxy([], {
+    get: (_, key) => { const a = array(), v = Reflect.get(a, key, a); return typeof v === 'function' ? v.bind(a) : v; },
+    has: (_, key) => Reflect.has(array(), key),
+    ownKeys: () => Reflect.ownKeys(array()),
+    getOwnPropertyDescriptor: (_, key) => Reflect.getOwnPropertyDescriptor(array(), key),
+  });
+}
+// Lasm's library modules compiled with the prefix, in import order. Lazy: it reads library/Lasm/JS/Web's
+// module list and sources, and importing this module must touch no file (mutation sandboxes have no library/).
+export const libraryModules = lazyArray(() => ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS',
   // Lasm.JS.Class (docs/JS_BINDINGS.md, "JavaScript classes"): not imported by Lasm.JS.
   'Lasm.JS.Class',
   // Lasm.Fetch (docs/FETCH.md): one HTTP handler for Node, WASI, Fastly and the edge.
@@ -56,13 +71,14 @@ export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', '
   ...wasiHttpModules,
   'Lasm.Fetch', 'Lasm.Fetch.Assets', 'Lasm.Fetch.Embed', 'Lasm.KV',
   // Lasm.JS.Web (docs/JS_BINDINGS.md, "Lasm.JS.Web"): the whole web platform, generated from the WebIDL of
-  // @webref/idl by scripts/bindings/generate-web.mjs (webModules, in import order).
-  'Lasm.JS.Web.Support', ...webModules,
-  // Lasm.JS.Node (docs/JS_BINDINGS.md, "Lasm.JS.Node"): Node's server-essential modules, generated from
-  // Node's API docs (scripts/bindings/node-api.mjs, generate-web.mjs).
-  'Lasm.JS.Node.Support', 'Lasm.JS.Node.Events', 'Lasm.JS.Node.Stream', 'Lasm.JS.Node.Buffer', 'Lasm.JS.Node.Path',
-  'Lasm.JS.Node.Os', 'Lasm.JS.Node.Process', 'Lasm.JS.Node.Fs', 'Lasm.JS.Node.Crypto', 'Lasm.JS.Node.ChildProcess', 'Lasm.JS.Node.Net',
-  'Lasm.JS.Node.Http', 'Lasm.JS.Node.Https', 'Lasm.JS.Node',
+  // @webref/idl by scripts/bindings/generate-web.mjs (eagerWebModules, in import order).
+  'Lasm.JS.Web.Support', ...eagerWebModules(),
+  // Lasm.JS.Node (docs/JS_BINDINGS.md, "Lasm.JS.Node"): Node's core set, compiled (scripts/bindings/node-modules.json
+  // `core`, in import order). Every other Lasm.JS.Node.* module ships as source and is compiled on first import
+  // (src/lazy-library.mjs). No umbrella module: programs import each module they use (0.4-39).
+  'Lasm.JS.Node.Support', 'Lasm.JS.Node.AsyncHooks', 'Lasm.JS.Node.Events', 'Lasm.JS.Node.Stream',
+  'Lasm.JS.Node.Buffer', 'Lasm.JS.Node.Path', 'Lasm.JS.Node.Os', 'Lasm.JS.Node.Net', 'Lasm.JS.Node.Process',
+  'Lasm.JS.Node.Readline', 'Lasm.JS.Node.Fs', 'Lasm.JS.Node.Crypto', 'Lasm.JS.Node.ChildProcess',
   // Node.serve (docs/JS_BINDINGS.md, "Serving HTTP on Node: Node.serve"): provided by Lasm, hand-written, not generated.
   'Lasm.JS.Node.Serve',
   // Lasm.JS.Deno and Lasm.JS.Bun (docs/JS_BINDINGS.md, "Standard bindings for Deno" and "...for Bun") have no prebuilt core
@@ -70,14 +86,14 @@ export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', '
   // (src/lazy-library.mjs), so none is listed here.
   // Lasm.JS.Cloudflare (docs/JS_BINDINGS.md, "Cloudflare Workers: Lasm.JS.Cloudflare"): Workers' runtime APIs,
   // generated from @cloudflare/workers-types (scripts/bindings/cloudflare-api.mjs, generate-web.mjs).
-  'Lasm.JS.Cloudflare.Support', 'Lasm.JS.Cloudflare.Kv', 'Lasm.JS.Cloudflare.D1', 'Lasm.JS.Cloudflare.R2', 'Lasm.JS.Cloudflare.Queues',
-  'Lasm.JS.Cloudflare.Cache', 'Lasm.JS.Cloudflare.Sockets', 'Lasm.JS.Cloudflare.DurableObjects', 'Lasm.JS.Cloudflare.Workers',
-  'Lasm.JS.Cloudflare',
+  // Prebuilt: the core a Worker's fetch handler and its KV and D1 bindings need (API_DECISIONS 0.5-16); every
+  // other Lasm.JS.Cloudflare module compiles on first import (src/lazy-library.mjs).
+  'Lasm.JS.Cloudflare.Support', 'Lasm.JS.Cloudflare.Kv', 'Lasm.JS.Cloudflare.D1', 'Lasm.JS.Cloudflare.Workers',
   // Lasm.UI (docs/UI.md): the Elm-architecture frontend framework.
   'Lasm.UI.Html', 'Lasm.UI.Diff', 'Lasm.UI.Model', 'Lasm.UI.Encode', 'Lasm.UI.Elements', 'Lasm.UI.Cmd', 'Lasm.UI.Subs',
   'Lasm.UI.Url', 'Lasm.UI.Mount', 'Lasm.UI.App', 'Lasm.UI.Render', 'Lasm.UI.Syntax', 'Lasm.UI',
   // Lasm.RPC (docs/RPC.md): typed endpoints shared by a Lasm.Fetch server and a Lasm.UI app.
-  'Lasm.RPC.Core', 'Lasm.RPC.Server', 'Lasm.RPC.Client', 'Lasm.RPC'];
+  'Lasm.RPC.Core', 'Lasm.RPC.Server', 'Lasm.RPC.Client', 'Lasm.RPC']);
 // The proofs-only modules (library/Lasm/UI/Proofs*, each library's Spec.lean and Theorems.lean;
 // library/PROOFS.md) are checked by scripts/library-proofs.mjs (Lasm.UI's also by scripts/ui/lean-tests.mjs), not shipped.
 
@@ -204,14 +220,17 @@ export function importsLibrary(sources) {
 
 /** The generated C (from the prefix) of the library modules the program links,
  * and the C glue, for the link; `modules` are those modules, `oleans` their
- * module data (for the binding check: library bindings name their JS modules). */
-export function librarySources(lean, programSources) {
+ * module data (for the binding check: library bindings name their JS modules). `supplied`: library modules
+ * the program's own sources already compile (Lake built them, src/lake-library.mjs), linked from there only. */
+export function librarySources(lean, programSources, { supplied } = {}) {
   const missing = module => !existsSync(libraryC(lean, module));
   if (libraryModules.some(missing)) throw new Error(`This program imports Lasm's library (Lasm.JS, Lasm.Fetch, Lasm.UI), which needs Lean ${libraryLeanVersions.join(' or ')} with Lean's elaborator libraries (the extended tier); it is missing from ${lean.prefix}`);
   const cache = new Map();
   const libraryText = module => { if (!cache.has(module)) cache.set(module, readFileSync(libraryC(lean, module), 'latin1')); return cache.get(module); };
   // The prefix's library: the modules compiled with it, then those compiled on first import.
-  const modules = linkedLibraryModules(programSources, { libraryText, modules: [...libraryModules, ...compiledLazyModules(lean.prefix, libraryModules)] });
+  const theirs = new Set(supplied);
+  const modules = linkedLibraryModules(programSources, { libraryText,
+    modules: [...libraryModules, ...compiledLazyModules(lean.prefix, libraryModules)].filter(module => !theirs.has(module)) });
   const sources = [], inputs = [];
   for (const module of modules) {
     sources.push(libraryC(lean, module)); inputs.push({ module: '+' + module, source: join(lean.prefix, 'src', 'lean', ...module.split('.')) + '.lean' });

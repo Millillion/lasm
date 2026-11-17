@@ -281,9 +281,10 @@ export async function runApplicationCli(argv) {
   }
   // A function platform: --output names the package; the Node build it is
   // made from stays in its cache entry, as for every target but node.
-  const functionPlatform = target !== undefined && target !== 'node';
+  // (The arguments always name a target: node by default under Node, src/cli-arguments.mjs.)
+  const functionPlatform = target !== 'node';
   const { output, ...cachedOptions } = buildOptions;
-  const result = await buildApplicationWithProgress(options.input, { ...(functionPlatform ? cachedOptions : buildOptions), webTarget: target ?? 'node' });
+  const result = await buildApplicationWithProgress(options.input, { ...(functionPlatform ? cachedOptions : buildOptions), webTarget: target });
   await editor();
   const profileNote = result.profile === 'dev' ? ' (dev profile: size optimizations skipped, not for deployment)' : ' (release profile)';
   if (options.command === 'build') {

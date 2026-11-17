@@ -20,7 +20,16 @@ import Lasm.JS.Web.Fetch
 import Lasm.JS.Web.Streams
 import Lasm.JS.Web.Html
 import Lasm.JS.Web.Websockets
-import Lasm.JS.Deno
+import Lasm.JS.Deno.Fetch
+import Lasm.JS.Deno.Fs
+import Lasm.JS.Deno.Io
+import Lasm.JS.Deno.Kv
+import Lasm.JS.Deno.Net
+import Lasm.JS.Deno.Permissions
+import Lasm.JS.Deno.Runtime
+import Lasm.JS.Deno.Serve
+import Lasm.JS.Deno.Subprocess
+import Lasm.JS.Deno.WebSockets
 import Surface
 import Tls
 open Lasm.JS Lasm.JS.Web

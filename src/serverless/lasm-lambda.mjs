@@ -5,7 +5,7 @@
 // handler the program publishes (Lasm.JS.exportDefault), called directly,
 // and its Responses back to each event's response shape. The Lean
 // model of this mapping, with its theorems, is
-// library/Lasm/Serverless/Proofs/Model.lean; the serverless-http fuzz target
+// verification/cli/Lasm/Serverless/Proofs/Model.lean; the serverless-http fuzz target
 // checks this file against it.
 import { forward, isTextual, loadHandler, requestTarget } from './lasm-function.mjs';
 

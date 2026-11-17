@@ -12,7 +12,9 @@ Environment: PORT (default 8000), KV_PATH (a local database file; Deno Deploy's 
 -/
 import Lasm.JS.Web.Fetch
 import Lasm.JS.Web.Url
-import Lasm.JS.Deno
+import Lasm.JS.Deno.Runtime
+import Lasm.JS.Deno.Serve
+import Lasm.JS.Deno.Kv
 open Lasm.JS Lasm.JS.Web
 
 def respond (body : String) (status : Nat := 200) : IO Response :=
