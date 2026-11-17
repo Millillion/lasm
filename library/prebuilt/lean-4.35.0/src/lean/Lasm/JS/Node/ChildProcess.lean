@@ -8,7 +8,8 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.Dom
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.MediacaptureStreams
 import Lasm.JS.Node.Events
 import Lasm.JS.Node.Stream
 import Lasm.JS.Node.Buffer
@@ -18,6 +19,9 @@ import Lasm.JS.Node.Fs
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class ChildProcess extends EventEmitter` of `node:child_process` (Node.js 24.22.2 documentation, child_process.md): a handle to the JavaScript object. -/
 structure ChildProcess extends EventEmitter
@@ -35,10 +39,10 @@ instance instToJSChildProcessCloseListener : ToJS ChildProcess.CloseListener := 
 instance instFromJSChildProcessCloseListener : FromJS ChildProcess.CloseListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.ChildProcess.CloseListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ChildProcess.CloseListener.ofFn (f : (Option Int) → (Option String) → Async Unit) : IO ChildProcess.CloseListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg (Option Int) args 0) (← Support.arg (Option String) args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg (Option Int) args 0) (← Internal.arg (Option String) args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ChildProcess.CloseListener.ofSyncFn (f : (Option Int) → (Option String) → IO Unit) : IO ChildProcess.CloseListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg (Option Int) args 0) (← Support.arg (Option String) args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg (Option Int) args 0) (← Internal.arg (Option String) args 1)) }
 
 /-- `callback ChildProcess.DisconnectListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ChildProcess.DisconnectListener where
@@ -63,10 +67,10 @@ instance instToJSChildProcessErrorListener : ToJS ChildProcess.ErrorListener := 
 instance instFromJSChildProcessErrorListener : FromJS ChildProcess.ErrorListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.ChildProcess.ErrorListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ChildProcess.ErrorListener.ofFn (f : Data → Async Unit) : IO ChildProcess.ErrorListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ChildProcess.ErrorListener.ofSyncFn (f : Data → IO Unit) : IO ChildProcess.ErrorListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0)) }
 
 /-- `callback ChildProcess.ExitListener = undefined (long long? code, DOMString? signal)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ChildProcess.ExitListener where
@@ -77,10 +81,10 @@ instance instToJSChildProcessExitListener : ToJS ChildProcess.ExitListener := �
 instance instFromJSChildProcessExitListener : FromJS ChildProcess.ExitListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.ChildProcess.ExitListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ChildProcess.ExitListener.ofFn (f : (Option Int) → (Option String) → Async Unit) : IO ChildProcess.ExitListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg (Option Int) args 0) (← Support.arg (Option String) args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg (Option Int) args 0) (← Internal.arg (Option String) args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ChildProcess.ExitListener.ofSyncFn (f : (Option Int) → (Option String) → IO Unit) : IO ChildProcess.ExitListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg (Option Int) args 0) (← Support.arg (Option String) args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg (Option Int) args 0) (← Internal.arg (Option String) args 1)) }
 
 /-- `callback ChildProcess.MessageListener = undefined (object message, object? sendHandle)` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ChildProcess.MessageListener where
@@ -91,10 +95,10 @@ instance instToJSChildProcessMessageListener : ToJS ChildProcess.MessageListener
 instance instFromJSChildProcessMessageListener : FromJS ChildProcess.MessageListener := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.ChildProcess.MessageListener", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ChildProcess.MessageListener.ofFn (f : Data → (Option Data) → Async Unit) : IO ChildProcess.MessageListener := do
-  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg (Option Data) args 1)) }
+  return { val := ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg (Option Data) args 1)) }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ChildProcess.MessageListener.ofSyncFn (f : Data → (Option Data) → IO Unit) : IO ChildProcess.MessageListener := do
-  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Data args 0) (← Support.arg (Option Data) args 1)) }
+  return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Data args 0) (← Internal.arg (Option Data) args 1)) }
 
 /-- `callback ChildProcess.SpawnListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ChildProcess.SpawnListener where
@@ -114,7 +118,7 @@ def ChildProcess.SpawnListener.ofSyncFn (f : IO Unit) : IO ChildProcess.SpawnLis
 structure ChildProcess.SendOptions where
   /-- `boolean keepOpen = false` -/
   keepOpen : Option Bool := none
-instance instToJSChildProcessSendOptions : ToJS ChildProcess.SendOptions := ⟨fun d => Support.fields #[("keepOpen", Support.optional d.keepOpen)]⟩
+instance instToJSChildProcessSendOptions : ToJS ChildProcess.SendOptions := ⟨fun d => Internal.fields #[("keepOpen", Internal.optional d.keepOpen)]⟩
 
 /-- `dictionary child_process.ExecOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure child_process.ExecOptions where
@@ -140,17 +144,17 @@ structure child_process.ExecOptions where
   gid : Option Nat := none
   /-- `boolean windowsHide = false` -/
   windowsHide : Option Bool := none
-instance instToJSChild_processExecOptions : ToJS child_process.ExecOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
+instance instToJSChild_processExecOptions : ToJS child_process.ExecOptions := ⟨fun d => Internal.fields #[("cwd", Internal.optional d.cwd),
     ("env", d.env),
-    ("encoding", Support.optional d.encoding),
-    ("shell", Support.optional d.shell),
-    ("signal", Support.optional d.signal),
-    ("timeout", Support.optional d.timeout),
-    ("maxBuffer", Support.optional d.maxBuffer),
-    ("killSignal", Support.optional d.killSignal),
-    ("uid", Support.optional d.uid),
-    ("gid", Support.optional d.gid),
-    ("windowsHide", Support.optional d.windowsHide)]⟩
+    ("encoding", Internal.optional d.encoding),
+    ("shell", Internal.optional d.shell),
+    ("signal", Internal.optional d.signal),
+    ("timeout", Internal.optional d.timeout),
+    ("maxBuffer", Internal.optional d.maxBuffer),
+    ("killSignal", Internal.optional d.killSignal),
+    ("uid", Internal.optional d.uid),
+    ("gid", Internal.optional d.gid),
+    ("windowsHide", Internal.optional d.windowsHide)]⟩
 
 /-- `dictionary child_process.ExecFileOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure child_process.ExecFileOptions where
@@ -178,18 +182,18 @@ structure child_process.ExecFileOptions where
   shell : Option BooleanOrDOMString := none
   /-- `AbortSignal signal` -/
   signal : Option AbortSignal := none
-instance instToJSChild_processExecFileOptions : ToJS child_process.ExecFileOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
-    ("env", Support.optional d.env),
-    ("encoding", Support.optional d.encoding),
-    ("timeout", Support.optional d.timeout),
-    ("maxBuffer", Support.optional d.maxBuffer),
-    ("killSignal", Support.optional d.killSignal),
-    ("uid", Support.optional d.uid),
-    ("gid", Support.optional d.gid),
-    ("windowsHide", Support.optional d.windowsHide),
-    ("windowsVerbatimArguments", Support.optional d.windowsVerbatimArguments),
-    ("shell", Support.optional d.shell),
-    ("signal", Support.optional d.signal)]⟩
+instance instToJSChild_processExecFileOptions : ToJS child_process.ExecFileOptions := ⟨fun d => Internal.fields #[("cwd", Internal.optional d.cwd),
+    ("env", Internal.optional d.env),
+    ("encoding", Internal.optional d.encoding),
+    ("timeout", Internal.optional d.timeout),
+    ("maxBuffer", Internal.optional d.maxBuffer),
+    ("killSignal", Internal.optional d.killSignal),
+    ("uid", Internal.optional d.uid),
+    ("gid", Internal.optional d.gid),
+    ("windowsHide", Internal.optional d.windowsHide),
+    ("windowsVerbatimArguments", Internal.optional d.windowsVerbatimArguments),
+    ("shell", Internal.optional d.shell),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary child_process.ExecFileResult` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure child_process.ExecFileResult where
@@ -247,21 +251,21 @@ structure child_process.ForkOptions where
   windowsVerbatimArguments : Option Bool := none
   /-- `double /* integer: Nat */ timeout` -/
   timeout : Option Nat := none
-instance instToJSChild_processForkOptions : ToJS child_process.ForkOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
-    ("detached", Support.optional d.detached),
+instance instToJSChild_processForkOptions : ToJS child_process.ForkOptions := ⟨fun d => Internal.fields #[("cwd", Internal.optional d.cwd),
+    ("detached", Internal.optional d.detached),
     ("env", d.env),
-    ("execPath", Support.optional d.execPath),
-    ("execArgv", Support.optional d.execArgv),
-    ("gid", Support.optional d.gid),
-    ("serialization", Support.optional d.serialization),
-    ("signal", Support.optional d.signal),
-    ("killSignal", Support.optional d.killSignal),
-    ("silent", Support.optional d.silent),
-    ("stdio", Support.optional d.stdio),
-    ("uid", Support.optional d.uid),
-    ("windowsHide", Support.optional d.windowsHide),
-    ("windowsVerbatimArguments", Support.optional d.windowsVerbatimArguments),
-    ("timeout", Support.optional d.timeout)]⟩
+    ("execPath", Internal.optional d.execPath),
+    ("execArgv", Internal.optional d.execArgv),
+    ("gid", Internal.optional d.gid),
+    ("serialization", Internal.optional d.serialization),
+    ("signal", Internal.optional d.signal),
+    ("killSignal", Internal.optional d.killSignal),
+    ("silent", Internal.optional d.silent),
+    ("stdio", Internal.optional d.stdio),
+    ("uid", Internal.optional d.uid),
+    ("windowsHide", Internal.optional d.windowsHide),
+    ("windowsVerbatimArguments", Internal.optional d.windowsVerbatimArguments),
+    ("timeout", Internal.optional d.timeout)]⟩
 
 /-- `dictionary child_process.SpawnOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure child_process.SpawnOptions where
@@ -293,20 +297,20 @@ structure child_process.SpawnOptions where
   timeout : Option Nat := none
   /-- `(DOMString or long long) killSignal = "SIGTERM"` -/
   killSignal : Option DOMStringOrLongLong := none
-instance instToJSChild_processSpawnOptions : ToJS child_process.SpawnOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
-    ("env", Support.optional d.env),
-    ("argv0", Support.optional d.argv0),
-    ("stdio", Support.optional d.stdio),
-    ("detached", Support.optional d.detached),
-    ("uid", Support.optional d.uid),
-    ("gid", Support.optional d.gid),
-    ("serialization", Support.optional d.serialization),
-    ("shell", Support.optional d.shell),
-    ("windowsVerbatimArguments", Support.optional d.windowsVerbatimArguments),
-    ("windowsHide", Support.optional d.windowsHide),
-    ("signal", Support.optional d.signal),
-    ("timeout", Support.optional d.timeout),
-    ("killSignal", Support.optional d.killSignal)]⟩
+instance instToJSChild_processSpawnOptions : ToJS child_process.SpawnOptions := ⟨fun d => Internal.fields #[("cwd", Internal.optional d.cwd),
+    ("env", Internal.optional d.env),
+    ("argv0", Internal.optional d.argv0),
+    ("stdio", Internal.optional d.stdio),
+    ("detached", Internal.optional d.detached),
+    ("uid", Internal.optional d.uid),
+    ("gid", Internal.optional d.gid),
+    ("serialization", Internal.optional d.serialization),
+    ("shell", Internal.optional d.shell),
+    ("windowsVerbatimArguments", Internal.optional d.windowsVerbatimArguments),
+    ("windowsHide", Internal.optional d.windowsHide),
+    ("signal", Internal.optional d.signal),
+    ("timeout", Internal.optional d.timeout),
+    ("killSignal", Internal.optional d.killSignal)]⟩
 
 /-- `(DOMString or sequence<any>)`: one constructor per member type. -/
 inductive DOMStringOrSequenceOfAny where
@@ -346,18 +350,18 @@ structure child_process.ExecFileSyncOptions where
   windowsHide : Option Bool := none
   /-- `(boolean or DOMString) shell` -/
   shell : Option BooleanOrDOMString := none
-instance instToJSChild_processExecFileSyncOptions : ToJS child_process.ExecFileSyncOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
-    ("input", Support.optional d.input),
-    ("stdio", Support.optional d.stdio),
+instance instToJSChild_processExecFileSyncOptions : ToJS child_process.ExecFileSyncOptions := ⟨fun d => Internal.fields #[("cwd", Internal.optional d.cwd),
+    ("input", Internal.optional d.input),
+    ("stdio", Internal.optional d.stdio),
     ("env", d.env),
-    ("uid", Support.optional d.uid),
-    ("gid", Support.optional d.gid),
-    ("timeout", Support.optional d.timeout),
-    ("killSignal", Support.optional d.killSignal),
-    ("maxBuffer", Support.optional d.maxBuffer),
-    ("encoding", Support.optional d.encoding),
-    ("windowsHide", Support.optional d.windowsHide),
-    ("shell", Support.optional d.shell)]⟩
+    ("uid", Internal.optional d.uid),
+    ("gid", Internal.optional d.gid),
+    ("timeout", Internal.optional d.timeout),
+    ("killSignal", Internal.optional d.killSignal),
+    ("maxBuffer", Internal.optional d.maxBuffer),
+    ("encoding", Internal.optional d.encoding),
+    ("windowsHide", Internal.optional d.windowsHide),
+    ("shell", Internal.optional d.shell)]⟩
 
 /-- `dictionary child_process.ExecSyncOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure child_process.ExecSyncOptions where
@@ -385,18 +389,18 @@ structure child_process.ExecSyncOptions where
   encoding : Option String := none
   /-- `boolean windowsHide = false` -/
   windowsHide : Option Bool := none
-instance instToJSChild_processExecSyncOptions : ToJS child_process.ExecSyncOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
-    ("input", Support.optional d.input),
-    ("stdio", Support.optional d.stdio),
+instance instToJSChild_processExecSyncOptions : ToJS child_process.ExecSyncOptions := ⟨fun d => Internal.fields #[("cwd", Internal.optional d.cwd),
+    ("input", Internal.optional d.input),
+    ("stdio", Internal.optional d.stdio),
     ("env", d.env),
-    ("shell", Support.optional d.shell),
-    ("uid", Support.optional d.uid),
-    ("gid", Support.optional d.gid),
-    ("timeout", Support.optional d.timeout),
-    ("killSignal", Support.optional d.killSignal),
-    ("maxBuffer", Support.optional d.maxBuffer),
-    ("encoding", Support.optional d.encoding),
-    ("windowsHide", Support.optional d.windowsHide)]⟩
+    ("shell", Internal.optional d.shell),
+    ("uid", Internal.optional d.uid),
+    ("gid", Internal.optional d.gid),
+    ("timeout", Internal.optional d.timeout),
+    ("killSignal", Internal.optional d.killSignal),
+    ("maxBuffer", Internal.optional d.maxBuffer),
+    ("encoding", Internal.optional d.encoding),
+    ("windowsHide", Internal.optional d.windowsHide)]⟩
 
 /-- `dictionary child_process.SpawnSyncOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure child_process.SpawnSyncOptions where
@@ -428,176 +432,188 @@ structure child_process.SpawnSyncOptions where
   windowsVerbatimArguments : Option Bool := none
   /-- `boolean windowsHide = false` -/
   windowsHide : Option Bool := none
-instance instToJSChild_processSpawnSyncOptions : ToJS child_process.SpawnSyncOptions := ⟨fun d => Support.fields #[("cwd", Support.optional d.cwd),
-    ("input", Support.optional d.input),
-    ("argv0", Support.optional d.argv0),
-    ("stdio", Support.optional d.stdio),
+instance instToJSChild_processSpawnSyncOptions : ToJS child_process.SpawnSyncOptions := ⟨fun d => Internal.fields #[("cwd", Internal.optional d.cwd),
+    ("input", Internal.optional d.input),
+    ("argv0", Internal.optional d.argv0),
+    ("stdio", Internal.optional d.stdio),
     ("env", d.env),
-    ("uid", Support.optional d.uid),
-    ("gid", Support.optional d.gid),
-    ("timeout", Support.optional d.timeout),
-    ("killSignal", Support.optional d.killSignal),
-    ("maxBuffer", Support.optional d.maxBuffer),
-    ("encoding", Support.optional d.encoding),
-    ("shell", Support.optional d.shell),
-    ("windowsVerbatimArguments", Support.optional d.windowsVerbatimArguments),
-    ("windowsHide", Support.optional d.windowsHide)]⟩
+    ("uid", Internal.optional d.uid),
+    ("gid", Internal.optional d.gid),
+    ("timeout", Internal.optional d.timeout),
+    ("killSignal", Internal.optional d.killSignal),
+    ("maxBuffer", Internal.optional d.maxBuffer),
+    ("encoding", Internal.optional d.encoding),
+    ("shell", Internal.optional d.shell),
+    ("windowsVerbatimArguments", Internal.optional d.windowsVerbatimArguments),
+    ("windowsHide", Internal.optional d.windowsHide)]⟩
 
 /-- `v instanceof ChildProcess`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ChildProcess`). -/
-def ChildProcess.cast? (v : Value) : IO (Option ChildProcess) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:child_process" ["ChildProcess"] Value) v) then some { val := v } else none
+@[macro_inline] def ChildProcess.cast? (v : Value) : IO (Option ChildProcess) := Internal.api "Lasm.JS.Node.ChildProcess.cast?" do
+  Internal.cast (Support.getExport "node:child_process" ["ChildProcess"] Value) (fun x => { val := x }) v
 
 /-- `subprocess.channel` (added in Node.js v7.1.0): `readonly attribute object channel` -/
-def ChildProcess.channel (self : ChildProcess) : IO Data := self.val.get "channel" Data
+@[macro_inline] def ChildProcess.channel (self : ChildProcess) : IO Data := Internal.api "Lasm.JS.Node.ChildProcess.channel" do
+  self.val.get "channel" Data
 
 /-- `subprocess.connected` (added in Node.js v0.7.2): `readonly attribute boolean connected` -/
-def ChildProcess.connected (self : ChildProcess) : IO Bool := self.val.get "connected" Bool
+@[macro_inline] def ChildProcess.connected (self : ChildProcess) : IO Bool := Internal.api "Lasm.JS.Node.ChildProcess.connected" do
+  self.val.get "connected" Bool
 
 /-- `subprocess.exitCode`: `readonly attribute long long? exitCode` -/
-def ChildProcess.exitCode (self : ChildProcess) : IO (Option Int) := self.val.get "exitCode" (Option Int)
+@[macro_inline] def ChildProcess.exitCode (self : ChildProcess) : IO (Option Int) := Internal.api "Lasm.JS.Node.ChildProcess.exitCode" do
+  self.val.get "exitCode" (Option Int)
 
 /-- `subprocess.killed` (added in Node.js v0.5.10): `readonly attribute boolean killed` -/
-def ChildProcess.killed (self : ChildProcess) : IO Bool := self.val.get "killed" Bool
+@[macro_inline] def ChildProcess.killed (self : ChildProcess) : IO Bool := Internal.api "Lasm.JS.Node.ChildProcess.killed" do
+  self.val.get "killed" Bool
 
 /-- `subprocess.pid` (added in Node.js v0.1.90): `readonly attribute long long? pid` -/
-def ChildProcess.pid (self : ChildProcess) : IO (Option Int) := self.val.get "pid" (Option Int)
+@[macro_inline] def ChildProcess.pid (self : ChildProcess) : IO (Option Int) := Internal.api "Lasm.JS.Node.ChildProcess.pid" do
+  self.val.get "pid" (Option Int)
 
 /-- `subprocess.signalCode`: `readonly attribute DOMString? signalCode` -/
-def ChildProcess.signalCode (self : ChildProcess) : IO (Option String) := self.val.get "signalCode" (Option String)
+@[macro_inline] def ChildProcess.signalCode (self : ChildProcess) : IO (Option String) := Internal.api "Lasm.JS.Node.ChildProcess.signalCode" do
+  self.val.get "signalCode" (Option String)
 
 /-- `subprocess.spawnargs`: `readonly attribute sequence<any> spawnargs` -/
-def ChildProcess.spawnargs (self : ChildProcess) : IO (Array Data) := self.val.get "spawnargs" (Array Data)
+@[macro_inline] def ChildProcess.spawnargs (self : ChildProcess) : IO (Array Data) := Internal.api "Lasm.JS.Node.ChildProcess.spawnargs" do
+  self.val.get "spawnargs" (Array Data)
 
 /-- `subprocess.spawnfile`: `readonly attribute DOMString spawnfile` -/
-def ChildProcess.spawnfile (self : ChildProcess) : IO String := self.val.get "spawnfile" String
+@[macro_inline] def ChildProcess.spawnfile (self : ChildProcess) : IO String := Internal.api "Lasm.JS.Node.ChildProcess.spawnfile" do
+  self.val.get "spawnfile" String
 
 /-- `subprocess.stderr` (added in Node.js v0.1.90): `readonly attribute stream.Readable? stderr` -/
-def ChildProcess.stderr (self : ChildProcess) : IO (Option stream.Readable) := self.val.get "stderr" (Option stream.Readable)
+@[macro_inline] def ChildProcess.stderr (self : ChildProcess) : IO (Option stream.Readable) := Internal.api "Lasm.JS.Node.ChildProcess.stderr" do
+  self.val.get "stderr" (Option stream.Readable)
 
 /-- `subprocess.stdin` (added in Node.js v0.1.90): `readonly attribute stream.Writable? stdin` -/
-def ChildProcess.stdin (self : ChildProcess) : IO (Option stream.Writable) := self.val.get "stdin" (Option stream.Writable)
+@[macro_inline] def ChildProcess.stdin (self : ChildProcess) : IO (Option stream.Writable) := Internal.api "Lasm.JS.Node.ChildProcess.stdin" do
+  self.val.get "stdin" (Option stream.Writable)
 
 /-- `subprocess.stdio` (added in Node.js v0.7.10): `readonly attribute sequence<any> stdio` -/
-def ChildProcess.stdio (self : ChildProcess) : IO (Array Data) := self.val.get "stdio" (Array Data)
+@[macro_inline] def ChildProcess.stdio (self : ChildProcess) : IO (Array Data) := Internal.api "Lasm.JS.Node.ChildProcess.stdio" do
+  self.val.get "stdio" (Array Data)
 
 /-- `subprocess.stdout` (added in Node.js v0.1.90): `readonly attribute stream.Readable? stdout` -/
-def ChildProcess.stdout (self : ChildProcess) : IO (Option stream.Readable) := self.val.get "stdout" (Option stream.Readable)
+@[macro_inline] def ChildProcess.stdout (self : ChildProcess) : IO (Option stream.Readable) := Internal.api "Lasm.JS.Node.ChildProcess.stdout" do
+  self.val.get "stdout" (Option stream.Readable)
 
 /-- `Event: 'close'` (added in Node.js v0.7.7): `ChildProcess onClose(ChildProcess.CloseListener listener)`: calls `on("close", listener)` -/
-def ChildProcess.onClose (self : ChildProcess) (listener : ChildProcess.CloseListener) : IO ChildProcess := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def ChildProcess.onClose (self : ChildProcess) (listener : ChildProcess.CloseListener) : IO ChildProcess := Internal.api "Lasm.JS.Node.ChildProcess.onClose" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'close'` (added in Node.js v0.7.7): `ChildProcess onceClose(ChildProcess.CloseListener listener)`: calls `once("close", listener)` -/
-def ChildProcess.onceClose (self : ChildProcess) (listener : ChildProcess.CloseListener) : IO ChildProcess := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "close", toJS listener]) Value
+@[macro_inline] def ChildProcess.onceClose (self : ChildProcess) (listener : ChildProcess.CloseListener) : IO ChildProcess := Internal.api "Lasm.JS.Node.ChildProcess.onceClose" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "close", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'disconnect'` (added in Node.js v0.7.2): `ChildProcess onDisconnect(ChildProcess.DisconnectListener listener)`: calls `on("disconnect", listener)` -/
-def ChildProcess.onDisconnect (self : ChildProcess) (listener : ChildProcess.DisconnectListener) : IO ChildProcess := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "disconnect", toJS listener]) Value
+@[macro_inline] def ChildProcess.onDisconnect (self : ChildProcess) (listener : ChildProcess.DisconnectListener) : IO ChildProcess := Internal.api "Lasm.JS.Node.ChildProcess.onDisconnect" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "disconnect", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'disconnect'` (added in Node.js v0.7.2): `ChildProcess onceDisconnect(ChildProcess.DisconnectListener listener)`: calls `once("disconnect", listener)` -/
-def ChildProcess.onceDisconnect (self : ChildProcess) (listener : ChildProcess.DisconnectListener) : IO ChildProcess := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "disconnect", toJS listener]) Value
+@[macro_inline] def ChildProcess.onceDisconnect (self : ChildProcess) (listener : ChildProcess.DisconnectListener) : IO ChildProcess := Internal.api "Lasm.JS.Node.ChildProcess.onceDisconnect" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "disconnect", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'error'`: `ChildProcess onError(ChildProcess.ErrorListener listener)`: calls `on("error", listener)` -/
-def ChildProcess.onError (self : ChildProcess) (listener : ChildProcess.ErrorListener) : IO ChildProcess := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "error", toJS listener]) Value
+@[macro_inline] def ChildProcess.onError (self : ChildProcess) (listener : ChildProcess.ErrorListener) : IO ChildProcess := Internal.api "Lasm.JS.Node.ChildProcess.onError" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'error'`: `ChildProcess onceError(ChildProcess.ErrorListener listener)`: calls `once("error", listener)` -/
-def ChildProcess.onceError (self : ChildProcess) (listener : ChildProcess.ErrorListener) : IO ChildProcess := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "error", toJS listener]) Value
+@[macro_inline] def ChildProcess.onceError (self : ChildProcess) (listener : ChildProcess.ErrorListener) : IO ChildProcess := Internal.api "Lasm.JS.Node.ChildProcess.onceError" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "error", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'exit'` (added in Node.js v0.1.90): `ChildProcess onExit(ChildProcess.ExitListener listener)`: calls `on("exit", listener)` -/
-def ChildProcess.onExit (self : ChildProcess) (listener : ChildProcess.ExitListener) : IO ChildProcess := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "exit", toJS listener]) Value
+@[macro_inline] def ChildProcess.onExit (self : ChildProcess) (listener : ChildProcess.ExitListener) : IO ChildProcess := Internal.api "Lasm.JS.Node.ChildProcess.onExit" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "exit", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'exit'` (added in Node.js v0.1.90): `ChildProcess onceExit(ChildProcess.ExitListener listener)`: calls `once("exit", listener)` -/
-def ChildProcess.onceExit (self : ChildProcess) (listener : ChildProcess.ExitListener) : IO ChildProcess := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "exit", toJS listener]) Value
+@[macro_inline] def ChildProcess.onceExit (self : ChildProcess) (listener : ChildProcess.ExitListener) : IO ChildProcess := Internal.api "Lasm.JS.Node.ChildProcess.onceExit" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "exit", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'message'` (added in Node.js v0.5.9): `ChildProcess onMessage(ChildProcess.MessageListener listener)`: calls `on("message", listener)` -/
-def ChildProcess.onMessage (self : ChildProcess) (listener : ChildProcess.MessageListener) : IO ChildProcess := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "message", toJS listener]) Value
+@[macro_inline] def ChildProcess.onMessage (self : ChildProcess) (listener : ChildProcess.MessageListener) : IO ChildProcess := Internal.api "Lasm.JS.Node.ChildProcess.onMessage" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "message", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'message'` (added in Node.js v0.5.9): `ChildProcess onceMessage(ChildProcess.MessageListener listener)`: calls `once("message", listener)` -/
-def ChildProcess.onceMessage (self : ChildProcess) (listener : ChildProcess.MessageListener) : IO ChildProcess := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "message", toJS listener]) Value
+@[macro_inline] def ChildProcess.onceMessage (self : ChildProcess) (listener : ChildProcess.MessageListener) : IO ChildProcess := Internal.api "Lasm.JS.Node.ChildProcess.onceMessage" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "message", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'spawn'` (added in Node.js v15.1.0, v14.17.0): `ChildProcess onSpawn(ChildProcess.SpawnListener listener)`: calls `on("spawn", listener)` -/
-def ChildProcess.onSpawn (self : ChildProcess) (listener : ChildProcess.SpawnListener) : IO ChildProcess := do
-  let r ← self.val.callMethod "on" (Support.args #[toJS "spawn", toJS listener]) Value
+@[macro_inline] def ChildProcess.onSpawn (self : ChildProcess) (listener : ChildProcess.SpawnListener) : IO ChildProcess := Internal.api "Lasm.JS.Node.ChildProcess.onSpawn" do
+  let r ← self.val.callMethod "on" (Internal.args #[toJS "spawn", toJS listener]) Value
   pure { val := r }
 
 /-- `Event: 'spawn'` (added in Node.js v15.1.0, v14.17.0): `ChildProcess onceSpawn(ChildProcess.SpawnListener listener)`: calls `once("spawn", listener)` -/
-def ChildProcess.onceSpawn (self : ChildProcess) (listener : ChildProcess.SpawnListener) : IO ChildProcess := do
-  let r ← self.val.callMethod "once" (Support.args #[toJS "spawn", toJS listener]) Value
+@[macro_inline] def ChildProcess.onceSpawn (self : ChildProcess) (listener : ChildProcess.SpawnListener) : IO ChildProcess := Internal.api "Lasm.JS.Node.ChildProcess.onceSpawn" do
+  let r ← self.val.callMethod "once" (Internal.args #[toJS "spawn", toJS listener]) Value
   pure { val := r }
 
 /-- `subprocess.disconnect()` (added in Node.js v0.7.2): `undefined disconnect()` -/
-def ChildProcess.disconnect (self : ChildProcess) : IO Unit :=
-  self.val.callMethod "disconnect" (Support.args #[]) Unit
+@[macro_inline] def ChildProcess.disconnect (self : ChildProcess) : IO Unit := Internal.api "Lasm.JS.Node.ChildProcess.disconnect" do
+  self.val.callMethod "disconnect" (Internal.args #[]) Unit
 
 /-- `subprocess.kill([signal])` (added in Node.js v0.1.90): `boolean kill(optional (double or DOMString) signal)` -/
-def ChildProcess.kill (self : ChildProcess) (signal : Option DoubleOrDOMString := none) : IO Bool :=
-  self.val.callMethod "kill" (Support.args #[Support.optional signal]) Bool
+@[macro_inline] def ChildProcess.kill (self : ChildProcess) (signal : Option DoubleOrDOMString := none) : IO Bool := Internal.api "Lasm.JS.Node.ChildProcess.kill" do
+  self.val.callMethod "kill" (Internal.args #[Internal.optional signal]) Bool
 
 /-- `subprocess.ref()` (added in Node.js v0.7.10): `undefined ref()` -/
-def ChildProcess.ref (self : ChildProcess) : IO Unit :=
-  self.val.callMethod "ref" (Support.args #[]) Unit
+@[macro_inline] def ChildProcess.ref (self : ChildProcess) : IO Unit := Internal.api "Lasm.JS.Node.ChildProcess.ref" do
+  self.val.callMethod "ref" (Internal.args #[]) Unit
 
 /-- `subprocess.send(message[, sendHandle[, options]][, callback])` (added in Node.js v0.5.9): `boolean send(object message, optional object sendHandle, optional ChildProcess.SendOptions options)` -/
-def ChildProcess.send (self : ChildProcess) (message : Data) (sendHandle : Data := .undefined) (options : Option ChildProcess.SendOptions := none) : IO Bool :=
-  self.val.callMethod "send" (Support.args #[toJS message, sendHandle, Support.optional options]) Bool
+@[macro_inline] def ChildProcess.send (self : ChildProcess) (message : Data) (sendHandle : Data := .undefined) (options : Option ChildProcess.SendOptions := none) : IO Bool := Internal.api "Lasm.JS.Node.ChildProcess.send" do
+  self.val.callMethod "send" (Internal.args #[toJS message, sendHandle, Internal.optional options]) Bool
 
 /-- `subprocess.unref()` (added in Node.js v0.7.10): `undefined unref()` -/
-def ChildProcess.unref (self : ChildProcess) : IO Unit :=
-  self.val.callMethod "unref" (Support.args #[]) Unit
+@[macro_inline] def ChildProcess.unref (self : ChildProcess) : IO Unit := Internal.api "Lasm.JS.Node.ChildProcess.unref" do
+  self.val.callMethod "unref" (Internal.args #[]) Unit
 
 /-- `child_process.exec(command[, options][, callback])` (added in Node.js v0.1.90): `ChildProcess exec(DOMString command, optional child_process.ExecOptions options)` (Node.js 24.22.2 documentation, child_process.md) -/
-def child_process.exec (command : String) (options : Option child_process.ExecOptions := none) : IO ChildProcess := do
+@[macro_inline] def child_process.exec (command : String) (options : Option child_process.ExecOptions := none) : IO ChildProcess := Internal.api "Lasm.JS.Node.child_process.exec" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.child_process.exec", module := "node:child_process", path := "exec", construct := false, arity := 2 }
-    (Support.args #[toJS command, Support.optional options]) (await := false)
+    (Internal.args #[toJS command, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `child_process.execFile(file[, args][, options][, callback])` (added in Node.js v0.1.91): `Promise<child_process.ExecFileResult> execFile(DOMString file, optional sequence<DOMString> args, optional child_process.ExecFileOptions options)` (Node.js 24.22.2 documentation, child_process.md) -/
-def child_process.execFile (file : String) (args : Option (Array String) := none) (options : Option child_process.ExecFileOptions := none) : Async child_process.ExecFileResult :=
-  Support.promisified child_process.ExecFileResult "node:child_process" "execFile" (Support.args #[toJS file, Support.optional args, Support.optional options])
+@[macro_inline] def child_process.execFile (file : String) (args : Option (Array String) := none) (options : Option child_process.ExecFileOptions := none) : Async child_process.ExecFileResult := Internal.api "Lasm.JS.Node.child_process.execFile" do
+  Support.promisified child_process.ExecFileResult "node:child_process" "execFile" (Internal.args #[toJS file, Internal.optional args, Internal.optional options])
 
 /-- `child_process.fork(modulePath[, args][, options])` (added in Node.js v0.5.0): `ChildProcess fork((DOMString or URL) modulePath, optional sequence<DOMString> args, optional child_process.ForkOptions options)` (Node.js 24.22.2 documentation, child_process.md) -/
-def child_process.fork (modulePath : DOMStringOrURL) (args : Option (Array String) := none) (options : Option child_process.ForkOptions := none) : IO ChildProcess := do
+@[macro_inline] def child_process.fork (modulePath : DOMStringOrURL) (args : Option (Array String) := none) (options : Option child_process.ForkOptions := none) : IO ChildProcess := Internal.api "Lasm.JS.Node.child_process.fork" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.child_process.fork", module := "node:child_process", path := "fork", construct := false, arity := 3 }
-    (Support.args #[toJS modulePath, Support.optional args, Support.optional options]) (await := false)
+    (Internal.args #[toJS modulePath, Internal.optional args, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `child_process.spawn(command[, args][, options])` (added in Node.js v0.1.90): `ChildProcess spawn(DOMString command, optional sequence<DOMString> args, optional child_process.SpawnOptions options)` (Node.js 24.22.2 documentation, child_process.md) -/
-def child_process.spawn (command : String) (args : Option (Array String) := none) (options : Option child_process.SpawnOptions := none) : IO ChildProcess := do
+@[macro_inline] def child_process.spawn (command : String) (args : Option (Array String) := none) (options : Option child_process.SpawnOptions := none) : IO ChildProcess := Internal.api "Lasm.JS.Node.child_process.spawn" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.child_process.spawn", module := "node:child_process", path := "spawn", construct := false, arity := 3 }
-    (Support.args #[toJS command, Support.optional args, Support.optional options]) (await := false)
+    (Internal.args #[toJS command, Internal.optional args, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `child_process.execFileSync(file[, args][, options])` (added in Node.js v0.11.12): `(Uint8Array or DOMString)? execFileSync(DOMString file, optional sequence<DOMString> args, optional child_process.ExecFileSyncOptions options)` (Node.js 24.22.2 documentation, child_process.md) -/
-def child_process.execFileSync (file : String) (args : Option (Array String) := none) (options : Option child_process.ExecFileSyncOptions := none) : IO (Option Uint8ArrayOrDOMString) :=
+@[macro_inline] def child_process.execFileSync (file : String) (args : Option (Array String) := none) (options : Option child_process.ExecFileSyncOptions := none) : IO (Option Uint8ArrayOrDOMString) := Internal.api "Lasm.JS.Node.child_process.execFileSync" do
   Lasm.JS.Binding.invoke (Option Uint8ArrayOrDOMString) { name := "Lasm.JS.Node.child_process.execFileSync", module := "node:child_process", path := "execFileSync", construct := false, arity := 3 }
-    (Support.args #[toJS file, Support.optional args, Support.optional options]) (await := false)
+    (Internal.args #[toJS file, Internal.optional args, Internal.optional options]) (await := false)
 
 /-- `child_process.execSync(command[, options])` (added in Node.js v0.11.12): `(Uint8Array or DOMString)? execSync(DOMString command, optional child_process.ExecSyncOptions options)` (Node.js 24.22.2 documentation, child_process.md) -/
-def child_process.execSync (command : String) (options : Option child_process.ExecSyncOptions := none) : IO (Option Uint8ArrayOrDOMString) :=
+@[macro_inline] def child_process.execSync (command : String) (options : Option child_process.ExecSyncOptions := none) : IO (Option Uint8ArrayOrDOMString) := Internal.api "Lasm.JS.Node.child_process.execSync" do
   Lasm.JS.Binding.invoke (Option Uint8ArrayOrDOMString) { name := "Lasm.JS.Node.child_process.execSync", module := "node:child_process", path := "execSync", construct := false, arity := 2 }
-    (Support.args #[toJS command, Support.optional options]) (await := false)
+    (Internal.args #[toJS command, Internal.optional options]) (await := false)
 
 /-- `child_process.spawnSync(command[, args][, options])` (added in Node.js v0.11.12): `object spawnSync(DOMString command, optional sequence<DOMString> args, optional child_process.SpawnSyncOptions options)` (Node.js 24.22.2 documentation, child_process.md) -/
-def child_process.spawnSync (command : String) (args : Option (Array String) := none) (options : Option child_process.SpawnSyncOptions := none) : IO Data :=
+@[macro_inline] def child_process.spawnSync (command : String) (args : Option (Array String) := none) (options : Option child_process.SpawnSyncOptions := none) : IO Data := Internal.api "Lasm.JS.Node.child_process.spawnSync" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.child_process.spawnSync", module := "node:child_process", path := "spawnSync", construct := false, arity := 3 }
-    (Support.args #[toJS command, Support.optional args, Support.optional options]) (await := false)
+    (Internal.args #[toJS command, Internal.optional args, Internal.optional options]) (await := false)
 
 end Lasm.JS.Node

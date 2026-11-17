@@ -8,12 +8,11 @@ docs/JS_BINDINGS.md ("Cloudflare Workers: Lasm.JS.Cloudflare"). The doc comments
 declaration and its lowered WebIDL.
 -/
 import Lasm.JS.Cloudflare.Support
-import Lasm.JS.Web.Dom
-import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Types.Dom
+import Lasm.JS.Web.Types.Fetch
 
 namespace Lasm.JS.Cloudflare
 open Lasm.JS Lasm.JS.Web
-
 set_option genInjectivity false
 set_option genSizeOfSpec false
 set_option compiler.extract_closed false
@@ -75,24 +74,23 @@ instance : ToJS Span := ⟨fun x => .ref x.val ""⟩
 instance : FromJS Span := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.Span", .data⟩
 
 /-- `enum TracingSpanStatusCode` (@cloudflare/workers-types 5.20261019.1 type declarations): "unset", "ok", "error". -/
-inductive TracingSpanStatusCode where
-  /-- "unset" -/
-  | unset
-  /-- "ok" -/
-  | ok
-  /-- "error" -/
-  | error
+structure TracingSpanStatusCode where
+  /-- A value from its string, unchecked: the generated values (`.unset`) are the normal way to make one. -/
+  unsafeOfString ::
+  /-- The string. -/
+  val : String
   deriving BEq, Repr, Inhabited
-instance : ToJS TracingSpanStatusCode := ⟨fun
-  | .unset => .string "unset"
-  | .ok => .string "ok"
-  | .error => .string "error"⟩
+/-- "unset" -/
+@[match_pattern] abbrev TracingSpanStatusCode.unset : TracingSpanStatusCode := .unsafeOfString "unset"
+/-- "ok" -/
+@[match_pattern] abbrev TracingSpanStatusCode.ok : TracingSpanStatusCode := .unsafeOfString "ok"
+/-- "error" -/
+@[match_pattern] abbrev TracingSpanStatusCode.error : TracingSpanStatusCode := .unsafeOfString "error"
+instance : ToJS TracingSpanStatusCode := ⟨fun x => .string x.val⟩
 instance : FromJS TracingSpanStatusCode where
   fromJS
-    | .string "unset" => .ok .unset
-    | .string "ok" => .ok .ok
-    | .string "error" => .ok .error
-    | _ => .error "not a value of the enumeration"
+    | .string s => .ok (.unsafeOfString s)
+    | _ => .error "not a string"
   typeName := "Lasm.JS.Cloudflare.TracingSpanStatusCode"
 
 /-- `dictionary CachePurgeOptions` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
@@ -103,9 +101,9 @@ structure CachePurgeOptions where
   pathPrefixes : Option (Array String) := none
   /-- `boolean purgeEverything` -/
   purgeEverything : Option Bool := none
-instance : ToJS CachePurgeOptions := ⟨fun d => Support.fields #[("tags", Support.optional d.tags),
-    ("pathPrefixes", Support.optional d.pathPrefixes),
-    ("purgeEverything", Support.optional d.purgeEverything)]⟩
+instance : ToJS CachePurgeOptions := ⟨fun d => Internal.fields #[("tags", Internal.optional d.tags),
+    ("pathPrefixes", Internal.optional d.pathPrefixes),
+    ("purgeEverything", Internal.optional d.purgeEverything)]⟩
 
 /-- `dictionary CachePurgeError` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure CachePurgeError where
@@ -221,13 +219,13 @@ instance : ToJS TracingEnterSpanCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS TracingEnterSpanCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.TracingEnterSpanCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def TracingEnterSpanCallback.ofFn (f : Span → Data → Async Data) : IO TracingEnterSpanCallback := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Span args 0) (← Support.arg Data args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Span args 0) (← Internal.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def TracingEnterSpanCallback.ofSyncFn (f : Span → Data → IO Data) : IO TracingEnterSpanCallback := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Span args 0) (← Support.arg Data args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Span args 0) (← Internal.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -241,13 +239,13 @@ instance : ToJS TracingStartActiveSpanCallback := ⟨fun x => .ref x.val ""⟩
 instance : FromJS TracingStartActiveSpanCallback := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.TracingStartActiveSpanCallback", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def TracingStartActiveSpanCallback.ofFn (f : Span → Data → Async Data) : IO TracingStartActiveSpanCallback := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Span args 0) (← Support.arg Data args 1))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Span args 0) (← Internal.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def TracingStartActiveSpanCallback.ofSyncFn (f : Span → Data → IO Data) : IO TracingStartActiveSpanCallback := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Span args 0) (← Support.arg Data args 1))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Span args 0) (← Internal.arg Data args 1))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 2)]] Value
   return { val := fn }
@@ -296,12 +294,12 @@ structure TracingSpanStatus where
   code : TracingSpanStatusCode
   /-- `DOMString message` -/
   message : Option String := none
-instance : ToJS TracingSpanStatus := ⟨fun d => Support.fields #[("code", toJS d.code),
-    ("message", Support.optional d.message)]⟩
+instance : ToJS TracingSpanStatus := ⟨fun d => Internal.fields #[("code", toJS d.code),
+    ("message", Internal.optional d.message)]⟩
 
 /-- `dictionary TestController` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure TestController where
-instance : ToJS TestController := ⟨fun _ => Support.fields #[]⟩
+instance : ToJS TestController := ⟨fun _ => Internal.fields #[]⟩
 instance : FromJS TestController where
   fromJS d := match d with | .object _ => .ok {} | _ => .error ""
   typeName := "Lasm.JS.Cloudflare.TestController"
@@ -310,7 +308,7 @@ instance : FromJS TestController where
 structure Cloudflare where
   /-- `required record<DOMString, boolean> compatibilityFlags` -/
   compatibilityFlags : Record Bool
-instance : ToJS Cloudflare := ⟨fun d => Support.fields #[("compatibilityFlags", toJS d.compatibilityFlags)]⟩
+instance : ToJS Cloudflare := ⟨fun d => Internal.fields #[("compatibilityFlags", toJS d.compatibilityFlags)]⟩
 
 /-- `callback ExportedHandlerFetchHandler = Promise<Response> (Request request, Env env, ExecutionContext ctx)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure ExportedHandlerFetchHandler where
@@ -321,13 +319,13 @@ instance : ToJS ExportedHandlerFetchHandler := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ExportedHandlerFetchHandler := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.ExportedHandlerFetchHandler", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ExportedHandlerFetchHandler.ofFn {Env : Type} [FromJS Env] (f : Request → Env → ExecutionContext → Async Response) : IO ExportedHandlerFetchHandler := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Request args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Request args 0) (← Support.declared Env (← Internal.arg Data args 1)) (← Internal.arg ExecutionContext args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ExportedHandlerFetchHandler.ofSyncFn {Env : Type} [FromJS Env] (f : Request → Env → ExecutionContext → IO Response) : IO ExportedHandlerFetchHandler := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Request args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Request args 0) (← Support.declared Env (← Internal.arg Data args 1)) (← Internal.arg ExecutionContext args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
@@ -341,13 +339,13 @@ instance : ToJS ExportedHandlerScheduledHandler := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ExportedHandlerScheduledHandler := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.ExportedHandlerScheduledHandler", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ExportedHandlerScheduledHandler.ofFn {Env : Type} [FromJS Env] (f : ScheduledController → Env → ExecutionContext → Async Unit) : IO ExportedHandlerScheduledHandler := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg ScheduledController args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg ScheduledController args 0) (← Support.declared Env (← Internal.arg Data args 1)) (← Internal.arg ExecutionContext args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ExportedHandlerScheduledHandler.ofSyncFn {Env : Type} [FromJS Env] (f : ScheduledController → Env → ExecutionContext → IO Unit) : IO ExportedHandlerScheduledHandler := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg ScheduledController args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg ScheduledController args 0) (← Support.declared Env (← Internal.arg Data args 1)) (← Internal.arg ExecutionContext args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
@@ -361,13 +359,13 @@ instance : ToJS ExportedHandlerTestHandler := ⟨fun x => .ref x.val ""⟩
 instance : FromJS ExportedHandlerTestHandler := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.ExportedHandlerTestHandler", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def ExportedHandlerTestHandler.ofFn {Env : Type} [FromJS Env] (f : TestController → Env → ExecutionContext → Async Unit) : IO ExportedHandlerTestHandler := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg TestController args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg TestController args 0) (← Support.declared Env (← Internal.arg Data args 1)) (← Internal.arg ExecutionContext args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def ExportedHandlerTestHandler.ofSyncFn {Env : Type} [FromJS Env] (f : TestController → Env → ExecutionContext → IO Unit) : IO ExportedHandlerTestHandler := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg TestController args 0) (← Support.declared Env (← Support.arg Data args 1)) (← Support.arg ExecutionContext args 2))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg TestController args 0) (← Support.declared Env (← Internal.arg Data args 1)) (← Internal.arg ExecutionContext args 2))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 3)]] Value
   return { val := fn }
@@ -400,10 +398,10 @@ structure SpanRecordExceptionException where
   message : Option String := none
   /-- `DOMString stack` -/
   stack : Option String := none
-instance : ToJS SpanRecordExceptionException := ⟨fun d => Support.fields #[("code", toJS d.code),
-    ("name", Support.optional d.name),
-    ("message", Support.optional d.message),
-    ("stack", Support.optional d.stack)]⟩
+instance : ToJS SpanRecordExceptionException := ⟨fun d => Internal.fields #[("code", toJS d.code),
+    ("name", Internal.optional d.name),
+    ("message", Internal.optional d.message),
+    ("stack", Internal.optional d.stack)]⟩
 
 /-- `callback PagesFunction = undefined (Promise<any> promise)` (@cloudflare/workers-types 5.20261019.1 type declarations, index.d.ts): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure PagesFunction where
@@ -414,13 +412,13 @@ instance : ToJS PagesFunction := ⟨fun x => .ref x.val ""⟩
 instance : FromJS PagesFunction := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.PagesFunction", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def PagesFunction.ofFn (f : Value → Async Unit) : IO PagesFunction := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Value args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Value args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def PagesFunction.ofSyncFn (f : Value → IO Unit) : IO PagesFunction := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Value args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Value args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -429,13 +427,13 @@ def PagesFunction.ofSyncFn (f : Value → IO Unit) : IO PagesFunction := do
 structure PagesFunction2EnvASSETS where
   /-- `required any fetch` -/
   fetch : Data
-instance : ToJS PagesFunction2EnvASSETS := ⟨fun d => Support.fields #[("fetch", toJS d.fetch)]⟩
+instance : ToJS PagesFunction2EnvASSETS := ⟨fun d => Internal.fields #[("fetch", toJS d.fetch)]⟩
 
 /-- `dictionary PagesFunction2Env` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PagesFunction2Env where
   /-- `required PagesFunction2EnvASSETS ASSETS` -/
   ASSETS : PagesFunction2EnvASSETS
-instance : ToJS PagesFunction2Env := ⟨fun d => Support.fields #[("ASSETS", toJS d.ASSETS)]⟩
+instance : ToJS PagesFunction2Env := ⟨fun d => Internal.fields #[("ASSETS", toJS d.ASSETS)]⟩
 
 /-- `dictionary PagesFunction2` (@cloudflare/workers-types 5.20261019.1 type declarations); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure PagesFunction2 where
@@ -455,7 +453,7 @@ structure PagesFunction2 where
   params : Data
   /-- `required any data` -/
   data : Data
-instance : ToJS PagesFunction2 := ⟨fun d => Support.fields #[("request", toJS d.request),
+instance : ToJS PagesFunction2 := ⟨fun d => Internal.fields #[("request", toJS d.request),
     ("functionPath", toJS d.functionPath),
     ("waitUntil", toJS d.waitUntil),
     ("passThroughOnException", toJS d.passThroughOnException),
@@ -473,13 +471,13 @@ instance : ToJS PagesPluginFunction := ⟨fun x => .ref x.val ""⟩
 instance : FromJS PagesPluginFunction := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Cloudflare.PagesPluginFunction", .data⟩
 /-- A JavaScript function that runs `f` asynchronously (`Lasm.JS.Function.ofFn`): it returns a promise at once and `f` runs as a Lean task, holding no Lean thread while it awaits. -/
 def PagesPluginFunction.ofFn (f : Value → Async Unit) : IO PagesPluginFunction := do
-  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Support.arg Value args 0))
+  let fn ← Lasm.JS.Function.ofFn fun args => do return toJS (← f (← Internal.arg Value args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def PagesPluginFunction.ofSyncFn (f : Value → IO Unit) : IO PagesPluginFunction := do
-  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Support.arg Value args 0))
+  let fn ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg Value args 0))
   let _ : Value ← (← (← Lasm.JS.global).get "Object" Value).callMethod "defineProperty"
     #[toJS fn, toJS "length", obj [("value", toJS 1)]] Value
   return { val := fn }
@@ -504,7 +502,7 @@ structure PagesPluginFunction2 where
   data : Data
   /-- `required any pluginArgs` -/
   pluginArgs : Data
-instance : ToJS PagesPluginFunction2 := ⟨fun d => Support.fields #[("request", toJS d.request),
+instance : ToJS PagesPluginFunction2 := ⟨fun d => Internal.fields #[("request", toJS d.request),
     ("functionPath", toJS d.functionPath),
     ("waitUntil", toJS d.waitUntil),
     ("passThroughOnException", toJS d.passThroughOnException),
@@ -524,189 +522,214 @@ abbrev PagesPluginFunction2EnvASSETS := PagesFunction2EnvASSETS
 abbrev PagesPluginFunction2Env := PagesFunction2Env
 
 /-- `readonly exports: Cloudflare.Exports`: `readonly attribute any exports` -/
-def ExecutionContext.exports (self : ExecutionContext) : IO Data := self.val.get "exports" Data
+@[macro_inline] def ExecutionContext.exports (self : ExecutionContext) : IO Data := Internal.api "Lasm.JS.Cloudflare.ExecutionContext.exports" do
+  self.val.get "exports" Data
 
 /-- `readonly props: Props`: `readonly attribute any props` -/
-def ExecutionContext.props (self : ExecutionContext) : IO Data := self.val.get "props" Data
+@[macro_inline] def ExecutionContext.props (self : ExecutionContext) : IO Data := Internal.api "Lasm.JS.Cloudflare.ExecutionContext.props" do
+  self.val.get "props" Data
 
 /-- `cache?: CacheContext`: `readonly attribute CacheContext? cache` -/
-def ExecutionContext.cache (self : ExecutionContext) : IO (Option CacheContext) := self.val.get "cache" (Option CacheContext)
+@[macro_inline] def ExecutionContext.cache (self : ExecutionContext) : IO (Option CacheContext) := Internal.api "Lasm.JS.Cloudflare.ExecutionContext.cache" do
+  self.val.get "cache" (Option CacheContext)
 
 /-- `readonly access?: CloudflareAccessContext`: `readonly attribute CloudflareAccessContext? access` -/
-def ExecutionContext.access (self : ExecutionContext) : IO (Option CloudflareAccessContext) := self.val.get "access" (Option CloudflareAccessContext)
+@[macro_inline] def ExecutionContext.access (self : ExecutionContext) : IO (Option CloudflareAccessContext) := Internal.api "Lasm.JS.Cloudflare.ExecutionContext.access" do
+  self.val.get "access" (Option CloudflareAccessContext)
 
 /-- `tracing: Tracing`: `readonly attribute Tracing tracing` -/
-def ExecutionContext.tracing (self : ExecutionContext) : IO Tracing := do
+@[macro_inline] def ExecutionContext.tracing (self : ExecutionContext) : IO Tracing := Internal.api "Lasm.JS.Cloudflare.ExecutionContext.tracing" do
   let r ← self.val.get "tracing" Value
   pure { val := r }
 
 /-- `waitUntil(promise: Promise<any>): void`: `undefined waitUntil(Promise<any> promise)` -/
-def ExecutionContext.waitUntil (self : ExecutionContext) (promise : Value) : IO Unit :=
-  self.val.callMethod "waitUntil" (Support.args #[toJS promise]) Unit
+@[macro_inline] def ExecutionContext.waitUntil (self : ExecutionContext) (promise : Value) : IO Unit := Internal.api "Lasm.JS.Cloudflare.ExecutionContext.waitUntil" do
+  self.val.callMethod "waitUntil" (Internal.args #[toJS promise]) Unit
 
 /-- `passThroughOnException(): void`: `undefined passThroughOnException()` -/
-def ExecutionContext.passThroughOnException (self : ExecutionContext) : IO Unit :=
-  self.val.callMethod "passThroughOnException" (Support.args #[]) Unit
+@[macro_inline] def ExecutionContext.passThroughOnException (self : ExecutionContext) : IO Unit := Internal.api "Lasm.JS.Cloudflare.ExecutionContext.passThroughOnException" do
+  self.val.callMethod "passThroughOnException" (Internal.args #[]) Unit
 
 /-- `abort(reason?: any): void`: `undefined abort(optional any reason)` -/
-def ExecutionContext.abort (self : ExecutionContext) (reason : Data := .undefined) : IO Unit :=
-  self.val.callMethod "abort" (Support.args #[reason]) Unit
+@[macro_inline] def ExecutionContext.abort (self : ExecutionContext) (reason : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Cloudflare.ExecutionContext.abort" do
+  self.val.callMethod "abort" (Internal.args #[reason]) Unit
 
 /-- `purge(options: CachePurgeOptions): Promise<CachePurgeResult>`: `Promise<CachePurgeResult> purge(CachePurgeOptions options)` -/
-def CacheContext.purge (self : CacheContext) (options : CachePurgeOptions) : Async CachePurgeResult :=
-  self.val.callMethodAwait "purge" (Support.args #[toJS options]) CachePurgeResult
+@[macro_inline] def CacheContext.purge (self : CacheContext) (options : CachePurgeOptions) : Async CachePurgeResult := Internal.api "Lasm.JS.Cloudflare.CacheContext.purge" do
+  self.val.callMethodAwait "purge" (Internal.args #[toJS options]) CachePurgeResult
 
 /-- `invalidate(options: CachePurgeOptions): Promise<CachePurgeResult>`: `Promise<CachePurgeResult> invalidate(CachePurgeOptions options)` -/
-def CacheContext.invalidate (self : CacheContext) (options : CachePurgeOptions) : Async CachePurgeResult :=
-  self.val.callMethodAwait "invalidate" (Support.args #[toJS options]) CachePurgeResult
+@[macro_inline] def CacheContext.invalidate (self : CacheContext) (options : CachePurgeOptions) : Async CachePurgeResult := Internal.api "Lasm.JS.Cloudflare.CacheContext.invalidate" do
+  self.val.callMethodAwait "invalidate" (Internal.args #[toJS options]) CachePurgeResult
 
 /-- `readonly scheduledTime: number`: `readonly attribute double scheduledTime` -/
-def ScheduledController.scheduledTime (self : ScheduledController) : IO Float := self.val.get "scheduledTime" Float
+@[macro_inline] def ScheduledController.scheduledTime (self : ScheduledController) : IO Float := Internal.api "Lasm.JS.Cloudflare.ScheduledController.scheduledTime" do
+  self.val.get "scheduledTime" Float
 
 /-- `readonly cron: string`: `readonly attribute DOMString cron` -/
-def ScheduledController.cron (self : ScheduledController) : IO String := self.val.get "cron" String
+@[macro_inline] def ScheduledController.cron (self : ScheduledController) : IO String := Internal.api "Lasm.JS.Cloudflare.ScheduledController.cron" do
+  self.val.get "cron" String
 
 /-- `noRetry(): void`: `undefined noRetry()` -/
-def ScheduledController.noRetry (self : ScheduledController) : IO Unit :=
-  self.val.callMethod "noRetry" (Support.args #[]) Unit
+@[macro_inline] def ScheduledController.noRetry (self : ScheduledController) : IO Unit := Internal.api "Lasm.JS.Cloudflare.ScheduledController.noRetry" do
+  self.val.callMethod "noRetry" (Internal.args #[]) Unit
 
 /-- `readonly aud: string`: `readonly attribute DOMString aud` -/
-def CloudflareAccessContext.aud (self : CloudflareAccessContext) : IO String := self.val.get "aud" String
+@[macro_inline] def CloudflareAccessContext.aud (self : CloudflareAccessContext) : IO String := Internal.api "Lasm.JS.Cloudflare.CloudflareAccessContext.aud" do
+  self.val.get "aud" String
 
 /-- `getIdentity(): Promise<CloudflareAccessIdentity | undefined>`: `Promise<CloudflareAccessIdentity?> getIdentity()` -/
-def CloudflareAccessContext.getIdentity (self : CloudflareAccessContext) : Async (Option CloudflareAccessIdentity) := do
-  let r ← self.val.callMethodAwait "getIdentity" (Support.args #[]) Value
-  Support.cloneAs (Option CloudflareAccessIdentity) r
+@[macro_inline] def CloudflareAccessContext.getIdentity (self : CloudflareAccessContext) : Async (Option CloudflareAccessIdentity) := Internal.api "Lasm.JS.Cloudflare.CloudflareAccessContext.getIdentity" do
+  let r ← self.val.callMethodAwait "getIdentity" (Internal.args #[]) Value
+  Internal.cloneAs (Option CloudflareAccessIdentity) r
 
 /-- `get type(): string`: `readonly attribute DOMString type` -/
-def ScheduledEvent.type (self : ScheduledEvent) : IO String := self.val.get "type" String
+@[macro_inline] def ScheduledEvent.type (self : ScheduledEvent) : IO String := Internal.api "Lasm.JS.Cloudflare.ScheduledEvent.type" do
+  self.val.get "type" String
 
 /-- `get eventPhase(): number`: `readonly attribute double eventPhase` -/
-def ScheduledEvent.eventPhase (self : ScheduledEvent) : IO Float := self.val.get "eventPhase" Float
+@[macro_inline] def ScheduledEvent.eventPhase (self : ScheduledEvent) : IO Float := Internal.api "Lasm.JS.Cloudflare.ScheduledEvent.eventPhase" do
+  self.val.get "eventPhase" Float
 
 /-- `get composed(): boolean`: `readonly attribute boolean composed` -/
-def ScheduledEvent.composed (self : ScheduledEvent) : IO Bool := self.val.get "composed" Bool
+@[macro_inline] def ScheduledEvent.composed (self : ScheduledEvent) : IO Bool := Internal.api "Lasm.JS.Cloudflare.ScheduledEvent.composed" do
+  self.val.get "composed" Bool
 
 /-- `get bubbles(): boolean`: `readonly attribute boolean bubbles` -/
-def ScheduledEvent.bubbles (self : ScheduledEvent) : IO Bool := self.val.get "bubbles" Bool
+@[macro_inline] def ScheduledEvent.bubbles (self : ScheduledEvent) : IO Bool := Internal.api "Lasm.JS.Cloudflare.ScheduledEvent.bubbles" do
+  self.val.get "bubbles" Bool
 
 /-- `get cancelable(): boolean`: `readonly attribute boolean cancelable` -/
-def ScheduledEvent.cancelable (self : ScheduledEvent) : IO Bool := self.val.get "cancelable" Bool
+@[macro_inline] def ScheduledEvent.cancelable (self : ScheduledEvent) : IO Bool := Internal.api "Lasm.JS.Cloudflare.ScheduledEvent.cancelable" do
+  self.val.get "cancelable" Bool
 
 /-- `get defaultPrevented(): boolean`: `readonly attribute boolean defaultPrevented` -/
-def ScheduledEvent.defaultPrevented (self : ScheduledEvent) : IO Bool := self.val.get "defaultPrevented" Bool
+@[macro_inline] def ScheduledEvent.defaultPrevented (self : ScheduledEvent) : IO Bool := Internal.api "Lasm.JS.Cloudflare.ScheduledEvent.defaultPrevented" do
+  self.val.get "defaultPrevented" Bool
 
 /-- `get currentTarget(): EventTarget | undefined`: `readonly attribute EventTarget? currentTarget` -/
-def ScheduledEvent.currentTarget (self : ScheduledEvent) : IO (Option EventTarget) := self.val.get "currentTarget" (Option EventTarget)
+@[macro_inline] def ScheduledEvent.currentTarget (self : ScheduledEvent) : IO (Option EventTarget) := Internal.api "Lasm.JS.Cloudflare.ScheduledEvent.currentTarget" do
+  self.val.get "currentTarget" (Option EventTarget)
 
 /-- `get target(): EventTarget | undefined`: `readonly attribute EventTarget? target` -/
-def ScheduledEvent.target (self : ScheduledEvent) : IO (Option EventTarget) := self.val.get "target" (Option EventTarget)
+@[macro_inline] def ScheduledEvent.target (self : ScheduledEvent) : IO (Option EventTarget) := Internal.api "Lasm.JS.Cloudflare.ScheduledEvent.target" do
+  self.val.get "target" (Option EventTarget)
 
 /-- `get timeStamp(): number`: `readonly attribute double timeStamp` -/
-def ScheduledEvent.timeStamp (self : ScheduledEvent) : IO Float := self.val.get "timeStamp" Float
+@[macro_inline] def ScheduledEvent.timeStamp (self : ScheduledEvent) : IO Float := Internal.api "Lasm.JS.Cloudflare.ScheduledEvent.timeStamp" do
+  self.val.get "timeStamp" Float
 
 /-- `get isTrusted(): boolean`: `readonly attribute boolean isTrusted` -/
-def ScheduledEvent.isTrusted (self : ScheduledEvent) : IO Bool := self.val.get "isTrusted" Bool
+@[macro_inline] def ScheduledEvent.isTrusted (self : ScheduledEvent) : IO Bool := Internal.api "Lasm.JS.Cloudflare.ScheduledEvent.isTrusted" do
+  self.val.get "isTrusted" Bool
 
 /-- `static readonly NONE: number`: `static readonly attribute double NONE` -/
-def ScheduledEvent.NONE : IO Float := Support.getGlobal ["Cloudflare_ScheduledEvent", "NONE"] Float
+@[macro_inline] def ScheduledEvent.NONE : IO Float := Internal.api "Lasm.JS.Cloudflare.ScheduledEvent.NONE" do
+  Internal.getGlobal ["ScheduledEvent", "NONE"] Float
 
 /-- `static readonly CAPTURING_PHASE: number`: `static readonly attribute double CAPTURING_PHASE` -/
-def ScheduledEvent.CAPTURING_PHASE : IO Float := Support.getGlobal ["Cloudflare_ScheduledEvent", "CAPTURING_PHASE"] Float
+@[macro_inline] def ScheduledEvent.CAPTURING_PHASE : IO Float := Internal.api "Lasm.JS.Cloudflare.ScheduledEvent.CAPTURING_PHASE" do
+  Internal.getGlobal ["ScheduledEvent", "CAPTURING_PHASE"] Float
 
 /-- `static readonly AT_TARGET: number`: `static readonly attribute double AT_TARGET` -/
-def ScheduledEvent.AT_TARGET : IO Float := Support.getGlobal ["Cloudflare_ScheduledEvent", "AT_TARGET"] Float
+@[macro_inline] def ScheduledEvent.AT_TARGET : IO Float := Internal.api "Lasm.JS.Cloudflare.ScheduledEvent.AT_TARGET" do
+  Internal.getGlobal ["ScheduledEvent", "AT_TARGET"] Float
 
 /-- `static readonly BUBBLING_PHASE: number`: `static readonly attribute double BUBBLING_PHASE` -/
-def ScheduledEvent.BUBBLING_PHASE : IO Float := Support.getGlobal ["Cloudflare_ScheduledEvent", "BUBBLING_PHASE"] Float
+@[macro_inline] def ScheduledEvent.BUBBLING_PHASE : IO Float := Internal.api "Lasm.JS.Cloudflare.ScheduledEvent.BUBBLING_PHASE" do
+  Internal.getGlobal ["ScheduledEvent", "BUBBLING_PHASE"] Float
 
 /-- `readonly scheduledTime: number`: `readonly attribute double scheduledTime` -/
-def ScheduledEvent.scheduledTime (self : ScheduledEvent) : IO Float := self.val.get "scheduledTime" Float
+@[macro_inline] def ScheduledEvent.scheduledTime (self : ScheduledEvent) : IO Float := Internal.api "Lasm.JS.Cloudflare.ScheduledEvent.scheduledTime" do
+  self.val.get "scheduledTime" Float
 
 /-- `readonly cron: string`: `readonly attribute DOMString cron` -/
-def ScheduledEvent.cron (self : ScheduledEvent) : IO String := self.val.get "cron" String
+@[macro_inline] def ScheduledEvent.cron (self : ScheduledEvent) : IO String := Internal.api "Lasm.JS.Cloudflare.ScheduledEvent.cron" do
+  self.val.get "cron" String
 
 /-- `stopImmediatePropagation(): void`: `undefined stopImmediatePropagation()` -/
-def ScheduledEvent.stopImmediatePropagation (self : ScheduledEvent) : IO Unit :=
-  self.val.callMethod "stopImmediatePropagation" (Support.args #[]) Unit
+@[macro_inline] def ScheduledEvent.stopImmediatePropagation (self : ScheduledEvent) : IO Unit := Internal.api "Lasm.JS.Cloudflare.ScheduledEvent.stopImmediatePropagation" do
+  self.val.callMethod "stopImmediatePropagation" (Internal.args #[]) Unit
 
 /-- `preventDefault(): void`: `undefined preventDefault()` -/
-def ScheduledEvent.preventDefault (self : ScheduledEvent) : IO Unit :=
-  self.val.callMethod "preventDefault" (Support.args #[]) Unit
+@[macro_inline] def ScheduledEvent.preventDefault (self : ScheduledEvent) : IO Unit := Internal.api "Lasm.JS.Cloudflare.ScheduledEvent.preventDefault" do
+  self.val.callMethod "preventDefault" (Internal.args #[]) Unit
 
 /-- `stopPropagation(): void`: `undefined stopPropagation()` -/
-def ScheduledEvent.stopPropagation (self : ScheduledEvent) : IO Unit :=
-  self.val.callMethod "stopPropagation" (Support.args #[]) Unit
+@[macro_inline] def ScheduledEvent.stopPropagation (self : ScheduledEvent) : IO Unit := Internal.api "Lasm.JS.Cloudflare.ScheduledEvent.stopPropagation" do
+  self.val.callMethod "stopPropagation" (Internal.args #[]) Unit
 
 /-- `composedPath(): EventTarget[]`: `sequence<EventTarget> composedPath()` -/
-def ScheduledEvent.composedPath (self : ScheduledEvent) : IO (Array EventTarget) :=
-  self.val.callMethod "composedPath" (Support.args #[]) (Array EventTarget)
+@[macro_inline] def ScheduledEvent.composedPath (self : ScheduledEvent) : IO (Array EventTarget) := Internal.api "Lasm.JS.Cloudflare.ScheduledEvent.composedPath" do
+  self.val.callMethod "composedPath" (Internal.args #[]) (Array EventTarget)
 
 /-- `waitUntil(promise: Promise<any>): void`: `undefined waitUntil(Promise<any> promise)` -/
-def ScheduledEvent.waitUntil (self : ScheduledEvent) (promise : Value) : IO Unit :=
-  self.val.callMethod "waitUntil" (Support.args #[toJS promise]) Unit
+@[macro_inline] def ScheduledEvent.waitUntil (self : ScheduledEvent) (promise : Value) : IO Unit := Internal.api "Lasm.JS.Cloudflare.ScheduledEvent.waitUntil" do
+  self.val.callMethod "waitUntil" (Internal.args #[toJS promise]) Unit
 
 /-- `noRetry(): void`: `undefined noRetry()` -/
-def ScheduledEvent.noRetry (self : ScheduledEvent) : IO Unit :=
-  self.val.callMethod "noRetry" (Support.args #[]) Unit
+@[macro_inline] def ScheduledEvent.noRetry (self : ScheduledEvent) : IO Unit := Internal.api "Lasm.JS.Cloudflare.ScheduledEvent.noRetry" do
+  self.val.callMethod "noRetry" (Internal.args #[]) Unit
 
 /-- `Span: typeof Span`: `readonly attribute any Span` -/
-def Tracing.SpanClass (self : Tracing) : IO Data := self.val.get "Span" Data
+@[macro_inline] def Tracing.SpanClass (self : Tracing) : IO Data := Internal.api "Lasm.JS.Cloudflare.Tracing.SpanClass" do
+  self.val.get "Span" Data
 
 /-- `enterSpan<T, A extends unknown[]>(name: string, callback: (span: Span, ...args: A) => T, ...args: A): T`: `any enterSpan(DOMString name, TracingEnterSpanCallback callback, any... args)` -/
-def Tracing.enterSpan (self : Tracing) (name : String) (callback : TracingEnterSpanCallback) (args : Array Data := #[]) : IO Data :=
-  self.val.callMethod "enterSpan" (Support.argsWith #[toJS name, toJS callback] (args.map toJS)) Data
+@[macro_inline] def Tracing.enterSpan (self : Tracing) (name : String) (callback : TracingEnterSpanCallback) (args : Array Data := #[]) : IO Data := Internal.api "Lasm.JS.Cloudflare.Tracing.enterSpan" do
+  self.val.callMethod "enterSpan" (Internal.argsWith #[toJS name, toJS callback] (args.map toJS)) Data
 
 /-- `startActiveSpan<T, A extends unknown[]>(name: string, callback: (span: Span, ...args: A) => T, ...args: A): T`: `any startActiveSpan(DOMString name, TracingStartActiveSpanCallback callback, any... args)` -/
-def Tracing.startActiveSpan (self : Tracing) (name : String) (callback : TracingStartActiveSpanCallback) (args : Array Data := #[]) : IO Data :=
-  self.val.callMethod "startActiveSpan" (Support.argsWith #[toJS name, toJS callback] (args.map toJS)) Data
+@[macro_inline] def Tracing.startActiveSpan (self : Tracing) (name : String) (callback : TracingStartActiveSpanCallback) (args : Array Data := #[]) : IO Data := Internal.api "Lasm.JS.Cloudflare.Tracing.startActiveSpan" do
+  self.val.callMethod "startActiveSpan" (Internal.argsWith #[toJS name, toJS callback] (args.map toJS)) Data
 
 /-- `startSpan(name: string): Span`: `Span startSpan(DOMString name)` -/
-def Tracing.startSpan (self : Tracing) (name : String) : IO Span := do
-  let r ← self.val.callMethod "startSpan" (Support.args #[toJS name]) Value
+@[macro_inline] def Tracing.startSpan (self : Tracing) (name : String) : IO Span := Internal.api "Lasm.JS.Cloudflare.Tracing.startSpan" do
+  let r ← self.val.callMethod "startSpan" (Internal.args #[toJS name]) Value
   pure { val := r }
 
 /-- `getActiveSpan(): Span | undefined`: `Span? getActiveSpan()` -/
-def Tracing.getActiveSpan (self : Tracing) : IO (Option Span) :=
-  self.val.callMethod "getActiveSpan" (Support.args #[]) (Option Span)
+@[macro_inline] def Tracing.getActiveSpan (self : Tracing) : IO (Option Span) := Internal.api "Lasm.JS.Cloudflare.Tracing.getActiveSpan" do
+  self.val.callMethod "getActiveSpan" (Internal.args #[]) (Option Span)
 
 /-- `get isTraced(): boolean`: `readonly attribute boolean isTraced` -/
-def Span.isTraced (self : Span) : IO Bool := self.val.get "isTraced" Bool
+@[macro_inline] def Span.isTraced (self : Span) : IO Bool := Internal.api "Lasm.JS.Cloudflare.Span.isTraced" do
+  self.val.get "isTraced" Bool
 
 /-- `spanContext(): TracingSpanContext`: `TracingSpanContext spanContext()` -/
-def Span.spanContext (self : Span) : IO TracingSpanContext :=
-  self.val.callMethod "spanContext" (Support.args #[]) TracingSpanContext
+@[macro_inline] def Span.spanContext (self : Span) : IO TracingSpanContext := Internal.api "Lasm.JS.Cloudflare.Span.spanContext" do
+  self.val.callMethod "spanContext" (Internal.args #[]) TracingSpanContext
 
 /-- `setAttribute(key: string, value: boolean | number | string): this`: `Span setAttribute(DOMString key, BooleanOrDoubleOrDOMString value)` -/
-def Span.setAttribute (self : Span) (key : String) (value : BooleanOrDoubleOrDOMString) : IO Span := do
-  let r ← self.val.callMethod "setAttribute" (Support.args #[toJS key, toJS value]) Value
+@[macro_inline] def Span.setAttribute (self : Span) (key : String) (value : BooleanOrDoubleOrDOMString) : IO Span := Internal.api "Lasm.JS.Cloudflare.Span.setAttribute" do
+  let r ← self.val.callMethod "setAttribute" (Internal.args #[toJS key, toJS value]) Value
   pure { val := r }
 
 /-- `setAttributes(attributes: Record<string, boolean | number | string | undefined>): this`: `Span setAttributes(record<DOMString, BooleanOrDoubleOrDOMString?> attributes)` -/
-def Span.setAttributes (self : Span) (attributes : Record (Option BooleanOrDoubleOrDOMString)) : IO Span := do
-  let r ← self.val.callMethod "setAttributes" (Support.args #[toJS attributes]) Value
+@[macro_inline] def Span.setAttributes (self : Span) (attributes : Record (Option BooleanOrDoubleOrDOMString)) : IO Span := Internal.api "Lasm.JS.Cloudflare.Span.setAttributes" do
+  let r ← self.val.callMethod "setAttributes" (Internal.args #[toJS attributes]) Value
   pure { val := r }
 
 /-- `recordException(exception: | string | { code: string | number; name?: string; message?: string; stack?: string; } | { code?: string | number; name: string; message?: string; stack?: string; } | { code?: string | number; name?: string; message: string; stack?: string; }): void`: `undefined recordException(any exception)` -/
-def Span.recordException (self : Span) (exception : Data) : IO Unit :=
-  self.val.callMethod "recordException" (Support.args #[toJS exception]) Unit
+@[macro_inline] def Span.recordException (self : Span) (exception : Data) : IO Unit := Internal.api "Lasm.JS.Cloudflare.Span.recordException" do
+  self.val.callMethod "recordException" (Internal.args #[toJS exception]) Unit
 
 /-- `updateName(name: string): this`: `Span updateName(DOMString name)` -/
-def Span.updateName (self : Span) (name : String) : IO Span := do
-  let r ← self.val.callMethod "updateName" (Support.args #[toJS name]) Value
+@[macro_inline] def Span.updateName (self : Span) (name : String) : IO Span := Internal.api "Lasm.JS.Cloudflare.Span.updateName" do
+  let r ← self.val.callMethod "updateName" (Internal.args #[toJS name]) Value
   pure { val := r }
 
 /-- `setStatus(status: TracingSpanStatus): this`: `Span setStatus(TracingSpanStatus status)` -/
-def Span.setStatus (self : Span) (status : TracingSpanStatus) : IO Span := do
-  let r ← self.val.callMethod "setStatus" (Support.args #[toJS status]) Value
+@[macro_inline] def Span.setStatus (self : Span) (status : TracingSpanStatus) : IO Span := Internal.api "Lasm.JS.Cloudflare.Span.setStatus" do
+  let r ← self.val.callMethod "setStatus" (Internal.args #[toJS status]) Value
   pure { val := r }
 
 /-- `end(): void`: `undefined end()` -/
-def Span.«end» (self : Span) : IO Unit :=
-  self.val.callMethod "end" (Support.args #[]) Unit
+@[macro_inline] def Span.«end» (self : Span) : IO Unit := Internal.api "Lasm.JS.Cloudflare.Span.end" do
+  self.val.callMethod "end" (Internal.args #[]) Unit
 
 /-- `const env: Cloudflare.Env`: `readonly attribute Env env` (@cloudflare/workers-types 5.20261019.1 type declarations) -/
-def env {Env : Type} [FromJS Env] : IO Env := do
+@[macro_inline] def env {Env : Type} [FromJS Env] : IO Env := Internal.api "Lasm.JS.Cloudflare.env" do
   let r ← Support.getExport "cloudflare:workers" ["env"] Data
   Support.declared Env r
 

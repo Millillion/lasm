@@ -8,10 +8,13 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
-import Lasm.JS.Web.File
+import Lasm.JS.Web.Types.FileAPI
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
+set_option genInjectivity false
+set_option genSizeOfSpec false
+set_option compiler.extract_closed false
 
 /-- `class SlowBuffer` of `node:buffer` (Node.js 24.22.2 documentation, buffer.md): a handle to the JavaScript object. -/
 structure SlowBuffer where
@@ -74,293 +77,296 @@ instance : FromJS LongLongOrDOMString where
   typeName := "Lasm.JS.Node.LongLongOrDOMString"
 
 /-- `v instanceof SlowBuffer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SlowBuffer`). -/
-def SlowBuffer.cast? (v : Value) : IO (Option SlowBuffer) := do
-  return if (← Lasm.JS.Web.Support.isInstance (Support.getExport "node:buffer" ["SlowBuffer"] Value) v) then some { val := v } else none
+@[macro_inline] def SlowBuffer.cast? (v : Value) : IO (Option SlowBuffer) := Internal.api "Lasm.JS.Node.SlowBuffer.cast?" do
+  Internal.cast (Support.getExport "node:buffer" ["SlowBuffer"] Value) (fun x => { val := x }) v
 
 /-- `buf.compare(target[, targetStart[, targetEnd[, sourceStart[, sourceEnd]]]])` (added in Node.js v0.11.13): `long long compare(Uint8Array target, optional long long targetStart, optional long long targetEnd, optional long long sourceStart, optional long long sourceEnd)` -/
-def Buffer.compare (self : ByteArray) (target : ByteArray) (targetStart : Option Int := none) (targetEnd : Option Int := none) (sourceStart : Option Int := none) (sourceEnd : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.compare" self (Support.args #[toJS target, Support.optional targetStart, Support.optional targetEnd, Support.optional sourceStart, Support.optional sourceEnd]) Int
+@[macro_inline] def Buffer.compare (self : ByteArray) (target : ByteArray) (targetStart : Option Int := none) (targetEnd : Option Int := none) (sourceStart : Option Int := none) (sourceEnd : Option Int := none) : IO Int := Internal.api "Lasm.JS.Node.Buffer.compare" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.compare" self (Internal.args #[toJS target, Internal.optional targetStart, Internal.optional targetEnd, Internal.optional sourceStart, Internal.optional sourceEnd]) Int
 
 /-- `buf.copy(target[, targetStart[, sourceStart[, sourceEnd]]])` (added in Node.js v0.1.90): `long long copy(Uint8Array target, optional long long targetStart, optional long long sourceStart, optional long long sourceEnd)` -/
-def Buffer.copy (self : ByteArray) (target : ByteArray) (targetStart : Option Int := none) (sourceStart : Option Int := none) (sourceEnd : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.copy" self (Support.args #[toJS target, Support.optional targetStart, Support.optional sourceStart, Support.optional sourceEnd]) Int
+@[macro_inline] def Buffer.copy (self : ByteArray) (target : ByteArray) (targetStart : Option Int := none) (sourceStart : Option Int := none) (sourceEnd : Option Int := none) : IO Int := Internal.api "Lasm.JS.Node.Buffer.copy" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.copy" self (Internal.args #[toJS target, Internal.optional targetStart, Internal.optional sourceStart, Internal.optional sourceEnd]) Int
 
 /-- `buf.entries()` (added in Node.js v1.1.0): `object entries()` -/
-def Buffer.entries (self : ByteArray) : IO Data :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.entries" self (Support.args #[]) Data
+@[macro_inline] def Buffer.entries (self : ByteArray) : IO Data := Internal.api "Lasm.JS.Node.Buffer.entries" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.entries" self (Internal.args #[]) Data
 
 /-- `buf.equals(otherBuffer)` (added in Node.js v0.11.13): `boolean equals(Uint8Array otherBuffer)` -/
-def Buffer.equals (self : ByteArray) (otherBuffer : ByteArray) : IO Bool :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.equals" self (Support.args #[toJS otherBuffer]) Bool
+@[macro_inline] def Buffer.equals (self : ByteArray) (otherBuffer : ByteArray) : IO Bool := Internal.api "Lasm.JS.Node.Buffer.equals" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.equals" self (Internal.args #[toJS otherBuffer]) Bool
 
 /-- `buf.fill(value[, offset[, end]][, encoding])` (added in Node.js v0.5.0): `Uint8Array fill((DOMString or Uint8Array or long long) value, optional long long offset, optional long long end, optional DOMString encoding)` -/
-def Buffer.fill (self : ByteArray) (value : DOMStringOrUint8ArrayOrLongLong) (offset : Option Int := none) («end» : Option Int := none) (encoding : Option String := none) : IO ByteArray :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.fill" self (Support.args #[toJS value, Support.optional offset, Support.optional «end», Support.optional encoding]) ByteArray
+@[macro_inline] def Buffer.fill (self : ByteArray) (value : DOMStringOrUint8ArrayOrLongLong) (offset : Option Int := none) («end» : Option Int := none) (encoding : Option String := none) : IO ByteArray := Internal.api "Lasm.JS.Node.Buffer.fill" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.fill" self (Internal.args #[toJS value, Internal.optional offset, Internal.optional «end», Internal.optional encoding]) ByteArray
 
 /-- `buf.includes(value[, start[, end]][, encoding])` (added in Node.js v5.3.0): `boolean includes((DOMString or Uint8Array or long long) value, optional long long start, optional long long end, optional DOMString encoding)` -/
-def Buffer.includes (self : ByteArray) (value : DOMStringOrUint8ArrayOrLongLong) (start : Option Int := none) («end» : Option Int := none) (encoding : Option String := none) : IO Bool :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.includes" self (Support.args #[toJS value, Support.optional start, Support.optional «end», Support.optional encoding]) Bool
+@[macro_inline] def Buffer.includes (self : ByteArray) (value : DOMStringOrUint8ArrayOrLongLong) (start : Option Int := none) («end» : Option Int := none) (encoding : Option String := none) : IO Bool := Internal.api "Lasm.JS.Node.Buffer.includes" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.includes" self (Internal.args #[toJS value, Internal.optional start, Internal.optional «end», Internal.optional encoding]) Bool
 
 /-- `buf.indexOf(value[, start[, end]][, encoding])` (added in Node.js v1.5.0): `long long indexOf((DOMString or Uint8Array or long long) value, optional long long start, optional long long end, optional DOMString encoding)` -/
-def Buffer.indexOf (self : ByteArray) (value : DOMStringOrUint8ArrayOrLongLong) (start : Option Int := none) («end» : Option Int := none) (encoding : Option String := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.indexOf" self (Support.args #[toJS value, Support.optional start, Support.optional «end», Support.optional encoding]) Int
+@[macro_inline] def Buffer.indexOf (self : ByteArray) (value : DOMStringOrUint8ArrayOrLongLong) (start : Option Int := none) («end» : Option Int := none) (encoding : Option String := none) : IO Int := Internal.api "Lasm.JS.Node.Buffer.indexOf" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.indexOf" self (Internal.args #[toJS value, Internal.optional start, Internal.optional «end», Internal.optional encoding]) Int
 
 /-- `buf.keys()` (added in Node.js v1.1.0): `object keys()` -/
-def Buffer.keys (self : ByteArray) : IO Data :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.keys" self (Support.args #[]) Data
+@[macro_inline] def Buffer.keys (self : ByteArray) : IO Data := Internal.api "Lasm.JS.Node.Buffer.keys" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.keys" self (Internal.args #[]) Data
 
 /-- `buf.lastIndexOf(value[, start[, end]][, encoding])` (added in Node.js v6.0.0): `long long lastIndexOf((DOMString or Uint8Array or long long) value, optional long long start, optional long long end, optional DOMString encoding)` -/
-def Buffer.lastIndexOf (self : ByteArray) (value : DOMStringOrUint8ArrayOrLongLong) (start : Option Int := none) («end» : Option Int := none) (encoding : Option String := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.lastIndexOf" self (Support.args #[toJS value, Support.optional start, Support.optional «end», Support.optional encoding]) Int
+@[macro_inline] def Buffer.lastIndexOf (self : ByteArray) (value : DOMStringOrUint8ArrayOrLongLong) (start : Option Int := none) («end» : Option Int := none) (encoding : Option String := none) : IO Int := Internal.api "Lasm.JS.Node.Buffer.lastIndexOf" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.lastIndexOf" self (Internal.args #[toJS value, Internal.optional start, Internal.optional «end», Internal.optional encoding]) Int
 
 /-- `buf.readBigInt64BE([offset])` (added in Node.js v12.0.0, v10.20.0): `bigint readBigInt64BE(optional long long offset)` -/
-def Buffer.readBigInt64BE (self : ByteArray) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.readBigInt64BE" self (Support.args #[Support.optional offset]) Int
+@[macro_inline] def Buffer.readBigInt64BE (self : ByteArray) (offset : Option Int := none) : IO Int := Internal.api "Lasm.JS.Node.Buffer.readBigInt64BE" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.readBigInt64BE" self (Internal.args #[Internal.optional offset]) Int
 
 /-- `buf.readBigInt64LE([offset])` (added in Node.js v12.0.0, v10.20.0): `bigint readBigInt64LE(optional long long offset)` -/
-def Buffer.readBigInt64LE (self : ByteArray) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.readBigInt64LE" self (Support.args #[Support.optional offset]) Int
+@[macro_inline] def Buffer.readBigInt64LE (self : ByteArray) (offset : Option Int := none) : IO Int := Internal.api "Lasm.JS.Node.Buffer.readBigInt64LE" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.readBigInt64LE" self (Internal.args #[Internal.optional offset]) Int
 
 /-- `buf.readBigUInt64BE([offset])` (added in Node.js v12.0.0, v10.20.0): `bigint readBigUInt64BE(optional long long offset)` -/
-def Buffer.readBigUInt64BE (self : ByteArray) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.readBigUInt64BE" self (Support.args #[Support.optional offset]) Int
+@[macro_inline] def Buffer.readBigUInt64BE (self : ByteArray) (offset : Option Int := none) : IO Int := Internal.api "Lasm.JS.Node.Buffer.readBigUInt64BE" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.readBigUInt64BE" self (Internal.args #[Internal.optional offset]) Int
 
 /-- `buf.readBigUInt64LE([offset])` (added in Node.js v12.0.0, v10.20.0): `bigint readBigUInt64LE(optional long long offset)` -/
-def Buffer.readBigUInt64LE (self : ByteArray) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.readBigUInt64LE" self (Support.args #[Support.optional offset]) Int
+@[macro_inline] def Buffer.readBigUInt64LE (self : ByteArray) (offset : Option Int := none) : IO Int := Internal.api "Lasm.JS.Node.Buffer.readBigUInt64LE" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.readBigUInt64LE" self (Internal.args #[Internal.optional offset]) Int
 
 /-- `buf.readDoubleBE([offset])` (added in Node.js v0.11.15): `double readDoubleBE(optional long long offset)` -/
-def Buffer.readDoubleBE (self : ByteArray) (offset : Option Int := none) : IO Float :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.readDoubleBE" self (Support.args #[Support.optional offset]) Float
+@[macro_inline] def Buffer.readDoubleBE (self : ByteArray) (offset : Option Int := none) : IO Float := Internal.api "Lasm.JS.Node.Buffer.readDoubleBE" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.readDoubleBE" self (Internal.args #[Internal.optional offset]) Float
 
 /-- `buf.readDoubleLE([offset])` (added in Node.js v0.11.15): `double readDoubleLE(optional long long offset)` -/
-def Buffer.readDoubleLE (self : ByteArray) (offset : Option Int := none) : IO Float :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.readDoubleLE" self (Support.args #[Support.optional offset]) Float
+@[macro_inline] def Buffer.readDoubleLE (self : ByteArray) (offset : Option Int := none) : IO Float := Internal.api "Lasm.JS.Node.Buffer.readDoubleLE" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.readDoubleLE" self (Internal.args #[Internal.optional offset]) Float
 
 /-- `buf.readFloatBE([offset])` (added in Node.js v0.11.15): `double readFloatBE(optional long long offset)` -/
-def Buffer.readFloatBE (self : ByteArray) (offset : Option Int := none) : IO Float :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.readFloatBE" self (Support.args #[Support.optional offset]) Float
+@[macro_inline] def Buffer.readFloatBE (self : ByteArray) (offset : Option Int := none) : IO Float := Internal.api "Lasm.JS.Node.Buffer.readFloatBE" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.readFloatBE" self (Internal.args #[Internal.optional offset]) Float
 
 /-- `buf.readFloatLE([offset])` (added in Node.js v0.11.15): `double readFloatLE(optional long long offset)` -/
-def Buffer.readFloatLE (self : ByteArray) (offset : Option Int := none) : IO Float :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.readFloatLE" self (Support.args #[Support.optional offset]) Float
+@[macro_inline] def Buffer.readFloatLE (self : ByteArray) (offset : Option Int := none) : IO Float := Internal.api "Lasm.JS.Node.Buffer.readFloatLE" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.readFloatLE" self (Internal.args #[Internal.optional offset]) Float
 
 /-- `buf.readInt8([offset])` (added in Node.js v0.5.0): `long long readInt8(optional long long offset)` -/
-def Buffer.readInt8 (self : ByteArray) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.readInt8" self (Support.args #[Support.optional offset]) Int
+@[macro_inline] def Buffer.readInt8 (self : ByteArray) (offset : Option Int := none) : IO Int := Internal.api "Lasm.JS.Node.Buffer.readInt8" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.readInt8" self (Internal.args #[Internal.optional offset]) Int
 
 /-- `buf.readInt16BE([offset])` (added in Node.js v0.5.5): `long long readInt16BE(optional long long offset)` -/
-def Buffer.readInt16BE (self : ByteArray) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.readInt16BE" self (Support.args #[Support.optional offset]) Int
+@[macro_inline] def Buffer.readInt16BE (self : ByteArray) (offset : Option Int := none) : IO Int := Internal.api "Lasm.JS.Node.Buffer.readInt16BE" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.readInt16BE" self (Internal.args #[Internal.optional offset]) Int
 
 /-- `buf.readInt16LE([offset])` (added in Node.js v0.5.5): `long long readInt16LE(optional long long offset)` -/
-def Buffer.readInt16LE (self : ByteArray) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.readInt16LE" self (Support.args #[Support.optional offset]) Int
+@[macro_inline] def Buffer.readInt16LE (self : ByteArray) (offset : Option Int := none) : IO Int := Internal.api "Lasm.JS.Node.Buffer.readInt16LE" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.readInt16LE" self (Internal.args #[Internal.optional offset]) Int
 
 /-- `buf.readInt32BE([offset])` (added in Node.js v0.5.5): `long long readInt32BE(optional long long offset)` -/
-def Buffer.readInt32BE (self : ByteArray) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.readInt32BE" self (Support.args #[Support.optional offset]) Int
+@[macro_inline] def Buffer.readInt32BE (self : ByteArray) (offset : Option Int := none) : IO Int := Internal.api "Lasm.JS.Node.Buffer.readInt32BE" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.readInt32BE" self (Internal.args #[Internal.optional offset]) Int
 
 /-- `buf.readInt32LE([offset])` (added in Node.js v0.5.5): `long long readInt32LE(optional long long offset)` -/
-def Buffer.readInt32LE (self : ByteArray) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.readInt32LE" self (Support.args #[Support.optional offset]) Int
+@[macro_inline] def Buffer.readInt32LE (self : ByteArray) (offset : Option Int := none) : IO Int := Internal.api "Lasm.JS.Node.Buffer.readInt32LE" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.readInt32LE" self (Internal.args #[Internal.optional offset]) Int
 
 /-- `buf.readIntBE(offset, byteLength)` (added in Node.js v0.11.15): `long long readIntBE(long long offset, long long byteLength)` -/
-def Buffer.readIntBE (self : ByteArray) (offset : Int) (byteLength : Int) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.readIntBE" self (Support.args #[toJS offset, toJS byteLength]) Int
+@[macro_inline] def Buffer.readIntBE (self : ByteArray) (offset : Int) (byteLength : Int) : IO Int := Internal.api "Lasm.JS.Node.Buffer.readIntBE" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.readIntBE" self (Internal.args #[toJS offset, toJS byteLength]) Int
 
 /-- `buf.readIntLE(offset, byteLength)` (added in Node.js v0.11.15): `long long readIntLE(long long offset, long long byteLength)` -/
-def Buffer.readIntLE (self : ByteArray) (offset : Int) (byteLength : Int) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.readIntLE" self (Support.args #[toJS offset, toJS byteLength]) Int
+@[macro_inline] def Buffer.readIntLE (self : ByteArray) (offset : Int) (byteLength : Int) : IO Int := Internal.api "Lasm.JS.Node.Buffer.readIntLE" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.readIntLE" self (Internal.args #[toJS offset, toJS byteLength]) Int
 
 /-- `buf.readUInt8([offset])` (added in Node.js v0.5.0): `long long readUInt8(optional long long offset)` -/
-def Buffer.readUInt8 (self : ByteArray) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.readUInt8" self (Support.args #[Support.optional offset]) Int
+@[macro_inline] def Buffer.readUInt8 (self : ByteArray) (offset : Option Int := none) : IO Int := Internal.api "Lasm.JS.Node.Buffer.readUInt8" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.readUInt8" self (Internal.args #[Internal.optional offset]) Int
 
 /-- `buf.readUInt16BE([offset])` (added in Node.js v0.5.5): `long long readUInt16BE(optional long long offset)` -/
-def Buffer.readUInt16BE (self : ByteArray) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.readUInt16BE" self (Support.args #[Support.optional offset]) Int
+@[macro_inline] def Buffer.readUInt16BE (self : ByteArray) (offset : Option Int := none) : IO Int := Internal.api "Lasm.JS.Node.Buffer.readUInt16BE" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.readUInt16BE" self (Internal.args #[Internal.optional offset]) Int
 
 /-- `buf.readUInt16LE([offset])` (added in Node.js v0.5.5): `long long readUInt16LE(optional long long offset)` -/
-def Buffer.readUInt16LE (self : ByteArray) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.readUInt16LE" self (Support.args #[Support.optional offset]) Int
+@[macro_inline] def Buffer.readUInt16LE (self : ByteArray) (offset : Option Int := none) : IO Int := Internal.api "Lasm.JS.Node.Buffer.readUInt16LE" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.readUInt16LE" self (Internal.args #[Internal.optional offset]) Int
 
 /-- `buf.readUInt32BE([offset])` (added in Node.js v0.5.5): `long long readUInt32BE(optional long long offset)` -/
-def Buffer.readUInt32BE (self : ByteArray) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.readUInt32BE" self (Support.args #[Support.optional offset]) Int
+@[macro_inline] def Buffer.readUInt32BE (self : ByteArray) (offset : Option Int := none) : IO Int := Internal.api "Lasm.JS.Node.Buffer.readUInt32BE" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.readUInt32BE" self (Internal.args #[Internal.optional offset]) Int
 
 /-- `buf.readUInt32LE([offset])` (added in Node.js v0.5.5): `long long readUInt32LE(optional long long offset)` -/
-def Buffer.readUInt32LE (self : ByteArray) (offset : Option Int := none) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.readUInt32LE" self (Support.args #[Support.optional offset]) Int
+@[macro_inline] def Buffer.readUInt32LE (self : ByteArray) (offset : Option Int := none) : IO Int := Internal.api "Lasm.JS.Node.Buffer.readUInt32LE" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.readUInt32LE" self (Internal.args #[Internal.optional offset]) Int
 
 /-- `buf.readUIntBE(offset, byteLength)` (added in Node.js v0.11.15): `long long readUIntBE(long long offset, long long byteLength)` -/
-def Buffer.readUIntBE (self : ByteArray) (offset : Int) (byteLength : Int) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.readUIntBE" self (Support.args #[toJS offset, toJS byteLength]) Int
+@[macro_inline] def Buffer.readUIntBE (self : ByteArray) (offset : Int) (byteLength : Int) : IO Int := Internal.api "Lasm.JS.Node.Buffer.readUIntBE" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.readUIntBE" self (Internal.args #[toJS offset, toJS byteLength]) Int
 
 /-- `buf.readUIntLE(offset, byteLength)` (added in Node.js v0.11.15): `long long readUIntLE(long long offset, long long byteLength)` -/
-def Buffer.readUIntLE (self : ByteArray) (offset : Int) (byteLength : Int) : IO Int :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.readUIntLE" self (Support.args #[toJS offset, toJS byteLength]) Int
+@[macro_inline] def Buffer.readUIntLE (self : ByteArray) (offset : Int) (byteLength : Int) : IO Int := Internal.api "Lasm.JS.Node.Buffer.readUIntLE" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.readUIntLE" self (Internal.args #[toJS offset, toJS byteLength]) Int
 
 /-- `buf.subarray([start[, end]])` (added in Node.js v3.0.0): `Uint8Array subarray(optional long long start, optional long long end)` -/
-def Buffer.subarray (self : ByteArray) (start : Option Int := none) («end» : Option Int := none) : IO ByteArray :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.subarray" self (Support.args #[Support.optional start, Support.optional «end»]) ByteArray
+@[macro_inline] def Buffer.subarray (self : ByteArray) (start : Option Int := none) («end» : Option Int := none) : IO ByteArray := Internal.api "Lasm.JS.Node.Buffer.subarray" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.subarray" self (Internal.args #[Internal.optional start, Internal.optional «end»]) ByteArray
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `buf.slice([start[, end]])` (added in Node.js v0.3.0): `Uint8Array slice(optional long long start, optional long long end)` -/
-def Buffer.slice (self : ByteArray) (start : Option Int := none) («end» : Option Int := none) : IO ByteArray :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.slice" self (Support.args #[Support.optional start, Support.optional «end»]) ByteArray
+@[macro_inline] def Buffer.slice (self : ByteArray) (start : Option Int := none) («end» : Option Int := none) : IO ByteArray := Internal.api "Lasm.JS.Node.Buffer.slice" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.slice" self (Internal.args #[Internal.optional start, Internal.optional «end»]) ByteArray
 
 /-- `buf.swap16()` (added in Node.js v5.10.0): `Uint8Array swap16()` -/
-def Buffer.swap16 (self : ByteArray) : IO ByteArray :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.swap16" self (Support.args #[]) ByteArray
+@[macro_inline] def Buffer.swap16 (self : ByteArray) : IO ByteArray := Internal.api "Lasm.JS.Node.Buffer.swap16" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.swap16" self (Internal.args #[]) ByteArray
 
 /-- `buf.swap32()` (added in Node.js v5.10.0): `Uint8Array swap32()` -/
-def Buffer.swap32 (self : ByteArray) : IO ByteArray :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.swap32" self (Support.args #[]) ByteArray
+@[macro_inline] def Buffer.swap32 (self : ByteArray) : IO ByteArray := Internal.api "Lasm.JS.Node.Buffer.swap32" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.swap32" self (Internal.args #[]) ByteArray
 
 /-- `buf.swap64()` (added in Node.js v6.3.0): `Uint8Array swap64()` -/
-def Buffer.swap64 (self : ByteArray) : IO ByteArray :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.swap64" self (Support.args #[]) ByteArray
+@[macro_inline] def Buffer.swap64 (self : ByteArray) : IO ByteArray := Internal.api "Lasm.JS.Node.Buffer.swap64" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.swap64" self (Internal.args #[]) ByteArray
 
 /-- `buf.toJSON()` (added in Node.js v0.9.2): `object toJSON()` -/
-def Buffer.toJSON (self : ByteArray) : IO Data :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.toJSON" self (Support.args #[]) Data
+@[macro_inline] def Buffer.toJSON (self : ByteArray) : IO Data := Internal.api "Lasm.JS.Node.Buffer.toJSON" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.toJSON" self (Internal.args #[]) Data
 
 /-- `buf.toString([encoding[, start[, end]]])` (added in Node.js v0.1.90): `DOMString toString(optional DOMString encoding, optional long long start, optional long long end)` -/
-def Buffer.toString (self : ByteArray) (encoding : Option String := none) (start : Option Int := none) («end» : Option Int := none) : IO String :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.toString" self (Support.args #[Support.optional encoding, Support.optional start, Support.optional «end»]) String
+@[macro_inline] def Buffer.toString (self : ByteArray) (encoding : Option String := none) (start : Option Int := none) («end» : Option Int := none) : IO String := Internal.api "Lasm.JS.Node.Buffer.toString" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.toString" self (Internal.args #[Internal.optional encoding, Internal.optional start, Internal.optional «end»]) String
 
 /-- `buf.values()` (added in Node.js v1.1.0): `object values()` -/
-def Buffer.values (self : ByteArray) : IO Data :=
-  Support.callOnBytes "node:buffer" "Buffer.prototype.values" self (Support.args #[]) Data
+@[macro_inline] def Buffer.values (self : ByteArray) : IO Data := Internal.api "Lasm.JS.Node.Buffer.values" do
+  Support.callOnBytes "node:buffer" "Buffer.prototype.values" self (Internal.args #[]) Data
 
 /-- `Buffer.alloc(size[, fill[, encoding]])` (added in Node.js v5.10.0): `static Uint8Array alloc(long long size, optional (DOMString or Uint8Array or long long) fill, optional DOMString encoding)` -/
-def Buffer.alloc (size : Int) (fill : Option DOMStringOrUint8ArrayOrLongLong := none) (encoding : Option String := none) : IO ByteArray :=
+@[macro_inline] def Buffer.alloc (size : Int) (fill : Option DOMStringOrUint8ArrayOrLongLong := none) (encoding : Option String := none) : IO ByteArray := Internal.api "Lasm.JS.Node.Buffer.alloc" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Buffer.alloc", module := "node:buffer", path := "Buffer.alloc", construct := false, arity := 3 }
-    (Support.args #[toJS size, Support.optional fill, Support.optional encoding]) (await := false)
+    (Internal.args #[toJS size, Internal.optional fill, Internal.optional encoding]) (await := false)
 
 /-- `Buffer.allocUnsafe(size)` (added in Node.js v5.10.0): `static Uint8Array allocUnsafe(long long size)` -/
-def Buffer.allocUnsafe (size : Int) : IO ByteArray :=
+@[macro_inline] def Buffer.allocUnsafe (size : Int) : IO ByteArray := Internal.api "Lasm.JS.Node.Buffer.allocUnsafe" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Buffer.allocUnsafe", module := "node:buffer", path := "Buffer.allocUnsafe", construct := false, arity := 1 }
-    (Support.args #[toJS size]) (await := false)
+    (Internal.args #[toJS size]) (await := false)
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `Buffer.allocUnsafe(size[, alignment])` (added in Node.js v5.10.0): `static Uint8Array allocUnsafe(long long size, optional long long alignment)` -/
-def Buffer.allocUnsafeWithAlignment (size : Int) (alignment : Option Int := none) : IO ByteArray :=
+@[macro_inline] def Buffer.allocUnsafeWithAlignment (size : Int) (alignment : Option Int := none) : IO ByteArray := Internal.api "Lasm.JS.Node.Buffer.allocUnsafeWithAlignment" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Buffer.allocUnsafeWithAlignment", module := "node:buffer", path := "Buffer.allocUnsafe", construct := false, arity := 2 }
-    (Support.args #[toJS size, Support.optional alignment]) (await := false)
+    (Internal.args #[toJS size, Internal.optional alignment]) (await := false)
 
 /-- `Buffer.allocUnsafeSlow(size)` (added in Node.js v5.12.0): `static Uint8Array allocUnsafeSlow(long long size)` -/
-def Buffer.allocUnsafeSlow (size : Int) : IO ByteArray :=
+@[macro_inline] def Buffer.allocUnsafeSlow (size : Int) : IO ByteArray := Internal.api "Lasm.JS.Node.Buffer.allocUnsafeSlow" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Buffer.allocUnsafeSlow", module := "node:buffer", path := "Buffer.allocUnsafeSlow", construct := false, arity := 1 }
-    (Support.args #[toJS size]) (await := false)
+    (Internal.args #[toJS size]) (await := false)
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `Buffer.allocUnsafeSlow(size[, alignment])` (added in Node.js v5.12.0): `static Uint8Array allocUnsafeSlow(long long size, optional long long alignment)` -/
-def Buffer.allocUnsafeSlowWithAlignment (size : Int) (alignment : Option Int := none) : IO ByteArray :=
+@[macro_inline] def Buffer.allocUnsafeSlowWithAlignment (size : Int) (alignment : Option Int := none) : IO ByteArray := Internal.api "Lasm.JS.Node.Buffer.allocUnsafeSlowWithAlignment" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Buffer.allocUnsafeSlowWithAlignment", module := "node:buffer", path := "Buffer.allocUnsafeSlow", construct := false, arity := 2 }
-    (Support.args #[toJS size, Support.optional alignment]) (await := false)
+    (Internal.args #[toJS size, Internal.optional alignment]) (await := false)
 
 /-- `Buffer.byteLength(string[, encoding])` (added in Node.js v0.1.90): `static long long byteLength((DOMString or Uint8Array) string, optional DOMString encoding)` -/
-def Buffer.byteLength (string : DOMStringOrUint8Array) (encoding : Option String := none) : IO Int :=
+@[macro_inline] def Buffer.byteLength (string : DOMStringOrUint8Array) (encoding : Option String := none) : IO Int := Internal.api "Lasm.JS.Node.Buffer.byteLength" do
   Lasm.JS.Binding.invoke Int { name := "Lasm.JS.Node.Buffer.byteLength", module := "node:buffer", path := "Buffer.byteLength", construct := false, arity := 2 }
-    (Support.args #[toJS string, Support.optional encoding]) (await := false)
+    (Internal.args #[toJS string, Internal.optional encoding]) (await := false)
 
 /-- `Buffer.compare(buf1, buf2)` (added in Node.js v0.11.13): `static long long compare(Uint8Array buf1, Uint8Array buf2)` -/
-def Buffer.staticCompare (buf1 : ByteArray) (buf2 : ByteArray) : IO Int :=
+@[macro_inline] def Buffer.staticCompare (buf1 : ByteArray) (buf2 : ByteArray) : IO Int := Internal.api "Lasm.JS.Node.Buffer.staticCompare" do
   Lasm.JS.Binding.invoke Int { name := "Lasm.JS.Node.Buffer.staticCompare", module := "node:buffer", path := "Buffer.compare", construct := false, arity := 2 }
-    (Support.args #[toJS buf1, toJS buf2]) (await := false)
+    (Internal.args #[toJS buf1, toJS buf2]) (await := false)
 
 /-- `Buffer.concat(list[, totalLength])` (added in Node.js v0.7.11): `static Uint8Array concat(sequence<Uint8Array> list, optional long long totalLength)` -/
-def Buffer.concat (list : Array ByteArray) (totalLength : Option Int := none) : IO ByteArray :=
+@[macro_inline] def Buffer.concat (list : Array ByteArray) (totalLength : Option Int := none) : IO ByteArray := Internal.api "Lasm.JS.Node.Buffer.concat" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Buffer.concat", module := "node:buffer", path := "Buffer.concat", construct := false, arity := 2 }
-    (Support.args #[toJS list, Support.optional totalLength]) (await := false)
+    (Internal.args #[toJS list, Internal.optional totalLength]) (await := false)
 
 /-- `Buffer.copyBytesFrom(view[, offset[, length]])` (added in Node.js v19.8.0, v18.16.0): `static Uint8Array copyBytesFrom(Uint8Array view, optional long long offset, optional long long length)` -/
-def Buffer.copyBytesFrom (view : ByteArray) (offset : Option Int := none) (length : Option Int := none) : IO ByteArray :=
+@[macro_inline] def Buffer.copyBytesFrom (view : ByteArray) (offset : Option Int := none) (length : Option Int := none) : IO ByteArray := Internal.api "Lasm.JS.Node.Buffer.copyBytesFrom" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Buffer.copyBytesFrom", module := "node:buffer", path := "Buffer.copyBytesFrom", construct := false, arity := 3 }
-    (Support.args #[toJS view, Support.optional offset, Support.optional length]) (await := false)
+    (Internal.args #[toJS view, Internal.optional offset, Internal.optional length]) (await := false)
 
 /-- `Buffer.from(array)` (added in Node.js v5.10.0): `static Uint8Array from(sequence<long long> array)` -/
-def Buffer.«from» (array : Array Int) : IO ByteArray :=
+@[macro_inline] def Buffer.«from» (array : Array Int) : IO ByteArray := Internal.api "Lasm.JS.Node.Buffer.from" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Buffer.from", module := "node:buffer", path := "Buffer.from", construct := false, arity := 1 }
-    (Support.args #[toJS array]) (await := false)
+    (Internal.args #[toJS array]) (await := false)
 
 /-- `Buffer.from(arrayBuffer[, byteOffset[, length]])` (added in Node.js v5.10.0): `static Uint8Array from(Uint8Array arrayBuffer, optional long long byteOffset, optional long long length)` -/
-def Buffer.fromWithArrayBuffer (arrayBuffer : ByteArray) (byteOffset : Option Int := none) (length : Option Int := none) : IO ByteArray :=
+@[macro_inline] def Buffer.fromWithArrayBuffer (arrayBuffer : ByteArray) (byteOffset : Option Int := none) (length : Option Int := none) : IO ByteArray := Internal.api "Lasm.JS.Node.Buffer.fromWithArrayBuffer" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Buffer.fromWithArrayBuffer", module := "node:buffer", path := "Buffer.from", construct := false, arity := 3 }
-    (Support.args #[toJS arrayBuffer, Support.optional byteOffset, Support.optional length]) (await := false)
+    (Internal.args #[toJS arrayBuffer, Internal.optional byteOffset, Internal.optional length]) (await := false)
 
 /-- `Buffer.from(buffer)` (added in Node.js v5.10.0): `static Uint8Array from(Uint8Array buffer)` -/
-def Buffer.fromWithBuffer (buffer_ : ByteArray) : IO ByteArray :=
+@[macro_inline] def Buffer.fromWithBuffer (buffer_ : ByteArray) : IO ByteArray := Internal.api "Lasm.JS.Node.Buffer.fromWithBuffer" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Buffer.fromWithBuffer", module := "node:buffer", path := "Buffer.from", construct := false, arity := 1 }
-    (Support.args #[toJS buffer_]) (await := false)
+    (Internal.args #[toJS buffer_]) (await := false)
 
 /-- `Buffer.from(object[, offsetOrEncoding[, length]])` (added in Node.js v8.2.0): `static Uint8Array from(object object, optional (long long or DOMString) offsetOrEncoding, optional long long length)` -/
-def Buffer.fromWithObject (object : Data) (offsetOrEncoding : Option LongLongOrDOMString := none) (length : Option Int := none) : IO ByteArray :=
+@[macro_inline] def Buffer.fromWithObject (object : Data) (offsetOrEncoding : Option LongLongOrDOMString := none) (length : Option Int := none) : IO ByteArray := Internal.api "Lasm.JS.Node.Buffer.fromWithObject" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Buffer.fromWithObject", module := "node:buffer", path := "Buffer.from", construct := false, arity := 3 }
-    (Support.args #[toJS object, Support.optional offsetOrEncoding, Support.optional length]) (await := false)
+    (Internal.args #[toJS object, Internal.optional offsetOrEncoding, Internal.optional length]) (await := false)
 
 /-- `Buffer.from(string[, encoding])` (added in Node.js v5.10.0): `static Uint8Array from(DOMString string, optional DOMString encoding)` -/
-def Buffer.fromWithString (string : String) (encoding : Option String := none) : IO ByteArray :=
+@[macro_inline] def Buffer.fromWithString (string : String) (encoding : Option String := none) : IO ByteArray := Internal.api "Lasm.JS.Node.Buffer.fromWithString" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Buffer.fromWithString", module := "node:buffer", path := "Buffer.from", construct := false, arity := 2 }
-    (Support.args #[toJS string, Support.optional encoding]) (await := false)
+    (Internal.args #[toJS string, Internal.optional encoding]) (await := false)
 
 /-- `Buffer.isBuffer(obj)` (added in Node.js v0.1.101): `static boolean isBuffer(object obj)` -/
-def Buffer.isBuffer (obj : Data) : IO Bool :=
+@[macro_inline] def Buffer.isBuffer (obj : Data) : IO Bool := Internal.api "Lasm.JS.Node.Buffer.isBuffer" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.Buffer.isBuffer", module := "node:buffer", path := "Buffer.isBuffer", construct := false, arity := 1 }
-    (Support.args #[toJS obj]) (await := false)
+    (Internal.args #[toJS obj]) (await := false)
 
 /-- `Buffer.isEncoding(encoding)` (added in Node.js v0.9.1): `static boolean isEncoding(DOMString encoding)` -/
-def Buffer.isEncoding (encoding : String) : IO Bool :=
+@[macro_inline] def Buffer.isEncoding (encoding : String) : IO Bool := Internal.api "Lasm.JS.Node.Buffer.isEncoding" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.Buffer.isEncoding", module := "node:buffer", path := "Buffer.isEncoding", construct := false, arity := 1 }
-    (Support.args #[toJS encoding]) (await := false)
+    (Internal.args #[toJS encoding]) (await := false)
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `Buffer.stringLength(input[, encoding])` (added in Node.js v26.11.0): `static long long stringLength(Uint8Array input, optional DOMString encoding)` -/
-def Buffer.stringLength (input : ByteArray) (encoding : Option String := none) : IO Int :=
+@[macro_inline] def Buffer.stringLength (input : ByteArray) (encoding : Option String := none) : IO Int := Internal.api "Lasm.JS.Node.Buffer.stringLength" do
   Lasm.JS.Binding.invoke Int { name := "Lasm.JS.Node.Buffer.stringLength", module := "node:buffer", path := "Buffer.stringLength", construct := false, arity := 2 }
-    (Support.args #[toJS input, Support.optional encoding]) (await := false)
+    (Internal.args #[toJS input, Internal.optional encoding]) (await := false)
 
 /-- `buffer.INSPECT_MAX_BYTES` (added in Node.js v0.5.4): `readonly attribute long long INSPECT_MAX_BYTES` (Node.js 24.22.2 documentation, buffer.md) -/
-def buffer.INSPECT_MAX_BYTES : IO Int := Support.getExport "node:buffer" ["INSPECT_MAX_BYTES"] Int
+@[macro_inline] def buffer.INSPECT_MAX_BYTES : IO Int := Internal.api "Lasm.JS.Node.buffer.INSPECT_MAX_BYTES" do
+  Support.getExport "node:buffer" ["INSPECT_MAX_BYTES"] Int
 
 /-- `buffer.kMaxLength` (added in Node.js v3.0.0): `readonly attribute long long kMaxLength` (Node.js 24.22.2 documentation, buffer.md) -/
-def buffer.kMaxLength : IO Int := Support.getExport "node:buffer" ["kMaxLength"] Int
+@[macro_inline] def buffer.kMaxLength : IO Int := Internal.api "Lasm.JS.Node.buffer.kMaxLength" do
+  Support.getExport "node:buffer" ["kMaxLength"] Int
 
 /-- `buffer.kStringMaxLength` (added in Node.js v3.0.0): `readonly attribute long long kStringMaxLength` (Node.js 24.22.2 documentation, buffer.md) -/
-def buffer.kStringMaxLength : IO Int := Support.getExport "node:buffer" ["kStringMaxLength"] Int
+@[macro_inline] def buffer.kStringMaxLength : IO Int := Internal.api "Lasm.JS.Node.buffer.kStringMaxLength" do
+  Support.getExport "node:buffer" ["kStringMaxLength"] Int
 
 /-- **Legacy** in the Node.js 24.22.2 docs. `buffer.atob(data)` (added in Node.js v15.13.0, v14.17.0): `DOMString atob(any data)` (Node.js 24.22.2 documentation, buffer.md) -/
-def buffer.atob (data : Data) : IO String :=
+@[macro_inline] def buffer.atob (data : Data) : IO String := Internal.api "Lasm.JS.Node.buffer.atob" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.buffer.atob", module := "node:buffer", path := "atob", construct := false, arity := 1 }
-    (Support.args #[toJS data]) (await := false)
+    (Internal.args #[toJS data]) (await := false)
 
 /-- **Legacy** in the Node.js 24.22.2 docs. `buffer.btoa(data)` (added in Node.js v15.13.0, v14.17.0): `DOMString btoa(any data)` (Node.js 24.22.2 documentation, buffer.md) -/
-def buffer.btoa (data : Data) : IO String :=
+@[macro_inline] def buffer.btoa (data : Data) : IO String := Internal.api "Lasm.JS.Node.buffer.btoa" do
   Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.buffer.btoa", module := "node:buffer", path := "btoa", construct := false, arity := 1 }
-    (Support.args #[toJS data]) (await := false)
+    (Internal.args #[toJS data]) (await := false)
 
 /-- `buffer.isAscii(input)` (added in Node.js v19.6.0, v18.15.0): `boolean isAscii(Uint8Array input)` (Node.js 24.22.2 documentation, buffer.md) -/
-def buffer.isAscii (input : ByteArray) : IO Bool :=
+@[macro_inline] def buffer.isAscii (input : ByteArray) : IO Bool := Internal.api "Lasm.JS.Node.buffer.isAscii" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.buffer.isAscii", module := "node:buffer", path := "isAscii", construct := false, arity := 1 }
-    (Support.args #[toJS input]) (await := false)
+    (Internal.args #[toJS input]) (await := false)
 
 /-- `buffer.isUtf8(input)` (added in Node.js v19.4.0, v18.14.0): `boolean isUtf8(Uint8Array input)` (Node.js 24.22.2 documentation, buffer.md) -/
-def buffer.isUtf8 (input : ByteArray) : IO Bool :=
+@[macro_inline] def buffer.isUtf8 (input : ByteArray) : IO Bool := Internal.api "Lasm.JS.Node.buffer.isUtf8" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.buffer.isUtf8", module := "node:buffer", path := "isUtf8", construct := false, arity := 1 }
-    (Support.args #[toJS input]) (await := false)
+    (Internal.args #[toJS input]) (await := false)
 
 /-- `buffer.resolveObjectURL(id)` (added in Node.js v16.7.0): `Blob resolveObjectURL(DOMString id)` (Node.js 24.22.2 documentation, buffer.md) -/
-def buffer.resolveObjectURL (id : String) : IO Blob := do
+@[macro_inline] def buffer.resolveObjectURL (id : String) : IO Blob := Internal.api "Lasm.JS.Node.buffer.resolveObjectURL" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.buffer.resolveObjectURL", module := "node:buffer", path := "resolveObjectURL", construct := false, arity := 1 }
-    (Support.args #[toJS id]) (await := false)
+    (Internal.args #[toJS id]) (await := false)
   pure { val := r }
 
 /-- `buffer.transcode(source, fromEnc, toEnc)` (added in Node.js v7.1.0): `Uint8Array transcode(Uint8Array source, DOMString fromEnc, DOMString toEnc)` (Node.js 24.22.2 documentation, buffer.md) -/
-def buffer.transcode (source : ByteArray) (fromEnc : String) (toEnc : String) : IO ByteArray :=
+@[macro_inline] def buffer.transcode (source : ByteArray) (fromEnc : String) (toEnc : String) : IO ByteArray := Internal.api "Lasm.JS.Node.buffer.transcode" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.buffer.transcode", module := "node:buffer", path := "transcode", construct := false, arity := 3 }
-    (Support.args #[toJS source, toJS fromEnc, toJS toEnc]) (await := false)
+    (Internal.args #[toJS source, toJS fromEnc, toJS toEnc]) (await := false)
 
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `buffer.isLatin1(input)` (added in Node.js v26.11.0): `boolean isLatin1(DOMString input)` (Node.js 24.22.2 documentation, buffer.md) -/
-def buffer.isLatin1 (input : String) : IO Bool :=
+@[macro_inline] def buffer.isLatin1 (input : String) : IO Bool := Internal.api "Lasm.JS.Node.buffer.isLatin1" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.buffer.isLatin1", module := "node:buffer", path := "isLatin1", construct := false, arity := 1 }
-    (Support.args #[toJS input]) (await := false)
+    (Internal.args #[toJS input]) (await := false)
 
 end Lasm.JS.Node
