@@ -8,8 +8,7 @@ serve it with their WebSockets in `Server/EdgeWs.lean`; Node in
 `Server/NodeWs.lean`.
 -/
 import Lasm.JS
-import Lasm.JS.Web.Dom
-import Lasm.JS.Web.Fetch
+import Lasm.JS.Web
 import Server.Web
 open Lasm.JS Std.Async
 
