@@ -66,10 +66,12 @@ async function request(base, method, path, body) {
 
 /** The HTTP contract every server template implements. */
 async function checkServer(base, framework) {
+  // The fetch template (framework null: the web's Request and Response) greets without a framework and echoes the
+  // body itself.
   const checks = [
-    ['GET', '/', undefined, 200, { message: `Hello from Lean on ${framework}!` }],
+    ['GET', '/', undefined, 200, { message: framework ? `Hello from Lean on ${framework}!` : 'Hello from Lean!' }],
     ['GET', '/hello/Ada', undefined, 200, { message: 'Hello, Ada, from Lean!' }],
-    ['POST', '/echo', { n: [1, 2], s: 'λ' }, 200, { echo: { n: [1, 2], s: 'λ' } }],
+    ['POST', '/echo', { n: [1, 2], s: 'λ' }, 200, framework ? { echo: { n: [1, 2], s: 'λ' } } : { n: [1, 2], s: 'λ' }],
     ['GET', '/health', undefined, 200, { ok: true }],
   ];
   const seen = [];
@@ -130,8 +132,8 @@ async function checkLambda(app, template) {
   }
 }
 
-const framework = { express: 'Express', hono: 'Hono', fastify: 'Fastify', 'std-http': 'Std.Http' };
-assert.ok(templates.every(t => t === 'plain' || t === 'guide' || framework[t]), `Unknown template in ${templates}`);
+const framework = { express: 'Express', hono: 'Hono', fastify: 'Fastify', 'std-http': 'Std.Http', fetch: null };
+assert.ok(templates.every(t => t === 'plain' || t === 'guide' || t in framework), `Unknown template in ${templates}`);
 
 try {
   mkdirSync(work, { recursive: true });
@@ -187,7 +189,9 @@ try {
       child.stdout.on('data', b => { output.text += b; }); child.stderr.on('data', b => { output.text += b; });
       const exited = new Promise(done => child.once('exit', (code, signal) => done({ code, signal })));
       try {
-        await waitForLine(child, /Listening on http:\/\/127\.0\.0\.1:\d+/, 120_000, output);
+        // The startup line names the server's URL: 127.0.0.1 from the framework templates, localhost from Node.serve
+        // (the fetch template); the port is the one given.
+        await waitForLine(child, new RegExp(`Listening on http://(?:127\\.0\\.0\\.1|localhost|\\[::1\\]):${port}\\b`), 120_000, output);
         entry.readyMs = Math.round(performance.now() - started);
         entry.requests = await checkServer(`http://127.0.0.1:${port}`, framework[base]);
         if (guide) {
