@@ -91,23 +91,23 @@ def inspector.Session.InspectorNotificationListener.ofSyncFn (f : Data → IO Un
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.inspector.waitForDebugger", module := "node:inspector", path := "waitForDebugger", construct := false, arity := 0 }
     (Internal.args #[]) (await := false)
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.Network.domStorageItemAdded` (added in Node.js v24.16.0): `readonly attribute object domStorageItemAdded` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `inspector.Network.domStorageItemAdded` (added in Node.js v24.16.0): `readonly attribute object domStorageItemAdded` (Node.js 24.22.2 documentation, inspector.md) -/
 @[macro_inline] def inspector.Network.domStorageItemAdded : IO Data := Internal.api "Lasm.JS.Node.inspector.Network.domStorageItemAdded" do
   Support.getExport "node:inspector" ["Network", "domStorageItemAdded"] Data
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.Network.domStorageItemRemoved` (added in Node.js v24.16.0): `readonly attribute object domStorageItemRemoved` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `inspector.Network.domStorageItemRemoved` (added in Node.js v24.16.0): `readonly attribute object domStorageItemRemoved` (Node.js 24.22.2 documentation, inspector.md) -/
 @[macro_inline] def inspector.Network.domStorageItemRemoved : IO Data := Internal.api "Lasm.JS.Node.inspector.Network.domStorageItemRemoved" do
   Support.getExport "node:inspector" ["Network", "domStorageItemRemoved"] Data
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.Network.domStorageItemUpdated` (added in Node.js v24.16.0): `readonly attribute object domStorageItemUpdated` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `inspector.Network.domStorageItemUpdated` (added in Node.js v24.16.0): `readonly attribute object domStorageItemUpdated` (Node.js 24.22.2 documentation, inspector.md) -/
 @[macro_inline] def inspector.Network.domStorageItemUpdated : IO Data := Internal.api "Lasm.JS.Node.inspector.Network.domStorageItemUpdated" do
   Support.getExport "node:inspector" ["Network", "domStorageItemUpdated"] Data
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.Network.domStorageItemsCleared` (added in Node.js v24.16.0): `readonly attribute object domStorageItemsCleared` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `inspector.Network.domStorageItemsCleared` (added in Node.js v24.16.0): `readonly attribute object domStorageItemsCleared` (Node.js 24.22.2 documentation, inspector.md) -/
 @[macro_inline] def inspector.Network.domStorageItemsCleared : IO Data := Internal.api "Lasm.JS.Node.inspector.Network.domStorageItemsCleared" do
   Support.getExport "node:inspector" ["Network", "domStorageItemsCleared"] Data
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.Network.registerStorage` (added in Node.js v24.16.0): `readonly attribute object registerStorage` (Node.js 24.22.2 documentation, inspector.md) -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `inspector.Network.registerStorage` (added in Node.js v24.16.0): `readonly attribute object registerStorage` (Node.js 24.22.2 documentation, inspector.md) -/
 @[macro_inline] def inspector.Network.registerStorage : IO Data := Internal.api "Lasm.JS.Node.inspector.Network.registerStorage" do
   Support.getExport "node:inspector" ["Network", "registerStorage"] Data
 
@@ -163,29 +163,5 @@ def inspector.Session.InspectorNotificationListener.ofSyncFn (f : Data → IO Un
 /-- **Experimental** in the Node.js 24.22.2 docs. `inspector.NetworkResources.put` (added in Node.js v24.5.0): `readonly attribute any put` (Node.js 24.22.2 documentation, inspector.md) -/
 @[macro_inline] def inspector.NetworkResources.put : IO Data := Internal.api "Lasm.JS.Node.inspector.NetworkResources.put" do
   Support.getExport "node:inspector" ["NetworkResources", "put"] Data
-
-/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.NetworkResources.domStorageItemAdded` (added in Node.js v24.16.0): `readonly attribute object domStorageItemAdded` (Node.js 24.22.2 documentation, inspector.md) -/
-@[macro_inline] def inspector.NetworkResources.domStorageItemAdded : IO Data := Internal.api "Lasm.JS.Node.inspector.NetworkResources.domStorageItemAdded" do
-  Support.getExport "node:inspector" ["NetworkResources", "domStorageItemAdded"] Data
-
-/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.NetworkResources.domStorageItemRemoved` (added in Node.js v24.16.0): `readonly attribute object domStorageItemRemoved` (Node.js 24.22.2 documentation, inspector.md) -/
-@[macro_inline] def inspector.NetworkResources.domStorageItemRemoved : IO Data := Internal.api "Lasm.JS.Node.inspector.NetworkResources.domStorageItemRemoved" do
-  Support.getExport "node:inspector" ["NetworkResources", "domStorageItemRemoved"] Data
-
-/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.NetworkResources.domStorageItemUpdated` (added in Node.js v24.16.0): `readonly attribute object domStorageItemUpdated` (Node.js 24.22.2 documentation, inspector.md) -/
-@[macro_inline] def inspector.NetworkResources.domStorageItemUpdated : IO Data := Internal.api "Lasm.JS.Node.inspector.NetworkResources.domStorageItemUpdated" do
-  Support.getExport "node:inspector" ["NetworkResources", "domStorageItemUpdated"] Data
-
-/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.NetworkResources.domStorageItemsCleared` (added in Node.js v24.16.0): `readonly attribute object domStorageItemsCleared` (Node.js 24.22.2 documentation, inspector.md) -/
-@[macro_inline] def inspector.NetworkResources.domStorageItemsCleared : IO Data := Internal.api "Lasm.JS.Node.inspector.NetworkResources.domStorageItemsCleared" do
-  Support.getExport "node:inspector" ["NetworkResources", "domStorageItemsCleared"] Data
-
-/-- **Experimental** in the Node.js 24.22.2 docs. `inspector.NetworkResources.registerStorage` (added in Node.js v24.16.0): `readonly attribute object registerStorage` (Node.js 24.22.2 documentation, inspector.md) -/
-@[macro_inline] def inspector.NetworkResources.registerStorage : IO Data := Internal.api "Lasm.JS.Node.inspector.NetworkResources.registerStorage" do
-  Support.getExport "node:inspector" ["NetworkResources", "registerStorage"] Data
-
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `inspector.NetworkResources.params` (added in Node.js v25.5.0): `readonly attribute object params` (Node.js 24.22.2 documentation, inspector.md) -/
-@[macro_inline] def inspector.NetworkResources.params : IO Data := Internal.api "Lasm.JS.Node.inspector.NetworkResources.params" do
-  Support.getExport "node:inspector" ["NetworkResources", "params"] Data
 
 end Lasm.JS.Node

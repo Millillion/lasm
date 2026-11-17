@@ -63,10 +63,6 @@ structure url.PathToFileURLOptions where
   windows : Option Bool := none
 instance instToJSUrlPathToFileURLOptions : ToJS url.PathToFileURLOptions := ⟨fun d => Internal.fields #[("windows", Internal.optional d.windows)]⟩
 
-/-- `v instanceof UrlObject`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `UrlObject`). -/
-@[macro_inline] def url.UrlObject.cast? (v : Value) : IO (Option url.UrlObject) := Internal.api "Lasm.JS.Node.url.UrlObject.cast?" do
-  Internal.cast (Support.getExport "node:url" ["UrlObject"] Value) (fun x => { val := x }) v
-
 /-- **Legacy** in the Node.js 24.22.2 docs. `urlObject.auth`: `readonly attribute any auth` -/
 @[macro_inline] def url.UrlObject.auth (self : url.UrlObject) : IO Data := Internal.api "Lasm.JS.Node.url.UrlObject.auth" do
   self.val.get "auth" Data

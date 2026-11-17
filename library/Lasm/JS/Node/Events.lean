@@ -131,10 +131,6 @@ instance instToJSEventsOnOptions : ToJS events.OnOptions := ⟨fun d => Internal
     ("highWaterMark", Internal.optional d.highWaterMark),
     ("lowWaterMark", Internal.optional d.lowWaterMark)]⟩
 
-/-- `v instanceof NodeEventTarget`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `NodeEventTarget`). -/
-@[macro_inline] def NodeEventTarget.cast? (v : Value) : IO (Option NodeEventTarget) := Internal.api "Lasm.JS.Node.NodeEventTarget.cast?" do
-  Internal.cast (Support.getExport "node:events" ["NodeEventTarget"] Value) (fun x => { val := x }) v
-
 /-- `nodeEventTarget.addListener(type, listener)` (added in Node.js v14.5.0): `EventTarget addListener(DOMString type, Function listener)` -/
 @[macro_inline] def NodeEventTarget.addListener (self : NodeEventTarget) (type : String) (listener : JSFunction) : IO EventTarget := Internal.api "Lasm.JS.Node.NodeEventTarget.addListener" do
   let r ← self.val.callMethod "addListener" (Internal.args #[toJS type, toJS listener]) Value

@@ -175,6 +175,9 @@ def extOf (name : String) : String :=
 
 @[js "globalThis" "JSON.parse"] opaque jsonParse : String → IO Data
 @[js "globalThis" "Reflect.has"] opaque reflectHas : Value → String → IO Bool
+/-- `Reflect.has`, false for a value that is not an object (Bun gives some of Node's exports as primitives or undefined,
+where Reflect.has throws). -/
+def probeHas (v : Value) (k : String) : IO Bool := try reflectHas v k catch _ => pure false
 
 def str : Data → String
   | .string s => s
@@ -792,20 +795,20 @@ def availability (r : Checks) : Async Unit := do
       let mut ok := true
       for part in (exportPath.map (·.splitOn ".")).getD [] do
         if ok then
-          if ← reflectHas target part then target ← target.get part Value
+          if ← probeHas target part then target ← target.get part Value
           else ok := false
       unless ok do missing := missing.push s!"{module} {exportPath.getD ""}"
       if ok then
         for n in names "namespace" do
-          unless ← reflectHas target n do missing := missing.push s!"{module} {match exportPath with | some e => e ++ "." | none => ""}{n}"
+          unless ← probeHas target n do missing := missing.push s!"{module} {match exportPath with | some e => e ++ "." | none => ""}{n}"
     | some m, .string p =>
-      if ← reflectHas m p then
+      if ← probeHas m p then
         let c ← m.get p Value
         for n in names "static" do
-          unless ← reflectHas c n do missing := missing.push s!"{module} {p}.{n}"
+          unless ← probeHas c n do missing := missing.push s!"{module} {p}.{n}"
         let proto ← c.get "prototype" Value
         for n in names "prototype" do
-          unless ← reflectHas proto n do missing := missing.push s!"{module} {p}.prototype.{n}"
+          unless ← probeHas proto n do missing := missing.push s!"{module} {p}.prototype.{n}"
       else missing := missing.push s!"{module} {p}"
     | some _, _ => pure ()  -- no export (FileHandle): its members are exercised above
   r.modify fun s => { s with lines := (s.lines ++ missing.map (s!"missing {·}")).push s!"availability: {missing.size} generated members missing" }

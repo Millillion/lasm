@@ -996,10 +996,6 @@ structure TestContext.WaitForOptions where
 instance instToJSTestContextWaitForOptions : ToJS TestContext.WaitForOptions := ⟨fun d => Internal.fields #[("interval", Internal.optional d.interval),
     ("timeout", Internal.optional d.timeout)]⟩
 
-/-- `v instanceof MockFunctionContext`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MockFunctionContext`). -/
-@[macro_inline] def MockFunctionContext.cast? (v : Value) : IO (Option MockFunctionContext) := Internal.api "Lasm.JS.Node.MockFunctionContext.cast?" do
-  Internal.cast (Support.getExport "node:test" ["MockFunctionContext"] Value) (fun x => { val := x }) v
-
 /-- `ctx.calls` (added in Node.js v19.1.0, v18.13.0): `readonly attribute sequence<any> calls` -/
 @[macro_inline] def MockFunctionContext.calls (self : MockFunctionContext) : IO (Array Data) := Internal.api "Lasm.JS.Node.MockFunctionContext.calls" do
   self.val.get "calls" (Array Data)
@@ -1024,17 +1020,9 @@ instance instToJSTestContextWaitForOptions : ToJS TestContext.WaitForOptions := 
 @[macro_inline] def MockFunctionContext.restore (self : MockFunctionContext) : IO Unit := Internal.api "Lasm.JS.Node.MockFunctionContext.restore" do
   self.val.callMethod "restore" (Internal.args #[]) Unit
 
-/-- `v instanceof MockModuleContext`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MockModuleContext`). -/
-@[macro_inline] def MockModuleContext.cast? (v : Value) : IO (Option MockModuleContext) := Internal.api "Lasm.JS.Node.MockModuleContext.cast?" do
-  Internal.cast (Support.getExport "node:test" ["MockModuleContext"] Value) (fun x => { val := x }) v
-
 /-- **Experimental** in the Node.js 24.22.2 docs. `ctx.restore()` (added in Node.js v22.3.0, v20.18.0): `undefined restore()` -/
 @[macro_inline] def MockModuleContext.restore (self : MockModuleContext) : IO Unit := Internal.api "Lasm.JS.Node.MockModuleContext.restore" do
   self.val.callMethod "restore" (Internal.args #[]) Unit
-
-/-- `v instanceof MockPropertyContext`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MockPropertyContext`). -/
-@[macro_inline] def MockPropertyContext.cast? (v : Value) : IO (Option MockPropertyContext) := Internal.api "Lasm.JS.Node.MockPropertyContext.cast?" do
-  Internal.cast (Support.getExport "node:test" ["MockPropertyContext"] Value) (fun x => { val := x }) v
 
 /-- `ctx.accesses`: `readonly attribute sequence<any> accesses` -/
 @[macro_inline] def MockPropertyContext.accesses (self : MockPropertyContext) : IO (Array Data) := Internal.api "Lasm.JS.Node.MockPropertyContext.accesses" do
@@ -1059,10 +1047,6 @@ instance instToJSTestContextWaitForOptions : ToJS TestContext.WaitForOptions := 
 /-- `ctx.restore()`: `undefined restore()` -/
 @[macro_inline] def MockPropertyContext.restore (self : MockPropertyContext) : IO Unit := Internal.api "Lasm.JS.Node.MockPropertyContext.restore" do
   self.val.callMethod "restore" (Internal.args #[]) Unit
-
-/-- `v instanceof MockTracker`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MockTracker`). -/
-@[macro_inline] def MockTracker.cast? (v : Value) : IO (Option MockTracker) := Internal.api "Lasm.JS.Node.MockTracker.cast?" do
-  Internal.cast (Support.getExport "node:test" ["MockTracker"] Value) (fun x => { val := x }) v
 
 /-- `mock.fn([original[, implementation]][, options])` (added in Node.js v19.1.0, v18.13.0): `object fn(optional Function original, optional Function implementation, optional MockTracker.FnOptions options)` -/
 @[macro_inline] def MockTracker.fn (self : MockTracker) (original : Option JSFunction := none) (implementation : Option JSFunction := none) (options : Option MockTracker.FnOptions := none) : IO Data := Internal.api "Lasm.JS.Node.MockTracker.fn" do
@@ -1097,10 +1081,6 @@ instance instToJSTestContextWaitForOptions : ToJS TestContext.WaitForOptions := 
 @[macro_inline] def MockTracker.setter (self : MockTracker) (object : Data) (methodName : Data) (implementation : Data := .undefined) (options : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.MockTracker.setter" do
   self.val.callMethod "setter" (Internal.args #[toJS object, toJS methodName, implementation, options]) Unit
 
-/-- `v instanceof MockTimers`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MockTimers`). -/
-@[macro_inline] def MockTimers.cast? (v : Value) : IO (Option MockTimers) := Internal.api "Lasm.JS.Node.MockTimers.cast?" do
-  Internal.cast (Support.getExport "node:test" ["MockTimers"] Value) (fun x => { val := x }) v
-
 /-- `timers.enable([enableOptions])` (added in Node.js v20.4.0, v18.19.0): `undefined enable(optional any enableOptions)` -/
 @[macro_inline] def MockTimers.enable (self : MockTimers) (enableOptions : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.MockTimers.enable" do
   self.val.callMethod "enable" (Internal.args #[enableOptions]) Unit
@@ -1120,10 +1100,6 @@ instance instToJSTestContextWaitForOptions : ToJS TestContext.WaitForOptions := 
 /-- `timers.setTime(milliseconds)` (added in Node.js v21.2.0, v20.11.0): `undefined setTime(any milliseconds)` -/
 @[macro_inline] def MockTimers.setTime (self : MockTimers) (milliseconds : Data) : IO Unit := Internal.api "Lasm.JS.Node.MockTimers.setTime" do
   self.val.callMethod "setTime" (Internal.args #[toJS milliseconds]) Unit
-
-/-- `v instanceof TestsStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TestsStream`). -/
-@[macro_inline] def TestsStream.cast? (v : Value) : IO (Option TestsStream) := Internal.api "Lasm.JS.Node.TestsStream.cast?" do
-  Internal.cast (Support.getExport "node:test" ["TestsStream"] Value) (fun x => { val := x }) v
 
 /-- `Event: 'test:coverage'`: `TestsStream onTestCoverage(TestsStream.TestCoverageListener listener)`: calls `on("test:coverage", listener)` -/
 @[macro_inline] def TestsStream.onTestCoverage (self : TestsStream) (listener : TestsStream.TestCoverageListener) : IO TestsStream := Internal.api "Lasm.JS.Node.TestsStream.onTestCoverage" do
@@ -1285,10 +1261,6 @@ instance instToJSTestContextWaitForOptions : ToJS TestContext.WaitForOptions := 
   let r ← self.val.callMethod "once" (Internal.args #[toJS "test:watch:restarted", toJS listener]) Value
   pure { val := r }
 
-/-- `v instanceof TestContext`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TestContext`). -/
-@[macro_inline] def TestContext.cast? (v : Value) : IO (Option TestContext) := Internal.api "Lasm.JS.Node.TestContext.cast?" do
-  Internal.cast (Support.getExport "node:test" ["TestContext"] Value) (fun x => { val := x }) v
-
 /-- `context.assert` (added in Node.js v22.2.0, v20.15.0): `readonly attribute any assert` -/
 @[macro_inline] def TestContext.assert (self : TestContext) : IO Data := Internal.api "Lasm.JS.Node.TestContext.assert" do
   self.val.get "assert" Data
@@ -1377,10 +1349,6 @@ instance instToJSTestContextWaitForOptions : ToJS TestContext.WaitForOptions := 
 /-- `context.waitFor(condition[, options])` (added in Node.js v23.7.0, v22.14.0): `Promise<any> waitFor(Function condition, optional TestContext.WaitForOptions options)` -/
 @[macro_inline] def TestContext.waitFor (self : TestContext) (condition : JSFunction) (options : Option TestContext.WaitForOptions := none) : Async Data := Internal.api "Lasm.JS.Node.TestContext.waitFor" do
   self.val.callMethodAwait "waitFor" (Internal.args #[toJS condition, Internal.optional options]) Data
-
-/-- `v instanceof SuiteContext`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SuiteContext`). -/
-@[macro_inline] def SuiteContext.cast? (v : Value) : IO (Option SuiteContext) := Internal.api "Lasm.JS.Node.SuiteContext.cast?" do
-  Internal.cast (Support.getExport "node:test" ["SuiteContext"] Value) (fun x => { val := x }) v
 
 /-- `context.filePath` (added in Node.js v22.6.0): `readonly attribute any filePath` -/
 @[macro_inline] def SuiteContext.filePath (self : SuiteContext) : IO Data := Internal.api "Lasm.JS.Node.SuiteContext.filePath" do

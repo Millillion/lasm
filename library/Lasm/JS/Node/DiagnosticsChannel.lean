@@ -140,7 +140,7 @@ instance : Coe BoundedChannel DOMStringOrBoundedChannel := ⟨.boundedChannel⟩
 @[macro_inline] def Channel.cast? (v : Value) : IO (Option Channel) := Internal.api "Lasm.JS.Node.Channel.cast?" do
   Internal.cast (Support.getExport "node:diagnostics_channel" ["Channel"] Value) (fun x => { val := x }) v
 
-/-- `channel.hasSubscribers` (added in Node.js v15.1.0, v14.17.0): `readonly attribute boolean hasSubscribers` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). `channel.hasSubscribers` (added in Node.js v15.1.0, v14.17.0): `readonly attribute boolean hasSubscribers` -/
 @[macro_inline] def Channel.hasSubscribers (self : Channel) : IO Bool := Internal.api "Lasm.JS.Node.Channel.hasSubscribers" do
   self.val.get "hasSubscribers" Bool
 
@@ -173,11 +173,7 @@ instance : Coe BoundedChannel DOMStringOrBoundedChannel := ⟨.boundedChannel⟩
   let r ← self.val.callMethod "withStoreScope" (Internal.args #[toJS data]) Value
   pure { val := r }
 
-/-- `v instanceof TracingChannel`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TracingChannel`). -/
-@[macro_inline] def TracingChannel.cast? (v : Value) : IO (Option TracingChannel) := Internal.api "Lasm.JS.Node.TracingChannel.cast?" do
-  Internal.cast (Support.getExport "node:diagnostics_channel" ["TracingChannel"] Value) (fun x => { val := x }) v
-
-/-- **Experimental** in the Node.js 24.22.2 docs. `tracingChannel.hasSubscribers` (added in Node.js v22.0.0, v20.13.0): `readonly attribute boolean hasSubscribers` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `tracingChannel.hasSubscribers` (added in Node.js v22.0.0, v20.13.0): `readonly attribute boolean hasSubscribers` -/
 @[macro_inline] def TracingChannel.hasSubscribers (self : TracingChannel) : IO Bool := Internal.api "Lasm.JS.Node.TracingChannel.hasSubscribers" do
   self.val.get "hasSubscribers" Bool
 

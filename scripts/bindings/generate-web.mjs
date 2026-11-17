@@ -989,7 +989,8 @@ const nodeSignature = m => {
   const stability = extValue(extAttr(m, 'LasmStability'));
   const mark = stability === undefined ? '' : `**${{ 0: 'Deprecated', 1: 'Experimental', 3: 'Legacy' }[stability[0]] ?? 'Stability ' + stability}** in the Node.js ${nodeVersionOf(m)} docs. `;
   const since = extValue(extAttr(m, 'LasmSince'));
-  return sig ? `${since ? `**Node.js ${since.split('.')[0]} and later** (documented from Node.js ${since}, not in ${nodeTier.version}). ` : ''}${mark}\`${sig}\`${added ? ` (added in Node.js ${added})` : ''}: ` : '';
+  const removed = extValue(extAttr(m, 'LasmRemovedIn'));
+  return sig ? `${since ? `**Node.js ${since.split('.')[0]} and later** (documented from Node.js ${since}, not in ${nodeTier.version}). ` : ''}${removed ? `**Not documented in Node.js ${removed}** (removed or changed there). ` : ''}${mark}\`${sig}\`${added ? ` (added in Node.js ${added})` : ''}: ` : '';
 };
 const specOf = spec => spec === 'synthetic' ? 'written for Lasm (docs/JS_BINDINGS.md)' : specTitles[spec];
 
@@ -1756,6 +1757,8 @@ const nodeMayLack = { node24: [], node: [] };
 for (const m of plan.filter(m => m.ns === NODE_NS)) {
   const note = (d, x, probe) => {
     if (extAttr(x, 'LasmSince') || extAttr(d, 'LasmSince')) nodeMayLack.node24.push(probe);
+    // Documented by the Node 24 docs, no longer by the Node 26 docs (removed in 26).
+    if (extAttr(x, 'LasmRemovedIn') || extAttr(d, 'LasmRemovedIn')) nodeMayLack.node.push(probe);
     if (/^1/.test(extValue(extAttr(x, 'LasmStability')) ?? extValue(extAttr(d, 'LasmStability')) ?? '')) { nodeMayLack.node.push(probe); nodeMayLack.node24.push(probe); }
   };
   for (const n of m.namespaces) {
@@ -1768,9 +1771,18 @@ for (const m of plan.filter(m => m.ns === NODE_NS)) {
     const d = def(i), p = extValue(extAttr(d, 'LasmPath'));
     if (!p) continue;
     if (extAttr(d, 'LasmSince')) nodeMayLack.node24.push(`${jsModuleOf(i)} ${p}`);
+    if (extAttr(d, 'LasmRemovedIn')) nodeMayLack.node.push(`${jsModuleOf(i)} ${p}`);
+    if (/^1/.test(extValue(extAttr(d, 'LasmStability')) ?? '')) { nodeMayLack.node.push(`${jsModuleOf(i)} ${p}`); nodeMayLack.node24.push(`${jsModuleOf(i)} ${p}`); }
     for (const x of membersOf(i)) if (!extAttr(x, 'LasmEvent')) note(d, x, `${jsModuleOf(i)} ${p}.${x.special === 'static' ? '' : x.type === 'operation' ? 'prototype.' : ''}${memberName(x)}`);
   }
 }
+// A module the docs mark Experimental as a whole (node:stream/iter: behind a flag), and the members node-tier2.mjs
+// `conditional` lists (present only in some processes or on some objects), on both.
+for (const m of nodeModuleOrder) {
+  const mods = new Set(nodeDefs.filter(d => extValue(extAttr(d, 'LasmLeanModule')) === m.name).map(d => extValue(extAttr(d, 'LasmModule'))));
+  if (m.stability !== undefined && m.stability !== 2) for (const k of Object.keys(nodeMayLack)) nodeMayLack[k].push(...mods);
+}
+for (const probe of Object.keys(nodeTier.conditional)) for (const k of Object.keys(nodeMayLack)) nodeMayLack[k].push(probe);
 for (const k of Object.keys(nodeMayLack)) nodeMayLack[k] = [...new Set(nodeMayLack[k])].sort();
 files.set(join(root, 'scripts', 'bindings', 'node-surface.json'), JSON.stringify({ generatedBy: `scripts/bindings/generate-web.mjs (Node.js ${nodeTier.version} docs)`, mayLack: nodeMayLack, surface: nodeSurface }, null, 2) + '\n');
 files.set(join(root, 'test', 'fixtures', 'js-node', 'Surface.lean'), `/-

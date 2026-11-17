@@ -435,10 +435,6 @@ instance instToJSSqliteBackupOptions : ToJS sqlite.BackupOptions := ⟨fun d => 
 @[macro_inline] def StatementSync.setReadBigInts (self : StatementSync) (enabled : Bool) : IO Unit := Internal.api "Lasm.JS.Node.StatementSync.setReadBigInts" do
   self.val.callMethod "setReadBigInts" (Internal.args #[toJS enabled]) Unit
 
-/-- `v instanceof SQLTagStore`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SQLTagStore`). -/
-@[macro_inline] def SQLTagStore.cast? (v : Value) : IO (Option SQLTagStore) := Internal.api "Lasm.JS.Node.SQLTagStore.cast?" do
-  Internal.cast (Support.getExport "node:sqlite" ["SQLTagStore"] Value) (fun x => { val := x }) v
-
 /-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.size` (added in Node.js v24.9.0): `readonly attribute long long size` -/
 @[macro_inline] def SQLTagStore.size (self : SQLTagStore) : IO Int := Internal.api "Lasm.JS.Node.SQLTagStore.size" do
   self.val.get "size" Int

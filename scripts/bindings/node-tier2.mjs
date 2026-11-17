@@ -133,6 +133,48 @@ export const classes = {
   Buffer: { kind: 'bytes' },
   // Not exported by node:fs/promises (made by fsPromises.open).
   FileHandle: { path: null },
+  // stream_iter's Broadcast is exported (Broadcast.from).
+  Broadcast: { path: 'Broadcast' },
+};
+
+/**
+ * Classes the docs document that their module does not export: handle types for objects Node makes and hands out
+ * (`fs.watch` returns an fs.FSWatcher, `crypto.createMac` a Mac, `setTimeout` a Timeout), or option objects the docs
+ * write as classes. They are generated without an export (no constructor or static calls through the module); the
+ * availability probe checks them on the objects the conformance program makes, not on the module.
+ * (docs/api/decisions/0.4.md 0.4-40.)
+ */
+export const notExported = {
+  AsyncHook: 'made by async_hooks.createHook', NodeEventTarget: 'Node\'s EventTarget subclass, not exported', InterfaceConstructor: 'the base of readline.Interface and readlinePromises.Interface, not exported',
+  'fs.FSWatcher': 'returned by fs.watch', 'fs.StatWatcher': 'returned by fs.watchFile', 'fs.StatFs': 'returned by fs.statfs', Mac: 'made by crypto.createMac',
+  Http2Session: 'made by http2.connect and a server\'s \'session\' event', ServerHttp2Session: 'a server\'s session', ClientHttp2Session: 'returned by http2.connect',
+  Http2Stream: 'a session\'s stream', ClientHttp2Stream: 'returned by clienthttp2session.request', ServerHttp2Stream: 'a server\'s \'stream\' event', Http2Server: 'returned by http2.createServer',
+  Http2SecureServer: 'returned by http2.createSecureServer', 'zlib.ZlibBase': 'the base of the zlib classes, not exported', Options: 'an options object (zlib)', BrotliOptions: 'an options object (zlib)',
+  ZstdOptions: 'an options object (zlib)', Immediate: 'returned by setImmediate', Timeout: 'returned by setTimeout and setInterval', RunScope: 'returned by asyncLocalStorage.withScope',
+  TracingChannel: 'made by diagnostics_channel.tracingChannel', PerformanceNodeEntry: 'an entry of performance.getEntries', PerformanceNodeTiming: 'performance.nodeTiming',
+  Histogram: 'the base of the histograms', ELDHistogram: 'returned by perf_hooks.monitorEventLoopDelay', RecordableHistogram: 'returned by perf_hooks.createHistogram',
+  SlidingWindowHistogram: 'a histogram Node makes', SyncCPUProfileHandle: 'returned by v8 profiling', CPUProfileHandle: 'returned by v8 profiling', HeapProfileHandle: 'returned by v8 profiling',
+  SyncHeapProfileHandle: 'returned by v8 profiling', SQLTagStore: 'returned by database.createTagStore', MockFunctionContext: 'a mock\'s context', MockModuleContext: 'returned by mock.module',
+  MockPropertyContext: 'returned by mock.property', MockTracker: 'the test context\'s mock', MockTimers: 'mock.timers', TestsStream: 'returned by run', TestContext: 'passed to a test function',
+  SuiteContext: 'passed to a suite function',
+};
+for (const [name, why] of Object.entries(notExported)) classes[name] = { ...(classes[name] ?? {}), path: null, why };
+
+/**
+ * Members that Node defines only in some processes or on some objects: generated (real API), and expected to be
+ * missing where the condition does not hold (the availability probe accepts them; docs/api/decisions/0.4.md 0.4-41).
+ * Keyed by the probe's name (`<module> <path>`).
+ */
+export const conditional = {
+  'node:process disconnect': 'only in a process started with an IPC channel', 'node:process send': 'only in a process started with an IPC channel',
+  'node:process channel': 'only in a process started with an IPC channel', 'node:process connected': 'only in a process started with an IPC channel',
+  'node:child_process ChildProcess.prototype.disconnect': 'set on a ChildProcess that has an IPC channel, not on the prototype',
+  'node:child_process ChildProcess.prototype.send': 'set on a ChildProcess that has an IPC channel, not on the prototype',
+  'node:cluster worker': 'only in a cluster worker', 'node:process permission': 'only with --permission',
+  'node:process noDeprecation': 'only with --no-deprecation', 'node:process throwDeprecation': 'only with --throw-deprecation',
+  'node:process traceDeprecation': 'only with --trace-deprecation', 'node:process traceProcessWarnings': 'only with --trace-warnings',
+  'node:process mainModule': 'only in a CommonJS entry point (Deprecated)',
+  'node:crypto KeyObject.prototype.export': 'defined on the KeyObject subclasses Node returns (secret, public and private keys), not on KeyObject.prototype',
 };
 
 /**
@@ -142,6 +184,14 @@ export const classes = {
  * (`fs.read(fd, buffer, offset, length, position, callback)`).
  */
 export const exclude = {
+  // Implementer hooks: a subclass defines them and Node calls them; Node never provides them (docs/api/decisions/0.4.md 0.4-42).
+  'writable._construct': 'implemented by subclasses (called by Node), not provided by Node',
+  'writable._final': 'implemented by subclasses (called by Node), not provided by Node',
+  'readable._construct': 'implemented by subclasses (called by Node), not provided by Node',
+  'transform._flush': 'implemented by subclasses (called by Node), not provided by Node',
+  'serializer._writeHostObject': 'implemented by subclasses (called by Node), not provided by Node',
+  'serializer._getSharedArrayBufferId': 'implemented by subclasses (called by Node), not provided by Node',
+  'deserializer._readHostObject': 'implemented by subclasses (called by Node), not provided by Node',
 };
 
 /**
@@ -162,6 +212,16 @@ export const typeNames = {
   'zlib options': 'object', 'brotli options': 'object', 'zstd options': 'object', 'tls.SecureContext': 'object',
   'vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER': 'any', 'vm.constants.DONT_CONTEXTIFY': 'any', 'crypto.constants': 'object',
   'os.constants.dlopen': 'object', ModuleRequest: 'object', require: 'Function',
+};
+
+/**
+ * Properties the docs' JSON lists bare under another object's section, because it loses their heading
+ * (`process.features.cached_builtins` is written `cached_builtins` beside `process.arch`): the namespace they belong
+ * to, with a sentence of each one's documentation that says so (the lowering fails without it).
+ */
+export const reparent = {
+  'process.features': { from: 'process', quote: /if the current Node\.js build|if Node\.js is run with --experimental-transform-types/,
+    names: ['cached_builtins', 'debug', 'inspector', 'ipv6', 'require_module', 'tls', 'tls_alpn', 'tls_ocsp', 'tls_sni', 'typescript', 'uv'] },
 };
 
 /**

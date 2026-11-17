@@ -423,9 +423,9 @@ instance instToJSUtilStyleTextOptions : ToJS util.StyleTextOptions := ⟨fun d =
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Node.util.aborted", module := "node:util", path := "aborted", construct := false, arity := 2 }
     (Internal.args #[toJS signal, toJS resource])
 
-/-- **Deprecated** in the Node.js 24.22.2 docs. `util._extend(target, source)` (added in Node.js v0.7.5): `undefined extend(object target, object source)` (Node.js 24.22.2 documentation, util.md) -/
-@[macro_inline] def util.extend (target : Data) (source : Data) : IO Unit := Internal.api "Lasm.JS.Node.util.extend" do
-  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.util.extend", module := "node:util", path := "extend", construct := false, arity := 2 }
+/-- **Deprecated** in the Node.js 24.22.2 docs. `util._extend(target, source)` (added in Node.js v0.7.5): `undefined _extend(object target, object source)` (Node.js 24.22.2 documentation, util.md) -/
+@[macro_inline] def util._extend (target : Data) (source : Data) : IO Unit := Internal.api "Lasm.JS.Node.util._extend" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.util._extend", module := "node:util", path := "_extend", construct := false, arity := 2 }
     (Internal.args #[toJS target, toJS source]) (await := false)
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `util.isArray(object)` (added in Node.js v0.6.0): `boolean isArray(any object)` (Node.js 24.22.2 documentation, util.md) -/

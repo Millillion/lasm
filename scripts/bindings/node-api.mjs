@@ -145,6 +145,8 @@ function namedType(n, where) {
 const unknownTypes = new Set();
 const untypedHere = [];
 const excludedUsed = new Set();
+/** The notExported classes found in either version's docs. */
+const notExportedSeen = new Set();
 /** A type written in node-tier2.mjs (WebIDL with the docs' names) → WebIDL. */
 const proseType = text => text.replace(/\bbytes\b/g, 'Uint8Array').replace(/[A-Za-z_][\w]*(?:\.[A-Za-z_][\w]*)+|\b[A-Z][\w]*\b/g, n =>
   defined.has(n) ? defined.get(n) : n);
@@ -187,7 +189,7 @@ const idlKeywords = new Set(['any', 'async', 'attribute', 'bigint', 'boolean', '
   'double', 'enum', 'float', 'getter', 'includes', 'inherit', 'interface', 'iterable', 'long', 'maplike', 'mixin', 'namespace', 'object', 'octet',
   'optional', 'or', 'partial', 'readonly', 'record', 'required', 'sequence', 'setlike', 'setter', 'short', 'static', 'stringifier', 'symbol',
   'typedef', 'undefined', 'unrestricted', 'unsigned', 'true', 'false', 'null', 'Infinity', 'NaN']);
-const escapeName = n => ['constructor', 'toString', 'toJSON', 'prototype'].includes(n) ? n + '_' : idlKeywords.has(n) ? '_' + n : n;
+const escapeName = n => ['constructor', 'toString', 'toJSON', 'prototype'].includes(n) ? n + '_' : n.startsWith('_') ? 'lasm' + n : idlKeywords.has(n) ? '_' + n : n;
 const dicts = []; // IDL text
 /** The class being lowered (`{this}` is its type). */
 let currentSelf = null;
@@ -244,6 +246,13 @@ function lowerContainer(doc, all, mod, c, out) {
       let name, classStatic = false;
       if (k === 'properties') {
         name = /^`([^`]+)`/.exec(node.textRaw)?.[1] ?? (/^Type:/.test(node.textRaw) ? node.name : null); if (!name) continue;
+        const bare = !name.includes('.');
+        // A property documented under another property's heading (`cached_builtins` under `process.features`) belongs to
+        // that object (the namespace named after it), not to every namespace whose members share the section.
+        // A property the docs' JSON lists under the wrong object (node-tier2.mjs reparent).
+        const moved = bare && Object.entries(tier.reparent).find(([, r]) => r.names.includes(name) && dominantOwner(section) === r.from);
+        if (moved) { if (moved[0] !== c.name) continue; }
+        else if (bare && c.kind === 'namespace' && dominantOwner(section) !== c.name) continue;
         if (prefix && name.startsWith(prefix) && !name.slice(prefix.length).includes('.')) name = name.slice(prefix.length);
         // A static property documented beside the instance's (`Buffer.poolSize`).
         else if (c.path && name.startsWith(c.path + '.') && !name.slice(c.path.length + 1).includes('.')) { name = name.slice(c.path.length + 1); classStatic = true; }
@@ -376,7 +385,7 @@ function lowerContainer(doc, all, mod, c, out) {
       const prosy = !p?.returns && (!dt || dt === 'property');
       if (prosy) out.untyped.push(`${docName}: the property's type is prose only (any)`);
       const type = p?.returns ? proseType(p.returns) : prosy ? 'any' : lowerType(dt, { where: `${where} ${m.name}` });
-      lines.push(comment, `  [${[`LasmSignature="${docName}"`, addedOf(m.node), stab].filter(Boolean).join(', ')}] ${c.kind === 'namespace' ? '' : m.isStatic ? 'static ' : ''}readonly attribute ${type} ${escapeName(m.name)};`);
+      lines.push(comment, `  [${[m.name.startsWith('_') ? `LasmName="${m.name}"` : null, `LasmSignature="${docName}"`, addedOf(m.node), stab].filter(Boolean).join(', ')}] ${c.kind === 'namespace' ? '' : m.isStatic ? 'static ' : ''}readonly attribute ${type} ${escapeName(m.name)};`);
       continue;
     }
     const s = m.node.signatures?.[0];
@@ -448,10 +457,10 @@ function lowerContainer(doc, all, mod, c, out) {
         return `${x.optional ? 'optional ' : ''}${type} ${escapeName(x.name)}`;
       });
       // WebIDL reserves `toString` (and a few others) as identifiers: such a member is written `toString_`, named by LasmName.
-      const reserved = ['toString', 'constructor', 'toJSON', 'prototype'].includes(m.name);
+      const reserved = ['toString', 'constructor', 'toJSON', 'prototype'].includes(m.name) || m.name.startsWith('_');
       const attrs = [promisify ? 'LasmPromisify' : null, c.kind === 'bytes' && !m.isStatic ? 'LasmBytesThis' : null,
         reserved ? `LasmName="${m.name}"` : null, `LasmSignature="${signatureOf(m.node)}"`, addedOf(m.node), stab].filter(Boolean);
-      lines.push(comment, `  ${attrs.length ? `[${attrs.join(', ')}] ` : ''}${c.kind !== 'namespace' && m.isStatic ? 'static ' : ''}${ret} ${reserved ? m.name + '_' : escapeName(m.name)}(${args.join(', ')});`);
+      lines.push(comment, `  ${attrs.length ? `[${attrs.join(', ')}] ` : ''}${c.kind !== 'namespace' && m.isStatic ? 'static ' : ''}${ret} ${m.name.startsWith('_') ? 'lasm' + m.name : reserved ? m.name + '_' : escapeName(m.name)}(${args.join(', ')});`);
     }
     void lastRequired;
     } catch (error) {
@@ -462,7 +471,8 @@ function lowerContainer(doc, all, mod, c, out) {
   }
   const attrs = [`LasmModule="${c.jsModule}"`, c.path ? `LasmPath="${c.path}"` : null, `LasmLeanModule="${mod.name}"`, `LasmDoc="${doc}"`,
     c.name.includes('.') ? `LasmNamespace="${c.name.split('.')[0]}", LasmName="${c.name.split('.').slice(1).join('.')}"` : `LasmName="${c.name}"`,
-    c.kind === 'bytes' ? 'LasmNoHandle' : null].filter(Boolean);
+    c.kind === 'bytes' ? 'LasmNoHandle' : null,
+    classSec && stabilityOf(classSec.node, classSec.parents) !== 2 ? `LasmStability="${stabilityOf(classSec.node, classSec.parents)}"` : null].filter(Boolean);
   const head = c.kind === 'namespace' ? `namespace ${c.name.includes('.') ? idlName(c.name) : c.name}` : `interface ${idlName(c.name)}${c.extends ? ' : ' + idlName(c.extends) : ''}`;
   out.defs.push(`// ${c.heading ?? c.statics.heading} (${doc}.md), node:${c.jsModule.slice(5)}\n[${attrs.join(', ')}]\n${head} {\n${lines.join('\n')}\n};`);
 }
@@ -499,6 +509,23 @@ const ownerOf = textRaw => {
   return n.includes('.') ? n.slice(0, n.lastIndexOf('.')) : null;
 };
 const memberKinds = ['methods', 'classMethods', 'properties', 'ctors'];
+/** Whose members a section documents: a property's own name (`process.features`), else the most common owner of its
+ * members (`process` for the Process section, whose properties the docs write bare: `arch`). */
+function dominantOwner(section) {
+  if (['properties', 'methods', 'classMethods'].includes(section.kind)) return /^`([^`(]+)/.exec(section.node.textRaw ?? '')?.[1];
+  const counts = new Map();
+  for (const k of memberKinds) for (const n of section.node[k] ?? []) { const o = ownerOf(n.textRaw); if (o) counts.set(o, (counts.get(o) ?? 0) + 1); }
+  return [...counts].sort((x, y) => y[1] - x[1])[0]?.[0];
+}
+/** The export of its module a namespace is (`scheduler` of `timersPromises.scheduler`, `features` of
+ * `process.features`), or null for the module itself (`fs`, `fsPromises`, `trace_events` of node:trace_events). */
+function namespacePath(o, mod, jsModule) {
+  const first = o.split('.')[0], rest = o.split('.').slice(1).join('.');
+  const self = n => tier.jsModules.owners[n] || n === mod.doc || n === mod.doc.replace(/_/g, '') || n === jsModule.slice(5).replace(/\//g, '_') || n === jsModule.slice(5);
+  if (self(o)) return null;
+  if (self(first)) return rest || null;
+  return o;
+}
 /** Lean module names of the containers (`fs.Stats`, `Hash`), and which doc each class came from (for name clashes). */
 function autoContainers(mod, tree, out) {
   const all = sections(tree);
@@ -539,6 +566,23 @@ function autoContainers(mod, tree, out) {
       if (!owners.get(o).includes(s)) owners.get(o).push(s);
     }
   }
+  // An object documented as a property whose own members are listed under it (`process.features`): a namespace.
+  for (const s of all) if (s.kind === 'properties' && !inClass.has(s.node) && !s.parents.some(p => inClass.has(p))) {
+    const o = /^`([^`]+)`/.exec(s.node.textRaw ?? '')?.[1];
+    if (!o || !/^[a-z_][\w]*(\.[a-z_]\w*)+$/i.test(o)) continue;
+    if (!(s.node.properties ?? []).some(n => { const nm = /^`([^`]+)`/.exec(n.textRaw)?.[1] ?? (/^Type:/.test(n.textRaw) ? n.name : null); return nm && !nm.includes('.'); })) continue;
+    if (!owners.has(o)) owners.set(o, []);
+    if (!owners.get(o).includes(s)) owners.get(o).push(s);
+  }
+  for (const [target, r] of Object.entries(tier.reparent)) {
+    const secs = all.filter(sec => dominantOwner(sec) === r.from && (sec.node.properties ?? []).some(n => r.names.includes(/^`([^`]+)`/.exec(n.textRaw)?.[1])));
+    if (!secs.length) continue;
+    for (const sec of secs) for (const n of sec.node.properties) {
+      const nm = /^`([^`]+)`/.exec(n.textRaw)?.[1];
+      if (r.names.includes(nm) && !r.quote.test(plainText(n.desc))) fail(`${mod.doc}: ${nm} no longer says ${JSON.stringify(r.quote)} (node-tier2.mjs reparent)`);
+    }
+    owners.set(target, secs);
+  }
   for (const [o, secs] of owners) {
     // An instance's members documented outside its class section (`readable._read()` for implementers, `resolver.cancel()`).
     const cls = o !== mod.doc && containers.find(c => c.kind !== 'namespace' && c.prefix === o + '.');
@@ -547,7 +591,7 @@ function autoContainers(mod, tree, out) {
     const inst = tier.instances[`${mod.doc}:${o}`];
     if (inst === null) { out.unowned.push(`${mod.doc}: ${o} (${tier.instancesWhy[`${mod.doc}:${o}`]})`); continue; }
     if (inst) {
-      containers.push({ kind: 'class', sections: secs, heading: `${inst} (${mod.doc}.md)`, name: inst, jsModule, path: inst.split('.').at(-1), prefix: o + '.', extends: null });
+      containers.push({ kind: 'class', sections: secs, heading: `${inst} (${mod.doc}.md)`, name: inst, jsModule, path: tier.classes[inst] && 'path' in tier.classes[inst] ? tier.classes[inst].path : null, prefix: o + '.', extends: null });
       continue;
     }
     if (/^[A-Z]/.test(o) && !tier.jsModules.owners[o]) { out.unowned.push(`${mod.doc}: members of ${o}`); continue; }
@@ -555,9 +599,9 @@ function autoContainers(mod, tree, out) {
     if (webInterfaces.has(o) && webMembers.has(o)) { out.web.push(`${mod.doc}: ${o} (Lasm.JS.Web.${o})`); continue; }
     // Node's object of a web standard interface with Node's own additions (`performance`: Performance): the additions.
     const webOf = webInterfaces.has(capital(o)) ? capital(o) : null;
-    containers.push({ kind: 'namespace', sections: secs, heading: `${o} (${mod.doc}.md)`, name: o, jsModule: tier.jsModules.owners[o] ?? jsModule,
+    containers.push({ kind: 'namespace', sections: secs, heading: `${o} (${mod.doc}.md)`, name: o, jsModule: tier.jsModules.owners[o] ?? tier.jsModules.owners[o.split('.')[0]] ?? jsModule,
       webMembers: webOf ? webMembers.get(webOf) : null, webOf,
-      path: tier.jsModules.owners[o] || o === mod.doc || o === mod.doc.replace(/_/g, '') ? null : o.startsWith(mod.doc + '.') ? o.slice(mod.doc.length + 1) : o, prefix: o + '.' });
+      path: namespacePath(o, mod, jsModule), prefix: o + '.' });
   }
   // Statics of classes documented outside the class section (`Buffer.from`, `stream.Readable.from`).
   for (const c of containers.filter(c => c.kind !== 'namespace')) {
@@ -603,6 +647,7 @@ async function lower(version) {
     c.name = `${q(c)}.${c.name}`;
   }
   for (const p of plan) for (const c of p.containers) if (c.kind !== 'namespace') defined.set(c.name, idlName(c.name));
+  for (const k of Object.keys(tier.notExported)) if (plan.some(p => p.containers.some(c => c.name === k || c.name.endsWith('.' + k) && c.path === null))) notExportedSeen.add(k);
   // A class whose documented parent is not generated (a web class, or none of Node's): no parent.
   for (const p of plan) for (const c of p.containers) if (c.extends && !defined.has(c.extends)) {
     const mapped = tier.typeNames[c.extends];
@@ -675,8 +720,18 @@ function mergeNewer(baseIdl, newIdl, since) {
     }
     if (extra.length) old.b = old.b.replace(/\n\};$/, '\n' + extra.join('\n') + '\n};');
   }
+  // What the newer docs no longer document (a class, or a member by its documented signature): removed in that version.
+  const newer = new Map(blocksOf(newIdl.trimEnd()).filter(x => x.name).map(x => [x.name, x.b]));
+  for (const x of baseBlocks) {
+    if (!x.name || !/\n(?:interface|namespace) /.test(x.b)) continue;
+    const nb = newer.get(x.name);
+    if (!nb) { x.b = x.b.replace(/^((?:\/\/[^\n]*\n)*)\[/, `$1[LasmRemovedIn="${since}", `); continue; }
+    const sigs = new Set([...nb.matchAll(/LasmSignature="([^"]*)"/g)].map(m => m[1]));
+    x.b = x.b.split('\n').map(l => { const sig = /^  \[.*LasmSignature="([^"]*)"/.exec(l)?.[1]; return sig !== undefined && !sigs.has(sig) && !/LasmSince=/.test(l) ? l.replace(/^(\s*)\[/, `$1[LasmRemovedIn="${since}", `) : l; }).join('\n');
+  }
   return [...baseBlocks.map(x => x.b), ...added].join('\n\n') + '\n';
 }
+for (const [k, why] of Object.entries(tier.notExported)) if (!notExportedSeen.has(k)) fail(`node-tier2.mjs notExported ${k} (${why}) matches no documented class`);
 const merged = mergeNewer(base.idl, newer.idl, tier.compareVersion);
 const files = new Map([[idlFile, header(tier.version) + '\n' + merged]]);
 base.idl = merged;
@@ -717,7 +772,7 @@ base.idl = merged;
   tier.core.forEach(close);
   files.set(join(root, 'scripts', 'bindings', 'node-modules.json'), JSON.stringify({
     $comment: 'GENERATED by scripts/bindings/node-api.mjs: the Lasm.JS.Node modules in import order (each after the modules whose types it uses), with the modules each uses; do not edit.',
-    modules: ordered.map(m => ({ ...m, uses: tier.modules.map(x => x.name).filter(x => deps.get(m.name).has(x)), ...(coreClosure.has(m.name) ? { core: true } : {}) })) }, null, 1) + '\n');
+    modules: ordered.map(m => { const st = (base.report.trees[m.doc].modules ?? base.report.trees[m.doc].globals ?? [])[0]?.stability; return { ...m, uses: tier.modules.map(x => x.name).filter(x => deps.get(m.name).has(x)), ...(coreClosure.has(m.name) ? { core: true } : {}), ...(st !== undefined && st !== 2 ? { stability: st } : {}) }; }) }, null, 1) + '\n');
 }
 // What the lowering did not take as documented, for review: members not lowered (and why), types the docs name that
 // nothing defines (any), arguments given only in prose, web classes left to Lasm.JS.Web, parents dropped, name clashes.

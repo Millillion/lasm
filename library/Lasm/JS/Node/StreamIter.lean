@@ -114,7 +114,7 @@ instance : Coe BroadcastChannel ObjectOrBroadcastChannel := ⟨.broadcastChannel
 @[macro_inline] def Share.cast? (v : Value) : IO (Option Share) := Internal.api "Lasm.JS.Node.Share.cast?" do
   Internal.cast (Support.getExport "node:stream/iter" ["Share"] Value) (fun x => { val := x }) v
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `share.consumerCount`: `readonly attribute double consumerCount` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `share.consumerCount`: `readonly attribute double consumerCount` -/
 @[macro_inline] def Share.consumerCount (self : Share) : IO Float := Internal.api "Lasm.JS.Node.Share.consumerCount" do
   self.val.get "consumerCount" Float
 
@@ -136,11 +136,11 @@ instance : Coe BroadcastChannel ObjectOrBroadcastChannel := ⟨.broadcastChannel
 @[macro_inline] def SyncShare.cast? (v : Value) : IO (Option SyncShare) := Internal.api "Lasm.JS.Node.SyncShare.cast?" do
   Internal.cast (Support.getExport "node:stream/iter" ["SyncShare"] Value) (fun x => { val := x }) v
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `share.bufferSize`: `readonly attribute double bufferSize` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `share.bufferSize`: `readonly attribute double bufferSize` -/
 @[macro_inline] def SyncShare.bufferSize (self : SyncShare) : IO Float := Internal.api "Lasm.JS.Node.SyncShare.bufferSize" do
   self.val.get "bufferSize" Float
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `share.consumerCount`: `readonly attribute double consumerCount` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `share.consumerCount`: `readonly attribute double consumerCount` -/
 @[macro_inline] def SyncShare.consumerCount (self : SyncShare) : IO Float := Internal.api "Lasm.JS.Node.SyncShare.consumerCount" do
   self.val.get "consumerCount" Float
 
@@ -148,7 +148,7 @@ instance : Coe BroadcastChannel ObjectOrBroadcastChannel := ⟨.broadcastChannel
 @[macro_inline] def SyncShare.cancel (self : SyncShare) (reason : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.SyncShare.cancel" do
   self.val.callMethod "cancel" (Internal.args #[reason]) Unit
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `share.pull([...transforms][, options])`: `object pull((Function or object)... transforms, optional SyncShare.PullOptions options)` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `share.pull([...transforms][, options])`: `object pull((Function or object)... transforms, optional SyncShare.PullOptions options)` -/
 @[macro_inline] def SyncShare.pull (self : SyncShare) (transforms : Array JSFunctionOrObject := #[]) (options : Option SyncShare.PullOptions := none) : IO Data := Internal.api "Lasm.JS.Node.SyncShare.pull" do
   self.val.callMethod "pull" (Internal.argsWith #[Internal.optional options] (transforms.map toJS)) Data
 
@@ -162,11 +162,7 @@ instance : Coe BroadcastChannel ObjectOrBroadcastChannel := ⟨.broadcastChannel
     (Internal.args #[toJS input, options]) (await := false)
   pure { val := r }
 
-/-- `v instanceof Writer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Writer`). -/
-@[macro_inline] def Writer.cast? (v : Value) : IO (Option Writer) := Internal.api "Lasm.JS.Node.Writer.cast?" do
-  Internal.cast (Support.getExport "node:stream/iter" ["Writer"] Value) (fun x => { val := x }) v
-
-/-- **Experimental** in the Node.js 24.22.2 docs. `writer.canWrite`: `readonly attribute boolean? canWrite` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `writer.canWrite`: `readonly attribute boolean? canWrite` -/
 @[macro_inline] def Writer.canWrite (self : Writer) : IO (Option Bool) := Internal.api "Lasm.JS.Node.Writer.canWrite" do
   self.val.get "canWrite" (Option Bool)
 
@@ -178,7 +174,7 @@ instance : Coe BroadcastChannel ObjectOrBroadcastChannel := ⟨.broadcastChannel
 @[macro_inline] def Writer.endSync (self : Writer) : IO Float := Internal.api "Lasm.JS.Node.Writer.endSync" do
   self.val.callMethod "endSync" (Internal.args #[]) Float
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `writer.fail(reason)`: `undefined fail(any reason)` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `writer.fail(reason)`: `undefined fail(any reason)` -/
 @[macro_inline] def Writer.fail (self : Writer) (reason : Data) : IO Unit := Internal.api "Lasm.JS.Node.Writer.fail" do
   self.val.callMethod "fail" (Internal.args #[toJS reason]) Unit
 
@@ -202,7 +198,7 @@ instance : Coe BroadcastChannel ObjectOrBroadcastChannel := ⟨.broadcastChannel
 @[macro_inline] def Broadcast.cast? (v : Value) : IO (Option Broadcast) := Internal.api "Lasm.JS.Node.Broadcast.cast?" do
   Internal.cast (Support.getExport "node:stream/iter" ["Broadcast"] Value) (fun x => { val := x }) v
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `broadcast.consumerCount`: `readonly attribute double consumerCount` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `broadcast.consumerCount`: `readonly attribute double consumerCount` -/
 @[macro_inline] def Broadcast.consumerCount (self : Broadcast) : IO Float := Internal.api "Lasm.JS.Node.Broadcast.consumerCount" do
   self.val.get "consumerCount" Float
 

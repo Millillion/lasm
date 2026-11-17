@@ -241,7 +241,7 @@ instance : FromJS LongLongOrDOMString where
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Buffer.alloc", module := "node:buffer", path := "Buffer.alloc", construct := false, arity := 3 }
     (Internal.args #[toJS size, Internal.optional fill, Internal.optional encoding]) (await := false)
 
-/-- `Buffer.allocUnsafe(size)` (added in Node.js v5.10.0): `static Uint8Array allocUnsafe(long long size)` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). `Buffer.allocUnsafe(size)` (added in Node.js v5.10.0): `static Uint8Array allocUnsafe(long long size)` -/
 @[macro_inline] def Buffer.allocUnsafe (size : Int) : IO ByteArray := Internal.api "Lasm.JS.Node.Buffer.allocUnsafe" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Buffer.allocUnsafe", module := "node:buffer", path := "Buffer.allocUnsafe", construct := false, arity := 1 }
     (Internal.args #[toJS size]) (await := false)
@@ -251,7 +251,7 @@ instance : FromJS LongLongOrDOMString where
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Buffer.allocUnsafeWithAlignment", module := "node:buffer", path := "Buffer.allocUnsafe", construct := false, arity := 2 }
     (Internal.args #[toJS size, Internal.optional alignment]) (await := false)
 
-/-- `Buffer.allocUnsafeSlow(size)` (added in Node.js v5.12.0): `static Uint8Array allocUnsafeSlow(long long size)` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). `Buffer.allocUnsafeSlow(size)` (added in Node.js v5.12.0): `static Uint8Array allocUnsafeSlow(long long size)` -/
 @[macro_inline] def Buffer.allocUnsafeSlow (size : Int) : IO ByteArray := Internal.api "Lasm.JS.Node.Buffer.allocUnsafeSlow" do
   Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.Buffer.allocUnsafeSlow", module := "node:buffer", path := "Buffer.allocUnsafeSlow", construct := false, arity := 1 }
     (Internal.args #[toJS size]) (await := false)

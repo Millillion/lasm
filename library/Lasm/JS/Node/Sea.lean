@@ -18,29 +18,29 @@ set_option compiler.extract_closed false
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sea.getAsset(key[, encoding])` (added in Node.js v21.7.0, v20.12.0): `DOMString getAsset(any key, optional any encoding)` (Node.js 24.22.2 documentation, single-executable-applications.md) -/
 @[macro_inline] def sea.getAsset (key : Data) (encoding : Data := .undefined) : IO String := Internal.api "Lasm.JS.Node.sea.getAsset" do
-  Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.sea.getAsset", module := "node:sea", path := "sea.getAsset", construct := false, arity := 2 }
+  Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.sea.getAsset", module := "node:sea", path := "getAsset", construct := false, arity := 2 }
     (Internal.args #[toJS key, encoding]) (await := false)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sea.getAssetAsBlob(key[, options])` (added in Node.js v21.7.0, v20.12.0): `Blob getAssetAsBlob(any key, optional any options)` (Node.js 24.22.2 documentation, single-executable-applications.md) -/
 @[macro_inline] def sea.getAssetAsBlob (key : Data) (options : Data := .undefined) : IO Blob := Internal.api "Lasm.JS.Node.sea.getAssetAsBlob" do
-  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.sea.getAssetAsBlob", module := "node:sea", path := "sea.getAssetAsBlob", construct := false, arity := 2 }
+  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.sea.getAssetAsBlob", module := "node:sea", path := "getAssetAsBlob", construct := false, arity := 2 }
     (Internal.args #[toJS key, options]) (await := false)
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sea.getRawAsset(key)` (added in Node.js v21.7.0, v20.12.0): `ArrayBuffer getRawAsset(any key)` (Node.js 24.22.2 documentation, single-executable-applications.md) -/
 @[macro_inline] def sea.getRawAsset (key : Data) : IO ByteArray := Internal.api "Lasm.JS.Node.sea.getRawAsset" do
-  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.sea.getRawAsset", module := "node:sea", path := "sea.getRawAsset", construct := false, arity := 1 }
+  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.sea.getRawAsset", module := "node:sea", path := "getRawAsset", construct := false, arity := 1 }
     (Internal.args #[toJS key]) (await := false)
   Internal.arrayBufferBytes r
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sea.getAssetKeys()` (added in Node.js v24.8.0): `sequence<DOMString> getAssetKeys()` (Node.js 24.22.2 documentation, single-executable-applications.md) -/
 @[macro_inline] def sea.getAssetKeys : IO (Array String) := Internal.api "Lasm.JS.Node.sea.getAssetKeys" do
-  Lasm.JS.Binding.invoke (Array String) { name := "Lasm.JS.Node.sea.getAssetKeys", module := "node:sea", path := "sea.getAssetKeys", construct := false, arity := 0 }
+  Lasm.JS.Binding.invoke (Array String) { name := "Lasm.JS.Node.sea.getAssetKeys", module := "node:sea", path := "getAssetKeys", construct := false, arity := 0 }
     (Internal.args #[]) (await := false)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sea.isSea()` (added in Node.js v21.7.0, v20.12.0): `boolean isSea()` (Node.js 24.22.2 documentation, single-executable-applications.md) -/
 @[macro_inline] def sea.isSea : IO Bool := Internal.api "Lasm.JS.Node.sea.isSea" do
-  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.sea.isSea", module := "node:sea", path := "sea.isSea", construct := false, arity := 0 }
+  Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.sea.isSea", module := "node:sea", path := "isSea", construct := false, arity := 0 }
     (Internal.args #[]) (await := false)
 
 end Lasm.JS.Node

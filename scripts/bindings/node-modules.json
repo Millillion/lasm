@@ -6,7 +6,8 @@
    "doc": "async_hooks",
    "title": "async hooks",
    "uses": [],
-   "core": true
+   "core": true,
+   "stability": 1
   },
   {
    "name": "Events",
@@ -218,7 +219,8 @@
    "name": "Punycode",
    "doc": "punycode",
    "title": "Punycode",
-   "uses": []
+   "uses": [],
+   "stability": 0
   },
   {
    "name": "Timers",
@@ -275,7 +277,8 @@
    "title": "domains",
    "uses": [
     "Events"
-   ]
+   ],
+   "stability": 0
   },
   {
    "name": "PerfHooks",
@@ -287,7 +290,8 @@
    "name": "TraceEvents",
    "doc": "tracing",
    "title": "trace events",
-   "uses": []
+   "uses": [],
+   "stability": 1
   },
   {
    "name": "Inspector",
@@ -321,13 +325,15 @@
    "name": "Wasi",
    "doc": "wasi",
    "title": "WASI",
-   "uses": []
+   "uses": [],
+   "stability": 1
   },
   {
    "name": "Sqlite",
    "doc": "sqlite",
    "title": "SQLite",
-   "uses": []
+   "uses": [],
+   "stability": 1
   },
   {
    "name": "Test",
@@ -339,13 +345,15 @@
    "name": "Sea",
    "doc": "single-executable-applications",
    "title": "single executable applications",
-   "uses": []
+   "uses": [],
+   "stability": 1
   },
   {
    "name": "StreamIter",
    "doc": "stream_iter",
    "title": "iterable streams",
-   "uses": []
+   "uses": [],
+   "stability": 1
   }
  ]
 }

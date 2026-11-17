@@ -1015,10 +1015,6 @@ instance instToJSHttp2ConnectOptions : ToJS http2.ConnectOptions := ⟨fun d => 
     ("unknownProtocolTimeout", Internal.optional d.unknownProtocolTimeout),
     ("strictFieldWhitespaceValidation", Internal.optional d.strictFieldWhitespaceValidation)]⟩
 
-/-- `v instanceof Http2Session`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Http2Session`). -/
-@[macro_inline] def Http2Session.cast? (v : Value) : IO (Option Http2Session) := Internal.api "Lasm.JS.Node.Http2Session.cast?" do
-  Internal.cast (Support.getExport "node:http2" ["Http2Session"] Value) (fun x => { val := x }) v
-
 /-- `http2session.alpnProtocol` (added in Node.js v9.4.0): `readonly attribute DOMString? alpnProtocol` -/
 @[macro_inline] def Http2Session.alpnProtocol (self : Http2Session) : IO (Option String) := Internal.api "Lasm.JS.Node.Http2Session.alpnProtocol" do
   self.val.get "alpnProtocol" (Option String)
@@ -1207,10 +1203,6 @@ instance instToJSHttp2ConnectOptions : ToJS http2.ConnectOptions := ⟨fun d => 
 @[macro_inline] def Http2Session.unref (self : Http2Session) : IO Unit := Internal.api "Lasm.JS.Node.Http2Session.unref" do
   self.val.callMethod "unref" (Internal.args #[]) Unit
 
-/-- `v instanceof ServerHttp2Session`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ServerHttp2Session`). -/
-@[macro_inline] def ServerHttp2Session.cast? (v : Value) : IO (Option ServerHttp2Session) := Internal.api "Lasm.JS.Node.ServerHttp2Session.cast?" do
-  Internal.cast (Support.getExport "node:http2" ["ServerHttp2Session"] Value) (fun x => { val := x }) v
-
 /-- `serverhttp2session.altsvc(alt, originOrStream)` (added in Node.js v9.4.0): `undefined altsvc(DOMString alt, (double or DOMString or URL or object) originOrStream)` -/
 @[macro_inline] def ServerHttp2Session.altsvc (self : ServerHttp2Session) (alt : String) (originOrStream : DoubleOrDOMStringOrURLOrObject) : IO Unit := Internal.api "Lasm.JS.Node.ServerHttp2Session.altsvc" do
   self.val.callMethod "altsvc" (Internal.args #[toJS alt, toJS originOrStream]) Unit
@@ -1218,10 +1210,6 @@ instance instToJSHttp2ConnectOptions : ToJS http2.ConnectOptions := ⟨fun d => 
 /-- `serverhttp2session.origin(...origins)` (added in Node.js v10.12.0): `undefined origin((DOMString or URL or object)... origins)` -/
 @[macro_inline] def ServerHttp2Session.origin (self : ServerHttp2Session) (origins : Array DOMStringOrURLOrObject := #[]) : IO Unit := Internal.api "Lasm.JS.Node.ServerHttp2Session.origin" do
   self.val.callMethod "origin" (Internal.argsWith #[] (origins.map toJS)) Unit
-
-/-- `v instanceof ClientHttp2Session`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ClientHttp2Session`). -/
-@[macro_inline] def ClientHttp2Session.cast? (v : Value) : IO (Option ClientHttp2Session) := Internal.api "Lasm.JS.Node.ClientHttp2Session.cast?" do
-  Internal.cast (Support.getExport "node:http2" ["ClientHttp2Session"] Value) (fun x => { val := x }) v
 
 /-- `Event: 'altsvc'` (added in Node.js v9.4.0): `ClientHttp2Session onAltsvc(ClientHttp2Session.AltsvcListener listener)`: calls `on("altsvc", listener)` -/
 @[macro_inline] def ClientHttp2Session.onAltsvc (self : ClientHttp2Session) (listener : ClientHttp2Session.AltsvcListener) : IO ClientHttp2Session := Internal.api "Lasm.JS.Node.ClientHttp2Session.onAltsvc" do
@@ -1247,10 +1235,6 @@ instance instToJSHttp2ConnectOptions : ToJS http2.ConnectOptions := ⟨fun d => 
 @[macro_inline] def ClientHttp2Session.request (self : ClientHttp2Session) (headers : ObjectOrSequenceOfAny) (options : Option ClientHttp2Session.RequestOptions := none) : IO ClientHttp2Stream := Internal.api "Lasm.JS.Node.ClientHttp2Session.request" do
   let r ← self.val.callMethod "request" (Internal.args #[toJS headers, Internal.optional options]) Value
   pure { val := r }
-
-/-- `v instanceof Http2Stream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Http2Stream`). -/
-@[macro_inline] def Http2Stream.cast? (v : Value) : IO (Option Http2Stream) := Internal.api "Lasm.JS.Node.Http2Stream.cast?" do
-  Internal.cast (Support.getExport "node:http2" ["Http2Stream"] Value) (fun x => { val := x }) v
 
 /-- `http2stream.aborted` (added in Node.js v8.4.0): `readonly attribute boolean aborted` -/
 @[macro_inline] def Http2Stream.aborted (self : Http2Stream) : IO Bool := Internal.api "Lasm.JS.Node.Http2Stream.aborted" do
@@ -1401,10 +1385,6 @@ instance instToJSHttp2ConnectOptions : ToJS http2.ConnectOptions := ⟨fun d => 
 @[macro_inline] def Http2Stream.sendTrailers (self : Http2Stream) (headers : Data) : IO Unit := Internal.api "Lasm.JS.Node.Http2Stream.sendTrailers" do
   self.val.callMethod "sendTrailers" (Internal.args #[toJS headers]) Unit
 
-/-- `v instanceof ClientHttp2Stream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ClientHttp2Stream`). -/
-@[macro_inline] def ClientHttp2Stream.cast? (v : Value) : IO (Option ClientHttp2Stream) := Internal.api "Lasm.JS.Node.ClientHttp2Stream.cast?" do
-  Internal.cast (Support.getExport "node:http2" ["ClientHttp2Stream"] Value) (fun x => { val := x }) v
-
 /-- `Event: 'continue'` (added in Node.js v8.5.0): `ClientHttp2Stream onContinue(ClientHttp2Stream.ContinueListener listener)`: calls `on("continue", listener)` -/
 @[macro_inline] def ClientHttp2Stream.onContinue (self : ClientHttp2Stream) (listener : ClientHttp2Stream.ContinueListener) : IO ClientHttp2Stream := Internal.api "Lasm.JS.Node.ClientHttp2Stream.onContinue" do
   let r ← self.val.callMethod "on" (Internal.args #[toJS "continue", toJS listener]) Value
@@ -1445,10 +1425,6 @@ instance instToJSHttp2ConnectOptions : ToJS http2.ConnectOptions := ⟨fun d => 
   let r ← self.val.callMethod "once" (Internal.args #[toJS "response", toJS listener]) Value
   pure { val := r }
 
-/-- `v instanceof ServerHttp2Stream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ServerHttp2Stream`). -/
-@[macro_inline] def ServerHttp2Stream.cast? (v : Value) : IO (Option ServerHttp2Stream) := Internal.api "Lasm.JS.Node.ServerHttp2Stream.cast?" do
-  Internal.cast (Support.getExport "node:http2" ["ServerHttp2Stream"] Value) (fun x => { val := x }) v
-
 /-- `http2stream.headersSent` (added in Node.js v8.4.0): `readonly attribute boolean headersSent` -/
 @[macro_inline] def ServerHttp2Stream.headersSent (self : ServerHttp2Stream) : IO Bool := Internal.api "Lasm.JS.Node.ServerHttp2Stream.headersSent" do
   self.val.get "headersSent" Bool
@@ -1480,10 +1456,6 @@ instance instToJSHttp2ConnectOptions : ToJS http2.ConnectOptions := ⟨fun d => 
 /-- `http2stream.respondWithFile(path[, headers[, options]])` (added in Node.js v8.4.0): `undefined respondWithFile((DOMString or Uint8Array or URL) path, optional object headers, optional ServerHttp2Stream.RespondWithFileOptions options)` -/
 @[macro_inline] def ServerHttp2Stream.respondWithFile (self : ServerHttp2Stream) (path_ : DOMStringOrUint8ArrayOrURL) (headers : Data := .undefined) (options : Option ServerHttp2Stream.RespondWithFileOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.ServerHttp2Stream.respondWithFile" do
   self.val.callMethod "respondWithFile" (Internal.args #[toJS path_, headers, Internal.optional options]) Unit
-
-/-- `v instanceof Http2Server`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Http2Server`). -/
-@[macro_inline] def Http2Server.cast? (v : Value) : IO (Option Http2Server) := Internal.api "Lasm.JS.Node.Http2Server.cast?" do
-  Internal.cast (Support.getExport "node:http2" ["Http2Server"] Value) (fun x => { val := x }) v
 
 /-- `server.timeout` (added in Node.js v8.4.0): `readonly attribute double /* integer: Nat */ timeout` -/
 @[macro_inline] def Http2Server.timeout (self : Http2Server) : IO Nat := Internal.api "Lasm.JS.Node.Http2Server.timeout" do
@@ -1571,10 +1543,6 @@ instance instToJSHttp2ConnectOptions : ToJS http2.ConnectOptions := ⟨fun d => 
 /-- `server.updateSettings([settings])` (added in Node.js v15.1.0, v14.17.0): `undefined updateSettings(optional object settings)` -/
 @[macro_inline] def Http2Server.updateSettings (self : Http2Server) (settings : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Node.Http2Server.updateSettings" do
   self.val.callMethod "updateSettings" (Internal.args #[settings]) Unit
-
-/-- `v instanceof Http2SecureServer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Http2SecureServer`). -/
-@[macro_inline] def Http2SecureServer.cast? (v : Value) : IO (Option Http2SecureServer) := Internal.api "Lasm.JS.Node.Http2SecureServer.cast?" do
-  Internal.cast (Support.getExport "node:http2" ["Http2SecureServer"] Value) (fun x => { val := x }) v
 
 /-- `server.timeout` (added in Node.js v8.4.0): `readonly attribute double /* integer: Nat */ timeout` -/
 @[macro_inline] def Http2SecureServer.timeout (self : Http2SecureServer) : IO Nat := Internal.api "Lasm.JS.Node.Http2SecureServer.timeout" do

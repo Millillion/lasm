@@ -108,7 +108,7 @@ instance instFromJSAssertCallTracker : FromJS assert.CallTracker := ⟨fun | .re
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.assert.fail", module := "node:assert", path := "fail", construct := false, arity := 1 }
     (Internal.args #[message]) (await := false)
 
-/-- **Deprecated** in the Node.js 24.22.2 docs. `assert.fail(actual, expected[, message[, operator[, stackStartFn]]])` (added in Node.js v0.1.21): `undefined fail(any actual, any expected, optional any message, optional DOMString operator, optional Function stackStartFn)` (Node.js 24.22.2 documentation, assert.md) -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Deprecated** in the Node.js 24.22.2 docs. `assert.fail(actual, expected[, message[, operator[, stackStartFn]]])` (added in Node.js v0.1.21): `undefined fail(any actual, any expected, optional any message, optional DOMString operator, optional Function stackStartFn)` (Node.js 24.22.2 documentation, assert.md) -/
 @[macro_inline] def assert.failWithActual (actual : Data) (expected : Data) (message : Data := .undefined) (operator : Option String := none) (stackStartFn : Option JSFunction := none) : IO Unit := Internal.api "Lasm.JS.Node.assert.failWithActual" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.assert.failWithActual", module := "node:assert", path := "fail", construct := false, arity := 5 }
     (Internal.args #[toJS actual, toJS expected, message, Internal.optional operator, Internal.optional stackStartFn]) (await := false)
