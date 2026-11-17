@@ -126,3 +126,29 @@ test('the library sources a program links come from the prefix, with the glue, a
   assert.throws(() => librarySources(lean, [program]), { message: `This program imports Lasm's library (Lasm.JS, Lasm.Fetch, Lasm.UI), which needs Lean 4.35.0 or Lean's elaborator libraries (the extended tier); it is missing from ${prefix}`.replace('4.35.0 or Lean', '4.35.0 with Lean') });
 });
 
+
+test('importing src/lasm-library.mjs reads no file: the module list is computed on first use (mutation sandboxes have no library/)', async () => {
+  const { spawnSync } = await import('node:child_process');
+  // A fresh process whose fs reads are counted from the moment the module is imported.
+  const script = `
+    import fs from 'node:fs';
+    import { syncBuiltinESMExports } from 'node:module';
+    let reads = 0;
+    for (const name of ['readFileSync', 'readdirSync', 'existsSync', 'statSync', 'openSync']) {
+      const original = fs[name];
+      // Library files only: Node's module loader reads the modules' own sources through fs too.
+      fs[name] = (...args) => { if (/[\\\\/]library[\\\\/]/.test(String(args[0]))) reads++; return original(...args); };
+    }
+    // Named imports (import { readFileSync } from 'node:fs') see the counting functions too.
+    syncBuiltinESMExports();
+    const m = await import(${JSON.stringify(new URL('../src/lasm-library.mjs', import.meta.url).href)});
+    const atImport = reads;
+    const n = m.libraryModules.length;
+    console.log(JSON.stringify({ atImport, afterUse: reads, n, isArray: Array.isArray(m.libraryModules), spread: [...m.libraryModules].length, includes: m.libraryModules.includes('Lasm.JS') }));`;
+  const r = spawnSync(process.execPath, ['--input-type=module', '-e', script], { encoding: 'utf8' });
+  assert.equal(r.status, 0, r.stderr);
+  const { atImport, afterUse, n, isArray, spread, includes } = JSON.parse(r.stdout.trim().split('\n').at(-1));
+  assert.equal(atImport, 0, 'no file is read when the module is imported');
+  assert.ok(afterUse > 0, 'the list is read on first use');
+  assert.ok(n > 50 && isArray && spread === n && includes);
+});
