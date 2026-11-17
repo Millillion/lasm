@@ -1,6 +1,6 @@
 // Lean compiler output
 // Module: Lasm.JS.Node
-// Imports: public import Init public meta import Init public import Lasm.JS.Node.Events public import Lasm.JS.Node.Stream public import Lasm.JS.Node.Buffer public import Lasm.JS.Node.Path public import Lasm.JS.Node.Os public import Lasm.JS.Node.Process public import Lasm.JS.Node.Fs public import Lasm.JS.Node.Crypto public import Lasm.JS.Node.ChildProcess public import Lasm.JS.Node.Net public import Lasm.JS.Node.Http public import Lasm.JS.Node.Https
+// Imports: public import Init public meta import Init public import Lasm.JS.Node.AsyncHooks public import Lasm.JS.Node.Events public import Lasm.JS.Node.Stream public import Lasm.JS.Node.Buffer public import Lasm.JS.Node.Path public import Lasm.JS.Node.Os public import Lasm.JS.Node.Net public import Lasm.JS.Node.Process public import Lasm.JS.Node.Readline public import Lasm.JS.Node.Fs public import Lasm.JS.Node.Crypto public import Lasm.JS.Node.ChildProcess
 #include <lean/lean.h>
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wunused-parameter"
@@ -15,18 +15,18 @@ extern "C" {
 #endif
 lean_object* initialize_Init(uint8_t builtin);
 lean_object* initialize_Init(uint8_t builtin);
+lean_object* initialize_Lasm_JS_Node_AsyncHooks(uint8_t builtin);
 lean_object* initialize_Lasm_JS_Node_Events(uint8_t builtin);
 lean_object* initialize_Lasm_JS_Node_Stream(uint8_t builtin);
 lean_object* initialize_Lasm_JS_Node_Buffer(uint8_t builtin);
 lean_object* initialize_Lasm_JS_Node_Path(uint8_t builtin);
 lean_object* initialize_Lasm_JS_Node_Os(uint8_t builtin);
+lean_object* initialize_Lasm_JS_Node_Net(uint8_t builtin);
 lean_object* initialize_Lasm_JS_Node_Process(uint8_t builtin);
+lean_object* initialize_Lasm_JS_Node_Readline(uint8_t builtin);
 lean_object* initialize_Lasm_JS_Node_Fs(uint8_t builtin);
 lean_object* initialize_Lasm_JS_Node_Crypto(uint8_t builtin);
 lean_object* initialize_Lasm_JS_Node_ChildProcess(uint8_t builtin);
-lean_object* initialize_Lasm_JS_Node_Net(uint8_t builtin);
-lean_object* initialize_Lasm_JS_Node_Http(uint8_t builtin);
-lean_object* initialize_Lasm_JS_Node_Https(uint8_t builtin);
 void lean_initialize_runtime_module();
 static bool _G_initialized = false;
 LEAN_EXPORT lean_object* initialize_Lasm_JS_Node(uint8_t builtin) {
@@ -38,6 +38,9 @@ res = initialize_Init(builtin);
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
 res = initialize_Init(builtin);
+if (lean_io_result_is_error(res)) return res;
+lean_dec_ref(res);
+res = initialize_Lasm_JS_Node_AsyncHooks(builtin);
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
 res = initialize_Lasm_JS_Node_Events(builtin);
@@ -55,7 +58,13 @@ lean_dec_ref(res);
 res = initialize_Lasm_JS_Node_Os(builtin);
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
+res = initialize_Lasm_JS_Node_Net(builtin);
+if (lean_io_result_is_error(res)) return res;
+lean_dec_ref(res);
 res = initialize_Lasm_JS_Node_Process(builtin);
+if (lean_io_result_is_error(res)) return res;
+lean_dec_ref(res);
+res = initialize_Lasm_JS_Node_Readline(builtin);
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
 res = initialize_Lasm_JS_Node_Fs(builtin);
@@ -65,15 +74,6 @@ res = initialize_Lasm_JS_Node_Crypto(builtin);
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
 res = initialize_Lasm_JS_Node_ChildProcess(builtin);
-if (lean_io_result_is_error(res)) return res;
-lean_dec_ref(res);
-res = initialize_Lasm_JS_Node_Net(builtin);
-if (lean_io_result_is_error(res)) return res;
-lean_dec_ref(res);
-res = initialize_Lasm_JS_Node_Http(builtin);
-if (lean_io_result_is_error(res)) return res;
-lean_dec_ref(res);
-res = initialize_Lasm_JS_Node_Https(builtin);
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
 return lean_io_result_mk_ok(lean_box(0));

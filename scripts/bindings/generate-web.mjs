@@ -3,7 +3,7 @@
 //     the pinned @webref/idl (parsed by webidl2) as it is, one module per spec; web-rules.mjs holds only what the
 //     IDL cannot say. It also writes library/Lasm/JS/Web/availability.json (web-availability.mjs) for
 //     `lasm build --target`'s check;
-//   - Lasm.JS.Node (library/Lasm/JS/Node/*.lean, library/Lasm/JS/Node.lean): the
+//   - Lasm.JS.Node (library/Lasm/JS/Node/*.lean, no umbrella module): the
 //     Node.js modules of scripts/bindings/node-tier2.mjs, from Node's API docs
 //     lowered to WebIDL by scripts/bindings/node-api.mjs (scripts/bindings/node.idl);
 //   - Lasm.JS.Deno and Lasm.JS.Bun, from serve-api.mjs's lowering of their declarations.
@@ -298,7 +298,9 @@ const inModule = (key, f) => inTier(2, f, extModule(key));
 const inOwner = (key, f) => moduleOfType.has(key) ? inTier(2, f, extModule(moduleOfType.get(key))) : f();
 // Lasm.JS.Node's modules: its members are its node.idl definitions marked with its LasmLeanModule.
 const nodeDefs = [...defs.values()].filter(d => extAttr(d, 'LasmLeanModule') && !extAttr(d, 'LasmHost'));
-const nodeModules = nodeTier.modules.map(m => {
+// In node-api.mjs's import order (node-modules.json: each module after those whose types it uses).
+const nodeModuleOrder = JSON.parse(readFileSync(join(root, 'scripts', 'bindings', 'node-modules.json'), 'utf8')).modules;
+const nodeModules = nodeModuleOrder.map(m => {
   const mine = nodeDefs.filter(d => extValue(extAttr(d, 'LasmLeanModule')) === m.name);
   return { name: m.name, title: m.title, specs: `Node.js ${nodeTier.version} documentation, ${m.doc}.md`, tier: 2, ns: NODE_NS, key: `${NODE_NS}.${m.name}`,
     interfaces: mine.filter(d => d.type === 'interface').map(d => d.name), namespaces: mine.filter(d => d.type === 'namespace').map(d => d.name) };
@@ -980,9 +982,14 @@ const memberIdl = (m, owner) => {
   }
 };
 /** A Lasm.JS.Node member's documented signature (LasmSignature), quoted before its WebIDL. */
+const nodeVersionOf = m => extValue(extAttr(m, 'LasmSince')) ?? nodeTier.version;
 const nodeSignature = m => {
   const sig = extValue(extAttr(m, 'LasmSignature')), added = extValue(extAttr(m, 'LasmAdded'));
-  return sig ? `\`${sig}\`${added ? ` (added in Node.js ${added})` : ''}: ` : '';
+  // Node's stability index: 0 Deprecated, 1 Experimental, 3 Legacy (docs/JS_BINDINGS.md, "Stability").
+  const stability = extValue(extAttr(m, 'LasmStability'));
+  const mark = stability === undefined ? '' : `**${{ 0: 'Deprecated', 1: 'Experimental', 3: 'Legacy' }[stability[0]] ?? 'Stability ' + stability}** in the Node.js ${nodeVersionOf(m)} docs. `;
+  const since = extValue(extAttr(m, 'LasmSince'));
+  return sig ? `${since ? `**Node.js ${since.split('.')[0]} and later** (documented from Node.js ${since}, not in ${nodeTier.version}). ` : ''}${mark}\`${sig}\`${added ? ` (added in Node.js ${added})` : ''}: ` : '';
 };
 const specOf = spec => spec === 'synthetic' ? 'written for Lasm (docs/JS_BINDINGS.md)' : specTitles[spec];
 
@@ -1538,7 +1545,8 @@ for (const m of plan) inModule(m.key, () => {
       emitNamespaceOrGlobal(m.key, n, def(n).members.map(x => ({ ...x, name: memberName(x) })), path ? path.split('.') : [], extValue(extAttr(def(n), 'LasmLeanPrefix')) ?? '',
         extValue(extAttr(def(n), 'LasmModule')) ?? 'globalThis');
     }
-    else emitNamespaceOrGlobal(m.key, n, def(n).members.map(x => ({ ...x, name: memberName(x) })), [], `${leanTypeName(n)}.`, jsModule);
+    // A Node namespace that is an export of its module (`performance` of node:perf_hooks, `fs.realpath`): its LasmPath.
+    else emitNamespaceOrGlobal(m.key, n, def(n).members.map(x => ({ ...x, name: memberName(x) })), extValue(extAttr(def(n), 'LasmPath'))?.split('.') ?? [], `${leanTypeName(n)}.`, jsModule);
   }
   emitNamespaceOrGlobal(m.key, GLOBAL, m.globalMembers, [], '');
   for (const e of m.nsMembers) emitNamespaceOrGlobal(m.key, e.ns, e.members, [e.ns], `${e.ns}.`);
@@ -1666,14 +1674,7 @@ const webPlan = plan.filter(m => m.ns === NS);
 }
 files.set(join(outDir, 'modules.json'), JSON.stringify({
   generatedBy: `scripts/bindings/generate-web.mjs (@webref/idl ${webrefVersion})`, modules: webPlan.map(m => m.key) }, null, 2) + '\n');
-files.set(join(root, 'library', 'Lasm', 'JS', 'Node.lean'), [`/-
-${NODE_NS}: the server-essential Node.js modules (node:fs/promises, node:path, node:os,
-node:process, node:buffer, node:crypto, node:child_process, node:events, node:stream) as
-documented for Node.js ${nodeTier.version}, for Node and for what Bun and Deno implement of them.
-The same mapping as Lasm.JS.Web: classes are handle types, Promise results are \`Async\`,
-options objects dictionaries (docs/JS_BINDINGS.md, "Lasm.JS.Node").
-${nodeGeneratedBy}
--/`, ...order.filter(n => n.startsWith(NODE_NS + '.')).map(n => `import ${n}`), ''].join('\n'));
+// No umbrella module (docs/api/decisions/0.4.md 0.4-39): programs import each Lasm.JS.Node module they use.
 
 files.set(join(root, 'library', 'Lasm', 'JS', 'Cloudflare.lean'), [`/-
 Lasm.JS.Cloudflare: the runtime APIs of Cloudflare Workers as declared by ${hostSource(cloudflareTier.hosts[0])}: the
@@ -1737,7 +1738,7 @@ end Surface
 // (classes without an export, FileHandle, are probed on an instance by the test).
 const nodeSurface = [];
 for (const m of plan.filter(m => m.ns === NODE_NS)) {
-  for (const n of m.namespaces) nodeSurface.push({ lean: leanTypeName(n), module: jsModuleOf(n), path: '', leanModule: m.name,
+  for (const n of m.namespaces) nodeSurface.push({ lean: leanTypeName(n), module: jsModuleOf(n), path: '', ...(extAttr(def(n), 'LasmPath') ? { export: extValue(extAttr(def(n), 'LasmPath')) } : {}), leanModule: m.name,
     namespace: [...new Set(def(n).members.map(memberName))] });
   for (const i of m.ifaces) {
     const members = membersOf(i);
@@ -1749,7 +1750,29 @@ for (const m of plan.filter(m => m.ns === NODE_NS)) {
       instance: [...new Set(members.filter(x => x.special !== 'static' && x.type === 'attribute').map(memberName))] });
   }
 }
-files.set(join(root, 'scripts', 'bindings', 'node-surface.json'), JSON.stringify({ generatedBy: `scripts/bindings/generate-web.mjs (Node.js ${nodeTier.version} docs)`, surface: nodeSurface }, null, 2) + '\n');
+// What Node itself may lack, in the availability probe's words (`<module> <path>.<member>`): on Node 24, what only Node 26's
+// docs document (LasmSince); on either, Experimental members (stability 1, which can sit behind a flag).
+const nodeMayLack = { node24: [], node: [] };
+for (const m of plan.filter(m => m.ns === NODE_NS)) {
+  const note = (d, x, probe) => {
+    if (extAttr(x, 'LasmSince') || extAttr(d, 'LasmSince')) nodeMayLack.node24.push(probe);
+    if (/^1/.test(extValue(extAttr(x, 'LasmStability')) ?? extValue(extAttr(d, 'LasmStability')) ?? '')) { nodeMayLack.node.push(probe); nodeMayLack.node24.push(probe); }
+  };
+  for (const n of m.namespaces) {
+    const d = def(n);
+    if (extAttr(d, 'LasmSince')) nodeMayLack.node24.push(jsModuleOf(n));
+    const ex = extValue(extAttr(d, 'LasmPath'));
+    for (const x of d.members) note(d, x, `${jsModuleOf(n)} ${ex ? ex + '.' : ''}${memberName(x)}`);
+  }
+  for (const i of m.ifaces) {
+    const d = def(i), p = extValue(extAttr(d, 'LasmPath'));
+    if (!p) continue;
+    if (extAttr(d, 'LasmSince')) nodeMayLack.node24.push(`${jsModuleOf(i)} ${p}`);
+    for (const x of membersOf(i)) if (!extAttr(x, 'LasmEvent')) note(d, x, `${jsModuleOf(i)} ${p}.${x.special === 'static' ? '' : x.type === 'operation' ? 'prototype.' : ''}${memberName(x)}`);
+  }
+}
+for (const k of Object.keys(nodeMayLack)) nodeMayLack[k] = [...new Set(nodeMayLack[k])].sort();
+files.set(join(root, 'scripts', 'bindings', 'node-surface.json'), JSON.stringify({ generatedBy: `scripts/bindings/generate-web.mjs (Node.js ${nodeTier.version} docs)`, mayLack: nodeMayLack, surface: nodeSurface }, null, 2) + '\n');
 files.set(join(root, 'test', 'fixtures', 'js-node', 'Surface.lean'), `/-
 ${nodeGeneratedBy}
 The generated surface (scripts/bindings/node-surface.json), for the availability probe of Main.lean.

@@ -788,13 +788,24 @@ COST_PLACEHOLDER
 
 ## Standard bindings for Node: `Lasm.JS.Node`
 
-`import Lasm.JS.Node` gives typed bindings of Node's server-essential modules
-that the web APIs do not cover, as documented for **Node.js 24.22.2** (Node 24
-LTS, the oldest Node Lasm supports). Status: **current source, not yet
-released** (tier 2 of the standard bindings, first part).
+`Lasm.JS.Node` gives typed bindings of **every Node core module**, one Lean module each
+(`import Lasm.JS.Node.Fs`, `import Lasm.JS.Node.Http`), generated
+from Node's own documentation as it is (Jordan, 2026-11-16): the 45 documentation
+files of Node's modules at **Node.js 24.22.2** (Node 24 LTS, the oldest Node Lasm
+supports), plus what only the **Node.js 26.13.0** docs document, marked "Node.js 26
+and later". Web standard APIs that Node also provides (`URL`, `EventTarget`, `Blob`,
+`MessagePort`, `TextEncoder`, `crypto.subtle`, `performance.now`, …) are
+`Lasm.JS.Web`'s and are not generated again. Status: **current source, not yet
+released**.
 
 ```lean
-import Lasm.JS.Node
+import Lasm.JS.Node.Fs
+import Lasm.JS.Node.Path
+import Lasm.JS.Node.Os
+import Lasm.JS.Node.Crypto
+import Lasm.JS.Node.Buffer
+import Lasm.JS.Node.ChildProcess
+import Lasm.JS.Node.Zlib     -- outside the compiled core set: compiled on first import
 open Lasm.JS Lasm.JS.Web Lasm.JS.Node
 
 def run : Async Unit := do
@@ -803,6 +814,8 @@ def run : Async Unit := do
   match ← fsPromises.readFile file (some "utf8") with
   | .domString text => IO.println text                        -- hi
   | .uint8Array _ => pure ()
+  let gz ← zlib.gzipSync (.domString "hi")                     -- the synchronous forms are generated too
+  IO.println (← zlib.gunzip (.uint8Array gz)).size              -- and the callback forms as Async
   let key ← crypto.scrypt "password" "salt" 32
   IO.println (← Buffer.toString key (some "hex"))
   let out ← child_process.execFile "git" (some #["--version"])
@@ -812,49 +825,121 @@ def main : IO Unit := run.block
 ```
 
 Names are Node's own, as its docs write them: `fsPromises.readFile`,
-`path.join`, `os.cpus`, `process.cwd`, `crypto.createHash`,
-`child_process.spawn`, `buffer.isUtf8`, `Buffer.from`; classes are handle
-types (`FileHandle`, `fs.Stats`, `fs.Dirent`, `Hash`, `Hmac`, `ChildProcess`,
-`EventEmitter`, `stream.Readable`, `stream.Writable`), and options objects are
-structures (`fsPromises.ReadFileOptions`, `child_process.SpawnOptions`).
-Documented events are typed listeners: `server.onRequest`, `socket.onData`,
-`child.onceExit` ([Events](#events-typed-listeners)).
+`fs.readFileSync`, `path.join`, `os.cpus`, `process.cwd`, `crypto.createHash`,
+`child_process.spawn`, `zlib.gzip`, `dns.lookup`, `dnsPromises.resolve4`,
+`worker_threads.isMainThread`, `util.format`, `v8.getHeapStatistics`; classes are
+handle types (`FileHandle`, `fs.Stats`, `Hash`, `ChildProcess`, `EventEmitter`,
+`stream.Readable`, `net.Socket`, `http.Server`, `tls.TLSSocket`, `Http2Session`,
+`DatabaseSync`, `vm.Script`, `WASI`), and options objects are structures
+(`fsPromises.ReadFileOptions`, `child_process.SpawnOptions`). Documented events are
+typed listeners: `server.onRequest`, `socket.onData`, `child.onceExit`
+([Events](#events-typed-listeners)). A complete program:
+[examples/node-core](../examples/node-core).
 
 ### What is covered
 
-| Module | Members | Node module |
-| --- | --- | --- |
-| `Lasm.JS.Node.Fs` | every stable member of the promises API (`fsPromises.*`: `readFile`, `writeFile`, `appendFile`, `readdir`, `mkdir`, `mkdtemp`, `stat`, `lstat`, `rm`, `rename`, `copyFile`, `cp`, `symlink`, `readlink`, `realpath`, `open`, …), `FileHandle`, `fs.Stats`, `fs.Dirent` | `node:fs/promises`, `node:fs` |
-| `Lasm.JS.Node.Path` | every member of `path` | `node:path` |
-| `Lasm.JS.Node.Os` | every member of `os` | `node:os` |
-| `Lasm.JS.Node.Process` | `process.argv`, `env`, `exit`, `exitCode`, `cwd`, `chdir`, `platform`, `arch`, `pid`, `ppid`, `version`, `versions`, `execPath`, `execArgv`, `title`, `uptime`, `memoryUsage`, `kill` | `node:process` |
-| `Lasm.JS.Node.Buffer` | `Buffer.from` (string and encoding), `alloc`, `byteLength`, `compare`, `concat`, `isEncoding`, and as functions of bytes `Buffer.toString`, `equals`, `compare`; `buffer.isUtf8`, `isAscii`, `transcode`, `kMaxLength` | `node:buffer` |
-| `Lasm.JS.Node.Crypto` | `crypto.createHash`, `createHmac`, `hash`, `randomBytes`, `randomInt`, `randomUUID`, `timingSafeEqual`, `getHashes`, and `scrypt`, `pbkdf2`, `hkdf` as `Async` (through `util.promisify`); `Hash`, `Hmac` | `node:crypto` |
-| `Lasm.JS.Node.ChildProcess` | `child_process.spawn`, `child_process.execFile` (as `Async`, its documented promisified form: `{stdout, stderr}`), `ChildProcess` (`pid`, `exitCode`, `signalCode`, `killed`, `kill`, `stdin`, `stdout`, `stderr`) | `node:child_process` |
-| `Lasm.JS.Node.Events` | `EventEmitter` (`on`, `once`, `off`, `emit`, `listenerCount`, `eventNames`, `removeAllListeners`), `events.once` (`Async`) | `node:events` |
-| `Lasm.JS.Node.Stream` | `stream.Readable.toWeb`, `fromWeb`, `stream.Writable.toWeb`, `fromWeb`, `stream.Duplex.toWeb`, `fromWeb`: a child's `stdout` or a request body becomes a web `ReadableStream` (read with Lasm.JS.Web); `readable.pause`, `resume`, `isPaused`, `setEncoding`, `destroy`, `writable.write`, `end`, `destroy`; the streams' events (`'data'`, `'end'`, `'error'`, `'drain'`, `'finish'`, …) | `node:stream` |
-| `Lasm.JS.Node.Net` | every stable member of `net` (`net.createServer`, `connect` and `createConnection` in their options, path and port forms, `isIP`, the autoselection defaults), `net.Server` (`listen` with options, a path or a port; `address`, `close`, `getConnections` as `Async`, `ref`, `unref`, events `'connection'`, `'listening'`, `'close'`, `'error'`, `'drop'`), `net.Socket` (constructor, `connect`, `write`, `end`, `destroy`, `setEncoding`, `setKeepAlive`, `setNoDelay`, `setTimeout`, addresses and counters, twelve events), `net.BlockList`, `net.SocketAddress`, `net.BoundSocket` | `node:net` |
-| `Lasm.JS.Node.Http` | every stable member of `http` (`http.createServer`, `request` and `get` with options or a URL, `METHODS`, `STATUS_CODES`, `globalAgent`, `validateHeaderName`, …), `http.Server`, `http.IncomingMessage`, `http.ServerResponse`, `http.ClientRequest`, `http.OutgoingMessage`, `http.Agent`, with their stable events | `node:http` |
-| `Lasm.JS.Node.Https` | `https.createServer`, `request`, `get`, `globalAgent`, `https.Server` (with `http.Server`'s members and events), `https.Agent` | `node:https` |
+One Lean module per documentation file, each with everything that file documents.
 
-Not generated, with the reason (each listed in
-[`node-tier2.mjs`](../scripts/bindings/node-tier2.mjs)):
+**Imports.** A program imports each module it uses (`import Lasm.JS.Node.Fs`,
+`import Lasm.JS.Node.Http`); there is no umbrella module, as for every generated host
+(0.4-39). The core set ships compiled: `Events`, `Stream`, `Buffer`, `Path`, `Os`,
+`Process`, `Fs`, `Crypto`, `ChildProcess`, and the modules they use (`AsyncHooks`,
+`Net`, `Readline`). Every other module is compiled into Lasm's tool cache the first time
+a program imports it ([lazy library](HOW_LASM_WORKS.md)). Measured on 2026-11-16 (Linux x64, one
+core, `lean -c`, with the `@[macro_inline]` emitter of 0.3), the first import costs 0.3
+to 3.5 s per module: `Http2` 3.5 s, `Http` 2.6 s, `Test` 2.3 s, the others under 1.5 s;
+all 33 lazy modules together 26.1 s (16.3 MB of `.olean`, 3.5 MB of C). Later builds
+reuse the compiled modules. The compiled core set is 14 modules (with the hand-written
+`Support` and `Serve`): 17.4 s, 13.7 MB of `.olean` and 2.8 MB of C in `library/prebuilt`.
+[`node-modules.json`](../scripts/bindings/node-modules.json) lists them in import
+order and [`node-surface.json`](../scripts/bindings/node-surface.json) every
+generated class, namespace and member.
 
-- `net.Server`'s `listen(handle)` form (a libuv handle or file descriptor
-  object; the options, path and port forms are generated); `http.Server`'s and
-  `https.Server`'s own `listen()` entries, which the docs give as identical to
-  `net.Server`'s (inherited); `outgoingMessage.pipe()` (documented to throw);
-  the `[Symbol.asyncDispose]` methods (`await using`: `close`); `http`'s
-  `WebSocket` class (the global, `Lasm.JS.Web.WebSocket`); the `tls` module
-  (`https.createServer` takes TLS options as `Data`).
-- `fsPromises.glob`, `watch` and `opendir` (async iteration, as in Lasm.JS.Web),
-  `statfs`, `mkdtempDisposable` (explicit resource management); `FileHandle`'s
-  `createReadStream`, `createWriteStream` (Node stream classes: use
-  `readableWebStream`), `readLines`, `readv` and `writev` (in-place buffers).
-- `path.posix`, `path.win32` (the same functions again).
-- Members marked Experimental, Deprecated or Legacy in the docs
-  (`filehandle.pull`, `fsPromises.lchmod`, `buffer.atob`), and the callback and
-  synchronous forms of what has a promise form (`fs.readFile`, `fs.readFileSync`).
+| Lean module | Node module | Lean module | Node module |
+| --- | --- | --- | --- |
+| `Lasm.JS.Node.Assert` | `node:assert` | `Lasm.JS.Node.PerfHooks` | `node:perf_hooks` (Node's own: histograms, `monitorEventLoopDelay`, `performance.timerify`, …) |
+| `Lasm.JS.Node.AsyncHooks`, `.AsyncContext` | `node:async_hooks` | `Lasm.JS.Node.Process` | `node:process` |
+| `Lasm.JS.Node.Buffer` | `node:buffer` | `Lasm.JS.Node.Punycode` | `node:punycode` (Deprecated) |
+| `Lasm.JS.Node.ChildProcess` | `node:child_process` | `Lasm.JS.Node.Querystring` | `node:querystring` |
+| `Lasm.JS.Node.Cluster` | `node:cluster` | `Lasm.JS.Node.Readline` | `node:readline`, `node:readline/promises` |
+| `Lasm.JS.Node.Console` | `node:console` (the `Console` class) | `Lasm.JS.Node.Repl` | `node:repl` |
+| `Lasm.JS.Node.Crypto` | `node:crypto` | `Lasm.JS.Node.Sea` | `node:sea` |
+| `Lasm.JS.Node.Dgram` | `node:dgram` | `Lasm.JS.Node.Sqlite` | `node:sqlite` |
+| `Lasm.JS.Node.DiagnosticsChannel` | `node:diagnostics_channel` | `Lasm.JS.Node.Stream` | `node:stream` |
+| `Lasm.JS.Node.Dns` | `node:dns`, `node:dns/promises` | `Lasm.JS.Node.StreamIter` | `node:stream/iter` (Experimental) |
+| `Lasm.JS.Node.Domain` | `node:domain` (Deprecated) | `Lasm.JS.Node.StringDecoder` | `node:string_decoder` |
+| `Lasm.JS.Node.Events` | `node:events` | `Lasm.JS.Node.Test` | `node:test` |
+| `Lasm.JS.Node.Fs` | `node:fs`, `node:fs/promises` (the promises, callback and synchronous APIs) | `Lasm.JS.Node.Timers` | `node:timers/promises`, `Timeout`, `Immediate` |
+| `Lasm.JS.Node.Http` | `node:http` | `Lasm.JS.Node.Tls` | `node:tls` |
+| `Lasm.JS.Node.Http2` | `node:http2` | `Lasm.JS.Node.TraceEvents` | `node:trace_events` |
+| `Lasm.JS.Node.Https` | `node:https` | `Lasm.JS.Node.Tty` | `node:tty` |
+| `Lasm.JS.Node.Inspector` | `node:inspector` | `Lasm.JS.Node.Url` | `node:url` (the legacy API and Node's helpers: `fileURLToPath`, `pathToFileURL`, …) |
+| `Lasm.JS.Node.Module` | `node:module` | `Lasm.JS.Node.Util` | `node:util` |
+| `Lasm.JS.Node.Net` | `node:net` | `Lasm.JS.Node.V8` | `node:v8` |
+| `Lasm.JS.Node.Os` | `node:os` | `Lasm.JS.Node.Vm` | `node:vm` |
+| `Lasm.JS.Node.Path` | `node:path` | `Lasm.JS.Node.Wasi` | `node:wasi` |
+| `Lasm.JS.Node.WorkerThreads` | `node:worker_threads` | `Lasm.JS.Node.Zlib` | `node:zlib` |
+
+**How the containers are found.** Every `Class:` section of a documentation file is a
+class (`Class: fs.Stats` is `fs.Stats`), with the members its docs give it, wherever
+they are documented (`stream.Readable` for consumers and for implementers is one
+class). Every documented member owned by a module-level name is in that name's
+namespace (`fs.readFile` in `fs`, `fsPromises.open` in `fsPromises`, `dnsPromises.lookup`
+in `dnsPromises`); a namespace that is an export of its module is called through it
+(`performance.timerify` of `node:perf_hooks`, `fs.realpath.native`). An object the docs
+describe without a `Class:` heading (`tracing.enable()` of a `Tracing` object) is a class
+named in `node-tier2.mjs` `instances`. Two classes of the same name in different modules
+are named with their module (`cluster.Worker`, `worker_threads.Worker`).
+
+**Web standards are Lasm.JS.Web's.** A class whose name is a web standard interface
+of the pinned `@webref/idl` (`URL`, `URLSearchParams`, `URLPattern`, `EventTarget`,
+`Event`, `CustomEvent`, `Blob`, `File`, `WebSocket`, `MessageChannel`,
+`MessagePort`, `BroadcastChannel`, `Lock`, `LockManager`, `TextEncoder`,
+`TextDecoder`, `PerformanceEntry`, `PerformanceMark`, `PerformanceMeasure`,
+`PerformanceObserver`, `PerformanceObserverEntryList`, `PerformanceResourceTiming`),
+a web standard namespace (`console`), and the members of Node's objects that a web
+interface defines (`crypto.randomUUID`, `crypto.getRandomValues`, `crypto.subtle` of
+`Crypto`; `performance.now`, `mark`, `measure`, … of `Performance`) are not generated
+again: use `Lasm.JS.Web`'s. Node's own classes that share a web name are listed in
+`node-tier2.mjs` `notWeb` (`cluster.Worker`, `worker_threads.Worker`, `vm.Module`).
+Node classes that extend a web class (`NodeEventTarget`, `PerformanceNodeTiming`)
+are generated without that parent.
+
+**Stability.** Every member is generated whatever its stability in the docs; the doc
+comment of a member marked Deprecated (0), Experimental (1) or Legacy (3) says so
+(`**Experimental** in the Node.js 24.22.2 docs`). Experimental members can need a
+Node flag or be missing.
+
+**Node 24 and Node 26.** The bindings are the Node 24.22.2 docs; a member, class or
+namespace that only the Node 26.13.0 docs document is added, with `**Node.js 26 and
+later**` in its doc comment (`buffer.isLatin1`, `Buffer.stringLength`,
+`fs.openAsBlobSync`, …). Where the two document the same member differently, the
+bindings follow Node 24; [`node-api-26.json`](../scripts/bindings/node-api-26.json)
+lists every difference.
+
+**What the docs give only in prose.** A type the docs write only in prose (215
+members on 2026-11-16) is `any` (`Data` in Lean) unless `node-tier2.mjs` `prose`
+states it, quoting the sentence (the lowering fails if the sentence is gone); a type
+name that no generated class or web standard defines is `any` too.
+[`node-coverage.json`](../scripts/bindings/node-coverage.json) lists all of them,
+with the web classes left to Lasm.JS.Web, the parents dropped and the name clashes.
+
+**Not generated** (each with its reason, `node-coverage.json` `excluded` and
+`computedKeys`; docs/api/decisions/0.4.md 0.4-38):
+
+- `Buffer`'s instance properties (`buf.length`, `buf.buffer`, `buf.byteOffset`,
+  `buf.parent`, `buf.poolSize`) and the methods that write into the buffer in place
+  and do not return it (`buf.write`, `buf.writeUInt32BE` and the other `write…`
+  methods): a `Buffer` is a `ByteArray` in Lean, a copy, so the property describes a
+  view of memory Lean does not have and the write would be lost (`ByteArray.size`
+  is the length; `Buffer.fromWithString`, `Buffer.alloc`, `buf.fill` work).
+- Members with a computed key (`buf[index]`, `[Symbol.asyncDispose]()`,
+  `[Symbol.asyncIterator]()`): not named members (use `Value.get` with the key).
+- `inspector.Session`'s `'<inspector-protocol-method>'` event: a placeholder for every
+  protocol event (use `session.onInspectorNotification`).
+- `options.detached` and `options.stdio` of `child_process.md`: two of
+  `child_process.spawn`'s options, documented under their own headings; they are
+  members of `child_process.SpawnOptions`.
 
 ### How Node's docs become Lean
 
@@ -869,13 +954,19 @@ rules as Lasm.JS.Web ([above](#how-a-webidl-declaration-becomes-lean)):
 | `{string\|Buffer\|URL}` | `(DOMString or Uint8Array or URL)` | `DOMStringOrUint8ArrayOrURL`: `.domString "a.txt"`, `.uint8Array b`, `.url u`, or the value itself through Lasm.JS.Web's `Coe` instances (`fsPromises.readFile "a.txt"`) |
 | `{null}`, `{undefined}` in a type | nullable | `Option` |
 | `{Object}` with documented members (`options`) | `dictionary` | a structure, named after the method and parameter (`fsPromises.ReadFileOptions`) |
-| `{Object}` without them, and classes outside this cut (`KeyObject`, `Date`, `fs.ReadStream`) | `object` | `Data` |
+| `{Object}` without them, `{Date}`, `{Map}`, `{RegExp}` | `object` | `Data` |
+| a Node class (`{KeyObject}`, `{fs.ReadStream}`), named with or without its module (`{Socket}` for `net.Socket`) | the class | its handle type |
+| a web standard class (`{URL}`, `{Blob}`, `{MessagePort}`) | the web interface | `Lasm.JS.Web`'s type |
 | `{Function}` | `Function` | `JSFunction` (`ofFn`, `ofSyncFn`) |
 | a class (`Class: FileHandle`) | `interface` | a handle type; `Extends: EventEmitter` gives `structure ChildProcess extends EventEmitter` |
 | `Returns: {Promise} Fulfills with undefined upon success.` | `Promise<undefined>` | `Async Unit` |
 | `Fulfills with the {fs.Stats} object` | `Promise<fs.Stats>` | `Async fs.Stats` |
 | an optional trailing `callback` (`randomBytes(size[, callback])`) | left out | the synchronous form: `crypto.randomBytes 32 : IO ByteArray` |
 | a required trailing `callback(err, value)` (`scrypt(…, callback)`) | `Promise<value>` | `Async ByteArray`, called through `util.promisify` |
+| a required trailing callback with more values (`fs.read(fd, …, callback)`: `(err, bytesRead, buffer)`) or arguments the docs do not list | `Function` | a `JSFunction` argument, as documented (`Function.ofFn`) |
+| a type given only in prose, or a type name nothing defines (`{Tracing}` aside) | `any` | `Data` (listed in `node-coverage.json`) |
+| a member marked Deprecated, Experimental or Legacy | the member, `LasmStability` | generated, its doc comment says so |
+| a member only the Node 26 docs document | the member, `LasmSince="26.13.0"` | generated, its doc comment says **Node.js 26 and later** |
 | `[min, ]max` (an optional parameter before a required one) | two overloads | `crypto.randomInt max`, `crypto.randomIntWithMin min max` |
 | `buf.toString([encoding])` (a Buffer method) | an operation on bytes | `Buffer.toString (bytes) (encoding := none)`, called with the bytes as `this` |
 | a `Buffer` result | `Uint8Array` | `ByteArray` |
@@ -920,7 +1011,7 @@ and `signal` as `Option`s, since the docs say each is `null` in one case). The
 untyped `EventEmitter.on (name) (JSFunction)` stays for anything else.
 
 ```lean
-import Lasm.JS.Node
+import Lasm.JS.Node.Net
 open Lasm.JS Lasm.JS.Web Lasm.JS.Node
 
 def main : IO Unit := do
@@ -969,9 +1060,12 @@ which gives the bytes written where the docs give the string.
 - **Build time: about 4 to 9 seconds more** for a new project with warm tools:
   Node 13.0 → 16.8 s and 18.2 → 24.6 s, the edge runtime 8.8 → 13.9 s and
   12.9 → 21.7 s (two CI runs).
-- **Package size:** the compiled library (`library/prebuilt`) grows from 61.0
-  to 70.8 MB (7.0 MB of `.olean` files), 2.2 MB compressed. Nothing is
-  compiled on the user's machine.
+- **Package size:** `library/prebuilt` holds only the core set (13.7 MB of
+  `.olean` files and 2.8 MB of C, before compression); the other 33 modules ship
+  as Lean source and are compiled on first import (see [Imports](#what-is-covered-1)).
+  All of Lasm.JS.Node compiled is 30.0 MB of `.olean` and 6.3 MB of C with the
+  `@[macro_inline]` emitter, against 52.3 MB and 19.6 MB with the previous one
+  (2026-11-16).
 
 ### Pinned version and drift
 

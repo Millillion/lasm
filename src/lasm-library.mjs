@@ -58,11 +58,12 @@ export const libraryModules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', '
   // Lasm.JS.Web (docs/JS_BINDINGS.md, "Lasm.JS.Web"): the whole web platform, generated from the WebIDL of
   // @webref/idl by scripts/bindings/generate-web.mjs (webModules, in import order).
   'Lasm.JS.Web.Support', ...webModules,
-  // Lasm.JS.Node (docs/JS_BINDINGS.md, "Lasm.JS.Node"): Node's server-essential modules, generated from
-  // Node's API docs (scripts/bindings/node-api.mjs, generate-web.mjs).
-  'Lasm.JS.Node.Support', 'Lasm.JS.Node.Events', 'Lasm.JS.Node.Stream', 'Lasm.JS.Node.Buffer', 'Lasm.JS.Node.Path',
-  'Lasm.JS.Node.Os', 'Lasm.JS.Node.Process', 'Lasm.JS.Node.Fs', 'Lasm.JS.Node.Crypto', 'Lasm.JS.Node.ChildProcess', 'Lasm.JS.Node.Net',
-  'Lasm.JS.Node.Http', 'Lasm.JS.Node.Https', 'Lasm.JS.Node',
+  // Lasm.JS.Node (docs/JS_BINDINGS.md, "Lasm.JS.Node"): Node's core set, compiled (scripts/bindings/node-modules.json
+  // `core`, in import order). Every other Lasm.JS.Node.* module ships as source and is compiled on first import
+  // (src/lazy-library.mjs). No umbrella module: programs import each module they use (0.4-39).
+  'Lasm.JS.Node.Support', 'Lasm.JS.Node.AsyncHooks', 'Lasm.JS.Node.Events', 'Lasm.JS.Node.Stream',
+  'Lasm.JS.Node.Buffer', 'Lasm.JS.Node.Path', 'Lasm.JS.Node.Os', 'Lasm.JS.Node.Net', 'Lasm.JS.Node.Process',
+  'Lasm.JS.Node.Readline', 'Lasm.JS.Node.Fs', 'Lasm.JS.Node.Crypto', 'Lasm.JS.Node.ChildProcess',
   // Node.serve (docs/JS_BINDINGS.md, "Serving HTTP on Node: Node.serve"): provided by Lasm, hand-written, not generated.
   'Lasm.JS.Node.Serve',
   // Lasm.JS.Deno and Lasm.JS.Bun (docs/JS_BINDINGS.md, "Standard bindings for Deno" and "...for Bun") have no prebuilt core

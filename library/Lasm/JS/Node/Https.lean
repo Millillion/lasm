@@ -58,15 +58,15 @@ instance : Coe URL ObjectOrDOMStringOrURL := ⟨.url⟩
 
 /-- `dictionary https.RequestOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure https.RequestOptions where
-  /-- `undefined protocol = "https:"` -/
-  protocol : Option Unit := none
-  /-- `undefined port = 443` -/
-  port : Option Unit := none
-  /-- `undefined agent` -/
-  agent : Option Unit := none
-instance instToJSHttpsRequestOptions : ToJS https.RequestOptions := ⟨fun d => Internal.fields #[("protocol", Internal.optional d.protocol),
-    ("port", Internal.optional d.port),
-    ("agent", Internal.optional d.agent)]⟩
+  /-- `any protocol = "https:"` -/
+  protocol : Data := .undefined
+  /-- `any port = 443` -/
+  port : Data := .undefined
+  /-- `any agent` -/
+  agent : Data := .undefined
+instance instToJSHttpsRequestOptions : ToJS https.RequestOptions := ⟨fun d => Internal.fields #[("protocol", d.protocol),
+    ("port", d.port),
+    ("agent", d.agent)]⟩
 
 /-- `(https.RequestOptions or DOMString or URL)`: one constructor per member type. -/
 inductive https.RequestOptionsOrDOMStringOrURL where
@@ -130,6 +130,10 @@ instance instCoeURLHttpsRequestOptionsOrDOMStringOrURL : Coe URL https.RequestOp
 @[macro_inline] def https.Server.closeIdleConnections (self : https.Server) : IO Unit := Internal.api "Lasm.JS.Node.https.Server.closeIdleConnections" do
   self.val.callMethod "closeIdleConnections" (Internal.args #[]) Unit
 
+/-- `server.listen()`: `undefined listen()` -/
+@[macro_inline] def https.Server.listen (self : https.Server) : IO Unit := Internal.api "Lasm.JS.Node.https.Server.listen" do
+  self.val.callMethod "listen" (Internal.args #[]) Unit
+
 /-- `server.setTimeout([msecs][, callback])` (added in Node.js v0.11.2): `https.Server setTimeout(optional double msecs)` -/
 @[macro_inline] def https.Server.setTimeout (self : https.Server) (msecs : Option Float := none) : IO https.Server := Internal.api "Lasm.JS.Node.https.Server.setTimeout" do
   let r ← self.val.callMethod "setTimeout" (Internal.args #[Internal.optional msecs]) Value
@@ -153,9 +157,9 @@ instance instCoeURLHttpsRequestOptionsOrDOMStringOrURL : Coe URL https.RequestOp
   pure { val := r }
 
 /-- `https.get(url[, options][, callback])` (added in Node.js v0.3.6): `http.ClientRequest get((DOMString or URL) url, optional (object or DOMString or URL) options)` (Node.js 24.22.2 documentation, https.md) -/
-@[macro_inline] def https.getWithUrl (url : DOMStringOrURL) (options : Option ObjectOrDOMStringOrURL := none) : IO http.ClientRequest := Internal.api "Lasm.JS.Node.https.getWithUrl" do
+@[macro_inline] def https.getWithUrl (url_ : DOMStringOrURL) (options : Option ObjectOrDOMStringOrURL := none) : IO http.ClientRequest := Internal.api "Lasm.JS.Node.https.getWithUrl" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.https.getWithUrl", module := "node:https", path := "get", construct := false, arity := 2 }
-    (Internal.args #[toJS url, Internal.optional options]) (await := false)
+    (Internal.args #[toJS url_, Internal.optional options]) (await := false)
   pure { val := r }
 
 /-- `https.request(options[, callback])` (added in Node.js v0.3.6): `http.ClientRequest request((https.RequestOptions or DOMString or URL) options)` (Node.js 24.22.2 documentation, https.md) -/
@@ -165,9 +169,9 @@ instance instCoeURLHttpsRequestOptionsOrDOMStringOrURL : Coe URL https.RequestOp
   pure { val := r }
 
 /-- `https.request(url[, options][, callback])` (added in Node.js v0.3.6): `http.ClientRequest request((DOMString or URL) url, optional (https.RequestOptions or DOMString or URL) options)` (Node.js 24.22.2 documentation, https.md) -/
-@[macro_inline] def https.requestWithUrl (url : DOMStringOrURL) (options : Option https.RequestOptionsOrDOMStringOrURL := none) : IO http.ClientRequest := Internal.api "Lasm.JS.Node.https.requestWithUrl" do
+@[macro_inline] def https.requestWithUrl (url_ : DOMStringOrURL) (options : Option https.RequestOptionsOrDOMStringOrURL := none) : IO http.ClientRequest := Internal.api "Lasm.JS.Node.https.requestWithUrl" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.https.requestWithUrl", module := "node:https", path := "request", construct := false, arity := 2 }
-    (Internal.args #[toJS url, Internal.optional options]) (await := false)
+    (Internal.args #[toJS url_, Internal.optional options]) (await := false)
   pure { val := r }
 
 end Lasm.JS.Node

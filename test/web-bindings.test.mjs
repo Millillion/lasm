@@ -6,7 +6,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import * as nodeTier from '../scripts/bindings/node-tier2.mjs';
 import * as serveTier from '../scripts/bindings/serve-tier2.mjs';
@@ -41,17 +41,18 @@ test('Lasm.JS.Web is every spec of @webref/idl: each spec with an interface has 
   assert.ok(!libraryModules.includes('Lasm.JS.Web'));
 });
 
-test('every Lasm.JS.Node container is generated in its module, with the members node-tier2.mjs names', () => {
+test('every Lasm.JS.Node module is generated, with what its documentation file documents, minus the recorded exclusions', () => {
   const { surface } = JSON.parse(readFileSync(new URL('../scripts/bindings/node-surface.json', import.meta.url), 'utf8'));
-  for (const m of nodeTier.modules) for (const c of m.containers) {
-    const entry = surface.find(e => e.lean === c.name);
-    assert.ok(entry, `${c.name} is missing from the generated surface`);
-    assert.equal(entry.leanModule, m.name);
-    assert.equal(entry.module, c.jsModule);
-    const members = [...entry.namespace ?? [], ...entry.static ?? [], ...entry.prototype ?? [], ...entry.instance ?? []];
-    for (const o of c.only ?? []) assert.ok(members.includes(o.replace(/\(.*$/, '')), `${c.name}.${o} is not generated`);
-    for (const e of Object.keys(c.exclude ?? {})) assert.ok(!members.includes(e), `${c.name}.${e} is excluded but generated`);
-  }
+  const { modules } = JSON.parse(readFileSync(new URL('../scripts/bindings/node-modules.json', import.meta.url), 'utf8'));
+  assert.deepEqual(modules.map(m => m.name).sort(), nodeTier.modules.map(m => m.name).sort());
+  for (const m of modules) assert.ok(existsSync(new URL(`../library/Lasm/JS/Node/${m.name}.lean`, import.meta.url)), `Lasm.JS.Node.${m.name} is not generated`);
+  // The classes and namespaces of the modules this tier started with, by their documented names.
+  for (const name of ['fsPromises', 'fs', 'FileHandle', 'fs.Stats', 'path', 'os', 'process', 'crypto', 'Hash', 'child_process', 'ChildProcess',
+    'EventEmitter', 'stream.Readable', 'net.Server', 'net.Socket', 'http.Server', 'https.Agent', 'zlib', 'worker_threads.Worker', 'dns', 'util'])
+    assert.ok(surface.some(e => e.lean === name), `${name} is missing from the generated surface`);
+  const all = new Set(surface.flatMap(e => [...e.namespace ?? [], ...e.static ?? [], ...e.prototype ?? [], ...e.instance ?? []].map(x => `${e.lean}.${x}`)));
+  for (const key of Object.keys(nodeTier.exclude)) assert.ok(![...all].some(x => x.endsWith('.' + key.replace(/\(.*$/, '').split('.').at(-1)) && x.startsWith(key.split('.')[0])),
+    `${key} is excluded but generated`);
 });
 
 test('Lasm.JS.Node events: each documented event is a typed listener with on<Event> and once<Event>', () => {
@@ -89,9 +90,20 @@ test('Lasm.JS.Node names: a parent projection or instance never repeats an ances
 test('the generated modules are shipped library modules, in import order', () => {
   for (const tier of ['Node', 'Cloudflare']) {
     const generated = readdirSync(new URL(`../library/Lasm/JS/${tier}/`, import.meta.url)).map(f => `Lasm.JS.${tier}.${f.replace(/\.lean$/, '')}`);
-    for (const m of [...generated, `Lasm.JS.${tier}`]) assert.ok(libraryModules.includes(m), `${m} is not in src/lasm-library.mjs libraryModules`);
-    for (const m of generated) for (const imported of importsOf(m))
+    // Lasm.JS.Node ships a compiled core set and no umbrella (0.4-39); its other modules are compiled on first import.
+    const eager = tier === 'Node' ? generated.filter(m => libraryModules.includes(m)) : generated;
+    for (const m of [...eager, ...(tier === 'Node' ? [] : [`Lasm.JS.${tier}`])]) assert.ok(libraryModules.includes(m), `${m} is not in src/lasm-library.mjs libraryModules`);
+    for (const m of eager) for (const imported of importsOf(m)) {
+      assert.ok(libraryModules.includes(imported), `${m} (prebuilt) imports ${imported} (compiled on first import)`);
       assert.ok(libraryModules.indexOf(imported) < libraryModules.indexOf(m), `${m} imports ${imported}, which comes later`);
+    }
+    if (tier === 'Node') {
+      const { modules } = JSON.parse(readFileSync(new URL('../scripts/bindings/node-modules.json', import.meta.url), 'utf8'));
+      assert.ok(!existsSync(new URL('../library/Lasm/JS/Node.lean', import.meta.url)), 'no Lasm.JS.Node umbrella module (0.4-39)');
+      assert.deepEqual(eager.filter(m => m !== 'Lasm.JS.Node.Support' && m !== 'Lasm.JS.Node.Serve').sort(),  // Support and Node.serve are hand-written
+        modules.filter(m => m.core).map(m => `Lasm.JS.Node.${m.name}`).sort(), 'the compiled Node modules are node-modules.json\'s core');
+      for (const m of generated) assert.ok(eager.includes(m) || lazyModules(libraryModules).includes(m), `${m} is neither compiled nor compiled on first import`);
+    }
   }
   const order = JSON.parse(readFileSync(new URL('modules.json', webDir), 'utf8')).modules;
   for (const m of webModules) {
