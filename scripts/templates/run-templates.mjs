@@ -66,10 +66,12 @@ async function request(base, method, path, body) {
 
 /** The HTTP contract every server template implements. */
 async function checkServer(base, framework) {
+  // The fetch template (framework null: the web's Request and Response) greets without a framework and echoes the
+  // body itself.
   const checks = [
-    ['GET', '/', undefined, 200, { message: `Hello from Lean on ${framework}!` }],
+    ['GET', '/', undefined, 200, { message: framework ? `Hello from Lean on ${framework}!` : 'Hello from Lean!' }],
     ['GET', '/hello/Ada', undefined, 200, { message: 'Hello, Ada, from Lean!' }],
-    ['POST', '/echo', { n: [1, 2], s: 'λ' }, 200, { echo: { n: [1, 2], s: 'λ' } }],
+    ['POST', '/echo', { n: [1, 2], s: 'λ' }, 200, framework ? { echo: { n: [1, 2], s: 'λ' } } : { n: [1, 2], s: 'λ' }],
     ['GET', '/health', undefined, 200, { ok: true }],
   ];
   const seen = [];
@@ -130,8 +132,8 @@ async function checkLambda(app, template) {
   }
 }
 
-const framework = { express: 'Express', hono: 'Hono', fastify: 'Fastify', 'std-http': 'Std.Http' };
-assert.ok(templates.every(t => t === 'plain' || t === 'guide' || framework[t]), `Unknown template in ${templates}`);
+const framework = { express: 'Express', hono: 'Hono', fastify: 'Fastify', 'std-http': 'Std.Http', fetch: null };
+assert.ok(templates.every(t => t === 'plain' || t === 'guide' || t in framework), `Unknown template in ${templates}`);
 
 try {
   mkdirSync(work, { recursive: true });
