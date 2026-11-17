@@ -204,21 +204,13 @@ instance instToJSPromiseHooksCreateHookCallbacks : ToJS promiseHooks.CreateHookC
 @[macro_inline] def v8.Serializer.writeRawBytes (self : v8.Serializer) (buffer_ : ByteArray) : IO Unit := Internal.api "Lasm.JS.Node.v8.Serializer.writeRawBytes" do
   self.val.callMethod "writeRawBytes" (Internal.args #[toJS buffer_]) Unit
 
-/-- `serializer._writeHostObject(object)`: `undefined writeHostObject(object object)` -/
-@[macro_inline] def v8.Serializer.writeHostObject (self : v8.Serializer) (object : Data) : IO Unit := Internal.api "Lasm.JS.Node.v8.Serializer.writeHostObject" do
-  self.val.callMethod "writeHostObject" (Internal.args #[toJS object]) Unit
+/-- `serializer._getDataCloneError(message)`: `undefined _getDataCloneError(DOMString message)` -/
+@[macro_inline] def v8.Serializer._getDataCloneError (self : v8.Serializer) (message : String) : IO Unit := Internal.api "Lasm.JS.Node.v8.Serializer._getDataCloneError" do
+  self.val.callMethod "_getDataCloneError" (Internal.args #[toJS message]) Unit
 
-/-- `serializer._getDataCloneError(message)`: `undefined getDataCloneError(DOMString message)` -/
-@[macro_inline] def v8.Serializer.getDataCloneError (self : v8.Serializer) (message : String) : IO Unit := Internal.api "Lasm.JS.Node.v8.Serializer.getDataCloneError" do
-  self.val.callMethod "getDataCloneError" (Internal.args #[toJS message]) Unit
-
-/-- `serializer._getSharedArrayBufferId(sharedArrayBuffer)`: `undefined getSharedArrayBufferId(Uint8Array sharedArrayBuffer)` -/
-@[macro_inline] def v8.Serializer.getSharedArrayBufferId (self : v8.Serializer) (sharedArrayBuffer : ByteArray) : IO Unit := Internal.api "Lasm.JS.Node.v8.Serializer.getSharedArrayBufferId" do
-  self.val.callMethod "getSharedArrayBufferId" (Internal.args #[toJS sharedArrayBuffer]) Unit
-
-/-- `serializer._setTreatArrayBufferViewsAsHostObjects(flag)`: `undefined setTreatArrayBufferViewsAsHostObjects(boolean flag)` -/
-@[macro_inline] def v8.Serializer.setTreatArrayBufferViewsAsHostObjects (self : v8.Serializer) (flag : Bool) : IO Unit := Internal.api "Lasm.JS.Node.v8.Serializer.setTreatArrayBufferViewsAsHostObjects" do
-  self.val.callMethod "setTreatArrayBufferViewsAsHostObjects" (Internal.args #[toJS flag]) Unit
+/-- `serializer._setTreatArrayBufferViewsAsHostObjects(flag)`: `undefined _setTreatArrayBufferViewsAsHostObjects(boolean flag)` -/
+@[macro_inline] def v8.Serializer._setTreatArrayBufferViewsAsHostObjects (self : v8.Serializer) (flag : Bool) : IO Unit := Internal.api "Lasm.JS.Node.v8.Serializer._setTreatArrayBufferViewsAsHostObjects" do
+  self.val.callMethod "_setTreatArrayBufferViewsAsHostObjects" (Internal.args #[toJS flag]) Unit
 
 /-- `v instanceof Deserializer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Deserializer`). -/
 @[macro_inline] def v8.Deserializer.cast? (v : Value) : IO (Option v8.Deserializer) := Internal.api "Lasm.JS.Node.v8.Deserializer.cast?" do
@@ -256,10 +248,6 @@ instance instToJSPromiseHooksCreateHookCallbacks : ToJS promiseHooks.CreateHookC
 @[macro_inline] def v8.Deserializer.readRawBytes (self : v8.Deserializer) (length : Int) : IO ByteArray := Internal.api "Lasm.JS.Node.v8.Deserializer.readRawBytes" do
   self.val.callMethod "readRawBytes" (Internal.args #[toJS length]) ByteArray
 
-/-- `deserializer._readHostObject()`: `undefined readHostObject()` -/
-@[macro_inline] def v8.Deserializer.readHostObject (self : v8.Deserializer) : IO Unit := Internal.api "Lasm.JS.Node.v8.Deserializer.readHostObject" do
-  self.val.callMethod "readHostObject" (Internal.args #[]) Unit
-
 /-- `v instanceof DefaultSerializer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DefaultSerializer`). -/
 @[macro_inline] def v8.DefaultSerializer.cast? (v : Value) : IO (Option v8.DefaultSerializer) := Internal.api "Lasm.JS.Node.v8.DefaultSerializer.cast?" do
   Internal.cast (Support.getExport "node:v8" ["DefaultSerializer"] Value) (fun x => { val := x }) v
@@ -280,33 +268,17 @@ instance instToJSPromiseHooksCreateHookCallbacks : ToJS promiseHooks.CreateHookC
 @[macro_inline] def v8.GCProfiler.stop (self : v8.GCProfiler) : IO Unit := Internal.api "Lasm.JS.Node.v8.GCProfiler.stop" do
   self.val.callMethod "stop" (Internal.args #[]) Unit
 
-/-- `v instanceof SyncCPUProfileHandle`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SyncCPUProfileHandle`). -/
-@[macro_inline] def SyncCPUProfileHandle.cast? (v : Value) : IO (Option SyncCPUProfileHandle) := Internal.api "Lasm.JS.Node.SyncCPUProfileHandle.cast?" do
-  Internal.cast (Support.getExport "node:v8" ["SyncCPUProfileHandle"] Value) (fun x => { val := x }) v
-
 /-- `syncCpuProfileHandle.stop()` (added in Node.js v24.12.0): `DOMString stop()` -/
 @[macro_inline] def SyncCPUProfileHandle.stop (self : SyncCPUProfileHandle) : IO String := Internal.api "Lasm.JS.Node.SyncCPUProfileHandle.stop" do
   self.val.callMethod "stop" (Internal.args #[]) String
-
-/-- `v instanceof CPUProfileHandle`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CPUProfileHandle`). -/
-@[macro_inline] def CPUProfileHandle.cast? (v : Value) : IO (Option CPUProfileHandle) := Internal.api "Lasm.JS.Node.CPUProfileHandle.cast?" do
-  Internal.cast (Support.getExport "node:v8" ["CPUProfileHandle"] Value) (fun x => { val := x }) v
 
 /-- `cpuProfileHandle.stop()` (added in Node.js v24.8.0): `Promise<any> stop()` -/
 @[macro_inline] def CPUProfileHandle.stop (self : CPUProfileHandle) : Async Data := Internal.api "Lasm.JS.Node.CPUProfileHandle.stop" do
   self.val.callMethodAwait "stop" (Internal.args #[]) Data
 
-/-- `v instanceof HeapProfileHandle`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `HeapProfileHandle`). -/
-@[macro_inline] def HeapProfileHandle.cast? (v : Value) : IO (Option HeapProfileHandle) := Internal.api "Lasm.JS.Node.HeapProfileHandle.cast?" do
-  Internal.cast (Support.getExport "node:v8" ["HeapProfileHandle"] Value) (fun x => { val := x }) v
-
 /-- `heapProfileHandle.stop()` (added in Node.js v24.9.0): `Promise<any> stop()` -/
 @[macro_inline] def HeapProfileHandle.stop (self : HeapProfileHandle) : Async Data := Internal.api "Lasm.JS.Node.HeapProfileHandle.stop" do
   self.val.callMethodAwait "stop" (Internal.args #[]) Data
-
-/-- `v instanceof SyncHeapProfileHandle`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SyncHeapProfileHandle`). -/
-@[macro_inline] def SyncHeapProfileHandle.cast? (v : Value) : IO (Option SyncHeapProfileHandle) := Internal.api "Lasm.JS.Node.SyncHeapProfileHandle.cast?" do
-  Internal.cast (Support.getExport "node:v8" ["SyncHeapProfileHandle"] Value) (fun x => { val := x }) v
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `syncHeapProfileHandle.stop()` (added in Node.js v26.1.0): `DOMString stop()` -/
 @[macro_inline] def SyncHeapProfileHandle.stop (self : SyncHeapProfileHandle) : IO String := Internal.api "Lasm.JS.Node.SyncHeapProfileHandle.stop" do
@@ -378,7 +350,7 @@ instance instToJSPromiseHooksCreateHookCallbacks : ToJS promiseHooks.CreateHookC
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Node.v8.isStringOneByteRepresentation", module := "node:v8", path := "isStringOneByteRepresentation", construct := false, arity := 1 }
     (Internal.args #[toJS content]) (await := false)
 
-/-- `v8.startCpuProfile()` (added in Node.js v24.12.0): `SyncCPUProfileHandle startCpuProfile()` (Node.js 24.22.2 documentation, v8.md) -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). `v8.startCpuProfile()` (added in Node.js v24.12.0): `SyncCPUProfileHandle startCpuProfile()` (Node.js 24.22.2 documentation, v8.md) -/
 @[macro_inline] def v8.startCpuProfile : IO SyncCPUProfileHandle := Internal.api "Lasm.JS.Node.v8.startCpuProfile" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.v8.startCpuProfile", module := "node:v8", path := "startCpuProfile", construct := false, arity := 0 }
     (Internal.args #[]) (await := false)

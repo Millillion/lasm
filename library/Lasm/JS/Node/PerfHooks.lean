@@ -8,6 +8,7 @@ docs/JS_BINDINGS.md ("Lasm.JS.Node"). The doc comments quote each member's docum
 and its lowered WebIDL.
 -/
 import Lasm.JS.Node.Support
+import Lasm.JS.Web.Types.PerformanceTimeline
 import Lasm.JS.Web.Webidl
 import Lasm.JS.Node.Fs
 
@@ -156,9 +157,47 @@ structure performance.TimerifyOptions where
   histogram : Option RecordableHistogram := none
 instance instToJSPerformanceTimerifyOptions : ToJS performance.TimerifyOptions := ⟨fun d => Internal.fields #[("histogram", Internal.optional d.histogram)]⟩
 
-/-- `v instanceof PerformanceNodeEntry`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PerformanceNodeEntry`). -/
-@[macro_inline] def PerformanceNodeEntry.cast? (v : Value) : IO (Option PerformanceNodeEntry) := Internal.api "Lasm.JS.Node.PerformanceNodeEntry.cast?" do
-  Internal.cast (Support.getExport "node:perf_hooks" ["PerformanceNodeEntry"] Value) (fun x => { val := x }) v
+/-- `dictionary perf_hooks.performance.MarkOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure perf_hooks.performance.MarkOptions where
+  /-- `any detail` -/
+  detail : Data := .undefined
+  /-- `double startTime` -/
+  startTime : Option Float := none
+instance instToJSPerf_hooksPerformanceMarkOptions : ToJS perf_hooks.performance.MarkOptions := ⟨fun d => Internal.fields #[("detail", d.detail),
+    ("startTime", Internal.optional d.startTime)]⟩
+
+/-- `dictionary perf_hooks.performance.MeasureStartMarkOrOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure perf_hooks.performance.MeasureStartMarkOrOptions where
+  /-- `any detail` -/
+  detail : Data := .undefined
+  /-- `double duration` -/
+  duration : Option Float := none
+  /-- `(double or DOMString) end` -/
+  «end» : Option DoubleOrDOMString := none
+  /-- `(double or DOMString) start` -/
+  start : Option DoubleOrDOMString := none
+instance instToJSPerf_hooksPerformanceMeasureStartMarkOrOptions : ToJS perf_hooks.performance.MeasureStartMarkOrOptions := ⟨fun d => Internal.fields #[("detail", d.detail),
+    ("duration", Internal.optional d.duration),
+    ("end", Internal.optional d.«end»),
+    ("start", Internal.optional d.start)]⟩
+
+/-- `(DOMString or perf_hooks.performance.MeasureStartMarkOrOptions)`: one constructor per member type. -/
+inductive perf_hooks.performance.DOMStringOrMeasureStartMarkOrOptions where
+  /-- `DOMString` -/
+  | domString (value : String)
+  /-- `perf_hooks.performance.MeasureStartMarkOrOptions` -/
+  | measureStartMarkOrOptions (value : perf_hooks.performance.MeasureStartMarkOrOptions)
+instance instToJSPerf_hooksPerformanceDOMStringOrMeasureStartMarkOrOptions : ToJS perf_hooks.performance.DOMStringOrMeasureStartMarkOrOptions := ⟨fun
+  | .domString v => toJS v
+  | .measureStartMarkOrOptions v => toJS v⟩
+instance instCoeStringPerf_hooksPerformanceDOMStringOrMeasureStartMarkOrOptions : Coe String perf_hooks.performance.DOMStringOrMeasureStartMarkOrOptions := ⟨.domString⟩
+instance instCoePerf_hooksPerformanceMeasureStartMarkOrOptionsPerf_hooksPerformanceDOMStringOrMeasureStartMarkOrOptions : Coe perf_hooks.performance.MeasureStartMarkOrOptions perf_hooks.performance.DOMStringOrMeasureStartMarkOrOptions := ⟨.measureStartMarkOrOptions⟩
+
+/-- `dictionary perf_hooks.performance.TimerifyOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure perf_hooks.performance.TimerifyOptions where
+  /-- `Node_RecordableHistogram histogram` -/
+  histogram : Option RecordableHistogram := none
+instance instToJSPerf_hooksPerformanceTimerifyOptions : ToJS perf_hooks.performance.TimerifyOptions := ⟨fun d => Internal.fields #[("histogram", Internal.optional d.histogram)]⟩
 
 /-- `detail` (added in Node.js v16.0.0): `readonly attribute any detail` -/
 @[macro_inline] def PerformanceNodeEntry.detail (self : PerformanceNodeEntry) : IO Data := Internal.api "Lasm.JS.Node.PerformanceNodeEntry.detail" do
@@ -171,10 +210,6 @@ instance instToJSPerformanceTimerifyOptions : ToJS performance.TimerifyOptions :
 /-- **Deprecated** in the Node.js 24.22.2 docs. `kind` (added in Node.js v8.5.0): `readonly attribute double kind` -/
 @[macro_inline] def PerformanceNodeEntry.kind (self : PerformanceNodeEntry) : IO Float := Internal.api "Lasm.JS.Node.PerformanceNodeEntry.kind" do
   self.val.get "kind" Float
-
-/-- `v instanceof PerformanceNodeTiming`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PerformanceNodeTiming`). -/
-@[macro_inline] def PerformanceNodeTiming.cast? (v : Value) : IO (Option PerformanceNodeTiming) := Internal.api "Lasm.JS.Node.PerformanceNodeTiming.cast?" do
-  Internal.cast (Support.getExport "node:perf_hooks" ["PerformanceNodeTiming"] Value) (fun x => { val := x }) v
 
 /-- `bootstrapComplete` (added in Node.js v8.5.0): `readonly attribute double bootstrapComplete` -/
 @[macro_inline] def PerformanceNodeTiming.bootstrapComplete (self : PerformanceNodeTiming) : IO Float := Internal.api "Lasm.JS.Node.PerformanceNodeTiming.bootstrapComplete" do
@@ -211,10 +246,6 @@ instance instToJSPerformanceTimerifyOptions : ToJS performance.TimerifyOptions :
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `uvMetricsInfoBigInt` (added in Node.js v26.11.0): `readonly attribute object uvMetricsInfoBigInt` -/
 @[macro_inline] def PerformanceNodeTiming.uvMetricsInfoBigInt (self : PerformanceNodeTiming) : IO Data := Internal.api "Lasm.JS.Node.PerformanceNodeTiming.uvMetricsInfoBigInt" do
   self.val.get "uvMetricsInfoBigInt" Data
-
-/-- `v instanceof Histogram`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Histogram`). -/
-@[macro_inline] def Histogram.cast? (v : Value) : IO (Option Histogram) := Internal.api "Lasm.JS.Node.Histogram.cast?" do
-  Internal.cast (Support.getExport "node:perf_hooks" ["Histogram"] Value) (fun x => { val := x }) v
 
 /-- `histogram.count` (added in Node.js v17.4.0, v16.14.0): `readonly attribute double /* integer: Nat */ count` -/
 @[macro_inline] def Histogram.count (self : Histogram) : IO Nat := Internal.api "Lasm.JS.Node.Histogram.count" do
@@ -374,10 +405,6 @@ instance instToJSPerformanceTimerifyOptions : ToJS performance.TimerifyOptions :
   let r ← self.val.callMethod "snapshot" (Internal.args #[]) Value
   pure { val := r }
 
-/-- `v instanceof ELDHistogram`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ELDHistogram`). -/
-@[macro_inline] def ELDHistogram.cast? (v : Value) : IO (Option ELDHistogram) := Internal.api "Lasm.JS.Node.ELDHistogram.cast?" do
-  Internal.cast (Support.getExport "node:perf_hooks" ["ELDHistogram"] Value) (fun x => { val := x }) v
-
 /-- `histogram.disable()` (added in Node.js v11.10.0): `boolean disable()` -/
 @[macro_inline] def ELDHistogram.disable (self : ELDHistogram) : IO Bool := Internal.api "Lasm.JS.Node.ELDHistogram.disable" do
   self.val.callMethod "disable" (Internal.args #[]) Bool
@@ -385,10 +412,6 @@ instance instToJSPerformanceTimerifyOptions : ToJS performance.TimerifyOptions :
 /-- `histogram.enable()` (added in Node.js v11.10.0): `boolean enable()` -/
 @[macro_inline] def ELDHistogram.enable (self : ELDHistogram) : IO Bool := Internal.api "Lasm.JS.Node.ELDHistogram.enable" do
   self.val.callMethod "enable" (Internal.args #[]) Bool
-
-/-- `v instanceof RecordableHistogram`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `RecordableHistogram`). -/
-@[macro_inline] def RecordableHistogram.cast? (v : Value) : IO (Option RecordableHistogram) := Internal.api "Lasm.JS.Node.RecordableHistogram.cast?" do
-  Internal.cast (Support.getExport "node:perf_hooks" ["RecordableHistogram"] Value) (fun x => { val := x }) v
 
 /-- `histogram.add(other)` (added in Node.js v17.4.0, v16.14.0): `undefined add(RecordableHistogram other)` -/
 @[macro_inline] def RecordableHistogram.add (self : RecordableHistogram) (other : RecordableHistogram) : IO Unit := Internal.api "Lasm.JS.Node.RecordableHistogram.add" do
@@ -409,10 +432,6 @@ instance instToJSPerformanceTimerifyOptions : ToJS performance.TimerifyOptions :
 /-- `histogram.subtract(other)` (added in Node.js v24.21.0): `undefined subtract(RecordableHistogram other)` -/
 @[macro_inline] def RecordableHistogram.subtract (self : RecordableHistogram) (other : RecordableHistogram) : IO Unit := Internal.api "Lasm.JS.Node.RecordableHistogram.subtract" do
   self.val.callMethod "subtract" (Internal.args #[toJS other]) Unit
-
-/-- `v instanceof SlidingWindowHistogram`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SlidingWindowHistogram`). -/
-@[macro_inline] def SlidingWindowHistogram.cast? (v : Value) : IO (Option SlidingWindowHistogram) := Internal.api "Lasm.JS.Node.SlidingWindowHistogram.cast?" do
-  Internal.cast (Support.getExport "node:perf_hooks" ["SlidingWindowHistogram"] Value) (fun x => { val := x }) v
 
 /-- `slidingWindowHistogram.record(val)` (added in Node.js v24.22.0): `undefined record((double or bigint) val)` -/
 @[macro_inline] def SlidingWindowHistogram.record (self : SlidingWindowHistogram) (val : DoubleOrBigint) : IO Unit := Internal.api "Lasm.JS.Node.SlidingWindowHistogram.record" do
@@ -465,11 +484,6 @@ instance instToJSPerformanceTimerifyOptions : ToJS performance.TimerifyOptions :
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.perf_hooks.timerify", module := "node:perf_hooks", path := "timerify", construct := false, arity := 2 }
     (Internal.args #[toJS fn, Internal.optional options]) (await := false)
 
-/-- `performance.nodeTiming` (added in Node.js v8.5.0): `readonly attribute PerformanceNodeTiming nodeTiming` (Node.js 24.22.2 documentation, perf_hooks.md) -/
-@[macro_inline] def performance.nodeTiming : IO PerformanceNodeTiming := Internal.api "Lasm.JS.Node.performance.nodeTiming" do
-  let r ← Support.getExport "node:perf_hooks" ["performance", "nodeTiming"] Value
-  pure { val := r }
-
 /-- `performance.eventLoopUtilization([utilization1[, utilization2]])` (added in Node.js v14.10.0, v12.19.0): `object eventLoopUtilization(optional object utilization1, optional object utilization2)` (Node.js 24.22.2 documentation, perf_hooks.md) -/
 @[macro_inline] def performance.eventLoopUtilization (utilization1 : Data := .undefined) (utilization2 : Data := .undefined) : IO Data := Internal.api "Lasm.JS.Node.performance.eventLoopUtilization" do
   Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.performance.eventLoopUtilization", module := "node:perf_hooks", path := "performance.eventLoopUtilization", construct := false, arity := 2 }
@@ -484,5 +498,84 @@ instance instToJSPerformanceTimerifyOptions : ToJS performance.TimerifyOptions :
 @[macro_inline] def performance.timerify (fn : JSFunction) (options : Option performance.TimerifyOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.performance.timerify" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.performance.timerify", module := "node:perf_hooks", path := "performance.timerify", construct := false, arity := 2 }
     (Internal.args #[toJS fn, Internal.optional options]) (await := false)
+
+/-- `perf_hooks.performance.nodeTiming` (added in Node.js v8.5.0): `readonly attribute PerformanceNodeTiming nodeTiming` (Node.js 24.22.2 documentation, perf_hooks.md) -/
+@[macro_inline] def perf_hooks.performance.nodeTiming : IO PerformanceNodeTiming := Internal.api "Lasm.JS.Node.perf_hooks.performance.nodeTiming" do
+  let r ← Support.getExport "node:perf_hooks" ["performance", "nodeTiming"] Value
+  pure { val := r }
+
+/-- `perf_hooks.performance.timeOrigin` (added in Node.js v8.5.0): `readonly attribute double timeOrigin` (Node.js 24.22.2 documentation, perf_hooks.md) -/
+@[macro_inline] def perf_hooks.performance.timeOrigin : IO Float := Internal.api "Lasm.JS.Node.perf_hooks.performance.timeOrigin" do
+  Support.getExport "node:perf_hooks" ["performance", "timeOrigin"] Float
+
+/-- `performance.clearMarks([name])` (added in Node.js v8.5.0): `undefined clearMarks(optional DOMString name)` (Node.js 24.22.2 documentation, perf_hooks.md) -/
+@[macro_inline] def perf_hooks.performance.clearMarks (name : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.perf_hooks.performance.clearMarks" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.perf_hooks.performance.clearMarks", module := "node:perf_hooks", path := "performance.clearMarks", construct := false, arity := 1 }
+    (Internal.args #[Internal.optional name]) (await := false)
+
+/-- `performance.clearMeasures([name])` (added in Node.js v16.7.0): `undefined clearMeasures(optional DOMString name)` (Node.js 24.22.2 documentation, perf_hooks.md) -/
+@[macro_inline] def perf_hooks.performance.clearMeasures (name : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.perf_hooks.performance.clearMeasures" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.perf_hooks.performance.clearMeasures", module := "node:perf_hooks", path := "performance.clearMeasures", construct := false, arity := 1 }
+    (Internal.args #[Internal.optional name]) (await := false)
+
+/-- `performance.clearResourceTimings([name])` (added in Node.js v18.2.0, v16.17.0): `undefined clearResourceTimings(optional DOMString name)` (Node.js 24.22.2 documentation, perf_hooks.md) -/
+@[macro_inline] def perf_hooks.performance.clearResourceTimings (name : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.perf_hooks.performance.clearResourceTimings" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.perf_hooks.performance.clearResourceTimings", module := "node:perf_hooks", path := "performance.clearResourceTimings", construct := false, arity := 1 }
+    (Internal.args #[Internal.optional name]) (await := false)
+
+/-- `performance.eventLoopUtilization([utilization1[, utilization2]])` (added in Node.js v14.10.0, v12.19.0): `object eventLoopUtilization(optional object utilization1, optional object utilization2)` (Node.js 24.22.2 documentation, perf_hooks.md) -/
+@[macro_inline] def perf_hooks.performance.eventLoopUtilization (utilization1 : Data := .undefined) (utilization2 : Data := .undefined) : IO Data := Internal.api "Lasm.JS.Node.perf_hooks.performance.eventLoopUtilization" do
+  Lasm.JS.Binding.invoke Data { name := "Lasm.JS.Node.perf_hooks.performance.eventLoopUtilization", module := "node:perf_hooks", path := "performance.eventLoopUtilization", construct := false, arity := 2 }
+    (Internal.args #[utilization1, utilization2]) (await := false)
+
+/-- `performance.getEntries()` (added in Node.js v16.7.0): `sequence<PerformanceEntry> getEntries()` (Node.js 24.22.2 documentation, perf_hooks.md) -/
+@[macro_inline] def perf_hooks.performance.getEntries : IO (Array PerformanceEntry) := Internal.api "Lasm.JS.Node.perf_hooks.performance.getEntries" do
+  Lasm.JS.Binding.invoke (Array PerformanceEntry) { name := "Lasm.JS.Node.perf_hooks.performance.getEntries", module := "node:perf_hooks", path := "performance.getEntries", construct := false, arity := 0 }
+    (Internal.args #[]) (await := false)
+
+/-- `performance.getEntriesByName(name[, type])` (added in Node.js v16.7.0): `sequence<PerformanceEntry> getEntriesByName(DOMString name, optional DOMString type)` (Node.js 24.22.2 documentation, perf_hooks.md) -/
+@[macro_inline] def perf_hooks.performance.getEntriesByName (name : String) (type : Option String := none) : IO (Array PerformanceEntry) := Internal.api "Lasm.JS.Node.perf_hooks.performance.getEntriesByName" do
+  Lasm.JS.Binding.invoke (Array PerformanceEntry) { name := "Lasm.JS.Node.perf_hooks.performance.getEntriesByName", module := "node:perf_hooks", path := "performance.getEntriesByName", construct := false, arity := 2 }
+    (Internal.args #[toJS name, Internal.optional type]) (await := false)
+
+/-- `performance.getEntriesByType(type)` (added in Node.js v16.7.0): `sequence<PerformanceEntry> getEntriesByType(DOMString type)` (Node.js 24.22.2 documentation, perf_hooks.md) -/
+@[macro_inline] def perf_hooks.performance.getEntriesByType (type : String) : IO (Array PerformanceEntry) := Internal.api "Lasm.JS.Node.perf_hooks.performance.getEntriesByType" do
+  Lasm.JS.Binding.invoke (Array PerformanceEntry) { name := "Lasm.JS.Node.perf_hooks.performance.getEntriesByType", module := "node:perf_hooks", path := "performance.getEntriesByType", construct := false, arity := 1 }
+    (Internal.args #[toJS type]) (await := false)
+
+/-- `performance.mark(name[, options])` (added in Node.js v8.5.0): `undefined mark(DOMString name, optional perf_hooks.performance.MarkOptions options)` (Node.js 24.22.2 documentation, perf_hooks.md) -/
+@[macro_inline] def perf_hooks.performance.mark (name : String) (options : Option perf_hooks.performance.MarkOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.perf_hooks.performance.mark" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.perf_hooks.performance.mark", module := "node:perf_hooks", path := "performance.mark", construct := false, arity := 2 }
+    (Internal.args #[toJS name, Internal.optional options]) (await := false)
+
+/-- `performance.markResourceTiming(timingInfo, requestedUrl, initiatorType, global, cacheMode, bodyInfo, responseStatus[, deliveryType])` (added in Node.js v18.2.0, v16.17.0): `undefined markResourceTiming(object timingInfo, DOMString requestedUrl, DOMString initiatorType, object global, DOMString cacheMode, object bodyInfo, double responseStatus, optional DOMString deliveryType)` (Node.js 24.22.2 documentation, perf_hooks.md) -/
+@[macro_inline] def perf_hooks.performance.markResourceTiming (timingInfo : Data) (requestedUrl : String) (initiatorType : String) (global : Data) (cacheMode : String) (bodyInfo : Data) (responseStatus : Float) (deliveryType : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.perf_hooks.performance.markResourceTiming" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.perf_hooks.performance.markResourceTiming", module := "node:perf_hooks", path := "performance.markResourceTiming", construct := false, arity := 8 }
+    (Internal.args #[toJS timingInfo, toJS requestedUrl, toJS initiatorType, toJS global, toJS cacheMode, toJS bodyInfo, toJS responseStatus, Internal.optional deliveryType]) (await := false)
+
+/-- `performance.measure(name[, startMarkOrOptions[, endMark]])` (added in Node.js v8.5.0): `undefined measure(DOMString name, optional (DOMString or perf_hooks.performance.MeasureStartMarkOrOptions) startMarkOrOptions, optional DOMString endMark)` (Node.js 24.22.2 documentation, perf_hooks.md) -/
+@[macro_inline] def perf_hooks.performance.measure (name : String) (startMarkOrOptions : Option perf_hooks.performance.DOMStringOrMeasureStartMarkOrOptions := none) (endMark : Option String := none) : IO Unit := Internal.api "Lasm.JS.Node.perf_hooks.performance.measure" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.perf_hooks.performance.measure", module := "node:perf_hooks", path := "performance.measure", construct := false, arity := 3 }
+    (Internal.args #[toJS name, Internal.optional startMarkOrOptions, Internal.optional endMark]) (await := false)
+
+/-- `performance.now()` (added in Node.js v8.5.0): `double now()` (Node.js 24.22.2 documentation, perf_hooks.md) -/
+@[macro_inline] def perf_hooks.performance.now : IO Float := Internal.api "Lasm.JS.Node.perf_hooks.performance.now" do
+  Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Node.perf_hooks.performance.now", module := "node:perf_hooks", path := "performance.now", construct := false, arity := 0 }
+    (Internal.args #[]) (await := false)
+
+/-- `performance.setResourceTimingBufferSize(maxSize)` (added in Node.js v18.8.0): `undefined setResourceTimingBufferSize(any maxSize)` (Node.js 24.22.2 documentation, perf_hooks.md) -/
+@[macro_inline] def perf_hooks.performance.setResourceTimingBufferSize (maxSize : Data) : IO Unit := Internal.api "Lasm.JS.Node.perf_hooks.performance.setResourceTimingBufferSize" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.perf_hooks.performance.setResourceTimingBufferSize", module := "node:perf_hooks", path := "performance.setResourceTimingBufferSize", construct := false, arity := 1 }
+    (Internal.args #[toJS maxSize]) (await := false)
+
+/-- `performance.timerify(fn[, options])` (added in Node.js v8.5.0): `undefined timerify(Function fn, optional perf_hooks.performance.TimerifyOptions options)` (Node.js 24.22.2 documentation, perf_hooks.md) -/
+@[macro_inline] def perf_hooks.performance.timerify (fn : JSFunction) (options : Option perf_hooks.performance.TimerifyOptions := none) : IO Unit := Internal.api "Lasm.JS.Node.perf_hooks.performance.timerify" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.perf_hooks.performance.timerify", module := "node:perf_hooks", path := "performance.timerify", construct := false, arity := 2 }
+    (Internal.args #[toJS fn, Internal.optional options]) (await := false)
+
+/-- `performance.toJSON()` (added in Node.js v16.1.0): `undefined toJSON()` (Node.js 24.22.2 documentation, perf_hooks.md) -/
+@[macro_inline] def perf_hooks.performance.toJSON : IO Unit := Internal.api "Lasm.JS.Node.perf_hooks.performance.toJSON" do
+  Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.perf_hooks.performance.toJSON", module := "node:perf_hooks", path := "performance.toJSON", construct := false, arity := 0 }
+    (Internal.args #[]) (await := false)
 
 end Lasm.JS.Node

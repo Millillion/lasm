@@ -882,10 +882,6 @@ instance instToJSCryptoScryptSyncOptions : ToJS crypto.ScryptSyncOptions := ⟨f
     (Internal.args #[toJS key]) (await := false)
   pure { val := r }
 
-/-- `v instanceof Mac`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Mac`). -/
-@[macro_inline] def Mac.cast? (v : Value) : IO (Option Mac) := Internal.api "Lasm.JS.Node.Mac.cast?" do
-  Internal.cast (Support.getExport "node:crypto" ["Mac"] Value) (fun x => { val := x }) v
-
 /-- `mac.final([outputEncoding])` (added in Node.js v24.22.0): `(Uint8Array or DOMString) final(optional DOMString outputEncoding)` -/
 @[macro_inline] def Mac.final (self : Mac) (outputEncoding : Option String := none) : IO Uint8ArrayOrDOMString := Internal.api "Lasm.JS.Node.Mac.final" do
   self.val.callMethod "final" (Internal.args #[Internal.optional outputEncoding]) Uint8ArrayOrDOMString

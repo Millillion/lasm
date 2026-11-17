@@ -174,7 +174,7 @@ instance : Coe BroadcastChannel MessagePortOrBroadcastChannel := ⟨.broadcastCh
 @[macro_inline] def worker_threads.Worker.threadId (self : worker_threads.Worker) : IO Int := Internal.api "Lasm.JS.Node.worker_threads.Worker.threadId" do
   self.val.get "threadId" Int
 
-/-- `worker.threadName` (added in Node.js v24.6.0): `readonly attribute DOMString? threadName` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). `worker.threadName` (added in Node.js v24.6.0): `readonly attribute DOMString? threadName` -/
 @[macro_inline] def worker_threads.Worker.threadName (self : worker_threads.Worker) : IO (Option String) := Internal.api "Lasm.JS.Node.worker_threads.Worker.threadName" do
   self.val.get "threadName" (Option String)
 
@@ -248,7 +248,7 @@ instance : Coe BroadcastChannel MessagePortOrBroadcastChannel := ⟨.broadcastCh
 @[macro_inline] def worker_threads.Worker.ref (self : worker_threads.Worker) : IO Unit := Internal.api "Lasm.JS.Node.worker_threads.Worker.ref" do
   self.val.callMethod "ref" (Internal.args #[]) Unit
 
-/-- `worker.startCpuProfile()` (added in Node.js v24.8.0): `Promise<any> startCpuProfile()` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). `worker.startCpuProfile()` (added in Node.js v24.8.0): `Promise<any> startCpuProfile()` -/
 @[macro_inline] def worker_threads.Worker.startCpuProfile (self : worker_threads.Worker) : Async Data := Internal.api "Lasm.JS.Node.worker_threads.Worker.startCpuProfile" do
   self.val.callMethodAwait "startCpuProfile" (Internal.args #[]) Data
 
@@ -256,7 +256,7 @@ instance : Coe BroadcastChannel MessagePortOrBroadcastChannel := ⟨.broadcastCh
 @[macro_inline] def worker_threads.Worker.startCpuProfileWithOptions (self : worker_threads.Worker) (options : Option worker_threads.Worker.StartCpuProfileOptions := none) : Async Data := Internal.api "Lasm.JS.Node.worker_threads.Worker.startCpuProfileWithOptions" do
   self.val.callMethodAwait "startCpuProfile" (Internal.args #[Internal.optional options]) Data
 
-/-- `worker.startHeapProfile()` (added in Node.js v24.9.0): `Promise<any> startHeapProfile()` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). `worker.startHeapProfile()` (added in Node.js v24.9.0): `Promise<any> startHeapProfile()` -/
 @[macro_inline] def worker_threads.Worker.startHeapProfile (self : worker_threads.Worker) : Async Data := Internal.api "Lasm.JS.Node.worker_threads.Worker.startHeapProfile" do
   self.val.callMethodAwait "startHeapProfile" (Internal.args #[]) Data
 
@@ -296,7 +296,7 @@ instance : Coe BroadcastChannel MessagePortOrBroadcastChannel := ⟨.broadcastCh
 @[macro_inline] def worker_threads.threadId : IO Int := Internal.api "Lasm.JS.Node.worker_threads.threadId" do
   Support.getExport "node:worker_threads" ["threadId"] Int
 
-/-- `worker_threads.threadName` (added in Node.js v24.6.0): `readonly attribute DOMString? threadName` (Node.js 24.22.2 documentation, worker_threads.md) -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). `worker_threads.threadName` (added in Node.js v24.6.0): `readonly attribute DOMString? threadName` (Node.js 24.22.2 documentation, worker_threads.md) -/
 @[macro_inline] def worker_threads.threadName : IO (Option String) := Internal.api "Lasm.JS.Node.worker_threads.threadName" do
   Support.getExport "node:worker_threads" ["threadName"] (Option String)
 
@@ -304,7 +304,7 @@ instance : Coe BroadcastChannel MessagePortOrBroadcastChannel := ⟨.broadcastCh
 @[macro_inline] def worker_threads.workerData : IO Data := Internal.api "Lasm.JS.Node.worker_threads.workerData" do
   Support.getExport "node:worker_threads" ["workerData"] Data
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `worker_threads.locks` (added in Node.js v24.5.0): `readonly attribute LockManager locks` (Node.js 24.22.2 documentation, worker_threads.md) -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `worker_threads.locks` (added in Node.js v24.5.0): `readonly attribute LockManager locks` (Node.js 24.22.2 documentation, worker_threads.md) -/
 @[macro_inline] def worker_threads.locks : IO LockManager := Internal.api "Lasm.JS.Node.worker_threads.locks" do
   let r ← Support.getExport "node:worker_threads" ["locks"] Value
   pure { val := r }

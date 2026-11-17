@@ -92,7 +92,7 @@ instance instToJSModuleSetSourceMapsSupportOptions : ToJS module.SetSourceMapsSu
 @[macro_inline] def module.SourceMap.cast? (v : Value) : IO (Option module.SourceMap) := Internal.api "Lasm.JS.Node.module.SourceMap.cast?" do
   Internal.cast (Support.getExport "node:module" ["SourceMap"] Value) (fun x => { val := x }) v
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `sourceMap.payload`: `readonly attribute object payload` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `sourceMap.payload`: `readonly attribute object payload` -/
 @[macro_inline] def module.SourceMap.payload (self : module.SourceMap) : IO Data := Internal.api "Lasm.JS.Node.module.SourceMap.payload" do
   self.val.get "payload" Data
 

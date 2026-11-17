@@ -29,10 +29,6 @@ structure trace_events.CreateTracingOptions where
   categories : Option (Array String) := none
 instance instToJSTrace_eventsCreateTracingOptions : ToJS trace_events.CreateTracingOptions := ⟨fun d => Internal.fields #[("categories", Internal.optional d.categories)]⟩
 
-/-- `v instanceof Tracing`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Tracing`). -/
-@[macro_inline] def Tracing.cast? (v : Value) : IO (Option Tracing) := Internal.api "Lasm.JS.Node.Tracing.cast?" do
-  Internal.cast (Support.getExport "node:trace_events" ["Tracing"] Value) (fun x => { val := x }) v
-
 /-- **Experimental** in the Node.js 24.22.2 docs. `tracing.categories` (added in Node.js v10.0.0): `readonly attribute DOMString categories` -/
 @[macro_inline] def Tracing.categories (self : Tracing) : IO String := Internal.api "Lasm.JS.Node.Tracing.categories" do
   self.val.get "categories" String
@@ -51,13 +47,13 @@ instance instToJSTrace_eventsCreateTracingOptions : ToJS trace_events.CreateTrac
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `trace_events.createTracing(options)` (added in Node.js v10.0.0): `Tracing createTracing(trace_events.CreateTracingOptions options)` (Node.js 24.22.2 documentation, tracing.md) -/
 @[macro_inline] def trace_events.createTracing (options : trace_events.CreateTracingOptions) : IO Tracing := Internal.api "Lasm.JS.Node.trace_events.createTracing" do
-  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.trace_events.createTracing", module := "node:trace_events", path := "trace_events.createTracing", construct := false, arity := 1 }
+  let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.trace_events.createTracing", module := "node:trace_events", path := "createTracing", construct := false, arity := 1 }
     (Internal.args #[toJS options]) (await := false)
   pure { val := r }
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `trace_events.getEnabledCategories()` (added in Node.js v10.0.0): `DOMString getEnabledCategories()` (Node.js 24.22.2 documentation, tracing.md) -/
 @[macro_inline] def trace_events.getEnabledCategories : IO String := Internal.api "Lasm.JS.Node.trace_events.getEnabledCategories" do
-  Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.trace_events.getEnabledCategories", module := "node:trace_events", path := "trace_events.getEnabledCategories", construct := false, arity := 0 }
+  Lasm.JS.Binding.invoke String { name := "Lasm.JS.Node.trace_events.getEnabledCategories", module := "node:trace_events", path := "getEnabledCategories", construct := false, arity := 0 }
     (Internal.args #[]) (await := false)
 
 end Lasm.JS.Node

@@ -70,11 +70,7 @@ instance instToJSAsync_hooksCreateHookOptions : ToJS async_hooks.CreateHookOptio
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.AsyncResource.bind", module := "node:async_hooks", path := "AsyncResource.bind", construct := false, arity := 3 }
     (Internal.args #[toJS fn, Internal.optional type, thisArg]) (await := false)
 
-/-- `v instanceof AsyncHook`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AsyncHook`). -/
-@[macro_inline] def AsyncHook.cast? (v : Value) : IO (Option AsyncHook) := Internal.api "Lasm.JS.Node.AsyncHook.cast?" do
-  Internal.cast (Support.getExport "node:async_hooks" ["AsyncHook"] Value) (fun x => { val := x }) v
-
-/-- **Experimental** in the Node.js 24.22.2 docs. `async_hooks.asyncWrapProviders` (added in Node.js v17.2.0, v16.14.0): `readonly attribute any asyncWrapProviders` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `async_hooks.asyncWrapProviders` (added in Node.js v17.2.0, v16.14.0): `readonly attribute any asyncWrapProviders` -/
 @[macro_inline] def AsyncHook.asyncWrapProviders (self : AsyncHook) : IO Data := Internal.api "Lasm.JS.Node.AsyncHook.asyncWrapProviders" do
   self.val.get "asyncWrapProviders" Data
 

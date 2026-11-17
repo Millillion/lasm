@@ -1083,7 +1083,7 @@ instance instToJSNetCreateServerOptions : ToJS net.CreateServerOptions := ⟨fun
   Lasm.JS.Binding.invoke net.BoundSocket { name := "Lasm.JS.Node.net.BoundSocket.new", module := "node:net", path := "BoundSocket", construct := true, arity := 1 }
     (Internal.args #[Internal.optional options]) (await := false)
 
-/-- `boundSocket.isPipe` (added in Node.js v24.20.0): `readonly attribute boolean isPipe` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). `boundSocket.isPipe` (added in Node.js v24.20.0): `readonly attribute boolean isPipe` -/
 @[macro_inline] def net.BoundSocket.isPipe (self : net.BoundSocket) : IO Bool := Internal.api "Lasm.JS.Node.net.BoundSocket.isPipe" do
   self.val.get "isPipe" Bool
 

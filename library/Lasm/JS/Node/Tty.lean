@@ -57,7 +57,7 @@ def tty.WriteStream.ResizeListener.ofSyncFn (f : IO Unit) : IO tty.WriteStream.R
 @[macro_inline] def tty.ReadStream.isTTY (self : tty.ReadStream) : IO Data := Internal.api "Lasm.JS.Node.tty.ReadStream.isTTY" do
   self.val.get "isTTY" Data
 
-/-- `readStream.rawMode` (added in Node.js v24.21.0): `readonly attribute (boolean or DOMString) rawMode` -/
+/-- **Not documented in Node.js 26.13.0** (removed or changed there). `readStream.rawMode` (added in Node.js v24.21.0): `readonly attribute (boolean or DOMString) rawMode` -/
 @[macro_inline] def tty.ReadStream.rawMode (self : tty.ReadStream) : IO BooleanOrDOMString := Internal.api "Lasm.JS.Node.tty.ReadStream.rawMode" do
   self.val.get "rawMode" BooleanOrDOMString
 

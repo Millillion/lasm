@@ -303,10 +303,6 @@ instance instCoeZlibZipFilesOptionsZlibDOMStringOrZipFilesOptions : Coe zlib.Zip
 @[macro_inline] def zlib.Unzip.cast? (v : Value) : IO (Option zlib.Unzip) := Internal.api "Lasm.JS.Node.zlib.Unzip.cast?" do
   Internal.cast (Support.getExport "node:zlib" ["Unzip"] Value) (fun x => { val := x }) v
 
-/-- `v instanceof ZlibBase`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ZlibBase`). -/
-@[macro_inline] def zlib.ZlibBase.cast? (v : Value) : IO (Option zlib.ZlibBase) := Internal.api "Lasm.JS.Node.zlib.ZlibBase.cast?" do
-  Internal.cast (Support.getExport "node:zlib" ["ZlibBase"] Value) (fun x => { val := x }) v
-
 /-- `bytesWritten` (added in Node.js v10.0.0): `readonly attribute double bytesWritten` -/
 @[macro_inline] def zlib.ZlibBase.bytesWritten (self : zlib.ZlibBase) : IO Float := Internal.api "Lasm.JS.Node.zlib.ZlibBase.bytesWritten" do
   self.val.get "bytesWritten" Float
@@ -318,18 +314,6 @@ instance instCoeZlibZipFilesOptionsZlibDOMStringOrZipFilesOptions : Coe zlib.Zip
 /-- `v instanceof ZstdDecompress`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ZstdDecompress`). -/
 @[macro_inline] def zlib.ZstdDecompress.cast? (v : Value) : IO (Option zlib.ZstdDecompress) := Internal.api "Lasm.JS.Node.zlib.ZstdDecompress.cast?" do
   Internal.cast (Support.getExport "node:zlib" ["ZstdDecompress"] Value) (fun x => { val := x }) v
-
-/-- `v instanceof Options`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Options`). -/
-@[macro_inline] def Options.cast? (v : Value) : IO (Option Options) := Internal.api "Lasm.JS.Node.Options.cast?" do
-  Internal.cast (Support.getExport "node:zlib" ["Options"] Value) (fun x => { val := x }) v
-
-/-- `v instanceof BrotliOptions`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `BrotliOptions`). -/
-@[macro_inline] def BrotliOptions.cast? (v : Value) : IO (Option BrotliOptions) := Internal.api "Lasm.JS.Node.BrotliOptions.cast?" do
-  Internal.cast (Support.getExport "node:zlib" ["BrotliOptions"] Value) (fun x => { val := x }) v
-
-/-- `v instanceof ZstdOptions`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ZstdOptions`). -/
-@[macro_inline] def ZstdOptions.cast? (v : Value) : IO (Option ZstdOptions) := Internal.api "Lasm.JS.Node.ZstdOptions.cast?" do
-  Internal.cast (Support.getExport "node:zlib" ["ZstdOptions"] Value) (fun x => { val := x }) v
 
 /-- `v instanceof ZipBuffer`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ZipBuffer`). -/
 @[macro_inline] def zlib.ZipBuffer.cast? (v : Value) : IO (Option zlib.ZipBuffer) := Internal.api "Lasm.JS.Node.zlib.ZipBuffer.cast?" do

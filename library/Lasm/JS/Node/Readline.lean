@@ -279,10 +279,6 @@ instance instToJSReadlinePromisesCreateInterfaceOptions : ToJS readlinePromises.
     ("tabSize", Internal.optional d.tabSize),
     ("signal", Internal.optional d.signal)]⟩
 
-/-- `v instanceof InterfaceConstructor`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `InterfaceConstructor`). -/
-@[macro_inline] def InterfaceConstructor.cast? (v : Value) : IO (Option InterfaceConstructor) := Internal.api "Lasm.JS.Node.InterfaceConstructor.cast?" do
-  Internal.cast (Support.getExport "node:readline" ["InterfaceConstructor"] Value) (fun x => { val := x }) v
-
 /-- `rl.line` (added in Node.js v0.1.98): `readonly attribute DOMString line` -/
 @[macro_inline] def InterfaceConstructor.line (self : InterfaceConstructor) : IO String := Internal.api "Lasm.JS.Node.InterfaceConstructor.line" do
   self.val.get "line" String

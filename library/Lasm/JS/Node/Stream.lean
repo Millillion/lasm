@@ -835,10 +835,6 @@ instance instToJSStreamFinishedOptions2 : ToJS stream.FinishedOptions2 := ⟨fun
   let r ← self.val.callMethod "destroy" (Internal.args #[error]) Value
   pure { val := r }
 
-/-- `writable._destroy(err, callback)` (added in Node.js v8.0.0): `undefined destroy(any err, Function callback)` -/
-@[macro_inline] def stream.Writable.destroyWithErr (self : stream.Writable) (err : Data) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.stream.Writable.destroyWithErr" do
-  self.val.callMethod "destroy" (Internal.args #[toJS err, toJS callback]) Unit
-
 /-- `writable.end([chunk[, encoding]][, callback])` (added in Node.js v0.9.4): `stream.Writable end(optional any chunk, optional DOMString encoding)` -/
 @[macro_inline] def stream.Writable.«end» (self : stream.Writable) (chunk : Data := .undefined) (encoding : Option String := none) : IO stream.Writable := Internal.api "Lasm.JS.Node.stream.Writable.end" do
   let r ← self.val.callMethod "end" (Internal.args #[chunk, Internal.optional encoding]) Value
@@ -857,21 +853,17 @@ instance instToJSStreamFinishedOptions2 : ToJS stream.FinishedOptions2 := ⟨fun
 @[macro_inline] def stream.Writable.write (self : stream.Writable) (chunk : Data) (encoding : Option String := none) : IO Bool := Internal.api "Lasm.JS.Node.stream.Writable.write" do
   self.val.callMethod "write" (Internal.args #[toJS chunk, Internal.optional encoding]) Bool
 
-/-- `writable._write(chunk, encoding, callback)`: `undefined write(any chunk, DOMString encoding, Function callback)` -/
-@[macro_inline] def stream.Writable.writeWithCallback (self : stream.Writable) (chunk : Data) (encoding : String) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.stream.Writable.writeWithCallback" do
-  self.val.callMethod "write" (Internal.args #[toJS chunk, toJS encoding, toJS callback]) Unit
+/-- `writable._write(chunk, encoding, callback)`: `undefined _write(any chunk, DOMString encoding, Function callback)` -/
+@[macro_inline] def stream.Writable._write (self : stream.Writable) (chunk : Data) (encoding : String) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.stream.Writable._write" do
+  self.val.callMethod "_write" (Internal.args #[toJS chunk, toJS encoding, toJS callback]) Unit
 
-/-- `writable._construct(callback)` (added in Node.js v15.0.0): `undefined construct(Function callback)` -/
-@[macro_inline] def stream.Writable.construct (self : stream.Writable) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.stream.Writable.construct" do
-  self.val.callMethod "construct" (Internal.args #[toJS callback]) Unit
+/-- `writable._writev(chunks, callback)`: `undefined _writev(sequence<object> chunks, Function callback)` -/
+@[macro_inline] def stream.Writable._writev (self : stream.Writable) (chunks : Array Data) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.stream.Writable._writev" do
+  self.val.callMethod "_writev" (Internal.args #[toJS chunks, toJS callback]) Unit
 
-/-- `writable._writev(chunks, callback)`: `undefined writev(sequence<object> chunks, Function callback)` -/
-@[macro_inline] def stream.Writable.writev (self : stream.Writable) (chunks : Array Data) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.stream.Writable.writev" do
-  self.val.callMethod "writev" (Internal.args #[toJS chunks, toJS callback]) Unit
-
-/-- `writable._final(callback)` (added in Node.js v8.0.0): `undefined final(Function callback)` -/
-@[macro_inline] def stream.Writable.final (self : stream.Writable) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.stream.Writable.final" do
-  self.val.callMethod "final" (Internal.args #[toJS callback]) Unit
+/-- `writable._destroy(err, callback)` (added in Node.js v8.0.0): `undefined _destroy(any err, Function callback)` -/
+@[macro_inline] def stream.Writable._destroy (self : stream.Writable) (err : Data) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.stream.Writable._destroy" do
+  self.val.callMethod "_destroy" (Internal.args #[toJS err, toJS callback]) Unit
 
 /-- `stream.Writable.fromWeb(writableStream[, options])` (added in Node.js v17.0.0): `static stream.Writable fromWeb(WritableStream writableStream, optional stream.Writable.FromWebOptions options)` -/
 @[macro_inline] def stream.Writable.fromWeb (writableStream : WritableStream) (options : Option stream.Writable.FromWebOptions := none) : IO stream.Writable := Internal.api "Lasm.JS.Node.stream.Writable.fromWeb" do
@@ -1012,10 +1004,6 @@ instance instToJSStreamFinishedOptions2 : ToJS stream.FinishedOptions2 := ⟨fun
   let r ← self.val.callMethod "destroy" (Internal.args #[error]) Value
   pure { val := r }
 
-/-- `readable._destroy(err, callback)` (added in Node.js v8.0.0): `undefined destroy(any err, Function callback)` -/
-@[macro_inline] def stream.Readable.destroyWithErr (self : stream.Readable) (err : Data) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.stream.Readable.destroyWithErr" do
-  self.val.callMethod "destroy" (Internal.args #[toJS err, toJS callback]) Unit
-
 /-- `readable.isPaused()` (added in Node.js v0.11.14): `boolean isPaused()` -/
 @[macro_inline] def stream.Readable.isPaused (self : stream.Readable) : IO Bool := Internal.api "Lasm.JS.Node.stream.Readable.isPaused" do
   self.val.callMethod "isPaused" (Internal.args #[]) Bool
@@ -1128,9 +1116,13 @@ instance instToJSStreamFinishedOptions2 : ToJS stream.FinishedOptions2 := ⟨fun
 @[macro_inline] def stream.Readable.pushWithChunk (self : stream.Readable) (chunk : Data) (encoding : Option String := none) : IO Bool := Internal.api "Lasm.JS.Node.stream.Readable.pushWithChunk" do
   self.val.callMethod "push" (Internal.args #[toJS chunk, Internal.optional encoding]) Bool
 
-/-- `readable._construct(callback)` (added in Node.js v15.0.0): `undefined construct(Function callback)` -/
-@[macro_inline] def stream.Readable.construct (self : stream.Readable) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.stream.Readable.construct" do
-  self.val.callMethod "construct" (Internal.args #[toJS callback]) Unit
+/-- `readable._read(size)` (added in Node.js v0.9.4): `undefined _read(double /* integer: Nat */ size)` -/
+@[macro_inline] def stream.Readable._read (self : stream.Readable) (size : Nat) : IO Unit := Internal.api "Lasm.JS.Node.stream.Readable._read" do
+  self.val.callMethod "_read" (Internal.args #[toJS size]) Unit
+
+/-- `readable._destroy(err, callback)` (added in Node.js v8.0.0): `undefined _destroy(any err, Function callback)` -/
+@[macro_inline] def stream.Readable._destroy (self : stream.Readable) (err : Data) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.stream.Readable._destroy" do
+  self.val.callMethod "_destroy" (Internal.args #[toJS err, toJS callback]) Unit
 
 /-- `stream.Readable.from(iterable[, options])` (added in Node.js v12.3.0, v10.17.0): `static stream.Readable from(object iterable, optional object options)` -/
 @[macro_inline] def stream.Readable.«from» (iterable : Data) (options : Data := .undefined) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.from" do
@@ -1189,13 +1181,9 @@ instance instToJSStreamFinishedOptions2 : ToJS stream.FinishedOptions2 := ⟨fun
   let r ← self.val.callMethod "destroy" (Internal.args #[error]) Value
   pure { val := r }
 
-/-- `transform._flush(callback)`: `undefined flush(Function callback)` -/
-@[macro_inline] def stream.Transform.flush (self : stream.Transform) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.stream.Transform.flush" do
-  self.val.callMethod "flush" (Internal.args #[toJS callback]) Unit
-
-/-- `transform._transform(chunk, encoding, callback)`: `undefined transform(any chunk, DOMString encoding, Function callback)` -/
-@[macro_inline] def stream.Transform.transform (self : stream.Transform) (chunk : Data) (encoding : String) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.stream.Transform.transform" do
-  self.val.callMethod "transform" (Internal.args #[toJS chunk, toJS encoding, toJS callback]) Unit
+/-- `transform._transform(chunk, encoding, callback)`: `undefined _transform(any chunk, DOMString encoding, Function callback)` -/
+@[macro_inline] def stream.Transform._transform (self : stream.Transform) (chunk : Data) (encoding : String) (callback : JSFunction) : IO Unit := Internal.api "Lasm.JS.Node.stream.Transform._transform" do
+  self.val.callMethod "_transform" (Internal.args #[toJS chunk, toJS encoding, toJS callback]) Unit
 
 /-- `v instanceof PassThrough`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PassThrough`). -/
 @[macro_inline] def stream.PassThrough.cast? (v : Value) : IO (Option stream.PassThrough) := Internal.api "Lasm.JS.Node.stream.PassThrough.cast?" do

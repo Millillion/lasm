@@ -4,7 +4,7 @@
 // each member's documented signature. generate-web.mjs turns this into Lasm.JS.Node.
 
 // Class: `NodeEventTarget` (events.md), node:events
-[LasmModule="node:events", LasmPath="NodeEventTarget", LasmLeanModule="Events", LasmDoc="events", LasmName="NodeEventTarget"]
+[LasmModule="node:events", LasmLeanModule="Events", LasmDoc="events", LasmName="NodeEventTarget"]
 interface Node_NodeEventTarget {
   // `nodeEventTarget.addListener(type, listener)` [events.md]
   [LasmSignature="nodeEventTarget.addListener(type, listener)", LasmAdded="v14.5.0"] EventTarget addListener(DOMString type, Function listener);
@@ -168,16 +168,12 @@ interface Node_stream_Writable : Node_EventEmitter {
   [LasmSignature="writable.writableNeedDrain", LasmAdded="v15.2.0, v14.17.0"] readonly attribute boolean writableNeedDrain;
   // `writableObjectMode` Type: {boolean} [stream.md]
   [LasmSignature="writable.writableObjectMode", LasmAdded="v12.3.0"] readonly attribute boolean writableObjectMode;
-  // `writable._construct(callback)` [stream.md]
-  [LasmSignature="writable._construct(callback)", LasmAdded="v15.0.0"] undefined _construct(Function _callback);
   // `writable._write(chunk, encoding, callback)` [stream.md]
-  [LasmSignature="writable._write(chunk, encoding, callback)"] undefined _write(any chunk, DOMString encoding, Function _callback);
+  [LasmName="_write", LasmSignature="writable._write(chunk, encoding, callback)"] undefined lasm_write(any chunk, DOMString encoding, Function _callback);
   // `writable._writev(chunks, callback)` [stream.md]
-  [LasmSignature="writable._writev(chunks, callback)"] undefined _writev(sequence<object> chunks, Function _callback);
+  [LasmName="_writev", LasmSignature="writable._writev(chunks, callback)"] undefined lasm_writev(sequence<object> chunks, Function _callback);
   // `writable._destroy(err, callback)` [stream.md]
-  [LasmSignature="writable._destroy(err, callback)", LasmAdded="v8.0.0"] undefined _destroy(any err, Function _callback);
-  // `writable._final(callback)` [stream.md]
-  [LasmSignature="writable._final(callback)", LasmAdded="v8.0.0"] undefined _final(Function _callback);
+  [LasmName="_destroy", LasmSignature="writable._destroy(err, callback)", LasmAdded="v8.0.0"] undefined lasm_destroy(any err, Function _callback);
   // `stream.Writable.fromWeb(writableStream[, options])` [stream.md]
   [LasmSignature="stream.Writable.fromWeb(writableStream[, options])", LasmAdded="v17.0.0"] static Node_stream_Writable fromWeb(WritableStream writableStream, optional Node_stream_Writable_FromWebOptions options);
   // `stream.Writable.toWeb(streamWritable)` [stream.md]
@@ -282,12 +278,10 @@ interface Node_stream_Readable : Node_EventEmitter {
   [LasmSignature="readable.read(0)"] undefined read();
   // `readable.push('')` [stream.md]
   [LasmSignature="readable.push('')"] undefined push();
-  // `readable._construct(callback)` [stream.md]
-  [LasmSignature="readable._construct(callback)", LasmAdded="v15.0.0"] undefined _construct(Function _callback);
   // `readable._read(size)` [stream.md]
-  [LasmSignature="readable._read(size)", LasmAdded="v0.9.4"] undefined _read(double size);
+  [LasmName="_read", LasmSignature="readable._read(size)", LasmAdded="v0.9.4"] undefined lasm_read(double size);
   // `readable._destroy(err, callback)` [stream.md]
-  [LasmSignature="readable._destroy(err, callback)", LasmAdded="v8.0.0"] undefined _destroy(any err, Function _callback);
+  [LasmName="_destroy", LasmSignature="readable._destroy(err, callback)", LasmAdded="v8.0.0"] undefined lasm_destroy(any err, Function _callback);
   // `readable.push(chunk[, encoding])` [stream.md]
   [LasmSignature="readable.push(chunk[, encoding])"] boolean push(any chunk, optional DOMString encoding);
   // `stream.Readable.from(iterable[, options])` [stream.md]
@@ -318,10 +312,8 @@ interface Node_stream_Duplex : Node_stream_Readable {
 interface Node_stream_Transform {
   // `transform.destroy([error])` [stream.md]
   [LasmSignature="transform.destroy([error])", LasmAdded="v8.0.0"] Node_stream_Transform destroy(optional any error);
-  // `transform._flush(callback)` [stream.md]
-  [LasmSignature="transform._flush(callback)"] undefined _flush(Function _callback);
   // `transform._transform(chunk, encoding, callback)` [stream.md]
-  [LasmSignature="transform._transform(chunk, encoding, callback)"] undefined _transform(any chunk, DOMString encoding, Function _callback);
+  [LasmName="_transform", LasmSignature="transform._transform(chunk, encoding, callback)"] undefined lasm_transform(any chunk, DOMString encoding, Function _callback);
 };
 
 // Class: `stream.PassThrough` (stream.md), node:stream
@@ -372,7 +364,7 @@ namespace stream {
 };
 
 // Class: `SlowBuffer` (buffer.md), node:buffer
-[LasmModule="node:buffer", LasmPath="SlowBuffer", LasmLeanModule="Buffer", LasmDoc="buffer", LasmName="SlowBuffer"]
+[LasmRemovedIn="26.13.0", LasmModule="node:buffer", LasmPath="SlowBuffer", LasmLeanModule="Buffer", LasmDoc="buffer", LasmName="SlowBuffer", LasmStability="0"]
 interface Node_SlowBuffer {
 
 };
@@ -461,9 +453,9 @@ interface Node_Buffer {
   // Static method: `Buffer.alloc(size[, fill[, encoding]])` [buffer.md]
   [LasmSignature="Buffer.alloc(size[, fill[, encoding]])", LasmAdded="v5.10.0"] static Uint8Array alloc(long long size, optional (DOMString or Uint8Array or long long) fill, optional DOMString encoding);
   // Static method: `Buffer.allocUnsafe(size)` [buffer.md]
-  [LasmSignature="Buffer.allocUnsafe(size)", LasmAdded="v5.10.0"] static Uint8Array allocUnsafe(long long size);
+  [LasmRemovedIn="26.13.0", LasmSignature="Buffer.allocUnsafe(size)", LasmAdded="v5.10.0"] static Uint8Array allocUnsafe(long long size);
   // Static method: `Buffer.allocUnsafeSlow(size)` [buffer.md]
-  [LasmSignature="Buffer.allocUnsafeSlow(size)", LasmAdded="v5.12.0"] static Uint8Array allocUnsafeSlow(long long size);
+  [LasmRemovedIn="26.13.0", LasmSignature="Buffer.allocUnsafeSlow(size)", LasmAdded="v5.12.0"] static Uint8Array allocUnsafeSlow(long long size);
   // Static method: `Buffer.byteLength(string[, encoding])` [buffer.md]
   [LasmSignature="Buffer.byteLength(string[, encoding])", LasmAdded="v0.1.90"] static long long byteLength((DOMString or Uint8Array) string, optional DOMString encoding);
   // Static method: `Buffer.compare(buf1, buf2)` [buffer.md]
@@ -727,28 +719,6 @@ namespace process {
   [LasmSignature="process.execPath", LasmAdded="v0.1.100"] readonly attribute DOMString execPath;
   // `exitCode` Type: {integer|string|null|undefined} The exit code. For string type, only integer strings (e.g.,'1') are allowed. **Default:** `undefined`. [process.md]
   [LasmSignature="process.exitCode", LasmAdded="v0.11.8"] readonly attribute (long long or DOMString)? exitCode;
-  // `cached_builtins` Type: {boolean} [process.md]
-  [LasmSignature="process.cached_builtins", LasmAdded="v12.0.0"] readonly attribute boolean cached_builtins;
-  // `debug` Type: {boolean} [process.md]
-  [LasmSignature="process.debug", LasmAdded="v0.5.5"] readonly attribute boolean debug;
-  // `inspector` Type: {boolean} [process.md]
-  [LasmSignature="process.inspector", LasmAdded="v11.10.0"] readonly attribute boolean inspector;
-  // `ipv6` Type: {boolean} [process.md]
-  [LasmSignature="process.ipv6", LasmAdded="v0.5.3", LasmStability="0"] readonly attribute boolean ipv6;
-  // `require_module` Type: {boolean} [process.md]
-  [LasmSignature="process.require_module", LasmAdded="v23.0.0, v22.10.0, v20.19.0"] readonly attribute boolean require_module;
-  // `tls` Type: {boolean} [process.md]
-  [LasmSignature="process.tls", LasmAdded="v0.5.3"] readonly attribute boolean tls;
-  // `tls_alpn` Type: {boolean} [process.md]
-  [LasmSignature="process.tls_alpn", LasmAdded="v4.8.0", LasmStability="0"] readonly attribute boolean tls_alpn;
-  // `tls_ocsp` Type: {boolean} [process.md]
-  [LasmSignature="process.tls_ocsp", LasmAdded="v0.11.13", LasmStability="0"] readonly attribute boolean tls_ocsp;
-  // `tls_sni` Type: {boolean} [process.md]
-  [LasmSignature="process.tls_sni", LasmAdded="v0.5.3", LasmStability="0"] readonly attribute boolean tls_sni;
-  // `typescript` Type: {boolean|string} [process.md]
-  [LasmSignature="process.typescript", LasmAdded="v23.0.0, v22.10.0", LasmStability="1"] readonly attribute (boolean or DOMString) typescript;
-  // `uv` Type: {boolean} [process.md]
-  [LasmSignature="process.uv", LasmAdded="v0.5.3", LasmStability="0"] readonly attribute boolean uv;
   // `mainModule` Type: {Object} [process.md]
   [LasmSignature="process.mainModule", LasmAdded="v0.1.17", LasmStability="0"] readonly attribute object mainModule;
   // `noDeprecation` Type: {boolean} [process.md]
@@ -780,7 +750,7 @@ namespace process {
   // `traceDeprecation` Type: {boolean} [process.md]
   [LasmSignature="process.traceDeprecation", LasmAdded="v0.8.0"] readonly attribute boolean traceDeprecation;
   // `traceProcessWarnings` {boolean} [process.md]
-  [LasmSignature="process.traceProcessWarnings", LasmAdded="v6.10.0"] readonly attribute boolean traceProcessWarnings;
+  [LasmRemovedIn="26.13.0", LasmSignature="process.traceProcessWarnings", LasmAdded="v6.10.0"] readonly attribute boolean traceProcessWarnings;
   // `version` Type: {string} [process.md]
   [LasmSignature="process.version", LasmAdded="v0.1.3"] readonly attribute DOMString version;
   // `versions` Type: {Object} [process.md]
@@ -798,88 +768,6 @@ namespace Node_process_finalization {
   [LasmSignature="process.finalization.registerBeforeExit(ref, callback)", LasmAdded="v22.5.0", LasmStability="1"] undefined registerBeforeExit((object or Function) ref, Function _callback);
   // `process.finalization.unregister(ref)` [process.md]
   [LasmSignature="process.finalization.unregister(ref)", LasmAdded="v22.5.0", LasmStability="1"] undefined unregister((object or Function) ref);
-  // `allowedNodeEnvironmentFlags` Type: {Set} [process.md]
-  [LasmSignature="process.finalization.allowedNodeEnvironmentFlags", LasmAdded="v10.10.0"] readonly attribute object allowedNodeEnvironmentFlags;
-  // `arch` Type: {string} [process.md]
-  [LasmSignature="process.finalization.arch", LasmAdded="v0.5.0"] readonly attribute DOMString arch;
-  // `argv` Type: {string\[]} [process.md]
-  [LasmSignature="process.finalization.argv", LasmAdded="v0.1.27"] readonly attribute sequence<DOMString> argv;
-  // `argv0` Type: {string} [process.md]
-  [LasmSignature="process.finalization.argv0", LasmAdded="v6.4.0"] readonly attribute DOMString argv0;
-  // `channel` Type: {Object} [process.md]
-  [LasmSignature="process.finalization.channel", LasmAdded="v7.1.0"] readonly attribute object channel;
-  // `config` Type: {Object} [process.md]
-  [LasmSignature="process.finalization.config", LasmAdded="v0.7.7"] readonly attribute object config;
-  // `connected` Type: {boolean} [process.md]
-  [LasmSignature="process.finalization.connected", LasmAdded="v0.7.2"] readonly attribute boolean connected;
-  // `debugPort` Type: {number} [process.md]
-  [LasmSignature="process.finalization.debugPort", LasmAdded="v0.7.2"] readonly attribute double debugPort;
-  // `env` Type: {Object} [process.md]
-  [LasmSignature="process.finalization.env", LasmAdded="v0.1.27"] readonly attribute object env;
-  // `execArgv` Type: {string\[]} [process.md]
-  [LasmSignature="process.finalization.execArgv", LasmAdded="v0.7.7"] readonly attribute sequence<DOMString> execArgv;
-  // `execPath` Type: {string} [process.md]
-  [LasmSignature="process.finalization.execPath", LasmAdded="v0.1.100"] readonly attribute DOMString execPath;
-  // `exitCode` Type: {integer|string|null|undefined} The exit code. For string type, only integer strings (e.g.,'1') are allowed. **Default:** `undefined`. [process.md]
-  [LasmSignature="process.finalization.exitCode", LasmAdded="v0.11.8"] readonly attribute (long long or DOMString)? exitCode;
-  // `cached_builtins` Type: {boolean} [process.md]
-  [LasmSignature="process.finalization.cached_builtins", LasmAdded="v12.0.0"] readonly attribute boolean cached_builtins;
-  // `debug` Type: {boolean} [process.md]
-  [LasmSignature="process.finalization.debug", LasmAdded="v0.5.5"] readonly attribute boolean debug;
-  // `inspector` Type: {boolean} [process.md]
-  [LasmSignature="process.finalization.inspector", LasmAdded="v11.10.0"] readonly attribute boolean inspector;
-  // `ipv6` Type: {boolean} [process.md]
-  [LasmSignature="process.finalization.ipv6", LasmAdded="v0.5.3", LasmStability="0"] readonly attribute boolean ipv6;
-  // `require_module` Type: {boolean} [process.md]
-  [LasmSignature="process.finalization.require_module", LasmAdded="v23.0.0, v22.10.0, v20.19.0"] readonly attribute boolean require_module;
-  // `tls` Type: {boolean} [process.md]
-  [LasmSignature="process.finalization.tls", LasmAdded="v0.5.3"] readonly attribute boolean tls;
-  // `tls_alpn` Type: {boolean} [process.md]
-  [LasmSignature="process.finalization.tls_alpn", LasmAdded="v4.8.0", LasmStability="0"] readonly attribute boolean tls_alpn;
-  // `tls_ocsp` Type: {boolean} [process.md]
-  [LasmSignature="process.finalization.tls_ocsp", LasmAdded="v0.11.13", LasmStability="0"] readonly attribute boolean tls_ocsp;
-  // `tls_sni` Type: {boolean} [process.md]
-  [LasmSignature="process.finalization.tls_sni", LasmAdded="v0.5.3", LasmStability="0"] readonly attribute boolean tls_sni;
-  // `typescript` Type: {boolean|string} [process.md]
-  [LasmSignature="process.finalization.typescript", LasmAdded="v23.0.0, v22.10.0", LasmStability="1"] readonly attribute (boolean or DOMString) typescript;
-  // `uv` Type: {boolean} [process.md]
-  [LasmSignature="process.finalization.uv", LasmAdded="v0.5.3", LasmStability="0"] readonly attribute boolean uv;
-  // `mainModule` Type: {Object} [process.md]
-  [LasmSignature="process.finalization.mainModule", LasmAdded="v0.1.17", LasmStability="0"] readonly attribute object mainModule;
-  // `noDeprecation` Type: {boolean} [process.md]
-  [LasmSignature="process.finalization.noDeprecation", LasmAdded="v0.8.0"] readonly attribute boolean noDeprecation;
-  // `permission` Type: {Object} [process.md]
-  [LasmSignature="process.finalization.permission", LasmAdded="v20.0.0"] readonly attribute object permission;
-  // `pid` Type: {integer} [process.md]
-  [LasmSignature="process.finalization.pid", LasmAdded="v0.1.15"] readonly attribute long long pid;
-  // `platform` Type: {string} [process.md]
-  [LasmSignature="process.finalization.platform", LasmAdded="v0.1.16"] readonly attribute DOMString platform;
-  // `ppid` Type: {integer} [process.md]
-  [LasmSignature="process.finalization.ppid", LasmAdded="v9.2.0, v8.10.0, v6.13.0"] readonly attribute long long ppid;
-  // `release` Type: {Object} [process.md]
-  [LasmSignature="process.finalization.release", LasmAdded="v3.0.0"] readonly attribute object release;
-  // `report` Type: {Object} [process.md]
-  [LasmSignature="process.finalization.report", LasmAdded="v11.8.0"] readonly attribute object report;
-  // `sourceMapsEnabled` Type: {boolean} [process.md]
-  [LasmSignature="process.finalization.sourceMapsEnabled", LasmAdded="v20.7.0, v18.19.0", LasmStability="1"] readonly attribute boolean sourceMapsEnabled;
-  // `stderr` Type: {Stream} [process.md]
-  [LasmSignature="process.finalization.stderr"] readonly attribute Node_EventEmitter stderr;
-  // `stdin` Type: {Stream} [process.md]
-  [LasmSignature="process.finalization.stdin"] readonly attribute Node_EventEmitter stdin;
-  // `stdout` Type: {Stream} [process.md]
-  [LasmSignature="process.finalization.stdout"] readonly attribute Node_EventEmitter stdout;
-  // `throwDeprecation` Type: {boolean} [process.md]
-  [LasmSignature="process.finalization.throwDeprecation", LasmAdded="v0.9.12"] readonly attribute boolean throwDeprecation;
-  // `title` Type: {string} [process.md]
-  [LasmSignature="process.finalization.title", LasmAdded="v0.1.104"] readonly attribute DOMString title;
-  // `traceDeprecation` Type: {boolean} [process.md]
-  [LasmSignature="process.finalization.traceDeprecation", LasmAdded="v0.8.0"] readonly attribute boolean traceDeprecation;
-  // `traceProcessWarnings` {boolean} [process.md]
-  [LasmSignature="process.finalization.traceProcessWarnings", LasmAdded="v6.10.0"] readonly attribute boolean traceProcessWarnings;
-  // `version` Type: {string} [process.md]
-  [LasmSignature="process.finalization.version", LasmAdded="v0.1.3"] readonly attribute DOMString version;
-  // `versions` Type: {Object} [process.md]
-  [LasmSignature="process.finalization.versions", LasmAdded="v0.2.0"] readonly attribute object versions;
 };
 
 // process.hrtime (process.md) (process.md), node:process
@@ -887,88 +775,6 @@ namespace Node_process_finalization {
 namespace Node_process_hrtime {
   // `process.hrtime.bigint()` [process.md]
   [LasmSignature="process.hrtime.bigint()", LasmAdded="v10.7.0"] bigint _bigint();
-  // `allowedNodeEnvironmentFlags` Type: {Set} [process.md]
-  [LasmSignature="process.hrtime.allowedNodeEnvironmentFlags", LasmAdded="v10.10.0"] readonly attribute object allowedNodeEnvironmentFlags;
-  // `arch` Type: {string} [process.md]
-  [LasmSignature="process.hrtime.arch", LasmAdded="v0.5.0"] readonly attribute DOMString arch;
-  // `argv` Type: {string\[]} [process.md]
-  [LasmSignature="process.hrtime.argv", LasmAdded="v0.1.27"] readonly attribute sequence<DOMString> argv;
-  // `argv0` Type: {string} [process.md]
-  [LasmSignature="process.hrtime.argv0", LasmAdded="v6.4.0"] readonly attribute DOMString argv0;
-  // `channel` Type: {Object} [process.md]
-  [LasmSignature="process.hrtime.channel", LasmAdded="v7.1.0"] readonly attribute object channel;
-  // `config` Type: {Object} [process.md]
-  [LasmSignature="process.hrtime.config", LasmAdded="v0.7.7"] readonly attribute object config;
-  // `connected` Type: {boolean} [process.md]
-  [LasmSignature="process.hrtime.connected", LasmAdded="v0.7.2"] readonly attribute boolean connected;
-  // `debugPort` Type: {number} [process.md]
-  [LasmSignature="process.hrtime.debugPort", LasmAdded="v0.7.2"] readonly attribute double debugPort;
-  // `env` Type: {Object} [process.md]
-  [LasmSignature="process.hrtime.env", LasmAdded="v0.1.27"] readonly attribute object env;
-  // `execArgv` Type: {string\[]} [process.md]
-  [LasmSignature="process.hrtime.execArgv", LasmAdded="v0.7.7"] readonly attribute sequence<DOMString> execArgv;
-  // `execPath` Type: {string} [process.md]
-  [LasmSignature="process.hrtime.execPath", LasmAdded="v0.1.100"] readonly attribute DOMString execPath;
-  // `exitCode` Type: {integer|string|null|undefined} The exit code. For string type, only integer strings (e.g.,'1') are allowed. **Default:** `undefined`. [process.md]
-  [LasmSignature="process.hrtime.exitCode", LasmAdded="v0.11.8"] readonly attribute (long long or DOMString)? exitCode;
-  // `cached_builtins` Type: {boolean} [process.md]
-  [LasmSignature="process.hrtime.cached_builtins", LasmAdded="v12.0.0"] readonly attribute boolean cached_builtins;
-  // `debug` Type: {boolean} [process.md]
-  [LasmSignature="process.hrtime.debug", LasmAdded="v0.5.5"] readonly attribute boolean debug;
-  // `inspector` Type: {boolean} [process.md]
-  [LasmSignature="process.hrtime.inspector", LasmAdded="v11.10.0"] readonly attribute boolean inspector;
-  // `ipv6` Type: {boolean} [process.md]
-  [LasmSignature="process.hrtime.ipv6", LasmAdded="v0.5.3", LasmStability="0"] readonly attribute boolean ipv6;
-  // `require_module` Type: {boolean} [process.md]
-  [LasmSignature="process.hrtime.require_module", LasmAdded="v23.0.0, v22.10.0, v20.19.0"] readonly attribute boolean require_module;
-  // `tls` Type: {boolean} [process.md]
-  [LasmSignature="process.hrtime.tls", LasmAdded="v0.5.3"] readonly attribute boolean tls;
-  // `tls_alpn` Type: {boolean} [process.md]
-  [LasmSignature="process.hrtime.tls_alpn", LasmAdded="v4.8.0", LasmStability="0"] readonly attribute boolean tls_alpn;
-  // `tls_ocsp` Type: {boolean} [process.md]
-  [LasmSignature="process.hrtime.tls_ocsp", LasmAdded="v0.11.13", LasmStability="0"] readonly attribute boolean tls_ocsp;
-  // `tls_sni` Type: {boolean} [process.md]
-  [LasmSignature="process.hrtime.tls_sni", LasmAdded="v0.5.3", LasmStability="0"] readonly attribute boolean tls_sni;
-  // `typescript` Type: {boolean|string} [process.md]
-  [LasmSignature="process.hrtime.typescript", LasmAdded="v23.0.0, v22.10.0", LasmStability="1"] readonly attribute (boolean or DOMString) typescript;
-  // `uv` Type: {boolean} [process.md]
-  [LasmSignature="process.hrtime.uv", LasmAdded="v0.5.3", LasmStability="0"] readonly attribute boolean uv;
-  // `mainModule` Type: {Object} [process.md]
-  [LasmSignature="process.hrtime.mainModule", LasmAdded="v0.1.17", LasmStability="0"] readonly attribute object mainModule;
-  // `noDeprecation` Type: {boolean} [process.md]
-  [LasmSignature="process.hrtime.noDeprecation", LasmAdded="v0.8.0"] readonly attribute boolean noDeprecation;
-  // `permission` Type: {Object} [process.md]
-  [LasmSignature="process.hrtime.permission", LasmAdded="v20.0.0"] readonly attribute object permission;
-  // `pid` Type: {integer} [process.md]
-  [LasmSignature="process.hrtime.pid", LasmAdded="v0.1.15"] readonly attribute long long pid;
-  // `platform` Type: {string} [process.md]
-  [LasmSignature="process.hrtime.platform", LasmAdded="v0.1.16"] readonly attribute DOMString platform;
-  // `ppid` Type: {integer} [process.md]
-  [LasmSignature="process.hrtime.ppid", LasmAdded="v9.2.0, v8.10.0, v6.13.0"] readonly attribute long long ppid;
-  // `release` Type: {Object} [process.md]
-  [LasmSignature="process.hrtime.release", LasmAdded="v3.0.0"] readonly attribute object release;
-  // `report` Type: {Object} [process.md]
-  [LasmSignature="process.hrtime.report", LasmAdded="v11.8.0"] readonly attribute object report;
-  // `sourceMapsEnabled` Type: {boolean} [process.md]
-  [LasmSignature="process.hrtime.sourceMapsEnabled", LasmAdded="v20.7.0, v18.19.0", LasmStability="1"] readonly attribute boolean sourceMapsEnabled;
-  // `stderr` Type: {Stream} [process.md]
-  [LasmSignature="process.hrtime.stderr"] readonly attribute Node_EventEmitter stderr;
-  // `stdin` Type: {Stream} [process.md]
-  [LasmSignature="process.hrtime.stdin"] readonly attribute Node_EventEmitter stdin;
-  // `stdout` Type: {Stream} [process.md]
-  [LasmSignature="process.hrtime.stdout"] readonly attribute Node_EventEmitter stdout;
-  // `throwDeprecation` Type: {boolean} [process.md]
-  [LasmSignature="process.hrtime.throwDeprecation", LasmAdded="v0.9.12"] readonly attribute boolean throwDeprecation;
-  // `title` Type: {string} [process.md]
-  [LasmSignature="process.hrtime.title", LasmAdded="v0.1.104"] readonly attribute DOMString title;
-  // `traceDeprecation` Type: {boolean} [process.md]
-  [LasmSignature="process.hrtime.traceDeprecation", LasmAdded="v0.8.0"] readonly attribute boolean traceDeprecation;
-  // `traceProcessWarnings` {boolean} [process.md]
-  [LasmSignature="process.hrtime.traceProcessWarnings", LasmAdded="v6.10.0"] readonly attribute boolean traceProcessWarnings;
-  // `version` Type: {string} [process.md]
-  [LasmSignature="process.hrtime.version", LasmAdded="v0.1.3"] readonly attribute DOMString version;
-  // `versions` Type: {Object} [process.md]
-  [LasmSignature="process.hrtime.versions", LasmAdded="v0.2.0"] readonly attribute object versions;
 };
 
 // process.memoryUsage (process.md) (process.md), node:process
@@ -976,88 +782,6 @@ namespace Node_process_hrtime {
 namespace Node_process_memoryUsage {
   // `process.memoryUsage.rss()` [process.md]
   [LasmSignature="process.memoryUsage.rss()", LasmAdded="v15.6.0, v14.18.0"] long long rss();
-  // `allowedNodeEnvironmentFlags` Type: {Set} [process.md]
-  [LasmSignature="process.memoryUsage.allowedNodeEnvironmentFlags", LasmAdded="v10.10.0"] readonly attribute object allowedNodeEnvironmentFlags;
-  // `arch` Type: {string} [process.md]
-  [LasmSignature="process.memoryUsage.arch", LasmAdded="v0.5.0"] readonly attribute DOMString arch;
-  // `argv` Type: {string\[]} [process.md]
-  [LasmSignature="process.memoryUsage.argv", LasmAdded="v0.1.27"] readonly attribute sequence<DOMString> argv;
-  // `argv0` Type: {string} [process.md]
-  [LasmSignature="process.memoryUsage.argv0", LasmAdded="v6.4.0"] readonly attribute DOMString argv0;
-  // `channel` Type: {Object} [process.md]
-  [LasmSignature="process.memoryUsage.channel", LasmAdded="v7.1.0"] readonly attribute object channel;
-  // `config` Type: {Object} [process.md]
-  [LasmSignature="process.memoryUsage.config", LasmAdded="v0.7.7"] readonly attribute object config;
-  // `connected` Type: {boolean} [process.md]
-  [LasmSignature="process.memoryUsage.connected", LasmAdded="v0.7.2"] readonly attribute boolean connected;
-  // `debugPort` Type: {number} [process.md]
-  [LasmSignature="process.memoryUsage.debugPort", LasmAdded="v0.7.2"] readonly attribute double debugPort;
-  // `env` Type: {Object} [process.md]
-  [LasmSignature="process.memoryUsage.env", LasmAdded="v0.1.27"] readonly attribute object env;
-  // `execArgv` Type: {string\[]} [process.md]
-  [LasmSignature="process.memoryUsage.execArgv", LasmAdded="v0.7.7"] readonly attribute sequence<DOMString> execArgv;
-  // `execPath` Type: {string} [process.md]
-  [LasmSignature="process.memoryUsage.execPath", LasmAdded="v0.1.100"] readonly attribute DOMString execPath;
-  // `exitCode` Type: {integer|string|null|undefined} The exit code. For string type, only integer strings (e.g.,'1') are allowed. **Default:** `undefined`. [process.md]
-  [LasmSignature="process.memoryUsage.exitCode", LasmAdded="v0.11.8"] readonly attribute (long long or DOMString)? exitCode;
-  // `cached_builtins` Type: {boolean} [process.md]
-  [LasmSignature="process.memoryUsage.cached_builtins", LasmAdded="v12.0.0"] readonly attribute boolean cached_builtins;
-  // `debug` Type: {boolean} [process.md]
-  [LasmSignature="process.memoryUsage.debug", LasmAdded="v0.5.5"] readonly attribute boolean debug;
-  // `inspector` Type: {boolean} [process.md]
-  [LasmSignature="process.memoryUsage.inspector", LasmAdded="v11.10.0"] readonly attribute boolean inspector;
-  // `ipv6` Type: {boolean} [process.md]
-  [LasmSignature="process.memoryUsage.ipv6", LasmAdded="v0.5.3", LasmStability="0"] readonly attribute boolean ipv6;
-  // `require_module` Type: {boolean} [process.md]
-  [LasmSignature="process.memoryUsage.require_module", LasmAdded="v23.0.0, v22.10.0, v20.19.0"] readonly attribute boolean require_module;
-  // `tls` Type: {boolean} [process.md]
-  [LasmSignature="process.memoryUsage.tls", LasmAdded="v0.5.3"] readonly attribute boolean tls;
-  // `tls_alpn` Type: {boolean} [process.md]
-  [LasmSignature="process.memoryUsage.tls_alpn", LasmAdded="v4.8.0", LasmStability="0"] readonly attribute boolean tls_alpn;
-  // `tls_ocsp` Type: {boolean} [process.md]
-  [LasmSignature="process.memoryUsage.tls_ocsp", LasmAdded="v0.11.13", LasmStability="0"] readonly attribute boolean tls_ocsp;
-  // `tls_sni` Type: {boolean} [process.md]
-  [LasmSignature="process.memoryUsage.tls_sni", LasmAdded="v0.5.3", LasmStability="0"] readonly attribute boolean tls_sni;
-  // `typescript` Type: {boolean|string} [process.md]
-  [LasmSignature="process.memoryUsage.typescript", LasmAdded="v23.0.0, v22.10.0", LasmStability="1"] readonly attribute (boolean or DOMString) typescript;
-  // `uv` Type: {boolean} [process.md]
-  [LasmSignature="process.memoryUsage.uv", LasmAdded="v0.5.3", LasmStability="0"] readonly attribute boolean uv;
-  // `mainModule` Type: {Object} [process.md]
-  [LasmSignature="process.memoryUsage.mainModule", LasmAdded="v0.1.17", LasmStability="0"] readonly attribute object mainModule;
-  // `noDeprecation` Type: {boolean} [process.md]
-  [LasmSignature="process.memoryUsage.noDeprecation", LasmAdded="v0.8.0"] readonly attribute boolean noDeprecation;
-  // `permission` Type: {Object} [process.md]
-  [LasmSignature="process.memoryUsage.permission", LasmAdded="v20.0.0"] readonly attribute object permission;
-  // `pid` Type: {integer} [process.md]
-  [LasmSignature="process.memoryUsage.pid", LasmAdded="v0.1.15"] readonly attribute long long pid;
-  // `platform` Type: {string} [process.md]
-  [LasmSignature="process.memoryUsage.platform", LasmAdded="v0.1.16"] readonly attribute DOMString platform;
-  // `ppid` Type: {integer} [process.md]
-  [LasmSignature="process.memoryUsage.ppid", LasmAdded="v9.2.0, v8.10.0, v6.13.0"] readonly attribute long long ppid;
-  // `release` Type: {Object} [process.md]
-  [LasmSignature="process.memoryUsage.release", LasmAdded="v3.0.0"] readonly attribute object release;
-  // `report` Type: {Object} [process.md]
-  [LasmSignature="process.memoryUsage.report", LasmAdded="v11.8.0"] readonly attribute object report;
-  // `sourceMapsEnabled` Type: {boolean} [process.md]
-  [LasmSignature="process.memoryUsage.sourceMapsEnabled", LasmAdded="v20.7.0, v18.19.0", LasmStability="1"] readonly attribute boolean sourceMapsEnabled;
-  // `stderr` Type: {Stream} [process.md]
-  [LasmSignature="process.memoryUsage.stderr"] readonly attribute Node_EventEmitter stderr;
-  // `stdin` Type: {Stream} [process.md]
-  [LasmSignature="process.memoryUsage.stdin"] readonly attribute Node_EventEmitter stdin;
-  // `stdout` Type: {Stream} [process.md]
-  [LasmSignature="process.memoryUsage.stdout"] readonly attribute Node_EventEmitter stdout;
-  // `throwDeprecation` Type: {boolean} [process.md]
-  [LasmSignature="process.memoryUsage.throwDeprecation", LasmAdded="v0.9.12"] readonly attribute boolean throwDeprecation;
-  // `title` Type: {string} [process.md]
-  [LasmSignature="process.memoryUsage.title", LasmAdded="v0.1.104"] readonly attribute DOMString title;
-  // `traceDeprecation` Type: {boolean} [process.md]
-  [LasmSignature="process.memoryUsage.traceDeprecation", LasmAdded="v0.8.0"] readonly attribute boolean traceDeprecation;
-  // `traceProcessWarnings` {boolean} [process.md]
-  [LasmSignature="process.memoryUsage.traceProcessWarnings", LasmAdded="v6.10.0"] readonly attribute boolean traceProcessWarnings;
-  // `version` Type: {string} [process.md]
-  [LasmSignature="process.memoryUsage.version", LasmAdded="v0.1.3"] readonly attribute DOMString version;
-  // `versions` Type: {Object} [process.md]
-  [LasmSignature="process.memoryUsage.versions", LasmAdded="v0.2.0"] readonly attribute object versions;
 };
 
 // process.channel (process.md) (process.md), node:process
@@ -1085,22 +809,33 @@ namespace Node_process_report {
   [LasmSignature="process.report.getReport([err])", LasmAdded="v11.8.0"] object getReport(optional any err);
   // `process.report.writeReport([filename][, err])` [process.md]
   [LasmSignature="process.report.writeReport([filename][, err])", LasmAdded="v11.8.0"] DOMString writeReport(optional DOMString filename, optional any err);
-  // `compact` Type: {boolean} [process.md]
-  [LasmSignature="process.report.compact", LasmAdded="v13.12.0, v12.17.0"] readonly attribute boolean compact;
-  // `directory` Type: {string} [process.md]
-  [LasmSignature="process.report.directory", LasmAdded="v11.12.0"] readonly attribute DOMString directory;
-  // `filename` Type: {string} [process.md]
-  [LasmSignature="process.report.filename", LasmAdded="v11.12.0"] readonly attribute DOMString filename;
-  // `reportOnFatalError` Type: {boolean} [process.md]
-  [LasmSignature="process.report.reportOnFatalError", LasmAdded="v11.12.0"] readonly attribute boolean reportOnFatalError;
-  // `reportOnSignal` Type: {boolean} [process.md]
-  [LasmSignature="process.report.reportOnSignal", LasmAdded="v11.12.0"] readonly attribute boolean reportOnSignal;
-  // `reportOnUncaughtException` Type: {boolean} [process.md]
-  [LasmSignature="process.report.reportOnUncaughtException", LasmAdded="v11.12.0"] readonly attribute boolean reportOnUncaughtException;
-  // `excludeEnv` Type: {boolean} [process.md]
-  [LasmSignature="process.report.excludeEnv", LasmAdded="v23.3.0, v22.13.0"] readonly attribute boolean excludeEnv;
-  // `signal` Type: {string} [process.md]
-  [LasmSignature="process.report.signal", LasmAdded="v11.12.0"] readonly attribute DOMString signal;
+};
+
+// process.features (process.md) (process.md), node:process
+[LasmRemovedIn="26.13.0", LasmModule="node:process", LasmPath="features", LasmLeanModule="Process", LasmDoc="process", LasmNamespace="process", LasmName="features"]
+namespace Node_process_features {
+  // `cached_builtins` Type: {boolean} [process.md]
+  [LasmSignature="process.features.cached_builtins", LasmAdded="v12.0.0"] readonly attribute boolean cached_builtins;
+  // `debug` Type: {boolean} [process.md]
+  [LasmSignature="process.features.debug", LasmAdded="v0.5.5"] readonly attribute boolean debug;
+  // `inspector` Type: {boolean} [process.md]
+  [LasmSignature="process.features.inspector", LasmAdded="v11.10.0"] readonly attribute boolean inspector;
+  // `ipv6` Type: {boolean} [process.md]
+  [LasmSignature="process.features.ipv6", LasmAdded="v0.5.3", LasmStability="0"] readonly attribute boolean ipv6;
+  // `require_module` Type: {boolean} [process.md]
+  [LasmSignature="process.features.require_module", LasmAdded="v23.0.0, v22.10.0, v20.19.0"] readonly attribute boolean require_module;
+  // `tls` Type: {boolean} [process.md]
+  [LasmSignature="process.features.tls", LasmAdded="v0.5.3"] readonly attribute boolean tls;
+  // `tls_alpn` Type: {boolean} [process.md]
+  [LasmSignature="process.features.tls_alpn", LasmAdded="v4.8.0", LasmStability="0"] readonly attribute boolean tls_alpn;
+  // `tls_ocsp` Type: {boolean} [process.md]
+  [LasmSignature="process.features.tls_ocsp", LasmAdded="v0.11.13", LasmStability="0"] readonly attribute boolean tls_ocsp;
+  // `tls_sni` Type: {boolean} [process.md]
+  [LasmSignature="process.features.tls_sni", LasmAdded="v0.5.3", LasmStability="0"] readonly attribute boolean tls_sni;
+  // `typescript` Type: {boolean|string} [process.md]
+  [LasmSignature="process.features.typescript", LasmAdded="v23.0.0, v22.10.0", LasmStability="1"] readonly attribute (boolean or DOMString) typescript;
+  // `uv` Type: {boolean} [process.md]
+  [LasmSignature="process.features.uv", LasmAdded="v0.5.3", LasmStability="0"] readonly attribute boolean uv;
 };
 
 // Class: `FileHandle` (fs.md), node:fs
@@ -1208,7 +943,7 @@ interface Node_fs_Dirent {
 };
 
 // Class: `fs.FSWatcher` (fs.md), node:fs
-[LasmModule="node:fs", LasmPath="FSWatcher", LasmLeanModule="Fs", LasmDoc="fs", LasmNamespace="fs", LasmName="FSWatcher"]
+[LasmModule="node:fs", LasmLeanModule="Fs", LasmDoc="fs", LasmNamespace="fs", LasmName="FSWatcher"]
 interface Node_fs_FSWatcher {
   // Event: 'change' [fs.md]
   [LasmEvent="change", LasmSignature="Event: 'change'", LasmAdded="v0.5.8"] Node_fs_FSWatcher onChange(Node_fs_FSWatcher_ChangeListener listener);
@@ -1228,7 +963,7 @@ interface Node_fs_FSWatcher {
 };
 
 // Class: `fs.StatWatcher` (fs.md), node:fs
-[LasmModule="node:fs", LasmPath="StatWatcher", LasmLeanModule="Fs", LasmDoc="fs", LasmNamespace="fs", LasmName="StatWatcher"]
+[LasmModule="node:fs", LasmLeanModule="Fs", LasmDoc="fs", LasmNamespace="fs", LasmName="StatWatcher"]
 interface Node_fs_StatWatcher {
   // `watcher.ref()` [fs.md]
   [LasmSignature="watcher.ref()", LasmAdded="v14.3.0, v12.20.0"] Node_fs_StatWatcher ref();
@@ -1320,7 +1055,7 @@ interface Node_fs_Stats {
 };
 
 // Class: `fs.StatFs` (fs.md), node:fs
-[LasmModule="node:fs", LasmPath="StatFs", LasmLeanModule="Fs", LasmDoc="fs", LasmNamespace="fs", LasmName="StatFs"]
+[LasmModule="node:fs", LasmLeanModule="Fs", LasmDoc="fs", LasmNamespace="fs", LasmName="StatFs"]
 interface Node_fs_StatFs {
   // `bavail` Type: {number|bigint} [fs.md]
   [LasmSignature="bavail", LasmAdded="v19.6.0, v18.15.0"] readonly attribute (double or bigint) bavail;
@@ -1341,7 +1076,7 @@ interface Node_fs_StatFs {
 };
 
 // Class: `fs.Utf8Stream` (fs.md), node:fs
-[LasmModule="node:fs", LasmPath="Utf8Stream", LasmLeanModule="Fs", LasmDoc="fs", LasmNamespace="fs", LasmName="Utf8Stream"]
+[LasmModule="node:fs", LasmPath="Utf8Stream", LasmLeanModule="Fs", LasmDoc="fs", LasmNamespace="fs", LasmName="Utf8Stream", LasmStability="1"]
 interface Node_fs_Utf8Stream {
   // Event: 'close' [fs.md]
   [LasmEvent="close", LasmSignature="Event: 'close'", LasmStability="1"] Node_fs_Utf8Stream onClose(Node_fs_Utf8Stream_CloseListener listener);
@@ -1377,29 +1112,29 @@ interface Node_fs_Utf8Stream {
   // `utf8Stream.write(data)` [fs.md]
   [LasmSignature="utf8Stream.write(data)", LasmStability="1"] boolean write((DOMString or Uint8Array) data);
   // `append` {boolean} Whether the stream is appending to the file or truncating it. [fs.md]
-  [LasmSignature="utf8Stream.append", LasmStability="1"] readonly attribute boolean append;
+  [LasmRemovedIn="26.13.0", LasmSignature="utf8Stream.append", LasmStability="1"] readonly attribute boolean append;
   // `contentMode` {string} The type of data that can be written to the stream. Supported values are `'utf8'` or `'buffer'`. **Default**: `'utf8'`. [fs.md]
-  [LasmSignature="utf8Stream.contentMode", LasmStability="1"] readonly attribute DOMString contentMode;
+  [LasmRemovedIn="26.13.0", LasmSignature="utf8Stream.contentMode", LasmStability="1"] readonly attribute DOMString contentMode;
   // `fd` {number} The file descriptor that is being written to. [fs.md]
-  [LasmSignature="utf8Stream.fd", LasmStability="1"] readonly attribute double fd;
+  [LasmRemovedIn="26.13.0", LasmSignature="utf8Stream.fd", LasmStability="1"] readonly attribute double fd;
   // `file` {string} The file that is being written to. [fs.md]
-  [LasmSignature="utf8Stream.file", LasmStability="1"] readonly attribute DOMString file;
+  [LasmRemovedIn="26.13.0", LasmSignature="utf8Stream.file", LasmStability="1"] readonly attribute DOMString file;
   // `fsync` {boolean} Whether the stream is performing a `fs.fsyncSync()` after every write operation. [fs.md]
-  [LasmSignature="utf8Stream.fsync", LasmStability="1"] readonly attribute boolean fsync;
+  [LasmRemovedIn="26.13.0", LasmSignature="utf8Stream.fsync", LasmStability="1"] readonly attribute boolean fsync;
   // `maxLength` {number} The maximum length of the internal buffer. If a write operation would cause the buffer to exceed `maxLength`, the data written is dropped and a drop event is emitted with the drop [fs.md]
-  [LasmSignature="utf8Stream.maxLength", LasmStability="1"] readonly attribute double maxLength;
+  [LasmRemovedIn="26.13.0", LasmSignature="utf8Stream.maxLength", LasmStability="1"] readonly attribute double maxLength;
   // `minLength` {number} The minimum length of the internal buffer that is required to be full before flushing. [fs.md]
-  [LasmSignature="utf8Stream.minLength", LasmStability="1"] readonly attribute double minLength;
+  [LasmRemovedIn="26.13.0", LasmSignature="utf8Stream.minLength", LasmStability="1"] readonly attribute double minLength;
   // `mkdir` {boolean} Whether the stream should ensure that the directory for the `dest` file exists. If `true`, it will create the directory if it does not exist. **Default**: `false`. [fs.md]
-  [LasmSignature="utf8Stream.mkdir", LasmStability="1"] readonly attribute boolean mkdir;
+  [LasmRemovedIn="26.13.0", LasmSignature="utf8Stream.mkdir", LasmStability="1"] readonly attribute boolean mkdir;
   // `mode` {number|string} The mode of the file that is being written to. [fs.md]
-  [LasmSignature="utf8Stream.mode", LasmStability="1"] readonly attribute (double or DOMString) mode;
+  [LasmRemovedIn="26.13.0", LasmSignature="utf8Stream.mode", LasmStability="1"] readonly attribute (double or DOMString) mode;
   // `periodicFlush` {number} The number of milliseconds between flushes. If set to `0`, no periodic flushes will be performed. [fs.md]
-  [LasmSignature="utf8Stream.periodicFlush", LasmStability="1"] readonly attribute double periodicFlush;
+  [LasmRemovedIn="26.13.0", LasmSignature="utf8Stream.periodicFlush", LasmStability="1"] readonly attribute double periodicFlush;
   // `sync` {boolean} Whether the stream is writing synchronously or asynchronously. [fs.md]
-  [LasmSignature="utf8Stream.sync", LasmStability="1"] readonly attribute boolean sync;
+  [LasmRemovedIn="26.13.0", LasmSignature="utf8Stream.sync", LasmStability="1"] readonly attribute boolean sync;
   // `writing` {boolean} Whether the stream is currently writing data to the file. [fs.md]
-  [LasmSignature="utf8Stream.writing", LasmStability="1"] readonly attribute boolean writing;
+  [LasmRemovedIn="26.13.0", LasmSignature="utf8Stream.writing", LasmStability="1"] readonly attribute boolean writing;
 };
 
 // Class: `fs.WriteStream` (fs.md), node:fs
@@ -1863,7 +1598,7 @@ interface Node_KeyObject {
 };
 
 // Class: `Mac` (crypto.md), node:crypto
-[LasmModule="node:crypto", LasmPath="Mac", LasmLeanModule="Crypto", LasmDoc="crypto", LasmName="Mac"]
+[LasmModule="node:crypto", LasmLeanModule="Crypto", LasmDoc="crypto", LasmName="Mac"]
 interface Node_Mac : Node_stream_Transform {
   // `mac.final([outputEncoding])` [crypto.md]
   [LasmSignature="mac.final([outputEncoding])", LasmAdded="v24.22.0"] (Uint8Array or DOMString) final(optional DOMString outputEncoding);
@@ -2425,7 +2160,7 @@ interface Node_net_BoundSocket {
   // `boundSocket.close()` [net.md]
   [LasmSignature="boundSocket.close()", LasmAdded="v24.19.0"] undefined close();
   // `isPipe` {boolean} [net.md]
-  [LasmSignature="boundSocket.isPipe", LasmAdded="v24.20.0"] readonly attribute boolean isPipe;
+  [LasmRemovedIn="26.13.0", LasmSignature="boundSocket.isPipe", LasmAdded="v24.20.0"] readonly attribute boolean isPipe;
 };
 
 // net (net.md) (net.md), node:net
@@ -3150,7 +2885,7 @@ namespace https {
 };
 
 // Class: `Http2Session` (http2.md), node:http2
-[LasmModule="node:http2", LasmPath="Http2Session", LasmLeanModule="Http2", LasmDoc="http2", LasmName="Http2Session"]
+[LasmModule="node:http2", LasmLeanModule="Http2", LasmDoc="http2", LasmName="Http2Session"]
 interface Node_Http2Session : Node_EventEmitter {
   // Event: 'close' [http2.md]
   [LasmEvent="close", LasmSignature="Event: 'close'", LasmAdded="v8.4.0"] Node_Http2Session onClose(Node_Http2Session_CloseListener listener);
@@ -3229,7 +2964,7 @@ interface Node_Http2Session : Node_EventEmitter {
 };
 
 // Class: `ServerHttp2Session` (http2.md), node:http2
-[LasmModule="node:http2", LasmPath="ServerHttp2Session", LasmLeanModule="Http2", LasmDoc="http2", LasmName="ServerHttp2Session"]
+[LasmModule="node:http2", LasmLeanModule="Http2", LasmDoc="http2", LasmName="ServerHttp2Session"]
 interface Node_ServerHttp2Session : Node_Http2Session {
   // `serverhttp2session.altsvc(alt, originOrStream)` [http2.md]
   [LasmSignature="serverhttp2session.altsvc(alt, originOrStream)", LasmAdded="v9.4.0"] undefined altsvc(DOMString alt, (double or DOMString or URL or object) originOrStream);
@@ -3238,7 +2973,7 @@ interface Node_ServerHttp2Session : Node_Http2Session {
 };
 
 // Class: `ClientHttp2Session` (http2.md), node:http2
-[LasmModule="node:http2", LasmPath="ClientHttp2Session", LasmLeanModule="Http2", LasmDoc="http2", LasmName="ClientHttp2Session"]
+[LasmModule="node:http2", LasmLeanModule="Http2", LasmDoc="http2", LasmName="ClientHttp2Session"]
 interface Node_ClientHttp2Session : Node_Http2Session {
   // Event: 'altsvc' [http2.md]
   [LasmEvent="altsvc", LasmSignature="Event: 'altsvc'", LasmAdded="v9.4.0"] Node_ClientHttp2Session onAltsvc(Node_ClientHttp2Session_AltsvcListener listener);
@@ -3251,7 +2986,7 @@ interface Node_ClientHttp2Session : Node_Http2Session {
 };
 
 // Class: `Http2Stream` (http2.md), node:http2
-[LasmModule="node:http2", LasmPath="Http2Stream", LasmLeanModule="Http2", LasmDoc="http2", LasmName="Http2Stream"]
+[LasmModule="node:http2", LasmLeanModule="Http2", LasmDoc="http2", LasmName="Http2Stream"]
 interface Node_Http2Stream : Node_stream_Duplex {
   // Event: 'aborted' [http2.md]
   [LasmEvent="aborted", LasmSignature="Event: 'aborted'", LasmAdded="v8.4.0"] Node_Http2Stream onAborted(Node_Http2Stream_AbortedListener listener);
@@ -3314,7 +3049,7 @@ interface Node_Http2Stream : Node_stream_Duplex {
 };
 
 // Class: `ClientHttp2Stream` (http2.md), node:http2
-[LasmModule="node:http2", LasmPath="ClientHttp2Stream", LasmLeanModule="Http2", LasmDoc="http2", LasmName="ClientHttp2Stream"]
+[LasmModule="node:http2", LasmLeanModule="Http2", LasmDoc="http2", LasmName="ClientHttp2Stream"]
 interface Node_ClientHttp2Stream {
   // Event: 'continue' [http2.md]
   [LasmEvent="continue", LasmSignature="Event: 'continue'", LasmAdded="v8.5.0"] Node_ClientHttp2Stream onContinue(Node_ClientHttp2Stream_ContinueListener listener);
@@ -3331,7 +3066,7 @@ interface Node_ClientHttp2Stream {
 };
 
 // Class: `ServerHttp2Stream` (http2.md), node:http2
-[LasmModule="node:http2", LasmPath="ServerHttp2Stream", LasmLeanModule="Http2", LasmDoc="http2", LasmName="ServerHttp2Stream"]
+[LasmModule="node:http2", LasmLeanModule="Http2", LasmDoc="http2", LasmName="ServerHttp2Stream"]
 interface Node_ServerHttp2Stream : Node_Http2Stream {
   // `http2stream.additionalHeaders(headers)` [http2.md]
   [LasmSignature="http2stream.additionalHeaders(headers)", LasmAdded="v8.4.0"] undefined additionalHeaders(object headers);
@@ -3352,7 +3087,7 @@ interface Node_ServerHttp2Stream : Node_Http2Stream {
 };
 
 // Class: `Http2Server` (http2.md), node:http2
-[LasmModule="node:http2", LasmPath="Http2Server", LasmLeanModule="Http2", LasmDoc="http2", LasmName="Http2Server"]
+[LasmModule="node:http2", LasmLeanModule="Http2", LasmDoc="http2", LasmName="Http2Server"]
 interface Node_Http2Server : Node_net_Server {
   // Event: 'checkContinue' [http2.md]
   [LasmEvent="checkContinue", LasmSignature="Event: 'checkContinue'", LasmAdded="v8.5.0"] Node_Http2Server onCheckContinue(Node_Http2Server_CheckContinueListener listener);
@@ -3386,7 +3121,7 @@ interface Node_Http2Server : Node_net_Server {
 };
 
 // Class: `Http2SecureServer` (http2.md), node:http2
-[LasmModule="node:http2", LasmPath="Http2SecureServer", LasmLeanModule="Http2", LasmDoc="http2", LasmName="Http2SecureServer"]
+[LasmModule="node:http2", LasmLeanModule="Http2", LasmDoc="http2", LasmName="Http2SecureServer"]
 interface Node_Http2SecureServer : Node_tls_Server {
   // Event: 'checkContinue' [http2.md]
   [LasmEvent="checkContinue", LasmSignature="Event: 'checkContinue'", LasmAdded="v8.5.0"] Node_Http2SecureServer onCheckContinue(Node_Http2SecureServer_CheckContinueListener listener);
@@ -3722,9 +3457,9 @@ interface Node_worker_threads_Worker : Node_EventEmitter {
   // `worker.ref()` [worker_threads.md]
   [LasmSignature="worker.ref()", LasmAdded="v10.5.0"] undefined ref();
   // `worker.startCpuProfile()` [worker_threads.md]
-  [LasmSignature="worker.startCpuProfile()", LasmAdded="v24.8.0"] Promise<any> startCpuProfile();
+  [LasmRemovedIn="26.13.0", LasmSignature="worker.startCpuProfile()", LasmAdded="v24.8.0"] Promise<any> startCpuProfile();
   // `worker.startHeapProfile()` [worker_threads.md]
-  [LasmSignature="worker.startHeapProfile()", LasmAdded="v24.9.0"] Promise<any> startHeapProfile();
+  [LasmRemovedIn="26.13.0", LasmSignature="worker.startHeapProfile()", LasmAdded="v24.9.0"] Promise<any> startHeapProfile();
   // `worker.terminate()` [worker_threads.md]
   [LasmSignature="worker.terminate()", LasmAdded="v10.5.0"] Promise<any> terminate();
   // `worker.unref()` [worker_threads.md]
@@ -3742,7 +3477,7 @@ interface Node_worker_threads_Worker : Node_EventEmitter {
   // `threadId` Type: {integer} [worker_threads.md]
   [LasmSignature="worker.threadId", LasmAdded="v10.5.0"] readonly attribute long long threadId;
   // `threadName` {string|null} [worker_threads.md]
-  [LasmSignature="worker.threadName", LasmAdded="v24.6.0"] readonly attribute DOMString? threadName;
+  [LasmRemovedIn="26.13.0", LasmSignature="worker.threadName", LasmAdded="v24.6.0"] readonly attribute DOMString? threadName;
   // `worker.startCpuProfile([options])` [worker_threads.md]
   [LasmSince="26.13.0", LasmSignature="worker.startCpuProfile([options])", LasmAdded="v24.8.0"] Promise<any> startCpuProfile(optional Node_worker_threads_Worker_StartCpuProfileOptions options);
   // `worker.startHeapProfile([options])` [worker_threads.md]
@@ -3781,11 +3516,11 @@ namespace worker_threads {
   // `threadId` Type: {integer} [worker_threads.md]
   [LasmSignature="worker_threads.threadId", LasmAdded="v10.5.0"] readonly attribute long long threadId;
   // `threadName` {string|null} [worker_threads.md]
-  [LasmSignature="worker_threads.threadName", LasmAdded="v24.6.0"] readonly attribute DOMString? threadName;
+  [LasmRemovedIn="26.13.0", LasmSignature="worker_threads.threadName", LasmAdded="v24.6.0"] readonly attribute DOMString? threadName;
   // `worker_threads.workerData` [worker_threads.md]
   [LasmSignature="worker_threads.workerData", LasmAdded="v10.5.0"] readonly attribute any workerData;
   // `locks` {LockManager} [worker_threads.md]
-  [LasmSignature="worker_threads.locks", LasmAdded="v24.5.0", LasmStability="1"] readonly attribute LockManager locks;
+  [LasmRemovedIn="26.13.0", LasmSignature="worker_threads.locks", LasmAdded="v24.5.0", LasmStability="1"] readonly attribute LockManager locks;
 };
 
 // Class: `zlib.BrotliCompress` (zlib.md), node:zlib
@@ -3843,38 +3578,38 @@ interface Node_zlib_Unzip {
 };
 
 // Class: `zlib.ZlibBase` (zlib.md), node:zlib
-[LasmModule="node:zlib", LasmPath="ZlibBase", LasmLeanModule="Zlib", LasmDoc="zlib", LasmNamespace="zlib", LasmName="ZlibBase"]
+[LasmModule="node:zlib", LasmLeanModule="Zlib", LasmDoc="zlib", LasmNamespace="zlib", LasmName="ZlibBase"]
 interface Node_zlib_ZlibBase {
   // `bytesWritten` Type: {number} [zlib.md]
   [LasmSignature="bytesWritten", LasmAdded="v10.0.0"] readonly attribute double bytesWritten;
 };
 
 // Class: `zlib.ZstdCompress` (zlib.md), node:zlib
-[LasmModule="node:zlib", LasmPath="ZstdCompress", LasmLeanModule="Zlib", LasmDoc="zlib", LasmNamespace="zlib", LasmName="ZstdCompress"]
+[LasmModule="node:zlib", LasmPath="ZstdCompress", LasmLeanModule="Zlib", LasmDoc="zlib", LasmNamespace="zlib", LasmName="ZstdCompress", LasmStability="1"]
 interface Node_zlib_ZstdCompress {
 
 };
 
 // Class: `zlib.ZstdDecompress` (zlib.md), node:zlib
-[LasmModule="node:zlib", LasmPath="ZstdDecompress", LasmLeanModule="Zlib", LasmDoc="zlib", LasmNamespace="zlib", LasmName="ZstdDecompress"]
+[LasmModule="node:zlib", LasmPath="ZstdDecompress", LasmLeanModule="Zlib", LasmDoc="zlib", LasmNamespace="zlib", LasmName="ZstdDecompress", LasmStability="1"]
 interface Node_zlib_ZstdDecompress {
 
 };
 
 // Class: `Options` (zlib.md), node:zlib
-[LasmModule="node:zlib", LasmPath="Options", LasmLeanModule="Zlib", LasmDoc="zlib", LasmName="Options"]
+[LasmModule="node:zlib", LasmLeanModule="Zlib", LasmDoc="zlib", LasmName="Options"]
 interface Node_Options {
 
 };
 
 // Class: `BrotliOptions` (zlib.md), node:zlib
-[LasmModule="node:zlib", LasmPath="BrotliOptions", LasmLeanModule="Zlib", LasmDoc="zlib", LasmName="BrotliOptions"]
+[LasmModule="node:zlib", LasmLeanModule="Zlib", LasmDoc="zlib", LasmName="BrotliOptions"]
 interface Node_BrotliOptions {
 
 };
 
 // Class: `ZstdOptions` (zlib.md), node:zlib
-[LasmModule="node:zlib", LasmPath="ZstdOptions", LasmLeanModule="Zlib", LasmDoc="zlib", LasmName="ZstdOptions"]
+[LasmModule="node:zlib", LasmLeanModule="Zlib", LasmDoc="zlib", LasmName="ZstdOptions", LasmStability="1"]
 interface Node_ZstdOptions {
 
 };
@@ -4066,7 +3801,7 @@ namespace util {
   // `util.types` [util.md]
   [LasmSignature="util.types", LasmAdded="v10.0.0"] readonly attribute any types;
   // `util._extend(target, source)` [util.md]
-  [LasmSignature="util._extend(target, source)", LasmAdded="v0.7.5", LasmStability="0"] undefined _extend(object target, object source);
+  [LasmName="_extend", LasmSignature="util._extend(target, source)", LasmAdded="v0.7.5", LasmStability="0"] undefined lasm_extend(object target, object source);
   // `util.isArray(object)` [util.md]
   [LasmSignature="util.isArray(object)", LasmAdded="v0.6.0", LasmStability="0"] boolean isArray(any _object);
   // `util.isPartialDeepStrictEqual(val1, val2)` [util.md]
@@ -4201,7 +3936,7 @@ namespace url {
 };
 
 // url.UrlObject (url.md) (url.md), node:url
-[LasmModule="node:url", LasmPath="UrlObject", LasmLeanModule="Url", LasmDoc="url", LasmNamespace="url", LasmName="UrlObject"]
+[LasmModule="node:url", LasmLeanModule="Url", LasmDoc="url", LasmNamespace="url", LasmName="UrlObject"]
 interface Node_url_UrlObject {
   // `urlObject.auth` [url.md]
   [LasmSignature="urlObject.auth", LasmStability="3"] readonly attribute any auth;
@@ -4273,7 +4008,7 @@ namespace Node_punycode_ucs2 {
 };
 
 // Class: `Immediate` (timers.md), node:timers
-[LasmModule="node:timers", LasmPath="Immediate", LasmLeanModule="Timers", LasmDoc="timers", LasmName="Immediate"]
+[LasmModule="node:timers", LasmLeanModule="Timers", LasmDoc="timers", LasmName="Immediate"]
 interface Node_Immediate {
   // `immediate.hasRef()` [timers.md]
   [LasmSignature="immediate.hasRef()", LasmAdded="v11.0.0"] boolean hasRef();
@@ -4284,7 +4019,7 @@ interface Node_Immediate {
 };
 
 // Class: `Timeout` (timers.md), node:timers
-[LasmModule="node:timers", LasmPath="Timeout", LasmLeanModule="Timers", LasmDoc="timers", LasmName="Timeout"]
+[LasmModule="node:timers", LasmLeanModule="Timers", LasmDoc="timers", LasmName="Timeout"]
 interface Node_Timeout {
   // `timeout.close()` [timers.md]
   [LasmSignature="timeout.close()", LasmAdded="v0.9.1", LasmStability="3"] Node_Timeout close();
@@ -4309,8 +4044,8 @@ namespace timersPromises {
   [LasmSignature="timersPromises.setInterval([delay[, value[, options]]])", LasmAdded="v15.9.0"] undefined setInterval(optional any delay, optional any value, optional any options);
 };
 
-// timersPromises.scheduler (timers.md) (timers.md), node:timers
-[LasmModule="node:timers", LasmPath="timersPromises.scheduler", LasmLeanModule="Timers", LasmDoc="timers", LasmNamespace="timersPromises", LasmName="scheduler"]
+// timersPromises.scheduler (timers.md) (timers.md), node:timers/promises
+[LasmModule="node:timers/promises", LasmPath="scheduler", LasmLeanModule="Timers", LasmDoc="timers", LasmNamespace="timersPromises", LasmName="scheduler"]
 namespace Node_timersPromises_scheduler {
   // `timersPromises.scheduler.wait(delay[, options])` [timers.md]
   [LasmSignature="timersPromises.scheduler.wait(delay[, options])", LasmAdded="v17.3.0, v16.14.0", LasmStability="1"] Promise<any> wait(double delay, optional Node_timersPromises_scheduler_WaitOptions options);
@@ -4319,7 +4054,7 @@ namespace Node_timersPromises_scheduler {
 };
 
 // Class: `InterfaceConstructor` (readline.md), node:readline
-[LasmModule="node:readline", LasmPath="InterfaceConstructor", LasmLeanModule="Readline", LasmDoc="readline", LasmName="InterfaceConstructor"]
+[LasmModule="node:readline", LasmLeanModule="Readline", LasmDoc="readline", LasmName="InterfaceConstructor"]
 interface Node_InterfaceConstructor : Node_EventEmitter {
   // Event: 'close' [readline.md]
   [LasmEvent="close", LasmSignature="Event: 'close'", LasmAdded="v0.1.98"] Node_InterfaceConstructor onClose(Node_InterfaceConstructor_CloseListener listener);
@@ -4465,7 +4200,7 @@ interface Node_tty_ReadStream : Node_net_Socket {
   // `readStream.isTTY` [tty.md]
   [LasmSignature="readStream.isTTY", LasmAdded="v0.5.8"] readonly attribute any isTTY;
   // `rawMode` {boolean|string} [tty.md]
-  [LasmSignature="readStream.rawMode", LasmAdded="v24.21.0"] readonly attribute (boolean or DOMString) rawMode;
+  [LasmRemovedIn="26.13.0", LasmSignature="readStream.rawMode", LasmAdded="v24.21.0"] readonly attribute (boolean or DOMString) rawMode;
 };
 
 // Class: `tty.WriteStream` (tty.md), node:tty
@@ -4559,7 +4294,7 @@ interface Node_assert_Assert {
 };
 
 // Class: `assert.CallTracker` (assert.md), node:assert
-[LasmModule="node:assert", LasmPath="CallTracker", LasmLeanModule="Assert", LasmDoc="assert", LasmNamespace="assert", LasmName="CallTracker"]
+[LasmRemovedIn="26.13.0", LasmModule="node:assert", LasmPath="CallTracker", LasmLeanModule="Assert", LasmDoc="assert", LasmNamespace="assert", LasmName="CallTracker", LasmStability="0"]
 interface Node_assert_CallTracker {
   // `tracker.calls([fn][, exact])` [assert.md]
   [LasmSignature="tracker.calls([fn][, exact])", LasmAdded="v14.2.0, v12.19.0", LasmStability="0"] Function calls(optional Function fn, optional double exact);
@@ -4591,7 +4326,7 @@ namespace assert {
   // `assert.fail([message])` [assert.md]
   [LasmSignature="assert.fail([message])", LasmAdded="v0.1.21"] undefined fail(optional any message);
   // `assert.fail(actual, expected[, message[, operator[, stackStartFn]]])` [assert.md]
-  [LasmSignature="assert.fail(actual, expected[, message[, operator[, stackStartFn]]])", LasmAdded="v0.1.21", LasmStability="0"] undefined fail(any actual, any expected, optional any message, optional DOMString operator, optional Function stackStartFn);
+  [LasmRemovedIn="26.13.0", LasmSignature="assert.fail(actual, expected[, message[, operator[, stackStartFn]]])", LasmAdded="v0.1.21", LasmStability="0"] undefined fail(any actual, any expected, optional any message, optional DOMString operator, optional Function stackStartFn);
   // `assert.ifError(value)` [assert.md]
   [LasmSignature="assert.ifError(value)", LasmAdded="v0.1.97"] undefined ifError(any value);
   // `assert.match(string, regexp[, message])` [assert.md]
@@ -4617,14 +4352,14 @@ namespace assert {
 };
 
 // Class: `AsyncResource` (async_hooks.md), node:async_hooks
-[LasmModule="node:async_hooks", LasmPath="AsyncResource", LasmLeanModule="AsyncHooks", LasmDoc="async_hooks", LasmName="AsyncResource"]
+[LasmModule="node:async_hooks", LasmPath="AsyncResource", LasmLeanModule="AsyncHooks", LasmDoc="async_hooks", LasmName="AsyncResource", LasmStability="1"]
 interface Node_AsyncResource {
   // Static method: `AsyncResource.bind(fn[, type[, thisArg]])` [async_hooks.md]
   [LasmSignature="AsyncResource.bind(fn[, type[, thisArg]])", LasmAdded="v14.8.0, v12.19.0"] static undefined bind(Function fn, optional DOMString type, optional any thisArg);
 };
 
 // Class: `AsyncHook` (async_hooks.md), node:async_hooks
-[LasmModule="node:async_hooks", LasmPath="AsyncHook", LasmLeanModule="AsyncHooks", LasmDoc="async_hooks", LasmName="AsyncHook"]
+[LasmModule="node:async_hooks", LasmLeanModule="AsyncHooks", LasmDoc="async_hooks", LasmName="AsyncHook", LasmStability="1"]
 interface Node_AsyncHook {
   // `async_hooks.executionAsyncResource()` [async_hooks.md]
   [LasmSignature="async_hooks.executionAsyncResource()", LasmAdded="v13.9.0, v12.17.0", LasmStability="1"] object executionAsyncResource();
@@ -4633,11 +4368,11 @@ interface Node_AsyncHook {
   // `async_hooks.triggerAsyncId()` [async_hooks.md]
   [LasmSignature="async_hooks.triggerAsyncId()", LasmStability="1"] double triggerAsyncId();
   // `asyncWrapProviders` Returns: A map of provider types to the corresponding numeric id. This map contains all the event types that might be emitted by the `async_hooks.init()` event. [async_hooks.md]
-  [LasmSignature="async_hooks.asyncWrapProviders", LasmAdded="v17.2.0, v16.14.0", LasmStability="1"] readonly attribute any asyncWrapProviders;
+  [LasmRemovedIn="26.13.0", LasmSignature="async_hooks.asyncWrapProviders", LasmAdded="v17.2.0, v16.14.0", LasmStability="1"] readonly attribute any asyncWrapProviders;
 };
 
 // Class: `AsyncLocalStorage` (async_hooks.md), node:async_hooks
-[LasmModule="node:async_hooks", LasmPath="AsyncLocalStorage", LasmLeanModule="AsyncHooks", LasmDoc="async_hooks", LasmName="AsyncLocalStorage"]
+[LasmModule="node:async_hooks", LasmPath="AsyncLocalStorage", LasmLeanModule="AsyncHooks", LasmDoc="async_hooks", LasmName="AsyncLocalStorage", LasmStability="1"]
 interface Node_AsyncLocalStorage {
   // Static method: `AsyncLocalStorage.bind(fn)` [async_hooks.md]
   [LasmSignature="AsyncLocalStorage.bind(fn)", LasmAdded="v19.8.0, v18.16.0"] static Function bind(Function fn);
@@ -4655,7 +4390,7 @@ namespace async_hooks {
 };
 
 // Class: `RunScope` (async_context.md), node:async_hooks
-[LasmModule="node:async_hooks", LasmPath="RunScope", LasmLeanModule="AsyncContext", LasmDoc="async_context", LasmName="RunScope"]
+[LasmModule="node:async_hooks", LasmLeanModule="AsyncContext", LasmDoc="async_context", LasmName="RunScope", LasmStability="1"]
 interface Node_RunScope {
   // `scope.dispose()` [async_context.md]
   [LasmSignature="scope.dispose()", LasmAdded="v24.20.0", LasmStability="1"] undefined dispose();
@@ -4677,13 +4412,13 @@ interface Node_Channel {
   // `channel.runStores(context, fn[, thisArg[, ...args]])` [diagnostics_channel.md]
   [LasmSignature="channel.runStores(context, fn[, thisArg[, ...args]])", LasmAdded="v19.9.0, v18.19.0", LasmStability="1"] undefined runStores(any context, Function fn, optional any thisArg, any... args);
   // `hasSubscribers` Returns: {boolean} If there are active subscribers [diagnostics_channel.md]
-  [LasmSignature="channel.hasSubscribers", LasmAdded="v15.1.0, v14.17.0"] readonly attribute boolean hasSubscribers;
+  [LasmRemovedIn="26.13.0", LasmSignature="channel.hasSubscribers", LasmAdded="v15.1.0, v14.17.0"] readonly attribute boolean hasSubscribers;
   // `channel.withStoreScope(data)` [diagnostics_channel.md]
   [LasmSince="26.13.0", LasmSignature="channel.withStoreScope(data)", LasmAdded="v26.1.0", LasmStability="1"] Node_RunStoresScope withStoreScope(any data);
 };
 
 // Class: `TracingChannel` (diagnostics_channel.md), node:diagnostics_channel
-[LasmModule="node:diagnostics_channel", LasmPath="TracingChannel", LasmLeanModule="DiagnosticsChannel", LasmDoc="diagnostics_channel", LasmName="TracingChannel"]
+[LasmModule="node:diagnostics_channel", LasmLeanModule="DiagnosticsChannel", LasmDoc="diagnostics_channel", LasmName="TracingChannel", LasmStability="1"]
 interface Node_TracingChannel {
   // `tracingChannel.subscribe(subscribers)` [diagnostics_channel.md]
   [LasmSignature="tracingChannel.subscribe(subscribers)", LasmAdded="v19.9.0, v18.19.0", LasmStability="1"] undefined subscribe(Node_TracingChannel_SubscribeSubscribers subscribers);
@@ -4696,7 +4431,7 @@ interface Node_TracingChannel {
   // `tracingChannel.traceCallback(fn[, position[, context[, thisArg[, ...args]]]])` [diagnostics_channel.md]
   [LasmSignature="tracingChannel.traceCallback(fn[, position[, context[, thisArg[, ...args]]]])", LasmAdded="v19.9.0, v18.19.0", LasmStability="1"] any traceCallback(Function fn, optional double position, optional object context, optional any thisArg, any... args);
   // `hasSubscribers` Returns: {boolean} `true` if any of the individual channels has a subscriber, `false` if not. [diagnostics_channel.md]
-  [LasmSignature="tracingChannel.hasSubscribers", LasmAdded="v22.0.0, v20.13.0", LasmStability="1"] readonly attribute boolean hasSubscribers;
+  [LasmRemovedIn="26.13.0", LasmSignature="tracingChannel.hasSubscribers", LasmAdded="v22.0.0, v20.13.0", LasmStability="1"] readonly attribute boolean hasSubscribers;
 };
 
 // diagnostics_channel (diagnostics_channel.md) (diagnostics_channel.md), node:diagnostics_channel
@@ -4717,7 +4452,7 @@ namespace diagnostics_channel {
 };
 
 // Class: `Domain` (domain.md), node:domain
-[LasmModule="node:domain", LasmPath="Domain", LasmLeanModule="Domain", LasmDoc="domain", LasmName="Domain"]
+[LasmModule="node:domain", LasmPath="Domain", LasmLeanModule="Domain", LasmDoc="domain", LasmName="Domain", LasmStability="0"]
 interface Node_Domain : Node_EventEmitter {
   // `domain.add(emitter)` [domain.md]
   [LasmSignature="domain.add(emitter)", LasmStability="0"] undefined add(Node_EventEmitter emitter);
@@ -4745,7 +4480,7 @@ namespace domain {
 };
 
 // Class: `PerformanceNodeEntry` (perf_hooks.md), node:perf_hooks
-[LasmModule="node:perf_hooks", LasmPath="PerformanceNodeEntry", LasmLeanModule="PerfHooks", LasmDoc="perf_hooks", LasmName="PerformanceNodeEntry"]
+[LasmModule="node:perf_hooks", LasmLeanModule="PerfHooks", LasmDoc="perf_hooks", LasmName="PerformanceNodeEntry"]
 interface Node_PerformanceNodeEntry {
   // `detail` Type: {any} [perf_hooks.md]
   [LasmSignature="detail", LasmAdded="v16.0.0"] readonly attribute any detail;
@@ -4756,7 +4491,7 @@ interface Node_PerformanceNodeEntry {
 };
 
 // Class: `PerformanceNodeTiming` (perf_hooks.md), node:perf_hooks
-[LasmModule="node:perf_hooks", LasmPath="PerformanceNodeTiming", LasmLeanModule="PerfHooks", LasmDoc="perf_hooks", LasmName="PerformanceNodeTiming"]
+[LasmModule="node:perf_hooks", LasmLeanModule="PerfHooks", LasmDoc="perf_hooks", LasmName="PerformanceNodeTiming"]
 interface Node_PerformanceNodeTiming {
   // `bootstrapComplete` Type: {number} [perf_hooks.md]
   [LasmSignature="bootstrapComplete", LasmAdded="v8.5.0"] readonly attribute double bootstrapComplete;
@@ -4779,7 +4514,7 @@ interface Node_PerformanceNodeTiming {
 };
 
 // Class: `Histogram` (perf_hooks.md), node:perf_hooks
-[LasmModule="node:perf_hooks", LasmPath="Histogram", LasmLeanModule="PerfHooks", LasmDoc="perf_hooks", LasmName="Histogram"]
+[LasmModule="node:perf_hooks", LasmLeanModule="PerfHooks", LasmDoc="perf_hooks", LasmName="Histogram"]
 interface Node_Histogram {
   // `histogram.ccdf(value)` [perf_hooks.md]
   [LasmSignature="histogram.ccdf(value)", LasmAdded="v24.21.0"] double ccdf(double value);
@@ -4862,7 +4597,7 @@ interface Node_Histogram {
 };
 
 // Class: `ELDHistogram extends Histogram` (perf_hooks.md), node:perf_hooks
-[LasmModule="node:perf_hooks", LasmPath="ELDHistogram", LasmLeanModule="PerfHooks", LasmDoc="perf_hooks", LasmName="ELDHistogram"]
+[LasmModule="node:perf_hooks", LasmLeanModule="PerfHooks", LasmDoc="perf_hooks", LasmName="ELDHistogram"]
 interface Node_ELDHistogram : Node_Histogram {
   // `histogram.disable()` [perf_hooks.md]
   [LasmSignature="histogram.disable()", LasmAdded="v11.10.0"] boolean disable();
@@ -4871,7 +4606,7 @@ interface Node_ELDHistogram : Node_Histogram {
 };
 
 // Class: `RecordableHistogram extends Histogram` (perf_hooks.md), node:perf_hooks
-[LasmModule="node:perf_hooks", LasmPath="RecordableHistogram", LasmLeanModule="PerfHooks", LasmDoc="perf_hooks", LasmName="RecordableHistogram"]
+[LasmModule="node:perf_hooks", LasmLeanModule="PerfHooks", LasmDoc="perf_hooks", LasmName="RecordableHistogram"]
 interface Node_RecordableHistogram : Node_Histogram {
   // `histogram.add(other)` [perf_hooks.md]
   [LasmSignature="histogram.add(other)", LasmAdded="v17.4.0, v16.14.0"] undefined add(Node_RecordableHistogram other);
@@ -4886,7 +4621,7 @@ interface Node_RecordableHistogram : Node_Histogram {
 };
 
 // Class: `SlidingWindowHistogram` (perf_hooks.md), node:perf_hooks
-[LasmModule="node:perf_hooks", LasmPath="SlidingWindowHistogram", LasmLeanModule="PerfHooks", LasmDoc="perf_hooks", LasmName="SlidingWindowHistogram"]
+[LasmModule="node:perf_hooks", LasmLeanModule="PerfHooks", LasmDoc="perf_hooks", LasmName="SlidingWindowHistogram"]
 interface Node_SlidingWindowHistogram {
   // `slidingWindowHistogram.record(val)` [perf_hooks.md]
   [LasmSignature="slidingWindowHistogram.record(val)", LasmAdded="v24.22.0"] undefined _record((double or bigint) val);
@@ -4924,12 +4659,47 @@ namespace performance {
   [LasmSignature="performance.markResourceTiming(timingInfo, requestedUrl, initiatorType, global, cacheMode, bodyInfo, responseStatus[, deliveryType])", LasmAdded="v18.2.0, v16.17.0"] undefined markResourceTiming(object timingInfo, DOMString requestedUrl, DOMString initiatorType, object global, DOMString cacheMode, object bodyInfo, double responseStatus, optional DOMString deliveryType);
   // `performance.timerify(fn[, options])` [perf_hooks.md]
   [LasmSignature="performance.timerify(fn[, options])", LasmAdded="v8.5.0"] undefined timerify(Function fn, optional Node_performance_TimerifyOptions options);
+};
+
+// perf_hooks.performance (perf_hooks.md) (perf_hooks.md), node:perf_hooks
+[LasmModule="node:perf_hooks", LasmPath="performance", LasmLeanModule="PerfHooks", LasmDoc="perf_hooks", LasmNamespace="perf_hooks", LasmName="performance"]
+namespace Node_perf_hooks_performance {
+  // `performance.clearMarks([name])` [perf_hooks.md]
+  [LasmSignature="performance.clearMarks([name])", LasmAdded="v8.5.0"] undefined clearMarks(optional DOMString name);
+  // `performance.clearMeasures([name])` [perf_hooks.md]
+  [LasmSignature="performance.clearMeasures([name])", LasmAdded="v16.7.0"] undefined clearMeasures(optional DOMString name);
+  // `performance.clearResourceTimings([name])` [perf_hooks.md]
+  [LasmSignature="performance.clearResourceTimings([name])", LasmAdded="v18.2.0, v16.17.0"] undefined clearResourceTimings(optional DOMString name);
+  // `performance.eventLoopUtilization([utilization1[, utilization2]])` [perf_hooks.md]
+  [LasmSignature="performance.eventLoopUtilization([utilization1[, utilization2]])", LasmAdded="v14.10.0, v12.19.0"] object eventLoopUtilization(optional object utilization1, optional object utilization2);
+  // `performance.getEntries()` [perf_hooks.md]
+  [LasmSignature="performance.getEntries()", LasmAdded="v16.7.0"] sequence<PerformanceEntry> getEntries();
+  // `performance.getEntriesByName(name[, type])` [perf_hooks.md]
+  [LasmSignature="performance.getEntriesByName(name[, type])", LasmAdded="v16.7.0"] sequence<PerformanceEntry> getEntriesByName(DOMString name, optional DOMString type);
+  // `performance.getEntriesByType(type)` [perf_hooks.md]
+  [LasmSignature="performance.getEntriesByType(type)", LasmAdded="v16.7.0"] sequence<PerformanceEntry> getEntriesByType(DOMString type);
+  // `performance.mark(name[, options])` [perf_hooks.md]
+  [LasmSignature="performance.mark(name[, options])", LasmAdded="v8.5.0"] undefined mark(DOMString name, optional Node_perf_hooks_performance_MarkOptions options);
+  // `performance.markResourceTiming(timingInfo, requestedUrl, initiatorType, global, cacheMode, bodyInfo, responseStatus[, deliveryType])` [perf_hooks.md]
+  [LasmSignature="performance.markResourceTiming(timingInfo, requestedUrl, initiatorType, global, cacheMode, bodyInfo, responseStatus[, deliveryType])", LasmAdded="v18.2.0, v16.17.0"] undefined markResourceTiming(object timingInfo, DOMString requestedUrl, DOMString initiatorType, object global, DOMString cacheMode, object bodyInfo, double responseStatus, optional DOMString deliveryType);
+  // `performance.measure(name[, startMarkOrOptions[, endMark]])` [perf_hooks.md]
+  [LasmSignature="performance.measure(name[, startMarkOrOptions[, endMark]])", LasmAdded="v8.5.0"] undefined measure(DOMString name, optional (DOMString or Node_perf_hooks_performance_MeasureStartMarkOrOptions) startMarkOrOptions, optional DOMString endMark);
+  // `performance.now()` [perf_hooks.md]
+  [LasmSignature="performance.now()", LasmAdded="v8.5.0"] double now();
+  // `performance.setResourceTimingBufferSize(maxSize)` [perf_hooks.md]
+  [LasmSignature="performance.setResourceTimingBufferSize(maxSize)", LasmAdded="v18.8.0"] undefined setResourceTimingBufferSize(any maxSize);
+  // `performance.timerify(fn[, options])` [perf_hooks.md]
+  [LasmSignature="performance.timerify(fn[, options])", LasmAdded="v8.5.0"] undefined timerify(Function fn, optional Node_perf_hooks_performance_TimerifyOptions options);
+  // `performance.toJSON()` [perf_hooks.md]
+  [LasmName="toJSON", LasmSignature="performance.toJSON()", LasmAdded="v16.1.0"] undefined toJSON_();
   // `nodeTiming` Type: {PerformanceNodeTiming} [perf_hooks.md]
-  [LasmSignature="performance.nodeTiming", LasmAdded="v8.5.0"] readonly attribute Node_PerformanceNodeTiming nodeTiming;
+  [LasmSignature="perf_hooks.performance.nodeTiming", LasmAdded="v8.5.0"] readonly attribute Node_PerformanceNodeTiming nodeTiming;
+  // `timeOrigin` Type: {number} [perf_hooks.md]
+  [LasmSignature="perf_hooks.performance.timeOrigin", LasmAdded="v8.5.0"] readonly attribute double timeOrigin;
 };
 
 // trace_events (tracing.md) (tracing.md), node:trace_events
-[LasmModule="node:trace_events", LasmPath="trace_events", LasmLeanModule="TraceEvents", LasmDoc="tracing", LasmName="trace_events"]
+[LasmModule="node:trace_events", LasmLeanModule="TraceEvents", LasmDoc="tracing", LasmName="trace_events"]
 namespace trace_events {
   // `trace_events.createTracing(options)` [tracing.md]
   [LasmSignature="trace_events.createTracing(options)", LasmAdded="v10.0.0", LasmStability="1"] Node_Tracing createTracing(Node_trace_events_CreateTracingOptions options);
@@ -4938,7 +4708,7 @@ namespace trace_events {
 };
 
 // Tracing (tracing.md) (tracing.md), node:trace_events
-[LasmModule="node:trace_events", LasmPath="Tracing", LasmLeanModule="TraceEvents", LasmDoc="tracing", LasmName="Tracing"]
+[LasmModule="node:trace_events", LasmLeanModule="TraceEvents", LasmDoc="tracing", LasmName="Tracing"]
 interface Node_Tracing {
   // `tracing.disable()` [tracing.md]
   [LasmSignature="tracing.disable()", LasmAdded="v10.0.0", LasmStability="1"] undefined disable();
@@ -4951,7 +4721,7 @@ interface Node_Tracing {
 };
 
 // Class: `inspector.Session` (inspector.md), node:inspector
-[LasmModule="node:inspector", LasmPath="Session", LasmLeanModule="Inspector", LasmDoc="inspector", LasmNamespace="inspector", LasmName="Session"]
+[LasmModule="node:inspector", LasmPath="Session", LasmLeanModule="Inspector", LasmDoc="inspector", LasmNamespace="inspector", LasmName="Session", LasmStability="1"]
 interface Node_inspector_Session : Node_EventEmitter {
   // Event: 'inspectorNotification' [inspector.md]
   [LasmEvent="inspectorNotification", LasmSignature="Event: 'inspectorNotification'", LasmAdded="v8.0.0", LasmStability="1"] Node_inspector_Session onInspectorNotification(Node_inspector_Session_InspectorNotificationListener listener);
@@ -5005,15 +4775,15 @@ namespace Node_inspector_Network {
   // `inspector.Network.webSocketClosed([params])` [inspector.md]
   [LasmSignature="inspector.Network.webSocketClosed([params])", LasmAdded="v24.7.0", LasmStability="1"] undefined webSocketClosed(optional object params);
   // `domStorageItemAdded` `params` {Object} [inspector.md]
-  [LasmSignature="inspector.Network.domStorageItemAdded", LasmAdded="v24.16.0", LasmStability="1"] readonly attribute object domStorageItemAdded;
+  [LasmRemovedIn="26.13.0", LasmSignature="inspector.Network.domStorageItemAdded", LasmAdded="v24.16.0", LasmStability="1"] readonly attribute object domStorageItemAdded;
   // `domStorageItemRemoved` `params` {Object} [inspector.md]
-  [LasmSignature="inspector.Network.domStorageItemRemoved", LasmAdded="v24.16.0", LasmStability="1"] readonly attribute object domStorageItemRemoved;
+  [LasmRemovedIn="26.13.0", LasmSignature="inspector.Network.domStorageItemRemoved", LasmAdded="v24.16.0", LasmStability="1"] readonly attribute object domStorageItemRemoved;
   // `domStorageItemUpdated` `params` {Object} [inspector.md]
-  [LasmSignature="inspector.Network.domStorageItemUpdated", LasmAdded="v24.16.0", LasmStability="1"] readonly attribute object domStorageItemUpdated;
+  [LasmRemovedIn="26.13.0", LasmSignature="inspector.Network.domStorageItemUpdated", LasmAdded="v24.16.0", LasmStability="1"] readonly attribute object domStorageItemUpdated;
   // `domStorageItemsCleared` `params` {Object} [inspector.md]
-  [LasmSignature="inspector.Network.domStorageItemsCleared", LasmAdded="v24.16.0", LasmStability="1"] readonly attribute object domStorageItemsCleared;
+  [LasmRemovedIn="26.13.0", LasmSignature="inspector.Network.domStorageItemsCleared", LasmAdded="v24.16.0", LasmStability="1"] readonly attribute object domStorageItemsCleared;
   // `registerStorage` `params` {Object} [inspector.md]
-  [LasmSignature="inspector.Network.registerStorage", LasmAdded="v24.16.0", LasmStability="1"] readonly attribute object registerStorage;
+  [LasmRemovedIn="26.13.0", LasmSignature="inspector.Network.registerStorage", LasmAdded="v24.16.0", LasmStability="1"] readonly attribute object registerStorage;
   // `params` {Object} [inspector.md]
   [LasmSince="26.13.0", LasmSignature="inspector.Network.params", LasmAdded="v25.5.0", LasmStability="1.1"] readonly attribute object params;
 };
@@ -5023,29 +4793,17 @@ namespace Node_inspector_Network {
 namespace Node_inspector_NetworkResources {
   // `inspector.NetworkResources.put` [inspector.md]
   [LasmSignature="inspector.NetworkResources.put", LasmAdded="v24.5.0", LasmStability="1"] readonly attribute any put;
-  // `domStorageItemAdded` `params` {Object} [inspector.md]
-  [LasmSignature="inspector.NetworkResources.domStorageItemAdded", LasmAdded="v24.16.0", LasmStability="1"] readonly attribute object domStorageItemAdded;
-  // `domStorageItemRemoved` `params` {Object} [inspector.md]
-  [LasmSignature="inspector.NetworkResources.domStorageItemRemoved", LasmAdded="v24.16.0", LasmStability="1"] readonly attribute object domStorageItemRemoved;
-  // `domStorageItemUpdated` `params` {Object} [inspector.md]
-  [LasmSignature="inspector.NetworkResources.domStorageItemUpdated", LasmAdded="v24.16.0", LasmStability="1"] readonly attribute object domStorageItemUpdated;
-  // `domStorageItemsCleared` `params` {Object} [inspector.md]
-  [LasmSignature="inspector.NetworkResources.domStorageItemsCleared", LasmAdded="v24.16.0", LasmStability="1"] readonly attribute object domStorageItemsCleared;
-  // `registerStorage` `params` {Object} [inspector.md]
-  [LasmSignature="inspector.NetworkResources.registerStorage", LasmAdded="v24.16.0", LasmStability="1"] readonly attribute object registerStorage;
-  // `params` {Object} [inspector.md]
-  [LasmSince="26.13.0", LasmSignature="inspector.NetworkResources.params", LasmAdded="v25.5.0", LasmStability="1.1"] readonly attribute object params;
 };
 
 // Class: `module.SourceMap` (module.md), node:module
-[LasmModule="node:module", LasmPath="SourceMap", LasmLeanModule="Module", LasmDoc="module", LasmNamespace="module", LasmName="SourceMap"]
+[LasmModule="node:module", LasmPath="SourceMap", LasmLeanModule="Module", LasmDoc="module", LasmNamespace="module", LasmName="SourceMap", LasmStability="1"]
 interface Node_module_SourceMap {
   // `sourceMap.findEntry(lineOffset, columnOffset)` [module.md]
   [LasmSignature="sourceMap.findEntry(lineOffset, columnOffset)", LasmStability="1"] object findEntry(double lineOffset, double columnOffset);
   // `sourceMap.findOrigin(lineNumber, columnNumber)` [module.md]
   [LasmSignature="sourceMap.findOrigin(lineNumber, columnNumber)", LasmAdded="v20.4.0, v18.18.0", LasmStability="1"] object findOrigin(double lineNumber, double columnNumber);
   // `payload` Returns: {Object} [module.md]
-  [LasmSignature="sourceMap.payload", LasmStability="1"] readonly attribute object payload;
+  [LasmRemovedIn="26.13.0", LasmSignature="sourceMap.payload", LasmStability="1"] readonly attribute object payload;
 };
 
 // module (module.md) (module.md), node:module
@@ -5107,14 +4865,10 @@ interface Node_v8_Serializer {
   [LasmSignature="serializer.writeDouble(value)"] undefined writeDouble(double value);
   // `serializer.writeRawBytes(buffer)` [v8.md]
   [LasmSignature="serializer.writeRawBytes(buffer)"] undefined writeRawBytes(Uint8Array buffer);
-  // `serializer._writeHostObject(object)` [v8.md]
-  [LasmSignature="serializer._writeHostObject(object)"] undefined _writeHostObject(object _object);
   // `serializer._getDataCloneError(message)` [v8.md]
-  [LasmSignature="serializer._getDataCloneError(message)"] undefined _getDataCloneError(DOMString message);
-  // `serializer._getSharedArrayBufferId(sharedArrayBuffer)` [v8.md]
-  [LasmSignature="serializer._getSharedArrayBufferId(sharedArrayBuffer)"] undefined _getSharedArrayBufferId(Uint8Array sharedArrayBuffer);
+  [LasmName="_getDataCloneError", LasmSignature="serializer._getDataCloneError(message)"] undefined lasm_getDataCloneError(DOMString message);
   // `serializer._setTreatArrayBufferViewsAsHostObjects(flag)` [v8.md]
-  [LasmSignature="serializer._setTreatArrayBufferViewsAsHostObjects(flag)"] undefined _setTreatArrayBufferViewsAsHostObjects(boolean flag);
+  [LasmName="_setTreatArrayBufferViewsAsHostObjects", LasmSignature="serializer._setTreatArrayBufferViewsAsHostObjects(flag)"] undefined lasm_setTreatArrayBufferViewsAsHostObjects(boolean flag);
 };
 
 // Class: `v8.Deserializer` (v8.md), node:v8
@@ -5136,8 +4890,6 @@ interface Node_v8_Deserializer {
   [LasmSignature="deserializer.readDouble()"] double readDouble();
   // `deserializer.readRawBytes(length)` [v8.md]
   [LasmSignature="deserializer.readRawBytes(length)"] Uint8Array readRawBytes(long long length);
-  // `deserializer._readHostObject()` [v8.md]
-  [LasmSignature="deserializer._readHostObject()"] undefined _readHostObject();
 };
 
 // Class: `v8.DefaultSerializer` (v8.md), node:v8
@@ -5162,21 +4914,21 @@ interface Node_v8_GCProfiler {
 };
 
 // Class: `SyncCPUProfileHandle` (v8.md), node:v8
-[LasmModule="node:v8", LasmPath="SyncCPUProfileHandle", LasmLeanModule="V8", LasmDoc="v8", LasmName="SyncCPUProfileHandle"]
+[LasmModule="node:v8", LasmLeanModule="V8", LasmDoc="v8", LasmName="SyncCPUProfileHandle"]
 interface Node_SyncCPUProfileHandle {
   // `syncCpuProfileHandle.stop()` [v8.md]
   [LasmSignature="syncCpuProfileHandle.stop()", LasmAdded="v24.12.0"] DOMString stop();
 };
 
 // Class: `CPUProfileHandle` (v8.md), node:v8
-[LasmModule="node:v8", LasmPath="CPUProfileHandle", LasmLeanModule="V8", LasmDoc="v8", LasmName="CPUProfileHandle"]
+[LasmModule="node:v8", LasmLeanModule="V8", LasmDoc="v8", LasmName="CPUProfileHandle"]
 interface Node_CPUProfileHandle {
   // `cpuProfileHandle.stop()` [v8.md]
   [LasmSignature="cpuProfileHandle.stop()", LasmAdded="v24.8.0"] Promise<any> stop();
 };
 
 // Class: `HeapProfileHandle` (v8.md), node:v8
-[LasmModule="node:v8", LasmPath="HeapProfileHandle", LasmLeanModule="V8", LasmDoc="v8", LasmName="HeapProfileHandle"]
+[LasmModule="node:v8", LasmLeanModule="V8", LasmDoc="v8", LasmName="HeapProfileHandle"]
 interface Node_HeapProfileHandle {
   // `heapProfileHandle.stop()` [v8.md]
   [LasmSignature="heapProfileHandle.stop()", LasmAdded="v24.9.0"] Promise<any> stop();
@@ -5212,7 +4964,7 @@ namespace v8 {
   // `v8.isStringOneByteRepresentation(content)` [v8.md]
   [LasmSignature="v8.isStringOneByteRepresentation(content)", LasmAdded="v23.10.0, v22.15.0"] boolean isStringOneByteRepresentation(DOMString content);
   // `v8.startCpuProfile()` [v8.md]
-  [LasmSignature="v8.startCpuProfile()", LasmAdded="v24.12.0"] Node_SyncCPUProfileHandle startCpuProfile();
+  [LasmRemovedIn="26.13.0", LasmSignature="v8.startCpuProfile()", LasmAdded="v24.12.0"] Node_SyncCPUProfileHandle startCpuProfile();
   // `v8.serialize(value)` [v8.md]
   [LasmSignature="v8.serialize(value)", LasmAdded="v8.0.0"] Uint8Array serialize(any value);
   // `v8.deserialize(buffer)` [v8.md]
@@ -5271,7 +5023,7 @@ interface Node_vm_Script {
 };
 
 // Class: `vm.Module` (vm.md), node:vm
-[LasmModule="node:vm", LasmPath="Module", LasmLeanModule="Vm", LasmDoc="vm", LasmNamespace="vm", LasmName="Module"]
+[LasmModule="node:vm", LasmPath="Module", LasmLeanModule="Vm", LasmDoc="vm", LasmNamespace="vm", LasmName="Module", LasmStability="1"]
 interface Node_vm_Module {
   // `module.evaluate([options])` [vm.md]
   [LasmSignature="module.evaluate([options])", LasmStability="1"] Promise<undefined> evaluate(optional Node_vm_Module_EvaluateOptions options);
@@ -5288,7 +5040,7 @@ interface Node_vm_Module {
 };
 
 // Class: `vm.SourceTextModule` (vm.md), node:vm
-[LasmModule="node:vm", LasmPath="SourceTextModule", LasmLeanModule="Vm", LasmDoc="vm", LasmNamespace="vm", LasmName="SourceTextModule"]
+[LasmModule="node:vm", LasmPath="SourceTextModule", LasmLeanModule="Vm", LasmDoc="vm", LasmNamespace="vm", LasmName="SourceTextModule", LasmStability="1"]
 interface Node_vm_SourceTextModule : Node_vm_Module {
   // `sourceTextModule.createCachedData()` [vm.md]
   [LasmSignature="sourceTextModule.createCachedData()", LasmAdded="v13.7.0, v12.17.0", LasmStability="1"] Uint8Array createCachedData();
@@ -5307,7 +5059,7 @@ interface Node_vm_SourceTextModule : Node_vm_Module {
 };
 
 // Class: `vm.SyntheticModule` (vm.md), node:vm
-[LasmModule="node:vm", LasmPath="SyntheticModule", LasmLeanModule="Vm", LasmDoc="vm", LasmNamespace="vm", LasmName="SyntheticModule"]
+[LasmModule="node:vm", LasmPath="SyntheticModule", LasmLeanModule="Vm", LasmDoc="vm", LasmNamespace="vm", LasmName="SyntheticModule", LasmStability="1"]
 interface Node_vm_SyntheticModule : Node_vm_Module {
   // `syntheticModule.setExport(name, value)` [vm.md]
   [LasmSignature="syntheticModule.setExport(name, value)", LasmAdded="v13.0.0, v12.16.0", LasmStability="1"] undefined setExport(DOMString name, any value);
@@ -5344,7 +5096,7 @@ namespace Node_vm_constants {
 };
 
 // Class: `WASI` (wasi.md), node:wasi
-[LasmModule="node:wasi", LasmPath="WASI", LasmLeanModule="Wasi", LasmDoc="wasi", LasmName="WASI"]
+[LasmModule="node:wasi", LasmPath="WASI", LasmLeanModule="Wasi", LasmDoc="wasi", LasmName="WASI", LasmStability="1"]
 interface Node_WASI {
   // `wasi.getImportObject()` [wasi.md]
   [LasmSignature="wasi.getImportObject()", LasmAdded="v19.8.0", LasmStability="1"] undefined getImportObject();
@@ -5359,7 +5111,7 @@ interface Node_WASI {
 };
 
 // Class: `DatabaseSync` (sqlite.md), node:sqlite
-[LasmModule="node:sqlite", LasmPath="DatabaseSync", LasmLeanModule="Sqlite", LasmDoc="sqlite", LasmName="DatabaseSync"]
+[LasmRemovedIn="26.13.0", LasmModule="node:sqlite", LasmPath="DatabaseSync", LasmLeanModule="Sqlite", LasmDoc="sqlite", LasmName="DatabaseSync", LasmStability="1"]
 interface Node_DatabaseSync {
   // `database.aggregate(name, options)` [sqlite.md]
   [LasmSignature="database.aggregate(name, options)", LasmAdded="v24.0.0", LasmStability="1"] undefined aggregate(any name, any options);
@@ -5404,7 +5156,7 @@ interface Node_DatabaseSync {
 };
 
 // Class: `Session` (sqlite.md), node:sqlite
-[LasmModule="node:sqlite", LasmPath="Session", LasmLeanModule="Sqlite", LasmDoc="sqlite", LasmName="Session"]
+[LasmModule="node:sqlite", LasmPath="Session", LasmLeanModule="Sqlite", LasmDoc="sqlite", LasmName="Session", LasmStability="1"]
 interface Node_Session {
   // `session.changeset()` [sqlite.md]
   [LasmSignature="session.changeset()", LasmAdded="v23.3.0, v22.12.0", LasmStability="1"] Uint8Array changeset();
@@ -5415,7 +5167,7 @@ interface Node_Session {
 };
 
 // Class: `StatementSync` (sqlite.md), node:sqlite
-[LasmModule="node:sqlite", LasmPath="StatementSync", LasmLeanModule="Sqlite", LasmDoc="sqlite", LasmName="StatementSync"]
+[LasmRemovedIn="26.13.0", LasmModule="node:sqlite", LasmPath="StatementSync", LasmLeanModule="Sqlite", LasmDoc="sqlite", LasmName="StatementSync", LasmStability="1"]
 interface Node_StatementSync {
   // `statement.all([namedParameters][, ...anonymousParameters])` [sqlite.md]
   [LasmSignature="statement.all([namedParameters][, ...anonymousParameters])", LasmAdded="v22.5.0", LasmStability="1"] sequence<any> all(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters);
@@ -5444,7 +5196,7 @@ interface Node_StatementSync {
 };
 
 // Class: `SQLTagStore` (sqlite.md), node:sqlite
-[LasmModule="node:sqlite", LasmPath="SQLTagStore", LasmLeanModule="Sqlite", LasmDoc="sqlite", LasmName="SQLTagStore"]
+[LasmModule="node:sqlite", LasmLeanModule="Sqlite", LasmDoc="sqlite", LasmName="SQLTagStore", LasmStability="1"]
 interface Node_SQLTagStore {
   // `sqlTagStore.all(stringElements[, ...boundParameters])` [sqlite.md]
   [LasmSignature="sqlTagStore.all(stringElements[, ...boundParameters])", LasmAdded="v24.9.0", LasmStability="1"] sequence<any> all(sequence<DOMString> stringElements, (double or bigint or boolean or DOMString or Uint8Array)... boundParameters);
@@ -5474,7 +5226,7 @@ namespace sqlite {
 };
 
 // Class: `MockFunctionContext` (test.md), node:test
-[LasmModule="node:test", LasmPath="MockFunctionContext", LasmLeanModule="Test", LasmDoc="test", LasmName="MockFunctionContext"]
+[LasmModule="node:test", LasmLeanModule="Test", LasmDoc="test", LasmName="MockFunctionContext"]
 interface Node_MockFunctionContext {
   // `ctx.callCount()` [test.md]
   [LasmSignature="ctx.callCount()", LasmAdded="v19.1.0, v18.13.0"] long long callCount();
@@ -5491,14 +5243,14 @@ interface Node_MockFunctionContext {
 };
 
 // Class: `MockModuleContext` (test.md), node:test
-[LasmModule="node:test", LasmPath="MockModuleContext", LasmLeanModule="Test", LasmDoc="test", LasmName="MockModuleContext"]
+[LasmModule="node:test", LasmLeanModule="Test", LasmDoc="test", LasmName="MockModuleContext", LasmStability="1"]
 interface Node_MockModuleContext {
   // `ctx.restore()` [test.md]
   [LasmSignature="ctx.restore()", LasmAdded="v22.3.0, v20.18.0", LasmStability="1"] undefined restore();
 };
 
 // Class: `MockPropertyContext` (test.md), node:test
-[LasmModule="node:test", LasmPath="MockPropertyContext", LasmLeanModule="Test", LasmDoc="test", LasmName="MockPropertyContext"]
+[LasmModule="node:test", LasmLeanModule="Test", LasmDoc="test", LasmName="MockPropertyContext"]
 interface Node_MockPropertyContext {
   // `ctx.accessCount()` [test.md]
   [LasmSignature="ctx.accessCount()"] long long accessCount();
@@ -5515,7 +5267,7 @@ interface Node_MockPropertyContext {
 };
 
 // Class: `MockTracker` (test.md), node:test
-[LasmModule="node:test", LasmPath="MockTracker", LasmLeanModule="Test", LasmDoc="test", LasmName="MockTracker"]
+[LasmModule="node:test", LasmLeanModule="Test", LasmDoc="test", LasmName="MockTracker"]
 interface Node_MockTracker {
   // `mock.fn([original[, implementation]][, options])` [test.md]
   [LasmSignature="mock.fn([original[, implementation]][, options])", LasmAdded="v19.1.0, v18.13.0"] object fn(optional Function original, optional Function implementation, optional Node_MockTracker_FnOptions options);
@@ -5536,7 +5288,7 @@ interface Node_MockTracker {
 };
 
 // Class: `MockTimers` (test.md), node:test
-[LasmModule="node:test", LasmPath="MockTimers", LasmLeanModule="Test", LasmDoc="test", LasmName="MockTimers"]
+[LasmModule="node:test", LasmLeanModule="Test", LasmDoc="test", LasmName="MockTimers"]
 interface Node_MockTimers {
   // `timers.enable([enableOptions])` [test.md]
   [LasmSignature="timers.enable([enableOptions])", LasmAdded="v20.4.0, v18.19.0"] undefined enable(optional any enableOptions);
@@ -5551,7 +5303,7 @@ interface Node_MockTimers {
 };
 
 // Class: `TestsStream` (test.md), node:test
-[LasmModule="node:test", LasmPath="TestsStream", LasmLeanModule="Test", LasmDoc="test", LasmName="TestsStream"]
+[LasmModule="node:test", LasmLeanModule="Test", LasmDoc="test", LasmName="TestsStream"]
 interface Node_TestsStream {
   // Event: 'test:coverage' [test.md]
   [LasmEvent="test:coverage", LasmSignature="Event: 'test:coverage'"] Node_TestsStream onTestCoverage(Node_TestsStream_TestCoverageListener listener);
@@ -5604,7 +5356,7 @@ interface Node_TestsStream {
 };
 
 // Class: `TestContext` (test.md), node:test
-[LasmModule="node:test", LasmPath="TestContext", LasmLeanModule="Test", LasmDoc="test", LasmName="TestContext"]
+[LasmModule="node:test", LasmLeanModule="Test", LasmDoc="test", LasmName="TestContext"]
 interface Node_TestContext {
   // `context.before([fn][, options])` [test.md]
   [LasmSignature="context.before([fn][, options])", LasmAdded="v20.1.0, v18.17.0"] undefined before(optional Function fn, optional Node_TestContext_BeforeOptions options);
@@ -5653,7 +5405,7 @@ interface Node_TestContext {
 };
 
 // Class: `SuiteContext` (test.md), node:test
-[LasmModule="node:test", LasmPath="SuiteContext", LasmLeanModule="Test", LasmDoc="test", LasmName="SuiteContext"]
+[LasmModule="node:test", LasmLeanModule="Test", LasmDoc="test", LasmName="SuiteContext"]
 interface Node_SuiteContext {
   // `context.diagnostic(message)` [test.md]
   [LasmSignature="context.diagnostic(message)", LasmAdded="v24.16.0"] undefined diagnostic(DOMString message);
@@ -5727,7 +5479,7 @@ namespace snapshot {
 };
 
 // sea (single-executable-applications.md) (single-executable-applications.md), node:sea
-[LasmModule="node:sea", LasmPath="sea", LasmLeanModule="Sea", LasmDoc="single-executable-applications", LasmName="sea"]
+[LasmModule="node:sea", LasmLeanModule="Sea", LasmDoc="single-executable-applications", LasmName="sea"]
 namespace sea {
   // `sea.getAsset(key[, encoding])` [single-executable-applications.md]
   [LasmSignature="sea.getAsset(key[, encoding])", LasmAdded="v21.7.0, v20.12.0", LasmStability="1"] DOMString getAsset(any key, optional any encoding);
@@ -5742,7 +5494,7 @@ namespace sea {
 };
 
 // Class: `Share` (stream_iter.md), node:stream/iter
-[LasmModule="node:stream/iter", LasmPath="Share", LasmLeanModule="StreamIter", LasmDoc="stream_iter", LasmName="Share"]
+[LasmModule="node:stream/iter", LasmPath="Share", LasmLeanModule="StreamIter", LasmDoc="stream_iter", LasmName="Share", LasmStability="1"]
 interface Node_Share {
   // `share.cancel([reason])` [stream_iter.md]
   [LasmSignature="share.cancel([reason])", LasmStability="1"] undefined cancel(optional any reason);
@@ -5751,35 +5503,35 @@ interface Node_Share {
   // Static method: `Share.from(input[, options])` [stream_iter.md]
   [LasmSignature="Share.from(input[, options])", LasmAdded="v25.9.0", LasmStability="1"] static Node_Share from(any input, optional object options);
   // `consumerCount` {number} [stream_iter.md]
-  [LasmSignature="share.consumerCount", LasmStability="1"] readonly attribute double consumerCount;
+  [LasmRemovedIn="26.13.0", LasmSignature="share.consumerCount", LasmStability="1"] readonly attribute double consumerCount;
 };
 
 // Class: `SyncShare` (stream_iter.md), node:stream/iter
-[LasmModule="node:stream/iter", LasmPath="SyncShare", LasmLeanModule="StreamIter", LasmDoc="stream_iter", LasmName="SyncShare"]
+[LasmModule="node:stream/iter", LasmPath="SyncShare", LasmLeanModule="StreamIter", LasmDoc="stream_iter", LasmName="SyncShare", LasmStability="1"]
 interface Node_SyncShare {
   // `share.cancel([reason])` [stream_iter.md]
   [LasmSignature="share.cancel([reason])", LasmStability="1"] undefined cancel(optional any reason);
   // `share.pull([...transforms][, options])` [stream_iter.md]
-  [LasmSignature="share.pull([...transforms][, options])", LasmStability="1"] object pull((Function or object)... transforms, optional Node_SyncShare_PullOptions options);
+  [LasmRemovedIn="26.13.0", LasmSignature="share.pull([...transforms][, options])", LasmStability="1"] object pull((Function or object)... transforms, optional Node_SyncShare_PullOptions options);
   // Static method: `SyncShare.fromSync(input[, options])` [stream_iter.md]
   [LasmSignature="SyncShare.fromSync(input[, options])", LasmAdded="v24.20.0", LasmStability="1"] static Node_SyncShare fromSync(any input, optional object options);
   // `bufferSize` {number} [stream_iter.md]
-  [LasmSignature="share.bufferSize", LasmStability="1"] readonly attribute double bufferSize;
+  [LasmRemovedIn="26.13.0", LasmSignature="share.bufferSize", LasmStability="1"] readonly attribute double bufferSize;
   // `consumerCount` {number} [stream_iter.md]
-  [LasmSignature="share.consumerCount", LasmStability="1"] readonly attribute double consumerCount;
+  [LasmRemovedIn="26.13.0", LasmSignature="share.consumerCount", LasmStability="1"] readonly attribute double consumerCount;
   // `share.pull([...transforms])` [stream_iter.md]
   [LasmSince="26.13.0", LasmSignature="share.pull([...transforms])", LasmStability="1"] sequence<Uint8Array> pull((Function or object)... transforms);
 };
 
 // Writer (stream_iter.md) (stream_iter.md), node:stream/iter
-[LasmModule="node:stream/iter", LasmPath="Writer", LasmLeanModule="StreamIter", LasmDoc="stream_iter", LasmName="Writer"]
+[LasmModule="node:stream/iter", LasmLeanModule="StreamIter", LasmDoc="stream_iter", LasmName="Writer"]
 interface Node_Writer {
   // `writer.end([options])` [stream_iter.md]
   [LasmSignature="writer.end([options])", LasmStability="1"] Promise<any> end(optional Node_Writer_EndOptions options);
   // `writer.endSync()` [stream_iter.md]
   [LasmSignature="writer.endSync()", LasmStability="1"] double endSync();
   // `writer.fail(reason)` [stream_iter.md]
-  [LasmSignature="writer.fail(reason)", LasmStability="1"] undefined fail(any reason);
+  [LasmRemovedIn="26.13.0", LasmSignature="writer.fail(reason)", LasmStability="1"] undefined fail(any reason);
   // `writer.write(chunk[, options])` [stream_iter.md]
   [LasmSignature="writer.write(chunk[, options])", LasmStability="1"] Promise<any> write((Uint8Array or DOMString) chunk, optional Node_Writer_WriteOptions options);
   // `writer.writeSync(chunk)` [stream_iter.md]
@@ -5789,7 +5541,7 @@ interface Node_Writer {
   // `writer.writevSync(chunks)` [stream_iter.md]
   [LasmSignature="writer.writevSync(chunks)", LasmStability="1"] boolean writevSync((sequence<Uint8Array> or sequence<DOMString>) chunks);
   // `canWrite` {boolean|null} [stream_iter.md]
-  [LasmSignature="writer.canWrite", LasmStability="1"] readonly attribute boolean? canWrite;
+  [LasmRemovedIn="26.13.0", LasmSignature="writer.canWrite", LasmStability="1"] readonly attribute boolean? canWrite;
   // `writer.fail([reason])` [stream_iter.md]
   [LasmSince="26.13.0", LasmSignature="writer.fail([reason])", LasmStability="1"] undefined fail(optional any reason);
 };
@@ -5802,7 +5554,7 @@ interface Node_Broadcast {
   // `broadcast.push([...transforms][, options])` [stream_iter.md]
   [LasmSignature="broadcast.push([...transforms][, options])", LasmStability="1"] object push((Function or object)... transforms, optional Node_Broadcast_PushOptions options);
   // `consumerCount` {number} [stream_iter.md]
-  [LasmSignature="broadcast.consumerCount", LasmStability="1"] readonly attribute double consumerCount;
+  [LasmRemovedIn="26.13.0", LasmSignature="broadcast.consumerCount", LasmStability="1"] readonly attribute double consumerCount;
   // `Broadcast.from(input[, options])` [stream_iter.md]
   [LasmSignature="Broadcast.from(input[, options])", LasmAdded="v24.20.0", LasmStability="1"] static object from((object or BroadcastChannel) input, optional object options);
 };
@@ -8171,6 +7923,25 @@ dictionary Node_performance_TimerifyOptions {
   Node_RecordableHistogram histogram;
 };
 
+[LasmNamespace="perf_hooks.performance", LasmName="MarkOptions"]
+dictionary Node_perf_hooks_performance_MarkOptions {
+  any detail;
+  double startTime;
+};
+
+[LasmNamespace="perf_hooks.performance", LasmName="MeasureStartMarkOrOptions"]
+dictionary Node_perf_hooks_performance_MeasureStartMarkOrOptions {
+  any detail;
+  double duration;
+  (double or DOMString) end;
+  (double or DOMString) start;
+};
+
+[LasmNamespace="perf_hooks.performance", LasmName="TimerifyOptions"]
+dictionary Node_perf_hooks_performance_TimerifyOptions {
+  Node_RecordableHistogram histogram;
+};
+
 [LasmNamespace="trace_events", LasmName="CreateTracingOptions"]
 dictionary Node_trace_events_CreateTracingOptions {
   sequence<DOMString> categories;
@@ -8767,7 +8538,7 @@ dictionary Node_Broadcast_PushOptions {
 };
 
 // Class: `zlib.ZipBuffer` (zlib.md), node:zlib
-[LasmSince="26.13.0", LasmModule="node:zlib", LasmPath="ZipBuffer", LasmLeanModule="Zlib", LasmDoc="zlib", LasmNamespace="zlib", LasmName="ZipBuffer"]
+[LasmSince="26.13.0", LasmModule="node:zlib", LasmPath="ZipBuffer", LasmLeanModule="Zlib", LasmDoc="zlib", LasmNamespace="zlib", LasmName="ZipBuffer", LasmStability="1"]
 interface Node_zlib_ZipBuffer {
   // `zipBuffer.add(filename, data[, options])` [zlib.md]
   [LasmSignature="zipBuffer.add(filename, data[, options])", LasmAdded="v26.8.0", LasmStability="1"] Promise<Node_zlib_ZipEntry> add(DOMString filename, Uint8Array data, optional object options);
@@ -8804,7 +8575,7 @@ interface Node_zlib_ZipBuffer {
 };
 
 // Class: `zlib.ZipEntry` (zlib.md), node:zlib
-[LasmSince="26.13.0", LasmModule="node:zlib", LasmPath="ZipEntry", LasmLeanModule="Zlib", LasmDoc="zlib", LasmNamespace="zlib", LasmName="ZipEntry"]
+[LasmSince="26.13.0", LasmModule="node:zlib", LasmPath="ZipEntry", LasmLeanModule="Zlib", LasmDoc="zlib", LasmNamespace="zlib", LasmName="ZipEntry", LasmStability="1"]
 interface Node_zlib_ZipEntry {
   // `zipEntry.content([options])` [zlib.md]
   [LasmSignature="zipEntry.content([options])", LasmAdded="v26.8.0", LasmStability="1"] Promise<Uint8Array> content(optional Node_zlib_ZipEntry_ContentOptions options);
@@ -8845,7 +8616,7 @@ interface Node_zlib_ZipEntry {
 };
 
 // Class: `zlib.ZipFile` (zlib.md), node:zlib
-[LasmSince="26.13.0", LasmModule="node:zlib", LasmPath="ZipFile", LasmLeanModule="Zlib", LasmDoc="zlib", LasmNamespace="zlib", LasmName="ZipFile"]
+[LasmSince="26.13.0", LasmModule="node:zlib", LasmPath="ZipFile", LasmLeanModule="Zlib", LasmDoc="zlib", LasmNamespace="zlib", LasmName="ZipFile", LasmStability="1"]
 interface Node_zlib_ZipFile {
   // `zipFile.add(filename, data[, options])` [zlib.md]
   [LasmSignature="zipFile.add(filename, data[, options])", LasmAdded="v26.8.0", LasmStability="1"] Promise<Node_zlib_ZipEntry> add(DOMString filename, Uint8Array data, optional object options);
@@ -8898,13 +8669,13 @@ interface Node_zlib_ZipFile {
 };
 
 // Class: `RunStoresScope` (diagnostics_channel.md), node:diagnostics_channel
-[LasmSince="26.13.0", LasmModule="node:diagnostics_channel", LasmPath="RunStoresScope", LasmLeanModule="DiagnosticsChannel", LasmDoc="diagnostics_channel", LasmName="RunStoresScope"]
+[LasmSince="26.13.0", LasmModule="node:diagnostics_channel", LasmPath="RunStoresScope", LasmLeanModule="DiagnosticsChannel", LasmDoc="diagnostics_channel", LasmName="RunStoresScope", LasmStability="1"]
 interface Node_RunStoresScope {
 
 };
 
 // Class: `BoundedChannel` (diagnostics_channel.md), node:diagnostics_channel
-[LasmSince="26.13.0", LasmModule="node:diagnostics_channel", LasmPath="BoundedChannel", LasmLeanModule="DiagnosticsChannel", LasmDoc="diagnostics_channel", LasmName="BoundedChannel"]
+[LasmSince="26.13.0", LasmModule="node:diagnostics_channel", LasmPath="BoundedChannel", LasmLeanModule="DiagnosticsChannel", LasmDoc="diagnostics_channel", LasmName="BoundedChannel", LasmStability="1"]
 interface Node_BoundedChannel {
   // `boundedChannel.subscribe(handlers)` [diagnostics_channel.md]
   [LasmSignature="boundedChannel.subscribe(handlers)", LasmAdded="v26.1.0", LasmStability="1"] undefined subscribe(Node_BoundedChannel_SubscribeHandlers handlers);
@@ -8917,20 +8688,20 @@ interface Node_BoundedChannel {
 };
 
 // Class: `BoundedChannelScope` (diagnostics_channel.md), node:diagnostics_channel
-[LasmSince="26.13.0", LasmModule="node:diagnostics_channel", LasmPath="BoundedChannelScope", LasmLeanModule="DiagnosticsChannel", LasmDoc="diagnostics_channel", LasmName="BoundedChannelScope"]
+[LasmSince="26.13.0", LasmModule="node:diagnostics_channel", LasmPath="BoundedChannelScope", LasmLeanModule="DiagnosticsChannel", LasmDoc="diagnostics_channel", LasmName="BoundedChannelScope", LasmStability="1"]
 interface Node_BoundedChannelScope {
 
 };
 
 // Class: `SyncHeapProfileHandle` (v8.md), node:v8
-[LasmSince="26.13.0", LasmModule="node:v8", LasmPath="SyncHeapProfileHandle", LasmLeanModule="V8", LasmDoc="v8", LasmName="SyncHeapProfileHandle"]
+[LasmSince="26.13.0", LasmModule="node:v8", LasmLeanModule="V8", LasmDoc="v8", LasmName="SyncHeapProfileHandle", LasmStability="1"]
 interface Node_SyncHeapProfileHandle {
   // `syncHeapProfileHandle.stop()` [v8.md]
   [LasmSignature="syncHeapProfileHandle.stop()", LasmAdded="v26.1.0", LasmStability="1"] DOMString stop();
 };
 
 // Class: `Database` (sqlite.md), node:sqlite
-[LasmSince="26.13.0", LasmModule="node:sqlite", LasmPath="Database", LasmLeanModule="Sqlite", LasmDoc="sqlite", LasmName="Database"]
+[LasmSince="26.13.0", LasmModule="node:sqlite", LasmPath="Database", LasmLeanModule="Sqlite", LasmDoc="sqlite", LasmName="Database", LasmStability="1.2"]
 interface Node_Database {
   // `database.aggregate(name, options)` [sqlite.md]
   [LasmSignature="database.aggregate(name, options)", LasmAdded="v24.0.0, v22.16.0", LasmStability="1.2"] undefined aggregate(DOMString name, Node_Database_AggregateOptions options);
@@ -8977,7 +8748,7 @@ interface Node_Database {
 };
 
 // Class: `Statement` (sqlite.md), node:sqlite
-[LasmSince="26.13.0", LasmModule="node:sqlite", LasmPath="Statement", LasmLeanModule="Sqlite", LasmDoc="sqlite", LasmName="Statement"]
+[LasmSince="26.13.0", LasmModule="node:sqlite", LasmPath="Statement", LasmLeanModule="Sqlite", LasmDoc="sqlite", LasmName="Statement", LasmStability="1.2"]
 interface Node_Statement {
   // `statement.all([namedParameters][, ...anonymousParameters])` [sqlite.md]
   [LasmSignature="statement.all([namedParameters][, ...anonymousParameters])", LasmAdded="v22.5.0", LasmStability="1.2"] sequence<any> all(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters);
