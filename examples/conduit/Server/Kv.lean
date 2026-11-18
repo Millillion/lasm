@@ -1,9 +1,13 @@
 /-
-Conduit's `Store` on a key-value store (`Lasm.KV.Store`: get, put and
-delete of string values), for the platforms without SQL: Deno KV (Deno
-Deploy), Fastly's KV Store, Netlify Blobs, and memory where a platform has
-no store at all. Each function does to the keys what its SQL statement in
-`Server/Sql.lean` does to the tables.
+Conduit's `Store` on a key-value store (`KvStore`: get, put and delete of
+string values), for the platforms without SQL: Deno KV (Deno Deploy,
+`ServerDenoDeploy.lean`), Fastly's KV Store (`ServerFastly.lean`), Netlify
+Blobs (`Server/NetlifyBlobs.lean`), Postgres through PostgREST
+(`Server/Postgrest.lean`), and memory on Vercel Edge, which has no store of
+its own. Each entry file makes the `KvStore` from its platform's own
+bindings; a store it names that is missing is an error, never memory. Each
+function here does to the keys what its SQL statement in `Server/Sql.lean`
+does to the tables.
 
 The keys (values are JSON):
 
@@ -18,16 +22,37 @@ The keys (values are JSON):
 
 A list (articles, a feed, the tags) reads every article's keys: fine for an
 example, slow for a large site. The writes of one request are not one
-transaction, so two concurrent writers can race (Lasm.KV has no
+transaction, so two concurrent writers can race (`KvStore` has no
 compare-and-set).
 -/
-import Lasm.KV
+import Std.Data.HashMap
+import Std.Async.Basic
 import Lean.Data.Json
 import Conduit.SafeJson
 import Conduit.Store
 open Lean Std.Async
 
-namespace Conduit.Server.Kv
+namespace Conduit.Server
+
+/-- A key-value store of strings, as each platform's store provides it. -/
+structure KvStore where
+  /-- The value of `key`, if any. -/
+  get : String → Async (Option String)
+  /-- Sets `key` to `value`. -/
+  put : String → String → Async Unit
+  /-- Removes `key` (nothing if it is absent). -/
+  delete : String → Async Unit
+
+/-- A store in this process's memory: one copy per process (or isolate),
+lost when it ends. Only where the platform has no store of its own (Vercel
+Edge). -/
+def KvStore.memory : IO KvStore := do
+  let table ← IO.mkRef ({} : Std.HashMap String String)
+  return { get := fun k => do return (← table.get)[k]?,
+           put := fun k v => table.modify (·.insert k v),
+           delete := fun k => table.modify (·.erase k) }
+
+namespace Kv
 
 /-! ## Rows as JSON -/
 
@@ -70,7 +95,7 @@ def insertOrIgnore {α : Type} [BEq α] (l : List α) (x : α) : List α :=
 /-! ## Reading and writing keys -/
 
 section
-variable (kv : Lasm.KV.Store)
+variable (kv : KvStore)
 
 def read {α : Type} (decode : Json → Option α) (key : String) : Async (Option α) := do
   match ← kv.get key with
@@ -117,7 +142,7 @@ end
 /-! ## The store -/
 
 /-- Conduit's store on `kv`. -/
-def store (kv : Lasm.KV.Store) : Store Async where
+def store (kv : KvStore) : Store Async where
   userById id := user kv id
   userByEmail e := byKey kv (user kv) s!"email/{nocase e}"
   userByUsername u := byKey kv (user kv) s!"username/{u}"
@@ -220,4 +245,5 @@ def store (kv : Lasm.KV.Store) : Store Async where
     -- Most used first, then by name (GROUP BY tag ORDER BY COUNT(*) DESC, tag).
     return (counts.mergeSort fun a b => a.2 > b.2 || (a.2 == b.2 && a.1 ≤ b.1)).map (·.1)
 
-end Conduit.Server.Kv
+end Kv
+end Conduit.Server

@@ -3,10 +3,10 @@ The server on the JavaScript targets (Node, Bun, Deno, the edge platforms
 and the function platforms): `Server/Http.lean` with the clock, passwords
 and tokens from Web Crypto, on a SQLite connection from one of the binding
 modules, or on a key-value store (`Server/Kv.lean`). The same code runs on
-every platform; only the store it is given differs.
+every platform; only the store (and, on Workers, where the secret comes
+from) differs.
 -/
 import Lasm.JS
-import Server.JsServe
 import Conduit.Api
 import Server.Sql
 import Server.Crypto
@@ -15,28 +15,18 @@ open Lasm.JS Lean
 
 namespace Conduit.Server
 
-/-- A setting: the process environment (Node, Bun), else the Worker's `env`
-(Cloudflare Workers `[vars]` and secrets). -/
-def setting (name : String) : IO (Option String) := do
-  if let some v ← IO.getEnv name then return some v
-  match ← JsServe.platformEnv.get with
-  | .ref env _ => match ← (try env.get name Data catch _ => pure .undefined) with
-    | .string s => return some s
-    | _ => return none
-  | env@(.object _) => match env.field name with
-    | .string s => return some s
-    | _ => return none
-  | _ => return none
+/-- `JWT_SECRET` from the environment, else the development secret. -/
+def envSecret : IO String := do return (← IO.getEnv "JWT_SECRET").getD developmentSecret
 
-def secret : IO String := do return (← setting "JWT_SECRET").getD developmentSecret
-
-/-- Milliseconds since the epoch (`Date.now()`). -/
+/-- Milliseconds since the epoch (`Date.now()`: ECMAScript's `Date`, which no
+generated binding covers). -/
 def nowMs : IO Nat := do
   let ms ← (← (← global).get "Date").callMethod "now" #[] Float
   return ms.toUInt64.toNat
 
-/-- The clock, passwords and tokens, with Web Crypto. -/
-def services : Services Async where
+/-- The clock, passwords and tokens, with Web Crypto; tokens are signed with
+the secret `secret` reads. -/
+def services (secret : IO String := envSecret) : Services Async where
   now := nowMs
   hashPassword := Crypto.hashPassword
   checkPassword := Crypto.checkPassword
@@ -46,14 +36,14 @@ def services : Services Async where
 /-- Conduit on a store, with the browser app's files (`assets`:
 `embed_dir! "dist/public"` in the entry file), as the handler the entry file
 serves. -/
-def storeHandler (store : Store Async) (assets : Web.Assets) : IO Web.Handler :=
-  handlerWith store services assets
+def storeHandler (store : Store Async) (assets : Web.Assets) (secret : IO String := envSecret) : IO Web.Handler :=
+  handlerWith store (services secret) assets
 
 /-- Conduit on a SQL database (whose binding module created the tables).
 `isolate`: run writes alone in this process (`Isolation` in
 `Server/Http.lean`); off on Cloudflare Workers, which cancels a request that
 waits on another request's promise. -/
-def sqlHandler (db : Sql) (assets : Web.Assets) (isolate := true) : IO Web.Handler :=
-  handlerWith (store db) services assets isolate
+def sqlHandler (db : Sql) (assets : Web.Assets) (isolate := true) (secret : IO String := envSecret) : IO Web.Handler :=
+  handlerWith (store db) (services secret) assets isolate
 
 end Conduit.Server

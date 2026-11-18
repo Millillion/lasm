@@ -1,11 +1,13 @@
 /- Conduit on Supabase Edge Functions, on the project's Postgres (the table of
 supabase/migrations/, through Supabase's REST API): `npm run build:supabase-edge`;
-locally `supabase start`, then `supabase functions serve`. JWT_SECRET as everywhere. -/
+locally `supabase start`, then `supabase functions serve`. The program's default export, which
+Supabase's edge runtime calls. JWT_SECRET as everywhere. -/
 import Server.App
 import Server.Embed
 import Server.JsServe
 import Server.Kv
 import Server.Postgrest
+open Lasm.JS
 
 /-- The browser app and its files (dist/public, from npm run build:client),
 embedded in the program so every target serves them. -/
@@ -20,4 +22,4 @@ def setting (name : String) : IO String := do
 def main : IO Unit := do
   let kv ← Conduit.Server.Postgrest.open Conduit.Server.JsServe.fetch ((← setting "SUPABASE_URL") ++ "/rest/v1")
     (some (← setting "SUPABASE_SERVICE_ROLE_KEY"))
-  Conduit.Server.JsServe.serveEdge (← Conduit.Server.storeHandler (Conduit.Server.Kv.store kv) assets)
+  exportDefault (Conduit.Server.JsServe.webHandler (← Conduit.Server.storeHandler (Conduit.Server.Kv.store kv) assets))
