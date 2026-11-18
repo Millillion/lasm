@@ -81,9 +81,10 @@ export const libraryModules = lazyArray(() => ['Lasm.JS.Core', 'Lasm.JS.Json', '
   'Lasm.JS.Node.Readline', 'Lasm.JS.Node.Fs', 'Lasm.JS.Node.Crypto', 'Lasm.JS.Node.ChildProcess',
   // Node.serve (docs/JS_BINDINGS.md, "Serving HTTP on Node: Node.serve"): provided by Lasm, hand-written, not generated.
   'Lasm.JS.Node.Serve',
-  // Lasm.JS.Deno and Lasm.JS.Bun (docs/JS_BINDINGS.md, "Standard bindings for Deno" and "...for Bun") have no prebuilt core
-  // (docs/api/decisions/0.4.md, 0.4-20): their modules ship as source and compile on first import
-  // (src/lazy-library.mjs), so none is listed here.
+  // Lasm.JS.Deno and Lasm.JS.Bun (docs/JS_BINDINGS.md, "Standard bindings for Deno" and "...for Bun"): their modules ship
+  // as source and compile on first import (src/lazy-library.mjs), except Deno KV, which the templates use
+  // (docs/api/decisions/0.4.md, 0.4-20, amended by 0.4-47).
+  'Lasm.JS.Deno.Kv',
   // Lasm.JS.Cloudflare (docs/JS_BINDINGS.md, "Cloudflare Workers: Lasm.JS.Cloudflare"): Workers' runtime APIs,
   // generated from @cloudflare/workers-types (scripts/bindings/cloudflare-api.mjs, generate-web.mjs).
   // Prebuilt: the core a Worker's fetch handler and its KV and D1 bindings need (API_DECISIONS 0.5-16); every
