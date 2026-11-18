@@ -3,6 +3,9 @@ SQLite on Bun: the built-in `bun:sqlite` module. One binding (the
 `Database` class); `db.query(sql)` caches the prepared statement. Like
 node:sqlite it is synchronous; `batch` runs in `BEGIN IMMEDIATE … COMMIT`,
 under a lock so that two transactions never interleave.
+
+Still bound by hand, until the generated `Lasm.JS.Bun.Sqlite` can bind SQL NULL parameters
+(Porter binds `null` for optional columns; reported to the 0.4 stream).
 -/
 import Lasm.JS
 import Std.Sync.Mutex
