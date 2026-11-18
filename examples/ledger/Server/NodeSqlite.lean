@@ -1,31 +1,40 @@
 /-
-SQLite on Node (and Deno): the built-in `node:sqlite` module (Node 24 and
-later, no npm package). One binding, the rest is method calls. node:sqlite is
-synchronous, but requests run concurrently, so every call takes one lock:
-`batch` runs in `BEGIN IMMEDIATE … COMMIT`, and no other statement on the
-connection (a read included) runs in the middle of it.
+SQLite on Node and Deno: the built-in `node:sqlite` module (Node 24 and later,
+no npm package), through the generated bindings (`Lasm.JS.Node.Sqlite`:
+`DatabaseSync`, `StatementSync`). node:sqlite is synchronous, but requests run
+concurrently, so every call takes one lock: `batch` runs in
+`BEGIN IMMEDIATE … COMMIT`, and no other statement on the connection (a read
+included) runs in the middle of it.
 -/
-import Lasm.JS
+import Lasm.JS.Node.Sqlite
 import Std.Data.HashMap
 import Std.Sync.Mutex
 import Server.Sql
-open Lasm.JS
+open Lasm.JS Lasm.JS.Node
 
 namespace Ledger.Server.NodeSqlite
 
-/-- `new DatabaseSync(path)` from node:sqlite. -/
-@[js "node:sqlite" "new DatabaseSync"] opaque openDatabase : String → IO Value
+/-- A bound value as node:sqlite takes it: text, a number, or NULL (`none`). Ledger binds
+only decimal text (`Sql.dec`) and text; numbers and NULL are accepted as they come. -/
+def param : Data → IO (Option DoubleOrBigintOrBooleanOrDOMStringOrUint8Array)
+  | .string s => pure (some (.domString s))
+  | .number n => pure (some (.double n))
+  | .bigint i => pure (some (.bigint i))
+  | .bool b => pure (some (.boolean b))
+  | .bytes b => pure (some (.uint8Array b))
+  | .null | .undefined => pure none
+  | _ => throw (IO.userError "Ledger: a SQL parameter must be text, a number, bytes or null")
 
 /-- Opens (or creates) the database file and its tables. -/
 def «open» (path : String) : IO Sql := do
-  let db ← openDatabase path
+  let db ← DatabaseSync.new (.domString path)
   for pragma in ["PRAGMA journal_mode = WAL", "PRAGMA busy_timeout = 5000"] do
-    let _ ← db.callMethod "exec" #[toJS pragma] Data
+    db.exec pragma
   -- Prepared statements, by SQL text.
-  let cache ← IO.mkRef ({} : Std.HashMap String Value)
-  let prepare (sql : String) : IO Value := do
+  let cache ← IO.mkRef ({} : Std.HashMap String StatementSync)
+  let prepare (sql : String) : IO StatementSync := do
     if let some st := (← cache.get)[sql]? then return st
-    let st ← db.callMethod "prepare" #[toJS sql]
+    let st ← db.prepare sql
     cache.modify (·.insert sql st)
     return st
   let lock ← Std.BaseMutex.new
@@ -33,19 +42,19 @@ def «open» (path : String) : IO Sql := do
     lock.lock
     try act finally lock.unlock
   let runOne (sql : String) (params : Array Data) : IO Unit := do
-    let _ ← (← prepare sql).callMethod "run" params Data
+    discard <| (← prepare sql).run (← params.mapM param)
   let sql : Sql := {
     -- Reads take the lock too: on this one connection, a read between a
     -- batch's statements would see its uncommitted writes.
-    all := fun sql params => locked do (← prepare sql).callMethod "all" params (Array Data)
+    all := fun sql params => locked do (← prepare sql).all (← params.mapM param)
     run := fun sql params => locked (runOne sql params)
     batch := fun stmts => locked do
-      let _ ← db.callMethod "exec" #[toJS "BEGIN IMMEDIATE"] Data
+      db.exec "BEGIN IMMEDIATE"
       try
         for (sql, params) in stmts do runOne sql params
-        let _ ← db.callMethod "exec" #[toJS "COMMIT"] Data
+        db.exec "COMMIT"
       catch e =>
-        let _ ← db.callMethod "exec" #[toJS "ROLLBACK"] Data
+        db.exec "ROLLBACK"
         throw e }
   (migrate sql).block
   return sql

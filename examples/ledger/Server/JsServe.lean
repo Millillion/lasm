@@ -3,25 +3,24 @@ Serving Ledger on the JavaScript runtimes with each runtime's own server,
 through Lasm.JS.Web's `Request` and `Response` (docs/JS_BINDINGS.md, "Servers
 on JavaScript runtimes"):
 
-- Cloudflare Workers: the program's default export, `export default {fetch}`
-  (`Lasm.JS.exportDefault`), which Lasm's generated entry serves;
-- Deno: `Deno.serve` (Lasm.JS.Deno); Bun: `Bun.serve` (Lasm.JS.Bun);
-- Node: `Server/NodeServe.lean` (still Lasm.Fetch's server, until how Lean
-  servers run on Node is decided).
+- Node: `Node.serve` (Lasm.JS.Node.Serve, `ServerNode.lean`);
+- Deno: `Deno.serve` (Lasm.JS.Deno, `ServerDeno.lean`); Bun: `Bun.serve`
+  (Lasm.JS.Bun, `ServerBun.lean`);
+- Cloudflare Workers: `ServerWorkers.lean` publishes its fetch handler
+  (Lasm.JS.Cloudflare) with `exportDefault`;
+- the function platforms (Lambda, Vercel, Netlify, Azure, Google Cloud
+  Functions): `ServerFunction.lean` publishes `webHandler` with `exportDefault`,
+  which the platform's generated file calls for each request.
 -/
 import Lasm.JS
-import Lasm.JS.Web
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Url
 import Lasm.JS.Deno.Serve
 import Lasm.JS.Bun.Serve
 import Server.Web
 open Lasm.JS Std.Async
 
 namespace Ledger.Server.JsServe
-
-/-- The platform's per-request environment on the edge (Cloudflare Workers'
-`env`: D1, variables, secrets), as the last request brought it;
-`.undefined` elsewhere. `Server/D1.lean` reads its database from it. -/
-initialize platformEnv : IO.Ref Data ← IO.mkRef .undefined
 
 /-- A web `Request` as Ledger's: its method, URL, headers and (except for
 `GET` and `HEAD`) its body. -/
@@ -45,19 +44,6 @@ def toResponse (method : String) (r : Web.Response) : IO Lasm.JS.Web.Response :=
 def webHandler (handler : Web.Handler) (request : Lasm.JS.Web.Request) : Async Lasm.JS.Web.Response := do
   let req ← toRequest request
   toResponse req.method (← Web.respond handler req)
-
-/-- The edge platforms: publishes `handler` as the program's default export,
-a function `(request, env, ctx) => Response`; `env` is kept in `platformEnv`. -/
-def serveEdge (handler : Web.Handler) : IO Unit := do
-  let fetch ← Function.ofFn fun args => do
-    -- Workers' env is a plain object (its bindings arrive as references); keep either form.
-    match (args[1]? : Option Data) with
-    | some env@(.ref _ _) | some env@(.object _) => platformEnv.set env
-    | _ => pure ()
-    let .ref request _ := args[0]?.getD .undefined
-      | throw (IO.userError "Ledger: the fetch handler expected a Request")
-    return toJS (← webHandler handler { val := request })
-  exportDefault fetch
 
 /-- `PORT` (else `default`) and `HOST` (else 0.0.0.0). -/
 def address (default : Nat) : IO (Nat × String) := do
@@ -85,11 +71,5 @@ def serveBun (handler : Web.Handler) : IO Unit := do
   let server ← Bun.serve { fetch, port := some (.unsignedShort port), hostname := some hostname }
   IO.eprintln s!"Listening on {← (← server.url).href}"
   forever
-
-/-- `Reflect.has(globalThis, name)`. -/
-@[js "globalThis" "Reflect.has"] opaque reflectHas : Value → String → IO Bool
-
-/-- Whether the program runs on Deno. -/
-def onDeno : IO Bool := do reflectHas (← global) "Deno"
 
 end Ledger.Server.JsServe

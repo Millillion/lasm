@@ -20,9 +20,15 @@ on the first build (cached); `node:sqlite` is part of Node.
 
 ## Platforms
 
-The same Lean runs on each platform below; only the SQLite binding module differs
+The same Lean runs on each platform below; only the SQLite module differs
 ([`Server/NodeSqlite.lean`](Server/NodeSqlite.lean), [`Server/BunSqlite.lean`](Server/BunSqlite.lean),
-[`Server/D1.lean`](Server/D1.lean)). Each row is a CI job
+[`Server/D1.lean`](Server/D1.lean), each on Lasm's generated bindings: `Lasm.JS.Node.Sqlite`,
+`Lasm.JS.Bun.Sqlite`, `Lasm.JS.Cloudflare.D1`) and how the platform serves the handler: its own
+server (`Node.serve`, `Deno.serve`, `Bun.serve`: [`ServerNode.lean`](ServerNode.lean),
+[`ServerDeno.lean`](ServerDeno.lean), [`ServerBun.lean`](ServerBun.lean)), or the handler published
+with `exportDefault`, which Workers ([`ServerWorkers.lean`](ServerWorkers.lean)) and the function
+platforms ([`ServerFunction.lean`](ServerFunction.lean), built by `npm run build:function`) call
+for each request. No hand-written binding is left: every JavaScript API Ledger calls is generated. Each row is a CI job
 ([ledger.yml](../../.github/workflows/ledger.yml) for Node,
 [ledger-platforms.yml](../../.github/workflows/ledger-platforms.yml) for the rest) that builds
 Ledger, serves it with the platform's own local tooling ([`test/platforms.mjs`](test/platforms.mjs))
@@ -35,11 +41,11 @@ and runs the API test and the bank workload against it. No account, nothing depl
 | Deno 2.9.6 | `npm run build:deno` | `deno run -A deno/main.mjs` | `node:sqlite` in Deno, a file |
 | Cloudflare Workers | `npm run build:workers` | `wrangler dev` | D1 (local), whose `batch` is one transaction |
 | Docker | `npm run build:docker` | `docker run --read-only` | `node:sqlite` on the `/data` volume |
-| AWS Lambda (.zip and container image) | `npm run build:lambda`, `build:lambda-image` | `sam local start-api` | `node:sqlite` in `/tmp`, per instance |
+| AWS Lambda (.zip and container image) | `npm run build:lambda`, `build:lambda-image` (from `dist/function`) | `sam local start-api` | `node:sqlite` in `/tmp`, per instance |
 | Vercel Functions | `vercel build` | Vercel's Node launcher | `node:sqlite` in `/tmp`, per instance |
 | Netlify Functions | `netlify build` | Netlify's bootstrap in the Lambda image | `node:sqlite` in `/tmp`, per instance |
-| Azure Functions | `npm run build:azure` | `func start` | `node:sqlite` in the temporary directory, per instance |
-| Google Cloud Functions | `npm run build:gcf` | Functions Framework | `node:sqlite` in the temporary directory, per instance |
+| Azure Functions | `npm run build:azure` (from `dist/function`) | `func start` | `node:sqlite` in the temporary directory, per instance |
+| Google Cloud Functions | `npm run build:gcf` (from `dist/function`) | Functions Framework | `node:sqlite` in the temporary directory, per instance |
 | WASI (the auditor) | `npm run build:wasi` | wasmtime 49.0.4, wasmer 7.4.2, `node:wasi` | reads an exported journal |
 
 On the function platforms the database lives as long as the function's instance: that is
@@ -135,7 +141,7 @@ like TigerBeetle's `create_transfer`.
 | [`Proofs/Spec.lean`](Proofs/Spec.lean) | Every proposition, in plain English, without proofs |
 | [`Proofs/`](Proofs) | The model of the database and the proofs |
 | [`Frontend/Page.lean`](Frontend/Page.lean), [`Client.lean`](Client.lean) | The browser page (Lasm.UI) |
-| [`Server/`](Server), [`ServerNode.lean`](ServerNode.lean) | The SQL, the HTTP glue and the `node:sqlite` binding; the Node program |
+| [`Server/`](Server), [`ServerNode.lean`](ServerNode.lean), [`ServerDeno.lean`](ServerDeno.lean), [`ServerBun.lean`](ServerBun.lean), [`ServerWorkers.lean`](ServerWorkers.lean), [`ServerFunction.lean`](ServerFunction.lean) | The SQL, the HTTP glue and each platform's SQLite module; the programs, one per way of serving |
 | [`Verify.lean`](Verify.lean) | The journal auditor, `ledger verify journal.ndjson` |
 | [`test/`](test) | The API test, the bank workload, the TigerBeetle differential test, the proof checks |
 
