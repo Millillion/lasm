@@ -319,6 +319,11 @@ instance instCoeZlibZipFilesOptionsZlibDOMStringOrZipFilesOptions : Coe zlib.Zip
 @[macro_inline] def zlib.ZipBuffer.cast? (v : Value) : IO (Option zlib.ZipBuffer) := Internal.api "Lasm.JS.Node.zlib.ZipBuffer.cast?" do
   Internal.cast (Support.getExport "node:zlib" ["ZipBuffer"] Value) (fun x => { val := x }) v
 
+/-- **Experimental** in the Node.js 24.22.2 docs. `new zlib.ZipBuffer(buffer)` (added in Node.js v26.8.0): `constructor(Uint8Array buffer)` -/
+@[macro_inline] def zlib.ZipBuffer.new (buffer_ : ByteArray) : IO zlib.ZipBuffer := Internal.api "Lasm.JS.Node.zlib.ZipBuffer.new" do
+  Lasm.JS.Binding.invoke zlib.ZipBuffer { name := "Lasm.JS.Node.zlib.ZipBuffer.new", module := "node:zlib", path := "ZipBuffer", construct := true, arity := 1 }
+    (Internal.args #[toJS buffer_]) (await := false)
+
 /-- **Experimental** in the Node.js 24.22.2 docs. `zipBuffer.comment` (added in Node.js v26.8.0): `readonly attribute DOMString comment` -/
 @[macro_inline] def zlib.ZipBuffer.comment (self : zlib.ZipBuffer) : IO String := Internal.api "Lasm.JS.Node.zlib.ZipBuffer.comment" do
   self.val.get "comment" String
@@ -634,6 +639,105 @@ instance instCoeZlibZipFilesOptionsZlibDOMStringOrZipFilesOptions : Coe zlib.Zip
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.createZstdDecompress", module := "node:zlib", path := "createZstdDecompress", construct := false, arity := 1 }
     (Internal.args #[options]) (await := false)
 
+/-- `zlib.brotliCompress(buffer[, options], callback)` (added in Node.js v11.7.0, v10.16.0): `Promise<Uint8Array> brotliCompress((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+@[macro_inline] def zlib.brotliCompress (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.brotliCompress" do
+  Support.promisified ByteArray "node:zlib" "brotliCompress" (Internal.args #[toJS buffer_, options])
+
+/-- `zlib.brotliCompressSync(buffer[, options])` (added in Node.js v11.7.0, v10.16.0): `Uint8Array brotliCompressSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+@[macro_inline] def zlib.brotliCompressSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.brotliCompressSync" do
+  Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.brotliCompressSync", module := "node:zlib", path := "brotliCompressSync", construct := false, arity := 2 }
+    (Internal.args #[toJS buffer_, options]) (await := false)
+
+/-- `zlib.brotliDecompress(buffer[, options], callback)` (added in Node.js v11.7.0, v10.16.0): `Promise<Uint8Array> brotliDecompress((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+@[macro_inline] def zlib.brotliDecompress (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.brotliDecompress" do
+  Support.promisified ByteArray "node:zlib" "brotliDecompress" (Internal.args #[toJS buffer_, options])
+
+/-- `zlib.brotliDecompressSync(buffer[, options])` (added in Node.js v11.7.0, v10.16.0): `Uint8Array brotliDecompressSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+@[macro_inline] def zlib.brotliDecompressSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.brotliDecompressSync" do
+  Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.brotliDecompressSync", module := "node:zlib", path := "brotliDecompressSync", construct := false, arity := 2 }
+    (Internal.args #[toJS buffer_, options]) (await := false)
+
+/-- `zlib.deflate(buffer[, options], callback)` (added in Node.js v0.6.0): `Promise<Uint8Array> deflate((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+@[macro_inline] def zlib.deflate (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.deflate" do
+  Support.promisified ByteArray "node:zlib" "deflate" (Internal.args #[toJS buffer_, options])
+
+/-- `zlib.deflateSync(buffer[, options])` (added in Node.js v0.11.12): `Uint8Array deflateSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+@[macro_inline] def zlib.deflateSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.deflateSync" do
+  Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.deflateSync", module := "node:zlib", path := "deflateSync", construct := false, arity := 2 }
+    (Internal.args #[toJS buffer_, options]) (await := false)
+
+/-- `zlib.deflateRaw(buffer[, options], callback)` (added in Node.js v0.6.0): `Promise<Uint8Array> deflateRaw((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+@[macro_inline] def zlib.deflateRaw (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.deflateRaw" do
+  Support.promisified ByteArray "node:zlib" "deflateRaw" (Internal.args #[toJS buffer_, options])
+
+/-- `zlib.deflateRawSync(buffer[, options])` (added in Node.js v0.11.12): `Uint8Array deflateRawSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+@[macro_inline] def zlib.deflateRawSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.deflateRawSync" do
+  Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.deflateRawSync", module := "node:zlib", path := "deflateRawSync", construct := false, arity := 2 }
+    (Internal.args #[toJS buffer_, options]) (await := false)
+
+/-- `zlib.gunzip(buffer[, options], callback)` (added in Node.js v0.6.0): `Promise<Uint8Array> gunzip((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+@[macro_inline] def zlib.gunzip (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.gunzip" do
+  Support.promisified ByteArray "node:zlib" "gunzip" (Internal.args #[toJS buffer_, options])
+
+/-- `zlib.gunzipSync(buffer[, options])` (added in Node.js v0.11.12): `Uint8Array gunzipSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+@[macro_inline] def zlib.gunzipSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.gunzipSync" do
+  Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.gunzipSync", module := "node:zlib", path := "gunzipSync", construct := false, arity := 2 }
+    (Internal.args #[toJS buffer_, options]) (await := false)
+
+/-- `zlib.gzip(buffer[, options], callback)` (added in Node.js v0.6.0): `Promise<Uint8Array> gzip((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+@[macro_inline] def zlib.gzip (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.gzip" do
+  Support.promisified ByteArray "node:zlib" "gzip" (Internal.args #[toJS buffer_, options])
+
+/-- `zlib.gzipSync(buffer[, options])` (added in Node.js v0.11.12): `Uint8Array gzipSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+@[macro_inline] def zlib.gzipSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.gzipSync" do
+  Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.gzipSync", module := "node:zlib", path := "gzipSync", construct := false, arity := 2 }
+    (Internal.args #[toJS buffer_, options]) (await := false)
+
+/-- `zlib.inflate(buffer[, options], callback)` (added in Node.js v0.6.0): `Promise<Uint8Array> inflate((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+@[macro_inline] def zlib.inflate (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.inflate" do
+  Support.promisified ByteArray "node:zlib" "inflate" (Internal.args #[toJS buffer_, options])
+
+/-- `zlib.inflateSync(buffer[, options])` (added in Node.js v0.11.12): `Uint8Array inflateSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+@[macro_inline] def zlib.inflateSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.inflateSync" do
+  Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.inflateSync", module := "node:zlib", path := "inflateSync", construct := false, arity := 2 }
+    (Internal.args #[toJS buffer_, options]) (await := false)
+
+/-- `zlib.inflateRaw(buffer[, options], callback)` (added in Node.js v0.6.0): `Promise<Uint8Array> inflateRaw((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+@[macro_inline] def zlib.inflateRaw (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.inflateRaw" do
+  Support.promisified ByteArray "node:zlib" "inflateRaw" (Internal.args #[toJS buffer_, options])
+
+/-- `zlib.inflateRawSync(buffer[, options])` (added in Node.js v0.11.12): `Uint8Array inflateRawSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+@[macro_inline] def zlib.inflateRawSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.inflateRawSync" do
+  Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.inflateRawSync", module := "node:zlib", path := "inflateRawSync", construct := false, arity := 2 }
+    (Internal.args #[toJS buffer_, options]) (await := false)
+
+/-- `zlib.unzip(buffer[, options], callback)` (added in Node.js v0.6.0): `Promise<Uint8Array> unzip((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+@[macro_inline] def zlib.unzip (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.unzip" do
+  Support.promisified ByteArray "node:zlib" "unzip" (Internal.args #[toJS buffer_, options])
+
+/-- `zlib.unzipSync(buffer[, options])` (added in Node.js v0.11.12): `Uint8Array unzipSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+@[macro_inline] def zlib.unzipSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.unzipSync" do
+  Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.unzipSync", module := "node:zlib", path := "unzipSync", construct := false, arity := 2 }
+    (Internal.args #[toJS buffer_, options]) (await := false)
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zlib.zstdCompress(buffer[, options], callback)` (added in Node.js v23.8.0, v22.15.0): `Promise<Uint8Array> zstdCompress((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+@[macro_inline] def zlib.zstdCompress (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.zstdCompress" do
+  Support.promisified ByteArray "node:zlib" "zstdCompress" (Internal.args #[toJS buffer_, options])
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zlib.zstdCompressSync(buffer[, options])` (added in Node.js v23.8.0, v22.15.0): `Uint8Array zstdCompressSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+@[macro_inline] def zlib.zstdCompressSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.zstdCompressSync" do
+  Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.zstdCompressSync", module := "node:zlib", path := "zstdCompressSync", construct := false, arity := 2 }
+    (Internal.args #[toJS buffer_, options]) (await := false)
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zlib.zstdDecompress(buffer[, options], callback)` (added in Node.js v23.8.0, v22.15.0): `Promise<Uint8Array> zstdDecompress((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+@[macro_inline] def zlib.zstdDecompress (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.zstdDecompress" do
+  Support.promisified ByteArray "node:zlib" "zstdDecompress" (Internal.args #[toJS buffer_, options])
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `zlib.zstdDecompressSync(buffer[, options])` (added in Node.js v23.8.0, v22.15.0): `Uint8Array zstdDecompressSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
+@[macro_inline] def zlib.zstdDecompressSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.zstdDecompressSync" do
+  Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.zstdDecompressSync", module := "node:zlib", path := "zstdDecompressSync", construct := false, arity := 2 }
+    (Internal.args #[toJS buffer_, options]) (await := false)
+
 /-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `zlib.createZipArchive(entries[, options])` (added in Node.js v26.8.0): `stream.Readable createZipArchive(object entries, optional (DOMString or zlib.CreateZipArchiveOptions) options)` (Node.js 24.22.2 documentation, zlib.md) -/
 @[macro_inline] def zlib.createZipArchive (entries : Data) (options : Option zlib.DOMStringOrCreateZipArchiveOptions := none) : IO stream.Readable := Internal.api "Lasm.JS.Node.zlib.createZipArchive" do
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Node.zlib.createZipArchive", module := "node:zlib", path := "createZipArchive", construct := false, arity := 2 }
@@ -660,104 +764,5 @@ instance instCoeZlibZipFilesOptionsZlibDOMStringOrZipFilesOptions : Coe zlib.Zip
 @[macro_inline] def zlib.setMaxZipContentSize (size : Nat) : IO Unit := Internal.api "Lasm.JS.Node.zlib.setMaxZipContentSize" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Node.zlib.setMaxZipContentSize", module := "node:zlib", path := "setMaxZipContentSize", construct := false, arity := 1 }
     (Internal.args #[toJS size]) (await := false)
-
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.brotliCompress(buffer[, options], callback)` (added in Node.js v11.7.0, v10.16.0): `Promise<Uint8Array> brotliCompress((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-@[macro_inline] def zlib.brotliCompress (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.brotliCompress" do
-  Support.promisified ByteArray "node:zlib" "brotliCompress" (Internal.args #[toJS buffer_, options])
-
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.brotliCompressSync(buffer[, options])` (added in Node.js v11.7.0, v10.16.0): `Uint8Array brotliCompressSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-@[macro_inline] def zlib.brotliCompressSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.brotliCompressSync" do
-  Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.brotliCompressSync", module := "node:zlib", path := "brotliCompressSync", construct := false, arity := 2 }
-    (Internal.args #[toJS buffer_, options]) (await := false)
-
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.brotliDecompress(buffer[, options], callback)` (added in Node.js v11.7.0, v10.16.0): `Promise<Uint8Array> brotliDecompress((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-@[macro_inline] def zlib.brotliDecompress (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.brotliDecompress" do
-  Support.promisified ByteArray "node:zlib" "brotliDecompress" (Internal.args #[toJS buffer_, options])
-
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.brotliDecompressSync(buffer[, options])` (added in Node.js v11.7.0, v10.16.0): `Uint8Array brotliDecompressSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-@[macro_inline] def zlib.brotliDecompressSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.brotliDecompressSync" do
-  Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.brotliDecompressSync", module := "node:zlib", path := "brotliDecompressSync", construct := false, arity := 2 }
-    (Internal.args #[toJS buffer_, options]) (await := false)
-
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.deflate(buffer[, options], callback)` (added in Node.js v0.6.0): `Promise<Uint8Array> deflate((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-@[macro_inline] def zlib.deflate (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.deflate" do
-  Support.promisified ByteArray "node:zlib" "deflate" (Internal.args #[toJS buffer_, options])
-
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.deflateSync(buffer[, options])` (added in Node.js v0.11.12): `Uint8Array deflateSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-@[macro_inline] def zlib.deflateSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.deflateSync" do
-  Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.deflateSync", module := "node:zlib", path := "deflateSync", construct := false, arity := 2 }
-    (Internal.args #[toJS buffer_, options]) (await := false)
-
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.deflateRaw(buffer[, options], callback)` (added in Node.js v0.6.0): `Promise<Uint8Array> deflateRaw((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-@[macro_inline] def zlib.deflateRaw (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.deflateRaw" do
-  Support.promisified ByteArray "node:zlib" "deflateRaw" (Internal.args #[toJS buffer_, options])
-
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.deflateRawSync(buffer[, options])` (added in Node.js v0.11.12): `Uint8Array deflateRawSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-@[macro_inline] def zlib.deflateRawSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.deflateRawSync" do
-  Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.deflateRawSync", module := "node:zlib", path := "deflateRawSync", construct := false, arity := 2 }
-    (Internal.args #[toJS buffer_, options]) (await := false)
-
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.gunzip(buffer[, options], callback)` (added in Node.js v0.6.0): `Promise<Uint8Array> gunzip((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-@[macro_inline] def zlib.gunzip (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.gunzip" do
-  Support.promisified ByteArray "node:zlib" "gunzip" (Internal.args #[toJS buffer_, options])
-
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.gunzipSync(buffer[, options])` (added in Node.js v0.11.12): `Uint8Array gunzipSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-@[macro_inline] def zlib.gunzipSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.gunzipSync" do
-  Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.gunzipSync", module := "node:zlib", path := "gunzipSync", construct := false, arity := 2 }
-    (Internal.args #[toJS buffer_, options]) (await := false)
-
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.gzip(buffer[, options], callback)` (added in Node.js v0.6.0): `Promise<Uint8Array> gzip((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-@[macro_inline] def zlib.gzip (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.gzip" do
-  Support.promisified ByteArray "node:zlib" "gzip" (Internal.args #[toJS buffer_, options])
-
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.gzipSync(buffer[, options])` (added in Node.js v0.11.12): `Uint8Array gzipSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-@[macro_inline] def zlib.gzipSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.gzipSync" do
-  Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.gzipSync", module := "node:zlib", path := "gzipSync", construct := false, arity := 2 }
-    (Internal.args #[toJS buffer_, options]) (await := false)
-
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.inflate(buffer[, options], callback)` (added in Node.js v0.6.0): `Promise<Uint8Array> inflate((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-@[macro_inline] def zlib.inflate (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.inflate" do
-  Support.promisified ByteArray "node:zlib" "inflate" (Internal.args #[toJS buffer_, options])
-
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.inflateSync(buffer[, options])` (added in Node.js v0.11.12): `Uint8Array inflateSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-@[macro_inline] def zlib.inflateSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.inflateSync" do
-  Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.inflateSync", module := "node:zlib", path := "inflateSync", construct := false, arity := 2 }
-    (Internal.args #[toJS buffer_, options]) (await := false)
-
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.inflateRaw(buffer[, options], callback)` (added in Node.js v0.6.0): `Promise<Uint8Array> inflateRaw((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-@[macro_inline] def zlib.inflateRaw (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.inflateRaw" do
-  Support.promisified ByteArray "node:zlib" "inflateRaw" (Internal.args #[toJS buffer_, options])
-
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.inflateRawSync(buffer[, options])` (added in Node.js v0.11.12): `Uint8Array inflateRawSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-@[macro_inline] def zlib.inflateRawSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.inflateRawSync" do
-  Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.inflateRawSync", module := "node:zlib", path := "inflateRawSync", construct := false, arity := 2 }
-    (Internal.args #[toJS buffer_, options]) (await := false)
-
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.unzip(buffer[, options], callback)` (added in Node.js v0.6.0): `Promise<Uint8Array> unzip((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-@[macro_inline] def zlib.unzip (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.unzip" do
-  Support.promisified ByteArray "node:zlib" "unzip" (Internal.args #[toJS buffer_, options])
-
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). `zlib.unzipSync(buffer[, options])` (added in Node.js v0.11.12): `Uint8Array unzipSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-@[macro_inline] def zlib.unzipSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.unzipSync" do
-  Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.unzipSync", module := "node:zlib", path := "unzipSync", construct := false, arity := 2 }
-    (Internal.args #[toJS buffer_, options]) (await := false)
-
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `zlib.zstdCompress(buffer[, options], callback)` (added in Node.js v23.8.0, v22.15.0): `Promise<Uint8Array> zstdCompress((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-@[macro_inline] def zlib.zstdCompress (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.zstdCompress" do
-  Support.promisified ByteArray "node:zlib" "zstdCompress" (Internal.args #[toJS buffer_, options])
-
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `zlib.zstdCompressSync(buffer[, options])` (added in Node.js v23.8.0, v22.15.0): `Uint8Array zstdCompressSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-@[macro_inline] def zlib.zstdCompressSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.zstdCompressSync" do
-  Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.zstdCompressSync", module := "node:zlib", path := "zstdCompressSync", construct := false, arity := 2 }
-    (Internal.args #[toJS buffer_, options]) (await := false)
-
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `zlib.zstdDecompress(buffer[, options], callback)` (added in Node.js v23.8.0, v22.15.0): `Promise<Uint8Array> zstdDecompress((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-@[macro_inline] def zlib.zstdDecompress (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : Async ByteArray := Internal.api "Lasm.JS.Node.zlib.zstdDecompress" do
-  Support.promisified ByteArray "node:zlib" "zstdDecompress" (Internal.args #[toJS buffer_, options])
-
-/-- **Node.js 26 and later** (documented from Node.js 26.13.0, not in 24.22.2). **Experimental** in the Node.js 26.13.0 docs. `zlib.zstdDecompressSync(buffer[, options])` (added in Node.js v23.8.0, v22.15.0): `Uint8Array zstdDecompressSync((Uint8Array or DOMString) buffer, optional object options)` (Node.js 24.22.2 documentation, zlib.md) -/
-@[macro_inline] def zlib.zstdDecompressSync (buffer_ : Uint8ArrayOrDOMString) (options : Data := .undefined) : IO ByteArray := Internal.api "Lasm.JS.Node.zlib.zstdDecompressSync" do
-  Lasm.JS.Binding.invoke ByteArray { name := "Lasm.JS.Node.zlib.zstdDecompressSync", module := "node:zlib", path := "zstdDecompressSync", construct := false, arity := 2 }
-    (Internal.args #[toJS buffer_, options]) (await := false)
 
 end Lasm.JS.Node

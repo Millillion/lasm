@@ -665,7 +665,12 @@ export function lowerAuto(host, files) {
     return params.filter(p => p.name !== 'this').map(p => {
       const t = parseType(p.type);
       const cc = { ...c, role: 'arg', optional: p.optional, intKey: `${c.intKey}.${p.name}`, owner: `${c.owner}${capital(c.member)}`, member: p.name, where: `${c.where} (${p.name})` };
-      if (p.rest) return `${lower(t.k === 'array' ? t.inner : t.k === 'name' && sequences.has(t.name) ? t.args[0] : t, cc).replace(/\?$/, '')}... ${escape(p.name)}`;
+      if (p.rest) {
+        // A rest parameter's element type: of its array type, also through a type parameter bounded by one
+        // (`...params: ParamsType` with `ParamsType extends SQLQueryBindings[]`). Elements keep their nullability (SQL NULL).
+        const rt = t.k === 'name' && !t.args.length && cc.subst?.has(t.name) ? cc.subst.get(t.name) : t;
+        return `${lower(rt.k === 'array' ? rt.inner : rt.k === 'name' && sequences.has(rt.name) ? rt.args[0] : rt, cc)}... ${escape(p.name)}`;
+      }
       let lt = lower(t, cc);
       if (p.optional) lt = lt.replace(/\?$/, '');
       return `${p.optional ? 'optional ' : ''}${lt} ${escape(p.name)}`;

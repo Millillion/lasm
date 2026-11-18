@@ -3640,15 +3640,15 @@ interface Bun_Statement {
   // constructor(nativeHandle: any)
   [LasmHost="Bun", LasmSignature="constructor(nativeHandle: any)"] constructor(any nativeHandle);
   // all(...params: ParamsType): ReturnType[]
-  [LasmHost="Bun", LasmSignature="all(...params: ParamsType): ReturnType[]"] sequence<any> all(sequence<any>... params);
+  [LasmHost="Bun", LasmSignature="all(...params: ParamsType): ReturnType[]"] sequence<any> all(any... params);
   // get(...params: ParamsType): ReturnType | null
-  [LasmHost="Bun", LasmSignature="get(...params: ParamsType): ReturnType | null"] any get(sequence<any>... params);
+  [LasmHost="Bun", LasmSignature="get(...params: ParamsType): ReturnType | null"] any get(any... params);
   // run(...params: ParamsType): Changes
-  [LasmHost="Bun", LasmSignature="run(...params: ParamsType): Changes"] Bun_Changes run(sequence<any>... params);
+  [LasmHost="Bun", LasmSignature="run(...params: ParamsType): Changes"] Bun_Changes run(any... params);
   // values(...params: ParamsType): Array<Array<string | bigint | number | Uint8Array | null>>
-  [LasmHost="Bun", LasmSignature="values(...params: ParamsType): Array<Array<string | bigint | number | Uint8Array | null>>"] sequence<sequence<Bun_DOMStringOrBigintOrDoubleOrUint8Array?>> values(sequence<any>... params);
+  [LasmHost="Bun", LasmSignature="values(...params: ParamsType): Array<Array<string | bigint | number | Uint8Array | null>>"] sequence<sequence<Bun_DOMStringOrBigintOrDoubleOrUint8Array?>> values(any... params);
   // raw(...params: ParamsType): Array<Array<Uint8Array | null>>
-  [LasmHost="Bun", LasmSignature="raw(...params: ParamsType): Array<Array<Uint8Array | null>>"] sequence<sequence<Uint8Array?>> raw(sequence<any>... params);
+  [LasmHost="Bun", LasmSignature="raw(...params: ParamsType): Array<Array<Uint8Array | null>>"] sequence<sequence<Uint8Array?>> raw(any... params);
   // readonly columnNames: string[]
   [LasmHost="Bun", LasmSignature="readonly columnNames: string[]"] readonly attribute sequence<DOMString> columnNames;
   // readonly paramsCount: number

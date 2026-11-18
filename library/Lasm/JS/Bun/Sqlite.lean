@@ -478,24 +478,24 @@ instance : Coe Float Uint8ArrayOrDouble := ⟨.double⟩
 @[macro_inline] def Statement.native (self : Statement) : IO Data := Internal.api "Lasm.JS.Bun.Statement.native" do
   self.val.get "native" Data
 
-/-- `all(...params: ParamsType): ReturnType[]`: `sequence<any> all(sequence<any>... params)` -/
-@[macro_inline] def Statement.all (self : Statement) (params : Array (Array Data) := #[]) : IO (Array Data) := Internal.api "Lasm.JS.Bun.Statement.all" do
+/-- `all(...params: ParamsType): ReturnType[]`: `sequence<any> all(any... params)` -/
+@[macro_inline] def Statement.all (self : Statement) (params : Array Data := #[]) : IO (Array Data) := Internal.api "Lasm.JS.Bun.Statement.all" do
   self.val.callMethod "all" (Internal.argsWith #[] (params.map toJS)) (Array Data)
 
-/-- `get(...params: ParamsType): ReturnType | null`: `any get(sequence<any>... params)` -/
-@[macro_inline] def Statement.get (self : Statement) (params : Array (Array Data) := #[]) : IO Data := Internal.api "Lasm.JS.Bun.Statement.get" do
+/-- `get(...params: ParamsType): ReturnType | null`: `any get(any... params)` -/
+@[macro_inline] def Statement.get (self : Statement) (params : Array Data := #[]) : IO Data := Internal.api "Lasm.JS.Bun.Statement.get" do
   self.val.callMethod "get" (Internal.argsWith #[] (params.map toJS)) Data
 
-/-- `run(...params: ParamsType): Changes`: `Changes run(sequence<any>... params)` -/
-@[macro_inline] def Statement.run (self : Statement) (params : Array (Array Data) := #[]) : IO Changes := Internal.api "Lasm.JS.Bun.Statement.run" do
+/-- `run(...params: ParamsType): Changes`: `Changes run(any... params)` -/
+@[macro_inline] def Statement.run (self : Statement) (params : Array Data := #[]) : IO Changes := Internal.api "Lasm.JS.Bun.Statement.run" do
   self.val.callMethod "run" (Internal.argsWith #[] (params.map toJS)) Changes
 
-/-- `values(...params: ParamsType): Array<Array<string | bigint | number | Uint8Array | null>>`: `sequence<sequence<DOMStringOrBigintOrDoubleOrUint8Array?>> values(sequence<any>... params)` -/
-@[macro_inline] def Statement.values (self : Statement) (params : Array (Array Data) := #[]) : IO (Array (Array (Option DOMStringOrBigintOrDoubleOrUint8Array))) := Internal.api "Lasm.JS.Bun.Statement.values" do
+/-- `values(...params: ParamsType): Array<Array<string | bigint | number | Uint8Array | null>>`: `sequence<sequence<DOMStringOrBigintOrDoubleOrUint8Array?>> values(any... params)` -/
+@[macro_inline] def Statement.values (self : Statement) (params : Array Data := #[]) : IO (Array (Array (Option DOMStringOrBigintOrDoubleOrUint8Array))) := Internal.api "Lasm.JS.Bun.Statement.values" do
   self.val.callMethod "values" (Internal.argsWith #[] (params.map toJS)) (Array (Array (Option DOMStringOrBigintOrDoubleOrUint8Array)))
 
-/-- `raw(...params: ParamsType): Array<Array<Uint8Array | null>>`: `sequence<sequence<Uint8Array?>> raw(sequence<any>... params)` -/
-@[macro_inline] def Statement.raw (self : Statement) (params : Array (Array Data) := #[]) : IO (Array (Array (Option ByteArray))) := Internal.api "Lasm.JS.Bun.Statement.raw" do
+/-- `raw(...params: ParamsType): Array<Array<Uint8Array | null>>`: `sequence<sequence<Uint8Array?>> raw(any... params)` -/
+@[macro_inline] def Statement.raw (self : Statement) (params : Array Data := #[]) : IO (Array (Array (Option ByteArray))) := Internal.api "Lasm.JS.Bun.Statement.raw" do
   self.val.callMethod "raw" (Internal.argsWith #[] (params.map toJS)) (Array (Array (Option ByteArray)))
 
 /-- `safeIntegers(enabled: boolean): this`: `Statement safeIntegers(boolean enabled)` -/

@@ -46,6 +46,39 @@ instance instToJSVmSyntheticModule : ToJS vm.SyntheticModule := ⟨fun x => .ref
 instance instFromJSVmSyntheticModule : FromJS vm.SyntheticModule := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.vm.SyntheticModule", .data⟩
 instance instCoeVmSyntheticModuleVmModule : Coe vm.SyntheticModule vm.Module := ⟨vm.SyntheticModule.toModule⟩
 
+/-- `dictionary vm.Script.NewOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure vm.Script.NewOptions where
+  /-- `DOMString filename = "evalmachine.<anonymous>"` -/
+  filename : Option String := none
+  /-- `double lineOffset = 0` -/
+  lineOffset : Option Float := none
+  /-- `double columnOffset = 0` -/
+  columnOffset : Option Float := none
+  /-- `Uint8Array cachedData` -/
+  cachedData : Option ByteArray := none
+  /-- `boolean produceCachedData = false` -/
+  produceCachedData : Option Bool := none
+  /-- `any importModuleDynamically` -/
+  importModuleDynamically : Data := .undefined
+instance instToJSVmScriptNewOptions : ToJS vm.Script.NewOptions := ⟨fun d => Internal.fields #[("filename", Internal.optional d.filename),
+    ("lineOffset", Internal.optional d.lineOffset),
+    ("columnOffset", Internal.optional d.columnOffset),
+    ("cachedData", Internal.optional d.cachedData),
+    ("produceCachedData", Internal.optional d.produceCachedData),
+    ("importModuleDynamically", d.importModuleDynamically)]⟩
+
+/-- `(vm.Script.NewOptions or DOMString)`: one constructor per member type. -/
+inductive vm.Script.NewOptionsOrDOMString where
+  /-- `vm.Script.NewOptions` -/
+  | newOptions (value : vm.Script.NewOptions)
+  /-- `DOMString` -/
+  | domString (value : String)
+instance instToJSVmScriptNewOptionsOrDOMString : ToJS vm.Script.NewOptionsOrDOMString := ⟨fun
+  | .newOptions v => toJS v
+  | .domString v => toJS v⟩
+instance instCoeVmScriptNewOptionsVmScriptNewOptionsOrDOMString : Coe vm.Script.NewOptions vm.Script.NewOptionsOrDOMString := ⟨.newOptions⟩
+instance instCoeStringVmScriptNewOptionsOrDOMString : Coe String vm.Script.NewOptionsOrDOMString := ⟨.domString⟩
+
 /-- `dictionary vm.Script.RunInContextOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure vm.Script.RunInContextOptions where
   /-- `boolean displayErrors = true` -/
@@ -308,6 +341,11 @@ instance instCoeStringVmRunInThisContextOptionsOrDOMString : Coe String vm.RunIn
 @[macro_inline] def vm.Script.cast? (v : Value) : IO (Option vm.Script) := Internal.api "Lasm.JS.Node.vm.Script.cast?" do
   Internal.cast (Support.getExport "node:vm" ["Script"] Value) (fun x => { val := x }) v
 
+/-- `new vm.Script(code[, options])` (added in Node.js v0.3.1): `constructor(DOMString code, optional (vm.Script.NewOptions or DOMString) options)` -/
+@[macro_inline] def vm.Script.new (code : String) (options : Option vm.Script.NewOptionsOrDOMString := none) : IO vm.Script := Internal.api "Lasm.JS.Node.vm.Script.new" do
+  Lasm.JS.Binding.invoke vm.Script { name := "Lasm.JS.Node.vm.Script.new", module := "node:vm", path := "Script", construct := true, arity := 2 }
+    (Internal.args #[toJS code, Internal.optional options]) (await := false)
+
 /-- `script.cachedDataRejected` (added in Node.js v5.7.0): `readonly attribute boolean? cachedDataRejected` -/
 @[macro_inline] def vm.Script.cachedDataRejected (self : vm.Script) : IO (Option Bool) := Internal.api "Lasm.JS.Node.vm.Script.cachedDataRejected" do
   self.val.get "cachedDataRejected" (Option Bool)
@@ -364,6 +402,11 @@ instance instCoeStringVmRunInThisContextOptionsOrDOMString : Coe String vm.RunIn
 @[macro_inline] def vm.SourceTextModule.cast? (v : Value) : IO (Option vm.SourceTextModule) := Internal.api "Lasm.JS.Node.vm.SourceTextModule.cast?" do
   Internal.cast (Support.getExport "node:vm" ["SourceTextModule"] Value) (fun x => { val := x }) v
 
+/-- **Experimental** in the Node.js 24.22.2 docs. `new vm.SourceTextModule(code[, options])` (added in Node.js v9.6.0): `constructor(DOMString code, optional any options)` -/
+@[macro_inline] def vm.SourceTextModule.new (code : String) (options : Data := .undefined) : IO vm.SourceTextModule := Internal.api "Lasm.JS.Node.vm.SourceTextModule.new" do
+  Lasm.JS.Binding.invoke vm.SourceTextModule { name := "Lasm.JS.Node.vm.SourceTextModule.new", module := "node:vm", path := "SourceTextModule", construct := true, arity := 2 }
+    (Internal.args #[toJS code, options]) (await := false)
+
 /-- **Deprecated** in the Node.js 24.22.2 docs. `sourceTextModule.dependencySpecifiers`: `readonly attribute sequence<DOMString> dependencySpecifiers` -/
 @[macro_inline] def vm.SourceTextModule.dependencySpecifiers (self : vm.SourceTextModule) : IO (Array String) := Internal.api "Lasm.JS.Node.vm.SourceTextModule.dependencySpecifiers" do
   self.val.get "dependencySpecifiers" (Array String)
@@ -395,6 +438,11 @@ instance instCoeStringVmRunInThisContextOptionsOrDOMString : Coe String vm.RunIn
 /-- `v instanceof SyntheticModule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `SyntheticModule`). -/
 @[macro_inline] def vm.SyntheticModule.cast? (v : Value) : IO (Option vm.SyntheticModule) := Internal.api "Lasm.JS.Node.vm.SyntheticModule.cast?" do
   Internal.cast (Support.getExport "node:vm" ["SyntheticModule"] Value) (fun x => { val := x }) v
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `new vm.SyntheticModule(exportNames, evaluateCallback[, options])` (added in Node.js v13.0.0, v12.16.0): `constructor(sequence<DOMString> exportNames, Function evaluateCallback, optional any options)` -/
+@[macro_inline] def vm.SyntheticModule.new (exportNames : Array String) (evaluateCallback : JSFunction) (options : Data := .undefined) : IO vm.SyntheticModule := Internal.api "Lasm.JS.Node.vm.SyntheticModule.new" do
+  Lasm.JS.Binding.invoke vm.SyntheticModule { name := "Lasm.JS.Node.vm.SyntheticModule.new", module := "node:vm", path := "SyntheticModule", construct := true, arity := 3 }
+    (Internal.args #[toJS exportNames, toJS evaluateCallback, options]) (await := false)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `syntheticModule.setExport(name, value)` (added in Node.js v13.0.0, v12.16.0): `undefined setExport(DOMString name, any value)` -/
 @[macro_inline] def vm.SyntheticModule.setExport (self : vm.SyntheticModule) (name : String) (value : Data) : IO Unit := Internal.api "Lasm.JS.Node.vm.SyntheticModule.setExport" do
