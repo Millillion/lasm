@@ -1,7 +1,7 @@
 ## Lasm.Fetch removed (breaking)
 
 - **`Lasm.Fetch` is deleted** (`Lasm.Fetch`, `Lasm.Fetch.Assets`, `Lasm.Fetch.Embed`; API decisions
-  A44–A46, 0.2-1, 0.2-2, 0.2-9; PR_DELETE_FETCH). Programs serve HTTP with each platform's own
+  A44–A46, 0.2-1, 0.2-2, 0.2-9; #359). Programs serve HTTP with each platform's own
   interface: a handler on the web's own `Request` and `Response` (`Lasm.JS.Web`) with `Node.serve` on
   Node and `exportDefault` elsewhere, `Lasm.Fastly` on Fastly Compute and `Lasm.WASI.Http` on
   wasi-http. `lasm init --template fetch` writes all of these (`Main.lean`, `Export.lean`,
