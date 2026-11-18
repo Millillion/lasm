@@ -89,7 +89,11 @@ operations arrive over the WebSocket, or by long-poll where the server has
 none (Workers). The replica is saved in `localStorage`, so closing the page
 while offline loses nothing, and each page load takes a new random replica
 number, so two tabs never create the same id. When other people's text
-arrives, the caret stays beside the character it was beside.
+arrives, the caret stays beside the character it was beside. `update`
+returns its effects as data (syncs, polls, the socket, storage, the text
+area), which the browser performs with `Cmd.task` over the generated
+bindings (`fetch`, `localStorage`, `WebSocket`, `crypto.getRandomValues`)
+and the simulation plays in its world.
 
 The end-to-end tests ([`test/e2e`](test/e2e), Playwright 1.63.0) run in
 Chromium, Firefox and WebKit against the Node server, and in Chromium
@@ -120,9 +124,14 @@ loser runs again on the longer log.
 
 On Node the WebSockets come from the `ws` package
 ([`Server/NodeWs.lean`](Server/NodeWs.lean)), with Tandem's own `node:http`
-server around the same handler; on Deno and Bun from `Deno.upgradeWebSocket`
-and `Bun.serve`'s `websocket` handlers
-([`Server/EdgeWs.lean`](Server/EdgeWs.lean)).
+server (the generated `Lasm.JS.Node.Http`) around the same handler: Node has
+no WebSocket server, and `Node.serve` no upgrade hook yet. On Deno and Bun
+they come from the generated `Deno.upgradeWebSocket` and `Bun.serve`'s
+`websocket` handlers ([`Server/EdgeWs.lean`](Server/EdgeWs.lean)). Every
+other platform API Tandem uses is a generated binding (`Lasm.JS.Node.Sqlite`,
+`Lasm.JS.Bun.Sqlite`, `Lasm.JS.Cloudflare.D1`, Lasm.JS.Web). Two hand-written
+bindings remain, each with its reason in its file: `ws`, and `node:sqlite`'s
+`new DatabaseSync`, which the generated binding does not have yet.
 
 A replica ([`Tandem/Client.lean`](Tandem/Client.lean), what the browser
 runs) keeps its document, the operations not yet acknowledged and its
@@ -151,8 +160,6 @@ nothing deployed.
 | Cloudflare Workers | `npm run build:workers` | `wrangler dev` | D1 (local) | Long-poll |
 | Docker | `npm run build:docker` | `docker run --read-only` | `node:sqlite` on the `/data` volume | WebSockets (`ws`) |
 
-On Bun, Lasm's generated entry starts `Bun.serve` without WebSocket
-handlers, so Tandem installs them on the first upgrade with `server.reload`.
 On Workers a WebSocket that outlives its request needs a Durable Object, and
 Lasm's Workers entry cannot export one, so clients long-poll.
 

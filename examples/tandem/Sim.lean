@@ -15,8 +15,8 @@ commits whose outcome is unknown, crash-restarts), each browser's
 
 The world decides everything from one seed; this program asks it for the
 next event, runs the code the event reaches, and hands back what that code
-asked for: an `update`'s commands become timers, HTTP requests, storage
-calls and random bytes in the world, and a server reply becomes a response
+asked for: an `update`'s effects (`Tandem.Ui.Effect`, data) become timers,
+HTTP requests, storage calls, sockets and random bytes in the world, and a server reply becomes a response
 and pushes on the simulated network. So a failing run replays from its seed.
 
 Checked here, on every step: an edit yields the typed text
@@ -72,7 +72,7 @@ structure Client where
 structure St where
   clients : Std.HashMap Nat Client := {}
   /-- What to do with the response of each HTTP request in flight. -/
-  handlers : Std.HashMap Nat (Except String Lasm.UI.Http.Response → Tandem.Ui.Msg) := {}
+  handlers : Std.HashMap Nat (Except String String → Tandem.Ui.Msg) := {}
   /-- The message of each timer. -/
   timers : Std.HashMap Nat Tandem.Ui.Msg := {}
   token : Nat := 0
@@ -93,54 +93,44 @@ def simSql (s : Value) : Tandem.Server.Sql where
   batch stmts := do
     let _ ← s.callMethod "batch" #[.array (stmts.map fun (q, p) => Data.array #[toJS q, .array p])] Data
 
-/-- Performs an `update`'s commands in the world; returns the messages to
+/-- Performs an `update`'s effects in the world; returns the messages to
 deliver at once (after this update, as the browser runtime does). -/
-def perform (w : Value) (st : IO.Ref St) (c gen : Nat) (cmd : Lasm.UI.Cmd Tandem.Ui.Msg) : IO (List Tandem.Ui.Msg) := do
+def perform (w : Value) (st : IO.Ref St) (c gen : Nat) (fx : List Tandem.Ui.Effect) : IO (List Tandem.Ui.Msg) := do
   let mut out : Array Tandem.Ui.Msg := #[]
-  for e in cmd.effects do
+  let http (method url body : String) (h : Except String String → Tandem.Ui.Msg) : IO Unit := do
+    let t ← fresh st
+    st.modify fun s => { s with handlers := s.handlers.insert t h }
+    call w "http" #[toJS c, toJS gen, toJS t, toJS method, toJS url, toJS body]
+  for e in fx do
     match e with
-    | .msg m => out := out.push m
     | .delay ms m =>
       let t ← fresh st
       st.modify fun s => { s with timers := s.timers.insert t m }
       call w "timer" #[toJS c, toJS gen, toJS t, toJS ms]
-    | .http req h =>
-      let t ← fresh st
-      st.modify fun s => { s with handlers := s.handlers.insert t h }
-      call w "http" #[toJS c, toJS gen, toJS t, toJS req.method, toJS req.url, toJS (req.body.getD "")]
-    | .randomBytes n h =>
-      let b ← w.callMethod "random" #[toJS c, toJS n] ByteArray
-      out := out.push (h b)
-    | .now h =>
-      let t ← w.callMethod "now" #[] Float
-      out := out.push (h t)
-    | .storageSet _ k v => call w "kvSet" #[toJS c, toJS k, toJS v]
-    | .storageRemove _ k => call w "kvRemove" #[toJS c, toJS k]
-    | .storageGet _ k h =>
+    | .sync doc body sent => http "POST" s!"/doc/{doc}/sync" body (.synced sent)
+    | .poll doc cursor => http "GET" s!"/doc/{doc}/poll?cursor={cursor}" "" .polled
+    | .randomReplica =>
+      let b ← w.callMethod "random" #[toJS c, toJS (6 : Nat)] ByteArray
+      out := out.push (.gotReplica (b.foldl (fun n x => n * 256 + x.toNat) 0 % 281474976710655 + 1))
+    | .save k v => call w "kvSet" #[toJS c, toJS k, toJS v]
+    | .load k =>
       let v ← w.callMethod "kvGet" #[toJS c, toJS k] (Option String)
-      out := out.push (h v)
-    | _ => pure ()   -- the DOM (`Cmd.io`: the text area), focus, title: not simulated
+      out := out.push (.loaded v)
+    | .connect _ => call w "wsConnect" #[toJS c, toJS gen]
+    | .showText _ _ => pure ()   -- the DOM (the text area): not simulated
   return out.toList
-
-/-- The messages after which the editor opens a WebSocket (in `Cmd.io`,
-which the world cannot see, so it is told). -/
-def connects : Tandem.Ui.Msg → Bool
-  | .loaded _ => true
-  | .reconnect => true
-  | _ => false
 
 /-- One `update` of client `c`. -/
 def step (w : Value) (st : IO.Ref St) (c : Nat) (msg : Tandem.Ui.Msg) : IO (List Tandem.Ui.Msg) := do
   let some cl := (← st.get).clients[c]? | return []
   let before := cl.model
-  let (after, cmd) := Tandem.Ui.update msg before
+  let (after, fx) := Tandem.Ui.update msg before
   st.modify fun s => { s with clients := s.clients.insert c { cl with model := after } }
   -- Operations that left `pending`: the client now treats them as acknowledged.
   let gone := before.rp.pending.filter fun o => !after.rp.pending.contains o
   unless gone.isEmpty do
     call w "acked" #[toJS c, toJS (gone.map Wire.encodeOp)]
-  if connects msg then call w "wsConnect" #[toJS c, toJS cl.gen]
-  perform w st c cl.gen cmd
+  perform w st c cl.gen fx
 
 /-- Delivers messages to client `c`, and the messages their commands send. -/
 def dispatch (w : Value) (st : IO.Ref St) (c : Nat) (msgs : List Tandem.Ui.Msg) : IO Unit := do
@@ -156,9 +146,9 @@ def dispatch (w : Value) (st : IO.Ref St) (c : Nat) (msgs : List Tandem.Ui.Msg) 
 
 /-- A page load: a new tab state, from `init`. -/
 def start (w : Value) (st : IO.Ref St) (doc : String) (c gen : Nat) : IO Unit := do
-  let (m, cmd) := Tandem.Ui.init doc
+  let (m, fx) := Tandem.Ui.init doc
   st.modify fun s => { s with clients := s.clients.insert c { gen, model := m } }
-  let msgs ← perform w st c gen cmd
+  let msgs ← perform w st c gen fx
   dispatch w st c msgs
 
 /-- The user edits the text area: replaces `del` characters at a position
@@ -201,8 +191,11 @@ def handle (w : Value) (st : IO.Ref St) (db : Tandem.Server.Sql) (doc : String) 
     let t := nat ev "token"
     let some h := (← st.get).handlers[t]? | return
     st.modify fun s => { s with handlers := s.handlers.erase t }
-    let r : Except String Lasm.UI.Http.Response :=
-      if bool ev "ok" then .ok { status := nat ev "status", body := str ev "body" } else .error "network error"
+    -- As `Tandem.Ui.bodyOf`: a 2xx response's body, else an error.
+    let status := nat ev "status"
+    let r : Except String String :=
+      if !bool ev "ok" then .error "network error"
+      else if 200 ≤ status && status < 300 then .ok (str ev "body") else .error s!"HTTP {status}"
     deliverTo w st ev (h r)
   | "timer" =>
     let t := nat ev "token"
