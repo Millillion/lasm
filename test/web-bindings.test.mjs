@@ -176,8 +176,8 @@ test('no Lasm.JS.Deno or Lasm.JS.Bun module is prebuilt beyond the declared core
     for (const dir of ['examples', 'test/fixtures']) for (const f of readdirSync(new URL(`../${dir}/`, import.meta.url), { recursive: true }).filter(f => String(f).endsWith('.lean') && !/\.lake|node_modules/.test(String(f))))
       assert.ok(!new RegExp(`^import Lasm\\.JS\\.${tier}\\s*$`, 'm').test(readFileSync(new URL(`../${dir}/${f}`, import.meta.url), 'utf8')), `${dir}/${f} imports the removed umbrella module Lasm.JS.${tier}`);
     for (const t of readdirSync(new URL('../templates/', import.meta.url), { recursive: true }).filter(f => String(f).endsWith('.lean')))
-      assert.ok(!/^import Lasm\.JS\.(Deno|Bun)\b/m.test(readFileSync(new URL(`../templates/${t}`, import.meta.url), 'utf8')),
-        `templates/${t} imports Lasm.JS.Deno or Lasm.JS.Bun: its modules belong in the prebuilt core`);
+      for (const [, m] of readFileSync(new URL(`../templates/${t}`, import.meta.url), 'utf8').matchAll(/^import (Lasm\.JS\.(?:Deno|Bun)(?:\.\w+)*)/gm))
+        assert.ok(denoBunCore.includes(m), `templates/${t} imports ${m}: a template's Lasm.JS.Deno and Lasm.JS.Bun modules belong in the prebuilt core`);
   }
 });
 
