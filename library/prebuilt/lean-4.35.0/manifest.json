@@ -2,7 +2,7 @@
   "schema": 1,
   "lean": "4.35.0",
   "leanCommit": "eb6cafb7290e8bd5f2937522d8d804f58f02bafc",
-  "library": "add6c2ded94e253396e0a563c5a9ae423bf2ad7506950a86a577d138074d4200",
+  "library": "4faede193b9af8caae070dda5fd336fbdb0d57ab694ffad10e5d014ab4e94aec",
   "files": {
     "lib/lean/Lasm/JS/Core.olean": "c79f382b3ed6a92e5691e96176c1bef3907a0166b75a48a4debcd90a9364fdb8",
     "lib/lasm/c/Lasm/JS/Core.c": "3d231a6c8b6ea37e73393bb30eb00674d5d6ac378fa40586e36107958e418552",
@@ -334,6 +334,9 @@
     "lib/lean/Lasm/JS/Node/Serve.olean": "ee6eac09c3ec985b21e9e79d5bc375ed641089ce1851000f01b67410ee368e32",
     "lib/lasm/c/Lasm/JS/Node/Serve.c": "f9d416d53b5594e5fc053b1d66aca1be5c1a0d90b87ed79a8acb0fb02a443c13",
     "src/lean/Lasm/JS/Node/Serve.lean": "52dedf769982dbf31012f216eab13b803718dcc7afd8dacebd5b4c8101ffe925",
+    "lib/lean/Lasm/JS/Deno/Kv.olean": "20429d57d129231187c9c2a260d266b571632c9df3cd50f968d963f931b58054",
+    "lib/lasm/c/Lasm/JS/Deno/Kv.c": "a61a36e92d3ed3b963cb3ba788036ae62b8d5054c5493c28ff71b0ecabe5e11e",
+    "src/lean/Lasm/JS/Deno/Kv.lean": "8a2b670c115f679356acc4f4f48f8b258b1cb6d103640a86ce2e6c08dd9da7f4",
     "lib/lean/Lasm/JS/Cloudflare/Support.olean": "9b87a48bcc00ea3ccc112194babc39500566091456d26027451c5eb1e56948b1",
     "lib/lasm/c/Lasm/JS/Cloudflare/Support.c": "1a717f918bf039b6a0759db55e96266afd062cb29e021897e70e0b5c6f8cccc4",
     "src/lean/Lasm/JS/Cloudflare/Support.lean": "6cfccbc9308fb8f8d98fd605b03f63b02fbe0edf20ded862af664396a47c0832",
