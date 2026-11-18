@@ -65,6 +65,81 @@ instance : Nonempty Statement := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS Statement := ⟨fun x => .ref x.val ""⟩
 instance : FromJS Statement := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.Statement", .data⟩
 
+/-- `dictionary DatabaseSync.NewOptionsLimits` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure DatabaseSync.NewOptionsLimits where
+  /-- `double /* integer: Nat */ length` -/
+  length : Option Nat := none
+  /-- `double sqlLength` -/
+  sqlLength : Option Float := none
+  /-- `double column` -/
+  column : Option Float := none
+  /-- `double exprDepth` -/
+  exprDepth : Option Float := none
+  /-- `double compoundSelect` -/
+  compoundSelect : Option Float := none
+  /-- `double vdbeOp` -/
+  vdbeOp : Option Float := none
+  /-- `double functionArg` -/
+  functionArg : Option Float := none
+  /-- `double attach` -/
+  attach : Option Float := none
+  /-- `double likePatternLength` -/
+  likePatternLength : Option Float := none
+  /-- `double variableNumber` -/
+  variableNumber : Option Float := none
+  /-- `double triggerDepth` -/
+  triggerDepth : Option Float := none
+instance instToJSDatabaseSyncNewOptionsLimits : ToJS DatabaseSync.NewOptionsLimits := ⟨fun d => Internal.fields #[("length", Internal.optional d.length),
+    ("sqlLength", Internal.optional d.sqlLength),
+    ("column", Internal.optional d.column),
+    ("exprDepth", Internal.optional d.exprDepth),
+    ("compoundSelect", Internal.optional d.compoundSelect),
+    ("vdbeOp", Internal.optional d.vdbeOp),
+    ("functionArg", Internal.optional d.functionArg),
+    ("attach", Internal.optional d.attach),
+    ("likePatternLength", Internal.optional d.likePatternLength),
+    ("variableNumber", Internal.optional d.variableNumber),
+    ("triggerDepth", Internal.optional d.triggerDepth)]⟩
+
+/-- `dictionary DatabaseSync.NewOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure DatabaseSync.NewOptions where
+  /-- `boolean open = true` -/
+  «open» : Option Bool := none
+  /-- `boolean readOnly = false` -/
+  readOnly : Option Bool := none
+  /-- `boolean enableForeignKeyConstraints = true` -/
+  enableForeignKeyConstraints : Option Bool := none
+  /-- `boolean enableDoubleQuotedStringLiterals = false` -/
+  enableDoubleQuotedStringLiterals : Option Bool := none
+  /-- `boolean allowExtension = false` -/
+  allowExtension : Option Bool := none
+  /-- `double /* integer: Nat */ timeout = 0` -/
+  timeout : Option Nat := none
+  /-- `boolean readBigInts = false` -/
+  readBigInts : Option Bool := none
+  /-- `boolean returnArrays = false` -/
+  returnArrays : Option Bool := none
+  /-- `boolean allowBareNamedParameters = true` -/
+  allowBareNamedParameters : Option Bool := none
+  /-- `boolean allowUnknownNamedParameters = false` -/
+  allowUnknownNamedParameters : Option Bool := none
+  /-- `boolean defensive = true` -/
+  defensive : Option Bool := none
+  /-- `Node_DatabaseSync_NewOptionsLimits limits` -/
+  limits : Option DatabaseSync.NewOptionsLimits := none
+instance instToJSDatabaseSyncNewOptions : ToJS DatabaseSync.NewOptions := ⟨fun d => Internal.fields #[("open", Internal.optional d.«open»),
+    ("readOnly", Internal.optional d.readOnly),
+    ("enableForeignKeyConstraints", Internal.optional d.enableForeignKeyConstraints),
+    ("enableDoubleQuotedStringLiterals", Internal.optional d.enableDoubleQuotedStringLiterals),
+    ("allowExtension", Internal.optional d.allowExtension),
+    ("timeout", Internal.optional d.timeout),
+    ("readBigInts", Internal.optional d.readBigInts),
+    ("returnArrays", Internal.optional d.returnArrays),
+    ("allowBareNamedParameters", Internal.optional d.allowBareNamedParameters),
+    ("allowUnknownNamedParameters", Internal.optional d.allowUnknownNamedParameters),
+    ("defensive", Internal.optional d.defensive),
+    ("limits", Internal.optional d.limits)]⟩
+
 /-- `dictionary DatabaseSync.FunctionOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure DatabaseSync.FunctionOptions where
   /-- `boolean deterministic = false` -/
@@ -142,6 +217,81 @@ instance : Coe Int DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := ⟨.bigint�
 instance : Coe Bool DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := ⟨.boolean⟩
 instance : Coe String DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := ⟨.domString⟩
 instance : Coe ByteArray DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := ⟨.uint8Array⟩
+
+/-- `dictionary Database.NewOptionsLimits` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure Database.NewOptionsLimits where
+  /-- `double /* integer: Nat */ length` -/
+  length : Option Nat := none
+  /-- `double sqlLength` -/
+  sqlLength : Option Float := none
+  /-- `double column` -/
+  column : Option Float := none
+  /-- `double exprDepth` -/
+  exprDepth : Option Float := none
+  /-- `double compoundSelect` -/
+  compoundSelect : Option Float := none
+  /-- `double vdbeOp` -/
+  vdbeOp : Option Float := none
+  /-- `double functionArg` -/
+  functionArg : Option Float := none
+  /-- `double attach` -/
+  attach : Option Float := none
+  /-- `double likePatternLength` -/
+  likePatternLength : Option Float := none
+  /-- `double variableNumber` -/
+  variableNumber : Option Float := none
+  /-- `double triggerDepth` -/
+  triggerDepth : Option Float := none
+instance instToJSDatabaseNewOptionsLimits : ToJS Database.NewOptionsLimits := ⟨fun d => Internal.fields #[("length", Internal.optional d.length),
+    ("sqlLength", Internal.optional d.sqlLength),
+    ("column", Internal.optional d.column),
+    ("exprDepth", Internal.optional d.exprDepth),
+    ("compoundSelect", Internal.optional d.compoundSelect),
+    ("vdbeOp", Internal.optional d.vdbeOp),
+    ("functionArg", Internal.optional d.functionArg),
+    ("attach", Internal.optional d.attach),
+    ("likePatternLength", Internal.optional d.likePatternLength),
+    ("variableNumber", Internal.optional d.variableNumber),
+    ("triggerDepth", Internal.optional d.triggerDepth)]⟩
+
+/-- `dictionary Database.NewOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure Database.NewOptions where
+  /-- `boolean open = true` -/
+  «open» : Option Bool := none
+  /-- `boolean readOnly = false` -/
+  readOnly : Option Bool := none
+  /-- `boolean enableForeignKeyConstraints = true` -/
+  enableForeignKeyConstraints : Option Bool := none
+  /-- `boolean enableDoubleQuotedStringLiterals = false` -/
+  enableDoubleQuotedStringLiterals : Option Bool := none
+  /-- `boolean allowExtension = false` -/
+  allowExtension : Option Bool := none
+  /-- `double /* integer: Nat */ timeout = 0` -/
+  timeout : Option Nat := none
+  /-- `boolean readBigInts = false` -/
+  readBigInts : Option Bool := none
+  /-- `boolean returnArrays = false` -/
+  returnArrays : Option Bool := none
+  /-- `boolean allowBareNamedParameters = true` -/
+  allowBareNamedParameters : Option Bool := none
+  /-- `boolean allowUnknownNamedParameters = false` -/
+  allowUnknownNamedParameters : Option Bool := none
+  /-- `boolean defensive = true` -/
+  defensive : Option Bool := none
+  /-- `Node_Database_NewOptionsLimits limits` -/
+  limits : Option Database.NewOptionsLimits := none
+instance instToJSDatabaseNewOptions : ToJS Database.NewOptions := ⟨fun d => Internal.fields #[("open", Internal.optional d.«open»),
+    ("readOnly", Internal.optional d.readOnly),
+    ("enableForeignKeyConstraints", Internal.optional d.enableForeignKeyConstraints),
+    ("enableDoubleQuotedStringLiterals", Internal.optional d.enableDoubleQuotedStringLiterals),
+    ("allowExtension", Internal.optional d.allowExtension),
+    ("timeout", Internal.optional d.timeout),
+    ("readBigInts", Internal.optional d.readBigInts),
+    ("returnArrays", Internal.optional d.returnArrays),
+    ("allowBareNamedParameters", Internal.optional d.allowBareNamedParameters),
+    ("allowUnknownNamedParameters", Internal.optional d.allowUnknownNamedParameters),
+    ("defensive", Internal.optional d.defensive),
+    ("limits", Internal.optional d.limits)]⟩
 
 /-- `(double or DOMString or sequence<any> or object or Function)`: one constructor per member type. -/
 inductive DoubleOrDOMStringOrSequenceOfAnyOrObjectOrJSFunction where
@@ -284,6 +434,11 @@ instance instToJSSqliteBackupOptions : ToJS sqlite.BackupOptions := ⟨fun d => 
 @[macro_inline] def DatabaseSync.cast? (v : Value) : IO (Option DatabaseSync) := Internal.api "Lasm.JS.Node.DatabaseSync.cast?" do
   Internal.cast (Support.getExport "node:sqlite" ["DatabaseSync"] Value) (fun x => { val := x }) v
 
+/-- **Experimental** in the Node.js 24.22.2 docs. `new DatabaseSync(path[, options])` (added in Node.js v22.5.0): `constructor((DOMString or Uint8Array or URL) path, optional DatabaseSync.NewOptions options)` -/
+@[macro_inline] def DatabaseSync.new (path_ : DOMStringOrUint8ArrayOrURL) (options : Option DatabaseSync.NewOptions := none) : IO DatabaseSync := Internal.api "Lasm.JS.Node.DatabaseSync.new" do
+  Lasm.JS.Binding.invoke DatabaseSync { name := "Lasm.JS.Node.DatabaseSync.new", module := "node:sqlite", path := "DatabaseSync", construct := true, arity := 2 }
+    (Internal.args #[toJS path_, Internal.optional options]) (await := false)
+
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.isOpen` (added in Node.js v23.11.0, v22.15.0): `readonly attribute boolean isOpen` -/
 @[macro_inline] def DatabaseSync.isOpen (self : DatabaseSync) : IO Bool := Internal.api "Lasm.JS.Node.DatabaseSync.isOpen" do
   self.val.get "isOpen" Bool
@@ -395,9 +550,13 @@ instance instToJSSqliteBackupOptions : ToJS sqlite.BackupOptions := ⟨fun d => 
 @[macro_inline] def StatementSync.sourceSQL (self : StatementSync) : IO String := Internal.api "Lasm.JS.Node.StatementSync.sourceSQL" do
   self.val.get "sourceSQL" String
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `statement.all([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `sequence<any> all(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
-@[macro_inline] def StatementSync.all (self : StatementSync) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO (Array Data) := Internal.api "Lasm.JS.Node.StatementSync.all" do
-  self.val.callMethod "all" (Internal.argsWith #[namedParameters] (anonymousParameters.map toJS)) (Array Data)
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.all([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `sequence<any> all((double or bigint or boolean or DOMString or Uint8Array)?... anonymousParameters)` -/
+@[macro_inline] def StatementSync.all (self : StatementSync) (anonymousParameters : Array (Option DoubleOrBigintOrBooleanOrDOMStringOrUint8Array) := #[]) : IO (Array Data) := Internal.api "Lasm.JS.Node.StatementSync.all" do
+  self.val.callMethod "all" (Internal.argsWith #[] (anonymousParameters.map toJS)) (Array Data)
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.all([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `sequence<any> all(object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)?... anonymousParameters)` -/
+@[macro_inline] def StatementSync.allWithNamedParameters (self : StatementSync) (namedParameters : Data) (anonymousParameters : Array (Option DoubleOrBigintOrBooleanOrDOMStringOrUint8Array) := #[]) : IO (Array Data) := Internal.api "Lasm.JS.Node.StatementSync.allWithNamedParameters" do
+  self.val.callMethod "all" (Internal.argsWith #[toJS namedParameters] (anonymousParameters.map toJS)) (Array Data)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.close()` (added in Node.js v24.22.0): `undefined close()` -/
 @[macro_inline] def StatementSync.close (self : StatementSync) : IO Unit := Internal.api "Lasm.JS.Node.StatementSync.close" do
@@ -407,17 +566,29 @@ instance instToJSSqliteBackupOptions : ToJS sqlite.BackupOptions := ⟨fun d => 
 @[macro_inline] def StatementSync.columns (self : StatementSync) : IO (Array Data) := Internal.api "Lasm.JS.Node.StatementSync.columns" do
   self.val.callMethod "columns" (Internal.args #[]) (Array Data)
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `statement.get([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `object? get(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
-@[macro_inline] def StatementSync.get (self : StatementSync) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO (Option Data) := Internal.api "Lasm.JS.Node.StatementSync.get" do
-  self.val.callMethod "get" (Internal.argsWith #[namedParameters] (anonymousParameters.map toJS)) (Option Data)
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.get([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `object? get((double or bigint or boolean or DOMString or Uint8Array)?... anonymousParameters)` -/
+@[macro_inline] def StatementSync.get (self : StatementSync) (anonymousParameters : Array (Option DoubleOrBigintOrBooleanOrDOMStringOrUint8Array) := #[]) : IO (Option Data) := Internal.api "Lasm.JS.Node.StatementSync.get" do
+  self.val.callMethod "get" (Internal.argsWith #[] (anonymousParameters.map toJS)) (Option Data)
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `statement.iterate([namedParameters][, ...anonymousParameters])` (added in Node.js v23.4.0, v22.13.0): `object iterate(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
-@[macro_inline] def StatementSync.iterate (self : StatementSync) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO Data := Internal.api "Lasm.JS.Node.StatementSync.iterate" do
-  self.val.callMethod "iterate" (Internal.argsWith #[namedParameters] (anonymousParameters.map toJS)) Data
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.get([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `object? get(object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)?... anonymousParameters)` -/
+@[macro_inline] def StatementSync.getWithNamedParameters (self : StatementSync) (namedParameters : Data) (anonymousParameters : Array (Option DoubleOrBigintOrBooleanOrDOMStringOrUint8Array) := #[]) : IO (Option Data) := Internal.api "Lasm.JS.Node.StatementSync.getWithNamedParameters" do
+  self.val.callMethod "get" (Internal.argsWith #[toJS namedParameters] (anonymousParameters.map toJS)) (Option Data)
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `statement.run([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `object run(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
-@[macro_inline] def StatementSync.run (self : StatementSync) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO Data := Internal.api "Lasm.JS.Node.StatementSync.run" do
-  self.val.callMethod "run" (Internal.argsWith #[namedParameters] (anonymousParameters.map toJS)) Data
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.iterate([namedParameters][, ...anonymousParameters])` (added in Node.js v23.4.0, v22.13.0): `object iterate((double or bigint or boolean or DOMString or Uint8Array)?... anonymousParameters)` -/
+@[macro_inline] def StatementSync.iterate (self : StatementSync) (anonymousParameters : Array (Option DoubleOrBigintOrBooleanOrDOMStringOrUint8Array) := #[]) : IO Data := Internal.api "Lasm.JS.Node.StatementSync.iterate" do
+  self.val.callMethod "iterate" (Internal.argsWith #[] (anonymousParameters.map toJS)) Data
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.iterate([namedParameters][, ...anonymousParameters])` (added in Node.js v23.4.0, v22.13.0): `object iterate(object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)?... anonymousParameters)` -/
+@[macro_inline] def StatementSync.iterateWithNamedParameters (self : StatementSync) (namedParameters : Data) (anonymousParameters : Array (Option DoubleOrBigintOrBooleanOrDOMStringOrUint8Array) := #[]) : IO Data := Internal.api "Lasm.JS.Node.StatementSync.iterateWithNamedParameters" do
+  self.val.callMethod "iterate" (Internal.argsWith #[toJS namedParameters] (anonymousParameters.map toJS)) Data
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.run([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `object run((double or bigint or boolean or DOMString or Uint8Array)?... anonymousParameters)` -/
+@[macro_inline] def StatementSync.run (self : StatementSync) (anonymousParameters : Array (Option DoubleOrBigintOrBooleanOrDOMStringOrUint8Array) := #[]) : IO Data := Internal.api "Lasm.JS.Node.StatementSync.run" do
+  self.val.callMethod "run" (Internal.argsWith #[] (anonymousParameters.map toJS)) Data
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.run([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `object run(object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)?... anonymousParameters)` -/
+@[macro_inline] def StatementSync.runWithNamedParameters (self : StatementSync) (namedParameters : Data) (anonymousParameters : Array (Option DoubleOrBigintOrBooleanOrDOMStringOrUint8Array) := #[]) : IO Data := Internal.api "Lasm.JS.Node.StatementSync.runWithNamedParameters" do
+  self.val.callMethod "run" (Internal.argsWith #[toJS namedParameters] (anonymousParameters.map toJS)) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.setAllowBareNamedParameters(enabled)` (added in Node.js v22.5.0): `undefined setAllowBareNamedParameters(boolean enabled)` -/
 @[macro_inline] def StatementSync.setAllowBareNamedParameters (self : StatementSync) (enabled : Bool) : IO Unit := Internal.api "Lasm.JS.Node.StatementSync.setAllowBareNamedParameters" do
@@ -448,20 +619,20 @@ instance instToJSSqliteBackupOptions : ToJS sqlite.BackupOptions := ⟨fun d => 
   let r ← self.val.get "db" Value
   pure { val := r }
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.all(stringElements[, ...boundParameters])` (added in Node.js v24.9.0): `sequence<any> all(sequence<DOMString> stringElements, (double or bigint or boolean or DOMString or Uint8Array)... boundParameters)` -/
-@[macro_inline] def SQLTagStore.all (self : SQLTagStore) (stringElements : Array String) (boundParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO (Array Data) := Internal.api "Lasm.JS.Node.SQLTagStore.all" do
+/-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.all(stringElements[, ...boundParameters])` (added in Node.js v24.9.0): `sequence<any> all(sequence<DOMString> stringElements, (double or bigint or boolean or DOMString or Uint8Array)?... boundParameters)` -/
+@[macro_inline] def SQLTagStore.all (self : SQLTagStore) (stringElements : Array String) (boundParameters : Array (Option DoubleOrBigintOrBooleanOrDOMStringOrUint8Array) := #[]) : IO (Array Data) := Internal.api "Lasm.JS.Node.SQLTagStore.all" do
   self.val.callMethod "all" (Internal.argsWith #[toJS stringElements] (boundParameters.map toJS)) (Array Data)
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.get(stringElements[, ...boundParameters])` (added in Node.js v24.9.0): `object? get(sequence<DOMString> stringElements, (double or bigint or boolean or DOMString or Uint8Array)... boundParameters)` -/
-@[macro_inline] def SQLTagStore.get (self : SQLTagStore) (stringElements : Array String) (boundParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO (Option Data) := Internal.api "Lasm.JS.Node.SQLTagStore.get" do
+/-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.get(stringElements[, ...boundParameters])` (added in Node.js v24.9.0): `object? get(sequence<DOMString> stringElements, (double or bigint or boolean or DOMString or Uint8Array)?... boundParameters)` -/
+@[macro_inline] def SQLTagStore.get (self : SQLTagStore) (stringElements : Array String) (boundParameters : Array (Option DoubleOrBigintOrBooleanOrDOMStringOrUint8Array) := #[]) : IO (Option Data) := Internal.api "Lasm.JS.Node.SQLTagStore.get" do
   self.val.callMethod "get" (Internal.argsWith #[toJS stringElements] (boundParameters.map toJS)) (Option Data)
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.iterate(stringElements[, ...boundParameters])` (added in Node.js v24.9.0): `object iterate(sequence<DOMString> stringElements, (double or bigint or boolean or DOMString or Uint8Array)... boundParameters)` -/
-@[macro_inline] def SQLTagStore.iterate (self : SQLTagStore) (stringElements : Array String) (boundParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO Data := Internal.api "Lasm.JS.Node.SQLTagStore.iterate" do
+/-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.iterate(stringElements[, ...boundParameters])` (added in Node.js v24.9.0): `object iterate(sequence<DOMString> stringElements, (double or bigint or boolean or DOMString or Uint8Array)?... boundParameters)` -/
+@[macro_inline] def SQLTagStore.iterate (self : SQLTagStore) (stringElements : Array String) (boundParameters : Array (Option DoubleOrBigintOrBooleanOrDOMStringOrUint8Array) := #[]) : IO Data := Internal.api "Lasm.JS.Node.SQLTagStore.iterate" do
   self.val.callMethod "iterate" (Internal.argsWith #[toJS stringElements] (boundParameters.map toJS)) Data
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.run(stringElements[, ...boundParameters])` (added in Node.js v24.9.0): `object run(sequence<DOMString> stringElements, (double or bigint or boolean or DOMString or Uint8Array)... boundParameters)` -/
-@[macro_inline] def SQLTagStore.run (self : SQLTagStore) (stringElements : Array String) (boundParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO Data := Internal.api "Lasm.JS.Node.SQLTagStore.run" do
+/-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.run(stringElements[, ...boundParameters])` (added in Node.js v24.9.0): `object run(sequence<DOMString> stringElements, (double or bigint or boolean or DOMString or Uint8Array)?... boundParameters)` -/
+@[macro_inline] def SQLTagStore.run (self : SQLTagStore) (stringElements : Array String) (boundParameters : Array (Option DoubleOrBigintOrBooleanOrDOMStringOrUint8Array) := #[]) : IO Data := Internal.api "Lasm.JS.Node.SQLTagStore.run" do
   self.val.callMethod "run" (Internal.argsWith #[toJS stringElements] (boundParameters.map toJS)) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `sqlTagStore.clear()` (added in Node.js v24.9.0): `undefined clear()` -/
@@ -471,6 +642,11 @@ instance instToJSSqliteBackupOptions : ToJS sqlite.BackupOptions := ⟨fun d => 
 /-- `v instanceof Database`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Database`). -/
 @[macro_inline] def Database.cast? (v : Value) : IO (Option Database) := Internal.api "Lasm.JS.Node.Database.cast?" do
   Internal.cast (Support.getExport "node:sqlite" ["Database"] Value) (fun x => { val := x }) v
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `new Database(path[, options])` (added in Node.js v22.5.0): `constructor((DOMString or Uint8Array or URL) path, optional Database.NewOptions options)` -/
+@[macro_inline] def Database.new (path_ : DOMStringOrUint8ArrayOrURL) (options : Option Database.NewOptions := none) : IO Database := Internal.api "Lasm.JS.Node.Database.new" do
+  Lasm.JS.Binding.invoke Database { name := "Lasm.JS.Node.Database.new", module := "node:sqlite", path := "Database", construct := true, arity := 2 }
+    (Internal.args #[toJS path_, Internal.optional options]) (await := false)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `database.isOpen` (added in Node.js v23.11.0, v22.15.0): `readonly attribute boolean isOpen` -/
 @[macro_inline] def Database.isOpen (self : Database) : IO Bool := Internal.api "Lasm.JS.Node.Database.isOpen" do
@@ -571,9 +747,13 @@ instance instToJSSqliteBackupOptions : ToJS sqlite.BackupOptions := ⟨fun d => 
 @[macro_inline] def Statement.sourceSQL (self : Statement) : IO String := Internal.api "Lasm.JS.Node.Statement.sourceSQL" do
   self.val.get "sourceSQL" String
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `statement.all([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `sequence<any> all(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
-@[macro_inline] def Statement.all (self : Statement) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO (Array Data) := Internal.api "Lasm.JS.Node.Statement.all" do
-  self.val.callMethod "all" (Internal.argsWith #[namedParameters] (anonymousParameters.map toJS)) (Array Data)
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.all([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `sequence<any> all((double or bigint or boolean or DOMString or Uint8Array)?... anonymousParameters)` -/
+@[macro_inline] def Statement.all (self : Statement) (anonymousParameters : Array (Option DoubleOrBigintOrBooleanOrDOMStringOrUint8Array) := #[]) : IO (Array Data) := Internal.api "Lasm.JS.Node.Statement.all" do
+  self.val.callMethod "all" (Internal.argsWith #[] (anonymousParameters.map toJS)) (Array Data)
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.all([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `sequence<any> all(object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)?... anonymousParameters)` -/
+@[macro_inline] def Statement.allWithNamedParameters (self : Statement) (namedParameters : Data) (anonymousParameters : Array (Option DoubleOrBigintOrBooleanOrDOMStringOrUint8Array) := #[]) : IO (Array Data) := Internal.api "Lasm.JS.Node.Statement.allWithNamedParameters" do
+  self.val.callMethod "all" (Internal.argsWith #[toJS namedParameters] (anonymousParameters.map toJS)) (Array Data)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.close()` (added in Node.js v26.8.0): `undefined close()` -/
 @[macro_inline] def Statement.close (self : Statement) : IO Unit := Internal.api "Lasm.JS.Node.Statement.close" do
@@ -583,21 +763,33 @@ instance instToJSSqliteBackupOptions : ToJS sqlite.BackupOptions := ⟨fun d => 
 @[macro_inline] def Statement.columns (self : Statement) : IO (Array Data) := Internal.api "Lasm.JS.Node.Statement.columns" do
   self.val.callMethod "columns" (Internal.args #[]) (Array Data)
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `statement.get([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `object? get(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
-@[macro_inline] def Statement.get (self : Statement) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO (Option Data) := Internal.api "Lasm.JS.Node.Statement.get" do
-  self.val.callMethod "get" (Internal.argsWith #[namedParameters] (anonymousParameters.map toJS)) (Option Data)
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.get([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `object? get((double or bigint or boolean or DOMString or Uint8Array)?... anonymousParameters)` -/
+@[macro_inline] def Statement.get (self : Statement) (anonymousParameters : Array (Option DoubleOrBigintOrBooleanOrDOMStringOrUint8Array) := #[]) : IO (Option Data) := Internal.api "Lasm.JS.Node.Statement.get" do
+  self.val.callMethod "get" (Internal.argsWith #[] (anonymousParameters.map toJS)) (Option Data)
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `statement.iterate([namedParameters][, ...anonymousParameters])` (added in Node.js v23.4.0, v22.13.0): `object iterate(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
-@[macro_inline] def Statement.iterate (self : Statement) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO Data := Internal.api "Lasm.JS.Node.Statement.iterate" do
-  self.val.callMethod "iterate" (Internal.argsWith #[namedParameters] (anonymousParameters.map toJS)) Data
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.get([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `object? get(object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)?... anonymousParameters)` -/
+@[macro_inline] def Statement.getWithNamedParameters (self : Statement) (namedParameters : Data) (anonymousParameters : Array (Option DoubleOrBigintOrBooleanOrDOMStringOrUint8Array) := #[]) : IO (Option Data) := Internal.api "Lasm.JS.Node.Statement.getWithNamedParameters" do
+  self.val.callMethod "get" (Internal.argsWith #[toJS namedParameters] (anonymousParameters.map toJS)) (Option Data)
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.iterate([namedParameters][, ...anonymousParameters])` (added in Node.js v23.4.0, v22.13.0): `object iterate((double or bigint or boolean or DOMString or Uint8Array)?... anonymousParameters)` -/
+@[macro_inline] def Statement.iterate (self : Statement) (anonymousParameters : Array (Option DoubleOrBigintOrBooleanOrDOMStringOrUint8Array) := #[]) : IO Data := Internal.api "Lasm.JS.Node.Statement.iterate" do
+  self.val.callMethod "iterate" (Internal.argsWith #[] (anonymousParameters.map toJS)) Data
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.iterate([namedParameters][, ...anonymousParameters])` (added in Node.js v23.4.0, v22.13.0): `object iterate(object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)?... anonymousParameters)` -/
+@[macro_inline] def Statement.iterateWithNamedParameters (self : Statement) (namedParameters : Data) (anonymousParameters : Array (Option DoubleOrBigintOrBooleanOrDOMStringOrUint8Array) := #[]) : IO Data := Internal.api "Lasm.JS.Node.Statement.iterateWithNamedParameters" do
+  self.val.callMethod "iterate" (Internal.argsWith #[toJS namedParameters] (anonymousParameters.map toJS)) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.resetStats()` (added in Node.js v26.8.0): `undefined resetStats()` -/
 @[macro_inline] def Statement.resetStats (self : Statement) : IO Unit := Internal.api "Lasm.JS.Node.Statement.resetStats" do
   self.val.callMethod "resetStats" (Internal.args #[]) Unit
 
-/-- **Experimental** in the Node.js 24.22.2 docs. `statement.run([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `object run(optional object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)... anonymousParameters)` -/
-@[macro_inline] def Statement.run (self : Statement) (namedParameters : Data := .undefined) (anonymousParameters : Array DoubleOrBigintOrBooleanOrDOMStringOrUint8Array := #[]) : IO Data := Internal.api "Lasm.JS.Node.Statement.run" do
-  self.val.callMethod "run" (Internal.argsWith #[namedParameters] (anonymousParameters.map toJS)) Data
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.run([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `object run((double or bigint or boolean or DOMString or Uint8Array)?... anonymousParameters)` -/
+@[macro_inline] def Statement.run (self : Statement) (anonymousParameters : Array (Option DoubleOrBigintOrBooleanOrDOMStringOrUint8Array) := #[]) : IO Data := Internal.api "Lasm.JS.Node.Statement.run" do
+  self.val.callMethod "run" (Internal.argsWith #[] (anonymousParameters.map toJS)) Data
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `statement.run([namedParameters][, ...anonymousParameters])` (added in Node.js v22.5.0): `object run(object namedParameters, (double or bigint or boolean or DOMString or Uint8Array)?... anonymousParameters)` -/
+@[macro_inline] def Statement.runWithNamedParameters (self : Statement) (namedParameters : Data) (anonymousParameters : Array (Option DoubleOrBigintOrBooleanOrDOMStringOrUint8Array) := #[]) : IO Data := Internal.api "Lasm.JS.Node.Statement.runWithNamedParameters" do
+  self.val.callMethod "run" (Internal.argsWith #[toJS namedParameters] (anonymousParameters.map toJS)) Data
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `statement.setAllowBareNamedParameters(enabled)` (added in Node.js v22.5.0): `undefined setAllowBareNamedParameters(boolean enabled)` -/
 @[macro_inline] def Statement.setAllowBareNamedParameters (self : Statement) (enabled : Bool) : IO Unit := Internal.api "Lasm.JS.Node.Statement.setAllowBareNamedParameters" do

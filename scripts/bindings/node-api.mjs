@@ -61,6 +61,25 @@ async function loadDoc(version, doc) {
   if (!existsSync(file)) { mkdirSync(dirname(file), { recursive: true }); writeFileSync(file, text); }
   return JSON.parse(text);
 }
+/** The Markdown source of a doc file at the same tag (doc/api/<doc>.md), pinned like the JSON: its headings keep what
+ * the JSON loses, a constructor's signature (`### \`new DatabaseSync(path[, options])\``). */
+async function loadMarkdown(version, doc) {
+  const file = join(cacheDir, `v${version}`, `${doc}.md`);
+  let text;
+  if (existsSync(file)) text = readFileSync(file, 'utf8');
+  else {
+    const url = `https://raw.githubusercontent.com/nodejs/node/v${version}/doc/api/${doc}.md`;
+    const response = await fetch(url);
+    if (!response.ok) fail(`${url}: HTTP ${response.status}`);
+    text = await response.text();
+  }
+  const sha256 = createHash('sha256').update(text).digest('hex');
+  const key = `${doc}.md`;
+  if (updateLock) { (lock[version] ??= {})[key] = sha256; }
+  else if (lock[version]?.[key] !== sha256) fail(`v${version} ${key} has SHA-256 ${sha256}, not the pinned ${lock[version]?.[key]} (node-api.lock.json)`);
+  if (!existsSync(file)) { mkdirSync(dirname(file), { recursive: true }); writeFileSync(file, text); }
+  return text;
+}
 
 // ---------- reading a doc tree ----------
 
@@ -356,6 +375,50 @@ function lowerContainer(doc, all, mod, c, out) {
     });
     lines.push(`  // ${c.ctor} [${doc}.md]`, `  [${[`LasmSignature="${c.ctor}"`, addedOf(sec.node)].filter(Boolean).join(', ')}] constructor(${idlArgs.join(', ')});`);
   }
+  // Constructors the docs document as such (`new DatabaseSync(path[, options])`, `new stream.Writable([options])`):
+  // one per documented form, its parameters typed as documented. A class with an export only (path).
+  if (!c.ctor && c.path && c.kind === 'class') {
+    // The JSON keeps a constructor's parameters as the class's `signatures` but loses its heading; the heading in the
+    // Markdown source gives which are optional (`new DatabaseSync(path[, options])`).
+    const last = c.name.split('.').at(-1);
+    const headings = [...(out.markdown[doc] ?? '').matchAll(/^#+ `new ((?:[\w$]+\.)*([\w$]+)\([^`]*\))`/gm)].filter(h => h[2] === last).map(h => h[1]);
+    const ctorNodes = [classSec, ...(c.extraSections ?? []).map(x => x.section)].filter(Boolean).flatMap(sec => [...(sec.node.ctors ?? []),
+      ...(sec.node.signatures?.length && headings.length ? headings.map(h => ({ textRaw: `\`new ${h}\``, signatures: sec.node.signatures, meta: sec.node.meta })) : [])]);
+    if (classSec?.node.signatures?.length && !headings.length && !(classSec.node.ctors ?? []).length)
+      out.notLowered.push(`${doc}: ${c.name}: a constructor with documented parameters but no \`new ${last}(…)\` heading in ${doc}.md`);
+    const seenCtors = new Set();
+    for (const node of ctorNodes) {
+      const text = /`new ([^`]+)`/.exec(node.textRaw)?.[1];
+      if (!text || seenCtors.has(text)) continue;
+      seenCtors.add(text);
+      const mark = lines.length, dmark = dicts.length;
+      try {
+        const parsed = parseSignature('`' + text + '`');
+        const typed = new Map((node.signatures?.[0]?.params ?? []).map(x => [x.name.replace(/^\.\.\./, ''), x]));
+        const ps = parsed.params;
+        const firstRequired = ps.findIndex(x => !x.optional);
+        // Optional parameters before a required one: one constructor without them and one with them (as for methods).
+        const variants = firstRequired > 0 && ps.slice(0, firstRequired).every(x => x.optional)
+          ? [ps.slice(firstRequired), ps.map((x, i) => i < firstRequired ? { ...x, optional: false } : x)] : [ps];
+        for (const vs of variants) {
+          if (vs.some((x, i) => x.optional && vs.slice(i + 1).some(y => !y.optional && !y.variadic))) fail(`new ${text}: an optional parameter before a required one`);
+          const idlArgs = vs.map(x => {
+            const d = typed.get(x.name);
+            const t = lowerType(docType(d), { where: `${where} new ${text} ${x.name}`, options: d?.options,
+              makeDict: opts => makeDictionary(c.name, `New${capital(x.name)}`, opts, `new ${text}`, {}, x.name), self });
+            if (x.variadic) return `${t}... ${escapeName(x.name)}`;
+            return `${x.optional ? 'optional ' : ''}${x.optional ? t.replace(/\?$/, '') : t} ${escapeName(x.name)}`;
+          });
+          const stab = stabilityOf(node, [...(classSec?.parents ?? []), classSec?.node].filter(Boolean));
+          lines.push(`  // new ${text} [${doc}.md]`, `  [${[`LasmSignature="new ${text.replace(/"/g, "'")}"`, addedOf(node), stab !== 2 ? `LasmStability="${stab}"` : null].filter(Boolean).join(', ')}] constructor(${idlArgs.join(', ')});`);
+        }
+      } catch (error) {
+        if (!String(error.message).startsWith('node-api: ')) throw error;
+        lines.length = mark; dicts.length = dmark;
+        out.notLowered.push(`${doc}: new ${text}: ${error.message.slice(10)}`);
+      }
+    }
+  }
   for (const m of selected) { const mark = lines.length, dmark = dicts.length; try {
     if (!/^[A-Za-z_$][\w$]*$/.test(m.name)) { out.computed.push(`${doc}: ${c.prefix}${m.name}: a computed key (index or Symbol), not a named member`); continue; }
     const stab = m.stability !== 2 ? `LasmStability="${m.stability}"` : null;
@@ -377,7 +440,9 @@ function lowerContainer(doc, all, mod, c, out) {
       out.proseUsed.add(proseKey);
       // quoteDoc: the sentence is elsewhere in the module's docs (`net.connect()`: "Aliases to net.createConnection()").
       const text = p.quoteDoc ? docText(out.trees[doc]) : memberText(m.node) + ' ' + plainText(section(all, m).desc ?? '');
-      if (!text.includes(p.quote)) absent(`${docName}: prose ${JSON.stringify(p.quote)} (node-tier2.mjs prose)`);
+      // The sentence may sit in the section a member is listed in, which the JSON can give twice (`zlib.gzip()` under
+      // Zlib and under Convenience methods): then the module's docs.
+      if (!text.includes(p.quote) && !docText(out.trees[doc]).includes(p.quote)) absent(`${docName}: prose ${JSON.stringify(p.quote)} (node-tier2.mjs prose)`);
     }
     const comment = `  // ${m.node.textRaw.replace(/\s+/g, ' ').slice(0, 200)} [${doc}.md]`;
     if (m.kind === 'properties') {
@@ -437,7 +502,13 @@ function lowerContainer(doc, all, mod, c, out) {
     const firstRequired = params.findIndex(x => !x.optional);
     const lastRequired = params.findLastIndex(x => !x.optional);
     const variants = [];
-    if (firstRequired > 0 && params.slice(0, firstRequired).every(x => x.optional)) {
+    const firstVariadic = params.findIndex(x => x.variadic);
+    if (firstVariadic > 0 && params.slice(0, firstVariadic).every(x => x.optional && !x.variadic)) {
+      // Optional parameters before a rest parameter (`statement.all([namedParameters][, ...anonymousParameters])`): without
+      // them (the rest arguments come first, as JavaScript reads them) and with them.
+      variants.push(params.slice(firstVariadic));
+      variants.push(params.map((x, i) => i < firstVariadic ? { ...x, optional: false } : x));
+    } else if (firstRequired > 0 && params.slice(0, firstRequired).every(x => x.optional)) {
       variants.push(params.slice(firstRequired));
       variants.push(params.map((x, i) => i < firstRequired ? { ...x, optional: false } : x));
     } else if (params.some((x, i) => x.optional && params.slice(i + 1).some(y => !y.optional && !y.variadic))) {
@@ -452,7 +523,8 @@ function lowerContainer(doc, all, mod, c, out) {
       const args = ps.map(x => {
         const override = p?.params?.[x.name];
         let type = override ? proseType(override) : lowerType(docType(x.doc), { where: `${docName} ${x.name}`, options: x.doc.options, makeDict: opts => makeDict(opts, x.name) });
-        if (x.variadic) return `${type.replace(/\?$/, '')}... ${escapeName(x.name)}`;
+        // A variadic's elements keep their documented nullability (`{null|number|…}`: SQL NULL in node:sqlite).
+        if (x.variadic) return `${type}... ${escapeName(x.name)}`;
         if (x.optional) type = type.replace(/\?$/, '');
         return `${x.optional ? 'optional ' : ''}${type} ${escapeName(x.name)}`;
       });
@@ -621,8 +693,9 @@ async function lower(version) {
   strict = version === tier.version;
   defined.clear(); dicts.length = 0; dictNames.clear();
   const trees = {};
-  const out = { defs: [], skipped: [], proseUsed: new Set(), absent: [], trees, notLowered: [], computed: [], web: [], unowned: [], untyped: [], dropped: [], clashes: [], excluded: [] };
+  const out = { defs: [], skipped: [], proseUsed: new Set(), absent: [], trees, markdown: {}, notLowered: [], computed: [], web: [], unowned: [], untyped: [], dropped: [], clashes: [], excluded: [] };
   for (const doc of tier.docs) trees[doc] = await loadDoc(version, doc);
+  for (const doc of tier.docs) out.markdown[doc] = await loadMarkdown(version, doc);
   // Every module's containers first, so that each type is known wherever it is used.
   const plan = tier.modules.map(mod => ({ mod, containers: autoContainers(mod, trees[mod.doc], out) }));
   // A class documented twice (AsyncLocalStorage in async_hooks.md and async_context.md): the first. Two classes of one
