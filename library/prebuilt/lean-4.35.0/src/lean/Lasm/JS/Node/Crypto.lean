@@ -919,6 +919,11 @@ instance instToJSCryptoScryptSyncOptions : ToJS crypto.ScryptSyncOptions := ⟨f
 @[macro_inline] def X509Certificate.cast? (v : Value) : IO (Option X509Certificate) := Internal.api "Lasm.JS.Node.X509Certificate.cast?" do
   Internal.cast (Support.getExport "node:crypto" ["X509Certificate"] Value) (fun x => { val := x }) v
 
+/-- `new X509Certificate(buffer)` (added in Node.js v15.6.0): `constructor((DOMString or Uint8Array) buffer)` -/
+@[macro_inline] def X509Certificate.new (buffer_ : DOMStringOrUint8Array) : IO X509Certificate := Internal.api "Lasm.JS.Node.X509Certificate.new" do
+  Lasm.JS.Binding.invoke X509Certificate { name := "Lasm.JS.Node.X509Certificate.new", module := "node:crypto", path := "X509Certificate", construct := true, arity := 1 }
+    (Internal.args #[toJS buffer_]) (await := false)
+
 /-- `x509.ca` (added in Node.js v15.6.0): `readonly attribute boolean ca` -/
 @[macro_inline] def X509Certificate.ca (self : X509Certificate) : IO Bool := Internal.api "Lasm.JS.Node.X509Certificate.ca" do
   self.val.get "ca" Bool

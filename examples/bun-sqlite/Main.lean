@@ -38,12 +38,12 @@ def handle (db : Bun.Database) (req : Request) : Async Response := do
     respond s!"[{",".intercalate (rows.map todoJson).toList}]"
   | "POST", ["", "todos"] =>
     let title ← req.text
-    let rows ← (← db.query "insert into todos (title) values (?) returning id, title").all #[#[toJS title]]
+    let rows ← (← db.query "insert into todos (title) values (?) returning id, title").all #[toJS title]
     respond (todoJson (rows[0]?.getD .null)) 201
   | "DELETE", ["", "todos", n] =>
     match n.toNat? with
     | some id => do
-      discard <| (← db.query "delete from todos where id = ?").run #[#[toJS id]]
+      discard <| (← db.query "delete from todos where id = ?").run #[toJS id]
       respond "{}"
     | none => respond "{\"error\":\"the id is not a number\"}" 400
   | _, _ => respond "{\"error\":\"not found\"}" 404

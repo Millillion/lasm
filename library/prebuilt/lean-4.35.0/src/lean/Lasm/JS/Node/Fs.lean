@@ -640,22 +640,6 @@ def fs.Utf8Stream.WriteListener.ofFn (f : Async Unit) : IO fs.Utf8Stream.WriteLi
 def fs.Utf8Stream.WriteListener.ofSyncFn (f : IO Unit) : IO fs.Utf8Stream.WriteListener := do
   return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
 
-/-- `(DOMString or Uint8Array or URL)`: one constructor per member type. -/
-inductive DOMStringOrUint8ArrayOrURL where
-  /-- `DOMString` -/
-  | domString (value : String)
-  /-- `Uint8Array` -/
-  | uint8Array (value : ByteArray)
-  /-- `URL` -/
-  | url (value : URL)
-instance : ToJS DOMStringOrUint8ArrayOrURL := ⟨fun
-  | .domString v => toJS v
-  | .uint8Array v => toJS v
-  | .url v => toJS v⟩
-instance : Coe String DOMStringOrUint8ArrayOrURL := ⟨.domString⟩
-instance : Coe ByteArray DOMStringOrUint8ArrayOrURL := ⟨.uint8Array⟩
-instance : Coe URL DOMStringOrUint8ArrayOrURL := ⟨.url⟩
-
 /-- `(double or DOMString)`: one constructor per member type. -/
 inductive DoubleOrDOMString where
   /-- `double` -/
@@ -673,6 +657,67 @@ instance : FromJS DoubleOrDOMString where
     | d@(.string _) => (FromJS.fromJS d : Except String String).map .domString
     | _ => .error ""
   typeName := "Lasm.JS.Node.DoubleOrDOMString"
+
+/-- `dictionary fs.Utf8Stream.NewOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure fs.Utf8Stream.NewOptions where
+  /-- `boolean append` -/
+  append : Option Bool := none
+  /-- `DOMString contentMode` -/
+  contentMode : Option String := none
+  /-- `DOMString dest` -/
+  dest : Option String := none
+  /-- `double /* integer: Nat */ fd` -/
+  fd : Option Nat := none
+  /-- `object fs` -/
+  fs : Data := .undefined
+  /-- `boolean fsync` -/
+  fsync : Option Bool := none
+  /-- `double maxLength` -/
+  maxLength : Option Float := none
+  /-- `double maxWrite` -/
+  maxWrite : Option Float := none
+  /-- `double minLength` -/
+  minLength : Option Float := none
+  /-- `boolean mkdir` -/
+  mkdir : Option Bool := none
+  /-- `(double or DOMString) mode` -/
+  mode : Option DoubleOrDOMString := none
+  /-- `double periodicFlush` -/
+  periodicFlush : Option Float := none
+  /-- `Function retryEAGAIN` -/
+  retryEAGAIN : Option JSFunction := none
+  /-- `boolean sync` -/
+  sync : Option Bool := none
+instance instToJSFsUtf8StreamNewOptions : ToJS fs.Utf8Stream.NewOptions := ⟨fun d => Internal.fields #[("append", Internal.optional d.append),
+    ("contentMode", Internal.optional d.contentMode),
+    ("dest", Internal.optional d.dest),
+    ("fd", Internal.optional d.fd),
+    ("fs", d.fs),
+    ("fsync", Internal.optional d.fsync),
+    ("maxLength", Internal.optional d.maxLength),
+    ("maxWrite", Internal.optional d.maxWrite),
+    ("minLength", Internal.optional d.minLength),
+    ("mkdir", Internal.optional d.mkdir),
+    ("mode", Internal.optional d.mode),
+    ("periodicFlush", Internal.optional d.periodicFlush),
+    ("retryEAGAIN", Internal.optional d.retryEAGAIN),
+    ("sync", Internal.optional d.sync)]⟩
+
+/-- `(DOMString or Uint8Array or URL)`: one constructor per member type. -/
+inductive DOMStringOrUint8ArrayOrURL where
+  /-- `DOMString` -/
+  | domString (value : String)
+  /-- `Uint8Array` -/
+  | uint8Array (value : ByteArray)
+  /-- `URL` -/
+  | url (value : URL)
+instance : ToJS DOMStringOrUint8ArrayOrURL := ⟨fun
+  | .domString v => toJS v
+  | .uint8Array v => toJS v
+  | .url v => toJS v⟩
+instance : Coe String DOMStringOrUint8ArrayOrURL := ⟨.domString⟩
+instance : Coe ByteArray DOMStringOrUint8ArrayOrURL := ⟨.uint8Array⟩
+instance : Coe URL DOMStringOrUint8ArrayOrURL := ⟨.url⟩
 
 /-- `callback fs.WriteStream.CloseListener = undefined ()` (Node.js 24.22.2 documentation): a JavaScript function, made from a Lean function with `ofFn` (asynchronous) or `ofSyncFn`. -/
 structure fs.WriteStream.CloseListener where
@@ -2483,6 +2528,11 @@ instance instCoeFsRealpathSyncNativeOptionsFsRealpathSyncDOMStringOrNativeOption
 /-- `v instanceof Utf8Stream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Utf8Stream`). -/
 @[macro_inline] def fs.Utf8Stream.cast? (v : Value) : IO (Option fs.Utf8Stream) := Internal.api "Lasm.JS.Node.fs.Utf8Stream.cast?" do
   Internal.cast (Support.getExport "node:fs" ["Utf8Stream"] Value) (fun x => { val := x }) v
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `new fs.Utf8Stream([options])` (added in Node.js v24.6.0): `constructor(optional fs.Utf8Stream.NewOptions options)` -/
+@[macro_inline] def fs.Utf8Stream.new (options : Option fs.Utf8Stream.NewOptions := none) : IO fs.Utf8Stream := Internal.api "Lasm.JS.Node.fs.Utf8Stream.new" do
+  Lasm.JS.Binding.invoke fs.Utf8Stream { name := "Lasm.JS.Node.fs.Utf8Stream.new", module := "node:fs", path := "Utf8Stream", construct := true, arity := 1 }
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `utf8Stream.append`: `readonly attribute boolean append` -/
 @[macro_inline] def fs.Utf8Stream.append (self : fs.Utf8Stream) : IO Bool := Internal.api "Lasm.JS.Node.fs.Utf8Stream.append" do

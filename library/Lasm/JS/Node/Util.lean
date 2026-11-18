@@ -210,6 +210,11 @@ instance instToJSUtilStyleTextOptions : ToJS util.StyleTextOptions := ⟨fun d =
 @[macro_inline] def util.MIMEType.cast? (v : Value) : IO (Option util.MIMEType) := Internal.api "Lasm.JS.Node.util.MIMEType.cast?" do
   Internal.cast (Support.getExport "node:util" ["MIMEType"] Value) (fun x => { val := x }) v
 
+/-- `new MIMEType(input)` (added in Node.js v19.1.0, v18.13.0): `constructor(DOMString input)` -/
+@[macro_inline] def util.MIMEType.new (input : String) : IO util.MIMEType := Internal.api "Lasm.JS.Node.util.MIMEType.new" do
+  Lasm.JS.Binding.invoke util.MIMEType { name := "Lasm.JS.Node.util.MIMEType.new", module := "node:util", path := "MIMEType", construct := true, arity := 1 }
+    (Internal.args #[toJS input]) (await := false)
+
 /-- `mime.type`: `readonly attribute DOMString type` -/
 @[macro_inline] def util.MIMEType.type (self : util.MIMEType) : IO String := Internal.api "Lasm.JS.Node.util.MIMEType.type" do
   self.val.get "type" String
@@ -244,6 +249,11 @@ instance instToJSUtilStyleTextOptions : ToJS util.StyleTextOptions := ⟨fun d =
 /-- `v instanceof MIMEParams`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `MIMEParams`). -/
 @[macro_inline] def util.MIMEParams.cast? (v : Value) : IO (Option util.MIMEParams) := Internal.api "Lasm.JS.Node.util.MIMEParams.cast?" do
   Internal.cast (Support.getExport "node:util" ["MIMEParams"] Value) (fun x => { val := x }) v
+
+/-- `new MIMEParams()` (added in Node.js v19.1.0, v18.13.0): `constructor()` -/
+@[macro_inline] def util.MIMEParams.new : IO util.MIMEParams := Internal.api "Lasm.JS.Node.util.MIMEParams.new" do
+  Lasm.JS.Binding.invoke util.MIMEParams { name := "Lasm.JS.Node.util.MIMEParams.new", module := "node:util", path := "MIMEParams", construct := true, arity := 0 }
+    (Internal.args #[]) (await := false)
 
 /-- `mimeParams.delete(name)`: `undefined delete(DOMString name)` -/
 @[macro_inline] def util.MIMEParams.delete (self : util.MIMEParams) (name : String) : IO Unit := Internal.api "Lasm.JS.Node.util.MIMEParams.delete" do

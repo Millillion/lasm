@@ -36,6 +36,7 @@ import Lasm.JS.Node.ChildProcess
 import Lasm.JS.Node.Net
 import Lasm.JS.Node.Http
 import Lasm.JS.Node.Https
+import Lasm.JS.Node.Sqlite
 import Surface
 open Lasm.JS Lasm.JS.Web Lasm.JS.Node
 
@@ -777,6 +778,29 @@ def netChecks (r : Checks) : Async Unit := do
   expect r "BlockList" ((← bl.check "10.1.2.3" (some "ipv4")) && !(← bl.check "11.0.0.1" (some "ipv4"))) ""
   closeServer server
 
+/-! node:sqlite: rows against a list, and SQL NULL bound and read back -/
+
+def sqliteChecks (r : Checks) : Async Unit := do
+  let db ← DatabaseSync.new (.domString ":memory:")
+  db.exec "create table t (id integer primary key, a text, b integer)"
+  let ins ← db.prepare "insert into t (a, b) values (?, ?)"
+  let mut g : Rng := ⟨0x5917⟩
+  let mut model : Array (Option String × Option Nat) := #[]
+  for i in [0:40] do
+    let (s, g1) := g.string 20; g := g1
+    -- every third row has a NULL text, every fifth a NULL integer
+    let a := if i % 3 == 0 then none else some s
+    let b := if i % 5 == 0 then none else some i
+    discard <| ins.run #[a.map .domString, b.map (fun n => .double n.toFloat)]
+    model := model.push (a, b)
+  let rows ← (← db.prepare "select a, b from t order by id").all
+  let read : Data → Option String × Option Nat := fun d =>
+    (match d.field "a" with | .string s => some s | _ => none, match d.field "b" with | .number n => some n.toUInt64.toNat | _ => none)
+  expect r "sqlite rows" (rows.map read == model) s!"{rows.size} of {model.size}"
+  let nulls ← (← db.prepare "select count(*) as n from t where a is ?").all #[none]
+  expect r "sqlite null bind" (nulls.map (fun d => match d.field "n" with | .number n => n | _ => -1) == #[14]) ""
+  db.close
+
 /-! Availability: which generated members this runtime lacks (reported, never a failure) -/
 
 def availability (r : Checks) : Async Unit := do
@@ -818,7 +842,7 @@ def availability (r : Checks) : Async Unit := do
 def checks : Async (String × Nat) := do
   let r ← IO.mkRef ({} : Report)
   for (name, body) in [("path", paths r), ("os", operatingSystem r), ("process", currentProcess r), ("buffer", buffers r),
-      ("crypto", cryptography r), ("fs", fileSystem r), ("childProcess", childProcesses r), ("net", netChecks r), ("http", httpChecks r), ("availability", availability r)] do
+      ("crypto", cryptography r), ("fs", fileSystem r), ("childProcess", childProcesses r), ("net", netChecks r), ("http", httpChecks r), ("sqlite", sqliteChecks r), ("availability", availability r)] do
     runSection r name body
   let s ← r.get
   return ("\n".intercalate (s.lines.push s!"summary {s.passed} {s.failed}").toList ++ "\n", s.failed)

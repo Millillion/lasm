@@ -195,6 +195,12 @@ structure readlinePromises.Interface.QuestionOptions where
   signal : Option AbortSignal := none
 instance instToJSReadlinePromisesInterfaceQuestionOptions : ToJS readlinePromises.Interface.QuestionOptions := ⟨fun d => Internal.fields #[("signal", Internal.optional d.signal)]⟩
 
+/-- `dictionary readlinePromises.Readline.NewOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure readlinePromises.Readline.NewOptions where
+  /-- `boolean autoCommit` -/
+  autoCommit : Option Bool := none
+instance instToJSReadlinePromisesReadlineNewOptions : ToJS readlinePromises.Readline.NewOptions := ⟨fun d => Internal.fields #[("autoCommit", Internal.optional d.autoCommit)]⟩
+
 /-- `dictionary readline.Interface.QuestionOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure readline.Interface.QuestionOptions where
   /-- `AbortSignal signal` -/
@@ -420,6 +426,11 @@ instance instToJSReadlinePromisesCreateInterfaceOptions : ToJS readlinePromises.
 /-- `v instanceof Readline`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Readline`). -/
 @[macro_inline] def readlinePromises.Readline.cast? (v : Value) : IO (Option readlinePromises.Readline) := Internal.api "Lasm.JS.Node.readlinePromises.Readline.cast?" do
   Internal.cast (Support.getExport "node:readline/promises" ["Readline"] Value) (fun x => { val := x }) v
+
+/-- `new readlinePromises.Readline(stream[, options])` (added in Node.js v17.0.0): `constructor(stream.Writable stream, optional readlinePromises.Readline.NewOptions options)` -/
+@[macro_inline] def readlinePromises.Readline.new (stream_ : stream.Writable) (options : Option readlinePromises.Readline.NewOptions := none) : IO readlinePromises.Readline := Internal.api "Lasm.JS.Node.readlinePromises.Readline.new" do
+  Lasm.JS.Binding.invoke readlinePromises.Readline { name := "Lasm.JS.Node.readlinePromises.Readline.new", module := "node:readline/promises", path := "Readline", construct := true, arity := 2 }
+    (Internal.args #[toJS stream_, Internal.optional options]) (await := false)
 
 /-- `rl.clearLine(dir)` (added in Node.js v17.0.0): `any clearLine(long long dir)` -/
 @[macro_inline] def readlinePromises.Readline.clearLine (self : readlinePromises.Readline) (dir : Int) : IO Data := Internal.api "Lasm.JS.Node.readlinePromises.Readline.clearLine" do

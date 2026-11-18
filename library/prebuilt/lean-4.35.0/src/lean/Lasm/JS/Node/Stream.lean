@@ -140,6 +140,45 @@ def stream.Writable.UnpipeListener.ofFn (f : stream.Readable → Async Unit) : I
 def stream.Writable.UnpipeListener.ofSyncFn (f : stream.Readable → IO Unit) : IO stream.Writable.UnpipeListener := do
   return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg stream.Readable args 0)) }
 
+/-- `dictionary stream.Writable.NewOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure stream.Writable.NewOptions where
+  /-- `double /* integer: Nat */ highWaterMark` -/
+  highWaterMark : Option Nat := none
+  /-- `boolean decodeStrings = true` -/
+  decodeStrings : Option Bool := none
+  /-- `DOMString defaultEncoding = "utf8"` -/
+  defaultEncoding : Option String := none
+  /-- `boolean objectMode = false` -/
+  objectMode : Option Bool := none
+  /-- `boolean emitClose = true` -/
+  emitClose : Option Bool := none
+  /-- `Function write` -/
+  write : Option JSFunction := none
+  /-- `Function writev` -/
+  writev : Option JSFunction := none
+  /-- `Function destroy` -/
+  destroy : Option JSFunction := none
+  /-- `Function final` -/
+  final : Option JSFunction := none
+  /-- `Function construct` -/
+  construct : Option JSFunction := none
+  /-- `boolean autoDestroy = true` -/
+  autoDestroy : Option Bool := none
+  /-- `AbortSignal signal` -/
+  signal : Option AbortSignal := none
+instance instToJSStreamWritableNewOptions : ToJS stream.Writable.NewOptions := ⟨fun d => Internal.fields #[("highWaterMark", Internal.optional d.highWaterMark),
+    ("decodeStrings", Internal.optional d.decodeStrings),
+    ("defaultEncoding", Internal.optional d.defaultEncoding),
+    ("objectMode", Internal.optional d.objectMode),
+    ("emitClose", Internal.optional d.emitClose),
+    ("write", Internal.optional d.write),
+    ("writev", Internal.optional d.writev),
+    ("destroy", Internal.optional d.destroy),
+    ("final", Internal.optional d.final),
+    ("construct", Internal.optional d.construct),
+    ("autoDestroy", Internal.optional d.autoDestroy),
+    ("signal", Internal.optional d.signal)]⟩
+
 /-- `dictionary stream.Writable.FromWebOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Writable.FromWebOptions where
   /-- `boolean decodeStrings` -/
@@ -252,6 +291,36 @@ def stream.Readable.ResumeListener.ofFn (f : Async Unit) : IO stream.Readable.Re
 /-- A JavaScript function that runs `f` synchronously (`Lasm.JS.Function.ofSyncFn`): JavaScript waits for its result (needed where the caller uses it at once: an event listener calling `preventDefault`, a queuing strategy's `size`). -/
 def stream.Readable.ResumeListener.ofSyncFn (f : IO Unit) : IO stream.Readable.ResumeListener := do
   return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
+
+/-- `dictionary stream.Readable.NewOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure stream.Readable.NewOptions where
+  /-- `double /* integer: Nat */ highWaterMark` -/
+  highWaterMark : Option Nat := none
+  /-- `DOMString encoding = null` -/
+  encoding : Option String := none
+  /-- `boolean objectMode = false` -/
+  objectMode : Option Bool := none
+  /-- `boolean emitClose = true` -/
+  emitClose : Option Bool := none
+  /-- `Function read` -/
+  read : Option JSFunction := none
+  /-- `Function destroy` -/
+  destroy : Option JSFunction := none
+  /-- `Function construct` -/
+  construct : Option JSFunction := none
+  /-- `boolean autoDestroy = true` -/
+  autoDestroy : Option Bool := none
+  /-- `AbortSignal signal` -/
+  signal : Option AbortSignal := none
+instance instToJSStreamReadableNewOptions : ToJS stream.Readable.NewOptions := ⟨fun d => Internal.fields #[("highWaterMark", Internal.optional d.highWaterMark),
+    ("encoding", Internal.optional d.encoding),
+    ("objectMode", Internal.optional d.objectMode),
+    ("emitClose", Internal.optional d.emitClose),
+    ("read", Internal.optional d.read),
+    ("destroy", Internal.optional d.destroy),
+    ("construct", Internal.optional d.construct),
+    ("autoDestroy", Internal.optional d.autoDestroy),
+    ("signal", Internal.optional d.signal)]⟩
 
 /-- `dictionary stream.Readable.PipeOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure stream.Readable.PipeOptions where
@@ -468,6 +537,15 @@ structure stream.Duplex.ToWebOptions where
   /-- `DOMString readableType` -/
   readableType : Option String := none
 instance instToJSStreamDuplexToWebOptions : ToJS stream.Duplex.ToWebOptions := ⟨fun d => Internal.fields #[("readableType", Internal.optional d.readableType)]⟩
+
+/-- `dictionary stream.Transform.NewOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure stream.Transform.NewOptions where
+  /-- `Function transform` -/
+  transform : Option JSFunction := none
+  /-- `Function flush` -/
+  flush : Option JSFunction := none
+instance instToJSStreamTransformNewOptions : ToJS stream.Transform.NewOptions := ⟨fun d => Internal.fields #[("transform", Internal.optional d.transform),
+    ("flush", Internal.optional d.flush)]⟩
 
 /-- `(EventEmitter or ReadableStream or WritableStream)`: one constructor per member type. -/
 inductive EventEmitterOrReadableStreamOrWritableStream where
@@ -718,6 +796,11 @@ instance instToJSStreamFinishedOptions2 : ToJS stream.FinishedOptions2 := ⟨fun
 @[macro_inline] def stream.Writable.cast? (v : Value) : IO (Option stream.Writable) := Internal.api "Lasm.JS.Node.stream.Writable.cast?" do
   Internal.cast (Support.getExport "node:stream" ["Writable"] Value) (fun x => { val := x }) v
 
+/-- `new stream.Writable([options])`: `constructor(optional stream.Writable.NewOptions options)` -/
+@[macro_inline] def stream.Writable.new (options : Option stream.Writable.NewOptions := none) : IO stream.Writable := Internal.api "Lasm.JS.Node.stream.Writable.new" do
+  Lasm.JS.Binding.invoke stream.Writable { name := "Lasm.JS.Node.stream.Writable.new", module := "node:stream", path := "Writable", construct := true, arity := 1 }
+    (Internal.args #[Internal.optional options]) (await := false)
+
 /-- `writable.closed` (added in Node.js v18.0.0): `readonly attribute boolean closed` -/
 @[macro_inline] def stream.Writable.closed (self : stream.Writable) : IO Bool := Internal.api "Lasm.JS.Node.stream.Writable.closed" do
   self.val.get "closed" Bool
@@ -880,6 +963,11 @@ instance instToJSStreamFinishedOptions2 : ToJS stream.FinishedOptions2 := ⟨fun
 /-- `v instanceof Readable`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Readable`). -/
 @[macro_inline] def stream.Readable.cast? (v : Value) : IO (Option stream.Readable) := Internal.api "Lasm.JS.Node.stream.Readable.cast?" do
   Internal.cast (Support.getExport "node:stream" ["Readable"] Value) (fun x => { val := x }) v
+
+/-- `new stream.Readable([options])`: `constructor(optional stream.Readable.NewOptions options)` -/
+@[macro_inline] def stream.Readable.new (options : Option stream.Readable.NewOptions := none) : IO stream.Readable := Internal.api "Lasm.JS.Node.stream.Readable.new" do
+  Lasm.JS.Binding.invoke stream.Readable { name := "Lasm.JS.Node.stream.Readable.new", module := "node:stream", path := "Readable", construct := true, arity := 1 }
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- `readable.closed` (added in Node.js v18.0.0): `readonly attribute boolean closed` -/
 @[macro_inline] def stream.Readable.closed (self : stream.Readable) : IO Bool := Internal.api "Lasm.JS.Node.stream.Readable.closed" do
@@ -1175,6 +1263,11 @@ instance instToJSStreamFinishedOptions2 : ToJS stream.FinishedOptions2 := ⟨fun
 /-- `v instanceof Transform`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Transform`). -/
 @[macro_inline] def stream.Transform.cast? (v : Value) : IO (Option stream.Transform) := Internal.api "Lasm.JS.Node.stream.Transform.cast?" do
   Internal.cast (Support.getExport "node:stream" ["Transform"] Value) (fun x => { val := x }) v
+
+/-- `new stream.Transform([options])`: `constructor(optional stream.Transform.NewOptions options)` -/
+@[macro_inline] def stream.Transform.new (options : Option stream.Transform.NewOptions := none) : IO stream.Transform := Internal.api "Lasm.JS.Node.stream.Transform.new" do
+  Lasm.JS.Binding.invoke stream.Transform { name := "Lasm.JS.Node.stream.Transform.new", module := "node:stream", path := "Transform", construct := true, arity := 1 }
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- `transform.destroy([error])` (added in Node.js v8.0.0): `stream.Transform destroy(optional any error)` -/
 @[macro_inline] def stream.Transform.destroy (self : stream.Transform) (error : Data := .undefined) : IO stream.Transform := Internal.api "Lasm.JS.Node.stream.Transform.destroy" do
