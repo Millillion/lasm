@@ -22,6 +22,18 @@ on:
       - 'examples/ui/**'
       - 'scripts/ui/**'
       - 'templates/fullstack/**'
+  # A pull request that changes Lasm.UI, its Lean checks or what they elaborate (the
+  # fullstack template, the UI examples): the native job only, a few minutes. Train B's
+  # and #331's template changes reached main without it (2026-11-17).
+  pull_request:
+    paths:
+      - '.github/workflows/ui.yml'
+      - 'library/Lasm/UI/**'
+      - 'library/Lasm/UI.lean'
+      - 'scripts/ui/**'
+      - 'test/ui/**'
+      - 'examples/ui/**'
+      - 'templates/fullstack/**'
 concurrency:
   # github.workflow is the caller's name in a call: release-checks and ci-nightly never cancel each other.
   group: ui-${{ github.workflow }}-${{ github.ref }}

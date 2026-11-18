@@ -170,6 +170,17 @@
       ]
     },
     {
+      "slug": "release-0-9-0",
+      "title": "Lasm 0.9.0",
+      "description": "A minor release with many breaking changes: the first release of Stage 0, which settles Lasm's public API before 1.0.",
+      "date": "2026-11-16",
+      "kind": "release",
+      "path": "docs/release/0.9.0-notes.md",
+      "sources": [
+        "https://github.com/Millillion/lasm/releases/tag/v0.9.0"
+      ]
+    },
+    {
       "slug": "release-0-8-0",
       "title": "Lasm 0.8.0",
       "description": "A minor release: the fetch template moves off Lasm.Fetch except on Node, and Fastly, WASI and wasi-http programs use far less memory.",

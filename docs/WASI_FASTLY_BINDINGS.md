@@ -16,8 +16,8 @@ no overloads or callbacks, so no override applies here yet.
 
 | Bindings | Generated from | Generator | Status |
 | --- | --- | --- | --- |
-| `Lasm.Fastly.*` | The witx of Fastly Compute's host ABI that Viceroy v0.21.1 ships (`scripts/fastly/witx/`) | [`scripts/bindings/generate-fastly.mjs`](../scripts/bindings/generate-fastly.mjs) | Current source, not yet released: 244 of 252 functions |
-| `Lasm.WASI.Http` | The WASI 0.2.12 WIT that Wasmtime v49.0.4 ships (`scripts/wasi/wit/deps/`) | [`scripts/bindings/generate-wasi-http.mjs`](../scripts/bindings/generate-wasi-http.mjs) | Current source, not yet released: every stable function of the wasi:http proxy world's imports (90) and its export |
+| `Lasm.Fastly.*` | The witx of Fastly Compute's host ABI that Viceroy v0.21.1 ships (`scripts/fastly/witx/`) | [`scripts/bindings/generate-fastly.mjs`](../scripts/bindings/generate-fastly.mjs) | Released in 0.7.0: 244 of 252 functions |
+| `Lasm.WASI.Http` | The WASI 0.2.12 WIT that Wasmtime v49.0.4 ships (`scripts/wasi/wit/deps/`) | [`scripts/bindings/generate-wasi-http.mjs`](../scripts/bindings/generate-wasi-http.mjs) | Released in 0.7.0: every stable function of the wasi:http proxy world's imports (90) and its export |
 
 `Lasm.Fetch` is being removed (Jordan, 2026-11-10): Fastly and WASI programs
 move to these bindings now; its JavaScript-host parts move to `Lasm.JS.*` in a
