@@ -170,6 +170,17 @@
       ]
     },
     {
+      "slug": "release-0-10-0",
+      "title": "Lasm 0.10.0",
+      "description": "A minor release with breaking changes: the last release of Stage 0, which settles Lasm's public API before 1.0.",
+      "date": "2026-11-18",
+      "kind": "release",
+      "path": "docs/release/0.10.0-notes.md",
+      "sources": [
+        "https://github.com/Millillion/lasm/releases/tag/v0.10.0"
+      ]
+    },
+    {
       "slug": "release-0-9-0",
       "title": "Lasm 0.9.0",
       "description": "A minor release with many breaking changes: the first release of Stage 0, which settles Lasm's public API before 1.0.",
