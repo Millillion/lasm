@@ -19,11 +19,11 @@
     "test:wasi": "node test/cli.mjs --engine node --engine wasmtime --engine wasmer --engine node-wasi",
     "build:preview": "lasm build PreviewClient.lean --target browser --output dist/public",
     "build:server": "npm run build:preview && lasm build PreviewServer.lean --output dist/server",
-    "build:bun": "npm run build:preview && bunx --bun lasm build PreviewServer.lean --target bun",
-    "build:deno": "npm run build:preview && lasm build PreviewServer.lean --target deno",
-    "build:workers": "lasm build ServerEdge.lean --target workers",
-    "build:deno-deploy": "lasm build ServerEdge.lean --target deno-deploy",
-    "build:fastly": "lasm build ServerEdge.lean --target fastly",
+    "build:bun": "npm run build:preview && bunx --bun lasm build PreviewServerBun.lean --target bun",
+    "build:deno": "npm run build:preview && lasm build PreviewServerDeno.lean --target deno",
+    "build:workers": "lasm build ServerWorkers.lean --target workers",
+    "build:deno-deploy": "lasm build ServerDenoDeploy.lean --target deno-deploy",
+    "build:fastly": "lasm build ServerFastly.lean --target fastly",
     "test:edge": "node test/edge.mjs",
     "start": "node dist/server/main.mjs",
     "test:e2e": "playwright test -c test/playwright.config.mjs",
@@ -34,8 +34,8 @@
     "node": ">=24"
   },
   "devDependencies": {
-    "@lasm/cli": "0.7.0",
-    "commonmark": "0.31.2",
-    "@playwright/test": "1.63.0"
+    "@lasm/cli": "0.9.0",
+    "@playwright/test": "1.63.0",
+    "commonmark": "0.31.2"
   }
 }

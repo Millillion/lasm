@@ -41,17 +41,65 @@ instance instNonemptyAssertCallTracker : Nonempty assert.CallTracker := ⟨{ val
 instance instToJSAssertCallTracker : ToJS assert.CallTracker := ⟨fun x => .ref x.val ""⟩
 instance instFromJSAssertCallTracker : FromJS assert.CallTracker := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.assert.CallTracker", .data⟩
 
+/-- `dictionary assert.AssertionError.NewOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure assert.AssertionError.NewOptions where
+  /-- `DOMString message` -/
+  message : Option String := none
+  /-- `any actual` -/
+  actual : Data := .undefined
+  /-- `any expected` -/
+  expected : Data := .undefined
+  /-- `DOMString operator` -/
+  operator : Option String := none
+  /-- `Function stackStartFn` -/
+  stackStartFn : Option JSFunction := none
+  /-- `DOMString diff` -/
+  diff : Option String := none
+instance instToJSAssertAssertionErrorNewOptions : ToJS assert.AssertionError.NewOptions := ⟨fun d => Internal.fields #[("message", Internal.optional d.message),
+    ("actual", d.actual),
+    ("expected", d.expected),
+    ("operator", Internal.optional d.operator),
+    ("stackStartFn", Internal.optional d.stackStartFn),
+    ("diff", Internal.optional d.diff)]⟩
+
+/-- `dictionary assert.Assert.NewOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure assert.Assert.NewOptions where
+  /-- `DOMString diff` -/
+  diff : Option String := none
+  /-- `boolean strict` -/
+  strict : Option Bool := none
+  /-- `boolean skipPrototype` -/
+  skipPrototype : Option Bool := none
+instance instToJSAssertAssertNewOptions : ToJS assert.Assert.NewOptions := ⟨fun d => Internal.fields #[("diff", Internal.optional d.diff),
+    ("strict", Internal.optional d.strict),
+    ("skipPrototype", Internal.optional d.skipPrototype)]⟩
+
 /-- `v instanceof AssertionError`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AssertionError`). -/
 @[macro_inline] def assert.AssertionError.cast? (v : Value) : IO (Option assert.AssertionError) := Internal.api "Lasm.JS.Node.assert.AssertionError.cast?" do
   Internal.cast (Support.getExport "node:assert" ["AssertionError"] Value) (fun x => { val := x }) v
+
+/-- `new assert.AssertionError(options)`: `constructor(assert.AssertionError.NewOptions options)` -/
+@[macro_inline] def assert.AssertionError.new (options : assert.AssertionError.NewOptions) : IO assert.AssertionError := Internal.api "Lasm.JS.Node.assert.AssertionError.new" do
+  Lasm.JS.Binding.invoke assert.AssertionError { name := "Lasm.JS.Node.assert.AssertionError.new", module := "node:assert", path := "AssertionError", construct := true, arity := 1 }
+    (Internal.args #[toJS options]) (await := false)
 
 /-- `v instanceof Assert`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Assert`). -/
 @[macro_inline] def assert.Assert.cast? (v : Value) : IO (Option assert.Assert) := Internal.api "Lasm.JS.Node.assert.Assert.cast?" do
   Internal.cast (Support.getExport "node:assert" ["Assert"] Value) (fun x => { val := x }) v
 
+/-- `new assert.Assert([options])` (added in Node.js v24.6.0): `constructor(optional assert.Assert.NewOptions options)` -/
+@[macro_inline] def assert.Assert.new (options : Option assert.Assert.NewOptions := none) : IO assert.Assert := Internal.api "Lasm.JS.Node.assert.Assert.new" do
+  Lasm.JS.Binding.invoke assert.Assert { name := "Lasm.JS.Node.assert.Assert.new", module := "node:assert", path := "Assert", construct := true, arity := 1 }
+    (Internal.args #[Internal.optional options]) (await := false)
+
 /-- `v instanceof CallTracker`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CallTracker`). -/
 @[macro_inline] def assert.CallTracker.cast? (v : Value) : IO (Option assert.CallTracker) := Internal.api "Lasm.JS.Node.assert.CallTracker.cast?" do
   Internal.cast (Support.getExport "node:assert" ["CallTracker"] Value) (fun x => { val := x }) v
+
+/-- **Deprecated** in the Node.js 24.22.2 docs. `new assert.CallTracker()` (added in Node.js v14.2.0, v12.19.0): `constructor()` -/
+@[macro_inline] def assert.CallTracker.new : IO assert.CallTracker := Internal.api "Lasm.JS.Node.assert.CallTracker.new" do
+  Lasm.JS.Binding.invoke assert.CallTracker { name := "Lasm.JS.Node.assert.CallTracker.new", module := "node:assert", path := "CallTracker", construct := true, arity := 0 }
+    (Internal.args #[]) (await := false)
 
 /-- **Deprecated** in the Node.js 24.22.2 docs. `tracker.calls([fn][, exact])` (added in Node.js v14.2.0, v12.19.0): `Function calls(optional Function fn, optional double exact)` -/
 @[macro_inline] def assert.CallTracker.calls (self : assert.CallTracker) (fn : Option JSFunction := none) (exact : Option Float := none) : IO JSFunction := Internal.api "Lasm.JS.Node.assert.CallTracker.calls" do

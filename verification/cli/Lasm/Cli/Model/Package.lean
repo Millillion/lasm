@@ -30,8 +30,8 @@ def packageTable : List PackageTarget := [
   ⟨"lambda-edge", "lambda-edge.zip", "Lambda@Edge .zip (CloudFront origin request, x86_64)"⟩,
   ⟨"vercel", ".vercel/output", "Vercel Function, prebuilt (.vercel/output, Build Output API v3)"⟩,
   ⟨"netlify", "netlify/functions/lasm", "Netlify Function (v2, netlify/functions/lasm)"⟩,
-  ⟨"azure", "azure-functions", "Azure Functions app (Node.js v4 programming model)"⟩,
-  ⟨"gcf", "gcf", "Google Cloud Functions (gen2, Functions Framework) source directory"⟩]
+  ⟨"azure-functions", "azure-functions", "Azure Functions app (Node.js v4 programming model)"⟩,
+  ⟨"cloud-functions", "cloud-functions", "Google Cloud Functions (gen2, Functions Framework) source directory"⟩]
 
 def packageTargets : List String := packageTable.map (·.name)
 
@@ -41,8 +41,8 @@ Packages a built Lasm program (lasm build output, default dist/) for a
 function platform. Its main publishes a fetch handler with
 Lasm.JS.exportDefault (Request → Async Response), which the platform's handler
 calls directly. Writes, by target:
-" ++ "\n".intercalate (packageTable.map fun t => "  " ++ padEnd t.name 12 ++ " " ++ padEnd t.output 23 ++ " " ++ t.summary) ++ "
-  " ++ padEnd "browser" 12 ++ " " ++ padEnd "(in place)" 23 ++ " a browser build (lasm build --target browser): checked against its manifest, _headers added
+" ++ "\n".intercalate (packageTable.map fun t => "  " ++ padEnd t.name 15 ++ " " ++ padEnd t.output 23 ++ " " ++ t.summary) ++ "
+  " ++ padEnd "browser" 15 ++ " " ++ padEnd "(in place)" 23 ++ " a browser build (lasm build --target browser): checked against its manifest, _headers added
 
 lasm build Main.lean --target <target> builds and packages in one step; use
 lasm package to package one build for several platforms. Lasm never installs
@@ -83,7 +83,7 @@ def parsePackageArguments (tokens : List String) : Except String Parsed :=
       | none => .error ("--target is required\n\n" ++ packageUsage)
       | some target =>
         if target ∉ packageTargets ∧ target ≠ "browser" then
-          .error ("Unknown target \"" ++ target ++ "\". Choose one of: " ++ ", ".intercalate (packageTargets ++ ["browser"]))
+          .error ("Unknown target \"" ++ target ++ "\"" ++ targetHintAmong target (packageTargets ++ ["browser"]) ++ ". Choose one of: " ++ ", ".intercalate (packageTargets ++ ["browser"]))
         else if target = "browser" ∧ r.output?.isSome then .error "lasm package --target browser checks the build in place; --output does not apply"
         else .ok { r with input? := some (positional.head?.getD "dist") }
 

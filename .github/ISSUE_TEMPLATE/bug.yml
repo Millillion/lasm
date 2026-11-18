@@ -34,7 +34,7 @@ body:
     attributes:
       label: Target
       description: The `--target` of the failing build (node when you passed none).
-      options: [node, lambda, lambda-edge, vercel, netlify, azure, gcf, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge, bun, deno, wasi, wasi-http, fastly, browser, not a build (install, lasm init, lasm editor, …)]
+      options: [node, lambda, lambda-edge, vercel, netlify, azure-functions, cloud-functions, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge, bun, deno, wasi, wasi-http, fastly, browser, not a build (install, lasm init, lasm editor, …)]
     validations:
       required: true
   - type: input

@@ -69,7 +69,7 @@ export const libraryModules = lazyArray(() => ['Lasm.JS.Core', 'Lasm.JS.Json', '
   // Lasm.WASI.Http (docs/WASI_FASTLY_BINDINGS.md): the wasi:http proxy world, generated from the
   // WASI 0.2.12 WIT by scripts/bindings/generate-wasi-http.mjs (wasiHttpModules, in import order).
   ...wasiHttpModules,
-  'Lasm.Fetch', 'Lasm.Fetch.Assets', 'Lasm.Fetch.Embed', 'Lasm.KV',
+  'Lasm.Fetch', 'Lasm.Fetch.Assets', 'Lasm.Fetch.Embed',
   // Lasm.JS.Web (docs/JS_BINDINGS.md, "Lasm.JS.Web"): the whole web platform, generated from the WebIDL of
   // @webref/idl by scripts/bindings/generate-web.mjs (eagerWebModules, in import order).
   'Lasm.JS.Web.Support', ...eagerWebModules(),

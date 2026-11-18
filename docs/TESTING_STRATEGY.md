@@ -103,7 +103,6 @@ so that proving it later is a mechanical step:
   a `def name : Prop`, a plain-English doc comment, and no proof. The theorem
   `Theorems.name : Spec.name` sits beside it, and
   `node scripts/library-proofs.mjs` checks the pair. Examples:
-  - [library/Lasm/KV/Spec.lean](../library/Lasm/KV/Spec.lean)
   - [library/Lasm/UI/Spec.lean](../library/Lasm/UI/Spec.lean)
   - [library/Lasm/JS/Spec.lean](../library/Lasm/JS/Spec.lean)
   - [verification/cli/Lasm/Serverless/Spec.lean](../verification/cli/Lasm/Serverless/Spec.lean)

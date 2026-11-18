@@ -1,8 +1,8 @@
 /-
 HTTP: `Conduit.Api.handle` (pure Lean, written against `Store` and
 `Services`) and the server-rendered pages, as one handler (`Server/Web.lean`)
-that each platform's server runs (`Server/JsServe.lean`, `Server/NodeServe.lean`,
-`Server/FastlyServe.lean`, `Server/WasiHttpServe.lean`). No JavaScript here:
+that each platform's server runs (`Server/JsServe.lean` on the JavaScript
+runtimes, `Server/FastlyServe.lean`, `Server/WasiHttpServe.lean`). No JavaScript here:
 every target uses it, with the store and the services its entry file gives
 (Web Crypto in `Server/App.lean`; pure Lean in `Server/LeanCrypto.lean` for
 Fastly and wasi-http).

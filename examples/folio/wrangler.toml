@@ -1,4 +1,4 @@
-# Cloudflare Workers: npm run build:workers writes workers/ (ServerEdge.lean,
+# Cloudflare Workers: npm run build:workers writes workers/ (ServerWorkers.lean,
 # the site server); npx wrangler dev serves it locally with a local Workers KV
 # namespace, and npx wrangler deploy deploys it to your account (Lasm never
 # runs wrangler). The site's files go in the namespace:

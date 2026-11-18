@@ -39,8 +39,8 @@ function setup(t, options) {
 
 test('package arguments: forms, values, repetition, unknown options and targets', () => {
   assert.deepEqual(parsePackageArguments(['--target', 'lambda']), { command: 'package', target: 'lambda', input: 'dist' });
-  assert.deepEqual(parsePackageArguments(['build', '--target=gcf', '--output=out', '--allow-dev']),
-    { command: 'package', target: 'gcf', output: 'out', allowDev: true, input: 'build' });
+  assert.deepEqual(parsePackageArguments(['build', '--target=cloud-functions', '--output=out', '--allow-dev']),
+    { command: 'package', target: 'cloud-functions', output: 'out', allowDev: true, input: 'build' });
   assert.deepEqual(parsePackageArguments(['--output', 'o', '-h']), { command: 'package-help' });
   assert.deepEqual(parsePackageArguments(['--target', 'browser', 'site']), { command: 'package', target: 'browser', input: 'site' });
   for (const target of Object.keys(packageTargets)) assert.equal(parsePackageArguments(['--target', target]).target, target);
@@ -52,17 +52,17 @@ test('package arguments: forms, values, repetition, unknown options and targets'
   assert.throws(() => parsePackageArguments(['a', 'b', '--target', 'lambda']), { message: packageUsage });
   assert.throws(() => parsePackageArguments(['a']), { message: '--target is required\n\n' + packageUsage });
   assert.throws(() => parsePackageArguments(['--target', 'heroku']),
-    { message: 'Unknown target "heroku". Choose one of: lambda, lambda-edge, vercel, netlify, azure, gcf, browser' });
+    { message: 'Unknown target "heroku". Choose one of: lambda, lambda-edge, vercel, netlify, azure-functions, cloud-functions, browser' });
   assert.throws(() => parsePackageArguments(['--target', 'toString']), /Unknown target "toString"/);
   assert.throws(() => parsePackageArguments(['--target', 'browser', '--output', 'x']),
     { message: 'lasm package --target browser checks the build in place; --output does not apply' });
 });
 
 test('the usage lists every target with its output and summary', () => {
-  assert.match(packageUsage, /^Usage: lasm package \[dist\] --target lambda\|lambda-edge\|vercel\|netlify\|azure\|gcf\|browser \[--output PATH\] \[--allow-dev\]\n/);
+  assert.match(packageUsage, /^Usage: lasm package \[dist\] --target lambda\|lambda-edge\|vercel\|netlify\|azure-functions\|cloud-functions\|browser \[--output PATH\] \[--allow-dev\]\n/);
   for (const [name, spec] of Object.entries(packageTargets))
-    assert.ok(packageUsage.includes(`  ${name.padEnd(12)} ${spec.output.padEnd(23)} ${spec.summary}`), name);
-  assert.ok(packageUsage.includes(`  ${'browser'.padEnd(12)} ${'(in place)'.padEnd(23)} a browser build`));
+    assert.ok(packageUsage.includes(`  ${name.padEnd(15)} ${spec.output.padEnd(23)} ${spec.summary}`), name);
+  assert.ok(packageUsage.includes(`  ${'browser'.padEnd(15)} ${'(in place)'.padEnd(23)} a browser build`));
 });
 
 test('the build profile defaults to release for builds before profiles', t => {
@@ -201,7 +201,7 @@ test('Azure and Google Cloud Functions pin every deployed npm package and name t
   write('node_modules/.bin/tool', '');
   write('node_modules/@scope/no-manifest/index.js', '');
   write('package.json', JSON.stringify({ private: true, type: 'module', description: 'kept' }));
-  const azure = packageApplication({ input: app, target: 'azure', output: join(directory, 'azure') });
+  const azure = packageApplication({ input: app, target: 'azure-functions', output: join(directory, 'azure') });
   const read = name => JSON.parse(readFileSync(join(directory, name), 'utf8'));
   const dependencies = { '@azure/functions': '1.2.3', '@google-cloud/functions-framework': '1.2.3', plain: '1.2.3' };
   assert.deepEqual(read('azure/package.json'), { private: true, type: 'module', description: 'kept', name: 'lasm-azure-app', main: 'lasm-azure.mjs', dependencies });
@@ -211,14 +211,14 @@ test('Azure and Google Cloud Functions pin every deployed npm package and name t
   assert.deepEqual(read('azure/local.settings.json'), { IsEncrypted: false, Values: { FUNCTIONS_WORKER_RUNTIME: 'node', AzureWebJobsStorage: '' } });
   assert.equal(azure.dependency, '@azure/functions@1.2.3');
   assert.ok(existsSync(join(directory, 'azure/lasm-azure.mjs')));
-  const gcf = packageApplication({ input: app, target: 'gcf', output: join(directory, 'gcf') });
+  const gcf = packageApplication({ input: app, target: 'cloud-functions', output: join(directory, 'gcf') });
   assert.deepEqual(read('gcf/package.json'), { private: true, type: 'module', description: 'kept', name: 'lasm-gcf-app', main: 'lasm-gcf.mjs',
     engines: { node: '>=24' }, dependencies, scripts: { start: 'functions-framework --target=lasm' } });
   assert.equal(readFileSync(join(directory, 'gcf/.gcloudignore'), 'utf8'), '.gcloudignore\n.git\n');
   assert.equal(gcf.dependency, '@google-cloud/functions-framework@1.2.3');
   assert.deepEqual(readdirSync(join(directory, 'gcf/node_modules')).sort(), ['.bin', '@azure', '@google-cloud', '@scope', 'plain']);
   rmSync(join(app, 'node_modules/@google-cloud'), { recursive: true });
-  assert.throws(() => packageApplication({ input: app, target: 'gcf', output: join(directory, 'gcf') }), {
+  assert.throws(() => packageApplication({ input: app, target: 'cloud-functions', output: join(directory, 'gcf') }), {
     message: 'This target needs the npm package @google-cloud/functions-framework in the build. Run npm install @google-cloud/functions-framework next to package.json, then lasm build again.' });
 });
 
@@ -252,13 +252,13 @@ test('the targets: their outputs, shims, limits and platform packages', () => {
     'lambda-edge': { summary: undefined, output: 'lambda-edge.zip', shim: 'lasm-lambda.mjs', zipped: 50 * MB, unzipped: 250 * MB, zippedHard: true },
     vercel: { summary: undefined, output: '.vercel/output', shim: 'lasm-vercel.mjs', unzipped: 250 * MB },
     netlify: { summary: undefined, output: 'netlify/functions/lasm', shim: 'lasm-netlify.mjs', unzipped: 250 * MB },
-    azure: { summary: undefined, output: 'azure-functions', shim: 'lasm-azure.mjs', dependency: '@azure/functions' },
-    gcf: { summary: undefined, output: 'gcf', shim: 'lasm-gcf.mjs', dependency: '@google-cloud/functions-framework' },
+    'azure-functions': { summary: undefined, output: 'azure-functions', shim: 'lasm-azure.mjs', dependency: '@azure/functions' },
+    'cloud-functions': { summary: undefined, output: 'cloud-functions', shim: 'lasm-gcf.mjs', dependency: '@google-cloud/functions-framework' },
   });
   for (const [name, words] of [['lambda', /AWS Lambda.*nodejs24\.x/], ['lambda-edge', /Lambda@Edge.*CloudFront/], ['vercel', /Vercel.*Build Output API v3/],
-    ['netlify', /Netlify Function \(v2/], ['azure', /Azure Functions.*v4/], ['gcf', /Google Cloud Functions \(gen2/]])
+    ['netlify', /Netlify Function \(v2/], ['azure-functions', /Azure Functions.*v4/], ['cloud-functions', /Google Cloud Functions \(gen2/]])
     assert.match(packageTargets[name].summary, words, name);
-  assert.ok(packageUsage.includes('\n  lambda       lambda.zip              AWS Lambda'));
+  assert.ok(packageUsage.includes('\n  lambda          lambda.zip              AWS Lambda'));
   assert.throws(() => parsePackageArguments(['--targets', 'lambda']), { message: `Unknown lasm package option: --targets\n\n${packageUsage}` });
   assert.throws(() => parsePackageArguments(['x--target', 'lambda']), { message: packageUsage });
 });
@@ -301,7 +301,7 @@ test('glibc-only manifests are written from memory into directory packages; a bu
   if (process.platform !== 'win32') assert.equal(statSync(join(func, 'host/native/process/linux-dir/inner')).mode & 0o777, 0o644);
   // Hidden entries of node_modules are not deployed packages.
   write('node_modules/@azure/functions/package.json', JSON.stringify({ version: '4.0.0' }));
-  packageApplication({ input: app, target: 'azure', output: join(directory, 'az') });
+  packageApplication({ input: app, target: 'azure-functions', output: join(directory, 'az') });
   assert.deepEqual(JSON.parse(readFileSync(join(directory, 'az/package.json'), 'utf8')).dependencies, { '@azure/functions': '4.0.0' });
 });
 
@@ -316,8 +316,8 @@ test('the report of every target, from inside the build, with only the Linux tar
     process.chdir(app);
     await runPackage({ input: '.', target: 'lambda', output: '../a.zip' });
     await runPackage({ input: '.', target: 'lambda-edge', output: '../e.zip' });
-    await runPackage({ input: '.', target: 'azure', output: '../az' });
-    await runPackage({ input: '.', target: 'gcf', output: '../gcf' });
+    await runPackage({ input: '.', target: 'azure-functions', output: '../az' });
+    await runPackage({ input: '.', target: 'cloud-functions', output: '../gcf' });
     process.chdir(directory);
     assert.equal(packageApplication({ target: 'netlify', output: 'nf' }).input, app, 'dist by default');
     await assert.rejects(runPackage({ input: 'dist', target: 'browser' }), { message: 'dist is not a browser build (no lasm-manifest.json); run lasm build Main.lean --target browser first' });
@@ -327,4 +327,11 @@ test('the report of every target, from inside the build, with only the Linux tar
   assert.match(logged[1], /\nCreate it in us-east-1 with runtime nodejs24\.x, handler lasm-lambda\.handler, architecture x86_64, then attach a published version to a CloudFront origin-request trigger \(with "Include body" for POST bodies\)\.$/);
   assert.match(logged[2], /\nRun locally with func start in \.\.\/az; publish with func azure functionapp publish APP_NAME\.$/);
   assert.match(logged[3], /\nRun locally with npx @google-cloud\/functions-framework --target=lasm in \.\.\/gcf; deploy with gcloud functions deploy my-app --gen2 --runtime nodejs24 --trigger-http --entry-point lasm --source \.\.\/gcf\.$/);
+});
+
+test('a renamed or misspelled package target names the target (0.7-24)', () => {
+  const list = 'lambda, lambda-edge, vercel, netlify, azure-functions, cloud-functions, browser';
+  for (const [old, now] of [['azure', 'azure-functions'], ['gcf', 'cloud-functions'], ['lamda', 'lambda'], ['brwser', 'browser']])
+    assert.throws(() => parsePackageArguments(['--target', old]), { message: `Unknown target "${old}" (did you mean --target ${now}?). Choose one of: ${list}` });
+  assert.throws(() => parsePackageArguments(['--target', 'heroku']), { message: `Unknown target "heroku". Choose one of: ${list}` });
 });

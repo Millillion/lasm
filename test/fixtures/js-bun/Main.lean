@@ -188,13 +188,24 @@ def sqliteChecks (r : Checks) (live : Live) : Async Unit := do
     see live "Statement" ins.val
     for _ in [0:25] do
       let (s, g') := g.string 40; g := g'
-      discard <| ins.run #[#[toJS s]]
+      discard <| ins.run #[toJS s]
       model := model.push s
     let rows ← (← db.query "select name from t order by id").all
     let names := rows.map fun d => match d.field "name" with | .string s => s | _ => ""
     expect r "rows" (names == model) s!"{names.size} of {model.size}"
     let one ← (← db.query "select count(*) as n from t").all
     expect r "count" (one.map (fun d => match d.field "n" with | .number n => n | _ => -1) == #[model.size.toFloat]) ""
+    -- SQL NULL binds and reads back (each bound value one argument of the rest parameter).
+    discard <| db.run "create table n (id integer primary key, a text, b integer)"
+    let insN ← db.query "insert into n (a, b) values (?, ?)"
+    discard <| insN.run #[.null, toJS (7 : Nat)]
+    discard <| insN.run #[toJS "x", .null]
+    let back ← (← db.query "select a, b from n where a is ? order by id").all #[.null]
+    let row := back[0]?.getD .undefined
+    let isNull : Data → Bool := fun | .null => true | _ => false
+    expect r "null binds" (back.size == 1 && isNull (row.field "a") && (match row.field "b" with | .number 7 => true | _ => false)) s!"{back.size}"
+    let both ← (← db.query "select count(*) as n from n where a is null or b is null").all
+    expect r "null reads" (both.map (fun d => match d.field "n" with | .number n => n | _ => -1) == #[2]) ""
     db.close none
 
 /-! Bun.serve with WebSockets, and TCP sockets -/

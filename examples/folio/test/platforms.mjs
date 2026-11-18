@@ -1,4 +1,5 @@
-// The edge platforms the site server (ServerEdge.lean) runs on, and how each
+// The edge platforms the site server (Server/Edge.lean, one entry file per
+// platform: ServerFastly.lean, ServerWorkers.lean, ServerDenoDeploy.lean) runs on, and how each
 // one's own local tooling serves it: the build (an npm script), the command
 // that puts a site's files in the platform's store (`seed`), and the command
 // that serves the build on a port. {port} is the port, {data} a new, empty
@@ -34,12 +35,10 @@ export const platforms = {
     // renderer, not the request body, needs it: on wasmtime with
     // -W max-memory-size, unclosed <!-- needs 192-256 MiB and backticks
     // 256-384 MiB, and every other case fits in 128 MiB (issue #234).
-    // With Lasm's mimalloc build after 0.7.0 (issue #246), unclosed <!--
-    // passes on Viceroy at 126.6 MB; Folio pins @lasm/cli 0.7.0, so its skip
-    // stays until a release with that build. Backticks still needs ~290 MiB.
+    // Lasm's mimalloc build (0.8.0, issue #246) fits unclosed <!-- in it
+    // (126.6 MB on Viceroy); backticks still needs ~290 MiB.
     pathologicalSkip: {
       'backticks': 'needs 256-384 MiB; Fastly Compute allows a 128 MB heap per request (#234)',
-      'unclosed <!--': 'needs 192-256 MiB with @lasm/cli 0.7.0; Fastly Compute allows a 128 MB heap per request (#234). Fits (126.6 MB) with the next release (#246)',
     },
   },
   // wrangler dev (workerd, Miniflare's local Workers KV in the run's own
@@ -51,7 +50,7 @@ export const platforms = {
       return 'wrangler kv bulk put {data}/kv.json --binding folio --local --persist-to {data}/state';
     },
     serve: 'exec wrangler dev --port {port} --ip 127.0.0.1 --persist-to {data}/state',
-    store: 'workers or memory',
+    store: 'workers',
   },
   // Deno Deploy's build in the Deno CLI, on Deno KV (deno run --unstable-kv:
   // a local SQLite database under DENO_DIR, here in the run's directory).

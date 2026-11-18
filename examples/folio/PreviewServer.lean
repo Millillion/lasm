@@ -1,22 +1,18 @@
-/- The live preview's server, for Node, Bun and Deno (`npm run build:server`,
-`build:bun`, `build:deno`): the browser page (dist/public, embedded), and
-`POST /api/render`, which renders the request's body with the same function
-the page runs (safe defaults), so a test can compare the two. PORT, HOST.
-Bun serves it with `Bun.serve`, Deno with `Deno.serve`, Node (for now) with
-Lasm.Fetch's Node server (`Server/NodeServe.lean`). -/
+/- The live preview's server on Node (`npm run build:server`, then `npm start`): the browser page
+(dist/public, embedded) and `POST /api/render` (`Server/Preview.lean`), which renders the request's
+body with the same function the page runs (safe defaults), so a test can compare the two.
+`Node.serve` (Lasm.JS.Node.Serve) serves it on $HOST (default every IPv4 address) and $PORT
+(default 3000), and stops cleanly on SIGTERM and SIGINT. Bun runs `PreviewServerBun.lean`, Deno
+`PreviewServerDeno.lean`. -/
 import Server.Assets
 import Server.Embed
-import Server.NodeServe
-import Folio
-open Std.Async Folio.Server
+import Server.JsServe
+import Server.Preview
+import Lasm.JS.Node.Serve
+open Lasm.JS
 
 /-- The browser page and its files, embedded in the program. -/
-def assets : Web.Assets := embed_dir! "dist/public"
+def assets : Folio.Server.Web.Assets := embed_dir! "dist/public"
 
-def handle (req : Web.Request) : Async Web.Response := do
-  match req.method, req.segments with
-  | "POST", ["api", "render"] =>
-    return Web.Response.withBody (Folio.render {} req.text).toUTF8 "text/html; charset=utf-8" 200
-  | _, _ => return .notFound
-
-def main : IO Unit := NodeServe.serve (assets.wrap handle)
+def main : IO Unit := do
+  Node.serve { fetch := Folio.Server.JsServe.webHandler (assets.wrap Folio.Server.Preview.handle), hostname := ← IO.getEnv "HOST" }

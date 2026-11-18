@@ -62,7 +62,12 @@ replays the proofs through Lean's kernel and the external checkers Lean ships.
 
 The same Lean runs on each platform below; only the SQLite binding module differs
 ([`Server/NodeSqlite.lean`](Server/NodeSqlite.lean), [`Server/BunSqlite.lean`](Server/BunSqlite.lean),
-[`Server/D1.lean`](Server/D1.lean)), and every one signs with its own Web Crypto. Each row is a
+[`Server/D1.lean`](Server/D1.lean), on Lasm.JS.Cloudflare's generated `D1Database`), and every one
+signs with its own Web Crypto (Lasm.JS.Web's generated bindings). Each platform serves Porter
+its own way: Node with `Node.serve` ([`ServerNode.lean`](ServerNode.lean)), Bun with `Bun.serve`,
+Cloudflare Workers with a typed `Env` and its fetch handler ([`ServerWorkers.lean`](ServerWorkers.lean)),
+and Deno and the function platforms through the program's default export
+([`ServerExport.lean`](ServerExport.lean), `Lasm.JS.exportDefault`). Each row is a
 CI job ([porter.yml](../../.github/workflows/porter.yml) for Node,
 [porter-platforms.yml](../../.github/workflows/porter-platforms.yml) for the rest) that builds
 Porter, serves it with the platform's own local tooling ([`test/platforms.mjs`](test/platforms.mjs))
@@ -221,6 +226,6 @@ ID tokens 10 minutes, refresh tokens 30 days (rotated on every use), sessions
 | [`Proofs/Spec.lean`](Proofs/Spec.lean) | Every proposition, in plain English, without proofs |
 | [`Proofs/`](Proofs) | The model of the database and the proofs |
 | [`Frontend/Ui.lean`](Frontend/Ui.lean), [`Client.lean`](Client.lean) | The sign-in and consent pages' browser app (Lasm.UI) |
-| [`Server/`](Server), [`ServerNode.lean`](ServerNode.lean) | Web Crypto, the SQL, the configuration, the HTTP glue and one SQLite binding per target; the Node program |
-| [`ServerBun.lean`](ServerBun.lean), [`ServerWorkers.lean`](ServerWorkers.lean), [`deploy/`](deploy), `Dockerfile`, `wrangler.toml`, `vercel.json`, `netlify.toml` | The other platforms |
+| [`Server/`](Server), [`ServerNode.lean`](ServerNode.lean) | Web Crypto, the SQL, the configuration, the HTTP glue and one SQLite module per target; the Node program |
+| [`ServerExport.lean`](ServerExport.lean), [`ServerBun.lean`](ServerBun.lean), [`ServerWorkers.lean`](ServerWorkers.lean), [`deploy/`](deploy), `Dockerfile`, `wrangler.toml`, `vercel.json`, `netlify.toml` | The other platforms |
 | [`test/`](test) | The oracle tests, the adversarial suite, the fuzzer, the end-to-end tests, the proof checks |

@@ -1,7 +1,7 @@
 /-
 Postgres through PostgREST (Supabase's REST API is PostgREST): the table
 `conduit_kv` (`key text primary key, value text`; supabase/migrations/) as a
-`Lasm.KV.Store`, so Conduit's store is `Server/Kv.lean`. No npm package: the
+`KvStore`, so Conduit's store is `Server/Kv.lean`. No npm package: the
 requests go through the `send` the entry file gives (Lasm.JS.Web's `fetch` on
 Supabase, `Server/JsServe.lean`; wasi:http's outgoing-handler on wasi-http,
 `Server/WasiHttpServe.lean`).
@@ -10,7 +10,7 @@ Supabase Edge Functions use it with the project's `SUPABASE_URL` and
 security, which allows nothing to anyone else).
 -/
 import Server.Web
-import Lasm.KV
+import Server.Kv
 import Lean.Data.Json
 import Conduit.SafeJson
 open Lean Std.Async
@@ -31,7 +31,7 @@ def encode (s : String) : String :=
 legacy keys, PostgREST's roles); a Supabase secret key goes alone. `send`
 sends a request and reads its whole response. -/
 def «open» (send : Web.Request → Async Web.Response) (url : String) (key : Option String)
-    (table : String := "conduit_kv") : IO Lasm.KV.Store := do
+    (table : String := "conduit_kv") : IO KvStore := do
   let url := url ++ "/" ++ table
   let headers := match key with
     | some key => #[("apikey", key)] ++ (if key.startsWith "eyJ" then #[("authorization", s!"Bearer {key}")] else #[])
@@ -42,7 +42,6 @@ def «open» (send : Web.Request → Async Web.Response) (url : String) (key : O
       throw (IO.userError s!"PostgREST {method} {table}: {r.status} {(r.text?).getD ""}")
     return r
   return {
-    kind := "postgrest"
     get := fun k => do
       let r ← call "GET" s!"{url}?select=value&key=eq.{encode k}" #[("accept", "application/json")]
       match (Conduit.parseJson ((r.text?).getD "")).toOption with

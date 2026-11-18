@@ -98,12 +98,12 @@ repository). See the [Vercel guide](https://github.com/Millillion/lasm/blob/main
 writes the function to `netlify/functions/lasm`; deploy with `netlify deploy --build`.
 See the [Netlify guide](https://github.com/Millillion/lasm/blob/main/docs/deploy/netlify.md).
 
-**Azure Functions:** `npm run build:azure` writes the function app to
+**Azure Functions:** `npm run build:azure-functions` writes the function app to
 `azure-functions/`; test it with `func start` there and publish with
 `func azure functionapp publish APP_NAME`. See the [Azure guide](https://github.com/Millillion/lasm/blob/main/docs/deploy/azure-functions.md).
 
-**Google Cloud Functions:** `npm run build:gcf` writes `gcf/`; deploy with
-`gcloud functions deploy my-app --gen2 --runtime nodejs24 --trigger-http --entry-point lasm --source gcf`.
+**Google Cloud Functions:** `npm run build:cloud-functions` writes `cloud-functions/`; deploy with
+`gcloud functions deploy my-app --gen2 --runtime nodejs24 --trigger-http --entry-point lasm --source cloud-functions`.
 See the [Cloud Functions guide](https://github.com/Millillion/lasm/blob/main/docs/deploy/cloud-functions.md).
 
 `Dockerfile.lambda` builds an AWS Lambda container image (Lambda's Node 24 image, whose

@@ -2,7 +2,7 @@
 // HTTP checks of a deployed fullstack template (no browser): the server-rendered
 // page, the browser app and public/ files served by the same program (embedded
 // with embed_dir!, or the platform's assets), the RPC endpoints, and
-// persistence through Lasm.KV.
+// persistence through the platform's store (Workers KV, Deno KV, Fastly's KV Store).
 //
 //   node scripts/fullstack/smoke.mjs --url URL --label NAME --out FILE
 //        [--add TITLE] [--expect TITLE] [--no-persist] [--platform-assets]

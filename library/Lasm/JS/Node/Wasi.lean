@@ -24,6 +24,33 @@ instance : Nonempty WASI := ⟨{ val := Classical.ofNonempty }⟩
 instance : ToJS WASI := ⟨fun x => .ref x.val ""⟩
 instance : FromJS WASI := ⟨fun | .ref v _ => .ok { val := v } | _ => .error "", "Lasm.JS.Node.WASI", .data⟩
 
+/-- `dictionary WASI.NewOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure WASI.NewOptions where
+  /-- `sequence<any> args` -/
+  args : Option (Array Data) := none
+  /-- `object env` -/
+  env : Data := .undefined
+  /-- `object preopens` -/
+  preopens : Data := .undefined
+  /-- `boolean returnOnExit = true` -/
+  returnOnExit : Option Bool := none
+  /-- `long long stdin = 0` -/
+  stdin : Option Int := none
+  /-- `long long stdout = 1` -/
+  stdout : Option Int := none
+  /-- `long long stderr = 2` -/
+  stderr : Option Int := none
+  /-- `DOMString version` -/
+  version : Option String := none
+instance instToJSWASINewOptions : ToJS WASI.NewOptions := ⟨fun d => Internal.fields #[("args", Internal.optional d.args),
+    ("env", d.env),
+    ("preopens", d.preopens),
+    ("returnOnExit", Internal.optional d.returnOnExit),
+    ("stdin", Internal.optional d.stdin),
+    ("stdout", Internal.optional d.stdout),
+    ("stderr", Internal.optional d.stderr),
+    ("version", Internal.optional d.version)]⟩
+
 /-- `dictionary WASI.FinalizeBindingsOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure WASI.FinalizeBindingsOptions where
   /-- `Memory memory` -/
@@ -33,6 +60,11 @@ instance instToJSWASIFinalizeBindingsOptions : ToJS WASI.FinalizeBindingsOptions
 /-- `v instanceof WASI`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WASI`). -/
 @[macro_inline] def WASI.cast? (v : Value) : IO (Option WASI) := Internal.api "Lasm.JS.Node.WASI.cast?" do
   Internal.cast (Support.getExport "node:wasi" ["WASI"] Value) (fun x => { val := x }) v
+
+/-- **Experimental** in the Node.js 24.22.2 docs. `new WASI([options])` (added in Node.js v13.3.0, v12.16.0): `constructor(optional WASI.NewOptions options)` -/
+@[macro_inline] def WASI.new (options : Option WASI.NewOptions := none) : IO WASI := Internal.api "Lasm.JS.Node.WASI.new" do
+  Lasm.JS.Binding.invoke WASI { name := "Lasm.JS.Node.WASI.new", module := "node:wasi", path := "WASI", construct := true, arity := 1 }
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- **Experimental** in the Node.js 24.22.2 docs. `wasi.wasiImport` (added in Node.js v13.3.0, v12.16.0): `readonly attribute object wasiImport` -/
 @[macro_inline] def WASI.wasiImport (self : WASI) : IO Data := Internal.api "Lasm.JS.Node.WASI.wasiImport" do

@@ -28,6 +28,11 @@ instance : FromJS StringDecoder := ⟨fun | .ref v _ => .ok { val := v } | _ => 
 @[macro_inline] def StringDecoder.cast? (v : Value) : IO (Option StringDecoder) := Internal.api "Lasm.JS.Node.StringDecoder.cast?" do
   Internal.cast (Support.getExport "node:string_decoder" ["StringDecoder"] Value) (fun x => { val := x }) v
 
+/-- `new StringDecoder([encoding])`: `constructor(optional DOMString encoding)` -/
+@[macro_inline] def StringDecoder.new (encoding : Option String := none) : IO StringDecoder := Internal.api "Lasm.JS.Node.StringDecoder.new" do
+  Lasm.JS.Binding.invoke StringDecoder { name := "Lasm.JS.Node.StringDecoder.new", module := "node:string_decoder", path := "StringDecoder", construct := true, arity := 1 }
+    (Internal.args #[Internal.optional encoding]) (await := false)
+
 /-- `stringDecoder.end([buffer])` (added in Node.js v0.9.3): `DOMString end(optional (DOMString or Uint8Array) buffer)` -/
 @[macro_inline] def StringDecoder.«end» (self : StringDecoder) (buffer_ : Option DOMStringOrUint8Array := none) : IO String := Internal.api "Lasm.JS.Node.StringDecoder.end" do
   self.val.callMethod "end" (Internal.args #[Internal.optional buffer_]) String

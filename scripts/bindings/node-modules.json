@@ -249,7 +249,9 @@
    "name": "Console",
    "doc": "console",
    "title": "the console",
-   "uses": []
+   "uses": [
+    "Stream"
+   ]
   },
   {
    "name": "Assert",

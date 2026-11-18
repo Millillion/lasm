@@ -1,6 +1,6 @@
 name: Folio on every platform
 # examples/folio beyond Node (folio.yml), on each platform's own local tooling:
-# - edge: the site server (ServerEdge.lean) on Fastly (Viceroy 0.21.1, a KV
+# - edge: the site server (Server/Edge.lean, an entry per platform) on Fastly (Viceroy 0.21.1, a KV
 #   Store from fastly.toml), Cloudflare Workers (wrangler dev, local Workers
 #   KV) and Deno Deploy's build (the Deno CLI, Deno KV in a local file). The
 #   example site is put in the store, and every page served must be byte for
@@ -9,8 +9,8 @@ name: Folio on every platform
 #   run on the server through POST /api/render (test/edge.mjs --spec), and
 #   CommonMark's pathological inputs with nesting far deeper than the
 #   engine's stack (issue #231; test/edge.mjs --pathological). On Fastly
-#   the two cases that need more than Compute's 128 MB heap per request
-#   (backticks, unclosed <!--) are skipped with that reason (#234).
+#   the one case that needs more than Compute's 128 MB heap per request
+#   (backticks) is skipped with that reason (#234).
 # - wasi: the 652 examples and the pathological inputs on the WASI build of
 #   the batch renderer (dist/batch-wasi) on wasmtime 49.0.4, wasmer 7.4.2
 #   and node:wasi.

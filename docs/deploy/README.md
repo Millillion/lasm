@@ -34,7 +34,7 @@ Requirements on every platform:
 - **Alpine/musl:** Debian, Ubuntu and Alpine (`node:24-alpine`) Node images all
   work ([Alpine](docker-kubernetes.md#alpine-musl)).
 
-**Function platforms:** `lasm build Main.lean --target <lambda|lambda-edge|vercel|netlify|azure|gcf>`
+**Function platforms:** `lasm build Main.lean --target <lambda|lambda-edge|vercel|netlify|azure-functions|cloud-functions>`
 builds `dist/` and the platform's package. Lasm builds for a platform; it never
 installs or starts the platform's environment. Run your platform's own CLI
 (`vercel dev`, `netlify dev`, `func start`, `sam local`, `gcloud`, …) yourself to
@@ -62,8 +62,8 @@ test and deploy.
 | Lambda@Edge | [lambda-edge.md](lambda-edge.md) | CloudFront origin-request trigger, x86_64, `lasm build --target lambda-edge`. |
 | Vercel Functions | [vercel.md](vercel.md) | `lasm build --target vercel` (Build Output API) or `lasm init --deploy vercel`. |
 | Netlify Functions | [netlify.md](netlify.md) | `lasm init --deploy netlify` (`netlify.toml` with `included_files`); 60 s synchronous limit. |
-| Azure Functions | [azure-functions.md](azure-functions.md) | `lasm init --deploy azure`; Node.js v4 model, Linux. |
-| Google Cloud Functions (gen2) | [cloud-functions.md](cloud-functions.md) | `lasm init --deploy gcf`; Functions Framework. |
+| Azure Functions | [azure-functions.md](azure-functions.md) | `lasm init --deploy azure-functions`; Node.js v4 model, Linux. |
+| Google Cloud Functions (gen2) | [cloud-functions.md](cloud-functions.md) | `lasm init --deploy cloud-functions`; Functions Framework. |
 | DigitalOcean App Platform | [digitalocean.md](digitalocean.md) | Container recipe; AMD64; runs in gVisor (tested with `runsc`, Phase 6). |
 
 **What is tested.** Lasm's CI builds and runs every template's Dockerfile on
