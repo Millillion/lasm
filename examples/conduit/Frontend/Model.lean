@@ -6,10 +6,10 @@ app starts from the same model, so it hydrates the server's HTML.
 -/
 import Lean.Data.Json
 import Conduit.SafeJson
-import Lasm.UI.Cmd
+import Frontend.Cmd
 import Conduit.Types
 import Frontend.Route
-open Lean Lasm.UI
+open Lean
 
 namespace Conduit.Frontend
 

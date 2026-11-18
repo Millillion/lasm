@@ -14,8 +14,9 @@ name = "Conduit"
 [[lean_lib]]
 name = "Proofs"
 
-# The browser app's pages (Lasm.UI): routes, model, views and update. The
-# server renders the same views for the first page of every URL.
+# The browser app's pages (Lasm.UI): routes, model, views, update and its
+# commands (as data). The server renders the same views for the first page
+# of every URL.
 [[lean_lib]]
 name = "Frontend"
 
@@ -25,5 +26,8 @@ name = "Frontend"
 [[lean_lib]]
 name = "Server"
 
-# ServerNode.lean, ServerWorkers.lean, ServerBun.lean and Client.lean are
-# the programs: lasm builds them (npm run build); they are not Lake targets.
+# Server*.lean (one entry file per serving model: ServerNode, ServerDeno,
+# ServerBun, ServerFunction, ServerWorkers, ServerDenoDeploy, ServerVercelEdge,
+# ServerNetlifyEdge, ServerSupabase, ServerFastly, ServerWasiHttp) and
+# Client.lean are the programs: lasm builds them (npm run build:*); they are
+# not Lake targets.
