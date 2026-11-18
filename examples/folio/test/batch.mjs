@@ -10,7 +10,7 @@
 //   (`npm run build:batch-browser`), in Playwright's headless browser
 //   (renderAllAsync only);
 // - a URL: `POST URL/api/render` once per document (`?raw_html=1` for raw
-//   HTML), on a running server (ServerEdge.lean; renderAllAsync only).
+//   HTML), on a running server (Server/Edge.lean; renderAllAsync only).
 //
 // The engine is the `engine` option, else FOLIO_BATCH, else `node`.
 import { execFileSync } from 'node:child_process';
