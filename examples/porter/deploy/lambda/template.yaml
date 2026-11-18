@@ -1,5 +1,5 @@
 # Porter on AWS Lambda, .zip package (nodejs24.x), behind an API Gateway HTTP API.
-#   npm run build:lambda          (npm run build, then lasm package: lambda.zip)
+#   npm run build:lambda          (npm run build:export, then lasm package: lambda.zip)
 #   sam local start-api -t deploy/lambda/template.yaml --warm-containers EAGER
 #   sam deploy --guided -t deploy/lambda/template.yaml
 # The database is /tmp/porter.db: it lasts as long as the function instance,
