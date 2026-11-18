@@ -34,7 +34,7 @@ How a module moves from pending to modelled:
 <!-- BEGIN MODELS -->
 <!-- Generated from verification/models.json by `node scripts/models.mjs --write`; do not edit by hand. -->
 
-**182 shipped modules**: 20 modelled, 28 pending, 134 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 28 modules still need a model.
+**183 shipped modules**: 20 modelled, 28 pending, 135 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 28 modules still need a model.
 
 ### Modelled (20)
 
@@ -94,7 +94,7 @@ How a module moves from pending to modelled:
 | [`src/wasm-objects.mjs`](../src/wasm-objects.mjs) | — | a reader of relocatable Wasm objects: pure |
 | [`src/web-availability.mjs`](../src/web-availability.mjs) | — | lasm build --target's web API check: pure over the program's C texts and the generated availability table; model the lookup |
 
-### Exempt (134)
+### Exempt (135)
 
 | Module | Kind | Reason |
 | --- | --- | --- |
@@ -145,6 +145,7 @@ How a module moves from pending to modelled:
 | [`src/lasm-modules/app.mjs`](../src/lasm-modules/app.mjs) | runtime | the app instance of Lasm.UI.Mount; tested in browsers (ui.yml) |
 | [`src/lasm-modules/class.mjs`](../src/lasm-modules/class.mjs) | runtime | lasm:class, behind Lasm.JS.Class.define: a JavaScript class built by the language itself (extends, super, prototype methods); tested in test/lasm-class.test.mjs and on every JavaScript target (test/fixtures/js-core) |
 | [`src/launcher.mjs`](../src/launcher.mjs) | io | starts a built program |
+| [`src/lean.mjs`](../src/lean.mjs) | io | `@lasm/cli/lean`: provisions the managed Lean (src/managed-lean.mjs, modelled where it is pure) and returns its paths; its effect is the installation, tested end to end |
 | [`src/link-driver/compile.mjs`](../src/link-driver/compile.mjs) | io | compiles Lasm's C with the managed clang; orchestration of files, processes or the network: its effect is the behaviour, tested end to end |
 | [`src/link-driver/link.mjs`](../src/link-driver/link.mjs) | io | runs wasm-ld and the glue; orchestration of files, processes or the network: its effect is the behaviour, tested end to end |
 | [`src/link-driver/settings.mjs`](../src/link-driver/settings.mjs) | data | Emscripten link settings as data |

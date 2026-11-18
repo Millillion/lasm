@@ -21,7 +21,7 @@ Key commands:
 
 ## CLI
 
-- [CLI reference](https://github.com/Millillion/lasm/blob/main/README.md#cli-reference): every command, option and environment variable
+- [CLI reference](https://github.com/Millillion/lasm/blob/main/README.md#cli-reference): every command, option and environment variable; the package exports only `@lasm/cli/vite`, `@lasm/cli/vite/client`, `@lasm/cli/lean` (`lasmLean(source)`: Lasm's own `lean` and `lake`) and `@lasm/cli/package.json`
 - [Templates](https://github.com/Millillion/lasm/tree/main/templates): what `npm create @lasm` and `lasm init --template` create (plain, express, hono, fastify, std-http, web, fetch, fullstack)
 - [Tool cache and requirements](https://github.com/Millillion/lasm/blob/main/docs/NODE_SUPPORT.md): where Lasm keeps Lean and its tools, and how to recover
 - [Installation hardening](https://github.com/Millillion/lasm/blob/main/docs/INSTALLATION_HARDENING.md): retries, offline repair, proxies and private CAs

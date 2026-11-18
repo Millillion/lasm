@@ -67,7 +67,7 @@ export function parsePackageArguments(tokens) {
   }
   if (positional.length > 1) throw new Error(packageUsage);
   if (!result.target) throw new Error('--target is required\n\n' + packageUsage);
-  if (!Object.hasOwn(packageTargets, result.target) && result.target !== 'browser') throw new Error(`Unknown target "${result.target}"${targetHintAmong(result.target, [...Object.keys(packageTargets), 'browser'])}. Choose one of: ${[...Object.keys(packageTargets), 'browser'].join(', ')}`);
+  if (!Object.hasOwn(packageTargets, result.target) && result.target !== 'browser') throw new Error(`Unknown package target "${result.target}"${targetHintAmong(result.target, [...Object.keys(packageTargets), 'browser'])}. Choose one of: ${[...Object.keys(packageTargets), 'browser'].join(', ')}`);
   if (result.target === 'browser' && result.output !== undefined) throw new Error('lasm package --target browser checks the build in place; --output does not apply');
   result.input = positional[0] ?? 'dist';
   return result;
@@ -162,7 +162,7 @@ function dependencyPackage(input, name) {
 /** Packages `input` for `target`; returns a summary for the CLI and tests. */
 export function packageApplication({ input = 'dist', target, output, allowDev = false }) {
   const spec = packageTargets[target];
-  if (!spec) throw new Error(`Unknown target "${target}"`);
+  if (!spec) throw new Error(`Unknown package target "${target}"`);
   input = resolve(input);
   const nativeTargets = checkApplication(input);
   // Dev builds (lasm run, lasm build --dev) skip Binaryen's size optimization:

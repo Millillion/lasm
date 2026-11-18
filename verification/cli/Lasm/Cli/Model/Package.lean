@@ -83,7 +83,7 @@ def parsePackageArguments (tokens : List String) : Except String Parsed :=
       | none => .error ("--target is required\n\n" ++ packageUsage)
       | some target =>
         if target ∉ packageTargets ∧ target ≠ "browser" then
-          .error ("Unknown target \"" ++ target ++ "\"" ++ targetHintAmong target (packageTargets ++ ["browser"]) ++ ". Choose one of: " ++ ", ".intercalate (packageTargets ++ ["browser"]))
+          .error ("Unknown package target \"" ++ target ++ "\"" ++ targetHintAmong target (packageTargets ++ ["browser"]) ++ ". Choose one of: " ++ ", ".intercalate (packageTargets ++ ["browser"]))
         else if target = "browser" ∧ r.output?.isSome then .error "lasm package --target browser checks the build in place; --output does not apply"
         else .ok { r with input? := some (positional.head?.getD "dist") }
 
