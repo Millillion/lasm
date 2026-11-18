@@ -174,7 +174,9 @@ install through `scripts/ci/apt-cache.sh`:
   populated during an Azure mirror outage.
 
 The packages installed are the same as before; only where they come from
-changes, so no test loses coverage.
+changes, so no test loses coverage. `scripts/fuzz/ensure-libfuzzer.sh` still
+calls apt-get directly: the images already have the libFuzzer runtimes, so it
+installs nothing.
 
 ## Inventory
 

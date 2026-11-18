@@ -5,10 +5,12 @@ name: Fuzz
 # function platforms' HTTP mapping and the Lasm.JS value codec (JavaScript,
 # under V8 block coverage; the last two checked against Lean: the model
 # verification/cli/Lasm/Serverless/Proofs/Model.lean, and Lean's own codec), the
-# Lasm.UI applier's reading against Lean's reference decoder (ui-decode), and Lasm's
-# tar reader against Python's tarfile (tar).
+# Lasm.UI applier's reading against Lean's reference decoder (ui-decode), Lasm's
+# tar reader against Python's tarfile (tar), and
+# the Lasm.JS value codec's Lean half natively, against its proved round trip
+# (lean-js-wire: libFuzzer, ASan).
 #   - pull requests and pushes to main: the committed corpus and regressions,
-#     once each (seconds);
+#     once each (seconds); the native targets when their sources change;
 #   - nightly: 10 minutes per target; weekly (Saturday): 60 minutes per target (10 for
 #     dev-proxy, project-files and edge-request).
 # A campaign fails on any failing input (a crash, a hang, a broken property)
@@ -81,6 +83,24 @@ jobs:
           LASM_JS_WIRE_MODEL: required
           LASM_UI_DECODE_MODEL: required
         run: node test/fuzz/run.mjs replay cli-arguments serverless-http ui-patch ui-decode lasm-js-wire dev-proxy project-files edge-request tar
+      - name: Do the native targets' sources change?
+        id: native
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        shell: bash
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = push ] || git diff --name-only "$BASE" HEAD | grep -E '^(library/|src/managed-lean\.mjs|src/lasm-library\.mjs|src/toolchains\.json|test/fuzz/|\.github/workflows/fuzz\.yml)' >/dev/null; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: libFuzzer runtime
+        if: steps.native.outputs.changed == 'true'
+        run: scripts/fuzz/ensure-libfuzzer.sh
+      - name: Build the native targets
+        if: steps.native.outputs.changed == 'true'
+        run: node test/fuzz/native/build.mjs
+      - name: Native targets
+        if: steps.native.outputs.changed == 'true'
+        run: node test/fuzz/run.mjs replay lean-js-wire
 
   campaign:
     needs: sunday
@@ -92,7 +112,7 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        target: [cli-arguments, serverless-http, ui-patch, ui-decode, lasm-js-wire, dev-proxy, project-files, edge-request, tar]
+        target: [cli-arguments, serverless-http, ui-patch, ui-decode, lasm-js-wire, dev-proxy, project-files, edge-request, tar, lean-js-wire]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -122,6 +142,11 @@ jobs:
         run: |
           node test/fuzz/support/lean-header-model.mjs
           echo "LASM_LEAN_HEADER_MODEL=required" >> "$GITHUB_ENV"
+      - name: Native target
+        if: startsWith(matrix.target, 'lean-')
+        run: |
+          scripts/fuzz/ensure-libfuzzer.sh
+          node test/fuzz/native/build.mjs ${{ matrix.target }}
       - name: Campaign (the seed is printed first)
         env:
           SECONDS_PER_TARGET: ${{ github.event.inputs.seconds || (github.event.schedule == '41 6 * * 6' && '3600') || '600' }}

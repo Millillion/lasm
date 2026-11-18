@@ -1,0 +1,3 @@
+{
+  "lean-js-wire": { "kind": "lean", "entry": "lasm_fuzz_js_wire_decode", "binary": "lean-js-wire", "description": "the Lasm.JS value codec's Lean reader and writer (Wire in library/Lasm/JS/Core.lean) on arbitrary bytes, natively: a clean refusal or a round trip that comes back intact" }
+}

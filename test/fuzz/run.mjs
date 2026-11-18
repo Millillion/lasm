@@ -3,17 +3,22 @@
 //   node test/fuzz/run.mjs list
 //   node test/fuzz/run.mjs replay [target…]            committed corpus and regressions, once each
 //   node test/fuzz/run.mjs fuzz --seconds N [target…]  a coverage-guided campaign per target
-//        [--out DIR] [--seed N]
+//        [--out DIR] [--seed N] [--native DIR]
 //
-// The targets (test/fuzz/targets/*.mjs) are JavaScript, and run in a worker
-// under V8 block coverage (test/fuzz/worker.mjs).
+// JavaScript targets (test/fuzz/targets/*.mjs) run in a worker under V8 block
+// coverage (test/fuzz/worker.mjs). Native targets (test/fuzz/native/: Lasm's
+// Lean code compiled to C; C targets with ASan and UBSan) are libFuzzer
+// binaries that test/fuzz/native/build.mjs writes to --native (default
+// .work/fuzz/native); without them the native targets are skipped, and named
+// ones fail.
 // Inputs live in test/fuzz/corpus/<target>/ (seeds and interesting inputs) and
 // test/fuzz/regressions/<target>/ (every failure found, kept once fixed). A
 // campaign writes new corpus entries to <out>/<target>/corpus/ and failing
 // inputs to <out>/<target>/crashes/; it exits 1 when a target fails or hangs.
 import { Worker } from 'node:worker_threads';
+import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -30,15 +35,18 @@ const option = (name, fallback) => {
 const seconds = Number(option('--seconds', '60'));
 const out = resolve(option('--out', join(root, '.work/fuzz')));
 const seed = Number(option('--seed', String(Date.now() % 2 ** 31)));
+const nativeDir = resolve(option('--native', join(root, '.work/fuzz/native')));
 const hangMs = Number(option('--hang-ms', '10000'));
 
 const jsTargets = readdirSync(join(here, 'targets')).filter(f => f.endsWith('.mjs')).map(f => f.slice(0, -4)).sort();
-const all = jsTargets;
+const nativeTargets = JSON.parse(readFileSync(join(here, 'native/targets.json'), 'utf8'));
+const all = [...jsTargets, ...Object.keys(nativeTargets)];
 const inputs = name => [join(here, 'corpus', name), join(here, 'regressions', name)];
 const filesOf = dir => existsSync(dir) ? readdirSync(dir).filter(f => !f.startsWith('.') && !f.endsWith('.md')).sort().map(f => join(dir, f)) : [];
 
 if (command === 'list') {
   for (const name of jsTargets) console.log(`${name} (JavaScript)`);
+  for (const [name, t] of Object.entries(nativeTargets)) console.log(`${name} (libFuzzer: ${t.description})`);
   process.exit(0);
 }
 // Writes each JavaScript target's seeds() into its committed corpus (seed-N files).
@@ -56,7 +64,7 @@ if (command === 'seed') {
   process.exit(0);
 }
 if (command !== 'replay' && command !== 'fuzz') {
-  console.error('Usage: node test/fuzz/run.mjs list | replay [target…] | fuzz --seconds N [target…] [--out DIR] [--seed N]');
+  console.error('Usage: node test/fuzz/run.mjs list | replay [target…] | fuzz --seconds N [target…] [--out DIR] [--seed N] [--native DIR]');
   process.exit(2);
 }
 const named = args.filter(a => !a.startsWith('--'));
@@ -104,17 +112,58 @@ function runJs(name) {
   });
 }
 
+function runNative(name) {
+  const binary = join(nativeDir, nativeTargets[name].binary);
+  if (!existsSync(binary)) return { skipped: true };
+  const crashes = join(out, name, 'crashes'), corpus = join(out, name, 'corpus');
+  mkdirSync(crashes, { recursive: true }); mkdirSync(corpus, { recursive: true });
+  // Lean keeps persistent objects for the process's life: leaks are not findings.
+  // (ASAN_OPTIONS below: the slow unwinder crashes inside Lean's runtime, so a
+  // report would end before libFuzzer saved the input.)
+  const common = ['-timeout=10', '-rss_limit_mb=2560', '-detect_leaks=0', `-artifact_prefix=${crashes}/`, '-print_final_stats=1'];
+  const dict = join(here, 'native', name + '.dict');
+  if (existsSync(dict)) common.push(`-dict=${dict}`);
+  const files = inputs(name).flatMap(filesOf);
+  const argv = command === 'replay' ? [...common, ...files]
+    : [...common, `-max_total_time=${seconds}`, `-seed=${seed}`, '-max_len=8192', corpus, ...inputs(name).filter(existsSync)];
+  if (command === 'replay' && !files.length) return { ok: true, result: { runs: 0 } };
+  const run = spawnSync(binary, argv, { encoding: 'utf8', stdio: ['ignore', 'inherit', 'pipe'], maxBuffer: 256 * 1024 * 1024,
+    env: { ...process.env, LEAN_ABORT_ON_PANIC: '1', ASAN_OPTIONS: ['detect_leaks=0', 'fast_unwind_on_fatal=1', process.env.ASAN_OPTIONS].filter(Boolean).join(':') } });
+  const log = run.stderr ?? '';
+  process.stderr.write(log.split('\n').filter(l => !/^#\d+\s+(NEW|REDUCE|pulse)|^(INFO|Running|Executed): /.test(l)).slice(-60).join('\n') + '\n');
+  // A campaign also leaves <out>/<target>/merged/: the committed corpus and the
+  // new entries, minimized by libFuzzer (-merge=1), ready to replace
+  // test/fuzz/corpus/<target>/.
+  if (command === 'fuzz' && run.status === 0) {
+    const merged = join(out, name, 'merged');
+    mkdirSync(merged, { recursive: true });
+    spawnSync(binary, ['-merge=1', '-detect_leaks=0', merged, join(here, 'corpus', name), corpus], { stdio: 'ignore',
+      env: { ...process.env, ASAN_OPTIONS: 'detect_leaks=0:fast_unwind_on_fatal=1' } });
+  }
+  const cov = [...log.matchAll(/cov: (\d+) ft: (\d+) corp: (\d+)/g)].at(-1);
+  const result = { runs: command === 'replay' ? files.length : Number(/stat::number_of_executed_units: (\d+)/.exec(log)?.[1] ?? 0),
+    edges: cov ? Number(cov[1]) : undefined, features: cov ? Number(cov[2]) : undefined, corpus: cov ? Number(cov[3]) : undefined };
+  return { ok: run.status === 0, result, failures: run.status === 0 ? [] : [{ file: crashes, error: `libFuzzer exited with ${run.status ?? run.signal}` }] };
+}
+
 let failed = false;
 const summary = [];
 for (const name of selected) {
   const started = Date.now();
+  const native = name in nativeTargets;
   console.log(`${command} ${name}${command === 'fuzz' ? ` (${seconds} s, seed ${seed})` : ''}`);
-  const outcome = await runJs(name);
+  const outcome = native ? runNative(name) : await runJs(name);
+  if (outcome.skipped) {
+    if (named.includes(name)) { failed = true; console.log(`FAIL ${name}: no binary in ${nativeDir} (node test/fuzz/native/build.mjs)`); }
+    else console.log(`skip ${name}: no binary in ${nativeDir} (node test/fuzz/native/build.mjs builds it)`);
+    continue;
+  }
   const r = outcome.result ?? {};
   const time = ((Date.now() - started) / 1000).toFixed(1);
   const detail = command === 'replay' ? `${r.runs ?? 0} inputs`
+    : native ? `${r.runs} runs, ${r.edges} edges, ${r.features} features, corpus ${r.corpus}`
     : `${r.execs} runs, ${r.blocks}/${r.allBlocks} blocks, ${r.features} features, corpus ${r.corpus} (+${r.added})`;
-  summary.push({ target: name, kind: 'JavaScript', ok: outcome.ok, seconds: Number(time), ...r });
+  summary.push({ target: name, kind: native ? 'libFuzzer' : 'JavaScript', ok: outcome.ok, seconds: Number(time), ...r });
   if (outcome.ok) console.log(`ok   ${name}: ${detail} (${time} s)`);
   else {
     failed = true;

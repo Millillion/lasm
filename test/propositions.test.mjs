@@ -59,6 +59,8 @@ test('check: dangling names, wrong or missing statements, untested and uncited c
       '// Proposition: Lasm.X.Spec.a', '//   ∀ n : Nat, n = 0',
       '// Proposition: Lasm.X.Spec.gone', '//   True',
       '// Proposition: Lasm.X.Spec.a', 'test("property: x", () => forAll(g, p));', ''].join('\n'));
+    put('test/fuzz/native/targets.json', '{}');
+    put('test/fuzz/native/LasmFuzz.lean', '');
     put('library/PROOFS.md', '# Proofs\n<!-- BEGIN CANDIDATES -->\n<!-- END CANDIDATES -->\n');
     execFileSync('git', ['init', '-q'], { cwd: root });
     const { problems } = check({ root });

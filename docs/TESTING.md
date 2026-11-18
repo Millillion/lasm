@@ -38,7 +38,7 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 | Upstream Lean suite | Lean's own tests, run through the installed package | `language-coverage-baseline.yml`, `nightly.yml` ([UPSTREAM_APPLICATION_TESTS.md](UPSTREAM_APPLICATION_TESTS.md)) | nightly, release |
 | Example apps | Conduit against the official RealWorld API and Playwright suites | `conduit.yml` | PR (paths) |
 | [Dependable tooling](#dependable-tooling) | Every user-triggerable error prints a clear message (error corpus); incremental, repeated, renamed and touched builds give the clean build's bytes (metamorphic); killed, offline, full-disk, read-only and corrupted runs end in success or a clear error (fault injection) | `scripts/tooling/`, `tooling.yml` | PR (corpus), nightly (all) |
-| [Fuzzing at boundaries](#fuzzing-at-the-boundaries) | Parsers and decoders never crash, hang or accept garbage: the CLI's arguments, tar archives, `lasm dev`'s proxy, project files, the edge entries' request mapping, the function platforms' HTTP mapping, the Lasm.UI patch decoder and its reading against Lean's decoder, the Lasm.JS value codec | `test/fuzz/`, `fuzz.yml` | PR (replay), nightly, weekly |
+| [Fuzzing at boundaries](#fuzzing-at-the-boundaries) | Parsers and decoders never crash, hang or accept garbage: the CLI's arguments, tar archives, `lasm dev`'s proxy, project files, the edge entries' request mapping, the function platforms' HTTP mapping, the Lasm.UI patch decoder and its reading against Lean's decoder, the Lasm.JS value codec (its JavaScript half against Lean's, and Lean's natively) | `test/fuzz/`, `fuzz.yml` | PR (replay), nightly, weekly |
 | [Model checking and schedule fuzzing](#deterministic-simulation-and-schedule-fuzzing) | The host bridge has no lost wake-ups, lost or doubly served requests, or deadlocks; the code follows the model | `verification/host-bridge/`, `scripts/bridge-fuzz/`, `bridge-verification.yml`, `lasm-js-stress.yml`, `test/node-js.test.mjs` | PR (paths), nightly, release |
 | [Deterministic simulation of the example apps](#deterministic-simulation-of-the-example-apps) | Tandem, Ledger and Porter keep their guarantees (no lost acknowledged edit, convergence, conservation of money, single-use codes and tokens, exact expiry) under simulated network, storage and clock faults; every failure replays from its seed | `scripts/sim/`, `examples/{tandem,ledger,porter}/Sim.lean` and `examples/*/test/dst/`, `tandem.yml`, `ledger.yml`, `porter.yml`, `dst-nightly.yml` | PR (paths, 30 fixed seeds), nightly (random seeds) |
 | Proofs | Lean theorems of Lasm.UI, Conduit, … (`#print axioms`) | `ui.yml`, `conduit.yml` | PR (paths), release |
@@ -882,6 +882,7 @@ where they are; these cover the libraries and hosts every app shares.
 | `project-files` | the project files Lasm reads itself: a Lean source's import header (`leanHeader`, the key of the build's reuse of Lake's configuration; `importClosure`, what `lasm dev` rebuilds after an edit), lake-manifest.json and lakefile.lean (`lakeConfigurationKey`), package.json (`edgeModules`, `supabaseFunctionName`, `fastlyName`) | JavaScript | against Lean's own header parser (`Lean.Elab.parseImports`, `test/fuzz/support/LeanHeaderModel.lean`, run with `lean --run` by `test/fuzz/support/lean-header-model.mjs`, required in CI): whenever Lean reads a header without error, `leanHeader` of the source has exactly its imports and `importClosure` reaches every imported file; a manifest is a key or no reuse, never a throw; package.json is read, or refused with a plain `Error` naming it (`Lasm.Cli.Candidates`: `lean_header_keeps_imports`, `import_closure_covers_imports`, `lake_key_total`, `package_readers_clear`). Lean 4.35 reads a header broken by a bare CR as no imports and no error, so texts with one have no verdict on `leanHeader` |
 | `edge-request` | the edge entries' request mapping (`src/edge/edge-build.mjs`): the Supabase entry's `route` (Supabase hands the function `/NAME/PATH`) and the Vercel Edge entry's `identity`, taken from the generated entries' text and run on Node's `Request` | JavaScript (every script's blocks count: the generated functions are `new Function` scripts) | `route` removes exactly the function's name from a path that is the name or starts with it and `/` (the name alone becomes `/`), keeping the origin, query, method, headers and body, and leaves any other request unchanged; `identity` changes nothing but Accept-Encoding (`Lasm.Cli.Candidates`: `supabase_route_strips_name`, `vercel_identity_drops_encoding`) |
 | `tar` | Lasm's tar reader and writer (`src/tar.mjs`): every tool archive, npm package and CI tree Lasm reads, and the Fastly package it writes | JavaScript | whatever Lasm's reader accepts, Python's `tarfile` accepts and reads as the same entries (paths, types, permission bits, sizes, link paths, each file's bytes); Lasm may only be stricter, and refuses with a plain `Invalid tar archive` error; what the writer writes, the reader reads back exactly. Inputs are raw archives (optionally with every expected header's checksum recomputed, to reach the fields behind it) or entries built from fields. Normalizations: trailing slashes, and no verdict for a non-POSIX header with a prefix field (tarfile joins it, POSIX and GNU tar do not). The oracle runs in one `python3 -I` process (`test/fuzz/support/tar-oracle.py`, required in CI) |
+| `lean-js-wire` | the Lasm.JS value codec's Lean half (`Wire` in `library/Lasm/JS/Core.lean`: `Wire.decodeWith` and `Wire.encode`) on arbitrary bytes, compiled natively | libFuzzer, ASan | the reader never panics or overruns: it refuses the bytes cleanly or reads a value; a value read is accepted by `encode`, the bytes `encode` writes are read back without error (`Lasm.JS.Spec.decode_encode`), and writing what was read back gives the same bytes |
 
 **Engines.** The JavaScript targets run in a worker under V8's block coverage
 (`node:inspector` `Profiler.takePreciseCoverage`, read after each run): an
@@ -898,17 +899,24 @@ and the ui-patch worker ran out of memory after about 50,000 runs (issue #160).
 Progress lines print the worker's heap. Jazzer.js
 was not used: it instruments CommonJS through Babel hooks and does not
 instrument ES modules, which all of Lasm's JavaScript is; fast-check is a
-property tester without coverage feedback. Until 0.9.0 three native targets
-fuzzed the removed HTTP library's Lean request parsing and its WASI and Fastly C
-hosts under libFuzzer (`test/fuzz/native/`, deleted with them, API decision
-A44); every target left is JavaScript. The pure request-path model they
-checked lives on in verification/cli (Lasm.RequestPath), with its candidates
-checked on generated URLs by `test/library-proofs/RequestPath.lean`.
+property tester without coverage feedback. The Lean targets are
+`test/fuzz/native/LasmFuzz.lean` compiled to C by the managed Lean 4.35.0 and
+linked with the C of the Lasm modules it imports, Lasm's native C glue and
+Lean's runtime, under libFuzzer (`test/fuzz/native/build.mjs`); a Lean panic
+fails the run (`lean_set_exit_on_panic`). This is coverage-guided fuzzing of
+the compiled Lean code itself, where Plausible would be random property
+testing; the Wasm build shares the same C. Until 0.9.0 three more native
+targets fuzzed the removed HTTP library's Lean request parsing and its WASI
+CGI and Fastly C hosts (deleted with them, API decisions A44 and A45); the
+pure request-path model they checked lives on in verification/cli
+(Lasm.RequestPath), with its candidates checked on generated URLs by
+`test/library-proofs/RequestPath.lean`.
 
 **Inputs.** `test/fuzz/corpus/<target>/` holds the seeds and the inputs past
 campaigns found interesting; `test/fuzz/regressions/<target>/` holds every
 input that ever failed, named after the bug. A campaign writes new corpus
-entries to `.work/fuzz/<target>/corpus/` and failing inputs to
+entries to `.work/fuzz/<target>/corpus/` (native targets also a minimized
+`merged/`, ready to replace the committed corpus) and failing inputs to
 `.work/fuzz/<target>/crashes/`. A failure found becomes a regression input and
 a fix, or an issue.
 
@@ -916,6 +924,7 @@ a fix, or an issue.
 
     node test/fuzz/run.mjs replay                       # every committed input, once (seconds)
     node test/fuzz/run.mjs fuzz --seconds 30 ui-patch   # a campaign; --seed N replays one
+    node test/fuzz/native/build.mjs                     # Linux, clang: the native targets
     node test/fuzz/support/serverless-model.mjs         # serverless-http's Lean model (used when prepared)
     node test/fuzz/support/ui-decode-model.mjs          # ui-decode's Lean decoder (used when prepared)
     node test/fuzz/support/js-wire-model.mjs            # lasm-js-wire's Lean half (used when prepared)
@@ -923,7 +932,9 @@ a fix, or an issue.
 
 **CI** ([fuzz.yml](../.github/workflows/fuzz.yml)): every pull request and push
 to `main` replays the committed corpus and regressions of the JavaScript
-targets (also `test/fuzz-replay.test.mjs` in the unit suite); nightly (02:23 UTC) a 10-minute campaign per target; weekly
+targets, and of the native targets when `library/`, the Lean provisioning or
+`test/fuzz/` change (also `test/fuzz-replay.test.mjs` in the unit suite);
+nightly (02:23 UTC) a 10-minute campaign per target; weekly
 (Saturday 06:41 UTC) a 60-minute campaign per target. A campaign fails on any
 failing input and uploads its new corpus entries and failing inputs (artifact
 `fuzz-<target>`, 30 days).

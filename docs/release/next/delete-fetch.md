@@ -31,4 +31,6 @@
   `test/library-proofs/RequestPath.lean`.
 - **Removed with it:** `examples/fetch` (its routes are `examples/fastly`'s and
   `examples/wasi-http`'s), `docs/FETCH.md`, the `fetch-example` target-equivalence app, and the
-  native libFuzzer targets `lean-fetch-request`, `wasi-cgi` and `fastly-host` with their build.
+  native libFuzzer targets `lean-fetch-request`, `wasi-cgi` and `fastly-host`. The native fuzz
+  harness stays, with a new target: `lean-js-wire` fuzzes the Lasm.JS value codec's Lean half
+  natively, checking the proved round trip (`Lasm.JS.Spec.decode_encode`) on every value it reads.
