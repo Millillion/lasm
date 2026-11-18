@@ -262,9 +262,6 @@
         {
           "lean": "verification/cli/Lasm/Cli/Model/CliArguments.lean",
           "functions": [
-            "asciiLower",
-            "editDistance",
-            "closest",
             "targetHint",
             "parseLasmArguments"
           ],
@@ -272,6 +269,22 @@
         }
       ],
       "reason": "the whole parser is modelled (run_args_kept, unknown_flag_refused, edit_distance_metric, closest_nearest_first, build_options_commute, parse_known_or_refused proved, the last with the parsers of lasm init, dev and package it hands to); existsSync is the environment and jsRuntime one of node, bun and deno"
+    },
+    "src/cli-names.mjs": {
+      "status": "modelled",
+      "models": [
+        {
+          "lean": "verification/cli/Lasm/Cli/Model/CliArguments.lean",
+          "functions": [
+            "asciiLower",
+            "editDistance",
+            "closest",
+            "targetHintAmong"
+          ],
+          "differential": "test/models/cli-differential.mjs"
+        }
+      ],
+      "reason": "the names and \"did you mean\" hints of every command: asciiLower, editDistance and closest are modelled with the parser (edit_distance_metric, closest_nearest_first proved); targetHintAmong is checked through the parsers of lasm init, dev and package that call it"
     },
     "src/dev-build-service.mjs": {
       "status": "exempt",
@@ -463,7 +476,7 @@
     },
     "src/lasm-modules/node-serve.mjs": {
       "status": "pending",
-      "reason": "Node.serve's node:http server and its req/res ↔ Request/Response translation (the plain-Host rule, joined Cookie lines, hop-by-hop fields, null-body statuses): a model of the translation is still due; tested by test/node-serve.test.mjs and the node-serve mutation module"
+      "reason": "Node.serve's node:http server and its req/res \u2194 Request/Response translation (the plain-Host rule, joined Cookie lines, hop-by-hop fields, null-body statuses): a model of the translation is still due; tested by test/node-serve.test.mjs and the node-serve mutation module"
     },
     "src/lasm-modules/ui-dom.mjs": {
       "status": "modelled",

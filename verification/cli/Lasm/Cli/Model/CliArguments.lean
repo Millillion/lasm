@@ -1,5 +1,5 @@
 /-
-# src/cli-arguments.mjs, in Lean: the command-line parser
+# src/cli-arguments.mjs and src/cli-names.mjs, in Lean: the command-line parser
 
 A model of the JavaScript, written to mirror it statement for statement,
 and checked against it on generated inputs by
@@ -9,10 +9,11 @@ Lasm.Cli.Theorems proves its propositions.
 | JavaScript (src/cli-arguments.mjs) | Lean |
 | --- | --- |
 | `buildTargets`, `suspendModes`, `fixedLayoutTargets`, `commandNames`, `cliUsage` | the definitions of the same names |
-| `targetAliases`, `targetHint(value)`, `targetHintAmong(value, candidates, option)` | `targetAliases`, `targetHint`, `targetHintAmong` |
-| `asciiLower(text)` | `asciiLower` |
-| `editDistance(a, b)` | `editDistance` (the row, `nextCells`) |
-| `closest(word, candidates)` | `closest` |
+| `targetHint(value)` | `targetHint` |
+| src/cli-names.mjs: `targetAliases`, `targetHintAmong(value, candidates, option)` | `targetAliases`, `targetHintAmong` |
+| src/cli-names.mjs: `asciiLower(text)` | `asciiLower` |
+| src/cli-names.mjs: `editDistance(a, b)` | `editDistance` (the row, `nextCells`) |
+| src/cli-names.mjs: `closest(word, candidates)` | `closest` |
 | `parseLasmArguments(argv)` | `parseLasmArgumentsWith` (the option loop, `optionLoop`; Interface.lean's `parseLasmArguments` is it with the imports) |
 
 What the module imports is a parameter, `ArgumentsEnv`: whether a file
@@ -76,7 +77,7 @@ def wasiBuildTargets : List String := ["wasi", "fastly", "wasi-http"]
 /-- `['node', ...Object.keys(packageTargets), ...edgeBuildTargets, ...wasiBuildTargets, 'browser']`:
 the keys of src/package.mjs `packageTargets` are written out. -/
 def buildTargets : List String :=
-  ["node"] ++ ["lambda", "lambda-edge", "vercel", "netlify", "azure", "gcf"] ++ edgeBuildTargets ++ wasiBuildTargets ++ ["browser"]
+  ["node"] ++ ["lambda", "lambda-edge", "vercel", "netlify", "azure-functions", "cloud-functions"] ++ edgeBuildTargets ++ wasiBuildTargets ++ ["browser"]
 def fixedLayoutTargets : List String := ["vercel-edge", "netlify-edge"]
 def suspendModes : List String := ["none", "jspi"]
 def commandNames : List String := ["build", "run", "dev", "init", "package", "editor", "cache"]
@@ -84,17 +85,17 @@ def commandNames : List String := ["build", "run", "dev", "init", "package", "ed
 def targetAliases : List (String × String) :=
   [("cloudflare", "workers"), ("cloudflare-workers", "workers"), ("worker", "workers"), ("aws", "lambda"), ("aws-lambda", "lambda"),
    ("cloudfront", "lambda-edge"), ("supabase", "supabase-edge"), ("deno-deploy-edge", "deno-deploy"), ("spin", "wasi-http"),
-   ("wasmtime", "wasi"), ("web", "browser"), ("vite", "browser"), ("azure-functions", "azure"), ("google-cloud-functions", "gcf"),
-   ("cloud-functions", "gcf"), ("vercel-functions", "vercel"), ("netlify-functions", "netlify"), ("lambda-zip", "lambda")]
+   ("wasmtime", "wasi"), ("web", "browser"), ("vite", "browser"), ("azure", "azure-functions"), ("gcf", "cloud-functions"),
+   ("google-cloud-functions", "cloud-functions"), ("cloud-run-functions", "cloud-functions"), ("vercel-functions", "vercel"), ("netlify-functions", "netlify"), ("lambda-zip", "lambda")]
 
 /-- The usage text: one literal in the JavaScript, two pieces here, so that a
 proof sees its first word without decoding the whole text. -/
 def cliUsage : String := "Usage:" ++ " lasm <Main.lean> [--release] [-- arguments…]
        lasm run <Main.lean> [--release] [-- arguments…]
        lasm dev [Main.lean] [--target TARGET[,TARGET…]] [--release] [--no-run] [-- arguments…]
-       lasm build <Main.lean> [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--output PATH] [--dev] [--allow-dev] [--suspend none|jspi] [--bundler]
+       lasm build <Main.lean> [--target node|lambda|lambda-edge|vercel|netlify|azure-functions|cloud-functions|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--output PATH] [--dev] [--allow-dev] [--suspend none|jspi] [--bundler]
        lasm init <directory> [--template NAME] [--deploy TARGET]…
-       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf|browser [--output PATH] [--allow-dev]
+       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure-functions|cloud-functions|browser [--output PATH] [--allow-dev]
        lasm editor [project-directory]
        lasm cache repair
 

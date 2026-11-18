@@ -1,7 +1,7 @@
 // Azure Functions and Google Cloud Functions with no cloud account:
 //   Azure: Azure Functions Core Tools `func start` (Node.js v4 programming
-//   model) on the `lasm package --target azure` app;
-//   Google: the Functions Framework on the `--target gcf` source directory,
+//   model) on the `lasm package --target azure-functions` app;
+//   Google: the Functions Framework on the `--target cloud-functions` source directory,
 //   and that directory built by Google Cloud's buildpacks (`pack build` with
 //   the google-24 builder, as Cloud Run functions build Node 24 sources), the
 //   image run with 512 MB.
@@ -47,23 +47,23 @@ async function serve(run, label, command, argv, options, port, framework) {
   }
 }
 
-for (const app of apps.filter(app => app.packages.azure || app.packages.gcf)) {
+for (const app of apps.filter(app => app.packages['azure-functions'] || app.packages['cloud-functions'])) {
   const run = { app: app.name, checks: [] };
   result.runs.push(run); save();
   const check = async (name, action) => {
     try { await action(); run.checks.push({ name, ok: true }); }
     catch (error) { run.checks.push({ name, ok: false, error: error.message.slice(0, 3000) }); }
   };
-  if (func && app.packages.azure) {
-    const directory = app.packages.azure.path;
+  if (func && app.packages['azure-functions']) {
+    const directory = app.packages['azure-functions'].path;
     await check('Azure Functions Core Tools func start', async () => {
       const port = await freePort();
       await serve(run, 'azure', func, ['start', '--port', String(port)], { cwd: directory,
         env: { ...process.env, FUNCTIONS_CORE_TOOLS_TELEMETRY_OPTOUT: '1' } }, port, app.framework);
     });
   }
-  if (app.packages.gcf) {
-    const directory = app.packages.gcf.path;
+  if (app.packages['cloud-functions']) {
+    const directory = app.packages['cloud-functions'].path;
     await check('Functions Framework (node, the runner\'s Ubuntu 24.04)', async () => {
       const port = await freePort();
       await serve(run, 'functionsFramework', process.execPath,

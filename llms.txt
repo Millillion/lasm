@@ -7,7 +7,7 @@ Key commands:
 - New project: `npm create @lasm@latest my-app -- --template <plain|express|hono|fastify|std-http|web|fetch|fullstack> [--deploy <target>]…`
 - Develop: `npm run dev` (= `lasm dev`: rebuild about 2 s after each save, restart, keep the last good build on errors)
 - Run a file: `npx @lasm/cli Main.lean [-- args]`; build: `npx @lasm/cli build Main.lean [--target <target>] [--output PATH]` (`--output` names what is deployed: `dist/` for `node`, the platform's own place, such as `lambda.zip` or `workers/`, for other targets)
-- Targets: node (default), lambda, lambda-edge, vercel, netlify, azure, gcf, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge, bun, deno, wasi, wasi-http, fastly, browser
+- Targets: node (default), lambda, lambda-edge, vercel, netlify, azure-functions, cloud-functions, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge, bun, deno, wasi, wasi-http, fastly, browser
 - Editor support for `import Lasm.*`: `npx lasm editor`; version for bug reports: `npx lasm --version`
 
 ## Getting started

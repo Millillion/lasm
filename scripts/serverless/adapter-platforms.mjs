@@ -250,12 +250,12 @@ Resources:
     front.close(); spawnSync('docker', ['rm', '-f', id]); rmSync(task, { recursive: true, force: true });
   }
 } else if (platform === 'azure') {
-  const output = packageApplication({ input: dist, target: 'azure', output: join(work, 'azure-functions') }).output;
+  const output = packageApplication({ input: dist, target: 'azure-functions', output: join(work, 'azure-functions') }).output;
   const port = await freePort();
   ok = await serving('func', ['start', '--port', String(port)], { cwd: output }, port,
     () => checkAll(`http://127.0.0.1:${port}`, 'Azure Functions: Core Tools func start'));
 } else if (platform === 'gcf') {
-  const output = packageApplication({ input: dist, target: 'gcf', output: join(work, 'gcf') }).output;
+  const output = packageApplication({ input: dist, target: 'cloud-functions', output: join(work, 'cloud-functions') }).output;
   const port = await freePort();
   ok = await serving(process.execPath, [join(output, 'node_modules/@google-cloud/functions-framework/build/src/main.js'), '--target=lasm', `--port=${port}`],
     { cwd: output }, port, () => checkAll(`http://127.0.0.1:${port}`, 'Google Cloud Functions: the Functions Framework'));
