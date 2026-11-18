@@ -596,6 +596,11 @@ before; Workers uses the default export (`Lasm.JS.exportDefault`, D1 from
   generated bindings follow the binding rules (A9–A12). Each has a migration
   note ([0.9.0-notes.md](release/0.9.0-notes.md)); the API decisions await
   sign-off per milestone.
+- [ ] **0.10.0's breaking changes (Stage 0's last release):** `Lasm.Fetch`
+  and `Lasm.KV` deleted (programs use each platform's own interface and store),
+  `--target azure-functions` and `cloud-functions`, `@lasm/cli`'s exports
+  narrowed with the new `@lasm/cli/lean`, and SQL NULL in the generated SQLite
+  bindings. Each has a migration note ([0.10.0-notes.md](release/0.10.0-notes.md)).
 
 ### Process
 - [ ] **The browser dev-rebuild budget is 2.5 s, was 2 s (2026-11-09).** It
