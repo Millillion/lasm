@@ -5,8 +5,8 @@ name: Fullstack
 # and wasi-http, each embedding the browser app), then tested end to end
 # (scripts/fullstack/fullstack-ci.mjs: server-side rendering, hydration, the
 # shared validation on both sides, the REST API) in headless Playwright
-# against every host, plus HTTP checks of the embedded assets and of Lasm.KV
-# persistence (scripts/fullstack/smoke.mjs): Node (Chromium, Firefox, WebKit),
+# against every host, plus HTTP checks of the embedded assets and of the
+# store's persistence (scripts/fullstack/smoke.mjs): Node (Chromium, Firefox, WebKit),
 # Workers under `wrangler dev` with a local KV namespace, Bun, Deno with Deno KV,
 # Fastly under Viceroy with a local KV Store, and wasmtime serve. `npm run dev`
 # (one URL, live reload, edit-to-reload time) is timed by
@@ -217,7 +217,7 @@ jobs:
         with:
           name: fullstack-app
           path: .work/app
-      - name: wrangler dev (local) with a local TODOS KV namespace, the end-to-end checks, then a restart (Lasm.KV kept the data)
+      - name: wrangler dev (local) with a local TODOS KV namespace, the end-to-end checks, then a restart (Workers KV kept the data)
         run: |
           cd .work/app
           # The template's wrangler.toml binds TODOS (Workers.lean's typed Env); wrangler dev keeps a local copy.

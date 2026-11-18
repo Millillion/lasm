@@ -28,7 +28,7 @@ test('build retains explicit output directories; binding configurations are not 
 
 test('build targets: node by default, or a function platform packaged after the build', () => {
   assert.equal(parseLasmArguments(['build', 'Main.lean']).target, 'node');
-  for (const target of ['node', 'lambda', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf']) {
+  for (const target of ['node', 'lambda', 'lambda-edge', 'vercel', 'netlify', 'azure-functions', 'cloud-functions']) {
     assert.equal(parseLasmArguments(['build', 'Main.lean', '--target', target]).target, target);
     assert.equal(parseLasmArguments(['build', `--target=${target}`, 'Main.lean', '--output', 'out']).target, target);
   }

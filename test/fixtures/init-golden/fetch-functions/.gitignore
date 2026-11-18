@@ -9,4 +9,4 @@ lambda-edge.zip
 .netlify/
 netlify/functions/lasm/
 azure-functions/
-gcf/
+cloud-functions/

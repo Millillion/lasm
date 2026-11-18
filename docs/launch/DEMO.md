@@ -42,7 +42,8 @@ published, record from a packed `launch` candidate.
   validation theorem and the server's use of it, `Lasm.RPC`'s two guarantees, and
   `Lasm.UI`'s diff. The JSON/HTTP transport, the DOM applier, Lasm itself and the
   browsers are tested, not proved.
-- The todos live in `Lasm.KV`: Workers KV, Deno KV or a Fastly KV Store where the
-  platform has one named `TODOS`, else memory. Say "in memory" for the local demo.
+- The todos live in the platform's own store, through its generated binding: Workers
+  KV (the Worker's `TODOS` binding), Deno KV, or the Fastly KV Store `TODOS`; on the
+  other targets, in memory. Say "in memory" for the local demo.
 - Never run `wrangler deploy` on camera with a real account unless that is the
   presenter's own deliberate choice. Lasm's own CI never deploys.

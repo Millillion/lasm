@@ -1,6 +1,8 @@
-# Both images (Dockerfile, deploy/lambda-image/Dockerfile) copy only the build
-# and Lasm's Lambda handler.
+# Both images (Dockerfile, deploy/lambda-image/Dockerfile) copy only a build
+# and Lasm's Lambda handler files.
 *
 !dist/server
+!dist/export
 !node_modules/@lasm/cli/src/serverless/lasm-lambda.mjs
-!node_modules/@lasm/cli/src/serverless/lasm-server.mjs
+!node_modules/@lasm/cli/src/serverless/lasm-function.mjs
+!node_modules/@lasm/cli/src/lasm-modules/node-serve.mjs

@@ -79,7 +79,6 @@ size_t lean_usize_add(size_t, size_t);
 lean_object* l___private_Lasm_JS_Core_0__Lasm_JS_hostCall(uint32_t, uint32_t, uint64_t, lean_object*);
 lean_object* l_String_quote(lean_object*);
 lean_object* l_Std_Format_pretty(lean_object*, lean_object*, lean_object*, lean_object*);
-lean_object* lean_st_mk_ref(lean_object*);
 uint8_t lean_nat_dec_le(lean_object*, lean_object*);
 uint8_t lean_string_memcmp(lean_object*, lean_object*, lean_object*, lean_object*, lean_object*);
 lean_object* l_Nat_reprFast(lean_object*);
@@ -126,6 +125,7 @@ lean_object* lean_io_promise_result_opt(lean_object*);
 lean_object* lean_task_map(lean_object*, lean_object*, lean_object*, uint8_t);
 lean_object* lean_task_pure(lean_object*);
 lean_object* lean_byte_array_copy_slice(lean_object*, lean_object*, lean_object*, lean_object*, lean_object*, uint8_t);
+lean_object* lean_st_mk_ref(lean_object*);
 lean_object* l_Lasm_JS_onEdge();
 lean_object* lean_st_ref_swap(lean_object*, lean_object*);
 uint8_t l_ByteArray_isEmpty(lean_object*);
@@ -517,8 +517,8 @@ static const lean_closure_object l___private_Lasm_Fetch_0__Lasm_Fetch_jsResponse
 static const lean_object* l___private_Lasm_Fetch_0__Lasm_Fetch_jsResponse___closed__0 = (const lean_object*)&l___private_Lasm_Fetch_0__Lasm_Fetch_jsResponse___closed__0_value;
 LEAN_EXPORT lean_object* l___private_Lasm_Fetch_0__Lasm_Fetch_jsResponse(lean_object*, lean_object*);
 LEAN_EXPORT lean_object* l___private_Lasm_Fetch_0__Lasm_Fetch_jsResponse___boxed(lean_object*, lean_object*, lean_object*);
-LEAN_EXPORT lean_object* l___private_Lasm_Fetch_0__Lasm_Fetch_initFn_00___x40_Lasm_Fetch_221885197____hygCtx___hyg_2_();
-LEAN_EXPORT lean_object* l___private_Lasm_Fetch_0__Lasm_Fetch_initFn_00___x40_Lasm_Fetch_221885197____hygCtx___hyg_2____boxed(lean_object*);
+LEAN_EXPORT lean_object* l___private_Lasm_Fetch_0__Lasm_Fetch_initFn_00___x40_Lasm_Fetch_2691014208____hygCtx___hyg_2_();
+LEAN_EXPORT lean_object* l___private_Lasm_Fetch_0__Lasm_Fetch_initFn_00___x40_Lasm_Fetch_2691014208____hygCtx___hyg_2____boxed(lean_object*);
 LEAN_EXPORT lean_object* l_Lasm_Fetch_platformEnv;
 LEAN_EXPORT lean_object* l_Lasm_Fetch_jsFetchHandler___lam__0(lean_object*);
 LEAN_EXPORT lean_object* l_Lasm_Fetch_jsFetchHandler___lam__0___boxed(lean_object*, lean_object*);
@@ -9817,7 +9817,7 @@ v_res_2868_ = l___private_Lasm_Fetch_0__Lasm_Fetch_jsResponse(v_method_2865_, v_
 return v_res_2868_;
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_Fetch_0__Lasm_Fetch_initFn_00___x40_Lasm_Fetch_221885197____hygCtx___hyg_2_(){
+LEAN_EXPORT lean_object* l___private_Lasm_Fetch_0__Lasm_Fetch_initFn_00___x40_Lasm_Fetch_2691014208____hygCtx___hyg_2_(){
 _start:
 {
 lean_object* v___x_2870_; lean_object* v___x_2871_; lean_object* v___x_2872_; 
@@ -9828,11 +9828,11 @@ lean_ctor_set(v___x_2872_, 0, v___x_2871_);
 return v___x_2872_;
 }
 }
-LEAN_EXPORT lean_object* l___private_Lasm_Fetch_0__Lasm_Fetch_initFn_00___x40_Lasm_Fetch_221885197____hygCtx___hyg_2____boxed(lean_object* v_a_2873_){
+LEAN_EXPORT lean_object* l___private_Lasm_Fetch_0__Lasm_Fetch_initFn_00___x40_Lasm_Fetch_2691014208____hygCtx___hyg_2____boxed(lean_object* v_a_2873_){
 _start:
 {
 lean_object* v_res_2874_; 
-v_res_2874_ = l___private_Lasm_Fetch_0__Lasm_Fetch_initFn_00___x40_Lasm_Fetch_221885197____hygCtx___hyg_2_();
+v_res_2874_ = l___private_Lasm_Fetch_0__Lasm_Fetch_initFn_00___x40_Lasm_Fetch_2691014208____hygCtx___hyg_2_();
 return v_res_2874_;
 }
 }
@@ -23568,7 +23568,7 @@ l_Lasm_Fetch_Response_notFound = _init_l_Lasm_Fetch_Response_notFound();
 lean_mark_persistent(l_Lasm_Fetch_Response_notFound);
 l___private_Lasm_Fetch_0__Lasm_Fetch_startsCookiePair___closed__1___boxed__const__1 = _init_l___private_Lasm_Fetch_0__Lasm_Fetch_startsCookiePair___closed__1___boxed__const__1();
 lean_mark_persistent(l___private_Lasm_Fetch_0__Lasm_Fetch_startsCookiePair___closed__1___boxed__const__1);
-res = l___private_Lasm_Fetch_0__Lasm_Fetch_initFn_00___x40_Lasm_Fetch_221885197____hygCtx___hyg_2_();
+res = l___private_Lasm_Fetch_0__Lasm_Fetch_initFn_00___x40_Lasm_Fetch_2691014208____hygCtx___hyg_2_();
 if (lean_io_result_is_error(res)) return res;
 l_Lasm_Fetch_platformEnv = lean_io_result_get_value(res);
 lean_mark_persistent(l_Lasm_Fetch_platformEnv);

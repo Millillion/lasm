@@ -1,25 +1,18 @@
-/- Conduit on Node and Deno with node:sqlite: `npm run build`, then `npm start` (DATABASE_PATH, PORT, HOST, JWT_SECRET).
-The same file is the Deno build (`npm run build:deno`) and, packaged, the Node function platforms
-(Lambda, Vercel, Netlify, Azure Functions, Google Cloud Functions: `npm run build:<platform>`). -/
+/- Conduit on Node with node:sqlite: `npm run build`, then `npm start` (DATABASE_PATH, PORT, HOST, JWT_SECRET).
+`Node.serve` (Lasm.JS.Node.Serve) serves it on $HOST (default every IPv4 address) and $PORT (default
+3000), and stops cleanly on SIGTERM and SIGINT. The same build runs in Docker (Dockerfile). The function
+platforms run `ServerFunction.lean`, Deno `ServerDeno.lean`. -/
 import Server.App
 import Server.Embed
-import Server.NodeServe
+import Server.JsServe
 import Server.NodeSqlite
+import Lasm.JS.Node.Serve
+open Lasm.JS
 
 /-- The browser app and its files (dist/public, from npm run build:client),
 embedded in the program so every target serves them. -/
 def assets : Conduit.Server.Web.Assets := embed_dir! "dist/public"
 
-/-- `DATABASE_PATH`, else `conduit.db` in the working directory, else (where
-that directory is read-only, as on function platforms) `conduit.db` in the
-temporary directory, which lasts only as long as the function's instance. -/
-def database : IO Conduit.Server.Sql := do
-  if let some path ← IO.getEnv "DATABASE_PATH" then return ← Conduit.Server.NodeSqlite.open path
-  try Conduit.Server.NodeSqlite.open "conduit.db"
-  catch e =>
-    let tmp := (← IO.getEnv "TMPDIR").getD "/tmp"
-    IO.eprintln s!"conduit.db cannot be opened here ({e}); using {tmp}/conduit.db"
-    Conduit.Server.NodeSqlite.open s!"{tmp}/conduit.db"
-
 def main : IO Unit := do
-  Conduit.Server.NodeServe.serve (← Conduit.Server.sqlHandler (← database) assets)
+  let handler ← Conduit.Server.sqlHandler (← Conduit.Server.NodeSqlite.openDefault) assets
+  Node.serve { fetch := Conduit.Server.JsServe.webHandler handler, hostname := ← IO.getEnv "HOST" }

@@ -11,7 +11,7 @@ test('the Async glue wraps the bind that the prebuilt library\'s C calls', () =>
   assert.equal(basename(asyncGlueSource), 'lasm_async.c');
   assert.ok(existsSync(asyncGlueSource));
   const name = wrap.slice('-Wl,--wrap='.length);
-  const kv = readFileSync(new URL('../library/prebuilt/lean-4.35.0/lib/lasm/c/Lasm/KV.c', import.meta.url), 'latin1');
-  assert.ok(kv.includes(name + '('));
+  const core = readFileSync(new URL('../library/prebuilt/lean-4.35.0/lib/lasm/c/Lasm/JS/Core.c', import.meta.url), 'latin1');
+  assert.ok(core.includes(name + '('));
   assert.match(readFileSync(asyncGlueSource, 'utf8'), new RegExp(`#define BIND ${name}\\n`));
 });

@@ -1,5 +1,5 @@
 # Conduit on AWS Lambda, .zip package (nodejs24.x), behind an API Gateway HTTP API.
-#   npm run build:lambda          (npm run build, then lasm package: lambda.zip)
+#   npm run build:lambda          (lasm build ServerFunction.lean --target lambda: lambda.zip)
 #   sam local start-api -t deploy/lambda/template.yaml --warm-containers EAGER --parameter-overrides JwtSecret=…
 #   sam deploy --guided -t deploy/lambda/template.yaml
 # The database is /tmp/conduit.db: it lasts as long as the function instance

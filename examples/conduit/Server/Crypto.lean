@@ -1,6 +1,7 @@
 /-
 Passwords and tokens with Web Crypto (`crypto.subtle`), which Node, Bun,
-Deno and Cloudflare Workers all provide, through `Lasm.JS`:
+Deno and Cloudflare Workers all provide, through the generated bindings
+(Lasm.JS.Web.Webcrypto):
 
 - passwords: PBKDF2-HMAC-SHA-256, 100,000 iterations (Workers' maximum),
   a 16-byte random salt per password, stored as
@@ -9,37 +10,29 @@ Deno and Cloudflare Workers all provide, through `Lasm.JS`:
   the user id as `sub`, as the spec's `Authorization: Token <jwt>` expects.
 -/
 import Lasm.JS
+import Lasm.JS.Web.Webcrypto
 import Lean.Data.Json
 import Conduit.SafeJson
 import Server.Base64
-open Lasm.JS Lean
+open Lasm.JS Lasm.JS.Web Lean
 
 namespace Conduit.Server.Crypto
 
 /-! ## Web Crypto -/
 
-def subtle : IO Value := do (← (← global).get "crypto").get "subtle"
+def subtle : IO SubtleCrypto := do (← crypto).subtle
 
+/-- `n` random bytes (`crypto.getRandomValues`). -/
 def randomBytes (n : Nat) : IO ByteArray := do
-  let g ← global
-  let arr ← (← g.get "Uint8Array").new #[toJS n]
-  let filled ← (← g.get "crypto").callMethod "getRandomValues" #[.ref arr ""] ByteArray
-  return filled
-
-/-- The bytes of an `ArrayBuffer`. -/
-def bufferBytes (buffer : Value) : IO ByteArray := do
-  (← (← global).get "Uint8Array").new #[.ref buffer ""] ByteArray
+  (← crypto).getRandomValues (ByteArray.mk (Array.replicate n 0))
 
 def iterations : Nat := 100000
 
 def pbkdf2 (password : String) (salt : ByteArray) (iters : Nat) : Async ByteArray := do
   let s ← subtle
-  let key ← s.callMethodAwait "importKey" #[toJS "raw", .bytes password.toUTF8, toJS "PBKDF2", toJS false,
-    .array #[toJS "deriveBits"]] Value
-  let bits ← s.callMethodAwait "deriveBits"
-    #[obj [("name", toJS "PBKDF2"), ("hash", toJS "SHA-256"), ("salt", .bytes salt), ("iterations", toJS iters)],
-      .ref key "", toJS 256] Value
-  bufferBytes bits
+  let key ← s.importKey .raw (.bufferSource password.toUTF8) (.domString "PBKDF2") false #[.deriveBits]
+  let params : Pbkdf2Params := { name := "PBKDF2", salt, iterations := iters, hash := .domString "SHA-256" }
+  s.deriveBits (.object (toJS params)) key (some 256)
 
 /-- Equal bytes, comparing every byte (no early exit). -/
 def sameBytes (a b : ByteArray) : Bool :=
@@ -58,9 +51,9 @@ def checkPassword (password stored : String) : Async Bool := do
     | _, _, _ => return false
   | _ => return false
 
-def hmacKey (secret : String) (usage : String) : Async Value := do
-  (← subtle).callMethodAwait "importKey" #[toJS "raw", .bytes secret.toUTF8,
-    obj [("name", toJS "HMAC"), ("hash", toJS "SHA-256")], toJS false, .array #[toJS usage]] Value
+def hmacKey (secret : String) (usage : KeyUsage) : Async CryptoKey := do
+  let params : HmacImportParams := { name := "HMAC", hash := .domString "SHA-256" }
+  (← subtle).importKey .raw (.bufferSource secret.toUTF8) (.object (toJS params)) false #[usage]
 
 def b64json (j : Json) : String := b64encode j.compress.toUTF8
 
@@ -71,8 +64,8 @@ def issueToken (secret : String) (id now : Nat) : Async String := do
   let header := b64json (Json.mkObj [("alg", "HS256"), ("typ", "JWT")])
   let payload := b64json (Json.mkObj [("sub", toString id), ("iat", (now : Int)), ("exp", ((now + tokenLifetime : Nat) : Int))])
   let input := s!"{header}.{payload}"
-  let sig ← (← subtle).callMethodAwait "sign" #[toJS "HMAC", .ref (← hmacKey secret "sign") "", .bytes input.toUTF8] Value
-  return s!"{input}.{b64encode (← bufferBytes sig)}"
+  let sig ← (← subtle).sign (.domString "HMAC") (← hmacKey secret .sign) input.toUTF8
+  return s!"{input}.{b64encode sig}"
 
 /-- The user id of a token whose signature verifies and that has not expired. -/
 def readToken (secret : String) (token : String) (now : Nat) : Async (Option Nat) := do
@@ -84,8 +77,7 @@ def readToken (secret : String) (token : String) (now : Nat) : Async (Option Nat
     (Conduit.parseJson text).toOption
   let some h := decodeJson header | return none
   unless (h.getObjValAs? String "alg").toOption == some "HS256" do return none
-  let ok ← (← subtle).callMethodAwait "verify" #[toJS "HMAC", .ref (← hmacKey secret "verify") "",
-    .bytes sigBytes, .bytes s!"{header}.{payload}".toUTF8] Bool
+  let ok ← (← subtle).verify (.domString "HMAC") (← hmacKey secret .verify) sigBytes s!"{header}.{payload}".toUTF8
   unless ok do return none
   let some p := decodeJson payload | return none
   let some exp := (p.getObjValAs? Nat "exp").toOption | return none

@@ -1,6 +1,7 @@
 /-
 Porter's cryptography, all from the platform's Web Crypto (`crypto.subtle`,
-which Node, Bun, Deno and Cloudflare Workers provide) through `Lasm.JS`;
+which Node, Bun, Deno and Cloudflare Workers provide) through Lasm.JS.Web's generated
+bindings (`Lasm.JS.Web.Webcrypto`);
 none of it is written in Lean (docs/DECISIONS.md):
 
 - SHA-256, for PKCE (S256), client secrets, and the hashes under which
@@ -15,28 +16,25 @@ none of it is written in Lean (docs/DECISIONS.md):
   thumbprint.
 -/
 import Lasm.JS
+import Lasm.JS.Json
+import Lasm.JS.Web.Webcrypto
 import Lean.Data.Json
 import Porter.Store
 import Porter.Text
-open Lasm.JS Lean
+open Lasm.JS Lasm.JS.Web Lean
 
 namespace Porter.Server.Crypto
 
-def subtle : IO Value := do (← (← global).get "crypto").get "subtle"
-
-def bufferBytes (buffer : Value) : IO ByteArray := do
-  (← (← global).get "Uint8Array").new #[.ref buffer ""] ByteArray
+def subtle : IO SubtleCrypto := do (← crypto).subtle
 
 def randomBytes (n : Nat) : IO ByteArray := do
-  let g ← global
-  let arr ← (← g.get "Uint8Array").new #[toJS n]
-  (← g.get "crypto").callMethod "getRandomValues" #[.ref arr ""] ByteArray
+  (← crypto).getRandomValues ⟨Array.replicate n 0⟩
 
 /-- 32 random bytes, base64url (43 characters). -/
 def fresh : IO String := do return Text.b64url (← randomBytes 32).toList
 
 def sha256Bytes (b : ByteArray) : Async ByteArray := do
-  bufferBytes (← (← subtle).callMethodAwait "digest" #[toJS "SHA-256", .bytes b] Value)
+  (← subtle).digest (.domString "SHA-256") b
 
 /-- SHA-256 of a string's UTF-8 bytes, base64url. -/
 def sha256 (s : String) : Async String := do return Text.b64url (← sha256Bytes s.toUTF8).toList
@@ -52,12 +50,9 @@ def sameBytes (a b : ByteArray) : Bool :=
 
 def pbkdf2 (password : String) (salt : ByteArray) (iters : Nat) : Async ByteArray := do
   let s ← subtle
-  let key ← s.callMethodAwait "importKey" #[toJS "raw", .bytes password.toUTF8, toJS "PBKDF2", toJS false,
-    .array #[toJS "deriveBits"]] Value
-  let bits ← s.callMethodAwait "deriveBits"
-    #[obj [("name", toJS "PBKDF2"), ("hash", toJS "SHA-256"), ("salt", .bytes salt), ("iterations", toJS iters)],
-      .ref key "", toJS 256] Value
-  bufferBytes bits
+  let key ← s.importKey .raw (.bufferSource password.toUTF8) (.domString "PBKDF2") false #[.deriveBits]
+  s.deriveBits (.object (obj [("name", toJS "PBKDF2"), ("hash", toJS "SHA-256"), ("salt", .bytes salt),
+    ("iterations", toJS iters)])) key (some 256)
 
 def iterations : Nat := 100000
 
@@ -80,28 +75,31 @@ def checkPassword (password stored : String) : Async Bool := do
 
 /-! ## Signing keys -/
 
-def algorithm : Alg → Data
-  | .ES256 => obj [("name", toJS "ECDSA"), ("namedCurve", toJS "P-256")]
-  | .EdDSA => obj [("name", toJS "Ed25519")]
+def algorithm : Alg → AlgorithmIdentifier
+  | .ES256 => .object (obj [("name", toJS "ECDSA"), ("namedCurve", toJS "P-256")])
+  | .EdDSA => .object (obj [("name", toJS "Ed25519")])
 
-def signAlgorithm : Alg → Data
-  | .ES256 => obj [("name", toJS "ECDSA"), ("hash", toJS "SHA-256")]
-  | .EdDSA => obj [("name", toJS "Ed25519")]
-
-def json : IO Value := do (← global).get "JSON"
+def signAlgorithm : Alg → AlgorithmIdentifier
+  | .ES256 => .object (obj [("name", toJS "ECDSA"), ("hash", toJS "SHA-256")])
+  | .EdDSA => .object (obj [("name", toJS "Ed25519")])
 
 /-- A new key pair's private key, as JWK JSON text. -/
 def generate (alg : Alg) : Async String := do
   let s ← subtle
-  let pair ← s.callMethodAwait "generateKey" #[algorithm alg, toJS true, .array #[toJS "sign", toJS "verify"]] Value
-  let jwk ← s.callMethodAwait "exportKey" #[toJS "jwk", .ref (← pair.get "privateKey") ""] Value
-  (← json).callMethod "stringify" #[.ref jwk ""] String
+  let .cryptoKeyPair pair ← s.generateKey (algorithm alg) true #[.sign, .verify]
+    | throw (IO.userError s!"Porter: generateKey {alg.name} gave one key, not a pair")
+  let some privateKey := pair.privateKey | throw (IO.userError "Porter: the key pair has no private key")
+  let .jsonWebKey jwk ← s.exportKey .jwk privateKey
+    | throw (IO.userError "Porter: exportKey jwk gave bytes")
+  -- The JWK as JSON text (Lasm.JS.Json: JavaScript data ↔ Lean's Json).
+  let json ← IO.ofExcept (FromJS.fromJS (toJS jwk) : Except String Json)
+  return json.compress
 
 /-- A private JWK (JSON text) imported for signing. -/
-def importPrivate (alg : Alg) (jwk : String) : Async Value := do
-  let parsed ← (← json).callMethod "parse" #[toJS jwk] Value
-  (← subtle).callMethodAwait "importKey" #[toJS "jwk", .ref parsed "", algorithm alg, toJS false, .array #[toJS "sign"]]
-    Value
+def importPrivate (alg : Alg) (jwk : String) : Async CryptoKey := do
+  let json ← IO.ofExcept (Json.parse jwk)
+  let key ← IO.ofExcept (FromJS.fromJS (toJS json) : Except String JsonWebKey)
+  (← subtle).importKey .jwk (.jsonWebKey key) (algorithm alg) false #[.sign]
 
 /-- The members of the public JWK, in RFC 7638's order for the thumbprint. -/
 def publicMembers (alg : Alg) (jwk : Json) : Except String (List (String × String)) := do
@@ -114,7 +112,7 @@ def publicMembers (alg : Alg) (jwk : Json) : Except String (List (String × Stri
 structure Key where
   alg : Alg
   kid : String
-  key : Value
+  key : CryptoKey
   publicJwk : String
 
 def loadKey (alg : Alg) (privateJwk : String) : Async Key := do
@@ -128,7 +126,7 @@ def loadKey (alg : Alg) (privateJwk : String) : Async Key := do
 
 /-- The signature of a JWS signing input, base64url. -/
 def sign (k : Key) (input : String) : Async String := do
-  let sig ← (← subtle).callMethodAwait "sign" #[signAlgorithm k.alg, .ref k.key "", .bytes input.toUTF8] Value
-  return Text.b64url (← bufferBytes sig).toList
+  let sig ← (← subtle).sign (signAlgorithm k.alg) k.key input.toUTF8
+  return Text.b64url sig.toList
 
 end Porter.Server.Crypto

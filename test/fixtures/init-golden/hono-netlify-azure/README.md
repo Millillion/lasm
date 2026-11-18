@@ -86,7 +86,7 @@ with your platform's own CLI (`vercel`, `netlify`, `func`, `gcloud`, `aws` or `s
 writes the function to `netlify/functions/lasm`; deploy with `netlify deploy --build`.
 See the [Netlify guide](https://github.com/Millillion/lasm/blob/main/docs/deploy/netlify.md).
 
-**Azure Functions:** `npm run build:azure` writes the function app to
+**Azure Functions:** `npm run build:azure-functions` writes the function app to
 `azure-functions/`; test it with `func start` there and publish with
 `func azure functionapp publish APP_NAME`. See the [Azure guide](https://github.com/Millillion/lasm/blob/main/docs/deploy/azure-functions.md).
 

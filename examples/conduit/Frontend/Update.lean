@@ -5,10 +5,10 @@ server (`Conduit/Validation.lean`) before anything is sent, and requests are
 encoded with the same functions the server decodes them with
 (`Conduit/Types.lean`).
 -/
-import Lasm.UI.Cmd
+import Frontend.Cmd
 import Conduit.Validation
 import Frontend.Model
-open Lean Lasm.UI
+open Lean
 
 namespace Conduit.Frontend
 

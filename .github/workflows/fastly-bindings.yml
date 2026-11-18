@@ -13,7 +13,6 @@ on:
     paths:
       - 'library/Lasm/Fastly/**'
       - 'library/Lasm/Fastly.lean'
-      - 'library/Lasm/KV.lean'
       - 'library/c/lasm_fastly.c'
       - 'library/prebuilt/**'
       - 'scripts/bindings/generate-fastly.mjs'

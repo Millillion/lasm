@@ -34,7 +34,7 @@ build tools.
 `npm run build:<target>` script:
 
 - **Serverless** (server templates): `lambda`, `lambda-container` (container image),
-  `lambda-edge`, `vercel`, `netlify`, `azure`, `gcf`.
+  `lambda-edge`, `vercel`, `netlify`, `azure-functions`, `cloud-functions`.
 - **Edge** (0.2.0): `workers`, `vercel-edge`, `netlify-edge`, `deno-deploy`
   (templates `hono`, `fetch`, `fullstack`), `supabase-edge` (`hono`).
 - **WebAssembly hosts** (0.3.0): `fastly`, `wasi-http`, `spin` (`fetch`,
