@@ -296,6 +296,14 @@ instance : ToJS EventModifierInit := ⟨fun d => Internal.fields #[("bubbles", I
   Lasm.JS.Binding.invoke UIEvent { name := "Lasm.JS.Web.UIEvent.new", module := "globalThis", path := "UIEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional UIEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def UIEvent.new? (type : String) (eventInitDict : Option UIEventInit := none) : IO (Option UIEvent) := Internal.api "Lasm.JS.Web.UIEvent.new?" do
+  if !(← Internal.hasGlobal ["UIEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke UIEvent { name := "Lasm.JS.Web.UIEvent.new?", module := "globalThis", path := "UIEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute Window? view` -/
 @[macro_inline] def UIEvent.view (self : UIEvent) : IO (Option Window) := Internal.api "Lasm.JS.Web.UIEvent.view" do
   self.val.get "view" (Option Window)
@@ -321,6 +329,14 @@ instance : ToJS EventModifierInit := ⟨fun d => Internal.fields #[("bubbles", I
   Lasm.JS.Binding.invoke CompositionEvent { name := "Lasm.JS.Web.CompositionEvent.new", module := "globalThis", path := "CompositionEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional CompositionEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CompositionEvent.new? (type : String) (eventInitDict : Option CompositionEventInit := none) : IO (Option CompositionEvent) := Internal.api "Lasm.JS.Web.CompositionEvent.new?" do
+  if !(← Internal.hasGlobal ["CompositionEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CompositionEvent { name := "Lasm.JS.Web.CompositionEvent.new?", module := "globalThis", path := "CompositionEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute USVString data` -/
 @[macro_inline] def CompositionEvent.data (self : CompositionEvent) : IO String := Internal.api "Lasm.JS.Web.CompositionEvent.data" do
   self.val.get "data" String
@@ -338,6 +354,14 @@ instance : ToJS EventModifierInit := ⟨fun d => Internal.fields #[("bubbles", I
   Lasm.JS.Binding.invoke FocusEvent { name := "Lasm.JS.Web.FocusEvent.new", module := "globalThis", path := "FocusEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional FocusEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def FocusEvent.new? (type : String) (eventInitDict : Option FocusEventInit := none) : IO (Option FocusEvent) := Internal.api "Lasm.JS.Web.FocusEvent.new?" do
+  if !(← Internal.hasGlobal ["FocusEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke FocusEvent { name := "Lasm.JS.Web.FocusEvent.new?", module := "globalThis", path := "FocusEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute EventTarget? relatedTarget` -/
 @[macro_inline] def FocusEvent.relatedTarget (self : FocusEvent) : IO (Option EventTarget) := Internal.api "Lasm.JS.Web.FocusEvent.relatedTarget" do
   self.val.get "relatedTarget" (Option EventTarget)
@@ -350,6 +374,14 @@ instance : ToJS EventModifierInit := ⟨fun d => Internal.fields #[("bubbles", I
 @[macro_inline] def InputEvent.new (type : String) (eventInitDict : Option InputEventInit := none) : IO InputEvent := Internal.api "Lasm.JS.Web.InputEvent.new" do
   Lasm.JS.Binding.invoke InputEvent { name := "Lasm.JS.Web.InputEvent.new", module := "globalThis", path := "InputEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, optional InputEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def InputEvent.new? (type : String) (eventInitDict : Option InputEventInit := none) : IO (Option InputEvent) := Internal.api "Lasm.JS.Web.InputEvent.new?" do
+  if !(← Internal.hasGlobal ["InputEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke InputEvent { name := "Lasm.JS.Web.InputEvent.new?", module := "globalThis", path := "InputEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute USVString? data` -/
 @[macro_inline] def InputEvent.data (self : InputEvent) : IO (Option String) := Internal.api "Lasm.JS.Web.InputEvent.data" do
@@ -371,6 +403,14 @@ instance : ToJS EventModifierInit := ⟨fun d => Internal.fields #[("bubbles", I
 @[macro_inline] def KeyboardEvent.new (type : String) (eventInitDict : Option KeyboardEventInit := none) : IO KeyboardEvent := Internal.api "Lasm.JS.Web.KeyboardEvent.new" do
   Lasm.JS.Binding.invoke KeyboardEvent { name := "Lasm.JS.Web.KeyboardEvent.new", module := "globalThis", path := "KeyboardEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, optional KeyboardEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def KeyboardEvent.new? (type : String) (eventInitDict : Option KeyboardEventInit := none) : IO (Option KeyboardEvent) := Internal.api "Lasm.JS.Web.KeyboardEvent.new?" do
+  if !(← Internal.hasGlobal ["KeyboardEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke KeyboardEvent { name := "Lasm.JS.Web.KeyboardEvent.new?", module := "globalThis", path := "KeyboardEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `const unsigned long DOM_KEY_LOCATION_STANDARD = 0x00` -/
 def KeyboardEvent.DOM_KEY_LOCATION_STANDARD : Nat := 0x00

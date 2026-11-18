@@ -109,4 +109,13 @@ instance : FromJS CustomMediaQuery where
   let r ← self.val.get "preferences" Value
   pure { val := r }
 
+/-- `readonly attribute PreferenceManager preferences` where the platform has it (`'preferences' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.preferences? (self' : Navigator) : IO (Option PreferenceManager) := Internal.api "Lasm.JS.Web.Navigator.preferences?" do
+  let self := self'
+  if !(← Internal.has self.val "preferences") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "preferences" Value
+    pure { val := r }
+  return some lasmGuarded
+
 end Lasm.JS.Web

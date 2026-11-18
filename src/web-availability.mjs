@@ -15,20 +15,49 @@ export function targetRuntime(target) {
     workers: 'workerd', 'vercel-edge': 'edge-light', 'netlify-edge': 'netlify' }[target ?? 'node'] ?? 'node';
 }
 
-/** The Lasm.JS.Web bindings (full Lean names) that these generated C texts call, unavailable somewhere. */
+/** The Lasm.JS.Web bindings (full Lean names) that these generated C texts call, unavailable somewhere, and the
+ * availability guards (`Lasm.JS.Web.Navigator.gpu?`, 0.3-11) they call. */
 export function referencedWebApis(texts, apis = loadTable().apis) {
   const found = new Set();
   // Lean's C has the name as `Internal.api` uses it, joined with its error's separator at compile time
-  // ("Lasm.JS.Web.Navigator.userAgent: "), and, for a global, static or constructor, as the binding record's name too.
-  for (const text of texts) for (const [, name] of text.matchAll(/"(Lasm\.JS\.Web\.[A-Za-z0-9_.']+)(?:: )?"/g)) if (apis[name]) found.add(name);
+  // ("Lasm.JS.Web.Navigator.userAgent: "), and, for a global, static or constructor, as the binding record's name too;
+  // a guard's `?` is escaped (`\?`) in C.
+  for (const text of texts) for (const [, name, guard] of text.matchAll(/"(Lasm\.JS\.Web\.[A-Za-z0-9_.']+)(\\?\?)?(?:: )?"/g)) {
+    const lean = guard ? name + '?' : name;
+    if (apis[lean] || guard && apis[name]) found.add(lean);
+  }
   return [...found].sort();
 }
 
-/** One message per referenced API that `target` lacks, naming the API, the target and where it is available. */
-export function webAvailabilityErrors(names, target, { apis, runtimes } = loadTable()) {
+/** The interface of a binding's full name (`Lasm.JS.Web.GPU.requestAdapter` → `GPU`); none for a global (`fetch`). */
+const ownerOf = lean => { const parts = lean.split('.'); return parts.length > 4 ? parts[3] : undefined; };
+
+/**
+ * The interfaces a program gets only through its availability guards (0.3-11): the result of each guarded binding
+ * (`Navigator.gpu?` gives a GPU), and what their unavailable members return in turn (GPUAdapter, GPUDevice, …).
+ * Their members need no guard of their own: without the API, the program never has such a value.
+ */
+export function guardedInterfaces(names, runtime, { apis, interfaces } = loadTable()) {
+  // Only interfaces the runtime lacks: a value of any other one the program may have from an unguarded API.
+  const lacking = t => (interfaces[t] ?? '').split(' ').includes(runtime);
+  const types = new Set(names.filter(n => n.endsWith('?')).map(n => apis[n.slice(0, -1)]?.[2]).filter(t => t && lacking(t)));
+  const byOwner = new Map();
+  for (const [lean, entry] of Object.entries(apis)) {
+    const owner = ownerOf(lean);
+    if (owner && entry[2]) byOwner.set(owner, [...(byOwner.get(owner) ?? []), entry[2]]);
+  }
+  for (const t of types) for (const next of byOwner.get(t) ?? []) if (lacking(next)) types.add(next);
+  return types;
+}
+
+/** One message per referenced API that `target` lacks, naming the API, the target and where it is available. A
+ * guard is never refused, nor a member of an interface only a guard gives (0.3-11). */
+export function webAvailabilityErrors(names, target, { apis, runtimes, interfaces = {} } = loadTable()) {
   const runtime = targetRuntime(target);
+  const guarded = guardedInterfaces(names, runtime, { apis, interfaces });
   const errors = [];
   for (const lean of names) {
+    if (lean.endsWith('?') || guarded.has(ownerOf(lean))) continue;
     const [path, missing] = apis[lean];
     const lacking = missing.split(' ');
     if (!lacking.includes(runtime)) continue;
@@ -44,7 +73,9 @@ export function assertWebAvailable(texts, target) {
   const errors = webAvailabilityErrors(referencedWebApis(texts), target);
   if (!errors.length) return;
   const error = new Error(`This program uses web APIs that --target ${target ?? 'node'} does not provide:\n  ${errors.join('\n  ')}\n`
-    + 'The availability comes from compatibility data (docs/JS_BINDINGS.md, "Availability per target"); use another target, or an API the target has.');
+    + 'The availability comes from compatibility data (docs/JS_BINDINGS.md, "Availability per target"). Use another target, '
+    + 'an API the target has, or the API\'s availability guard, which gives none where the platform lacks it '
+    + '(`if let some gpu ← (← navigator).gpu? then … else …`).');
   error.code = 'LASM_WEB_UNAVAILABLE';
   throw error;
 }

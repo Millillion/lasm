@@ -303,6 +303,14 @@ instance : ToJS PaymentDetailsBase := ⟨fun d => Internal.fields #[("displayIte
   Lasm.JS.Binding.invoke PaymentRequest { name := "Lasm.JS.Web.PaymentRequest.new", module := "globalThis", path := "PaymentRequest", construct := true, arity := 3 }
     (Internal.args #[toJS methodData, toJS details, Internal.optional options]) (await := false)
 
+/-- `constructor(sequence<PaymentMethodData> methodData, PaymentDetailsInit details, optional PaymentOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PaymentRequest.new? (methodData : Array PaymentMethodData) (details : PaymentDetailsInit) (options : Option PaymentOptions := none) : IO (Option PaymentRequest) := Internal.api "Lasm.JS.Web.PaymentRequest.new?" do
+  if !(← Internal.hasGlobal ["PaymentRequest"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PaymentRequest { name := "Lasm.JS.Web.PaymentRequest.new?", module := "globalThis", path := "PaymentRequest", construct := true, arity := 3 }
+      (Internal.args #[toJS methodData, toJS details, Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString id` -/
 @[macro_inline] def PaymentRequest.id (self : PaymentRequest) : IO String := Internal.api "Lasm.JS.Web.PaymentRequest.id" do
   self.val.get "id" String
@@ -364,6 +372,14 @@ instance : ToJS PaymentDetailsBase := ⟨fun d => Internal.fields #[("displayIte
 @[macro_inline] def PaymentRequestUpdateEvent.new (type : String) (eventInitDict : Option PaymentRequestUpdateEventInit := none) : IO PaymentRequestUpdateEvent := Internal.api "Lasm.JS.Web.PaymentRequestUpdateEvent.new" do
   Lasm.JS.Binding.invoke PaymentRequestUpdateEvent { name := "Lasm.JS.Web.PaymentRequestUpdateEvent.new", module := "globalThis", path := "PaymentRequestUpdateEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, optional PaymentRequestUpdateEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PaymentRequestUpdateEvent.new? (type : String) (eventInitDict : Option PaymentRequestUpdateEventInit := none) : IO (Option PaymentRequestUpdateEvent) := Internal.api "Lasm.JS.Web.PaymentRequestUpdateEvent.new?" do
+  if !(← Internal.hasGlobal ["PaymentRequestUpdateEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PaymentRequestUpdateEvent { name := "Lasm.JS.Web.PaymentRequestUpdateEvent.new?", module := "globalThis", path := "PaymentRequestUpdateEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `undefined updateWith(Promise<PaymentDetailsUpdate> detailsPromise)` -/
 @[macro_inline] def PaymentRequestUpdateEvent.updateWith (self : PaymentRequestUpdateEvent) (detailsPromise : Value) : IO Unit := Internal.api "Lasm.JS.Web.PaymentRequestUpdateEvent.updateWith" do
@@ -433,6 +449,14 @@ instance : ToJS PaymentDetailsBase := ⟨fun d => Internal.fields #[("displayIte
 @[macro_inline] def PaymentMethodChangeEvent.new (type : String) (eventInitDict : Option PaymentMethodChangeEventInit := none) : IO PaymentMethodChangeEvent := Internal.api "Lasm.JS.Web.PaymentMethodChangeEvent.new" do
   Lasm.JS.Binding.invoke PaymentMethodChangeEvent { name := "Lasm.JS.Web.PaymentMethodChangeEvent.new", module := "globalThis", path := "PaymentMethodChangeEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, optional PaymentMethodChangeEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PaymentMethodChangeEvent.new? (type : String) (eventInitDict : Option PaymentMethodChangeEventInit := none) : IO (Option PaymentMethodChangeEvent) := Internal.api "Lasm.JS.Web.PaymentMethodChangeEvent.new?" do
+  if !(← Internal.hasGlobal ["PaymentMethodChangeEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PaymentMethodChangeEvent { name := "Lasm.JS.Web.PaymentMethodChangeEvent.new?", module := "globalThis", path := "PaymentMethodChangeEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString methodName` -/
 @[macro_inline] def PaymentMethodChangeEvent.methodName (self : PaymentMethodChangeEvent) : IO String := Internal.api "Lasm.JS.Web.PaymentMethodChangeEvent.methodName" do

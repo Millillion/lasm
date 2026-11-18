@@ -194,6 +194,14 @@ instance : FromJS HandwritingRecognizerQueryResult where
   Lasm.JS.Binding.invoke HandwritingStroke { name := "Lasm.JS.Web.HandwritingStroke.new", module := "globalThis", path := "HandwritingStroke", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def HandwritingStroke.new? : IO (Option HandwritingStroke) := Internal.api "Lasm.JS.Web.HandwritingStroke.new?" do
+  if !(← Internal.hasGlobal ["HandwritingStroke"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke HandwritingStroke { name := "Lasm.JS.Web.HandwritingStroke.new?", module := "globalThis", path := "HandwritingStroke", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `undefined addPoint(HandwritingPoint point)` -/
 @[macro_inline] def HandwritingStroke.addPoint (self : HandwritingStroke) (point : HandwritingPoint) : IO Unit := Internal.api "Lasm.JS.Web.HandwritingStroke.addPoint" do
   self.val.callMethod "addPoint" (Internal.args #[toJS point]) Unit

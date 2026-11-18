@@ -36,8 +36,7 @@ cd my-app && npm install && npm run dev
   processes, and without files except on WASI. The rest of Lean works.
 - **Lean code can call JavaScript and npm packages** with `Lasm.JS`, one
   `@[js]` line per function. It also comes with libraries for HTTP handlers
-  (`Lasm.Fetch`), browser apps (`Lasm.UI`), typed client/server APIs
-  (`Lasm.RPC`) and more.
+  (`Lasm.Fetch`), and browser apps (`Lasm.UI`).
 - **The flagship example is [Conduit](../../examples/conduit),** the RealWorld
   app written entirely in Lean. It comes with 294 theorems about the code
   that runs ([PROOFS.md](../../examples/conduit/PROOFS.md)), and it passes

@@ -34,8 +34,24 @@ instance : ToJS ShareData := ⟨fun d => Internal.fields #[("files", Internal.op
 @[macro_inline] def Navigator.share (self : Navigator) (data : Option ShareData := none) : Async Unit := Internal.api "Lasm.JS.Web.Navigator.share" do
   self.val.callMethodAwait "share" (Internal.args #[Internal.optional data]) Unit
 
+/-- `Promise<undefined> share(optional ShareData data)` where the platform has it (`'share' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.share? (self' : Navigator) (data : Option ShareData := none) : Async (Option Unit) := Internal.api "Lasm.JS.Web.Navigator.share?" do
+  let self := self'
+  if !(← Internal.has self.val "share") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "share" (Internal.args #[Internal.optional data]) Unit
+  return some lasmGuarded
+
 /-- `boolean canShare(optional ShareData data)` -/
 @[macro_inline] def Navigator.canShare (self : Navigator) (data : Option ShareData := none) : IO Bool := Internal.api "Lasm.JS.Web.Navigator.canShare" do
   self.val.callMethod "canShare" (Internal.args #[Internal.optional data]) Bool
+
+/-- `boolean canShare(optional ShareData data)` where the platform has it (`'canShare' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.canShare? (self' : Navigator) (data : Option ShareData := none) : IO (Option Bool) := Internal.api "Lasm.JS.Web.Navigator.canShare?" do
+  let self := self'
+  if !(← Internal.has self.val "canShare") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "canShare" (Internal.args #[Internal.optional data]) Bool
+  return some lasmGuarded
 
 end Lasm.JS.Web

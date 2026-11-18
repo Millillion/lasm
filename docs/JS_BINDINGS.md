@@ -469,7 +469,7 @@ def notFound : IO Value := do
 `Lasm.JS.Web` is the **whole web platform**: every interface, namespace,
 dictionary and member of the WebIDL in the pinned `@webref/idl` (w3c/webref's
 curated IDL of every web spec). It is generated as it is, with no list of
-APIs, from more than 300 specs and about 1,150 interfaces. Status: **current source, not yet released**
+APIs, from more than 300 specs and about 1,150 interfaces. Status: **released in 0.9.0**
 (decision 0.3-1, Jordan, 2026-11-16).
 
 There is **one module per spec**, named from the spec's shortname by the
@@ -494,6 +494,14 @@ Lasm.JS.Web.IndexedDB (first use)…` (decision 0.3-6). In a Lake project,
 Lake builds it, in the editor too ([GETTING_STARTED.md](GETTING_STARTED.md#editor),
 decision 0.3-7). For that reason there is no umbrella `import Lasm.JS.Web`: it
 would compile every spec (0.3-18).
+
+**Forgot an import?** The build says which: a name a generated module defines,
+used without its import, gets the import to add under Lean's error (decision 0.3-20):
+
+```
+Main.lean:4:12: error: Unknown identifier `fetch`
+hint: fetch is defined in Lasm.JS.Web.Fetch; add: import Lasm.JS.Web.Fetch
+```
 
 ```lean
 import Lasm.JS.Web.Fetch
@@ -599,6 +607,37 @@ error: This program uses web APIs that --target workers does not provide:
 
 **Function platforms** (`lambda`, `vercel`, `netlify`, …) run on Node.
 
+**Feature detection: the availability guard** (decision 0.3-11). Where a
+target lacks an API, use its guard, `X?`: it is JavaScript's `'gpu' in
+navigator`, checked when the program runs, and it gives the typed value where
+the platform has the API and `none` where it does not:
+
+```lean
+import Lasm.JS.Web.Html
+import Lasm.JS.Web.Webgpu
+open Lasm.JS Lasm.JS.Web
+
+def describeGpu : IO String := do
+  if let some gpu ← (← navigator).gpu? then
+    return s!"WebGPU, preferred format {(← gpu.getPreferredCanvasFormat).val}"
+  else
+    return "no WebGPU: drawing with the 2D canvas"
+```
+
+- **Which bindings have one.** Every binding that some supported runtime lacks
+  and that a program reaches on its own: a global (`fetchLater?`), a namespace
+  member, a static member (`URL.parse?`), a constructor (`URLPattern.new?`),
+  or an instance member that some runtimes of its interface lack
+  (`Navigator.gpu?`). The members of an interface only a guard gives (GPU's,
+  GPUAdapter's, …) need none: the program has such a value only where the
+  guard found the API.
+- **What `lasm build --target` allows.** A guard is never refused. Neither is a
+  member of an interface the target lacks that the program gets only through a
+  guard: `gpu.getPreferredCanvasFormat` above builds for `--target node`, and
+  runs the `else` branch there. The same calls without the guard are refused.
+- **Checks:** the guard runs `Reflect.has` on the object (`'gpu' in
+  navigator`), or on each step of a global's path (`'parse' in URL`).
+
 **How an API is looked up.** The most specific path the data lists decides
 (`api.Element.append`, then `api.Element`). A path the data does not list is
 treated as unavailable.
@@ -615,7 +654,11 @@ names the binding in any error it raises. So the program's generated C holds
 that name as a string literal.
 [`src/web-availability.mjs`](../src/web-availability.mjs) finds those names
 and looks each up in `library/Lasm/JS/Web/availability.json`, which the
-generator writes from the data.
+generator writes from the data. A guard's name ends in `?`
+(`"Lasm.JS.Web.Navigator.gpu?"`), and its binding records are renamed too, so
+the C of a guarded call never holds the unguarded name. The table also records
+the interface each binding returns and the interfaces each runtime lacks, from
+which the check finds what only a guard gives.
 
 ### How a WebIDL declaration becomes Lean
 
@@ -1396,8 +1439,8 @@ review the diff of the IDL files.
 `Lasm.JS.Deno` is **the whole `Deno` namespace** of Deno 2.9.6, generated
 from Deno's own TypeScript declarations (`cli/tsc/dts/lib.deno.ns.d.ts`,
 `lib.deno_net.d.ts`, and Deno KV and `Deno.cron` from `lib.deno.unstable.d.ts`):
-every function, constant and class, and every type they use. Status: **current
-source, not yet released** (Stage 0, milestone 0.4; docs/API_DECISIONS.md 0.4-5,
+every function, constant and class, and every type they use. Status: **released
+in 0.9.0** (Stage 0, milestone 0.4; docs/API_DECISIONS.md 0.4-5,
 0.4-7, 0.4-9, 0.4-10 to 0.4-15). It runs with `--target deno` and `--target deno-deploy`.
 A program imports the modules whose members it calls (`import Lasm.JS.Deno.Kv`);
 there is no `import Lasm.JS.Deno` (0.4-21). The modules ship as source and compile
@@ -1542,7 +1585,7 @@ three declaration files.
 `s3.d.ts`, `shell.d.ts`, `security.d.ts`, `fetch.d.ts`, `wasm.d.ts`) by the same
 generator and rules as [Lasm.JS.Deno](#how-denos-declarations-become-lean). Web
 types Bun declares again (`Request`, `Response`, `WebSocket`, `Blob`, streams) are
-Lasm.JS.Web's. Status: **current source, not yet released** (Stage 0, milestone
+Lasm.JS.Web's. Status: **released in 0.9.0** (Stage 0, milestone
 0.4; docs/API_DECISIONS.md 0.4-4, 0.4-7, 0.4-8, A24.1, 0.4-17.x). A program
 imports the modules whose members it calls (`import Lasm.JS.Bun.Sqlite`); there is
 no `import Lasm.JS.Bun` (0.4-21). The modules ship as source and compile on the
@@ -1620,7 +1663,7 @@ objects. [examples/bun-sqlite](../examples/bun-sqlite) is a todo API on
 one module per area) gives typed bindings of the runtime APIs of Cloudflare
 Workers, **generated from Cloudflare's own TypeScript declarations**
 (`@cloudflare/workers-types` 5.20261019.1, the declarations of the workerd that
-CI's wrangler 4.152.0 runs). Status: **current source, not yet released** (tier
+CI's wrangler 4.152.0 runs). Status: **released in 0.9.0** (tier
 3 of the standard bindings). It covers what a Worker's `env` holds and what its
 handlers receive:
 

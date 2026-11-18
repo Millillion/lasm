@@ -66,4 +66,12 @@ instance : ToJS DigitalCredentialCreationOptions := ⟨fun d => Internal.fields 
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.DigitalCredential.userAgentAllowsProtocol", module := "globalThis", path := "DigitalCredential.userAgentAllowsProtocol", construct := false, arity := 1 }
     (Internal.args #[toJS protocol]) (await := false)
 
+/-- `static boolean userAgentAllowsProtocol(DOMString protocol)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DigitalCredential.userAgentAllowsProtocol? (protocol : String) : IO (Option Bool) := Internal.api "Lasm.JS.Web.DigitalCredential.userAgentAllowsProtocol?" do
+  if !(← Internal.hasGlobal ["DigitalCredential", "userAgentAllowsProtocol"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.DigitalCredential.userAgentAllowsProtocol?", module := "globalThis", path := "DigitalCredential.userAgentAllowsProtocol", construct := false, arity := 1 }
+      (Internal.args #[toJS protocol]) (await := false)
+  return some lasmGuarded
+
 end Lasm.JS.Web

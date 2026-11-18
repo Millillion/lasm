@@ -105,6 +105,14 @@ instance : FromJS ProfilerTrace where
   Lasm.JS.Binding.invoke Profiler { name := "Lasm.JS.Web.Profiler.new", module := "globalThis", path := "Profiler", construct := true, arity := 1 }
     (Internal.args #[toJS options]) (await := false)
 
+/-- `constructor(ProfilerInitOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Profiler.new? (options : ProfilerInitOptions) : IO (Option Profiler) := Internal.api "Lasm.JS.Web.Profiler.new?" do
+  if !(← Internal.hasGlobal ["Profiler"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Profiler { name := "Lasm.JS.Web.Profiler.new?", module := "globalThis", path := "Profiler", construct := true, arity := 1 }
+      (Internal.args #[toJS options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMHighResTimeStamp sampleInterval` -/
 @[macro_inline] def Profiler.sampleInterval (self : Profiler) : IO Float := Internal.api "Lasm.JS.Web.Profiler.sampleInterval" do
   self.val.get "sampleInterval" Float

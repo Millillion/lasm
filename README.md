@@ -51,7 +51,7 @@ files, except on WASI); the rest of Lean works.
 
 | Fact | Value |
 | --- | --- |
-| Current version | `@lasm/cli` 0.8.0 ([release notes](docs/release/)); `npm view @lasm/cli version` |
+| Current version | `@lasm/cli` 0.9.0 ([release notes](docs/release/)); `npm view @lasm/cli version` |
 | Install | `npm install -D @lasm/cli` (bin: `lasm`), or no install: `npx @lasm/cli …`; new project: `npm create @lasm@latest` |
 | Lean | exactly **4.35.0** (`lean-toolchain`: `leanprover/lean4:v4.35.0`); Lasm installs it, and you need no elan to build |
 | Develop on | Linux x64/arm64 (glibc 2.34+), macOS x64/arm64, Windows x64 |
@@ -59,7 +59,7 @@ files, except on WASI); the rest of Lean works.
 | Output | `dist/` with `program.wasm` + a JS launcher (Node); or a platform package (`--target …`) |
 | Node apps run on | Node ≥ 24, Linux x64/arm64 (glibc 2.28+ or musl) from any build machine, plus the build machine's own OS; ≥ 512 MB memory |
 | JS/npm interop | `import Lasm.JS`; one `@[js "pkg" "export"]` line per function you call; no premade bindings ([guide](docs/JS_BINDINGS.md)) |
-| Frameworks in Lean | `Lasm.Fetch` (HTTP, every server target), `Lasm.UI` (browser, Elm architecture, proved diff), `Lasm.RPC` (typed client/server API), `Lasm.KV`; `Lasm.JS.Web` (the standard web APIs of every JavaScript target, generated from WebIDL), `Lasm.JS.Node` (Node's fs, path, os, process, crypto, child_process, generated from Node's docs), `Lasm.JS.Cloudflare` (Workers KV, D1, R2, Durable Objects, Queues, cron and queue handlers, generated from `@cloudflare/workers-types`); `Lasm.Fastly` (Fastly Compute's host ABI, generated from its witx) and `Lasm.WASI.Http` (the wasi:http proxy world, generated from the WASI WIT); source, not yet released |
+| Frameworks in Lean | `Lasm.Fetch` (HTTP, every server target), `Lasm.UI` (browser, Elm architecture, proved diff), `Lasm.KV`; `Lasm.JS.Web` (the standard web APIs of every JavaScript target, generated from WebIDL), `Lasm.JS.Node` (Node's fs, path, os, process, crypto, child_process, generated from Node's docs), `Lasm.JS.Cloudflare` (Workers KV, D1, R2, Durable Objects, Queues, cron and queue handlers, generated from `@cloudflare/workers-types`); `Lasm.Fastly` (Fastly Compute's host ABI, generated from its witx) and `Lasm.WASI.Http` (the wasi:http proxy world, generated from the WASI WIT); source, not yet released |
 | Not available at run time | elaboration, `#eval`-style evaluation, loading `.olean`, Lean's kernel ([exact list](#lean-support-and-restrictions)); all of these work at build time |
 | License | MIT (Lasm); templates, examples and README code samples also MIT-0 |
 | Repository / issues | https://github.com/Millillion/lasm · [report a bug](https://github.com/Millillion/lasm/issues/new?template=bug.yml) (include `npx lasm --version`) |
@@ -220,9 +220,10 @@ npm run build && npm start                    # Node; also build:workers, build:
 
 ## The whole stack in Lean, verified
 
-The `fullstack` template is one Lean project with a server (`Lasm.Fetch`), a
-browser app (`Lasm.UI`) and the API between them (`Lasm.RPC`). The rule a request
-must satisfy is written and proved once, in `Shared.lean`, which both sides import
+The `fullstack` template is one Lean project with a server (`Node.serve` on Node,
+the default export elsewhere), a browser app (`Lasm.UI`) and a plain REST API
+between them (`/api/todos`). The rule a request must satisfy is written and
+proved once, in `Shared.lean`, which both sides import
 ([templates/fullstack](templates/fullstack)):
 
 ```lean
@@ -243,27 +244,31 @@ theorem checkTitle_ok {title : String} (h : checkTitle title = .ok ()) :
     · simp [h0, h1] at h
     · omega
 
-def addTodo : Endpoint NewTodo Todo := { name := "addTodo", validate := fun r => checkTitle r.title }
+/-- A title that passed `checkTitle`, with the proof. -/
+abbrev ValidTitle := { title : String // checkTitle title = .ok () }
 ```
 
 ```lean
--- Server.lean: storing a todo demands the proof that its title passed the check,
--- and `addTodo.serve` hands the handler that proof (`ok`) after re-validating.
-def Store.add (s : Store) (title : String) (_ : checkTitle title = .ok ()) : Store × Todo :=
-  let t := { id := s.next, title := clean title, done := false }
+-- Site.lean: storing a todo demands a ValidTitle (the title and the proof that
+-- it passed the check); POST /api/todos re-validates the body to get one.
+def Store.add (s : Store) (title : ValidTitle) : Store × Todo :=
+  let t := { id := s.next, title := clean title.val, done := false }
   ({ todos := s.todos.push t, next := s.next + 1 }, t)
 
-  addTodo.serve fun req ok => do
-    let (s, t) := (← load kv).add req.title ok
-    save kv s
-    return .ok t
+  | "POST", ["api", "todos"] => some do
+    match decodeJson (α := NewTodo) req.text >>= fun r => ValidTitle.check r.title with
+    | .error e => return failure 400 e
+    | .ok title =>
+      let (s, t) := (← load kv).add title
+      save kv s
+      return json t 201
 ```
 
 ```lean
 -- Client.lean: a theorem about the browser app: it never sends an invalid title.
 theorem add_invalid (m : Model) (e : String) (h : checkTitle m.draft = .error e) :
-    (update .add m).2.effects = [.msg (.added (.error (.invalid e)))] :=
-  addTodo.call_invalid { title := m.draft } Msg.added "" e h
+    (update .add m).2.effects = [.msg (.added (.error e))] := by
+  simp [update, h, Cmd.send, Cmd.ofEffect]
 ```
 
 **Where proofs live and how they are checked.**
@@ -271,7 +276,6 @@ theorem add_invalid (m : Model) (e : String) (h : checkTitle m.draft = .error e)
 | Proof | Where | Checked by |
 | --- | --- | --- |
 | Your theorems (like `checkTitle_ok`, `add_invalid`) | your `.lean` files | every `lasm build`/`lasm dev` (Lean elaborates them; a broken proof is a build error); pure modules also with `lake build` |
-| `Lasm.RPC`: the handler only runs on requests that pass `validate` (`Endpoint.decodeRequest_valid`); the client never sends one that fails it (`Endpoint.call_invalid`) | [library/Lasm/RPC](library/Lasm/RPC) | compiled into Lasm's library on every build |
 | `Lasm.UI`: the DOM diff is correct against a DOM model, keyed moves included (`diff_correct`, `mount_correct`, `session_correct`) | [library/Lasm/UI/Proofs](library/Lasm/UI/Proofs) (about 1,260 lines, no `sorry`, standard axioms only) | `node scripts/ui/lean-tests.mjs` in a checkout (CI: `ui.yml`) |
 | Conduit: 52 proved propositions (307 theorems) about authorization, follows, favorites, slugs, pagination, shared validation, JSON round trips and Markdown link safety | [examples/conduit/Proofs](examples/conduit/Proofs), listed in [PROOFS.md](examples/conduit/PROOFS.md) | `npm run proofs` in `examples/conduit` (no `sorry`, standard axioms only; CI `conduit.yml`) |
 | TodoMVC: every reachable model is valid | [examples/ui/todomvc/Todo.lean](examples/ui/todomvc/Todo.lean) | `lasm build`; CI `ui.yml` |
@@ -279,7 +283,7 @@ theorem add_invalid (m : Model) (e : String) (h : checkTitle m.draft = .error e)
 Not proved, tested in CI instead: the JSON/HTTP transport between client and
 server, the JavaScript that applies patches to the real DOM, the Lasm compiler and
 runtime, and the browsers. Lean's own compiler is trusted, as in any Lean program
-([UI.md](docs/UI.md#what-is-proved), [RPC.md](docs/RPC.md#what-is-proved)).
+([UI.md](docs/UI.md#what-is-proved)).
 
 ## Calling JavaScript and npm from Lean
 
@@ -396,7 +400,7 @@ is slower than native Lean (no GMP).
 - **Guides:** [servers and npm interop](docs/JS_BINDINGS.md) ·
   [serverless and containers](docs/deploy/README.md) · [edge](docs/EDGE.md) ·
   [Bun and Deno](docs/BUN_DENO.md) · [browser](docs/BROWSER.md) and
-  [Lasm.UI](docs/UI.md) · [full stack (Lasm.RPC)](docs/RPC.md) ·
+  [Lasm.UI](docs/UI.md) · [full stack](templates/fullstack) ·
   [Lasm.Fetch](docs/FETCH.md) · [WASI and Fastly](docs/WASI.md) · [Lasm.Fastly and Lasm.WASI.Http](docs/WASI_FASTLY_BINDINGS.md) ·
   [the edit loop](docs/DEVELOPER_WORKFLOW.md#lasm-dev)
 - **Evidence:** [benchmarks](docs/BENCHMARKS.md) · [where apps run](docs/DEPLOYMENT.md) ·
@@ -453,7 +457,7 @@ npx lasm build Main.lean --target lambda    # lambda.zip for AWS Lambda
 | Force rebuilding | `npx lasm build Main.lean --rebuild` | Ignore a cached application build. |
 | Detailed diagnostics | `npx lasm Main.lean --verbose` | Show compiler and linker details. |
 | Help | `npx lasm --help`, `npx lasm init --help` | Show usage; `-h` is an alias. |
-| Version | `npx lasm --version` | Print `lasm 0.8.0 (@lasm/cli; Lean 4.35.0; Node 26.13.1; linux-x64)`; `-v` is an alias. |
+| Version | `npx lasm --version` | Print `lasm 0.9.0 (@lasm/cli; Lean 4.35.0; Node 26.13.1; linux-x64)`; `-v` is an alias. |
 | New project | `npm create @lasm@latest my-app -- --template hono` or `npx @lasm/cli init my-app --template hono` | Create a Lake project in a new or empty directory (`Main.lean`, `App.lean`, lakefile, `lean-toolchain`, `package.json`, `README.md`, `.gitignore`, and for servers a `Dockerfile` and `.dockerignore`). Templates: see [Start here](#start-here). `--deploy` (repeatable) adds a platform's files and `npm run build:<target>`: `lambda` (`lambda.zip`), `lambda-container` (`Dockerfile.lambda`, a container image), `lambda-edge`, `vercel`, `netlify`, `azure-functions`, `cloud-functions` (templates `express`, `hono`, `fastify`, `std-http`, `fetch`); `workers`, `vercel-edge`, `netlify-edge`, `deno-deploy` (templates `hono`, `fetch`, `fullstack`), `supabase-edge` (`hono`); `fastly`, `wasi-http`, `spin` (`fetch`, `fullstack`), `wasi` (`fetch`, `plain`). The `fetch` and `fullstack` templates and their targets are 0.3.0. Each `--deploy` name is the `lasm build --target` it builds, except `lambda-container` and `spin` (which builds `wasi-http`). Writes files only; run `npm install` next. `-t` is an alias of `--template`; `--template=hono` also works. |
 | Package an existing build | `npx lasm package --target lambda` | Package a built program (default `dist/`) whose `main` publishes a fetch handler with `Lasm.JS.exportDefault handle` for a function platform, without rebuilding; the platform's handler calls it directly (no server, no port): the same targets and outputs as `lasm build --target`, except `node`. `--output PATH` chooses the output. Checks the platform's size limit. Refuses a dev build unless `--allow-dev`. For a browser build, `npx lasm package dist --target browser` checks every file against `lasm-manifest.json` and writes `_headers`. |
 | Editor support (0.3.0) | `npx lasm editor` | Make the Lean editor (VS Code's Lean 4 extension, any Lean language server client) resolve `import Lasm.*` in this Lake project: links Lasm's Lean 4.35.0 with its library as the elan toolchain `lasm-4.35.0-…` and sets it as the directory's elan override (`elan override unset` undoes it). `lasm init` (when Lasm's Lean is already installed), `lasm dev` and `lasm build` do the same, printing one line per project, except on CI or with `LASM_EDITOR=0`. [Editor setup](docs/GETTING_STARTED.md#editor). |
@@ -635,7 +639,7 @@ browser, `Lasm.UI`, full-stack apps, WASI/Fastly and the editor support
 ([notes](docs/release/0.3.0-notes.md)); 0.3.1 puts the starter code under MIT-0 and
 adds bug-report pointers ([notes](docs/release/0.3.1-notes.md)); 0.3.2 fixes
 `Std.Internal.UV` sockets, timers and signals ([notes](docs/release/0.3.2-notes.md)); 0.3.3 was never
-published, and its changes shipped in 0.3.4 ([notes](docs/release/0.3.4-notes.md)); 0.3.5 updates the README and the Conduit example ([notes](docs/release/0.3.5-notes.md)); 0.3.6 fixes Vercel Edge deployments ([notes](docs/release/0.3.6-notes.md)); 0.3.7 was never published, and its changes shipped in 0.3.8, which fixes a hang in synchronous JavaScript callbacks, WASI dev builds and environment variables on the edge targets ([notes](docs/release/0.3.8-notes.md)); 0.3.9 resolves `.` and `..` in `Request.path` as browsers do, on every platform, and fixes routing when a query contains `://`, fixes cookies and redirects on the function platforms, lets deep recursion on Node go about 16 times deeper, and fixes a Lasm.JS bug and a dev-build bug ([notes](docs/release/0.3.9-notes.md)); 0.4.0 lets Lasm.UI handlers decide `preventDefault` and `stopPropagation` for each event, a breaking change, retries downloads cut short, and fixes packages with C code on newer macOS SDKs and in the editor ([notes](docs/release/0.4.0-notes.md)); 0.4.1 reports a C-stack overflow on the edge as a stack overflow ([notes](docs/release/0.4.1-notes.md)); 0.5.0 runs Lasm.UI handlers in the bubble phase, makes `--output` name the platform directory, and makes waits inside synchronous callbacks fail instead of hanging ([notes](docs/release/0.5.0-notes.md)); 0.5.1 fixes what boundary fuzzing found, including a Host header that could change the request path ([notes](docs/release/0.5.1-notes.md)); 0.6.0 was never published, and its changes shipped in 0.6.1, which makes Lasm.JS values too large for their 32-bit lengths fail instead of being misread, a breaking change to `Lasm.JS.Wire.encode`, reconnects stalled downloads, fixes `lasm dev`, adds the standard web API bindings `Lasm.JS.Web`, makes Lasm.JS calls on Node cheaper and lets `Async` loops of any length run on Bun, Deno, Workers and browsers ([notes](docs/release/0.6.1-notes.md)); 0.7.0 replaces `Lasm.Web` with the generated browser bindings `Lasm.JS.Web.Browser` and generates `Lasm.Fastly` from Fastly's host ABI, both breaking changes, and adds the generated `Lasm.WASI.Http`, `Lasm.JS.Node`, `Lasm.JS.Deno` and `Lasm.JS.Bun` ([notes](docs/release/0.7.0-notes.md)); 0.8.0 moves the `fetch` template off `Lasm.Fetch` except on Node and cuts the memory Fastly, WASI and wasi-http programs use ([notes](docs/release/0.8.0-notes.md)). Lasm's npm
+published, and its changes shipped in 0.3.4 ([notes](docs/release/0.3.4-notes.md)); 0.3.5 updates the README and the Conduit example ([notes](docs/release/0.3.5-notes.md)); 0.3.6 fixes Vercel Edge deployments ([notes](docs/release/0.3.6-notes.md)); 0.3.7 was never published, and its changes shipped in 0.3.8, which fixes a hang in synchronous JavaScript callbacks, WASI dev builds and environment variables on the edge targets ([notes](docs/release/0.3.8-notes.md)); 0.3.9 resolves `.` and `..` in `Request.path` as browsers do, on every platform, and fixes routing when a query contains `://`, fixes cookies and redirects on the function platforms, lets deep recursion on Node go about 16 times deeper, and fixes a Lasm.JS bug and a dev-build bug ([notes](docs/release/0.3.9-notes.md)); 0.4.0 lets Lasm.UI handlers decide `preventDefault` and `stopPropagation` for each event, a breaking change, retries downloads cut short, and fixes packages with C code on newer macOS SDKs and in the editor ([notes](docs/release/0.4.0-notes.md)); 0.4.1 reports a C-stack overflow on the edge as a stack overflow ([notes](docs/release/0.4.1-notes.md)); 0.5.0 runs Lasm.UI handlers in the bubble phase, makes `--output` name the platform directory, and makes waits inside synchronous callbacks fail instead of hanging ([notes](docs/release/0.5.0-notes.md)); 0.5.1 fixes what boundary fuzzing found, including a Host header that could change the request path ([notes](docs/release/0.5.1-notes.md)); 0.6.0 was never published, and its changes shipped in 0.6.1, which makes Lasm.JS values too large for their 32-bit lengths fail instead of being misread, a breaking change to `Lasm.JS.Wire.encode`, reconnects stalled downloads, fixes `lasm dev`, adds the standard web API bindings `Lasm.JS.Web`, makes Lasm.JS calls on Node cheaper and lets `Async` loops of any length run on Bun, Deno, Workers and browsers ([notes](docs/release/0.6.1-notes.md)); 0.7.0 replaces `Lasm.Web` with the generated browser bindings `Lasm.JS.Web.Browser` and generates `Lasm.Fastly` from Fastly's host ABI, both breaking changes, and adds the generated `Lasm.WASI.Http`, `Lasm.JS.Node`, `Lasm.JS.Deno` and `Lasm.JS.Bun` ([notes](docs/release/0.7.0-notes.md)); 0.8.0 moves the `fetch` template off `Lasm.Fetch` except on Node and cuts the memory Fastly, WASI and wasi-http programs use ([notes](docs/release/0.8.0-notes.md)); 0.9.0, the first Stage 0 API release, makes the function platforms call the program's `exportDefault` handler directly, adds `Node.serve` and the generated `Lasm.JS.Cloudflare`, splits the templates into one entry module per serving model, changes several CLI flags, cuts `Lasm.UI` to its core and generates the whole web platform, one module per spec, deletes `Lasm.RPC`, all breaking changes with migration notes ([notes](docs/release/0.9.0-notes.md)). Lasm's npm
 packages (`@lasm/cli`, `@lasm/create` and the `@lasm/…` tool packages) are
 published only by the [`release.yml`](.github/workflows/release.yml) workflow,
 through npm trusted publishing with provenance: no npm tokens exist. A release is a

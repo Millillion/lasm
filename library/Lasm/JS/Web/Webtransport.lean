@@ -226,6 +226,14 @@ instance : FromJS WebTransportSendStreamStats where
   Lasm.JS.Binding.invoke WebTransport { name := "Lasm.JS.Web.WebTransport.new", module := "globalThis", path := "WebTransport", construct := true, arity := 2 }
     (Internal.args #[toJS url, Internal.optional options]) (await := false)
 
+/-- `constructor(USVString url, optional WebTransportOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebTransport.new? (url : String) (options : Option WebTransportOptions := none) : IO (Option WebTransport) := Internal.api "Lasm.JS.Web.WebTransport.new?" do
+  if !(← Internal.hasGlobal ["WebTransport"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke WebTransport { name := "Lasm.JS.Web.WebTransport.new?", module := "globalThis", path := "WebTransport", construct := true, arity := 2 }
+      (Internal.args #[toJS url, Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute Promise<undefined> ready` -/
 @[macro_inline] def WebTransport.ready (self : WebTransport) : Async Unit := Internal.api "Lasm.JS.Web.WebTransport.ready" do
   let p ← self.val.get "ready" Value
@@ -235,13 +243,37 @@ instance : FromJS WebTransportSendStreamStats where
 @[macro_inline] def WebTransport.reliability (self : WebTransport) : IO WebTransportReliabilityMode := Internal.api "Lasm.JS.Web.WebTransport.reliability" do
   self.val.get "reliability" WebTransportReliabilityMode
 
+/-- `readonly attribute WebTransportReliabilityMode reliability` where the platform has it (`'reliability' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebTransport.reliability? (self' : WebTransport) : IO (Option WebTransportReliabilityMode) := Internal.api "Lasm.JS.Web.WebTransport.reliability?" do
+  let self := self'
+  if !(← Internal.has self.val "reliability") then return none
+  let lasmGuarded ← do
+    self.val.get "reliability" WebTransportReliabilityMode
+  return some lasmGuarded
+
 /-- `readonly attribute WebTransportCongestionControl congestionControl` -/
 @[macro_inline] def WebTransport.congestionControl (self : WebTransport) : IO WebTransportCongestionControl := Internal.api "Lasm.JS.Web.WebTransport.congestionControl" do
   self.val.get "congestionControl" WebTransportCongestionControl
 
+/-- `readonly attribute WebTransportCongestionControl congestionControl` where the platform has it (`'congestionControl' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebTransport.congestionControl? (self' : WebTransport) : IO (Option WebTransportCongestionControl) := Internal.api "Lasm.JS.Web.WebTransport.congestionControl?" do
+  let self := self'
+  if !(← Internal.has self.val "congestionControl") then return none
+  let lasmGuarded ← do
+    self.val.get "congestionControl" WebTransportCongestionControl
+  return some lasmGuarded
+
 /-- `attribute unsigned short? anticipatedConcurrentIncomingUnidirectionalStreams` -/
 @[macro_inline] def WebTransport.anticipatedConcurrentIncomingUnidirectionalStreams (self : WebTransport) : IO (Option Nat) := Internal.api "Lasm.JS.Web.WebTransport.anticipatedConcurrentIncomingUnidirectionalStreams" do
   self.val.get "anticipatedConcurrentIncomingUnidirectionalStreams" (Option Nat)
+
+/-- `attribute unsigned short? anticipatedConcurrentIncomingUnidirectionalStreams` where the platform has it (`'anticipatedConcurrentIncomingUnidirectionalStreams' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebTransport.anticipatedConcurrentIncomingUnidirectionalStreams? (self' : WebTransport) : IO (Option (Option Nat)) := Internal.api "Lasm.JS.Web.WebTransport.anticipatedConcurrentIncomingUnidirectionalStreams?" do
+  let self := self'
+  if !(← Internal.has self.val "anticipatedConcurrentIncomingUnidirectionalStreams") then return none
+  let lasmGuarded ← do
+    self.val.get "anticipatedConcurrentIncomingUnidirectionalStreams" (Option Nat)
+  return some lasmGuarded
 
 /-- Sets `anticipatedConcurrentIncomingUnidirectionalStreams`: `attribute unsigned short? anticipatedConcurrentIncomingUnidirectionalStreams` -/
 @[macro_inline] def WebTransport.setAnticipatedConcurrentIncomingUnidirectionalStreams (self : WebTransport) (value : Option Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebTransport.setAnticipatedConcurrentIncomingUnidirectionalStreams" do
@@ -251,6 +283,14 @@ instance : FromJS WebTransportSendStreamStats where
 @[macro_inline] def WebTransport.anticipatedConcurrentIncomingBidirectionalStreams (self : WebTransport) : IO (Option Nat) := Internal.api "Lasm.JS.Web.WebTransport.anticipatedConcurrentIncomingBidirectionalStreams" do
   self.val.get "anticipatedConcurrentIncomingBidirectionalStreams" (Option Nat)
 
+/-- `attribute unsigned short? anticipatedConcurrentIncomingBidirectionalStreams` where the platform has it (`'anticipatedConcurrentIncomingBidirectionalStreams' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebTransport.anticipatedConcurrentIncomingBidirectionalStreams? (self' : WebTransport) : IO (Option (Option Nat)) := Internal.api "Lasm.JS.Web.WebTransport.anticipatedConcurrentIncomingBidirectionalStreams?" do
+  let self := self'
+  if !(← Internal.has self.val "anticipatedConcurrentIncomingBidirectionalStreams") then return none
+  let lasmGuarded ← do
+    self.val.get "anticipatedConcurrentIncomingBidirectionalStreams" (Option Nat)
+  return some lasmGuarded
+
 /-- Sets `anticipatedConcurrentIncomingBidirectionalStreams`: `attribute unsigned short? anticipatedConcurrentIncomingBidirectionalStreams` -/
 @[macro_inline] def WebTransport.setAnticipatedConcurrentIncomingBidirectionalStreams (self : WebTransport) (value : Option Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebTransport.setAnticipatedConcurrentIncomingBidirectionalStreams" do
   self.val.set "anticipatedConcurrentIncomingBidirectionalStreams" (toJS value)
@@ -258,6 +298,14 @@ instance : FromJS WebTransportSendStreamStats where
 /-- `readonly attribute Headers? responseHeaders` -/
 @[macro_inline] def WebTransport.responseHeaders (self : WebTransport) : IO (Option Headers) := Internal.api "Lasm.JS.Web.WebTransport.responseHeaders" do
   self.val.get "responseHeaders" (Option Headers)
+
+/-- `readonly attribute Headers? responseHeaders` where the platform has it (`'responseHeaders' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebTransport.responseHeaders? (self' : WebTransport) : IO (Option (Option Headers)) := Internal.api "Lasm.JS.Web.WebTransport.responseHeaders?" do
+  let self := self'
+  if !(← Internal.has self.val "responseHeaders") then return none
+  let lasmGuarded ← do
+    self.val.get "responseHeaders" (Option Headers)
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString protocol` -/
 @[macro_inline] def WebTransport.protocol (self : WebTransport) : IO String := Internal.api "Lasm.JS.Web.WebTransport.protocol" do
@@ -272,6 +320,15 @@ instance : FromJS WebTransportSendStreamStats where
 @[macro_inline] def WebTransport.draining (self : WebTransport) : Async Unit := Internal.api "Lasm.JS.Web.WebTransport.draining" do
   let p ← self.val.get "draining" Value
   p.await Unit
+
+/-- `readonly attribute Promise<undefined> draining` where the platform has it (`'draining' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebTransport.draining? (self' : WebTransport) : Async (Option Unit) := Internal.api "Lasm.JS.Web.WebTransport.draining?" do
+  let self := self'
+  if !(← Internal.has self.val "draining") then return none
+  let lasmGuarded ← do
+    let p ← self.val.get "draining" Value
+    p.await Unit
+  return some lasmGuarded
 
 /-- `readonly attribute WebTransportDatagramDuplexStream datagrams` -/
 @[macro_inline] def WebTransport.datagrams (self : WebTransport) : IO WebTransportDatagramDuplexStream := Internal.api "Lasm.JS.Web.WebTransport.datagrams" do
@@ -292,13 +349,36 @@ instance : FromJS WebTransportSendStreamStats where
 @[macro_inline] def WebTransport.supportsReliableOnly : IO Bool := Internal.api "Lasm.JS.Web.WebTransport.supportsReliableOnly" do
   Internal.getGlobal ["WebTransport", "supportsReliableOnly"] Bool
 
+/-- `static readonly attribute boolean supportsReliableOnly` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebTransport.supportsReliableOnly? : IO (Option Bool) := Internal.api "Lasm.JS.Web.WebTransport.supportsReliableOnly?" do
+  if !(← Internal.hasGlobal ["WebTransport", "supportsReliableOnly"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["WebTransport", "supportsReliableOnly"] Bool
+  return some lasmGuarded
+
 /-- `Promise<WebTransportConnectionStats> getStats()` -/
 @[macro_inline] def WebTransport.getStats (self : WebTransport) : Async WebTransportConnectionStats := Internal.api "Lasm.JS.Web.WebTransport.getStats" do
   self.val.callMethodAwait "getStats" (Internal.args #[]) WebTransportConnectionStats
 
+/-- `Promise<WebTransportConnectionStats> getStats()` where the platform has it (`'getStats' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebTransport.getStats? (self' : WebTransport) : Async (Option WebTransportConnectionStats) := Internal.api "Lasm.JS.Web.WebTransport.getStats?" do
+  let self := self'
+  if !(← Internal.has self.val "getStats") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "getStats" (Internal.args #[]) WebTransportConnectionStats
+  return some lasmGuarded
+
 /-- `Promise<Uint8Array> exportKeyingMaterial(BufferSource label, BufferSource context, unsigned long outputLength)` -/
 @[macro_inline] def WebTransport.exportKeyingMaterial (self : WebTransport) (label : ByteArray) (context : ByteArray) (outputLength : Nat) : Async ByteArray := Internal.api "Lasm.JS.Web.WebTransport.exportKeyingMaterial" do
   self.val.callMethodAwait "exportKeyingMaterial" (Internal.args #[toJS label, toJS context, toJS outputLength]) ByteArray
+
+/-- `Promise<Uint8Array> exportKeyingMaterial(BufferSource label, BufferSource context, unsigned long outputLength)` where the platform has it (`'exportKeyingMaterial' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebTransport.exportKeyingMaterial? (self' : WebTransport) (label : ByteArray) (context : ByteArray) (outputLength : Nat) : Async (Option ByteArray) := Internal.api "Lasm.JS.Web.WebTransport.exportKeyingMaterial?" do
+  let self := self'
+  if !(← Internal.has self.val "exportKeyingMaterial") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "exportKeyingMaterial" (Internal.args #[toJS label, toJS context, toJS outputLength]) ByteArray
+  return some lasmGuarded
 
 /-- `undefined close(optional WebTransportCloseInfo closeInfo)` -/
 @[macro_inline] def WebTransport.close (self : WebTransport) (closeInfo : Option WebTransportCloseInfo := none) : IO Unit := Internal.api "Lasm.JS.Web.WebTransport.close" do
@@ -318,6 +398,15 @@ instance : FromJS WebTransportSendStreamStats where
 @[macro_inline] def WebTransport.createSendGroup (self : WebTransport) : IO WebTransportSendGroup := Internal.api "Lasm.JS.Web.WebTransport.createSendGroup" do
   let r ← self.val.callMethod "createSendGroup" (Internal.args #[]) Value
   pure { val := r }
+
+/-- `WebTransportSendGroup createSendGroup()` where the platform has it (`'createSendGroup' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebTransport.createSendGroup? (self' : WebTransport) : IO (Option WebTransportSendGroup) := Internal.api "Lasm.JS.Web.WebTransport.createSendGroup?" do
+  let self := self'
+  if !(← Internal.has self.val "createSendGroup") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethod "createSendGroup" (Internal.args #[]) Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `v instanceof WebTransportBidirectionalStream`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebTransportBidirectionalStream`). -/
 @[macro_inline] def WebTransportBidirectionalStream.cast? (v : Value) : IO (Option WebTransportBidirectionalStream) := Internal.api "Lasm.JS.Web.WebTransportBidirectionalStream.cast?" do
@@ -366,6 +455,14 @@ instance : FromJS WebTransportSendStreamStats where
 @[macro_inline] def WebTransportDatagramDuplexStream.incomingMaxBufferedDatagrams (self : WebTransportDatagramDuplexStream) : IO Nat := Internal.api "Lasm.JS.Web.WebTransportDatagramDuplexStream.incomingMaxBufferedDatagrams" do
   self.val.get "incomingMaxBufferedDatagrams" Nat
 
+/-- `attribute unsigned long incomingMaxBufferedDatagrams` where the platform has it (`'incomingMaxBufferedDatagrams' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebTransportDatagramDuplexStream.incomingMaxBufferedDatagrams? (self' : WebTransportDatagramDuplexStream) : IO (Option Nat) := Internal.api "Lasm.JS.Web.WebTransportDatagramDuplexStream.incomingMaxBufferedDatagrams?" do
+  let self := self'
+  if !(← Internal.has self.val "incomingMaxBufferedDatagrams") then return none
+  let lasmGuarded ← do
+    self.val.get "incomingMaxBufferedDatagrams" Nat
+  return some lasmGuarded
+
 /-- Sets `incomingMaxBufferedDatagrams`: `attribute unsigned long incomingMaxBufferedDatagrams` -/
 @[macro_inline] def WebTransportDatagramDuplexStream.setIncomingMaxBufferedDatagrams (self : WebTransportDatagramDuplexStream) (value : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebTransportDatagramDuplexStream.setIncomingMaxBufferedDatagrams" do
   self.val.set "incomingMaxBufferedDatagrams" (toJS value)
@@ -373,6 +470,14 @@ instance : FromJS WebTransportSendStreamStats where
 /-- `attribute unsigned long outgoingMaxBufferedDatagrams` -/
 @[macro_inline] def WebTransportDatagramDuplexStream.outgoingMaxBufferedDatagrams (self : WebTransportDatagramDuplexStream) : IO Nat := Internal.api "Lasm.JS.Web.WebTransportDatagramDuplexStream.outgoingMaxBufferedDatagrams" do
   self.val.get "outgoingMaxBufferedDatagrams" Nat
+
+/-- `attribute unsigned long outgoingMaxBufferedDatagrams` where the platform has it (`'outgoingMaxBufferedDatagrams' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebTransportDatagramDuplexStream.outgoingMaxBufferedDatagrams? (self' : WebTransportDatagramDuplexStream) : IO (Option Nat) := Internal.api "Lasm.JS.Web.WebTransportDatagramDuplexStream.outgoingMaxBufferedDatagrams?" do
+  let self := self'
+  if !(← Internal.has self.val "outgoingMaxBufferedDatagrams") then return none
+  let lasmGuarded ← do
+    self.val.get "outgoingMaxBufferedDatagrams" Nat
+  return some lasmGuarded
 
 /-- Sets `outgoingMaxBufferedDatagrams`: `attribute unsigned long outgoingMaxBufferedDatagrams` -/
 @[macro_inline] def WebTransportDatagramDuplexStream.setOutgoingMaxBufferedDatagrams (self : WebTransportDatagramDuplexStream) (value : Nat) : IO Unit := Internal.api "Lasm.JS.Web.WebTransportDatagramDuplexStream.setOutgoingMaxBufferedDatagrams" do
@@ -382,6 +487,15 @@ instance : FromJS WebTransportSendStreamStats where
 @[macro_inline] def WebTransportDatagramDuplexStream.createWritable (self : WebTransportDatagramDuplexStream) (options : Option WebTransportSendOptions := none) : IO WebTransportDatagramsWritable := Internal.api "Lasm.JS.Web.WebTransportDatagramDuplexStream.createWritable" do
   let r ← self.val.callMethod "createWritable" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
+
+/-- `WebTransportDatagramsWritable createWritable(optional WebTransportSendOptions options)` where the platform has it (`'createWritable' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebTransportDatagramDuplexStream.createWritable? (self' : WebTransportDatagramDuplexStream) (options : Option WebTransportSendOptions := none) : IO (Option WebTransportDatagramsWritable) := Internal.api "Lasm.JS.Web.WebTransportDatagramDuplexStream.createWritable?" do
+  let self := self'
+  if !(← Internal.has self.val "createWritable") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethod "createWritable" (Internal.args #[Internal.optional options]) Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `v instanceof WebTransportDatagramsWritable`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `WebTransportDatagramsWritable`). -/
 @[macro_inline] def WebTransportDatagramsWritable.cast? (v : Value) : IO (Option WebTransportDatagramsWritable) := Internal.api "Lasm.JS.Web.WebTransportDatagramsWritable.cast?" do
@@ -411,6 +525,14 @@ instance : FromJS WebTransportSendStreamStats where
 @[macro_inline] def WebTransportError.new (message : Option String := none) (options : Option WebTransportErrorOptions := none) : IO WebTransportError := Internal.api "Lasm.JS.Web.WebTransportError.new" do
   Lasm.JS.Binding.invoke WebTransportError { name := "Lasm.JS.Web.WebTransportError.new", module := "globalThis", path := "WebTransportError", construct := true, arity := 2 }
     (Internal.args #[Internal.optional message, Internal.optional options]) (await := false)
+
+/-- `constructor(optional DOMString message, optional WebTransportErrorOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebTransportError.new? (message : Option String := none) (options : Option WebTransportErrorOptions := none) : IO (Option WebTransportError) := Internal.api "Lasm.JS.Web.WebTransportError.new?" do
+  if !(← Internal.hasGlobal ["WebTransportError"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke WebTransportError { name := "Lasm.JS.Web.WebTransportError.new?", module := "globalThis", path := "WebTransportError", construct := true, arity := 2 }
+      (Internal.args #[Internal.optional message, Internal.optional options]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute WebTransportErrorSource source` -/
 @[macro_inline] def WebTransportError.source (self : WebTransportError) : IO WebTransportErrorSource := Internal.api "Lasm.JS.Web.WebTransportError.source" do

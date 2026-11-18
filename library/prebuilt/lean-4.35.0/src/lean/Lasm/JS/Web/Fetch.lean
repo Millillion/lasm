@@ -221,6 +221,14 @@ instance : ToJS DeferredRequestInit := ⟨fun d => Internal.fields #[("method", 
   Lasm.JS.Binding.invoke Headers { name := "Lasm.JS.Web.Headers.new", module := "globalThis", path := "Headers", construct := true, arity := 1 }
     (Internal.args #[Internal.optional init]) (await := false)
 
+/-- `constructor(optional HeadersInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Headers.new? (init : Option HeadersInit := none) : IO (Option Headers) := Internal.api "Lasm.JS.Web.Headers.new?" do
+  if !(← Internal.hasGlobal ["Headers"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Headers { name := "Lasm.JS.Web.Headers.new?", module := "globalThis", path := "Headers", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional init]) (await := false)
+  return some lasmGuarded
+
 /-- `undefined append(ByteString name, ByteString value)` -/
 @[macro_inline] def Headers.append (self : Headers) (name : String) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.Headers.append" do
   self.val.callMethod "append" (Internal.args #[toJS name, toJS value]) Unit
@@ -266,6 +274,14 @@ instance : ToJS DeferredRequestInit := ⟨fun d => Internal.fields #[("method", 
   Lasm.JS.Binding.invoke Request { name := "Lasm.JS.Web.Request.new", module := "globalThis", path := "Request", construct := true, arity := 2 }
     (Internal.args #[toJS input, Internal.optional init]) (await := false)
 
+/-- `constructor(RequestInfo input, optional RequestInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Request.new? (input : RequestInfo) (init : Option RequestInit := none) : IO (Option Request) := Internal.api "Lasm.JS.Web.Request.new?" do
+  if !(← Internal.hasGlobal ["Request"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Request { name := "Lasm.JS.Web.Request.new?", module := "globalThis", path := "Request", construct := true, arity := 2 }
+      (Internal.args #[toJS input, Internal.optional init]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute ByteString method` -/
 @[macro_inline] def Request.method (self : Request) : IO String := Internal.api "Lasm.JS.Web.Request.method" do
   self.val.get "method" String
@@ -283,25 +299,73 @@ instance : ToJS DeferredRequestInit := ⟨fun d => Internal.fields #[("method", 
 @[macro_inline] def Request.destination (self : Request) : IO RequestDestination := Internal.api "Lasm.JS.Web.Request.destination" do
   self.val.get "destination" RequestDestination
 
+/-- `readonly attribute RequestDestination destination` where the platform has it (`'destination' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Request.destination? (self' : Request) : IO (Option RequestDestination) := Internal.api "Lasm.JS.Web.Request.destination?" do
+  let self := self'
+  if !(← Internal.has self.val "destination") then return none
+  let lasmGuarded ← do
+    self.val.get "destination" RequestDestination
+  return some lasmGuarded
+
 /-- `readonly attribute USVString referrer` -/
 @[macro_inline] def Request.referrer (self : Request) : IO String := Internal.api "Lasm.JS.Web.Request.referrer" do
   self.val.get "referrer" String
+
+/-- `readonly attribute USVString referrer` where the platform has it (`'referrer' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Request.referrer? (self' : Request) : IO (Option String) := Internal.api "Lasm.JS.Web.Request.referrer?" do
+  let self := self'
+  if !(← Internal.has self.val "referrer") then return none
+  let lasmGuarded ← do
+    self.val.get "referrer" String
+  return some lasmGuarded
 
 /-- `readonly attribute ReferrerPolicy referrerPolicy` -/
 @[macro_inline] def Request.referrerPolicy (self : Request) : IO ReferrerPolicy := Internal.api "Lasm.JS.Web.Request.referrerPolicy" do
   self.val.get "referrerPolicy" ReferrerPolicy
 
+/-- `readonly attribute ReferrerPolicy referrerPolicy` where the platform has it (`'referrerPolicy' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Request.referrerPolicy? (self' : Request) : IO (Option ReferrerPolicy) := Internal.api "Lasm.JS.Web.Request.referrerPolicy?" do
+  let self := self'
+  if !(← Internal.has self.val "referrerPolicy") then return none
+  let lasmGuarded ← do
+    self.val.get "referrerPolicy" ReferrerPolicy
+  return some lasmGuarded
+
 /-- `readonly attribute RequestMode mode` -/
 @[macro_inline] def Request.mode (self : Request) : IO RequestMode := Internal.api "Lasm.JS.Web.Request.mode" do
   self.val.get "mode" RequestMode
+
+/-- `readonly attribute RequestMode mode` where the platform has it (`'mode' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Request.mode? (self' : Request) : IO (Option RequestMode) := Internal.api "Lasm.JS.Web.Request.mode?" do
+  let self := self'
+  if !(← Internal.has self.val "mode") then return none
+  let lasmGuarded ← do
+    self.val.get "mode" RequestMode
+  return some lasmGuarded
 
 /-- `readonly attribute RequestCredentials credentials` -/
 @[macro_inline] def Request.credentials (self : Request) : IO RequestCredentials := Internal.api "Lasm.JS.Web.Request.credentials" do
   self.val.get "credentials" RequestCredentials
 
+/-- `readonly attribute RequestCredentials credentials` where the platform has it (`'credentials' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Request.credentials? (self' : Request) : IO (Option RequestCredentials) := Internal.api "Lasm.JS.Web.Request.credentials?" do
+  let self := self'
+  if !(← Internal.has self.val "credentials") then return none
+  let lasmGuarded ← do
+    self.val.get "credentials" RequestCredentials
+  return some lasmGuarded
+
 /-- `readonly attribute RequestCache cache` -/
 @[macro_inline] def Request.cache (self : Request) : IO RequestCache := Internal.api "Lasm.JS.Web.Request.cache" do
   self.val.get "cache" RequestCache
+
+/-- `readonly attribute RequestCache cache` where the platform has it (`'cache' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Request.cache? (self' : Request) : IO (Option RequestCache) := Internal.api "Lasm.JS.Web.Request.cache?" do
+  let self := self'
+  if !(← Internal.has self.val "cache") then return none
+  let lasmGuarded ← do
+    self.val.get "cache" RequestCache
+  return some lasmGuarded
 
 /-- `readonly attribute RequestRedirect redirect` -/
 @[macro_inline] def Request.redirect (self : Request) : IO RequestRedirect := Internal.api "Lasm.JS.Web.Request.redirect" do
@@ -311,17 +375,49 @@ instance : ToJS DeferredRequestInit := ⟨fun d => Internal.fields #[("method", 
 @[macro_inline] def Request.integrity (self : Request) : IO String := Internal.api "Lasm.JS.Web.Request.integrity" do
   self.val.get "integrity" String
 
+/-- `readonly attribute DOMString integrity` where the platform has it (`'integrity' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Request.integrity? (self' : Request) : IO (Option String) := Internal.api "Lasm.JS.Web.Request.integrity?" do
+  let self := self'
+  if !(← Internal.has self.val "integrity") then return none
+  let lasmGuarded ← do
+    self.val.get "integrity" String
+  return some lasmGuarded
+
 /-- `readonly attribute boolean keepalive` -/
 @[macro_inline] def Request.keepalive (self : Request) : IO Bool := Internal.api "Lasm.JS.Web.Request.keepalive" do
   self.val.get "keepalive" Bool
+
+/-- `readonly attribute boolean keepalive` where the platform has it (`'keepalive' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Request.keepalive? (self' : Request) : IO (Option Bool) := Internal.api "Lasm.JS.Web.Request.keepalive?" do
+  let self := self'
+  if !(← Internal.has self.val "keepalive") then return none
+  let lasmGuarded ← do
+    self.val.get "keepalive" Bool
+  return some lasmGuarded
 
 /-- `readonly attribute boolean isReloadNavigation` -/
 @[macro_inline] def Request.isReloadNavigation (self : Request) : IO Bool := Internal.api "Lasm.JS.Web.Request.isReloadNavigation" do
   self.val.get "isReloadNavigation" Bool
 
+/-- `readonly attribute boolean isReloadNavigation` where the platform has it (`'isReloadNavigation' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Request.isReloadNavigation? (self' : Request) : IO (Option Bool) := Internal.api "Lasm.JS.Web.Request.isReloadNavigation?" do
+  let self := self'
+  if !(← Internal.has self.val "isReloadNavigation") then return none
+  let lasmGuarded ← do
+    self.val.get "isReloadNavigation" Bool
+  return some lasmGuarded
+
 /-- `readonly attribute boolean isHistoryNavigation` -/
 @[macro_inline] def Request.isHistoryNavigation (self : Request) : IO Bool := Internal.api "Lasm.JS.Web.Request.isHistoryNavigation" do
   self.val.get "isHistoryNavigation" Bool
+
+/-- `readonly attribute boolean isHistoryNavigation` where the platform has it (`'isHistoryNavigation' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Request.isHistoryNavigation? (self' : Request) : IO (Option Bool) := Internal.api "Lasm.JS.Web.Request.isHistoryNavigation?" do
+  let self := self'
+  if !(← Internal.has self.val "isHistoryNavigation") then return none
+  let lasmGuarded ← do
+    self.val.get "isHistoryNavigation" Bool
+  return some lasmGuarded
 
 /-- `readonly attribute AbortSignal signal` -/
 @[macro_inline] def Request.signal (self : Request) : IO AbortSignal := Internal.api "Lasm.JS.Web.Request.signal" do
@@ -332,9 +428,25 @@ instance : ToJS DeferredRequestInit := ⟨fun d => Internal.fields #[("method", 
 @[macro_inline] def Request.duplex (self : Request) : IO RequestDuplex := Internal.api "Lasm.JS.Web.Request.duplex" do
   self.val.get "duplex" RequestDuplex
 
+/-- `readonly attribute RequestDuplex duplex` where the platform has it (`'duplex' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Request.duplex? (self' : Request) : IO (Option RequestDuplex) := Internal.api "Lasm.JS.Web.Request.duplex?" do
+  let self := self'
+  if !(← Internal.has self.val "duplex") then return none
+  let lasmGuarded ← do
+    self.val.get "duplex" RequestDuplex
+  return some lasmGuarded
+
 /-- `readonly attribute ReadableStream? body` -/
 @[macro_inline] def Request.body (self : Request) : IO (Option ReadableStream) := Internal.api "Lasm.JS.Web.Request.body" do
   self.val.get "body" (Option ReadableStream)
+
+/-- `readonly attribute ReadableStream? body` where the platform has it (`'body' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Request.body? (self' : Request) : IO (Option (Option ReadableStream)) := Internal.api "Lasm.JS.Web.Request.body?" do
+  let self := self'
+  if !(← Internal.has self.val "body") then return none
+  let lasmGuarded ← do
+    self.val.get "body" (Option ReadableStream)
+  return some lasmGuarded
 
 /-- `readonly attribute boolean bodyUsed` -/
 @[macro_inline] def Request.bodyUsed (self : Request) : IO Bool := Internal.api "Lasm.JS.Web.Request.bodyUsed" do
@@ -359,6 +471,14 @@ instance : ToJS DeferredRequestInit := ⟨fun d => Internal.fields #[("method", 
 @[macro_inline] def Request.bytes (self : Request) : Async ByteArray := Internal.api "Lasm.JS.Web.Request.bytes" do
   self.val.callMethodAwait "bytes" (Internal.args #[]) ByteArray
 
+/-- `Promise<Uint8Array> bytes()` where the platform has it (`'bytes' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Request.bytes? (self' : Request) : Async (Option ByteArray) := Internal.api "Lasm.JS.Web.Request.bytes?" do
+  let self := self'
+  if !(← Internal.has self.val "bytes") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "bytes" (Internal.args #[]) ByteArray
+  return some lasmGuarded
+
 /-- `Promise<FormData> formData()` -/
 @[macro_inline] def Request.formData (self : Request) : Async FormData := Internal.api "Lasm.JS.Web.Request.formData" do
   let r ← self.val.callMethodAwait "formData" (Internal.args #[]) Value
@@ -376,6 +496,15 @@ instance : ToJS DeferredRequestInit := ⟨fun d => Internal.fields #[("method", 
 @[macro_inline] def Request.textStream (self : Request) : IO ReadableStream := Internal.api "Lasm.JS.Web.Request.textStream" do
   let r ← self.val.callMethod "textStream" (Internal.args #[]) Value
   pure { val := r }
+
+/-- `ReadableStream textStream()` where the platform has it (`'textStream' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Request.textStream? (self' : Request) : IO (Option ReadableStream) := Internal.api "Lasm.JS.Web.Request.textStream?" do
+  let self := self'
+  if !(← Internal.has self.val "textStream") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethod "textStream" (Internal.args #[]) Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `v instanceof Response`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Response`). -/
 @[macro_inline] def Response.cast? (v : Value) : IO (Option Response) := Internal.api "Lasm.JS.Web.Response.cast?" do
@@ -460,6 +589,14 @@ instance : ToJS DeferredRequestInit := ⟨fun d => Internal.fields #[("method", 
 @[macro_inline] def Response.bytes (self : Response) : Async ByteArray := Internal.api "Lasm.JS.Web.Response.bytes" do
   self.val.callMethodAwait "bytes" (Internal.args #[]) ByteArray
 
+/-- `Promise<Uint8Array> bytes()` where the platform has it (`'bytes' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Response.bytes? (self' : Response) : Async (Option ByteArray) := Internal.api "Lasm.JS.Web.Response.bytes?" do
+  let self := self'
+  if !(← Internal.has self.val "bytes") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "bytes" (Internal.args #[]) ByteArray
+  return some lasmGuarded
+
 /-- `Promise<FormData> formData()` -/
 @[macro_inline] def Response.formData (self : Response) : Async FormData := Internal.api "Lasm.JS.Web.Response.formData" do
   let r ← self.val.callMethodAwait "formData" (Internal.args #[]) Value
@@ -478,10 +615,28 @@ instance : ToJS DeferredRequestInit := ⟨fun d => Internal.fields #[("method", 
   let r ← self.val.callMethod "textStream" (Internal.args #[]) Value
   pure { val := r }
 
+/-- `ReadableStream textStream()` where the platform has it (`'textStream' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Response.textStream? (self' : Response) : IO (Option ReadableStream) := Internal.api "Lasm.JS.Web.Response.textStream?" do
+  let self := self'
+  if !(← Internal.has self.val "textStream") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethod "textStream" (Internal.args #[]) Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `FetchLaterResult fetchLater(RequestInfo input, optional DeferredRequestInit init)` -/
 @[macro_inline] def Window.fetchLater (self : Window) (input : RequestInfo) (init : Option DeferredRequestInit := none) : IO FetchLaterResult := Internal.api "Lasm.JS.Web.Window.fetchLater" do
   let r ← self.val.callMethod "fetchLater" (Internal.args #[toJS input, Internal.optional init]) Value
   pure { val := r }
+
+/-- `FetchLaterResult fetchLater(RequestInfo input, optional DeferredRequestInit init)` where the platform has it (`'fetchLater' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.fetchLater? (self' : Window) (input : RequestInfo) (init : Option DeferredRequestInit := none) : IO (Option FetchLaterResult) := Internal.api "Lasm.JS.Web.Window.fetchLater?" do
+  let self := self'
+  if !(← Internal.has self.val "fetchLater") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethod "fetchLater" (Internal.args #[toJS input, Internal.optional init]) Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `Promise<Response> fetch(RequestInfo input, optional RequestInit init)` -/
 @[macro_inline] def Window.fetch (self : Window) (input : RequestInfo) (init : Option RequestInit := none) : Async Response := Internal.api "Lasm.JS.Web.Window.fetch" do
@@ -498,6 +653,15 @@ instance : ToJS DeferredRequestInit := ⟨fun d => Internal.fields #[("method", 
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.fetchLater", module := "globalThis", path := "fetchLater", construct := false, arity := 2 }
     (Internal.args #[toJS input, Internal.optional init]) (await := false)
   pure { val := r }
+
+/-- `FetchLaterResult fetchLater(RequestInfo input, optional DeferredRequestInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def fetchLater? (input : RequestInfo) (init : Option DeferredRequestInit := none) : IO (Option FetchLaterResult) := Internal.api "Lasm.JS.Web.fetchLater?" do
+  if !(← Internal.hasGlobal ["fetchLater"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.fetchLater?", module := "globalThis", path := "fetchLater", construct := false, arity := 2 }
+      (Internal.args #[toJS input, Internal.optional init]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `Promise<Response> fetch(RequestInfo input, optional RequestInit init)` (Fetch Standard (https://fetch.spec.whatwg.org/)) -/
 @[macro_inline] def fetch (input : RequestInfo) (init : Option RequestInit := none) : Async Response := Internal.api "Lasm.JS.Web.fetch" do

@@ -84,4 +84,11 @@ instance : ToJS XRDOMOverlayInit := ⟨fun d => Internal.fields #[("root", toJS 
 @[macro_inline] def onbeforexrselect : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onbeforexrselect" do
   Internal.getGlobal ["onbeforexrselect"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onbeforexrselect` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onbeforexrselect? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onbeforexrselect?" do
+  if !(← Internal.hasGlobal ["onbeforexrselect"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onbeforexrselect"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 end Lasm.JS.Web

@@ -31,6 +31,6 @@ Templates:
   std-http  an HTTP server in pure Lean (Std.Http)
   web       a browser app in Lean (Lasm.UI): a counter
   fetch     an HTTP handler on the web's Request and Response (Lasm.JS.Web) for Node, the edge, Bun, Deno and the function platforms, and on Fastly Compute and wasi-http (Spin) through their own interfaces
-  fullstack a full-stack Lean app: shared API and validation (Lasm.RPC), a server (Lasm.Fetch) that renders the first page, a browser app (Lasm.UI) that hydrates it; Node, Workers, Bun, Deno, and every edge --deploy target
+  fullstack a full-stack Lean app: shared types and validation, a REST server that renders the first page, a browser app (Lasm.UI) that hydrates it; Node, Workers, Bun, Deno, and every edge --deploy target
 
 Example: npx @lasm/cli init my-app --template hono

@@ -28,4 +28,13 @@ set_option compiler.extract_closed false
   let r ← self.val.get "login" Value
   pure { val := r }
 
+/-- `readonly attribute NavigatorLogin login` where the platform has it (`'login' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.login? (self' : Navigator) : IO (Option NavigatorLogin) := Internal.api "Lasm.JS.Web.Navigator.login?" do
+  let self := self'
+  if !(← Internal.has self.val "login") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "login" Value
+    pure { val := r }
+  return some lasmGuarded
+
 end Lasm.JS.Web

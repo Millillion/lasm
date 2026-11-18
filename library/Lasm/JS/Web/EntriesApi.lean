@@ -165,6 +165,14 @@ def FileCallback.ofSyncFn (f : File → IO Unit) : IO FileCallback := do
 @[macro_inline] def File.webkitRelativePath (self : File) : IO String := Internal.api "Lasm.JS.Web.File.webkitRelativePath" do
   self.val.get "webkitRelativePath" String
 
+/-- `readonly attribute USVString webkitRelativePath` where the platform has it (`'webkitRelativePath' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def File.webkitRelativePath? (self' : File) : IO (Option String) := Internal.api "Lasm.JS.Web.File.webkitRelativePath?" do
+  let self := self'
+  if !(← Internal.has self.val "webkitRelativePath") then return none
+  let lasmGuarded ← do
+    self.val.get "webkitRelativePath" String
+  return some lasmGuarded
+
 /-- `attribute boolean webkitdirectory` -/
 @[macro_inline] def HTMLInputElement.webkitdirectory (self : HTMLInputElement) : IO Bool := Internal.api "Lasm.JS.Web.HTMLInputElement.webkitdirectory" do
   self.val.get "webkitdirectory" Bool

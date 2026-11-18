@@ -20,12 +20,36 @@ set_option compiler.extract_closed false
 @[macro_inline] def Navigator.getAutoplayPolicy (self : Navigator) (type : AutoplayPolicyMediaType) : IO AutoplayPolicy := Internal.api "Lasm.JS.Web.Navigator.getAutoplayPolicy" do
   self.val.callMethod "getAutoplayPolicy" (Internal.args #[toJS type]) AutoplayPolicy
 
+/-- `AutoplayPolicy getAutoplayPolicy(AutoplayPolicyMediaType type)` where the platform has it (`'getAutoplayPolicy' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.getAutoplayPolicy? (self' : Navigator) (type : AutoplayPolicyMediaType) : IO (Option AutoplayPolicy) := Internal.api "Lasm.JS.Web.Navigator.getAutoplayPolicy?" do
+  let self := self'
+  if !(← Internal.has self.val "getAutoplayPolicy") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getAutoplayPolicy" (Internal.args #[toJS type]) AutoplayPolicy
+  return some lasmGuarded
+
 /-- `AutoplayPolicy getAutoplayPolicy(HTMLMediaElement element)` -/
 @[macro_inline] def Navigator.getAutoplayPolicyWithElement (self : Navigator) (element : HTMLMediaElement) : IO AutoplayPolicy := Internal.api "Lasm.JS.Web.Navigator.getAutoplayPolicyWithElement" do
   self.val.callMethod "getAutoplayPolicy" (Internal.args #[toJS element]) AutoplayPolicy
 
+/-- `AutoplayPolicy getAutoplayPolicy(HTMLMediaElement element)` where the platform has it (`'getAutoplayPolicy' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.getAutoplayPolicyWithElement? (self' : Navigator) (element : HTMLMediaElement) : IO (Option AutoplayPolicy) := Internal.api "Lasm.JS.Web.Navigator.getAutoplayPolicyWithElement?" do
+  let self := self'
+  if !(← Internal.has self.val "getAutoplayPolicy") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getAutoplayPolicy" (Internal.args #[toJS element]) AutoplayPolicy
+  return some lasmGuarded
+
 /-- `AutoplayPolicy getAutoplayPolicy(AudioContext context)` -/
 @[macro_inline] def Navigator.getAutoplayPolicyWithContext (self : Navigator) (context : AudioContext) : IO AutoplayPolicy := Internal.api "Lasm.JS.Web.Navigator.getAutoplayPolicyWithContext" do
   self.val.callMethod "getAutoplayPolicy" (Internal.args #[toJS context]) AutoplayPolicy
+
+/-- `AutoplayPolicy getAutoplayPolicy(AudioContext context)` where the platform has it (`'getAutoplayPolicy' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.getAutoplayPolicyWithContext? (self' : Navigator) (context : AudioContext) : IO (Option AutoplayPolicy) := Internal.api "Lasm.JS.Web.Navigator.getAutoplayPolicyWithContext?" do
+  let self := self'
+  if !(← Internal.has self.val "getAutoplayPolicy") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getAutoplayPolicy" (Internal.args #[toJS context]) AutoplayPolicy
+  return some lasmGuarded
 
 end Lasm.JS.Web

@@ -149,6 +149,14 @@ instance : ToJS PaymentHandlerResponse := ⟨fun d => Internal.fields #[("method
   Lasm.JS.Binding.invoke CanMakePaymentEvent { name := "Lasm.JS.Web.CanMakePaymentEvent.new", module := "globalThis", path := "CanMakePaymentEvent", construct := true, arity := 1 }
     (Internal.args #[toJS type]) (await := false)
 
+/-- `constructor(DOMString type)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CanMakePaymentEvent.new? (type : String) : IO (Option CanMakePaymentEvent) := Internal.api "Lasm.JS.Web.CanMakePaymentEvent.new?" do
+  if !(← Internal.hasGlobal ["CanMakePaymentEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CanMakePaymentEvent { name := "Lasm.JS.Web.CanMakePaymentEvent.new?", module := "globalThis", path := "CanMakePaymentEvent", construct := true, arity := 1 }
+      (Internal.args #[toJS type]) (await := false)
+  return some lasmGuarded
+
 /-- `undefined respondWith(Promise<boolean> canMakePaymentResponse)` -/
 @[macro_inline] def CanMakePaymentEvent.respondWith (self : CanMakePaymentEvent) (canMakePaymentResponse : Value) : IO Unit := Internal.api "Lasm.JS.Web.CanMakePaymentEvent.respondWith" do
   self.val.callMethod "respondWith" (Internal.args #[toJS canMakePaymentResponse]) Unit
@@ -177,6 +185,14 @@ instance : ToJS PaymentHandlerResponse := ⟨fun d => Internal.fields #[("method
 @[macro_inline] def PaymentRequestEvent.new (type : String) (eventInitDict : Option PaymentRequestEventInit := none) : IO PaymentRequestEvent := Internal.api "Lasm.JS.Web.PaymentRequestEvent.new" do
   Lasm.JS.Binding.invoke PaymentRequestEvent { name := "Lasm.JS.Web.PaymentRequestEvent.new", module := "globalThis", path := "PaymentRequestEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, optional PaymentRequestEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PaymentRequestEvent.new? (type : String) (eventInitDict : Option PaymentRequestEventInit := none) : IO (Option PaymentRequestEvent) := Internal.api "Lasm.JS.Web.PaymentRequestEvent.new?" do
+  if !(← Internal.hasGlobal ["PaymentRequestEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PaymentRequestEvent { name := "Lasm.JS.Web.PaymentRequestEvent.new?", module := "globalThis", path := "PaymentRequestEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute USVString topOrigin` -/
 @[macro_inline] def PaymentRequestEvent.topOrigin (self : PaymentRequestEvent) : IO String := Internal.api "Lasm.JS.Web.PaymentRequestEvent.topOrigin" do
@@ -234,6 +250,14 @@ instance : ToJS PaymentHandlerResponse := ⟨fun d => Internal.fields #[("method
 @[macro_inline] def ServiceWorkerGlobalScope.oncanmakepayment (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.oncanmakepayment" do
   self.val.get "oncanmakepayment" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler oncanmakepayment` where the platform has it (`'oncanmakepayment' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ServiceWorkerGlobalScope.oncanmakepayment? (self' : ServiceWorkerGlobalScope) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.oncanmakepayment?" do
+  let self := self'
+  if !(← Internal.has self.val "oncanmakepayment") then return none
+  let lasmGuarded ← do
+    self.val.get "oncanmakepayment" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `oncanmakepayment`: `attribute EventHandler oncanmakepayment` -/
 @[macro_inline] def ServiceWorkerGlobalScope.setOncanmakepayment (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOncanmakepayment" do
   self.val.set "oncanmakepayment" (toJS value)
@@ -241,6 +265,14 @@ instance : ToJS PaymentHandlerResponse := ⟨fun d => Internal.fields #[("method
 /-- `attribute EventHandler onpaymentrequest` -/
 @[macro_inline] def ServiceWorkerGlobalScope.onpaymentrequest (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onpaymentrequest" do
   self.val.get "onpaymentrequest" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onpaymentrequest` where the platform has it (`'onpaymentrequest' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ServiceWorkerGlobalScope.onpaymentrequest? (self' : ServiceWorkerGlobalScope) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onpaymentrequest?" do
+  let self := self'
+  if !(← Internal.has self.val "onpaymentrequest") then return none
+  let lasmGuarded ← do
+    self.val.get "onpaymentrequest" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onpaymentrequest`: `attribute EventHandler onpaymentrequest` -/
 @[macro_inline] def ServiceWorkerGlobalScope.setOnpaymentrequest (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOnpaymentrequest" do
@@ -250,5 +282,14 @@ instance : ToJS PaymentHandlerResponse := ⟨fun d => Internal.fields #[("method
 @[macro_inline] def ServiceWorkerRegistration.paymentManager (self : ServiceWorkerRegistration) : IO PaymentManager := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.paymentManager" do
   let r ← self.val.get "paymentManager" Value
   pure { val := r }
+
+/-- `readonly attribute PaymentManager paymentManager` where the platform has it (`'paymentManager' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ServiceWorkerRegistration.paymentManager? (self' : ServiceWorkerRegistration) : IO (Option PaymentManager) := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.paymentManager?" do
+  let self := self'
+  if !(← Internal.has self.val "paymentManager") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "paymentManager" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

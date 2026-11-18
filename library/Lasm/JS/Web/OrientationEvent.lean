@@ -99,6 +99,14 @@ instance : ToJS DeviceOrientationEventInit := ⟨fun d => Internal.fields #[("bu
   Lasm.JS.Binding.invoke DeviceMotionEvent { name := "Lasm.JS.Web.DeviceMotionEvent.new", module := "globalThis", path := "DeviceMotionEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional DeviceMotionEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DeviceMotionEvent.new? (type : String) (eventInitDict : Option DeviceMotionEventInit := none) : IO (Option DeviceMotionEvent) := Internal.api "Lasm.JS.Web.DeviceMotionEvent.new?" do
+  if !(← Internal.hasGlobal ["DeviceMotionEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke DeviceMotionEvent { name := "Lasm.JS.Web.DeviceMotionEvent.new?", module := "globalThis", path := "DeviceMotionEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DeviceMotionEventAcceleration? acceleration` -/
 @[macro_inline] def DeviceMotionEvent.acceleration (self : DeviceMotionEvent) : IO (Option DeviceMotionEventAcceleration) := Internal.api "Lasm.JS.Web.DeviceMotionEvent.acceleration" do
   self.val.get "acceleration" (Option DeviceMotionEventAcceleration)
@@ -119,6 +127,14 @@ instance : ToJS DeviceOrientationEventInit := ⟨fun d => Internal.fields #[("bu
 @[macro_inline] def DeviceMotionEvent.requestPermission : Async PermissionState := Internal.api "Lasm.JS.Web.DeviceMotionEvent.requestPermission" do
   Lasm.JS.Binding.invokeAsync PermissionState { name := "Lasm.JS.Web.DeviceMotionEvent.requestPermission", module := "globalThis", path := "DeviceMotionEvent.requestPermission", construct := false, arity := 0 }
     (Internal.args #[])
+
+/-- `static Promise<PermissionState> requestPermission()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DeviceMotionEvent.requestPermission? : Async (Option PermissionState) := Internal.api "Lasm.JS.Web.DeviceMotionEvent.requestPermission?" do
+  if !(← Internal.hasGlobal ["DeviceMotionEvent", "requestPermission"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync PermissionState { name := "Lasm.JS.Web.DeviceMotionEvent.requestPermission?", module := "globalThis", path := "DeviceMotionEvent.requestPermission", construct := false, arity := 0 }
+      (Internal.args #[])
+  return some lasmGuarded
 
 /-- `v instanceof DeviceMotionEventAcceleration`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `DeviceMotionEventAcceleration`). -/
 @[macro_inline] def DeviceMotionEventAcceleration.cast? (v : Value) : IO (Option DeviceMotionEventAcceleration) := Internal.api "Lasm.JS.Web.DeviceMotionEventAcceleration.cast?" do
@@ -161,6 +177,14 @@ instance : ToJS DeviceOrientationEventInit := ⟨fun d => Internal.fields #[("bu
   Lasm.JS.Binding.invoke DeviceOrientationEvent { name := "Lasm.JS.Web.DeviceOrientationEvent.new", module := "globalThis", path := "DeviceOrientationEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional DeviceOrientationEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DeviceOrientationEvent.new? (type : String) (eventInitDict : Option DeviceOrientationEventInit := none) : IO (Option DeviceOrientationEvent) := Internal.api "Lasm.JS.Web.DeviceOrientationEvent.new?" do
+  if !(← Internal.hasGlobal ["DeviceOrientationEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke DeviceOrientationEvent { name := "Lasm.JS.Web.DeviceOrientationEvent.new?", module := "globalThis", path := "DeviceOrientationEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute double? alpha` -/
 @[macro_inline] def DeviceOrientationEvent.alpha (self : DeviceOrientationEvent) : IO (Option Float) := Internal.api "Lasm.JS.Web.DeviceOrientationEvent.alpha" do
   self.val.get "alpha" (Option Float)
@@ -182,9 +206,25 @@ instance : ToJS DeviceOrientationEventInit := ⟨fun d => Internal.fields #[("bu
   Lasm.JS.Binding.invokeAsync PermissionState { name := "Lasm.JS.Web.DeviceOrientationEvent.requestPermission", module := "globalThis", path := "DeviceOrientationEvent.requestPermission", construct := false, arity := 1 }
     (Internal.args #[Internal.optional absolute])
 
+/-- `static Promise<PermissionState> requestPermission(optional boolean absolute)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DeviceOrientationEvent.requestPermission? (absolute : Option Bool := none) : Async (Option PermissionState) := Internal.api "Lasm.JS.Web.DeviceOrientationEvent.requestPermission?" do
+  if !(← Internal.hasGlobal ["DeviceOrientationEvent", "requestPermission"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync PermissionState { name := "Lasm.JS.Web.DeviceOrientationEvent.requestPermission?", module := "globalThis", path := "DeviceOrientationEvent.requestPermission", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional absolute])
+  return some lasmGuarded
+
 /-- `attribute EventHandler ondeviceorientation` -/
 @[macro_inline] def Window.ondeviceorientation (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.ondeviceorientation" do
   self.val.get "ondeviceorientation" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler ondeviceorientation` where the platform has it (`'ondeviceorientation' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.ondeviceorientation? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.ondeviceorientation?" do
+  let self := self'
+  if !(← Internal.has self.val "ondeviceorientation") then return none
+  let lasmGuarded ← do
+    self.val.get "ondeviceorientation" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `ondeviceorientation`: `attribute EventHandler ondeviceorientation` -/
 @[macro_inline] def Window.setOndeviceorientation (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOndeviceorientation" do
@@ -194,6 +234,14 @@ instance : ToJS DeviceOrientationEventInit := ⟨fun d => Internal.fields #[("bu
 @[macro_inline] def Window.ondeviceorientationabsolute (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.ondeviceorientationabsolute" do
   self.val.get "ondeviceorientationabsolute" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler ondeviceorientationabsolute` where the platform has it (`'ondeviceorientationabsolute' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.ondeviceorientationabsolute? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.ondeviceorientationabsolute?" do
+  let self := self'
+  if !(← Internal.has self.val "ondeviceorientationabsolute") then return none
+  let lasmGuarded ← do
+    self.val.get "ondeviceorientationabsolute" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `ondeviceorientationabsolute`: `attribute EventHandler ondeviceorientationabsolute` -/
 @[macro_inline] def Window.setOndeviceorientationabsolute (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOndeviceorientationabsolute" do
   self.val.set "ondeviceorientationabsolute" (toJS value)
@@ -201,6 +249,14 @@ instance : ToJS DeviceOrientationEventInit := ⟨fun d => Internal.fields #[("bu
 /-- `attribute EventHandler ondevicemotion` -/
 @[macro_inline] def Window.ondevicemotion (self : Window) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Window.ondevicemotion" do
   self.val.get "ondevicemotion" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler ondevicemotion` where the platform has it (`'ondevicemotion' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.ondevicemotion? (self' : Window) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Window.ondevicemotion?" do
+  let self := self'
+  if !(← Internal.has self.val "ondevicemotion") then return none
+  let lasmGuarded ← do
+    self.val.get "ondevicemotion" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `ondevicemotion`: `attribute EventHandler ondevicemotion` -/
 @[macro_inline] def Window.setOndevicemotion (self : Window) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Window.setOndevicemotion" do
@@ -210,12 +266,33 @@ instance : ToJS DeviceOrientationEventInit := ⟨fun d => Internal.fields #[("bu
 @[macro_inline] def ondeviceorientation : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ondeviceorientation" do
   Internal.getGlobal ["ondeviceorientation"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler ondeviceorientation` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ondeviceorientation? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ondeviceorientation?" do
+  if !(← Internal.hasGlobal ["ondeviceorientation"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ondeviceorientation"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler ondeviceorientationabsolute` (Device Orientation and Motion (https://w3c.github.io/deviceorientation/)) -/
 @[macro_inline] def ondeviceorientationabsolute : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ondeviceorientationabsolute" do
   Internal.getGlobal ["ondeviceorientationabsolute"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler ondeviceorientationabsolute` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ondeviceorientationabsolute? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ondeviceorientationabsolute?" do
+  if !(← Internal.hasGlobal ["ondeviceorientationabsolute"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ondeviceorientationabsolute"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler ondevicemotion` (Device Orientation and Motion (https://w3c.github.io/deviceorientation/)) -/
 @[macro_inline] def ondevicemotion : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ondevicemotion" do
   Internal.getGlobal ["ondevicemotion"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler ondevicemotion` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ondevicemotion? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ondevicemotion?" do
+  if !(← Internal.hasGlobal ["ondevicemotion"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["ondevicemotion"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 end Lasm.JS.Web

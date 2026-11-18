@@ -25,6 +25,14 @@ instance : ToJS AriaNotificationOptions := ⟨fun d => Internal.fields #[("prior
 @[macro_inline] def Document.ariaNotify (self : Document) (announcement : String) (options : Option AriaNotificationOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.Document.ariaNotify" do
   self.val.callMethod "ariaNotify" (Internal.args #[toJS announcement, Internal.optional options]) Unit
 
+/-- `undefined ariaNotify(DOMString announcement, optional AriaNotificationOptions options)` where the platform has it (`'ariaNotify' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Document.ariaNotify? (self' : Document) (announcement : String) (options : Option AriaNotificationOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Document.ariaNotify?" do
+  let self := self'
+  if !(← Internal.has self.val "ariaNotify") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "ariaNotify" (Internal.args #[toJS announcement, Internal.optional options]) Unit
+  return some lasmGuarded
+
 /-- `attribute DOMString? role` -/
 @[macro_inline] def Element.role (self : Element) : IO (Option String) := Internal.api "Lasm.JS.Web.Element.role" do
   self.val.get "role" (Option String)
@@ -293,6 +301,14 @@ instance : ToJS AriaNotificationOptions := ⟨fun d => Internal.fields #[("prior
 @[macro_inline] def Element.ariaOwnsElements (self : Element) : IO (Option (Array Element)) := Internal.api "Lasm.JS.Web.Element.ariaOwnsElements" do
   self.val.get "ariaOwnsElements" (Option (Array Element))
 
+/-- `attribute FrozenArray<Element>? ariaOwnsElements` where the platform has it (`'ariaOwnsElements' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Element.ariaOwnsElements? (self' : Element) : IO (Option (Option (Array Element))) := Internal.api "Lasm.JS.Web.Element.ariaOwnsElements?" do
+  let self := self'
+  if !(← Internal.has self.val "ariaOwnsElements") then return none
+  let lasmGuarded ← do
+    self.val.get "ariaOwnsElements" (Option (Array Element))
+  return some lasmGuarded
+
 /-- Sets `ariaOwnsElements`: `attribute FrozenArray<Element>? ariaOwnsElements` -/
 @[macro_inline] def Element.setAriaOwnsElements (self : Element) (value : Option (Array Element)) : IO Unit := Internal.api "Lasm.JS.Web.Element.setAriaOwnsElements" do
   self.val.set "ariaOwnsElements" (toJS value)
@@ -444,5 +460,13 @@ instance : ToJS AriaNotificationOptions := ⟨fun d => Internal.fields #[("prior
 /-- `undefined ariaNotify(DOMString announcement, optional AriaNotificationOptions options)` -/
 @[macro_inline] def Element.ariaNotify (self : Element) (announcement : String) (options : Option AriaNotificationOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.Element.ariaNotify" do
   self.val.callMethod "ariaNotify" (Internal.args #[toJS announcement, Internal.optional options]) Unit
+
+/-- `undefined ariaNotify(DOMString announcement, optional AriaNotificationOptions options)` where the platform has it (`'ariaNotify' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Element.ariaNotify? (self' : Element) (announcement : String) (options : Option AriaNotificationOptions := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Element.ariaNotify?" do
+  let self := self'
+  if !(← Internal.has self.val "ariaNotify") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "ariaNotify" (Internal.args #[toJS announcement, Internal.optional options]) Unit
+  return some lasmGuarded
 
 end Lasm.JS.Web

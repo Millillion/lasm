@@ -51,9 +51,25 @@ instance : ToJS QueryOptions := ⟨fun d => Internal.fields #[("postscriptNames"
 @[macro_inline] def Window.queryLocalFonts (self : Window) (options : Option QueryOptions := none) : Async (Array FontData) := Internal.api "Lasm.JS.Web.Window.queryLocalFonts" do
   self.val.callMethodAwait "queryLocalFonts" (Internal.args #[Internal.optional options]) (Array FontData)
 
+/-- `Promise<sequence<FontData>> queryLocalFonts(optional QueryOptions options)` where the platform has it (`'queryLocalFonts' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.queryLocalFonts? (self' : Window) (options : Option QueryOptions := none) : Async (Option (Array FontData)) := Internal.api "Lasm.JS.Web.Window.queryLocalFonts?" do
+  let self := self'
+  if !(← Internal.has self.val "queryLocalFonts") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "queryLocalFonts" (Internal.args #[Internal.optional options]) (Array FontData)
+  return some lasmGuarded
+
 /-- `Promise<sequence<FontData>> queryLocalFonts(optional QueryOptions options)` (Local Font Access API (https://wicg.github.io/local-font-access/)) -/
 @[macro_inline] def queryLocalFonts (options : Option QueryOptions := none) : Async (Array FontData) := Internal.api "Lasm.JS.Web.queryLocalFonts" do
   Lasm.JS.Binding.invokeAsync (Array FontData) { name := "Lasm.JS.Web.queryLocalFonts", module := "globalThis", path := "queryLocalFonts", construct := false, arity := 1 }
     (Internal.args #[Internal.optional options])
+
+/-- `Promise<sequence<FontData>> queryLocalFonts(optional QueryOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def queryLocalFonts? (options : Option QueryOptions := none) : Async (Option (Array FontData)) := Internal.api "Lasm.JS.Web.queryLocalFonts?" do
+  if !(← Internal.hasGlobal ["queryLocalFonts"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync (Array FontData) { name := "Lasm.JS.Web.queryLocalFonts?", module := "globalThis", path := "queryLocalFonts", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional options])
+  return some lasmGuarded
 
 end Lasm.JS.Web

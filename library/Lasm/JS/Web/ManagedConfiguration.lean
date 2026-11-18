@@ -39,4 +39,13 @@ set_option compiler.extract_closed false
   let r ← self.val.get "managed" Value
   pure { val := r }
 
+/-- `readonly attribute NavigatorManagedData managed` where the platform has it (`'managed' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.managed? (self' : Navigator) : IO (Option NavigatorManagedData) := Internal.api "Lasm.JS.Web.Navigator.managed?" do
+  let self := self'
+  if !(← Internal.has self.val "managed") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "managed" Value
+    pure { val := r }
+  return some lasmGuarded
+
 end Lasm.JS.Web

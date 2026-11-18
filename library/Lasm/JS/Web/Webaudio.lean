@@ -639,6 +639,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
   Lasm.JS.Binding.invoke AudioBuffer { name := "Lasm.JS.Web.AudioBuffer.new", module := "globalThis", path := "AudioBuffer", construct := true, arity := 1 }
     (Internal.args #[toJS options]) (await := false)
 
+/-- `constructor(AudioBufferOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioBuffer.new? (options : AudioBufferOptions) : IO (Option AudioBuffer) := Internal.api "Lasm.JS.Web.AudioBuffer.new?" do
+  if !(← Internal.hasGlobal ["AudioBuffer"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke AudioBuffer { name := "Lasm.JS.Web.AudioBuffer.new?", module := "globalThis", path := "AudioBuffer", construct := true, arity := 1 }
+      (Internal.args #[toJS options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute float sampleRate` -/
 @[macro_inline] def AudioBuffer.sampleRate (self : AudioBuffer) : IO Float := Internal.api "Lasm.JS.Web.AudioBuffer.sampleRate" do
   self.val.get "sampleRate" Float
@@ -679,45 +687,126 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
   let r ← self.val.get "positionX" Value
   pure { val := r }
 
+/-- `readonly attribute AudioParam positionX` where the platform has it (`'positionX' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioListener.positionX? (self' : AudioListener) : IO (Option AudioParam) := Internal.api "Lasm.JS.Web.AudioListener.positionX?" do
+  let self := self'
+  if !(← Internal.has self.val "positionX") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "positionX" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute AudioParam positionY` -/
 @[macro_inline] def AudioListener.positionY (self : AudioListener) : IO AudioParam := Internal.api "Lasm.JS.Web.AudioListener.positionY" do
   let r ← self.val.get "positionY" Value
   pure { val := r }
+
+/-- `readonly attribute AudioParam positionY` where the platform has it (`'positionY' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioListener.positionY? (self' : AudioListener) : IO (Option AudioParam) := Internal.api "Lasm.JS.Web.AudioListener.positionY?" do
+  let self := self'
+  if !(← Internal.has self.val "positionY") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "positionY" Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `readonly attribute AudioParam positionZ` -/
 @[macro_inline] def AudioListener.positionZ (self : AudioListener) : IO AudioParam := Internal.api "Lasm.JS.Web.AudioListener.positionZ" do
   let r ← self.val.get "positionZ" Value
   pure { val := r }
 
+/-- `readonly attribute AudioParam positionZ` where the platform has it (`'positionZ' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioListener.positionZ? (self' : AudioListener) : IO (Option AudioParam) := Internal.api "Lasm.JS.Web.AudioListener.positionZ?" do
+  let self := self'
+  if !(← Internal.has self.val "positionZ") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "positionZ" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute AudioParam forwardX` -/
 @[macro_inline] def AudioListener.forwardX (self : AudioListener) : IO AudioParam := Internal.api "Lasm.JS.Web.AudioListener.forwardX" do
   let r ← self.val.get "forwardX" Value
   pure { val := r }
+
+/-- `readonly attribute AudioParam forwardX` where the platform has it (`'forwardX' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioListener.forwardX? (self' : AudioListener) : IO (Option AudioParam) := Internal.api "Lasm.JS.Web.AudioListener.forwardX?" do
+  let self := self'
+  if !(← Internal.has self.val "forwardX") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "forwardX" Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `readonly attribute AudioParam forwardY` -/
 @[macro_inline] def AudioListener.forwardY (self : AudioListener) : IO AudioParam := Internal.api "Lasm.JS.Web.AudioListener.forwardY" do
   let r ← self.val.get "forwardY" Value
   pure { val := r }
 
+/-- `readonly attribute AudioParam forwardY` where the platform has it (`'forwardY' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioListener.forwardY? (self' : AudioListener) : IO (Option AudioParam) := Internal.api "Lasm.JS.Web.AudioListener.forwardY?" do
+  let self := self'
+  if !(← Internal.has self.val "forwardY") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "forwardY" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute AudioParam forwardZ` -/
 @[macro_inline] def AudioListener.forwardZ (self : AudioListener) : IO AudioParam := Internal.api "Lasm.JS.Web.AudioListener.forwardZ" do
   let r ← self.val.get "forwardZ" Value
   pure { val := r }
+
+/-- `readonly attribute AudioParam forwardZ` where the platform has it (`'forwardZ' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioListener.forwardZ? (self' : AudioListener) : IO (Option AudioParam) := Internal.api "Lasm.JS.Web.AudioListener.forwardZ?" do
+  let self := self'
+  if !(← Internal.has self.val "forwardZ") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "forwardZ" Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `readonly attribute AudioParam upX` -/
 @[macro_inline] def AudioListener.upX (self : AudioListener) : IO AudioParam := Internal.api "Lasm.JS.Web.AudioListener.upX" do
   let r ← self.val.get "upX" Value
   pure { val := r }
 
+/-- `readonly attribute AudioParam upX` where the platform has it (`'upX' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioListener.upX? (self' : AudioListener) : IO (Option AudioParam) := Internal.api "Lasm.JS.Web.AudioListener.upX?" do
+  let self := self'
+  if !(← Internal.has self.val "upX") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "upX" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute AudioParam upY` -/
 @[macro_inline] def AudioListener.upY (self : AudioListener) : IO AudioParam := Internal.api "Lasm.JS.Web.AudioListener.upY" do
   let r ← self.val.get "upY" Value
   pure { val := r }
 
+/-- `readonly attribute AudioParam upY` where the platform has it (`'upY' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioListener.upY? (self' : AudioListener) : IO (Option AudioParam) := Internal.api "Lasm.JS.Web.AudioListener.upY?" do
+  let self := self'
+  if !(← Internal.has self.val "upY") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "upY" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute AudioParam upZ` -/
 @[macro_inline] def AudioListener.upZ (self : AudioListener) : IO AudioParam := Internal.api "Lasm.JS.Web.AudioListener.upZ" do
   let r ← self.val.get "upZ" Value
   pure { val := r }
+
+/-- `readonly attribute AudioParam upZ` where the platform has it (`'upZ' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioListener.upZ? (self' : AudioListener) : IO (Option AudioParam) := Internal.api "Lasm.JS.Web.AudioListener.upZ?" do
+  let self := self'
+  if !(← Internal.has self.val "upZ") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "upZ" Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `undefined setPosition(float x, float y, float z)` -/
 @[macro_inline] def AudioListener.setPosition (self : AudioListener) (x : Float) (y : Float) (z : Float) : IO Unit := Internal.api "Lasm.JS.Web.AudioListener.setPosition" do
@@ -821,6 +910,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
 @[macro_inline] def AudioParam.automationRate (self : AudioParam) : IO AutomationRate := Internal.api "Lasm.JS.Web.AudioParam.automationRate" do
   self.val.get "automationRate" AutomationRate
 
+/-- `attribute AutomationRate automationRate` where the platform has it (`'automationRate' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioParam.automationRate? (self' : AudioParam) : IO (Option AutomationRate) := Internal.api "Lasm.JS.Web.AudioParam.automationRate?" do
+  let self := self'
+  if !(← Internal.has self.val "automationRate") then return none
+  let lasmGuarded ← do
+    self.val.get "automationRate" AutomationRate
+  return some lasmGuarded
+
 /-- Sets `automationRate`: `attribute AutomationRate automationRate` -/
 @[macro_inline] def AudioParam.setAutomationRate (self : AudioParam) (value : AutomationRate) : IO Unit := Internal.api "Lasm.JS.Web.AudioParam.setAutomationRate" do
   self.val.set "automationRate" (toJS value)
@@ -872,6 +969,15 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
   let r ← self.val.callMethod "cancelAndHoldAtTime" (Internal.args #[toJS cancelTime]) Value
   pure { val := r }
 
+/-- `AudioParam cancelAndHoldAtTime(double cancelTime)` where the platform has it (`'cancelAndHoldAtTime' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioParam.cancelAndHoldAtTime? (self' : AudioParam) (cancelTime : Float) : IO (Option AudioParam) := Internal.api "Lasm.JS.Web.AudioParam.cancelAndHoldAtTime?" do
+  let self := self'
+  if !(← Internal.has self.val "cancelAndHoldAtTime") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethod "cancelAndHoldAtTime" (Internal.args #[toJS cancelTime]) Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `v instanceof AudioParamMap`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AudioParamMap`). -/
 @[macro_inline] def AudioParamMap.cast? (v : Value) : IO (Option AudioParamMap) := Internal.api "Lasm.JS.Web.AudioParamMap.cast?" do
   Internal.cast (Internal.getGlobal ["AudioParamMap"] Value) (fun x => { val := x }) v
@@ -921,6 +1027,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
   Lasm.JS.Binding.invoke AudioProcessingEvent { name := "Lasm.JS.Web.AudioProcessingEvent.new", module := "globalThis", path := "AudioProcessingEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, AudioProcessingEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioProcessingEvent.new? (type : String) (eventInitDict : AudioProcessingEventInit) : IO (Option AudioProcessingEvent) := Internal.api "Lasm.JS.Web.AudioProcessingEvent.new?" do
+  if !(← Internal.hasGlobal ["AudioProcessingEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke AudioProcessingEvent { name := "Lasm.JS.Web.AudioProcessingEvent.new?", module := "globalThis", path := "AudioProcessingEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute double playbackTime` -/
 @[macro_inline] def AudioProcessingEvent.playbackTime (self : AudioProcessingEvent) : IO Float := Internal.api "Lasm.JS.Web.AudioProcessingEvent.playbackTime" do
   self.val.get "playbackTime" Float
@@ -952,6 +1066,15 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
   let r ← self.val.get "port" Value
   pure { val := r }
 
+/-- `readonly attribute MessagePort port` where the platform has it (`'port' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioWorklet.port? (self' : AudioWorklet) : IO (Option MessagePort) := Internal.api "Lasm.JS.Web.AudioWorklet.port?" do
+  let self := self'
+  if !(← Internal.has self.val "port") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "port" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `v instanceof AudioWorkletGlobalScope`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AudioWorkletGlobalScope`). -/
 @[macro_inline] def AudioWorkletGlobalScope.cast? (v : Value) : IO (Option AudioWorkletGlobalScope) := Internal.api "Lasm.JS.Web.AudioWorkletGlobalScope.cast?" do
   Internal.cast (Internal.getGlobal ["AudioWorkletGlobalScope"] Value) (fun x => { val := x }) v
@@ -977,6 +1100,15 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
   let r ← self.val.get "port" Value
   pure { val := r }
 
+/-- `readonly attribute MessagePort port` where the platform has it (`'port' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioWorkletGlobalScope.port? (self' : AudioWorkletGlobalScope) : IO (Option MessagePort) := Internal.api "Lasm.JS.Web.AudioWorkletGlobalScope.port?" do
+  let self := self'
+  if !(← Internal.has self.val "port") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "port" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `undefined registerProcessor(DOMString name, AudioWorkletProcessorConstructor processorCtor)` -/
 @[macro_inline] def AudioWorkletGlobalScope.registerProcessor (self : AudioWorkletGlobalScope) (name : String) (processorCtor : AudioWorkletProcessorConstructor) : IO Unit := Internal.api "Lasm.JS.Web.AudioWorkletGlobalScope.registerProcessor" do
   self.val.callMethod "registerProcessor" (Internal.args #[toJS name, toJS processorCtor]) Unit
@@ -989,6 +1121,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
 @[macro_inline] def AudioWorkletProcessor.new : IO AudioWorkletProcessor := Internal.api "Lasm.JS.Web.AudioWorkletProcessor.new" do
   Lasm.JS.Binding.invoke AudioWorkletProcessor { name := "Lasm.JS.Web.AudioWorkletProcessor.new", module := "globalThis", path := "AudioWorkletProcessor", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
+
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioWorkletProcessor.new? : IO (Option AudioWorkletProcessor) := Internal.api "Lasm.JS.Web.AudioWorkletProcessor.new?" do
+  if !(← Internal.hasGlobal ["AudioWorkletProcessor"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke AudioWorkletProcessor { name := "Lasm.JS.Web.AudioWorkletProcessor.new?", module := "globalThis", path := "AudioWorkletProcessor", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute MessagePort port` -/
 @[macro_inline] def AudioWorkletProcessor.port (self : AudioWorkletProcessor) : IO MessagePort := Internal.api "Lasm.JS.Web.AudioWorkletProcessor.port" do
@@ -1024,6 +1164,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
 /-- `readonly attribute unsigned long renderQuantumSize` -/
 @[macro_inline] def BaseAudioContext.renderQuantumSize (self : BaseAudioContext) : IO Nat := Internal.api "Lasm.JS.Web.BaseAudioContext.renderQuantumSize" do
   self.val.get "renderQuantumSize" Nat
+
+/-- `readonly attribute unsigned long renderQuantumSize` where the platform has it (`'renderQuantumSize' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def BaseAudioContext.renderQuantumSize? (self' : BaseAudioContext) : IO (Option Nat) := Internal.api "Lasm.JS.Web.BaseAudioContext.renderQuantumSize?" do
+  let self := self'
+  if !(← Internal.has self.val "renderQuantumSize") then return none
+  let lasmGuarded ← do
+    self.val.get "renderQuantumSize" Nat
+  return some lasmGuarded
 
 /-- `readonly attribute AudioWorklet audioWorklet` -/
 @[macro_inline] def BaseAudioContext.audioWorklet (self : BaseAudioContext) : IO AudioWorklet := Internal.api "Lasm.JS.Web.BaseAudioContext.audioWorklet" do
@@ -1142,6 +1290,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
   Lasm.JS.Binding.invoke OfflineAudioCompletionEvent { name := "Lasm.JS.Web.OfflineAudioCompletionEvent.new", module := "globalThis", path := "OfflineAudioCompletionEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, OfflineAudioCompletionEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def OfflineAudioCompletionEvent.new? (type : String) (eventInitDict : OfflineAudioCompletionEventInit) : IO (Option OfflineAudioCompletionEvent) := Internal.api "Lasm.JS.Web.OfflineAudioCompletionEvent.new?" do
+  if !(← Internal.hasGlobal ["OfflineAudioCompletionEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke OfflineAudioCompletionEvent { name := "Lasm.JS.Web.OfflineAudioCompletionEvent.new?", module := "globalThis", path := "OfflineAudioCompletionEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute AudioBuffer renderedBuffer` -/
 @[macro_inline] def OfflineAudioCompletionEvent.renderedBuffer (self : OfflineAudioCompletionEvent) : IO AudioBuffer := Internal.api "Lasm.JS.Web.OfflineAudioCompletionEvent.renderedBuffer" do
   let r ← self.val.get "renderedBuffer" Value
@@ -1156,6 +1312,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
   Lasm.JS.Binding.invoke PeriodicWave { name := "Lasm.JS.Web.PeriodicWave.new", module := "globalThis", path := "PeriodicWave", construct := true, arity := 2 }
     (Internal.args #[toJS context, Internal.optional options]) (await := false)
 
+/-- `constructor(BaseAudioContext context, optional PeriodicWaveOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PeriodicWave.new? (context : BaseAudioContext) (options : Option PeriodicWaveOptions := none) : IO (Option PeriodicWave) := Internal.api "Lasm.JS.Web.PeriodicWave.new?" do
+  if !(← Internal.hasGlobal ["PeriodicWave"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PeriodicWave { name := "Lasm.JS.Web.PeriodicWave.new?", module := "globalThis", path := "PeriodicWave", construct := true, arity := 2 }
+      (Internal.args #[toJS context, Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `v instanceof AnalyserNode`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AnalyserNode`). -/
 @[macro_inline] def AnalyserNode.cast? (v : Value) : IO (Option AnalyserNode) := Internal.api "Lasm.JS.Web.AnalyserNode.cast?" do
   Internal.cast (Internal.getGlobal ["AnalyserNode"] Value) (fun x => { val := x }) v
@@ -1164,6 +1328,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
 @[macro_inline] def AnalyserNode.new (context : BaseAudioContext) (options : Option AnalyserOptions := none) : IO AnalyserNode := Internal.api "Lasm.JS.Web.AnalyserNode.new" do
   Lasm.JS.Binding.invoke AnalyserNode { name := "Lasm.JS.Web.AnalyserNode.new", module := "globalThis", path := "AnalyserNode", construct := true, arity := 2 }
     (Internal.args #[toJS context, Internal.optional options]) (await := false)
+
+/-- `constructor(BaseAudioContext context, optional AnalyserOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def AnalyserNode.new? (context : BaseAudioContext) (options : Option AnalyserOptions := none) : IO (Option AnalyserNode) := Internal.api "Lasm.JS.Web.AnalyserNode.new?" do
+  if !(← Internal.hasGlobal ["AnalyserNode"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke AnalyserNode { name := "Lasm.JS.Web.AnalyserNode.new?", module := "globalThis", path := "AnalyserNode", construct := true, arity := 2 }
+      (Internal.args #[toJS context, Internal.optional options]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute unsigned long fftSize` -/
 @[macro_inline] def AnalyserNode.fftSize (self : AnalyserNode) : IO Nat := Internal.api "Lasm.JS.Web.AnalyserNode.fftSize" do
@@ -1228,6 +1400,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
   Lasm.JS.Binding.invoke AudioContext { name := "Lasm.JS.Web.AudioContext.new", module := "globalThis", path := "AudioContext", construct := true, arity := 1 }
     (Internal.args #[Internal.optional contextOptions]) (await := false)
 
+/-- `constructor(optional AudioContextOptions contextOptions)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioContext.new? (contextOptions : Option AudioContextOptions := none) : IO (Option AudioContext) := Internal.api "Lasm.JS.Web.AudioContext.new?" do
+  if !(← Internal.hasGlobal ["AudioContext"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke AudioContext { name := "Lasm.JS.Web.AudioContext.new?", module := "globalThis", path := "AudioContext", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional contextOptions]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute double baseLatency` -/
 @[macro_inline] def AudioContext.baseLatency (self : AudioContext) : IO Float := Internal.api "Lasm.JS.Web.AudioContext.baseLatency" do
   self.val.get "baseLatency" Float
@@ -1240,9 +1420,25 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
 @[macro_inline] def AudioContext.sinkId (self : AudioContext) : IO DOMStringOrAudioSinkInfo := Internal.api "Lasm.JS.Web.AudioContext.sinkId" do
   self.val.get "sinkId" DOMStringOrAudioSinkInfo
 
+/-- `readonly attribute (DOMString or AudioSinkInfo) sinkId` where the platform has it (`'sinkId' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioContext.sinkId? (self' : AudioContext) : IO (Option DOMStringOrAudioSinkInfo) := Internal.api "Lasm.JS.Web.AudioContext.sinkId?" do
+  let self := self'
+  if !(← Internal.has self.val "sinkId") then return none
+  let lasmGuarded ← do
+    self.val.get "sinkId" DOMStringOrAudioSinkInfo
+  return some lasmGuarded
+
 /-- `attribute EventHandler onsinkchange` -/
 @[macro_inline] def AudioContext.onsinkchange (self : AudioContext) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.AudioContext.onsinkchange" do
   self.val.get "onsinkchange" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onsinkchange` where the platform has it (`'onsinkchange' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioContext.onsinkchange? (self' : AudioContext) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.AudioContext.onsinkchange?" do
+  let self := self'
+  if !(← Internal.has self.val "onsinkchange") then return none
+  let lasmGuarded ← do
+    self.val.get "onsinkchange" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onsinkchange`: `attribute EventHandler onsinkchange` -/
 @[macro_inline] def AudioContext.setOnsinkchange (self : AudioContext) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.AudioContext.setOnsinkchange" do
@@ -1252,6 +1448,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
 @[macro_inline] def AudioContext.onerror (self : AudioContext) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.AudioContext.onerror" do
   self.val.get "onerror" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onerror` where the platform has it (`'onerror' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioContext.onerror? (self' : AudioContext) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.AudioContext.onerror?" do
+  let self := self'
+  if !(← Internal.has self.val "onerror") then return none
+  let lasmGuarded ← do
+    self.val.get "onerror" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `onerror`: `attribute EventHandler onerror` -/
 @[macro_inline] def AudioContext.setOnerror (self : AudioContext) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.AudioContext.setOnerror" do
   self.val.set "onerror" (toJS value)
@@ -1260,6 +1464,15 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
 @[macro_inline] def AudioContext.playbackStats (self : AudioContext) : IO AudioPlaybackStats := Internal.api "Lasm.JS.Web.AudioContext.playbackStats" do
   let r ← self.val.get "playbackStats" Value
   pure { val := r }
+
+/-- `readonly attribute AudioPlaybackStats playbackStats` where the platform has it (`'playbackStats' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioContext.playbackStats? (self' : AudioContext) : IO (Option AudioPlaybackStats) := Internal.api "Lasm.JS.Web.AudioContext.playbackStats?" do
+  let self := self'
+  if !(← Internal.has self.val "playbackStats") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "playbackStats" Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `AudioTimestamp getOutputTimestamp()` -/
 @[macro_inline] def AudioContext.getOutputTimestamp (self : AudioContext) : IO AudioTimestamp := Internal.api "Lasm.JS.Web.AudioContext.getOutputTimestamp" do
@@ -1281,6 +1494,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
 @[macro_inline] def AudioContext.setSinkId (self : AudioContext) (sinkId : DOMStringOrAudioSinkOptions) : Async Unit := Internal.api "Lasm.JS.Web.AudioContext.setSinkId" do
   self.val.callMethodAwait "setSinkId" (Internal.args #[toJS sinkId]) Unit
 
+/-- `Promise<undefined> setSinkId((DOMString or AudioSinkOptions) sinkId)` where the platform has it (`'setSinkId' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioContext.setSinkId? (self' : AudioContext) (sinkId : DOMStringOrAudioSinkOptions) : Async (Option Unit) := Internal.api "Lasm.JS.Web.AudioContext.setSinkId?" do
+  let self := self'
+  if !(← Internal.has self.val "setSinkId") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "setSinkId" (Internal.args #[toJS sinkId]) Unit
+  return some lasmGuarded
+
 /-- `MediaElementAudioSourceNode createMediaElementSource(HTMLMediaElement mediaElement)` -/
 @[macro_inline] def AudioContext.createMediaElementSource (self : AudioContext) (mediaElement : HTMLMediaElement) : IO MediaElementAudioSourceNode := Internal.api "Lasm.JS.Web.AudioContext.createMediaElementSource" do
   let r ← self.val.callMethod "createMediaElementSource" (Internal.args #[toJS mediaElement]) Value
@@ -1295,6 +1516,15 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
 @[macro_inline] def AudioContext.createMediaStreamTrackSource (self : AudioContext) (mediaStreamTrack : MediaStreamTrack) : IO MediaStreamTrackAudioSourceNode := Internal.api "Lasm.JS.Web.AudioContext.createMediaStreamTrackSource" do
   let r ← self.val.callMethod "createMediaStreamTrackSource" (Internal.args #[toJS mediaStreamTrack]) Value
   pure { val := r }
+
+/-- `MediaStreamTrackAudioSourceNode createMediaStreamTrackSource(MediaStreamTrack mediaStreamTrack)` where the platform has it (`'createMediaStreamTrackSource' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioContext.createMediaStreamTrackSource? (self' : AudioContext) (mediaStreamTrack : MediaStreamTrack) : IO (Option MediaStreamTrackAudioSourceNode) := Internal.api "Lasm.JS.Web.AudioContext.createMediaStreamTrackSource?" do
+  let self := self'
+  if !(← Internal.has self.val "createMediaStreamTrackSource") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethod "createMediaStreamTrackSource" (Internal.args #[toJS mediaStreamTrack]) Value
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `MediaStreamAudioDestinationNode createMediaStreamDestination()` -/
 @[macro_inline] def AudioContext.createMediaStreamDestination (self : AudioContext) : IO MediaStreamAudioDestinationNode := Internal.api "Lasm.JS.Web.AudioContext.createMediaStreamDestination" do
@@ -1338,6 +1568,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
   Lasm.JS.Binding.invoke AudioWorkletNode { name := "Lasm.JS.Web.AudioWorkletNode.new", module := "globalThis", path := "AudioWorkletNode", construct := true, arity := 3 }
     (Internal.args #[toJS context, toJS name, Internal.optional options]) (await := false)
 
+/-- `constructor(BaseAudioContext context, DOMString name, optional AudioWorkletNodeOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioWorkletNode.new? (context : BaseAudioContext) (name : String) (options : Option AudioWorkletNodeOptions := none) : IO (Option AudioWorkletNode) := Internal.api "Lasm.JS.Web.AudioWorkletNode.new?" do
+  if !(← Internal.hasGlobal ["AudioWorkletNode"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke AudioWorkletNode { name := "Lasm.JS.Web.AudioWorkletNode.new?", module := "globalThis", path := "AudioWorkletNode", construct := true, arity := 3 }
+      (Internal.args #[toJS context, toJS name, Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute AudioParamMap parameters` -/
 @[macro_inline] def AudioWorkletNode.parameters (self : AudioWorkletNode) : IO AudioParamMap := Internal.api "Lasm.JS.Web.AudioWorkletNode.parameters" do
   let r ← self.val.get "parameters" Value
@@ -1364,6 +1602,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
 @[macro_inline] def BiquadFilterNode.new (context : BaseAudioContext) (options : Option BiquadFilterOptions := none) : IO BiquadFilterNode := Internal.api "Lasm.JS.Web.BiquadFilterNode.new" do
   Lasm.JS.Binding.invoke BiquadFilterNode { name := "Lasm.JS.Web.BiquadFilterNode.new", module := "globalThis", path := "BiquadFilterNode", construct := true, arity := 2 }
     (Internal.args #[toJS context, Internal.optional options]) (await := false)
+
+/-- `constructor(BaseAudioContext context, optional BiquadFilterOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def BiquadFilterNode.new? (context : BaseAudioContext) (options : Option BiquadFilterOptions := none) : IO (Option BiquadFilterNode) := Internal.api "Lasm.JS.Web.BiquadFilterNode.new?" do
+  if !(← Internal.hasGlobal ["BiquadFilterNode"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke BiquadFilterNode { name := "Lasm.JS.Web.BiquadFilterNode.new?", module := "globalThis", path := "BiquadFilterNode", construct := true, arity := 2 }
+      (Internal.args #[toJS context, Internal.optional options]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute BiquadFilterType type` -/
 @[macro_inline] def BiquadFilterNode.type (self : BiquadFilterNode) : IO BiquadFilterType := Internal.api "Lasm.JS.Web.BiquadFilterNode.type" do
@@ -1409,6 +1655,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
   Lasm.JS.Binding.invoke ChannelMergerNode { name := "Lasm.JS.Web.ChannelMergerNode.new", module := "globalThis", path := "ChannelMergerNode", construct := true, arity := 2 }
     (Internal.args #[toJS context, Internal.optional options]) (await := false)
 
+/-- `constructor(BaseAudioContext context, optional ChannelMergerOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ChannelMergerNode.new? (context : BaseAudioContext) (options : Option ChannelMergerOptions := none) : IO (Option ChannelMergerNode) := Internal.api "Lasm.JS.Web.ChannelMergerNode.new?" do
+  if !(← Internal.hasGlobal ["ChannelMergerNode"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ChannelMergerNode { name := "Lasm.JS.Web.ChannelMergerNode.new?", module := "globalThis", path := "ChannelMergerNode", construct := true, arity := 2 }
+      (Internal.args #[toJS context, Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `v instanceof ChannelSplitterNode`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ChannelSplitterNode`). -/
 @[macro_inline] def ChannelSplitterNode.cast? (v : Value) : IO (Option ChannelSplitterNode) := Internal.api "Lasm.JS.Web.ChannelSplitterNode.cast?" do
   Internal.cast (Internal.getGlobal ["ChannelSplitterNode"] Value) (fun x => { val := x }) v
@@ -1418,6 +1672,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
   Lasm.JS.Binding.invoke ChannelSplitterNode { name := "Lasm.JS.Web.ChannelSplitterNode.new", module := "globalThis", path := "ChannelSplitterNode", construct := true, arity := 2 }
     (Internal.args #[toJS context, Internal.optional options]) (await := false)
 
+/-- `constructor(BaseAudioContext context, optional ChannelSplitterOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ChannelSplitterNode.new? (context : BaseAudioContext) (options : Option ChannelSplitterOptions := none) : IO (Option ChannelSplitterNode) := Internal.api "Lasm.JS.Web.ChannelSplitterNode.new?" do
+  if !(← Internal.hasGlobal ["ChannelSplitterNode"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ChannelSplitterNode { name := "Lasm.JS.Web.ChannelSplitterNode.new?", module := "globalThis", path := "ChannelSplitterNode", construct := true, arity := 2 }
+      (Internal.args #[toJS context, Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `v instanceof ConvolverNode`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ConvolverNode`). -/
 @[macro_inline] def ConvolverNode.cast? (v : Value) : IO (Option ConvolverNode) := Internal.api "Lasm.JS.Web.ConvolverNode.cast?" do
   Internal.cast (Internal.getGlobal ["ConvolverNode"] Value) (fun x => { val := x }) v
@@ -1426,6 +1688,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
 @[macro_inline] def ConvolverNode.new (context : BaseAudioContext) (options : Option ConvolverOptions := none) : IO ConvolverNode := Internal.api "Lasm.JS.Web.ConvolverNode.new" do
   Lasm.JS.Binding.invoke ConvolverNode { name := "Lasm.JS.Web.ConvolverNode.new", module := "globalThis", path := "ConvolverNode", construct := true, arity := 2 }
     (Internal.args #[toJS context, Internal.optional options]) (await := false)
+
+/-- `constructor(BaseAudioContext context, optional ConvolverOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ConvolverNode.new? (context : BaseAudioContext) (options : Option ConvolverOptions := none) : IO (Option ConvolverNode) := Internal.api "Lasm.JS.Web.ConvolverNode.new?" do
+  if !(← Internal.hasGlobal ["ConvolverNode"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ConvolverNode { name := "Lasm.JS.Web.ConvolverNode.new?", module := "globalThis", path := "ConvolverNode", construct := true, arity := 2 }
+      (Internal.args #[toJS context, Internal.optional options]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute AudioBuffer? buffer` -/
 @[macro_inline] def ConvolverNode.buffer (self : ConvolverNode) : IO (Option AudioBuffer) := Internal.api "Lasm.JS.Web.ConvolverNode.buffer" do
@@ -1452,6 +1722,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
   Lasm.JS.Binding.invoke DelayNode { name := "Lasm.JS.Web.DelayNode.new", module := "globalThis", path := "DelayNode", construct := true, arity := 2 }
     (Internal.args #[toJS context, Internal.optional options]) (await := false)
 
+/-- `constructor(BaseAudioContext context, optional DelayOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DelayNode.new? (context : BaseAudioContext) (options : Option DelayOptions := none) : IO (Option DelayNode) := Internal.api "Lasm.JS.Web.DelayNode.new?" do
+  if !(← Internal.hasGlobal ["DelayNode"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke DelayNode { name := "Lasm.JS.Web.DelayNode.new?", module := "globalThis", path := "DelayNode", construct := true, arity := 2 }
+      (Internal.args #[toJS context, Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute AudioParam delayTime` -/
 @[macro_inline] def DelayNode.delayTime (self : DelayNode) : IO AudioParam := Internal.api "Lasm.JS.Web.DelayNode.delayTime" do
   let r ← self.val.get "delayTime" Value
@@ -1465,6 +1743,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
 @[macro_inline] def DynamicsCompressorNode.new (context : BaseAudioContext) (options : Option DynamicsCompressorOptions := none) : IO DynamicsCompressorNode := Internal.api "Lasm.JS.Web.DynamicsCompressorNode.new" do
   Lasm.JS.Binding.invoke DynamicsCompressorNode { name := "Lasm.JS.Web.DynamicsCompressorNode.new", module := "globalThis", path := "DynamicsCompressorNode", construct := true, arity := 2 }
     (Internal.args #[toJS context, Internal.optional options]) (await := false)
+
+/-- `constructor(BaseAudioContext context, optional DynamicsCompressorOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DynamicsCompressorNode.new? (context : BaseAudioContext) (options : Option DynamicsCompressorOptions := none) : IO (Option DynamicsCompressorNode) := Internal.api "Lasm.JS.Web.DynamicsCompressorNode.new?" do
+  if !(← Internal.hasGlobal ["DynamicsCompressorNode"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke DynamicsCompressorNode { name := "Lasm.JS.Web.DynamicsCompressorNode.new?", module := "globalThis", path := "DynamicsCompressorNode", construct := true, arity := 2 }
+      (Internal.args #[toJS context, Internal.optional options]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute AudioParam threshold` -/
 @[macro_inline] def DynamicsCompressorNode.threshold (self : DynamicsCompressorNode) : IO AudioParam := Internal.api "Lasm.JS.Web.DynamicsCompressorNode.threshold" do
@@ -1504,6 +1790,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
   Lasm.JS.Binding.invoke GainNode { name := "Lasm.JS.Web.GainNode.new", module := "globalThis", path := "GainNode", construct := true, arity := 2 }
     (Internal.args #[toJS context, Internal.optional options]) (await := false)
 
+/-- `constructor(BaseAudioContext context, optional GainOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def GainNode.new? (context : BaseAudioContext) (options : Option GainOptions := none) : IO (Option GainNode) := Internal.api "Lasm.JS.Web.GainNode.new?" do
+  if !(← Internal.hasGlobal ["GainNode"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke GainNode { name := "Lasm.JS.Web.GainNode.new?", module := "globalThis", path := "GainNode", construct := true, arity := 2 }
+      (Internal.args #[toJS context, Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute AudioParam gain` -/
 @[macro_inline] def GainNode.gain (self : GainNode) : IO AudioParam := Internal.api "Lasm.JS.Web.GainNode.gain" do
   let r ← self.val.get "gain" Value
@@ -1517,6 +1811,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
 @[macro_inline] def IIRFilterNode.new (context : BaseAudioContext) (options : IIRFilterOptions) : IO IIRFilterNode := Internal.api "Lasm.JS.Web.IIRFilterNode.new" do
   Lasm.JS.Binding.invoke IIRFilterNode { name := "Lasm.JS.Web.IIRFilterNode.new", module := "globalThis", path := "IIRFilterNode", construct := true, arity := 2 }
     (Internal.args #[toJS context, toJS options]) (await := false)
+
+/-- `constructor(BaseAudioContext context, IIRFilterOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def IIRFilterNode.new? (context : BaseAudioContext) (options : IIRFilterOptions) : IO (Option IIRFilterNode) := Internal.api "Lasm.JS.Web.IIRFilterNode.new?" do
+  if !(← Internal.hasGlobal ["IIRFilterNode"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke IIRFilterNode { name := "Lasm.JS.Web.IIRFilterNode.new?", module := "globalThis", path := "IIRFilterNode", construct := true, arity := 2 }
+      (Internal.args #[toJS context, toJS options]) (await := false)
+  return some lasmGuarded
 
 /-- `undefined getFrequencyResponse(Float32Array frequencyHz, Float32Array magResponse, Float32Array phaseResponse)` -/
 @[macro_inline] def IIRFilterNode.getFrequencyResponse (self : IIRFilterNode) (frequencyHz : ByteArray) (magResponse : ByteArray) (phaseResponse : ByteArray) : IO Unit := Internal.api "Lasm.JS.Web.IIRFilterNode.getFrequencyResponse" do
@@ -1534,6 +1836,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
   Lasm.JS.Binding.invoke MediaElementAudioSourceNode { name := "Lasm.JS.Web.MediaElementAudioSourceNode.new", module := "globalThis", path := "MediaElementAudioSourceNode", construct := true, arity := 2 }
     (Internal.args #[toJS context, toJS options]) (await := false)
 
+/-- `constructor(AudioContext context, MediaElementAudioSourceOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaElementAudioSourceNode.new? (context : AudioContext) (options : MediaElementAudioSourceOptions) : IO (Option MediaElementAudioSourceNode) := Internal.api "Lasm.JS.Web.MediaElementAudioSourceNode.new?" do
+  if !(← Internal.hasGlobal ["MediaElementAudioSourceNode"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke MediaElementAudioSourceNode { name := "Lasm.JS.Web.MediaElementAudioSourceNode.new?", module := "globalThis", path := "MediaElementAudioSourceNode", construct := true, arity := 2 }
+      (Internal.args #[toJS context, toJS options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute HTMLMediaElement mediaElement` -/
 @[macro_inline] def MediaElementAudioSourceNode.mediaElement (self : MediaElementAudioSourceNode) : IO HTMLMediaElement := Internal.api "Lasm.JS.Web.MediaElementAudioSourceNode.mediaElement" do
   let r ← self.val.get "mediaElement" Value
@@ -1547,6 +1857,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
 @[macro_inline] def MediaStreamAudioDestinationNode.new (context : AudioContext) (options : Option AudioNodeOptions := none) : IO MediaStreamAudioDestinationNode := Internal.api "Lasm.JS.Web.MediaStreamAudioDestinationNode.new" do
   Lasm.JS.Binding.invoke MediaStreamAudioDestinationNode { name := "Lasm.JS.Web.MediaStreamAudioDestinationNode.new", module := "globalThis", path := "MediaStreamAudioDestinationNode", construct := true, arity := 2 }
     (Internal.args #[toJS context, Internal.optional options]) (await := false)
+
+/-- `constructor(AudioContext context, optional AudioNodeOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaStreamAudioDestinationNode.new? (context : AudioContext) (options : Option AudioNodeOptions := none) : IO (Option MediaStreamAudioDestinationNode) := Internal.api "Lasm.JS.Web.MediaStreamAudioDestinationNode.new?" do
+  if !(← Internal.hasGlobal ["MediaStreamAudioDestinationNode"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke MediaStreamAudioDestinationNode { name := "Lasm.JS.Web.MediaStreamAudioDestinationNode.new?", module := "globalThis", path := "MediaStreamAudioDestinationNode", construct := true, arity := 2 }
+      (Internal.args #[toJS context, Internal.optional options]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute MediaStream stream` -/
 @[macro_inline] def MediaStreamAudioDestinationNode.stream (self : MediaStreamAudioDestinationNode) : IO MediaStream := Internal.api "Lasm.JS.Web.MediaStreamAudioDestinationNode.stream" do
@@ -1562,6 +1880,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
   Lasm.JS.Binding.invoke MediaStreamAudioSourceNode { name := "Lasm.JS.Web.MediaStreamAudioSourceNode.new", module := "globalThis", path := "MediaStreamAudioSourceNode", construct := true, arity := 2 }
     (Internal.args #[toJS context, toJS options]) (await := false)
 
+/-- `constructor(AudioContext context, MediaStreamAudioSourceOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaStreamAudioSourceNode.new? (context : AudioContext) (options : MediaStreamAudioSourceOptions) : IO (Option MediaStreamAudioSourceNode) := Internal.api "Lasm.JS.Web.MediaStreamAudioSourceNode.new?" do
+  if !(← Internal.hasGlobal ["MediaStreamAudioSourceNode"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke MediaStreamAudioSourceNode { name := "Lasm.JS.Web.MediaStreamAudioSourceNode.new?", module := "globalThis", path := "MediaStreamAudioSourceNode", construct := true, arity := 2 }
+      (Internal.args #[toJS context, toJS options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute MediaStream mediaStream` -/
 @[macro_inline] def MediaStreamAudioSourceNode.mediaStream (self : MediaStreamAudioSourceNode) : IO MediaStream := Internal.api "Lasm.JS.Web.MediaStreamAudioSourceNode.mediaStream" do
   let r ← self.val.get "mediaStream" Value
@@ -1576,6 +1902,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
   Lasm.JS.Binding.invoke MediaStreamTrackAudioSourceNode { name := "Lasm.JS.Web.MediaStreamTrackAudioSourceNode.new", module := "globalThis", path := "MediaStreamTrackAudioSourceNode", construct := true, arity := 2 }
     (Internal.args #[toJS context, toJS options]) (await := false)
 
+/-- `constructor(AudioContext context, MediaStreamTrackAudioSourceOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaStreamTrackAudioSourceNode.new? (context : AudioContext) (options : MediaStreamTrackAudioSourceOptions) : IO (Option MediaStreamTrackAudioSourceNode) := Internal.api "Lasm.JS.Web.MediaStreamTrackAudioSourceNode.new?" do
+  if !(← Internal.hasGlobal ["MediaStreamTrackAudioSourceNode"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke MediaStreamTrackAudioSourceNode { name := "Lasm.JS.Web.MediaStreamTrackAudioSourceNode.new?", module := "globalThis", path := "MediaStreamTrackAudioSourceNode", construct := true, arity := 2 }
+      (Internal.args #[toJS context, toJS options]) (await := false)
+  return some lasmGuarded
+
 /-- `v instanceof OfflineAudioContext`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `OfflineAudioContext`). -/
 @[macro_inline] def OfflineAudioContext.cast? (v : Value) : IO (Option OfflineAudioContext) := Internal.api "Lasm.JS.Web.OfflineAudioContext.cast?" do
   Internal.cast (Internal.getGlobal ["OfflineAudioContext"] Value) (fun x => { val := x }) v
@@ -1585,10 +1919,26 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
   Lasm.JS.Binding.invoke OfflineAudioContext { name := "Lasm.JS.Web.OfflineAudioContext.new", module := "globalThis", path := "OfflineAudioContext", construct := true, arity := 1 }
     (Internal.args #[toJS contextOptions]) (await := false)
 
+/-- `constructor(OfflineAudioContextOptions contextOptions)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def OfflineAudioContext.new? (contextOptions : OfflineAudioContextOptions) : IO (Option OfflineAudioContext) := Internal.api "Lasm.JS.Web.OfflineAudioContext.new?" do
+  if !(← Internal.hasGlobal ["OfflineAudioContext"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke OfflineAudioContext { name := "Lasm.JS.Web.OfflineAudioContext.new?", module := "globalThis", path := "OfflineAudioContext", construct := true, arity := 1 }
+      (Internal.args #[toJS contextOptions]) (await := false)
+  return some lasmGuarded
+
 /-- `constructor(unsigned long numberOfChannels, unsigned long length, float sampleRate)` -/
 @[macro_inline] def OfflineAudioContext.newWithNumberOfChannels (numberOfChannels : Nat) (length : Nat) (sampleRate : Float) : IO OfflineAudioContext := Internal.api "Lasm.JS.Web.OfflineAudioContext.newWithNumberOfChannels" do
   Lasm.JS.Binding.invoke OfflineAudioContext { name := "Lasm.JS.Web.OfflineAudioContext.newWithNumberOfChannels", module := "globalThis", path := "OfflineAudioContext", construct := true, arity := 3 }
     (Internal.args #[toJS numberOfChannels, toJS length, toJS sampleRate]) (await := false)
+
+/-- `constructor(unsigned long numberOfChannels, unsigned long length, float sampleRate)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def OfflineAudioContext.newWithNumberOfChannels? (numberOfChannels : Nat) (length : Nat) (sampleRate : Float) : IO (Option OfflineAudioContext) := Internal.api "Lasm.JS.Web.OfflineAudioContext.newWithNumberOfChannels?" do
+  if !(← Internal.hasGlobal ["OfflineAudioContext"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke OfflineAudioContext { name := "Lasm.JS.Web.OfflineAudioContext.newWithNumberOfChannels?", module := "globalThis", path := "OfflineAudioContext", construct := true, arity := 3 }
+      (Internal.args #[toJS numberOfChannels, toJS length, toJS sampleRate]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute unsigned long? length` -/
 @[macro_inline] def OfflineAudioContext.length (self : OfflineAudioContext) : IO (Option Nat) := Internal.api "Lasm.JS.Web.OfflineAudioContext.length" do
@@ -1615,9 +1965,25 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
 @[macro_inline] def OfflineAudioContext.suspend (self : OfflineAudioContext) (suspendTime : Float) : Async Unit := Internal.api "Lasm.JS.Web.OfflineAudioContext.suspend" do
   self.val.callMethodAwait "suspend" (Internal.args #[toJS suspendTime]) Unit
 
+/-- `Promise<undefined> suspend(double suspendTime)` where the platform has it (`'suspend' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def OfflineAudioContext.suspend? (self' : OfflineAudioContext) (suspendTime : Float) : Async (Option Unit) := Internal.api "Lasm.JS.Web.OfflineAudioContext.suspend?" do
+  let self := self'
+  if !(← Internal.has self.val "suspend") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "suspend" (Internal.args #[toJS suspendTime]) Unit
+  return some lasmGuarded
+
 /-- `Promise<undefined> close()` -/
 @[macro_inline] def OfflineAudioContext.close (self : OfflineAudioContext) : Async Unit := Internal.api "Lasm.JS.Web.OfflineAudioContext.close" do
   self.val.callMethodAwait "close" (Internal.args #[]) Unit
+
+/-- `Promise<undefined> close()` where the platform has it (`'close' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def OfflineAudioContext.close? (self' : OfflineAudioContext) : Async (Option Unit) := Internal.api "Lasm.JS.Web.OfflineAudioContext.close?" do
+  let self := self'
+  if !(← Internal.has self.val "close") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "close" (Internal.args #[]) Unit
+  return some lasmGuarded
 
 /-- `v instanceof PannerNode`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `PannerNode`). -/
 @[macro_inline] def PannerNode.cast? (v : Value) : IO (Option PannerNode) := Internal.api "Lasm.JS.Web.PannerNode.cast?" do
@@ -1627,6 +1993,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
 @[macro_inline] def PannerNode.new (context : BaseAudioContext) (options : Option PannerOptions := none) : IO PannerNode := Internal.api "Lasm.JS.Web.PannerNode.new" do
   Lasm.JS.Binding.invoke PannerNode { name := "Lasm.JS.Web.PannerNode.new", module := "globalThis", path := "PannerNode", construct := true, arity := 2 }
     (Internal.args #[toJS context, Internal.optional options]) (await := false)
+
+/-- `constructor(BaseAudioContext context, optional PannerOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PannerNode.new? (context : BaseAudioContext) (options : Option PannerOptions := none) : IO (Option PannerNode) := Internal.api "Lasm.JS.Web.PannerNode.new?" do
+  if !(← Internal.hasGlobal ["PannerNode"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PannerNode { name := "Lasm.JS.Web.PannerNode.new?", module := "globalThis", path := "PannerNode", construct := true, arity := 2 }
+      (Internal.args #[toJS context, Internal.optional options]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute PanningModelType panningModel` -/
 @[macro_inline] def PannerNode.panningModel (self : PannerNode) : IO PanningModelType := Internal.api "Lasm.JS.Web.PannerNode.panningModel" do
@@ -1755,6 +2129,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
   Lasm.JS.Binding.invoke StereoPannerNode { name := "Lasm.JS.Web.StereoPannerNode.new", module := "globalThis", path := "StereoPannerNode", construct := true, arity := 2 }
     (Internal.args #[toJS context, Internal.optional options]) (await := false)
 
+/-- `constructor(BaseAudioContext context, optional StereoPannerOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def StereoPannerNode.new? (context : BaseAudioContext) (options : Option StereoPannerOptions := none) : IO (Option StereoPannerNode) := Internal.api "Lasm.JS.Web.StereoPannerNode.new?" do
+  if !(← Internal.hasGlobal ["StereoPannerNode"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke StereoPannerNode { name := "Lasm.JS.Web.StereoPannerNode.new?", module := "globalThis", path := "StereoPannerNode", construct := true, arity := 2 }
+      (Internal.args #[toJS context, Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute AudioParam pan` -/
 @[macro_inline] def StereoPannerNode.pan (self : StereoPannerNode) : IO AudioParam := Internal.api "Lasm.JS.Web.StereoPannerNode.pan" do
   let r ← self.val.get "pan" Value
@@ -1768,6 +2150,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
 @[macro_inline] def WaveShaperNode.new (context : BaseAudioContext) (options : Option WaveShaperOptions := none) : IO WaveShaperNode := Internal.api "Lasm.JS.Web.WaveShaperNode.new" do
   Lasm.JS.Binding.invoke WaveShaperNode { name := "Lasm.JS.Web.WaveShaperNode.new", module := "globalThis", path := "WaveShaperNode", construct := true, arity := 2 }
     (Internal.args #[toJS context, Internal.optional options]) (await := false)
+
+/-- `constructor(BaseAudioContext context, optional WaveShaperOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def WaveShaperNode.new? (context : BaseAudioContext) (options : Option WaveShaperOptions := none) : IO (Option WaveShaperNode) := Internal.api "Lasm.JS.Web.WaveShaperNode.new?" do
+  if !(← Internal.hasGlobal ["WaveShaperNode"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke WaveShaperNode { name := "Lasm.JS.Web.WaveShaperNode.new?", module := "globalThis", path := "WaveShaperNode", construct := true, arity := 2 }
+      (Internal.args #[toJS context, Internal.optional options]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute Float32Array? curve` -/
 @[macro_inline] def WaveShaperNode.curve (self : WaveShaperNode) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.WaveShaperNode.curve" do
@@ -1794,6 +2184,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
 @[macro_inline] def AudioBufferSourceNode.new (context : BaseAudioContext) (options : Option AudioBufferSourceOptions := none) : IO AudioBufferSourceNode := Internal.api "Lasm.JS.Web.AudioBufferSourceNode.new" do
   Lasm.JS.Binding.invoke AudioBufferSourceNode { name := "Lasm.JS.Web.AudioBufferSourceNode.new", module := "globalThis", path := "AudioBufferSourceNode", construct := true, arity := 2 }
     (Internal.args #[toJS context, Internal.optional options]) (await := false)
+
+/-- `constructor(BaseAudioContext context, optional AudioBufferSourceOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioBufferSourceNode.new? (context : BaseAudioContext) (options : Option AudioBufferSourceOptions := none) : IO (Option AudioBufferSourceNode) := Internal.api "Lasm.JS.Web.AudioBufferSourceNode.new?" do
+  if !(← Internal.hasGlobal ["AudioBufferSourceNode"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke AudioBufferSourceNode { name := "Lasm.JS.Web.AudioBufferSourceNode.new?", module := "globalThis", path := "AudioBufferSourceNode", construct := true, arity := 2 }
+      (Internal.args #[toJS context, Internal.optional options]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute AudioBuffer? buffer` -/
 @[macro_inline] def AudioBufferSourceNode.buffer (self : AudioBufferSourceNode) : IO (Option AudioBuffer) := Internal.api "Lasm.JS.Web.AudioBufferSourceNode.buffer" do
@@ -1850,6 +2248,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
   Lasm.JS.Binding.invoke ConstantSourceNode { name := "Lasm.JS.Web.ConstantSourceNode.new", module := "globalThis", path := "ConstantSourceNode", construct := true, arity := 2 }
     (Internal.args #[toJS context, Internal.optional options]) (await := false)
 
+/-- `constructor(BaseAudioContext context, optional ConstantSourceOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ConstantSourceNode.new? (context : BaseAudioContext) (options : Option ConstantSourceOptions := none) : IO (Option ConstantSourceNode) := Internal.api "Lasm.JS.Web.ConstantSourceNode.new?" do
+  if !(← Internal.hasGlobal ["ConstantSourceNode"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ConstantSourceNode { name := "Lasm.JS.Web.ConstantSourceNode.new?", module := "globalThis", path := "ConstantSourceNode", construct := true, arity := 2 }
+      (Internal.args #[toJS context, Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute AudioParam offset` -/
 @[macro_inline] def ConstantSourceNode.offset (self : ConstantSourceNode) : IO AudioParam := Internal.api "Lasm.JS.Web.ConstantSourceNode.offset" do
   let r ← self.val.get "offset" Value
@@ -1863,6 +2269,14 @@ instance : ToJS AudioParamDescriptor := ⟨fun d => Internal.fields #[("name", t
 @[macro_inline] def OscillatorNode.new (context : BaseAudioContext) (options : Option OscillatorOptions := none) : IO OscillatorNode := Internal.api "Lasm.JS.Web.OscillatorNode.new" do
   Lasm.JS.Binding.invoke OscillatorNode { name := "Lasm.JS.Web.OscillatorNode.new", module := "globalThis", path := "OscillatorNode", construct := true, arity := 2 }
     (Internal.args #[toJS context, Internal.optional options]) (await := false)
+
+/-- `constructor(BaseAudioContext context, optional OscillatorOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def OscillatorNode.new? (context : BaseAudioContext) (options : Option OscillatorOptions := none) : IO (Option OscillatorNode) := Internal.api "Lasm.JS.Web.OscillatorNode.new?" do
+  if !(← Internal.hasGlobal ["OscillatorNode"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke OscillatorNode { name := "Lasm.JS.Web.OscillatorNode.new?", module := "globalThis", path := "OscillatorNode", construct := true, arity := 2 }
+      (Internal.args #[toJS context, Internal.optional options]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute OscillatorType type` -/
 @[macro_inline] def OscillatorNode.type (self : OscillatorNode) : IO OscillatorType := Internal.api "Lasm.JS.Web.OscillatorNode.type" do

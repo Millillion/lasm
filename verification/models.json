@@ -430,6 +430,10 @@
       ],
       "reason": "the allocator is modelled; handle_fresh_in_range proved"
     },
+    "src/import-hints.mjs": {
+      "status": "pending",
+      "reason": "missing-import hints: reading the declarations, the index and the lookup are pure; model them (reading the index file is I/O)"
+    },
     "src/init.mjs": {
       "status": "pending",
       "models": [

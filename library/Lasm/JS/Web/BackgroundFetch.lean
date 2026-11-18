@@ -82,6 +82,14 @@ instance : ToJS BackgroundFetchUIOptions := ⟨fun d => Internal.fields #[("icon
   Lasm.JS.Binding.invoke BackgroundFetchEvent { name := "Lasm.JS.Web.BackgroundFetchEvent.new", module := "globalThis", path := "BackgroundFetchEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS init]) (await := false)
 
+/-- `constructor(DOMString type, BackgroundFetchEventInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def BackgroundFetchEvent.new? (type : String) (init : BackgroundFetchEventInit) : IO (Option BackgroundFetchEvent) := Internal.api "Lasm.JS.Web.BackgroundFetchEvent.new?" do
+  if !(← Internal.hasGlobal ["BackgroundFetchEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke BackgroundFetchEvent { name := "Lasm.JS.Web.BackgroundFetchEvent.new?", module := "globalThis", path := "BackgroundFetchEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS init]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute BackgroundFetchRegistration registration` -/
 @[macro_inline] def BackgroundFetchEvent.registration (self : BackgroundFetchEvent) : IO BackgroundFetchRegistration := Internal.api "Lasm.JS.Web.BackgroundFetchEvent.registration" do
   let r ← self.val.get "registration" Value
@@ -185,6 +193,14 @@ instance : ToJS BackgroundFetchUIOptions := ⟨fun d => Internal.fields #[("icon
   Lasm.JS.Binding.invoke BackgroundFetchUpdateUIEvent { name := "Lasm.JS.Web.BackgroundFetchUpdateUIEvent.new", module := "globalThis", path := "BackgroundFetchUpdateUIEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS init]) (await := false)
 
+/-- `constructor(DOMString type, BackgroundFetchEventInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def BackgroundFetchUpdateUIEvent.new? (type : String) (init : BackgroundFetchEventInit) : IO (Option BackgroundFetchUpdateUIEvent) := Internal.api "Lasm.JS.Web.BackgroundFetchUpdateUIEvent.new?" do
+  if !(← Internal.hasGlobal ["BackgroundFetchUpdateUIEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke BackgroundFetchUpdateUIEvent { name := "Lasm.JS.Web.BackgroundFetchUpdateUIEvent.new?", module := "globalThis", path := "BackgroundFetchUpdateUIEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS init]) (await := false)
+  return some lasmGuarded
+
 /-- `Promise<undefined> updateUI(optional BackgroundFetchUIOptions options)` -/
 @[macro_inline] def BackgroundFetchUpdateUIEvent.updateUI (self : BackgroundFetchUpdateUIEvent) (options : Option BackgroundFetchUIOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.BackgroundFetchUpdateUIEvent.updateUI" do
   self.val.callMethodAwait "updateUI" (Internal.args #[Internal.optional options]) Unit
@@ -192,6 +208,14 @@ instance : ToJS BackgroundFetchUIOptions := ⟨fun d => Internal.fields #[("icon
 /-- `attribute EventHandler onbackgroundfetchsuccess` -/
 @[macro_inline] def ServiceWorkerGlobalScope.onbackgroundfetchsuccess (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onbackgroundfetchsuccess" do
   self.val.get "onbackgroundfetchsuccess" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onbackgroundfetchsuccess` where the platform has it (`'onbackgroundfetchsuccess' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ServiceWorkerGlobalScope.onbackgroundfetchsuccess? (self' : ServiceWorkerGlobalScope) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onbackgroundfetchsuccess?" do
+  let self := self'
+  if !(← Internal.has self.val "onbackgroundfetchsuccess") then return none
+  let lasmGuarded ← do
+    self.val.get "onbackgroundfetchsuccess" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onbackgroundfetchsuccess`: `attribute EventHandler onbackgroundfetchsuccess` -/
 @[macro_inline] def ServiceWorkerGlobalScope.setOnbackgroundfetchsuccess (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOnbackgroundfetchsuccess" do
@@ -201,6 +225,14 @@ instance : ToJS BackgroundFetchUIOptions := ⟨fun d => Internal.fields #[("icon
 @[macro_inline] def ServiceWorkerGlobalScope.onbackgroundfetchfail (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onbackgroundfetchfail" do
   self.val.get "onbackgroundfetchfail" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onbackgroundfetchfail` where the platform has it (`'onbackgroundfetchfail' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ServiceWorkerGlobalScope.onbackgroundfetchfail? (self' : ServiceWorkerGlobalScope) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onbackgroundfetchfail?" do
+  let self := self'
+  if !(← Internal.has self.val "onbackgroundfetchfail") then return none
+  let lasmGuarded ← do
+    self.val.get "onbackgroundfetchfail" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `onbackgroundfetchfail`: `attribute EventHandler onbackgroundfetchfail` -/
 @[macro_inline] def ServiceWorkerGlobalScope.setOnbackgroundfetchfail (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOnbackgroundfetchfail" do
   self.val.set "onbackgroundfetchfail" (toJS value)
@@ -208,6 +240,14 @@ instance : ToJS BackgroundFetchUIOptions := ⟨fun d => Internal.fields #[("icon
 /-- `attribute EventHandler onbackgroundfetchabort` -/
 @[macro_inline] def ServiceWorkerGlobalScope.onbackgroundfetchabort (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onbackgroundfetchabort" do
   self.val.get "onbackgroundfetchabort" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onbackgroundfetchabort` where the platform has it (`'onbackgroundfetchabort' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ServiceWorkerGlobalScope.onbackgroundfetchabort? (self' : ServiceWorkerGlobalScope) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onbackgroundfetchabort?" do
+  let self := self'
+  if !(← Internal.has self.val "onbackgroundfetchabort") then return none
+  let lasmGuarded ← do
+    self.val.get "onbackgroundfetchabort" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onbackgroundfetchabort`: `attribute EventHandler onbackgroundfetchabort` -/
 @[macro_inline] def ServiceWorkerGlobalScope.setOnbackgroundfetchabort (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOnbackgroundfetchabort" do
@@ -217,6 +257,14 @@ instance : ToJS BackgroundFetchUIOptions := ⟨fun d => Internal.fields #[("icon
 @[macro_inline] def ServiceWorkerGlobalScope.onbackgroundfetchclick (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onbackgroundfetchclick" do
   self.val.get "onbackgroundfetchclick" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onbackgroundfetchclick` where the platform has it (`'onbackgroundfetchclick' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ServiceWorkerGlobalScope.onbackgroundfetchclick? (self' : ServiceWorkerGlobalScope) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onbackgroundfetchclick?" do
+  let self := self'
+  if !(← Internal.has self.val "onbackgroundfetchclick") then return none
+  let lasmGuarded ← do
+    self.val.get "onbackgroundfetchclick" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `onbackgroundfetchclick`: `attribute EventHandler onbackgroundfetchclick` -/
 @[macro_inline] def ServiceWorkerGlobalScope.setOnbackgroundfetchclick (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOnbackgroundfetchclick" do
   self.val.set "onbackgroundfetchclick" (toJS value)
@@ -225,5 +273,14 @@ instance : ToJS BackgroundFetchUIOptions := ⟨fun d => Internal.fields #[("icon
 @[macro_inline] def ServiceWorkerRegistration.backgroundFetch (self : ServiceWorkerRegistration) : IO BackgroundFetchManager := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.backgroundFetch" do
   let r ← self.val.get "backgroundFetch" Value
   pure { val := r }
+
+/-- `readonly attribute BackgroundFetchManager backgroundFetch` where the platform has it (`'backgroundFetch' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ServiceWorkerRegistration.backgroundFetch? (self' : ServiceWorkerRegistration) : IO (Option BackgroundFetchManager) := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.backgroundFetch?" do
+  let self := self'
+  if !(← Internal.has self.val "backgroundFetch") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "backgroundFetch" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

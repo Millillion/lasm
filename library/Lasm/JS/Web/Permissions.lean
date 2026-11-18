@@ -66,9 +66,27 @@ instance : ToJS PermissionSetParameters := ⟨fun d => Internal.fields #[("descr
   let r ← self.val.get "permissions" Value
   pure { val := r }
 
+/-- `readonly attribute Permissions permissions` where the platform has it (`'permissions' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.permissions? (self' : Navigator) : IO (Option Permissions) := Internal.api "Lasm.JS.Web.Navigator.permissions?" do
+  let self := self'
+  if !(← Internal.has self.val "permissions") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "permissions" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute Permissions permissions` -/
 @[macro_inline] def WorkerNavigator.permissions (self : WorkerNavigator) : IO Permissions := Internal.api "Lasm.JS.Web.WorkerNavigator.permissions" do
   let r ← self.val.get "permissions" Value
   pure { val := r }
+
+/-- `readonly attribute Permissions permissions` where the platform has it (`'permissions' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerNavigator.permissions? (self' : WorkerNavigator) : IO (Option Permissions) := Internal.api "Lasm.JS.Web.WorkerNavigator.permissions?" do
+  let self := self'
+  if !(← Internal.has self.val "permissions") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "permissions" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

@@ -50,9 +50,27 @@ instance : FromJS StorageEstimate where
   let r ← self.val.get "storage" Value
   pure { val := r }
 
+/-- `readonly attribute StorageManager storage` where the platform has it (`'storage' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.storage? (self' : Navigator) : IO (Option StorageManager) := Internal.api "Lasm.JS.Web.Navigator.storage?" do
+  let self := self'
+  if !(← Internal.has self.val "storage") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "storage" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute StorageManager storage` -/
 @[macro_inline] def WorkerNavigator.storage (self : WorkerNavigator) : IO StorageManager := Internal.api "Lasm.JS.Web.WorkerNavigator.storage" do
   let r ← self.val.get "storage" Value
   pure { val := r }
+
+/-- `readonly attribute StorageManager storage` where the platform has it (`'storage' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerNavigator.storage? (self' : WorkerNavigator) : IO (Option StorageManager) := Internal.api "Lasm.JS.Web.WorkerNavigator.storage?" do
+  let self := self'
+  if !(← Internal.has self.val "storage") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "storage" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

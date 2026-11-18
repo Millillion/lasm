@@ -25,6 +25,14 @@ set_option compiler.extract_closed false
   Lasm.JS.Binding.invoke ProximitySensor { name := "Lasm.JS.Web.ProximitySensor.new", module := "globalThis", path := "ProximitySensor", construct := true, arity := 1 }
     (Internal.args #[Internal.optional sensorOptions]) (await := false)
 
+/-- `constructor(optional SensorOptions sensorOptions)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ProximitySensor.new? (sensorOptions : Option SensorOptions := none) : IO (Option ProximitySensor) := Internal.api "Lasm.JS.Web.ProximitySensor.new?" do
+  if !(← Internal.hasGlobal ["ProximitySensor"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ProximitySensor { name := "Lasm.JS.Web.ProximitySensor.new?", module := "globalThis", path := "ProximitySensor", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional sensorOptions]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute double? distance` -/
 @[macro_inline] def ProximitySensor.distance (self : ProximitySensor) : IO (Option Float) := Internal.api "Lasm.JS.Web.ProximitySensor.distance" do
   self.val.get "distance" (Option Float)

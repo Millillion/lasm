@@ -293,7 +293,7 @@ trips). Details: [Std.Http performance](SERVER_MVP.md#launch-position-2026-10-23
 | An HTTP handler in pure Lean for Node, the edge, Fastly, WASI and Spin (**0.3.0**) | `--template fetch` | [FETCH.md](FETCH.md) |
 | An edge function (Cloudflare Workers, Vercel Edge, Netlify Edge, Deno Deploy, Supabase) | `--template hono --deploy workers` (or another edge target) | [EDGE.md](EDGE.md), [deploy/](deploy/README.md) |
 | A browser app (**0.3.0**) | `--template web` | [UI.md](UI.md), [BROWSER.md](BROWSER.md) |
-| A full-stack app with a verified API (**0.3.0**) | `--template fullstack` | [RPC.md](RPC.md) |
+| A full-stack app with a verified API (**0.3.0**) | `--template fullstack` | [templates/fullstack](../templates/fullstack) |
 | Bun or Deno | `bun create @lasm my-app --template hono` | [BUN_DENO.md](BUN_DENO.md) |
 
 All documentation: [docs/README.md](README.md).

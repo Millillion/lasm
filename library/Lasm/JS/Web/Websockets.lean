@@ -48,6 +48,14 @@ instance : ToJS CloseEventInit := ⟨fun d => Internal.fields #[("bubbles", Inte
   Lasm.JS.Binding.invoke CloseEvent { name := "Lasm.JS.Web.CloseEvent.new", module := "globalThis", path := "CloseEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional CloseEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CloseEvent.new? (type : String) (eventInitDict : Option CloseEventInit := none) : IO (Option CloseEvent) := Internal.api "Lasm.JS.Web.CloseEvent.new?" do
+  if !(← Internal.hasGlobal ["CloseEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CloseEvent { name := "Lasm.JS.Web.CloseEvent.new?", module := "globalThis", path := "CloseEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute boolean wasClean` -/
 @[macro_inline] def CloseEvent.wasClean (self : CloseEvent) : IO Bool := Internal.api "Lasm.JS.Web.CloseEvent.wasClean" do
   self.val.get "wasClean" Bool
@@ -68,6 +76,14 @@ instance : ToJS CloseEventInit := ⟨fun d => Internal.fields #[("bubbles", Inte
 @[macro_inline] def WebSocket.new (url : String) (protocols : Option DOMStringOrSequenceOfDOMString := none) : IO WebSocket := Internal.api "Lasm.JS.Web.WebSocket.new" do
   Lasm.JS.Binding.invoke WebSocket { name := "Lasm.JS.Web.WebSocket.new", module := "globalThis", path := "WebSocket", construct := true, arity := 2 }
     (Internal.args #[toJS url, Internal.optional protocols]) (await := false)
+
+/-- `constructor(USVString url, optional (DOMString or sequence<DOMString>) protocols)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebSocket.new? (url : String) (protocols : Option DOMStringOrSequenceOfDOMString := none) : IO (Option WebSocket) := Internal.api "Lasm.JS.Web.WebSocket.new?" do
+  if !(← Internal.hasGlobal ["WebSocket"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke WebSocket { name := "Lasm.JS.Web.WebSocket.new?", module := "globalThis", path := "WebSocket", construct := true, arity := 2 }
+      (Internal.args #[toJS url, Internal.optional protocols]) (await := false)
+  return some lasmGuarded
 
 /-- `const unsigned short CONNECTING = 0` -/
 def WebSocket.CONNECTING : Nat := 0
@@ -92,6 +108,14 @@ def WebSocket.CLOSED : Nat := 3
 /-- `readonly attribute unsigned long long bufferedAmount` -/
 @[macro_inline] def WebSocket.bufferedAmount (self : WebSocket) : IO Nat := Internal.api "Lasm.JS.Web.WebSocket.bufferedAmount" do
   self.val.get "bufferedAmount" Nat
+
+/-- `readonly attribute unsigned long long bufferedAmount` where the platform has it (`'bufferedAmount' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebSocket.bufferedAmount? (self' : WebSocket) : IO (Option Nat) := Internal.api "Lasm.JS.Web.WebSocket.bufferedAmount?" do
+  let self := self'
+  if !(← Internal.has self.val "bufferedAmount") then return none
+  let lasmGuarded ← do
+    self.val.get "bufferedAmount" Nat
+  return some lasmGuarded
 
 /-- `attribute EventHandler onopen` -/
 @[macro_inline] def WebSocket.onopen (self : WebSocket) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.WebSocket.onopen" do
@@ -136,6 +160,14 @@ def WebSocket.CLOSED : Nat := 3
 /-- `attribute BinaryType binaryType` -/
 @[macro_inline] def WebSocket.binaryType (self : WebSocket) : IO BinaryType := Internal.api "Lasm.JS.Web.WebSocket.binaryType" do
   self.val.get "binaryType" BinaryType
+
+/-- `attribute BinaryType binaryType` where the platform has it (`'binaryType' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebSocket.binaryType? (self' : WebSocket) : IO (Option BinaryType) := Internal.api "Lasm.JS.Web.WebSocket.binaryType?" do
+  let self := self'
+  if !(← Internal.has self.val "binaryType") then return none
+  let lasmGuarded ← do
+    self.val.get "binaryType" BinaryType
+  return some lasmGuarded
 
 /-- Sets `binaryType`: `attribute BinaryType binaryType` -/
 @[macro_inline] def WebSocket.setBinaryType (self : WebSocket) (value : BinaryType) : IO Unit := Internal.api "Lasm.JS.Web.WebSocket.setBinaryType" do

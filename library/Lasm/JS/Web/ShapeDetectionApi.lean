@@ -91,10 +91,26 @@ instance : FromJS DetectedFace where
   Lasm.JS.Binding.invoke BarcodeDetector { name := "Lasm.JS.Web.BarcodeDetector.new", module := "globalThis", path := "BarcodeDetector", construct := true, arity := 1 }
     (Internal.args #[Internal.optional barcodeDetectorOptions]) (await := false)
 
+/-- `constructor(optional BarcodeDetectorOptions barcodeDetectorOptions)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def BarcodeDetector.new? (barcodeDetectorOptions : Option BarcodeDetectorOptions := none) : IO (Option BarcodeDetector) := Internal.api "Lasm.JS.Web.BarcodeDetector.new?" do
+  if !(← Internal.hasGlobal ["BarcodeDetector"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke BarcodeDetector { name := "Lasm.JS.Web.BarcodeDetector.new?", module := "globalThis", path := "BarcodeDetector", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional barcodeDetectorOptions]) (await := false)
+  return some lasmGuarded
+
 /-- `static Promise<sequence<BarcodeFormat>> getSupportedFormats()` -/
 @[macro_inline] def BarcodeDetector.getSupportedFormats : Async (Array BarcodeFormat) := Internal.api "Lasm.JS.Web.BarcodeDetector.getSupportedFormats" do
   Lasm.JS.Binding.invokeAsync (Array BarcodeFormat) { name := "Lasm.JS.Web.BarcodeDetector.getSupportedFormats", module := "globalThis", path := "BarcodeDetector.getSupportedFormats", construct := false, arity := 0 }
     (Internal.args #[])
+
+/-- `static Promise<sequence<BarcodeFormat>> getSupportedFormats()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def BarcodeDetector.getSupportedFormats? : Async (Option (Array BarcodeFormat)) := Internal.api "Lasm.JS.Web.BarcodeDetector.getSupportedFormats?" do
+  if !(← Internal.hasGlobal ["BarcodeDetector", "getSupportedFormats"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync (Array BarcodeFormat) { name := "Lasm.JS.Web.BarcodeDetector.getSupportedFormats?", module := "globalThis", path := "BarcodeDetector.getSupportedFormats", construct := false, arity := 0 }
+      (Internal.args #[])
+  return some lasmGuarded
 
 /-- `Promise<sequence<DetectedBarcode>> detect(ImageBitmapSource image)` -/
 @[macro_inline] def BarcodeDetector.detect (self : BarcodeDetector) (image : ImageBitmapSource) : Async (Array DetectedBarcode) := Internal.api "Lasm.JS.Web.BarcodeDetector.detect" do
@@ -108,6 +124,14 @@ instance : FromJS DetectedFace where
 @[macro_inline] def FaceDetector.new (faceDetectorOptions : Option FaceDetectorOptions := none) : IO FaceDetector := Internal.api "Lasm.JS.Web.FaceDetector.new" do
   Lasm.JS.Binding.invoke FaceDetector { name := "Lasm.JS.Web.FaceDetector.new", module := "globalThis", path := "FaceDetector", construct := true, arity := 1 }
     (Internal.args #[Internal.optional faceDetectorOptions]) (await := false)
+
+/-- `constructor(optional FaceDetectorOptions faceDetectorOptions)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def FaceDetector.new? (faceDetectorOptions : Option FaceDetectorOptions := none) : IO (Option FaceDetector) := Internal.api "Lasm.JS.Web.FaceDetector.new?" do
+  if !(← Internal.hasGlobal ["FaceDetector"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke FaceDetector { name := "Lasm.JS.Web.FaceDetector.new?", module := "globalThis", path := "FaceDetector", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional faceDetectorOptions]) (await := false)
+  return some lasmGuarded
 
 /-- `Promise<sequence<DetectedFace>> detect(ImageBitmapSource image)` -/
 @[macro_inline] def FaceDetector.detect (self : FaceDetector) (image : ImageBitmapSource) : Async (Array DetectedFace) := Internal.api "Lasm.JS.Web.FaceDetector.detect" do

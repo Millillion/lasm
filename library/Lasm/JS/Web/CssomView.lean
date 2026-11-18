@@ -207,6 +207,14 @@ instance : ToJS ScrollResult := ⟨fun d => Internal.fields #[("interrupted", to
   Lasm.JS.Binding.invoke MediaQueryListEvent { name := "Lasm.JS.Web.MediaQueryListEvent.new", module := "globalThis", path := "MediaQueryListEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(CSSOMString type, optional MediaQueryListEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaQueryListEvent.new? (type : String) (eventInitDict : Option MediaQueryListEventInit := none) : IO (Option MediaQueryListEvent) := Internal.api "Lasm.JS.Web.MediaQueryListEvent.new?" do
+  if !(← Internal.hasGlobal ["MediaQueryListEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke MediaQueryListEvent { name := "Lasm.JS.Web.MediaQueryListEvent.new?", module := "globalThis", path := "MediaQueryListEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute CSSOMString media` -/
 @[macro_inline] def MediaQueryListEvent.media (self : MediaQueryListEvent) : IO String := Internal.api "Lasm.JS.Web.MediaQueryListEvent.media" do
   self.val.get "media" String
@@ -295,6 +303,14 @@ instance : ToJS ScrollResult := ⟨fun d => Internal.fields #[("interrupted", to
 @[macro_inline] def VisualViewport.onscrollend (self : VisualViewport) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.VisualViewport.onscrollend" do
   self.val.get "onscrollend" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onscrollend` where the platform has it (`'onscrollend' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def VisualViewport.onscrollend? (self' : VisualViewport) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.VisualViewport.onscrollend?" do
+  let self := self'
+  if !(← Internal.has self.val "onscrollend") then return none
+  let lasmGuarded ← do
+    self.val.get "onscrollend" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `onscrollend`: `attribute EventHandler onscrollend` -/
 @[macro_inline] def VisualViewport.setOnscrollend (self : VisualViewport) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.VisualViewport.setOnscrollend" do
   self.val.set "onscrollend" (toJS value)
@@ -337,6 +353,14 @@ instance : ToJS ScrollResult := ⟨fun d => Internal.fields #[("interrupted", to
 /-- `sequence<DOMQuad> getBoxQuads(optional BoxQuadOptions options)` -/
 @[macro_inline] def Document.getBoxQuads (self : Document) (options : Option BoxQuadOptions := none) : IO (Array DOMQuad) := Internal.api "Lasm.JS.Web.Document.getBoxQuads" do
   self.val.callMethod "getBoxQuads" (Internal.args #[Internal.optional options]) (Array DOMQuad)
+
+/-- `sequence<DOMQuad> getBoxQuads(optional BoxQuadOptions options)` where the platform has it (`'getBoxQuads' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Document.getBoxQuads? (self' : Document) (options : Option BoxQuadOptions := none) : IO (Option (Array DOMQuad)) := Internal.api "Lasm.JS.Web.Document.getBoxQuads?" do
+  let self := self'
+  if !(← Internal.has self.val "getBoxQuads") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getBoxQuads" (Internal.args #[Internal.optional options]) (Array DOMQuad)
+  return some lasmGuarded
 
 /-- `DOMQuad convertQuadFromNode(DOMQuadInit quad, GeometryNode from, optional ConvertCoordinateOptions options)` -/
 @[macro_inline] def Document.convertQuadFromNode (self : Document) (quad : DOMQuadInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMQuad := Internal.api "Lasm.JS.Web.Document.convertQuadFromNode" do
@@ -443,6 +467,14 @@ instance : ToJS ScrollResult := ⟨fun d => Internal.fields #[("interrupted", to
 @[macro_inline] def Element.getBoxQuads (self : Element) (options : Option BoxQuadOptions := none) : IO (Array DOMQuad) := Internal.api "Lasm.JS.Web.Element.getBoxQuads" do
   self.val.callMethod "getBoxQuads" (Internal.args #[Internal.optional options]) (Array DOMQuad)
 
+/-- `sequence<DOMQuad> getBoxQuads(optional BoxQuadOptions options)` where the platform has it (`'getBoxQuads' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Element.getBoxQuads? (self' : Element) (options : Option BoxQuadOptions := none) : IO (Option (Array DOMQuad)) := Internal.api "Lasm.JS.Web.Element.getBoxQuads?" do
+  let self := self'
+  if !(← Internal.has self.val "getBoxQuads") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getBoxQuads" (Internal.args #[Internal.optional options]) (Array DOMQuad)
+  return some lasmGuarded
+
 /-- `DOMQuad convertQuadFromNode(DOMQuadInit quad, GeometryNode from, optional ConvertCoordinateOptions options)` -/
 @[macro_inline] def Element.convertQuadFromNode (self : Element) (quad : DOMQuadInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMQuad := Internal.api "Lasm.JS.Web.Element.convertQuadFromNode" do
   let r ← self.val.callMethod "convertQuadFromNode" (Internal.args #[toJS quad, toJS «from», Internal.optional options]) Value
@@ -528,6 +560,14 @@ instance : ToJS ScrollResult := ⟨fun d => Internal.fields #[("interrupted", to
 @[macro_inline] def Text.getBoxQuads (self : Text) (options : Option BoxQuadOptions := none) : IO (Array DOMQuad) := Internal.api "Lasm.JS.Web.Text.getBoxQuads" do
   self.val.callMethod "getBoxQuads" (Internal.args #[Internal.optional options]) (Array DOMQuad)
 
+/-- `sequence<DOMQuad> getBoxQuads(optional BoxQuadOptions options)` where the platform has it (`'getBoxQuads' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Text.getBoxQuads? (self' : Text) (options : Option BoxQuadOptions := none) : IO (Option (Array DOMQuad)) := Internal.api "Lasm.JS.Web.Text.getBoxQuads?" do
+  let self := self'
+  if !(← Internal.has self.val "getBoxQuads") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getBoxQuads" (Internal.args #[Internal.optional options]) (Array DOMQuad)
+  return some lasmGuarded
+
 /-- `DOMQuad convertQuadFromNode(DOMQuadInit quad, GeometryNode from, optional ConvertCoordinateOptions options)` -/
 @[macro_inline] def Text.convertQuadFromNode (self : Text) (quad : DOMQuadInit) («from» : GeometryNode) (options : Option ConvertCoordinateOptions := none) : IO DOMQuad := Internal.api "Lasm.JS.Web.Text.convertQuadFromNode" do
   let r ← self.val.callMethod "convertQuadFromNode" (Internal.args #[toJS quad, toJS «from», Internal.optional options]) Value
@@ -548,21 +588,62 @@ instance : ToJS ScrollResult := ⟨fun d => Internal.fields #[("interrupted", to
   let r ← self.val.get "screen" Value
   pure { val := r }
 
+/-- `readonly attribute Screen screen` where the platform has it (`'screen' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.screen? (self' : Window) : IO (Option Screen) := Internal.api "Lasm.JS.Web.Window.screen?" do
+  let self := self'
+  if !(← Internal.has self.val "screen") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "screen" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute VisualViewport? visualViewport` -/
 @[macro_inline] def Window.visualViewport (self : Window) : IO (Option VisualViewport) := Internal.api "Lasm.JS.Web.Window.visualViewport" do
   self.val.get "visualViewport" (Option VisualViewport)
+
+/-- `readonly attribute VisualViewport? visualViewport` where the platform has it (`'visualViewport' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.visualViewport? (self' : Window) : IO (Option (Option VisualViewport)) := Internal.api "Lasm.JS.Web.Window.visualViewport?" do
+  let self := self'
+  if !(← Internal.has self.val "visualViewport") then return none
+  let lasmGuarded ← do
+    self.val.get "visualViewport" (Option VisualViewport)
+  return some lasmGuarded
 
 /-- `readonly attribute long innerWidth` -/
 @[macro_inline] def Window.innerWidth (self : Window) : IO Int := Internal.api "Lasm.JS.Web.Window.innerWidth" do
   self.val.get "innerWidth" Int
 
+/-- `readonly attribute long innerWidth` where the platform has it (`'innerWidth' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.innerWidth? (self' : Window) : IO (Option Int) := Internal.api "Lasm.JS.Web.Window.innerWidth?" do
+  let self := self'
+  if !(← Internal.has self.val "innerWidth") then return none
+  let lasmGuarded ← do
+    self.val.get "innerWidth" Int
+  return some lasmGuarded
+
 /-- `readonly attribute long innerHeight` -/
 @[macro_inline] def Window.innerHeight (self : Window) : IO Int := Internal.api "Lasm.JS.Web.Window.innerHeight" do
   self.val.get "innerHeight" Int
 
+/-- `readonly attribute long innerHeight` where the platform has it (`'innerHeight' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.innerHeight? (self' : Window) : IO (Option Int) := Internal.api "Lasm.JS.Web.Window.innerHeight?" do
+  let self := self'
+  if !(← Internal.has self.val "innerHeight") then return none
+  let lasmGuarded ← do
+    self.val.get "innerHeight" Int
+  return some lasmGuarded
+
 /-- `readonly attribute double scrollX` -/
 @[macro_inline] def Window.scrollX (self : Window) : IO Float := Internal.api "Lasm.JS.Web.Window.scrollX" do
   self.val.get "scrollX" Float
+
+/-- `readonly attribute double scrollX` where the platform has it (`'scrollX' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.scrollX? (self' : Window) : IO (Option Float) := Internal.api "Lasm.JS.Web.Window.scrollX?" do
+  let self := self'
+  if !(← Internal.has self.val "scrollX") then return none
+  let lasmGuarded ← do
+    self.val.get "scrollX" Float
+  return some lasmGuarded
 
 /-- `readonly attribute double pageXOffset` -/
 @[macro_inline] def Window.pageXOffset (self : Window) : IO Float := Internal.api "Lasm.JS.Web.Window.pageXOffset" do
@@ -572,6 +653,14 @@ instance : ToJS ScrollResult := ⟨fun d => Internal.fields #[("interrupted", to
 @[macro_inline] def Window.scrollY (self : Window) : IO Float := Internal.api "Lasm.JS.Web.Window.scrollY" do
   self.val.get "scrollY" Float
 
+/-- `readonly attribute double scrollY` where the platform has it (`'scrollY' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.scrollY? (self' : Window) : IO (Option Float) := Internal.api "Lasm.JS.Web.Window.scrollY?" do
+  let self := self'
+  if !(← Internal.has self.val "scrollY") then return none
+  let lasmGuarded ← do
+    self.val.get "scrollY" Float
+  return some lasmGuarded
+
 /-- `readonly attribute double pageYOffset` -/
 @[macro_inline] def Window.pageYOffset (self : Window) : IO Float := Internal.api "Lasm.JS.Web.Window.pageYOffset" do
   self.val.get "pageYOffset" Float
@@ -580,135 +669,386 @@ instance : ToJS ScrollResult := ⟨fun d => Internal.fields #[("interrupted", to
 @[macro_inline] def Window.screenX (self : Window) : IO Int := Internal.api "Lasm.JS.Web.Window.screenX" do
   self.val.get "screenX" Int
 
+/-- `readonly attribute long screenX` where the platform has it (`'screenX' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.screenX? (self' : Window) : IO (Option Int) := Internal.api "Lasm.JS.Web.Window.screenX?" do
+  let self := self'
+  if !(← Internal.has self.val "screenX") then return none
+  let lasmGuarded ← do
+    self.val.get "screenX" Int
+  return some lasmGuarded
+
 /-- `readonly attribute long screenLeft` -/
 @[macro_inline] def Window.screenLeft (self : Window) : IO Int := Internal.api "Lasm.JS.Web.Window.screenLeft" do
   self.val.get "screenLeft" Int
+
+/-- `readonly attribute long screenLeft` where the platform has it (`'screenLeft' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.screenLeft? (self' : Window) : IO (Option Int) := Internal.api "Lasm.JS.Web.Window.screenLeft?" do
+  let self := self'
+  if !(← Internal.has self.val "screenLeft") then return none
+  let lasmGuarded ← do
+    self.val.get "screenLeft" Int
+  return some lasmGuarded
 
 /-- `readonly attribute long screenY` -/
 @[macro_inline] def Window.screenY (self : Window) : IO Int := Internal.api "Lasm.JS.Web.Window.screenY" do
   self.val.get "screenY" Int
 
+/-- `readonly attribute long screenY` where the platform has it (`'screenY' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.screenY? (self' : Window) : IO (Option Int) := Internal.api "Lasm.JS.Web.Window.screenY?" do
+  let self := self'
+  if !(← Internal.has self.val "screenY") then return none
+  let lasmGuarded ← do
+    self.val.get "screenY" Int
+  return some lasmGuarded
+
 /-- `readonly attribute long screenTop` -/
 @[macro_inline] def Window.screenTop (self : Window) : IO Int := Internal.api "Lasm.JS.Web.Window.screenTop" do
   self.val.get "screenTop" Int
+
+/-- `readonly attribute long screenTop` where the platform has it (`'screenTop' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.screenTop? (self' : Window) : IO (Option Int) := Internal.api "Lasm.JS.Web.Window.screenTop?" do
+  let self := self'
+  if !(← Internal.has self.val "screenTop") then return none
+  let lasmGuarded ← do
+    self.val.get "screenTop" Int
+  return some lasmGuarded
 
 /-- `readonly attribute long outerWidth` -/
 @[macro_inline] def Window.outerWidth (self : Window) : IO Int := Internal.api "Lasm.JS.Web.Window.outerWidth" do
   self.val.get "outerWidth" Int
 
+/-- `readonly attribute long outerWidth` where the platform has it (`'outerWidth' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.outerWidth? (self' : Window) : IO (Option Int) := Internal.api "Lasm.JS.Web.Window.outerWidth?" do
+  let self := self'
+  if !(← Internal.has self.val "outerWidth") then return none
+  let lasmGuarded ← do
+    self.val.get "outerWidth" Int
+  return some lasmGuarded
+
 /-- `readonly attribute long outerHeight` -/
 @[macro_inline] def Window.outerHeight (self : Window) : IO Int := Internal.api "Lasm.JS.Web.Window.outerHeight" do
   self.val.get "outerHeight" Int
 
+/-- `readonly attribute long outerHeight` where the platform has it (`'outerHeight' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.outerHeight? (self' : Window) : IO (Option Int) := Internal.api "Lasm.JS.Web.Window.outerHeight?" do
+  let self := self'
+  if !(← Internal.has self.val "outerHeight") then return none
+  let lasmGuarded ← do
+    self.val.get "outerHeight" Int
+  return some lasmGuarded
+
 /-- `readonly attribute double devicePixelRatio` -/
 @[macro_inline] def Window.devicePixelRatio (self : Window) : IO Float := Internal.api "Lasm.JS.Web.Window.devicePixelRatio" do
   self.val.get "devicePixelRatio" Float
+
+/-- `readonly attribute double devicePixelRatio` where the platform has it (`'devicePixelRatio' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.devicePixelRatio? (self' : Window) : IO (Option Float) := Internal.api "Lasm.JS.Web.Window.devicePixelRatio?" do
+  let self := self'
+  if !(← Internal.has self.val "devicePixelRatio") then return none
+  let lasmGuarded ← do
+    self.val.get "devicePixelRatio" Float
+  return some lasmGuarded
 
 /-- `MediaQueryList matchMedia(CSSOMString query)` -/
 @[macro_inline] def Window.matchMedia (self : Window) (query : String) : IO MediaQueryList := Internal.api "Lasm.JS.Web.Window.matchMedia" do
   let r ← self.val.callMethod "matchMedia" (Internal.args #[toJS query]) Value
   pure { val := r }
 
+/-- `MediaQueryList matchMedia(CSSOMString query)` where the platform has it (`'matchMedia' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.matchMedia? (self' : Window) (query : String) : IO (Option MediaQueryList) := Internal.api "Lasm.JS.Web.Window.matchMedia?" do
+  let self := self'
+  if !(← Internal.has self.val "matchMedia") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethod "matchMedia" (Internal.args #[toJS query]) Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `undefined moveTo(long x, long y)` -/
 @[macro_inline] def Window.moveTo (self : Window) (x : Int) (y : Int) : IO Unit := Internal.api "Lasm.JS.Web.Window.moveTo" do
   self.val.callMethod "moveTo" (Internal.args #[toJS x, toJS y]) Unit
+
+/-- `undefined moveTo(long x, long y)` where the platform has it (`'moveTo' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.moveTo? (self' : Window) (x : Int) (y : Int) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Window.moveTo?" do
+  let self := self'
+  if !(← Internal.has self.val "moveTo") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "moveTo" (Internal.args #[toJS x, toJS y]) Unit
+  return some lasmGuarded
 
 /-- `undefined moveBy(long x, long y)` -/
 @[macro_inline] def Window.moveBy (self : Window) (x : Int) (y : Int) : IO Unit := Internal.api "Lasm.JS.Web.Window.moveBy" do
   self.val.callMethod "moveBy" (Internal.args #[toJS x, toJS y]) Unit
 
+/-- `undefined moveBy(long x, long y)` where the platform has it (`'moveBy' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.moveBy? (self' : Window) (x : Int) (y : Int) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Window.moveBy?" do
+  let self := self'
+  if !(← Internal.has self.val "moveBy") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "moveBy" (Internal.args #[toJS x, toJS y]) Unit
+  return some lasmGuarded
+
 /-- `undefined resizeTo(long width, long height)` -/
 @[macro_inline] def Window.resizeTo (self : Window) (width : Int) (height : Int) : IO Unit := Internal.api "Lasm.JS.Web.Window.resizeTo" do
   self.val.callMethod "resizeTo" (Internal.args #[toJS width, toJS height]) Unit
+
+/-- `undefined resizeTo(long width, long height)` where the platform has it (`'resizeTo' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.resizeTo? (self' : Window) (width : Int) (height : Int) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Window.resizeTo?" do
+  let self := self'
+  if !(← Internal.has self.val "resizeTo") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "resizeTo" (Internal.args #[toJS width, toJS height]) Unit
+  return some lasmGuarded
 
 /-- `undefined resizeBy(long x, long y)` -/
 @[macro_inline] def Window.resizeBy (self : Window) (x : Int) (y : Int) : IO Unit := Internal.api "Lasm.JS.Web.Window.resizeBy" do
   self.val.callMethod "resizeBy" (Internal.args #[toJS x, toJS y]) Unit
 
+/-- `undefined resizeBy(long x, long y)` where the platform has it (`'resizeBy' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.resizeBy? (self' : Window) (x : Int) (y : Int) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Window.resizeBy?" do
+  let self := self'
+  if !(← Internal.has self.val "resizeBy") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "resizeBy" (Internal.args #[toJS x, toJS y]) Unit
+  return some lasmGuarded
+
 /-- `Promise<ScrollResult> scroll(optional ScrollToOptions options)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
 @[macro_inline] def Window.scroll (self : Window) (options : Option ScrollToOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.Window.scroll" do
   self.val.callMethodAwait "scroll" (Internal.args #[Internal.optional options]) Unit
+
+/-- `Promise<ScrollResult> scroll(optional ScrollToOptions options)` where the platform has it (`'scroll' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.scroll? (self' : Window) (options : Option ScrollToOptions := none) : Async (Option Unit) := Internal.api "Lasm.JS.Web.Window.scroll?" do
+  let self := self'
+  if !(← Internal.has self.val "scroll") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "scroll" (Internal.args #[Internal.optional options]) Unit
+  return some lasmGuarded
 
 /-- `Promise<ScrollResult> scroll(unrestricted double x, unrestricted double y)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
 @[macro_inline] def Window.scrollWithX (self : Window) (x : Float) (y : Float) : Async Unit := Internal.api "Lasm.JS.Web.Window.scrollWithX" do
   self.val.callMethodAwait "scroll" (Internal.args #[toJS x, toJS y]) Unit
 
+/-- `Promise<ScrollResult> scroll(unrestricted double x, unrestricted double y)` where the platform has it (`'scroll' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.scrollWithX? (self' : Window) (x : Float) (y : Float) : Async (Option Unit) := Internal.api "Lasm.JS.Web.Window.scrollWithX?" do
+  let self := self'
+  if !(← Internal.has self.val "scroll") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "scroll" (Internal.args #[toJS x, toJS y]) Unit
+  return some lasmGuarded
+
 /-- `Promise<ScrollResult> scrollTo(optional ScrollToOptions options)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
 @[macro_inline] def Window.scrollTo (self : Window) (options : Option ScrollToOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.Window.scrollTo" do
   self.val.callMethodAwait "scrollTo" (Internal.args #[Internal.optional options]) Unit
+
+/-- `Promise<ScrollResult> scrollTo(optional ScrollToOptions options)` where the platform has it (`'scrollTo' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.scrollTo? (self' : Window) (options : Option ScrollToOptions := none) : Async (Option Unit) := Internal.api "Lasm.JS.Web.Window.scrollTo?" do
+  let self := self'
+  if !(← Internal.has self.val "scrollTo") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "scrollTo" (Internal.args #[Internal.optional options]) Unit
+  return some lasmGuarded
 
 /-- `Promise<ScrollResult> scrollTo(unrestricted double x, unrestricted double y)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
 @[macro_inline] def Window.scrollToWithX (self : Window) (x : Float) (y : Float) : Async Unit := Internal.api "Lasm.JS.Web.Window.scrollToWithX" do
   self.val.callMethodAwait "scrollTo" (Internal.args #[toJS x, toJS y]) Unit
 
+/-- `Promise<ScrollResult> scrollTo(unrestricted double x, unrestricted double y)` where the platform has it (`'scrollTo' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.scrollToWithX? (self' : Window) (x : Float) (y : Float) : Async (Option Unit) := Internal.api "Lasm.JS.Web.Window.scrollToWithX?" do
+  let self := self'
+  if !(← Internal.has self.val "scrollTo") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "scrollTo" (Internal.args #[toJS x, toJS y]) Unit
+  return some lasmGuarded
+
 /-- `Promise<ScrollResult> scrollBy(optional ScrollToOptions options)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
 @[macro_inline] def Window.scrollBy (self : Window) (options : Option ScrollToOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.Window.scrollBy" do
   self.val.callMethodAwait "scrollBy" (Internal.args #[Internal.optional options]) Unit
 
+/-- `Promise<ScrollResult> scrollBy(optional ScrollToOptions options)` where the platform has it (`'scrollBy' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.scrollBy? (self' : Window) (options : Option ScrollToOptions := none) : Async (Option Unit) := Internal.api "Lasm.JS.Web.Window.scrollBy?" do
+  let self := self'
+  if !(← Internal.has self.val "scrollBy") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "scrollBy" (Internal.args #[Internal.optional options]) Unit
+  return some lasmGuarded
+
 /-- `Promise<ScrollResult> scrollBy(unrestricted double x, unrestricted double y)`: read as `Promise<undefined>`, since shipping browsers return `undefined` (awaited at once) where the spec now returns a promise -/
 @[macro_inline] def Window.scrollByWithX (self : Window) (x : Float) (y : Float) : Async Unit := Internal.api "Lasm.JS.Web.Window.scrollByWithX" do
   self.val.callMethodAwait "scrollBy" (Internal.args #[toJS x, toJS y]) Unit
+
+/-- `Promise<ScrollResult> scrollBy(unrestricted double x, unrestricted double y)` where the platform has it (`'scrollBy' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.scrollByWithX? (self' : Window) (x : Float) (y : Float) : Async (Option Unit) := Internal.api "Lasm.JS.Web.Window.scrollByWithX?" do
+  let self := self'
+  if !(← Internal.has self.val "scrollBy") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "scrollBy" (Internal.args #[toJS x, toJS y]) Unit
+  return some lasmGuarded
 
 /-- `readonly attribute Screen screen` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def screen : IO Screen := Internal.api "Lasm.JS.Web.screen" do
   let r ← Internal.getGlobal ["screen"] Value
   pure { val := r }
 
+/-- `readonly attribute Screen screen` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def screen? : IO (Option Screen) := Internal.api "Lasm.JS.Web.screen?" do
+  if !(← Internal.hasGlobal ["screen"]) then return none
+  let lasmGuarded ← do
+    let r ← Internal.getGlobal ["screen"] Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `readonly attribute VisualViewport? visualViewport` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def visualViewport : IO (Option VisualViewport) := Internal.api "Lasm.JS.Web.visualViewport" do
   Internal.getGlobal ["visualViewport"] (Option VisualViewport)
+
+/-- `readonly attribute VisualViewport? visualViewport` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def visualViewport? : IO (Option (Option VisualViewport)) := Internal.api "Lasm.JS.Web.visualViewport?" do
+  if !(← Internal.hasGlobal ["visualViewport"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["visualViewport"] (Option VisualViewport)
+  return some lasmGuarded
 
 /-- `readonly attribute long innerWidth` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def innerWidth : IO Int := Internal.api "Lasm.JS.Web.innerWidth" do
   Internal.getGlobal ["innerWidth"] Int
 
+/-- `readonly attribute long innerWidth` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def innerWidth? : IO (Option Int) := Internal.api "Lasm.JS.Web.innerWidth?" do
+  if !(← Internal.hasGlobal ["innerWidth"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["innerWidth"] Int
+  return some lasmGuarded
+
 /-- `readonly attribute long innerHeight` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def innerHeight : IO Int := Internal.api "Lasm.JS.Web.innerHeight" do
   Internal.getGlobal ["innerHeight"] Int
+
+/-- `readonly attribute long innerHeight` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def innerHeight? : IO (Option Int) := Internal.api "Lasm.JS.Web.innerHeight?" do
+  if !(← Internal.hasGlobal ["innerHeight"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["innerHeight"] Int
+  return some lasmGuarded
 
 /-- `readonly attribute double scrollX` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def scrollX : IO Float := Internal.api "Lasm.JS.Web.scrollX" do
   Internal.getGlobal ["scrollX"] Float
 
+/-- `readonly attribute double scrollX` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def scrollX? : IO (Option Float) := Internal.api "Lasm.JS.Web.scrollX?" do
+  if !(← Internal.hasGlobal ["scrollX"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["scrollX"] Float
+  return some lasmGuarded
+
 /-- `readonly attribute double pageXOffset` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def pageXOffset : IO Float := Internal.api "Lasm.JS.Web.pageXOffset" do
   Internal.getGlobal ["pageXOffset"] Float
+
+/-- `readonly attribute double pageXOffset` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def pageXOffset? : IO (Option Float) := Internal.api "Lasm.JS.Web.pageXOffset?" do
+  if !(← Internal.hasGlobal ["pageXOffset"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["pageXOffset"] Float
+  return some lasmGuarded
 
 /-- `readonly attribute double scrollY` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def scrollY : IO Float := Internal.api "Lasm.JS.Web.scrollY" do
   Internal.getGlobal ["scrollY"] Float
 
+/-- `readonly attribute double scrollY` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def scrollY? : IO (Option Float) := Internal.api "Lasm.JS.Web.scrollY?" do
+  if !(← Internal.hasGlobal ["scrollY"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["scrollY"] Float
+  return some lasmGuarded
+
 /-- `readonly attribute double pageYOffset` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def pageYOffset : IO Float := Internal.api "Lasm.JS.Web.pageYOffset" do
   Internal.getGlobal ["pageYOffset"] Float
+
+/-- `readonly attribute double pageYOffset` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def pageYOffset? : IO (Option Float) := Internal.api "Lasm.JS.Web.pageYOffset?" do
+  if !(← Internal.hasGlobal ["pageYOffset"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["pageYOffset"] Float
+  return some lasmGuarded
 
 /-- `readonly attribute long screenX` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def screenX : IO Int := Internal.api "Lasm.JS.Web.screenX" do
   Internal.getGlobal ["screenX"] Int
 
+/-- `readonly attribute long screenX` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def screenX? : IO (Option Int) := Internal.api "Lasm.JS.Web.screenX?" do
+  if !(← Internal.hasGlobal ["screenX"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["screenX"] Int
+  return some lasmGuarded
+
 /-- `readonly attribute long screenLeft` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def screenLeft : IO Int := Internal.api "Lasm.JS.Web.screenLeft" do
   Internal.getGlobal ["screenLeft"] Int
+
+/-- `readonly attribute long screenLeft` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def screenLeft? : IO (Option Int) := Internal.api "Lasm.JS.Web.screenLeft?" do
+  if !(← Internal.hasGlobal ["screenLeft"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["screenLeft"] Int
+  return some lasmGuarded
 
 /-- `readonly attribute long screenY` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def screenY : IO Int := Internal.api "Lasm.JS.Web.screenY" do
   Internal.getGlobal ["screenY"] Int
 
+/-- `readonly attribute long screenY` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def screenY? : IO (Option Int) := Internal.api "Lasm.JS.Web.screenY?" do
+  if !(← Internal.hasGlobal ["screenY"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["screenY"] Int
+  return some lasmGuarded
+
 /-- `readonly attribute long screenTop` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def screenTop : IO Int := Internal.api "Lasm.JS.Web.screenTop" do
   Internal.getGlobal ["screenTop"] Int
+
+/-- `readonly attribute long screenTop` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def screenTop? : IO (Option Int) := Internal.api "Lasm.JS.Web.screenTop?" do
+  if !(← Internal.hasGlobal ["screenTop"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["screenTop"] Int
+  return some lasmGuarded
 
 /-- `readonly attribute long outerWidth` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def outerWidth : IO Int := Internal.api "Lasm.JS.Web.outerWidth" do
   Internal.getGlobal ["outerWidth"] Int
 
+/-- `readonly attribute long outerWidth` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def outerWidth? : IO (Option Int) := Internal.api "Lasm.JS.Web.outerWidth?" do
+  if !(← Internal.hasGlobal ["outerWidth"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["outerWidth"] Int
+  return some lasmGuarded
+
 /-- `readonly attribute long outerHeight` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def outerHeight : IO Int := Internal.api "Lasm.JS.Web.outerHeight" do
   Internal.getGlobal ["outerHeight"] Int
 
+/-- `readonly attribute long outerHeight` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def outerHeight? : IO (Option Int) := Internal.api "Lasm.JS.Web.outerHeight?" do
+  if !(← Internal.hasGlobal ["outerHeight"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["outerHeight"] Int
+  return some lasmGuarded
+
 /-- `readonly attribute double devicePixelRatio` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def devicePixelRatio : IO Float := Internal.api "Lasm.JS.Web.devicePixelRatio" do
   Internal.getGlobal ["devicePixelRatio"] Float
+
+/-- `readonly attribute double devicePixelRatio` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def devicePixelRatio? : IO (Option Float) := Internal.api "Lasm.JS.Web.devicePixelRatio?" do
+  if !(← Internal.hasGlobal ["devicePixelRatio"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["devicePixelRatio"] Float
+  return some lasmGuarded
 
 /-- `MediaQueryList matchMedia(CSSOMString query)` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def matchMedia (query : String) : IO MediaQueryList := Internal.api "Lasm.JS.Web.matchMedia" do
@@ -716,54 +1056,143 @@ instance : ToJS ScrollResult := ⟨fun d => Internal.fields #[("interrupted", to
     (Internal.args #[toJS query]) (await := false)
   pure { val := r }
 
+/-- `MediaQueryList matchMedia(CSSOMString query)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def matchMedia? (query : String) : IO (Option MediaQueryList) := Internal.api "Lasm.JS.Web.matchMedia?" do
+  if !(← Internal.hasGlobal ["matchMedia"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.matchMedia?", module := "globalThis", path := "matchMedia", construct := false, arity := 1 }
+      (Internal.args #[toJS query]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `undefined moveTo(long x, long y)` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def moveTo (x : Int) (y : Int) : IO Unit := Internal.api "Lasm.JS.Web.moveTo" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.moveTo", module := "globalThis", path := "moveTo", construct := false, arity := 2 }
     (Internal.args #[toJS x, toJS y]) (await := false)
+
+/-- `undefined moveTo(long x, long y)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def moveTo? (x : Int) (y : Int) : IO (Option Unit) := Internal.api "Lasm.JS.Web.moveTo?" do
+  if !(← Internal.hasGlobal ["moveTo"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.moveTo?", module := "globalThis", path := "moveTo", construct := false, arity := 2 }
+      (Internal.args #[toJS x, toJS y]) (await := false)
+  return some lasmGuarded
 
 /-- `undefined moveBy(long x, long y)` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def moveBy (x : Int) (y : Int) : IO Unit := Internal.api "Lasm.JS.Web.moveBy" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.moveBy", module := "globalThis", path := "moveBy", construct := false, arity := 2 }
     (Internal.args #[toJS x, toJS y]) (await := false)
 
+/-- `undefined moveBy(long x, long y)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def moveBy? (x : Int) (y : Int) : IO (Option Unit) := Internal.api "Lasm.JS.Web.moveBy?" do
+  if !(← Internal.hasGlobal ["moveBy"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.moveBy?", module := "globalThis", path := "moveBy", construct := false, arity := 2 }
+      (Internal.args #[toJS x, toJS y]) (await := false)
+  return some lasmGuarded
+
 /-- `undefined resizeTo(long width, long height)` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def resizeTo (width : Int) (height : Int) : IO Unit := Internal.api "Lasm.JS.Web.resizeTo" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.resizeTo", module := "globalThis", path := "resizeTo", construct := false, arity := 2 }
     (Internal.args #[toJS width, toJS height]) (await := false)
+
+/-- `undefined resizeTo(long width, long height)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def resizeTo? (width : Int) (height : Int) : IO (Option Unit) := Internal.api "Lasm.JS.Web.resizeTo?" do
+  if !(← Internal.hasGlobal ["resizeTo"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.resizeTo?", module := "globalThis", path := "resizeTo", construct := false, arity := 2 }
+      (Internal.args #[toJS width, toJS height]) (await := false)
+  return some lasmGuarded
 
 /-- `undefined resizeBy(long x, long y)` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def resizeBy (x : Int) (y : Int) : IO Unit := Internal.api "Lasm.JS.Web.resizeBy" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.resizeBy", module := "globalThis", path := "resizeBy", construct := false, arity := 2 }
     (Internal.args #[toJS x, toJS y]) (await := false)
 
+/-- `undefined resizeBy(long x, long y)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def resizeBy? (x : Int) (y : Int) : IO (Option Unit) := Internal.api "Lasm.JS.Web.resizeBy?" do
+  if !(← Internal.hasGlobal ["resizeBy"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.resizeBy?", module := "globalThis", path := "resizeBy", construct := false, arity := 2 }
+      (Internal.args #[toJS x, toJS y]) (await := false)
+  return some lasmGuarded
+
 /-- `Promise<ScrollResult> scroll(optional ScrollToOptions options)` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def scroll (options : Option ScrollToOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.scroll" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.scroll", module := "globalThis", path := "scroll", construct := false, arity := 1 }
     (Internal.args #[Internal.optional options])
+
+/-- `Promise<ScrollResult> scroll(optional ScrollToOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def scroll? (options : Option ScrollToOptions := none) : Async (Option Unit) := Internal.api "Lasm.JS.Web.scroll?" do
+  if !(← Internal.hasGlobal ["scroll"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.scroll?", module := "globalThis", path := "scroll", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional options])
+  return some lasmGuarded
 
 /-- `Promise<ScrollResult> scroll(unrestricted double x, unrestricted double y)` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def scrollWithX (x : Float) (y : Float) : Async Unit := Internal.api "Lasm.JS.Web.scrollWithX" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.scrollWithX", module := "globalThis", path := "scroll", construct := false, arity := 2 }
     (Internal.args #[toJS x, toJS y])
 
+/-- `Promise<ScrollResult> scroll(unrestricted double x, unrestricted double y)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def scrollWithX? (x : Float) (y : Float) : Async (Option Unit) := Internal.api "Lasm.JS.Web.scrollWithX?" do
+  if !(← Internal.hasGlobal ["scroll"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.scrollWithX?", module := "globalThis", path := "scroll", construct := false, arity := 2 }
+      (Internal.args #[toJS x, toJS y])
+  return some lasmGuarded
+
 /-- `Promise<ScrollResult> scrollTo(optional ScrollToOptions options)` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def scrollTo (options : Option ScrollToOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.scrollTo" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.scrollTo", module := "globalThis", path := "scrollTo", construct := false, arity := 1 }
     (Internal.args #[Internal.optional options])
+
+/-- `Promise<ScrollResult> scrollTo(optional ScrollToOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def scrollTo? (options : Option ScrollToOptions := none) : Async (Option Unit) := Internal.api "Lasm.JS.Web.scrollTo?" do
+  if !(← Internal.hasGlobal ["scrollTo"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.scrollTo?", module := "globalThis", path := "scrollTo", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional options])
+  return some lasmGuarded
 
 /-- `Promise<ScrollResult> scrollTo(unrestricted double x, unrestricted double y)` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def scrollToWithX (x : Float) (y : Float) : Async Unit := Internal.api "Lasm.JS.Web.scrollToWithX" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.scrollToWithX", module := "globalThis", path := "scrollTo", construct := false, arity := 2 }
     (Internal.args #[toJS x, toJS y])
 
+/-- `Promise<ScrollResult> scrollTo(unrestricted double x, unrestricted double y)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def scrollToWithX? (x : Float) (y : Float) : Async (Option Unit) := Internal.api "Lasm.JS.Web.scrollToWithX?" do
+  if !(← Internal.hasGlobal ["scrollTo"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.scrollToWithX?", module := "globalThis", path := "scrollTo", construct := false, arity := 2 }
+      (Internal.args #[toJS x, toJS y])
+  return some lasmGuarded
+
 /-- `Promise<ScrollResult> scrollBy(optional ScrollToOptions options)` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def scrollBy (options : Option ScrollToOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.scrollBy" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.scrollBy", module := "globalThis", path := "scrollBy", construct := false, arity := 1 }
     (Internal.args #[Internal.optional options])
 
+/-- `Promise<ScrollResult> scrollBy(optional ScrollToOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def scrollBy? (options : Option ScrollToOptions := none) : Async (Option Unit) := Internal.api "Lasm.JS.Web.scrollBy?" do
+  if !(← Internal.hasGlobal ["scrollBy"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.scrollBy?", module := "globalThis", path := "scrollBy", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional options])
+  return some lasmGuarded
+
 /-- `Promise<ScrollResult> scrollBy(unrestricted double x, unrestricted double y)` (CSSOM View Module Level 1 (https://drafts.csswg.org/cssom-view-1/)) -/
 @[macro_inline] def scrollByWithX (x : Float) (y : Float) : Async Unit := Internal.api "Lasm.JS.Web.scrollByWithX" do
   Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.scrollByWithX", module := "globalThis", path := "scrollBy", construct := false, arity := 2 }
     (Internal.args #[toJS x, toJS y])
+
+/-- `Promise<ScrollResult> scrollBy(unrestricted double x, unrestricted double y)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def scrollByWithX? (x : Float) (y : Float) : Async (Option Unit) := Internal.api "Lasm.JS.Web.scrollByWithX?" do
+  if !(← Internal.hasGlobal ["scrollBy"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Unit { name := "Lasm.JS.Web.scrollByWithX?", module := "globalThis", path := "scrollBy", construct := false, arity := 2 }
+      (Internal.args #[toJS x, toJS y])
+  return some lasmGuarded
 
 end Lasm.JS.Web

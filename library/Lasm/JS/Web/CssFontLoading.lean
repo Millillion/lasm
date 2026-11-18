@@ -86,6 +86,14 @@ instance : ToJS FontFaceSetLoadEventInit := ⟨fun d => Internal.fields #[("bubb
   Lasm.JS.Binding.invoke FontFace { name := "Lasm.JS.Web.FontFace.new", module := "globalThis", path := "FontFace", construct := true, arity := 3 }
     (Internal.args #[toJS family, toJS source, Internal.optional descriptors]) (await := false)
 
+/-- `constructor(CSSOMString family, (CSSOMString or BufferSource) source, optional FontFaceDescriptors descriptors)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def FontFace.new? (family : String) (source : CSSOMStringOrBufferSource) (descriptors : Option FontFaceDescriptors := none) : IO (Option FontFace) := Internal.api "Lasm.JS.Web.FontFace.new?" do
+  if !(← Internal.hasGlobal ["FontFace"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke FontFace { name := "Lasm.JS.Web.FontFace.new?", module := "globalThis", path := "FontFace", construct := true, arity := 3 }
+      (Internal.args #[toJS family, toJS source, Internal.optional descriptors]) (await := false)
+  return some lasmGuarded
+
 /-- `attribute CSSOMString family` -/
 @[macro_inline] def FontFace.family (self : FontFace) : IO String := Internal.api "Lasm.JS.Web.FontFace.family" do
   self.val.get "family" String
@@ -138,6 +146,14 @@ instance : ToJS FontFaceSetLoadEventInit := ⟨fun d => Internal.fields #[("bubb
 @[macro_inline] def FontFace.variationSettings (self : FontFace) : IO String := Internal.api "Lasm.JS.Web.FontFace.variationSettings" do
   self.val.get "variationSettings" String
 
+/-- `attribute CSSOMString variationSettings` where the platform has it (`'variationSettings' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def FontFace.variationSettings? (self' : FontFace) : IO (Option String) := Internal.api "Lasm.JS.Web.FontFace.variationSettings?" do
+  let self := self'
+  if !(← Internal.has self.val "variationSettings") then return none
+  let lasmGuarded ← do
+    self.val.get "variationSettings" String
+  return some lasmGuarded
+
 /-- Sets `variationSettings`: `attribute CSSOMString variationSettings` -/
 @[macro_inline] def FontFace.setVariationSettings (self : FontFace) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.FontFace.setVariationSettings" do
   self.val.set "variationSettings" (toJS value)
@@ -154,6 +170,14 @@ instance : ToJS FontFaceSetLoadEventInit := ⟨fun d => Internal.fields #[("bubb
 @[macro_inline] def FontFace.ascentOverride (self : FontFace) : IO String := Internal.api "Lasm.JS.Web.FontFace.ascentOverride" do
   self.val.get "ascentOverride" String
 
+/-- `attribute CSSOMString ascentOverride` where the platform has it (`'ascentOverride' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def FontFace.ascentOverride? (self' : FontFace) : IO (Option String) := Internal.api "Lasm.JS.Web.FontFace.ascentOverride?" do
+  let self := self'
+  if !(← Internal.has self.val "ascentOverride") then return none
+  let lasmGuarded ← do
+    self.val.get "ascentOverride" String
+  return some lasmGuarded
+
 /-- Sets `ascentOverride`: `attribute CSSOMString ascentOverride` -/
 @[macro_inline] def FontFace.setAscentOverride (self : FontFace) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.FontFace.setAscentOverride" do
   self.val.set "ascentOverride" (toJS value)
@@ -162,6 +186,14 @@ instance : ToJS FontFaceSetLoadEventInit := ⟨fun d => Internal.fields #[("bubb
 @[macro_inline] def FontFace.descentOverride (self : FontFace) : IO String := Internal.api "Lasm.JS.Web.FontFace.descentOverride" do
   self.val.get "descentOverride" String
 
+/-- `attribute CSSOMString descentOverride` where the platform has it (`'descentOverride' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def FontFace.descentOverride? (self' : FontFace) : IO (Option String) := Internal.api "Lasm.JS.Web.FontFace.descentOverride?" do
+  let self := self'
+  if !(← Internal.has self.val "descentOverride") then return none
+  let lasmGuarded ← do
+    self.val.get "descentOverride" String
+  return some lasmGuarded
+
 /-- Sets `descentOverride`: `attribute CSSOMString descentOverride` -/
 @[macro_inline] def FontFace.setDescentOverride (self : FontFace) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.FontFace.setDescentOverride" do
   self.val.set "descentOverride" (toJS value)
@@ -169,6 +201,14 @@ instance : ToJS FontFaceSetLoadEventInit := ⟨fun d => Internal.fields #[("bubb
 /-- `attribute CSSOMString lineGapOverride` -/
 @[macro_inline] def FontFace.lineGapOverride (self : FontFace) : IO String := Internal.api "Lasm.JS.Web.FontFace.lineGapOverride" do
   self.val.get "lineGapOverride" String
+
+/-- `attribute CSSOMString lineGapOverride` where the platform has it (`'lineGapOverride' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def FontFace.lineGapOverride? (self' : FontFace) : IO (Option String) := Internal.api "Lasm.JS.Web.FontFace.lineGapOverride?" do
+  let self := self'
+  if !(← Internal.has self.val "lineGapOverride") then return none
+  let lasmGuarded ← do
+    self.val.get "lineGapOverride" String
+  return some lasmGuarded
 
 /-- Sets `lineGapOverride`: `attribute CSSOMString lineGapOverride` -/
 @[macro_inline] def FontFace.setLineGapOverride (self : FontFace) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.FontFace.setLineGapOverride" do
@@ -308,6 +348,14 @@ instance : ToJS FontFaceSetLoadEventInit := ⟨fun d => Internal.fields #[("bubb
   Lasm.JS.Binding.invoke FontFaceSetLoadEvent { name := "Lasm.JS.Web.FontFaceSetLoadEvent.new", module := "globalThis", path := "FontFaceSetLoadEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(CSSOMString type, optional FontFaceSetLoadEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def FontFaceSetLoadEvent.new? (type : String) (eventInitDict : Option FontFaceSetLoadEventInit := none) : IO (Option FontFaceSetLoadEvent) := Internal.api "Lasm.JS.Web.FontFaceSetLoadEvent.new?" do
+  if !(← Internal.hasGlobal ["FontFaceSetLoadEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke FontFaceSetLoadEvent { name := "Lasm.JS.Web.FontFaceSetLoadEvent.new?", module := "globalThis", path := "FontFaceSetLoadEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute FrozenArray<FontFace> fontfaces` -/
 @[macro_inline] def FontFaceSetLoadEvent.fontfaces (self : FontFaceSetLoadEvent) : IO (Array FontFace) := Internal.api "Lasm.JS.Web.FontFaceSetLoadEvent.fontfaces" do
   self.val.get "fontfaces" (Array FontFace)
@@ -349,5 +397,14 @@ instance : ToJS FontFaceSetLoadEventInit := ⟨fun d => Internal.fields #[("bubb
 @[macro_inline] def WorkerGlobalScope.fonts (self : WorkerGlobalScope) : IO FontFaceSet := Internal.api "Lasm.JS.Web.WorkerGlobalScope.fonts" do
   let r ← self.val.get "fonts" Value
   pure { val := r }
+
+/-- `readonly attribute FontFaceSet fonts` where the platform has it (`'fonts' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WorkerGlobalScope.fonts? (self' : WorkerGlobalScope) : IO (Option FontFaceSet) := Internal.api "Lasm.JS.Web.WorkerGlobalScope.fonts?" do
+  let self := self'
+  if !(← Internal.has self.val "fonts") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "fonts" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

@@ -111,7 +111,9 @@ path = ".lake/lasm-library"
 ```
 
 `.lake/lasm-library` is a link (a junction on Windows) that every lasm command
-(`init`, `build`, `dev`, `editor`) makes or repairs. It points to one package
+(`init`, `build`, `dev`, `editor`) makes or repairs, with the package's entry in
+`lake-manifest.json` (as `lake update` writes it: Lake needs a manifest entry for
+every require, and the editor's `lake setup-file` does not update the manifest). It points to one package
 per Lean prefix in Lasm's cache ([src/lake-library.mjs](../src/lake-library.mjs)):
 a lakefile whose one library has as roots the modules compiled on first import,
 from the installed library's sources. Lake then builds those modules on demand,
@@ -387,7 +389,6 @@ linked only into programs that import them.
 | `Lasm.Fetch` ([Fetch.lean](../library/Lasm/Fetch.lean), [FETCH.md](FETCH.md)) | One `Request → Async Response` handler | Node: a `node:http` server, through `Lasm.JS`. Edge, Bun, Deno: the platform's fetch handler. Fastly: its host calls. WASI: one CGI (WAGI) request on stdin/stdout ([lasm_fetch_wasi.c](../src/wasi/lasm_fetch_wasi.c)). wasi-http: the component's handler |
 | `Lasm.JS.Web` ([JS/Web.lean](../library/Lasm/JS/Web.lean), [JS_BINDINGS.md](JS_BINDINGS.md#standard-bindings-lasmjsweb)) | Bindings of the whole web platform, generated from the WebIDL of every spec (one module per spec); `lasm build --target` refuses an API the target lacks | Every JavaScript target, per API |
 | `Lasm.UI` ([UI.lean](../library/Lasm/UI.lean), [UI.md](UI.md)) | The Elm architecture, `html!`, routing, SSR and hydration. The diff runs in Lean and is proved correct ([UI/Proofs.lean](../library/Lasm/UI/Proofs.lean)) | Browser; rendering to HTML also on the server |
-| `Lasm.RPC` ([RPC.lean](../library/Lasm/RPC.lean), [RPC.md](RPC.md)) | Typed endpoints shared by a server and a browser app | `RPC.Server` with `Lasm.Fetch`, `RPC.Client` with `Lasm.UI` |
 | `Lasm.KV` ([KV.lean](../library/Lasm/KV.lean)) | A small key-value store | Workers KV, Deno KV or Fastly KV where the binding exists; otherwise in memory, one copy per process, isolate or instance |
 | `Lasm.Fastly` ([Fastly/](../library/Lasm/Fastly), [WASI_FASTLY_BINDINGS.md](WASI_FASTLY_BINDINGS.md)) | Fastly Compute's host ABI, generated from its witx: requests, responses, bodies, backends, stores, cache, geolocation, rate limiting | `--target fastly` (generated C glue, [lasm_fastly.c](../library/c/lasm_fastly.c)); elsewhere every call fails with `FastlyStatus.unsupported` |
 | `Lasm.WASI.Http` ([WASI/](../library/Lasm/WASI), [WASI_FASTLY_BINDINGS.md](WASI_FASTLY_BINDINGS.md)) | The wasi:http proxy world, generated from the WASI 0.2.12 WIT: incoming and outgoing requests and responses, fields, streams, poll, the monotonic clock, the incoming-handler export | `--target wasi-http` (generated canonical ABI glue, [lasm_wasi_http_bindings.c](../library/c/lasm_wasi_http_bindings.c)); elsewhere every call fails |

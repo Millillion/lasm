@@ -19,4 +19,13 @@ set_option compiler.extract_closed false
   let r ← self.val.callMethodAwait "request" (Internal.args #[toJS permissionDesc]) Value
   pure { val := r }
 
+/-- `Promise<PermissionStatus> request(object permissionDesc)` where the platform has it (`'request' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Permissions.request? (self' : Permissions) (permissionDesc : Data) : Async (Option PermissionStatus) := Internal.api "Lasm.JS.Web.Permissions.request?" do
+  let self := self'
+  if !(← Internal.has self.val "request") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethodAwait "request" (Internal.args #[toJS permissionDesc]) Value
+    pure { val := r }
+  return some lasmGuarded
+
 end Lasm.JS.Web

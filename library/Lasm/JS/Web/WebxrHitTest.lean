@@ -81,10 +81,26 @@ instance : ToJS XRTransientInputHitTestOptionsInit := ⟨fun d => Internal.field
   Lasm.JS.Binding.invoke XRRay { name := "Lasm.JS.Web.XRRay.new", module := "globalThis", path := "XRRay", construct := true, arity := 2 }
     (Internal.args #[Internal.optional origin, Internal.optional direction]) (await := false)
 
+/-- `constructor(optional DOMPointInit origin, optional XRRayDirectionInit direction)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def XRRay.new? (origin : Option DOMPointInit := none) (direction : Option XRRayDirectionInit := none) : IO (Option XRRay) := Internal.api "Lasm.JS.Web.XRRay.new?" do
+  if !(← Internal.hasGlobal ["XRRay"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke XRRay { name := "Lasm.JS.Web.XRRay.new?", module := "globalThis", path := "XRRay", construct := true, arity := 2 }
+      (Internal.args #[Internal.optional origin, Internal.optional direction]) (await := false)
+  return some lasmGuarded
+
 /-- `constructor(XRRigidTransform transform)` -/
 @[macro_inline] def XRRay.newWithTransform (transform : XRRigidTransform) : IO XRRay := Internal.api "Lasm.JS.Web.XRRay.newWithTransform" do
   Lasm.JS.Binding.invoke XRRay { name := "Lasm.JS.Web.XRRay.newWithTransform", module := "globalThis", path := "XRRay", construct := true, arity := 1 }
     (Internal.args #[toJS transform]) (await := false)
+
+/-- `constructor(XRRigidTransform transform)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def XRRay.newWithTransform? (transform : XRRigidTransform) : IO (Option XRRay) := Internal.api "Lasm.JS.Web.XRRay.newWithTransform?" do
+  if !(← Internal.hasGlobal ["XRRay"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke XRRay { name := "Lasm.JS.Web.XRRay.newWithTransform?", module := "globalThis", path := "XRRay", construct := true, arity := 1 }
+      (Internal.args #[toJS transform]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute DOMPointReadOnly origin` -/
 @[macro_inline] def XRRay.origin (self : XRRay) : IO DOMPointReadOnly := Internal.api "Lasm.JS.Web.XRRay.origin" do

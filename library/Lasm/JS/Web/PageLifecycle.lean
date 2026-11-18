@@ -25,6 +25,14 @@ set_option compiler.extract_closed false
 @[macro_inline] def Document.onfreeze (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onfreeze" do
   self.val.get "onfreeze" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onfreeze` where the platform has it (`'onfreeze' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Document.onfreeze? (self' : Document) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Document.onfreeze?" do
+  let self := self'
+  if !(← Internal.has self.val "onfreeze") then return none
+  let lasmGuarded ← do
+    self.val.get "onfreeze" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `onfreeze`: `attribute EventHandler onfreeze` -/
 @[macro_inline] def Document.setOnfreeze (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnfreeze" do
   self.val.set "onfreeze" (toJS value)
@@ -33,6 +41,14 @@ set_option compiler.extract_closed false
 @[macro_inline] def Document.onresume (self : Document) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.Document.onresume" do
   self.val.get "onresume" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onresume` where the platform has it (`'onresume' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Document.onresume? (self' : Document) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.Document.onresume?" do
+  let self := self'
+  if !(← Internal.has self.val "onresume") then return none
+  let lasmGuarded ← do
+    self.val.get "onresume" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `onresume`: `attribute EventHandler onresume` -/
 @[macro_inline] def Document.setOnresume (self : Document) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.Document.setOnresume" do
   self.val.set "onresume" (toJS value)
@@ -40,5 +56,13 @@ set_option compiler.extract_closed false
 /-- `readonly attribute boolean wasDiscarded` -/
 @[macro_inline] def Document.wasDiscarded (self : Document) : IO Bool := Internal.api "Lasm.JS.Web.Document.wasDiscarded" do
   self.val.get "wasDiscarded" Bool
+
+/-- `readonly attribute boolean wasDiscarded` where the platform has it (`'wasDiscarded' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Document.wasDiscarded? (self' : Document) : IO (Option Bool) := Internal.api "Lasm.JS.Web.Document.wasDiscarded?" do
+  let self := self'
+  if !(← Internal.has self.val "wasDiscarded") then return none
+  let lasmGuarded ← do
+    self.val.get "wasDiscarded" Bool
+  return some lasmGuarded
 
 end Lasm.JS.Web

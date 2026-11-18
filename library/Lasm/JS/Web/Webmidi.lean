@@ -100,6 +100,14 @@ instance : ToJS MidiPermissionDescriptor := ⟨fun d => Internal.fields #[("name
   Lasm.JS.Binding.invoke MIDIConnectionEvent { name := "Lasm.JS.Web.MIDIConnectionEvent.new", module := "globalThis", path := "MIDIConnectionEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional MIDIConnectionEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MIDIConnectionEvent.new? (type : String) (eventInitDict : Option MIDIConnectionEventInit := none) : IO (Option MIDIConnectionEvent) := Internal.api "Lasm.JS.Web.MIDIConnectionEvent.new?" do
+  if !(← Internal.hasGlobal ["MIDIConnectionEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke MIDIConnectionEvent { name := "Lasm.JS.Web.MIDIConnectionEvent.new?", module := "globalThis", path := "MIDIConnectionEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute MIDIPort? port` -/
 @[macro_inline] def MIDIConnectionEvent.port (self : MIDIConnectionEvent) : IO (Option MIDIPort) := Internal.api "Lasm.JS.Web.MIDIConnectionEvent.port" do
   self.val.get "port" (Option MIDIPort)
@@ -116,6 +124,14 @@ instance : ToJS MidiPermissionDescriptor := ⟨fun d => Internal.fields #[("name
 @[macro_inline] def MIDIMessageEvent.new (type : String) (eventInitDict : Option MIDIMessageEventInit := none) : IO MIDIMessageEvent := Internal.api "Lasm.JS.Web.MIDIMessageEvent.new" do
   Lasm.JS.Binding.invoke MIDIMessageEvent { name := "Lasm.JS.Web.MIDIMessageEvent.new", module := "globalThis", path := "MIDIMessageEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, optional MIDIMessageEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MIDIMessageEvent.new? (type : String) (eventInitDict : Option MIDIMessageEventInit := none) : IO (Option MIDIMessageEvent) := Internal.api "Lasm.JS.Web.MIDIMessageEvent.new?" do
+  if !(← Internal.hasGlobal ["MIDIMessageEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke MIDIMessageEvent { name := "Lasm.JS.Web.MIDIMessageEvent.new?", module := "globalThis", path := "MIDIMessageEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute Uint8Array? data` -/
 @[macro_inline] def MIDIMessageEvent.data (self : MIDIMessageEvent) : IO (Option ByteArray) := Internal.api "Lasm.JS.Web.MIDIMessageEvent.data" do
@@ -203,5 +219,14 @@ instance : ToJS MidiPermissionDescriptor := ⟨fun d => Internal.fields #[("name
 @[macro_inline] def Navigator.requestMIDIAccess (self : Navigator) (options : Option MIDIOptions := none) : Async MIDIAccess := Internal.api "Lasm.JS.Web.Navigator.requestMIDIAccess" do
   let r ← self.val.callMethodAwait "requestMIDIAccess" (Internal.args #[Internal.optional options]) Value
   pure { val := r }
+
+/-- `Promise<MIDIAccess> requestMIDIAccess(optional MIDIOptions options)` where the platform has it (`'requestMIDIAccess' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.requestMIDIAccess? (self' : Navigator) (options : Option MIDIOptions := none) : Async (Option MIDIAccess) := Internal.api "Lasm.JS.Web.Navigator.requestMIDIAccess?" do
+  let self := self'
+  if !(← Internal.has self.val "requestMIDIAccess") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethodAwait "requestMIDIAccess" (Internal.args #[Internal.optional options]) Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

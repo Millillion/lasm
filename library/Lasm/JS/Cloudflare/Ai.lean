@@ -13076,7 +13076,7 @@ abbrev AutoRagAiSearchResponseData := AutoRagSearchResponseData
   Internal.cloneAs AiSearchChatCompletionsResponse r
 
 /-- `chatCompletions(params: AiSearchChatCompletionsRequest & { stream: true; }): Promise<ReadableStream>`: `Promise<ReadableStream> chatCompletions(AiSearchInstanceChatCompletionsParams params)` -/
-@[macro_inline] def AiSearchInstance.chatCompletionsWithAiSearchInstanceChatCompletionsParams (self : AiSearchInstance) (params : AiSearchInstanceChatCompletionsParams) : Async ReadableStream := Internal.api "Lasm.JS.Cloudflare.AiSearchInstance.chatCompletionsWithAiSearchInstanceChatCompletionsParams" do
+@[macro_inline] def AiSearchInstance.chatCompletionsStream (self : AiSearchInstance) (params : AiSearchInstanceChatCompletionsParams) : Async ReadableStream := Internal.api "Lasm.JS.Cloudflare.AiSearchInstance.chatCompletionsStream" do
   let r ← self.val.callMethodAwait "chatCompletions" (Internal.args #[toJS params]) Value
   pure { val := r }
 
@@ -13118,12 +13118,12 @@ abbrev AutoRagAiSearchResponseData := AutoRagSearchResponseData
   self.val.callMethodAwait "search" (Internal.args #[toJS params]) AiSearchMultiSearchResponse
 
 /-- `chatCompletions(params: AiSearchMultiChatCompletionsRequest & { stream: true; }): Promise<ReadableStream>`: `Promise<ReadableStream> chatCompletions(AiSearchNamespaceChatCompletionsParams params)` -/
-@[macro_inline] def AiSearchNamespace.chatCompletions (self : AiSearchNamespace) (params : AiSearchNamespaceChatCompletionsParams) : Async ReadableStream := Internal.api "Lasm.JS.Cloudflare.AiSearchNamespace.chatCompletions" do
+@[macro_inline] def AiSearchNamespace.chatCompletionsStream (self : AiSearchNamespace) (params : AiSearchNamespaceChatCompletionsParams) : Async ReadableStream := Internal.api "Lasm.JS.Cloudflare.AiSearchNamespace.chatCompletionsStream" do
   let r ← self.val.callMethodAwait "chatCompletions" (Internal.args #[toJS params]) Value
   pure { val := r }
 
 /-- `chatCompletions(params: AiSearchMultiChatCompletionsRequest): Promise<AiSearchMultiChatCompletionsResponse>`: `Promise<AiSearchMultiChatCompletionsResponse> chatCompletions(AiSearchMultiChatCompletionsRequest params)` -/
-@[macro_inline] def AiSearchNamespace.chatCompletionsWithAiSearchMultiChatCompletionsRequest (self : AiSearchNamespace) (params : AiSearchMultiChatCompletionsRequest) : Async AiSearchMultiChatCompletionsResponse := Internal.api "Lasm.JS.Cloudflare.AiSearchNamespace.chatCompletionsWithAiSearchMultiChatCompletionsRequest" do
+@[macro_inline] def AiSearchNamespace.chatCompletions (self : AiSearchNamespace) (params : AiSearchMultiChatCompletionsRequest) : Async AiSearchMultiChatCompletionsResponse := Internal.api "Lasm.JS.Cloudflare.AiSearchNamespace.chatCompletions" do
   self.val.callMethodAwait "chatCompletions" (Internal.args #[toJS params]) AiSearchMultiChatCompletionsResponse
 
 /-- `inputs: AiImageClassificationInput`: `readonly attribute AiImageClassificationInput inputs` -/
@@ -13662,26 +13662,26 @@ abbrev AutoRagAiSearchResponseData := AutoRagSearchResponseData
   pure { val := r }
 
 /-- `run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]['inputs'] & { stream: true; }, options?: AiOptions): Promise<ReadableStream>`: `Promise<ReadableStream> run(any model, AiRunInputs inputs, optional AiOptions options)` -/
-@[macro_inline] def Ai.run (self : Ai) (model : Data) (inputs : AiRunInputs) (options : Option AiOptions := none) : Async ReadableStream := Internal.api "Lasm.JS.Cloudflare.Ai.run" do
+@[macro_inline] def Ai.runStream (self : Ai) (model : Data) (inputs : AiRunInputs) (options : Option AiOptions := none) : Async ReadableStream := Internal.api "Lasm.JS.Cloudflare.Ai.runStream" do
   let r ← self.val.callMethodAwait "run" (Internal.args #[toJS model, toJS inputs, Internal.optional options]) Value
   pure { val := r }
 
 /-- `run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]['inputs'], options?: AiOptions): Promise<AiModelList[Name]['postProcessedOutputs']>`: `Promise<any> run(any model, any inputs, optional AiOptions options)` -/
-@[macro_inline] def Ai.runWithAnyAnyAiOptions (self : Ai) (model : Data) (inputs : Data) (options : Option AiOptions := none) : Async Data := Internal.api "Lasm.JS.Cloudflare.Ai.runWithAnyAnyAiOptions" do
+@[macro_inline] def Ai.run (self : Ai) (model : Data) (inputs : Data) (options : Option AiOptions := none) : Async Data := Internal.api "Lasm.JS.Cloudflare.Ai.run" do
   self.val.callMethodAwait "run" (Internal.args #[toJS model, toJS inputs, Internal.optional options]) Data
 
 /-- `run<Model extends string>(model: Model extends keyof AiModelList ? never : Model, inputs: Record<string, unknown>, options?: AiOptions): Promise<Record<string, unknown>>`: `Promise<record<DOMString, any>> run(any model, record<DOMString, any> inputs, optional AiOptions options)` -/
-@[macro_inline] def Ai.runWithAnyRecordOfAnyAiOptions (self : Ai) (model : Data) (inputs : Record Data) (options : Option AiOptions := none) : Async (Record Data) := Internal.api "Lasm.JS.Cloudflare.Ai.runWithAnyRecordOfAnyAiOptions" do
+@[macro_inline] def Ai.runOtherModel (self : Ai) (model : Data) (inputs : Record Data) (options : Option AiOptions := none) : Async (Record Data) := Internal.api "Lasm.JS.Cloudflare.Ai.runOtherModel" do
   let r ← self.val.callMethodAwait "run" (Internal.args #[toJS model, toJS inputs, Internal.optional options]) Value
   Internal.recordOf Data r
 
 /-- `run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]['inputs'], options: AiOptions & { websocket: true; }): Promise<Response>`: `Promise<Response> run(any model, any inputs, AiRunOptions options)` -/
-@[macro_inline] def Ai.runWithAnyAnyAiRunOptions (self : Ai) (model : Data) (inputs : Data) (options : AiRunOptions) : Async Response := Internal.api "Lasm.JS.Cloudflare.Ai.runWithAnyAnyAiRunOptions" do
+@[macro_inline] def Ai.runWebSocket (self : Ai) (model : Data) (inputs : Data) (options : AiRunOptions) : Async Response := Internal.api "Lasm.JS.Cloudflare.Ai.runWebSocket" do
   let r ← self.val.callMethodAwait "run" (Internal.args #[toJS model, toJS inputs, toJS options]) Value
   pure { val := r }
 
 /-- `run<Name extends keyof AiModelList>(model: Name, inputs: AiModelList[Name]['inputs'], options: AiOptions & { returnRawResponse: true; }): Promise<Response>`: `Promise<Response> run(any model, any inputs, any options)` -/
-@[macro_inline] def Ai.runWithAnyAnyAny (self : Ai) (model : Data) (inputs : Data) (options : Data) : Async Response := Internal.api "Lasm.JS.Cloudflare.Ai.runWithAnyAnyAny" do
+@[macro_inline] def Ai.runRawResponse (self : Ai) (model : Data) (inputs : Data) (options : Data) : Async Response := Internal.api "Lasm.JS.Cloudflare.Ai.runRawResponse" do
   let r ← self.val.callMethodAwait "run" (Internal.args #[toJS model, toJS inputs, toJS options]) Value
   pure { val := r }
 
@@ -13695,11 +13695,11 @@ abbrev AutoRagAiSearchResponseData := AutoRagSearchResponseData
   pure { val := r }
 
 /-- `toMarkdown(files: MarkdownDocument, options?: ConversionRequestOptions): Promise<ConversionResponse>`: `Promise<ConversionResponse> toMarkdown(MarkdownDocument files, optional ConversionRequestOptions options)` -/
-@[macro_inline] def Ai.toMarkdownWithFiles (self : Ai) (files : MarkdownDocument) (options : Option ConversionRequestOptions := none) : Async ConversionResponse := Internal.api "Lasm.JS.Cloudflare.Ai.toMarkdownWithFiles" do
+@[macro_inline] def Ai.toMarkdownFile (self : Ai) (files : MarkdownDocument) (options : Option ConversionRequestOptions := none) : Async ConversionResponse := Internal.api "Lasm.JS.Cloudflare.Ai.toMarkdownFile" do
   self.val.callMethodAwait "toMarkdown" (Internal.args #[toJS files, Internal.optional options]) ConversionResponse
 
 /-- `toMarkdown(files: MarkdownDocument[], options?: ConversionRequestOptions): Promise<ConversionResponse[]>`: `Promise<sequence<ConversionResponse>> toMarkdown(sequence<MarkdownDocument> files, optional ConversionRequestOptions options)` -/
-@[macro_inline] def Ai.toMarkdownWithFilesOptions (self : Ai) (files : Array MarkdownDocument) (options : Option ConversionRequestOptions := none) : Async (Array ConversionResponse) := Internal.api "Lasm.JS.Cloudflare.Ai.toMarkdownWithFilesOptions" do
+@[macro_inline] def Ai.toMarkdownFiles (self : Ai) (files : Array MarkdownDocument) (options : Option ConversionRequestOptions := none) : Async (Array ConversionResponse) := Internal.api "Lasm.JS.Cloudflare.Ai.toMarkdownFiles" do
   self.val.callMethodAwait "toMarkdown" (Internal.args #[toJS files, Internal.optional options]) (Array ConversionResponse)
 
 /-- `patchLog(logId: string, data: AiGatewayPatchLog): Promise<void>`: `Promise<undefined> patchLog(DOMString logId, AiGatewayPatchLog data)` -/
@@ -13725,7 +13725,7 @@ abbrev AutoRagAiSearchResponseData := AutoRagSearchResponseData
   self.val.callMethodAwait "transform" (Internal.args #[toJS files, Internal.optional options]) ConversionResponse
 
 /-- `transform(files: MarkdownDocument[], options?: ConversionRequestOptions): Promise<ConversionResponse[]>`: `Promise<sequence<ConversionResponse>> transform(sequence<MarkdownDocument> files, optional ConversionRequestOptions options)` -/
-@[macro_inline] def ToMarkdownService.transformWithSequenceOfMarkdownDocumentConversionRequestOptions (self : ToMarkdownService) (files : Array MarkdownDocument) (options : Option ConversionRequestOptions := none) : Async (Array ConversionResponse) := Internal.api "Lasm.JS.Cloudflare.ToMarkdownService.transformWithSequenceOfMarkdownDocumentConversionRequestOptions" do
+@[macro_inline] def ToMarkdownService.transformMany (self : ToMarkdownService) (files : Array MarkdownDocument) (options : Option ConversionRequestOptions := none) : Async (Array ConversionResponse) := Internal.api "Lasm.JS.Cloudflare.ToMarkdownService.transformMany" do
   self.val.callMethodAwait "transform" (Internal.args #[toJS files, Internal.optional options]) (Array ConversionResponse)
 
 /-- `supported(): Promise<SupportedFileFormat[]>`: `Promise<sequence<SupportedFileFormat>> supported()` -/

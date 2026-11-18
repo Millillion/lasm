@@ -24,6 +24,14 @@ set_option compiler.extract_closed false
   Lasm.JS.Binding.invoke CompressionStream { name := "Lasm.JS.Web.CompressionStream.new", module := "globalThis", path := "CompressionStream", construct := true, arity := 1 }
     (Internal.args #[toJS format]) (await := false)
 
+/-- `constructor(CompressionFormat format)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CompressionStream.new? (format : CompressionFormat) : IO (Option CompressionStream) := Internal.api "Lasm.JS.Web.CompressionStream.new?" do
+  if !(← Internal.hasGlobal ["CompressionStream"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CompressionStream { name := "Lasm.JS.Web.CompressionStream.new?", module := "globalThis", path := "CompressionStream", construct := true, arity := 1 }
+      (Internal.args #[toJS format]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute ReadableStream readable` -/
 @[macro_inline] def CompressionStream.readable (self : CompressionStream) : IO ReadableStream := Internal.api "Lasm.JS.Web.CompressionStream.readable" do
   let r ← self.val.get "readable" Value
@@ -42,6 +50,14 @@ set_option compiler.extract_closed false
 @[macro_inline] def DecompressionStream.new (format : CompressionFormat) : IO DecompressionStream := Internal.api "Lasm.JS.Web.DecompressionStream.new" do
   Lasm.JS.Binding.invoke DecompressionStream { name := "Lasm.JS.Web.DecompressionStream.new", module := "globalThis", path := "DecompressionStream", construct := true, arity := 1 }
     (Internal.args #[toJS format]) (await := false)
+
+/-- `constructor(CompressionFormat format)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DecompressionStream.new? (format : CompressionFormat) : IO (Option DecompressionStream) := Internal.api "Lasm.JS.Web.DecompressionStream.new?" do
+  if !(← Internal.hasGlobal ["DecompressionStream"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke DecompressionStream { name := "Lasm.JS.Web.DecompressionStream.new?", module := "globalThis", path := "DecompressionStream", construct := true, arity := 1 }
+      (Internal.args #[toJS format]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute ReadableStream readable` -/
 @[macro_inline] def DecompressionStream.readable (self : DecompressionStream) : IO ReadableStream := Internal.api "Lasm.JS.Web.DecompressionStream.readable" do

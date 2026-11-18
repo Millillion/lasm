@@ -670,6 +670,14 @@ instance : ToJS VideoFrameCopyToOptions := ⟨fun d => Internal.fields #[("rect"
   Lasm.JS.Binding.invoke AudioData { name := "Lasm.JS.Web.AudioData.new", module := "globalThis", path := "AudioData", construct := true, arity := 1 }
     (Internal.args #[toJS init]) (await := false)
 
+/-- `constructor(AudioDataInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioData.new? (init : AudioDataInit) : IO (Option AudioData) := Internal.api "Lasm.JS.Web.AudioData.new?" do
+  if !(← Internal.hasGlobal ["AudioData"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke AudioData { name := "Lasm.JS.Web.AudioData.new?", module := "globalThis", path := "AudioData", construct := true, arity := 1 }
+      (Internal.args #[toJS init]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute AudioSampleFormat? format` -/
 @[macro_inline] def AudioData.format (self : AudioData) : IO (Option AudioSampleFormat) := Internal.api "Lasm.JS.Web.AudioData.format" do
   self.val.get "format" (Option AudioSampleFormat)
@@ -720,6 +728,14 @@ instance : ToJS VideoFrameCopyToOptions := ⟨fun d => Internal.fields #[("rect"
   Lasm.JS.Binding.invoke AudioDecoder { name := "Lasm.JS.Web.AudioDecoder.new", module := "globalThis", path := "AudioDecoder", construct := true, arity := 1 }
     (Internal.args #[toJS init]) (await := false)
 
+/-- `constructor(AudioDecoderInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioDecoder.new? (init : AudioDecoderInit) : IO (Option AudioDecoder) := Internal.api "Lasm.JS.Web.AudioDecoder.new?" do
+  if !(← Internal.hasGlobal ["AudioDecoder"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke AudioDecoder { name := "Lasm.JS.Web.AudioDecoder.new?", module := "globalThis", path := "AudioDecoder", construct := true, arity := 1 }
+      (Internal.args #[toJS init]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute CodecState state` -/
 @[macro_inline] def AudioDecoder.state (self : AudioDecoder) : IO CodecState := Internal.api "Lasm.JS.Web.AudioDecoder.state" do
   self.val.get "state" CodecState
@@ -761,6 +777,14 @@ instance : ToJS VideoFrameCopyToOptions := ⟨fun d => Internal.fields #[("rect"
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Web.AudioDecoder.isConfigSupported", module := "globalThis", path := "AudioDecoder.isConfigSupported", construct := false, arity := 1 }
     (Internal.args #[toJS config])
 
+/-- `static Promise<AudioDecoderSupport> isConfigSupported(AudioDecoderConfig config)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioDecoder.isConfigSupported? (config : AudioDecoderConfig) : Async (Option Data) := Internal.api "Lasm.JS.Web.AudioDecoder.isConfigSupported?" do
+  if !(← Internal.hasGlobal ["AudioDecoder", "isConfigSupported"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Web.AudioDecoder.isConfigSupported?", module := "globalThis", path := "AudioDecoder.isConfigSupported", construct := false, arity := 1 }
+      (Internal.args #[toJS config])
+  return some lasmGuarded
+
 /-- `v instanceof AudioEncoder`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `AudioEncoder`). -/
 @[macro_inline] def AudioEncoder.cast? (v : Value) : IO (Option AudioEncoder) := Internal.api "Lasm.JS.Web.AudioEncoder.cast?" do
   Internal.cast (Internal.getGlobal ["AudioEncoder"] Value) (fun x => { val := x }) v
@@ -769,6 +793,14 @@ instance : ToJS VideoFrameCopyToOptions := ⟨fun d => Internal.fields #[("rect"
 @[macro_inline] def AudioEncoder.new (init : AudioEncoderInit) : IO AudioEncoder := Internal.api "Lasm.JS.Web.AudioEncoder.new" do
   Lasm.JS.Binding.invoke AudioEncoder { name := "Lasm.JS.Web.AudioEncoder.new", module := "globalThis", path := "AudioEncoder", construct := true, arity := 1 }
     (Internal.args #[toJS init]) (await := false)
+
+/-- `constructor(AudioEncoderInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioEncoder.new? (init : AudioEncoderInit) : IO (Option AudioEncoder) := Internal.api "Lasm.JS.Web.AudioEncoder.new?" do
+  if !(← Internal.hasGlobal ["AudioEncoder"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke AudioEncoder { name := "Lasm.JS.Web.AudioEncoder.new?", module := "globalThis", path := "AudioEncoder", construct := true, arity := 1 }
+      (Internal.args #[toJS init]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute CodecState state` -/
 @[macro_inline] def AudioEncoder.state (self : AudioEncoder) : IO CodecState := Internal.api "Lasm.JS.Web.AudioEncoder.state" do
@@ -811,6 +843,14 @@ instance : ToJS VideoFrameCopyToOptions := ⟨fun d => Internal.fields #[("rect"
   Lasm.JS.Binding.invokeAsync AudioEncoderSupport { name := "Lasm.JS.Web.AudioEncoder.isConfigSupported", module := "globalThis", path := "AudioEncoder.isConfigSupported", construct := false, arity := 1 }
     (Internal.args #[toJS config])
 
+/-- `static Promise<AudioEncoderSupport> isConfigSupported(AudioEncoderConfig config)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def AudioEncoder.isConfigSupported? (config : AudioEncoderConfig) : Async (Option AudioEncoderSupport) := Internal.api "Lasm.JS.Web.AudioEncoder.isConfigSupported?" do
+  if !(← Internal.hasGlobal ["AudioEncoder", "isConfigSupported"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync AudioEncoderSupport { name := "Lasm.JS.Web.AudioEncoder.isConfigSupported?", module := "globalThis", path := "AudioEncoder.isConfigSupported", construct := false, arity := 1 }
+      (Internal.args #[toJS config])
+  return some lasmGuarded
+
 /-- `v instanceof EncodedAudioChunk`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `EncodedAudioChunk`). -/
 @[macro_inline] def EncodedAudioChunk.cast? (v : Value) : IO (Option EncodedAudioChunk) := Internal.api "Lasm.JS.Web.EncodedAudioChunk.cast?" do
   Internal.cast (Internal.getGlobal ["EncodedAudioChunk"] Value) (fun x => { val := x }) v
@@ -819,6 +859,14 @@ instance : ToJS VideoFrameCopyToOptions := ⟨fun d => Internal.fields #[("rect"
 @[macro_inline] def EncodedAudioChunk.new (init : EncodedAudioChunkInit) : IO EncodedAudioChunk := Internal.api "Lasm.JS.Web.EncodedAudioChunk.new" do
   Lasm.JS.Binding.invoke EncodedAudioChunk { name := "Lasm.JS.Web.EncodedAudioChunk.new", module := "globalThis", path := "EncodedAudioChunk", construct := true, arity := 1 }
     (Internal.args #[toJS init]) (await := false)
+
+/-- `constructor(EncodedAudioChunkInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def EncodedAudioChunk.new? (init : EncodedAudioChunkInit) : IO (Option EncodedAudioChunk) := Internal.api "Lasm.JS.Web.EncodedAudioChunk.new?" do
+  if !(← Internal.hasGlobal ["EncodedAudioChunk"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke EncodedAudioChunk { name := "Lasm.JS.Web.EncodedAudioChunk.new?", module := "globalThis", path := "EncodedAudioChunk", construct := true, arity := 1 }
+      (Internal.args #[toJS init]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute EncodedAudioChunkType type` -/
 @[macro_inline] def EncodedAudioChunk.type (self : EncodedAudioChunk) : IO EncodedAudioChunkType := Internal.api "Lasm.JS.Web.EncodedAudioChunk.type" do
@@ -849,6 +897,14 @@ instance : ToJS VideoFrameCopyToOptions := ⟨fun d => Internal.fields #[("rect"
   Lasm.JS.Binding.invoke EncodedVideoChunk { name := "Lasm.JS.Web.EncodedVideoChunk.new", module := "globalThis", path := "EncodedVideoChunk", construct := true, arity := 1 }
     (Internal.args #[toJS init]) (await := false)
 
+/-- `constructor(EncodedVideoChunkInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def EncodedVideoChunk.new? (init : EncodedVideoChunkInit) : IO (Option EncodedVideoChunk) := Internal.api "Lasm.JS.Web.EncodedVideoChunk.new?" do
+  if !(← Internal.hasGlobal ["EncodedVideoChunk"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke EncodedVideoChunk { name := "Lasm.JS.Web.EncodedVideoChunk.new?", module := "globalThis", path := "EncodedVideoChunk", construct := true, arity := 1 }
+      (Internal.args #[toJS init]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute EncodedVideoChunkType type` -/
 @[macro_inline] def EncodedVideoChunk.type (self : EncodedVideoChunk) : IO EncodedVideoChunkType := Internal.api "Lasm.JS.Web.EncodedVideoChunk.type" do
   self.val.get "type" EncodedVideoChunkType
@@ -877,6 +933,14 @@ instance : ToJS VideoFrameCopyToOptions := ⟨fun d => Internal.fields #[("rect"
 @[macro_inline] def ImageDecoder.new (init : ImageDecoderInit) : IO ImageDecoder := Internal.api "Lasm.JS.Web.ImageDecoder.new" do
   Lasm.JS.Binding.invoke ImageDecoder { name := "Lasm.JS.Web.ImageDecoder.new", module := "globalThis", path := "ImageDecoder", construct := true, arity := 1 }
     (Internal.args #[toJS init]) (await := false)
+
+/-- `constructor(ImageDecoderInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ImageDecoder.new? (init : ImageDecoderInit) : IO (Option ImageDecoder) := Internal.api "Lasm.JS.Web.ImageDecoder.new?" do
+  if !(← Internal.hasGlobal ["ImageDecoder"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ImageDecoder { name := "Lasm.JS.Web.ImageDecoder.new?", module := "globalThis", path := "ImageDecoder", construct := true, arity := 1 }
+      (Internal.args #[toJS init]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString type` -/
 @[macro_inline] def ImageDecoder.type (self : ImageDecoder) : IO String := Internal.api "Lasm.JS.Web.ImageDecoder.type" do
@@ -912,6 +976,14 @@ instance : ToJS VideoFrameCopyToOptions := ⟨fun d => Internal.fields #[("rect"
 @[macro_inline] def ImageDecoder.isTypeSupported (type : String) : Async Bool := Internal.api "Lasm.JS.Web.ImageDecoder.isTypeSupported" do
   Lasm.JS.Binding.invokeAsync Bool { name := "Lasm.JS.Web.ImageDecoder.isTypeSupported", module := "globalThis", path := "ImageDecoder.isTypeSupported", construct := false, arity := 1 }
     (Internal.args #[toJS type])
+
+/-- `static Promise<boolean> isTypeSupported(DOMString type)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ImageDecoder.isTypeSupported? (type : String) : Async (Option Bool) := Internal.api "Lasm.JS.Web.ImageDecoder.isTypeSupported?" do
+  if !(← Internal.hasGlobal ["ImageDecoder", "isTypeSupported"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Bool { name := "Lasm.JS.Web.ImageDecoder.isTypeSupported?", module := "globalThis", path := "ImageDecoder.isTypeSupported", construct := false, arity := 1 }
+      (Internal.args #[toJS type])
+  return some lasmGuarded
 
 /-- `v instanceof ImageTrack`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ImageTrack`). -/
 @[macro_inline] def ImageTrack.cast? (v : Value) : IO (Option ImageTrack) := Internal.api "Lasm.JS.Web.ImageTrack.cast?" do
@@ -967,6 +1039,14 @@ instance : ToJS VideoFrameCopyToOptions := ⟨fun d => Internal.fields #[("rect"
   Lasm.JS.Binding.invoke VideoColorSpace { name := "Lasm.JS.Web.VideoColorSpace.new", module := "globalThis", path := "VideoColorSpace", construct := true, arity := 1 }
     (Internal.args #[Internal.optional init]) (await := false)
 
+/-- `constructor(optional VideoColorSpaceInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def VideoColorSpace.new? (init : Option VideoColorSpaceInit := none) : IO (Option VideoColorSpace) := Internal.api "Lasm.JS.Web.VideoColorSpace.new?" do
+  if !(← Internal.hasGlobal ["VideoColorSpace"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke VideoColorSpace { name := "Lasm.JS.Web.VideoColorSpace.new?", module := "globalThis", path := "VideoColorSpace", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional init]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute VideoColorPrimaries? primaries` -/
 @[macro_inline] def VideoColorSpace.primaries (self : VideoColorSpace) : IO (Option VideoColorPrimaries) := Internal.api "Lasm.JS.Web.VideoColorSpace.primaries" do
   self.val.get "primaries" (Option VideoColorPrimaries)
@@ -995,6 +1075,14 @@ instance : ToJS VideoFrameCopyToOptions := ⟨fun d => Internal.fields #[("rect"
 @[macro_inline] def VideoDecoder.new (init : VideoDecoderInit) : IO VideoDecoder := Internal.api "Lasm.JS.Web.VideoDecoder.new" do
   Lasm.JS.Binding.invoke VideoDecoder { name := "Lasm.JS.Web.VideoDecoder.new", module := "globalThis", path := "VideoDecoder", construct := true, arity := 1 }
     (Internal.args #[toJS init]) (await := false)
+
+/-- `constructor(VideoDecoderInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def VideoDecoder.new? (init : VideoDecoderInit) : IO (Option VideoDecoder) := Internal.api "Lasm.JS.Web.VideoDecoder.new?" do
+  if !(← Internal.hasGlobal ["VideoDecoder"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke VideoDecoder { name := "Lasm.JS.Web.VideoDecoder.new?", module := "globalThis", path := "VideoDecoder", construct := true, arity := 1 }
+      (Internal.args #[toJS init]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute CodecState state` -/
 @[macro_inline] def VideoDecoder.state (self : VideoDecoder) : IO CodecState := Internal.api "Lasm.JS.Web.VideoDecoder.state" do
@@ -1037,6 +1125,14 @@ instance : ToJS VideoFrameCopyToOptions := ⟨fun d => Internal.fields #[("rect"
   Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Web.VideoDecoder.isConfigSupported", module := "globalThis", path := "VideoDecoder.isConfigSupported", construct := false, arity := 1 }
     (Internal.args #[toJS config])
 
+/-- `static Promise<VideoDecoderSupport> isConfigSupported(VideoDecoderConfig config)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def VideoDecoder.isConfigSupported? (config : VideoDecoderConfig) : Async (Option Data) := Internal.api "Lasm.JS.Web.VideoDecoder.isConfigSupported?" do
+  if !(← Internal.hasGlobal ["VideoDecoder", "isConfigSupported"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Data { name := "Lasm.JS.Web.VideoDecoder.isConfigSupported?", module := "globalThis", path := "VideoDecoder.isConfigSupported", construct := false, arity := 1 }
+      (Internal.args #[toJS config])
+  return some lasmGuarded
+
 /-- `v instanceof VideoEncoder`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `VideoEncoder`). -/
 @[macro_inline] def VideoEncoder.cast? (v : Value) : IO (Option VideoEncoder) := Internal.api "Lasm.JS.Web.VideoEncoder.cast?" do
   Internal.cast (Internal.getGlobal ["VideoEncoder"] Value) (fun x => { val := x }) v
@@ -1045,6 +1141,14 @@ instance : ToJS VideoFrameCopyToOptions := ⟨fun d => Internal.fields #[("rect"
 @[macro_inline] def VideoEncoder.new (init : VideoEncoderInit) : IO VideoEncoder := Internal.api "Lasm.JS.Web.VideoEncoder.new" do
   Lasm.JS.Binding.invoke VideoEncoder { name := "Lasm.JS.Web.VideoEncoder.new", module := "globalThis", path := "VideoEncoder", construct := true, arity := 1 }
     (Internal.args #[toJS init]) (await := false)
+
+/-- `constructor(VideoEncoderInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def VideoEncoder.new? (init : VideoEncoderInit) : IO (Option VideoEncoder) := Internal.api "Lasm.JS.Web.VideoEncoder.new?" do
+  if !(← Internal.hasGlobal ["VideoEncoder"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke VideoEncoder { name := "Lasm.JS.Web.VideoEncoder.new?", module := "globalThis", path := "VideoEncoder", construct := true, arity := 1 }
+      (Internal.args #[toJS init]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute CodecState state` -/
 @[macro_inline] def VideoEncoder.state (self : VideoEncoder) : IO CodecState := Internal.api "Lasm.JS.Web.VideoEncoder.state" do
@@ -1087,6 +1191,14 @@ instance : ToJS VideoFrameCopyToOptions := ⟨fun d => Internal.fields #[("rect"
   Lasm.JS.Binding.invokeAsync VideoEncoderSupport { name := "Lasm.JS.Web.VideoEncoder.isConfigSupported", module := "globalThis", path := "VideoEncoder.isConfigSupported", construct := false, arity := 1 }
     (Internal.args #[toJS config])
 
+/-- `static Promise<VideoEncoderSupport> isConfigSupported(VideoEncoderConfig config)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def VideoEncoder.isConfigSupported? (config : VideoEncoderConfig) : Async (Option VideoEncoderSupport) := Internal.api "Lasm.JS.Web.VideoEncoder.isConfigSupported?" do
+  if !(← Internal.hasGlobal ["VideoEncoder", "isConfigSupported"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync VideoEncoderSupport { name := "Lasm.JS.Web.VideoEncoder.isConfigSupported?", module := "globalThis", path := "VideoEncoder.isConfigSupported", construct := false, arity := 1 }
+      (Internal.args #[toJS config])
+  return some lasmGuarded
+
 /-- `v instanceof VideoFrame`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `VideoFrame`). -/
 @[macro_inline] def VideoFrame.cast? (v : Value) : IO (Option VideoFrame) := Internal.api "Lasm.JS.Web.VideoFrame.cast?" do
   Internal.cast (Internal.getGlobal ["VideoFrame"] Value) (fun x => { val := x }) v
@@ -1096,10 +1208,26 @@ instance : ToJS VideoFrameCopyToOptions := ⟨fun d => Internal.fields #[("rect"
   Lasm.JS.Binding.invoke VideoFrame { name := "Lasm.JS.Web.VideoFrame.new", module := "globalThis", path := "VideoFrame", construct := true, arity := 2 }
     (Internal.args #[toJS image, Internal.optional init]) (await := false)
 
+/-- `constructor(CanvasImageSource image, optional VideoFrameInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def VideoFrame.new? (image : CanvasImageSource) (init : Option VideoFrameInit := none) : IO (Option VideoFrame) := Internal.api "Lasm.JS.Web.VideoFrame.new?" do
+  if !(← Internal.hasGlobal ["VideoFrame"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke VideoFrame { name := "Lasm.JS.Web.VideoFrame.new?", module := "globalThis", path := "VideoFrame", construct := true, arity := 2 }
+      (Internal.args #[toJS image, Internal.optional init]) (await := false)
+  return some lasmGuarded
+
 /-- `constructor(AllowSharedBufferSource data, VideoFrameBufferInit init)` -/
 @[macro_inline] def VideoFrame.newWithData (data : ByteArray) (init : VideoFrameBufferInit) : IO VideoFrame := Internal.api "Lasm.JS.Web.VideoFrame.newWithData" do
   Lasm.JS.Binding.invoke VideoFrame { name := "Lasm.JS.Web.VideoFrame.newWithData", module := "globalThis", path := "VideoFrame", construct := true, arity := 2 }
     (Internal.args #[toJS data, toJS init]) (await := false)
+
+/-- `constructor(AllowSharedBufferSource data, VideoFrameBufferInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def VideoFrame.newWithData? (data : ByteArray) (init : VideoFrameBufferInit) : IO (Option VideoFrame) := Internal.api "Lasm.JS.Web.VideoFrame.newWithData?" do
+  if !(← Internal.hasGlobal ["VideoFrame"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke VideoFrame { name := "Lasm.JS.Web.VideoFrame.newWithData?", module := "globalThis", path := "VideoFrame", construct := true, arity := 2 }
+      (Internal.args #[toJS data, toJS init]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute VideoPixelFormat? format` -/
 @[macro_inline] def VideoFrame.format (self : VideoFrame) : IO (Option VideoPixelFormat) := Internal.api "Lasm.JS.Web.VideoFrame.format" do
@@ -1125,9 +1253,25 @@ instance : ToJS VideoFrameCopyToOptions := ⟨fun d => Internal.fields #[("rect"
 @[macro_inline] def VideoFrame.rotation (self : VideoFrame) : IO Float := Internal.api "Lasm.JS.Web.VideoFrame.rotation" do
   self.val.get "rotation" Float
 
+/-- `readonly attribute double rotation` where the platform has it (`'rotation' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def VideoFrame.rotation? (self' : VideoFrame) : IO (Option Float) := Internal.api "Lasm.JS.Web.VideoFrame.rotation?" do
+  let self := self'
+  if !(← Internal.has self.val "rotation") then return none
+  let lasmGuarded ← do
+    self.val.get "rotation" Float
+  return some lasmGuarded
+
 /-- `readonly attribute boolean flip` -/
 @[macro_inline] def VideoFrame.flip (self : VideoFrame) : IO Bool := Internal.api "Lasm.JS.Web.VideoFrame.flip" do
   self.val.get "flip" Bool
+
+/-- `readonly attribute boolean flip` where the platform has it (`'flip' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def VideoFrame.flip? (self' : VideoFrame) : IO (Option Bool) := Internal.api "Lasm.JS.Web.VideoFrame.flip?" do
+  let self := self'
+  if !(← Internal.has self.val "flip") then return none
+  let lasmGuarded ← do
+    self.val.get "flip" Bool
+  return some lasmGuarded
 
 /-- `readonly attribute unsigned long displayWidth` -/
 @[macro_inline] def VideoFrame.displayWidth (self : VideoFrame) : IO Nat := Internal.api "Lasm.JS.Web.VideoFrame.displayWidth" do
@@ -1153,6 +1297,14 @@ instance : ToJS VideoFrameCopyToOptions := ⟨fun d => Internal.fields #[("rect"
 /-- `VideoFrameMetadata metadata()` -/
 @[macro_inline] def VideoFrame.metadata (self : VideoFrame) : IO VideoFrameMetadata := Internal.api "Lasm.JS.Web.VideoFrame.metadata" do
   self.val.callMethod "metadata" (Internal.args #[]) VideoFrameMetadata
+
+/-- `VideoFrameMetadata metadata()` where the platform has it (`'metadata' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def VideoFrame.metadata? (self' : VideoFrame) : IO (Option VideoFrameMetadata) := Internal.api "Lasm.JS.Web.VideoFrame.metadata?" do
+  let self := self'
+  if !(← Internal.has self.val "metadata") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "metadata" (Internal.args #[]) VideoFrameMetadata
+  return some lasmGuarded
 
 /-- `unsigned long allocationSize(optional VideoFrameCopyToOptions options)` -/
 @[macro_inline] def VideoFrame.allocationSize (self : VideoFrame) (options : Option VideoFrameCopyToOptions := none) : IO Nat := Internal.api "Lasm.JS.Web.VideoFrame.allocationSize" do

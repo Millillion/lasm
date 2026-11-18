@@ -114,6 +114,14 @@ instance : ToJS TextUpdateEventInit := ⟨fun d => Internal.fields #[("bubbles",
   Lasm.JS.Binding.invoke CharacterBoundsUpdateEvent { name := "Lasm.JS.Web.CharacterBoundsUpdateEvent.new", module := "globalThis", path := "CharacterBoundsUpdateEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional options]) (await := false)
 
+/-- `constructor(DOMString type, optional CharacterBoundsUpdateEventInit options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CharacterBoundsUpdateEvent.new? (type : String) (options : Option CharacterBoundsUpdateEventInit := none) : IO (Option CharacterBoundsUpdateEvent) := Internal.api "Lasm.JS.Web.CharacterBoundsUpdateEvent.new?" do
+  if !(← Internal.hasGlobal ["CharacterBoundsUpdateEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CharacterBoundsUpdateEvent { name := "Lasm.JS.Web.CharacterBoundsUpdateEvent.new?", module := "globalThis", path := "CharacterBoundsUpdateEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute unsigned long rangeStart` -/
 @[macro_inline] def CharacterBoundsUpdateEvent.rangeStart (self : CharacterBoundsUpdateEvent) : IO Nat := Internal.api "Lasm.JS.Web.CharacterBoundsUpdateEvent.rangeStart" do
   self.val.get "rangeStart" Nat
@@ -130,6 +138,14 @@ instance : ToJS TextUpdateEventInit := ⟨fun d => Internal.fields #[("bubbles",
 @[macro_inline] def EditContext.new (options : Option EditContextInit := none) : IO EditContext := Internal.api "Lasm.JS.Web.EditContext.new" do
   Lasm.JS.Binding.invoke EditContext { name := "Lasm.JS.Web.EditContext.new", module := "globalThis", path := "EditContext", construct := true, arity := 1 }
     (Internal.args #[Internal.optional options]) (await := false)
+
+/-- `constructor(optional EditContextInit options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def EditContext.new? (options : Option EditContextInit := none) : IO (Option EditContext) := Internal.api "Lasm.JS.Web.EditContext.new?" do
+  if !(← Internal.hasGlobal ["EditContext"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke EditContext { name := "Lasm.JS.Web.EditContext.new?", module := "globalThis", path := "EditContext", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional options]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString text` -/
 @[macro_inline] def EditContext.text (self : EditContext) : IO String := Internal.api "Lasm.JS.Web.EditContext.text" do
@@ -224,6 +240,14 @@ instance : ToJS TextUpdateEventInit := ⟨fun d => Internal.fields #[("bubbles",
   Lasm.JS.Binding.invoke TextFormat { name := "Lasm.JS.Web.TextFormat.new", module := "globalThis", path := "TextFormat", construct := true, arity := 1 }
     (Internal.args #[Internal.optional options]) (await := false)
 
+/-- `constructor(optional TextFormatInit options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def TextFormat.new? (options : Option TextFormatInit := none) : IO (Option TextFormat) := Internal.api "Lasm.JS.Web.TextFormat.new?" do
+  if !(← Internal.hasGlobal ["TextFormat"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke TextFormat { name := "Lasm.JS.Web.TextFormat.new?", module := "globalThis", path := "TextFormat", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute unsigned long rangeStart` -/
 @[macro_inline] def TextFormat.rangeStart (self : TextFormat) : IO Nat := Internal.api "Lasm.JS.Web.TextFormat.rangeStart" do
   self.val.get "rangeStart" Nat
@@ -249,6 +273,14 @@ instance : ToJS TextUpdateEventInit := ⟨fun d => Internal.fields #[("bubbles",
   Lasm.JS.Binding.invoke TextFormatUpdateEvent { name := "Lasm.JS.Web.TextFormatUpdateEvent.new", module := "globalThis", path := "TextFormatUpdateEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional options]) (await := false)
 
+/-- `constructor(DOMString type, optional TextFormatUpdateEventInit options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def TextFormatUpdateEvent.new? (type : String) (options : Option TextFormatUpdateEventInit := none) : IO (Option TextFormatUpdateEvent) := Internal.api "Lasm.JS.Web.TextFormatUpdateEvent.new?" do
+  if !(← Internal.hasGlobal ["TextFormatUpdateEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke TextFormatUpdateEvent { name := "Lasm.JS.Web.TextFormatUpdateEvent.new?", module := "globalThis", path := "TextFormatUpdateEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `sequence<TextFormat> getTextFormats()` -/
 @[macro_inline] def TextFormatUpdateEvent.getTextFormats (self : TextFormatUpdateEvent) : IO (Array TextFormat) := Internal.api "Lasm.JS.Web.TextFormatUpdateEvent.getTextFormats" do
   self.val.callMethod "getTextFormats" (Internal.args #[]) (Array TextFormat)
@@ -261,6 +293,14 @@ instance : ToJS TextUpdateEventInit := ⟨fun d => Internal.fields #[("bubbles",
 @[macro_inline] def TextUpdateEvent.new (type : String) (options : Option TextUpdateEventInit := none) : IO TextUpdateEvent := Internal.api "Lasm.JS.Web.TextUpdateEvent.new" do
   Lasm.JS.Binding.invoke TextUpdateEvent { name := "Lasm.JS.Web.TextUpdateEvent.new", module := "globalThis", path := "TextUpdateEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional options]) (await := false)
+
+/-- `constructor(DOMString type, optional TextUpdateEventInit options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def TextUpdateEvent.new? (type : String) (options : Option TextUpdateEventInit := none) : IO (Option TextUpdateEvent) := Internal.api "Lasm.JS.Web.TextUpdateEvent.new?" do
+  if !(← Internal.hasGlobal ["TextUpdateEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke TextUpdateEvent { name := "Lasm.JS.Web.TextUpdateEvent.new?", module := "globalThis", path := "TextUpdateEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional options]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute unsigned long updateRangeStart` -/
 @[macro_inline] def TextUpdateEvent.updateRangeStart (self : TextUpdateEvent) : IO Nat := Internal.api "Lasm.JS.Web.TextUpdateEvent.updateRangeStart" do
@@ -285,6 +325,14 @@ instance : ToJS TextUpdateEventInit := ⟨fun d => Internal.fields #[("bubbles",
 /-- `attribute EditContext? editContext` -/
 @[macro_inline] def HTMLElement.editContext (self : HTMLElement) : IO (Option EditContext) := Internal.api "Lasm.JS.Web.HTMLElement.editContext" do
   self.val.get "editContext" (Option EditContext)
+
+/-- `attribute EditContext? editContext` where the platform has it (`'editContext' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLElement.editContext? (self' : HTMLElement) : IO (Option (Option EditContext)) := Internal.api "Lasm.JS.Web.HTMLElement.editContext?" do
+  let self := self'
+  if !(← Internal.has self.val "editContext") then return none
+  let lasmGuarded ← do
+    self.val.get "editContext" (Option EditContext)
+  return some lasmGuarded
 
 /-- Sets `editContext`: `attribute EditContext? editContext` -/
 @[macro_inline] def HTMLElement.setEditContext (self : HTMLElement) (value : Option EditContext) : IO Unit := Internal.api "Lasm.JS.Web.HTMLElement.setEditContext" do

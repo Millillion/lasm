@@ -28,7 +28,7 @@ small downloads, fast start, fast updates, and a clean typed API.
 | Imperative escape hatch | `Lasm.JS.Web`: the whole web platform (the DOM and HTML elements, events, the window, storage, canvas, WebGL, IndexedDB, WebSocket, `fetch`, timers, `URL`, `crypto`, …), one module per spec, **generated from the specifications' WebIDL** ([JS_BINDINGS.md](JS_BINDINGS.md#standard-bindings-lasmjsweb)); it replaced the hand-written `Lasm.Web` (2026-11-10). `Lasm.UI` interoperates through ports and `Cmd`s. | Spec-faithful bindings of the standards, not premade npm bindings or a Lasm-designed API; anything else uses `@[js]` bindings as on Node. |
 | Markup | Both a function DSL (`div [class_ "x", onClick .inc] [text "hi"]`) and a JSX-like `html!` syntax (`<div class="x" onClick={.inc}>hi</div>`), with tag/attribute checking at elaboration. | Familiar to web developers; still plain Lean terms. |
 | SSR | `Html.render : Html Msg → String` runs anywhere (server, edge, Node); `mount` with `{ hydrate: true }` adopts server-rendered DOM. | Fast first paint and SEO for full-stack apps. |
-| Full stack | `Lasm.RPC`: shared Lean API types and functions; the server mounts them on Hono/Fastify/edge fetch handlers, the browser calls them through generated typed clients over `fetch` (JSON via `ToJson`/`FromJson` derivations). Template `fullstack`. | One language, one set of types, end to end. |
+| Full stack | Shared Lean types (JSON via `ToJson`/`FromJson` derivations); the server answers plain REST routes, the browser calls them with `Cmd.task` and `Lasm.JS.Web.fetch`. Template `fullstack`. | One language, one set of types, end to end. |
 | Verification story | Ship proofs, not claims: the TodoMVC example proves invariants of `update`; `Lasm.UI` proves its diff correct against a pure DOM model (`apply (diff a b) (render a) = render b`). | The pitch is formal verification of the whole stack. |
 
 ## Measured (browser CI run 40288509500, source `43f5b99`, 2026-10-26)
@@ -310,7 +310,6 @@ Never run browsers locally on the desktop (no headed browsers, no `open`).
   (`scripts/bindings/generate-web.mjs`, one module per spec).
 - `library/Lasm/UI/…` — `Html`, attributes, events, `diff`, the patch encoder,
   `App`, `Mount` (the loader's `lasm:app`), `Cmd`, `Subs`, router, `html!` syntax, SSR, proofs.
-- `library/Lasm/RPC.lean` — shared API definitions and adapters.
 - `src/edge/` (existing) and `src/browser/` — the browser entry, loader and
   `lasm:ui-dom` applier.
 - `src/vite/` — the Vite plugin (`@lasm/cli/vite`).

@@ -55,7 +55,7 @@ Each method below says what it is, what Lasm has today, and the next gap.
 | **Fault injection** | Killed processes, a full disk, a dropped network, corrupt caches, platform limits | `scripts/tooling/faults.mjs`; installer faults on 5 OSes; DST faults in the apps | Memory and CPU limits of the function platforms; host-call failures inside the Lasm.JS bridge |
 | **Deterministic simulation** | Seeded simulated clock, scheduler, network and storage; every failure replays from its seed | `scripts/sim/` with Tandem, Ledger and Porter; host-bridge schedule fuzzing (`scripts/bridge-fuzz/`) | Conduit and Folio's edge server; `lasm dev`'s rebuild loop |
 | **Mutation testing** | Change the code, check that a test fails | Stryker on 20 modules covering every JavaScript file under `src/` but `edge-library.js`, with a ratchet (85–97 %); mutants reintroduced in the bridge model | Mutated Spec propositions (does each proposition rule something out?); hand mutants in the C hosts |
-| **Formal proofs** | Lean theorems, checked by the kernel and independently | Lasm.UI, RPC, KV, Fetch, JS, Serverless (library/PROOFS.md); the five apps; the host-bridge model; `lake check --paranoid` | The candidates in library/PROOFS.md; the propositions each property test names, as they mature |
+| **Formal proofs** | Lean theorems, checked by the kernel and independently | Lasm.UI, KV, Fetch, JS, Serverless (library/PROOFS.md); the five apps; the host-bridge model; `lake check --paranoid` | The candidates in library/PROOFS.md; the propositions each property test names, as they mature |
 | **Translation validation** | For one compilation, check that the output is equivalent to the input, instead of verifying the compiler | Not started. The `-O0`/`-O2` and engine differentials compare outputs on tests; they validate nothing | Binaryen: check each pass Lasm uses (`wasm-opt` passes) on our programs, starting with the smallest passes (proposals/IRREDUCIBLE.md, M5) |
 
 ## 3. Method × component × tier
@@ -104,7 +104,6 @@ so that proving it later is a mechanical step:
   `Theorems.name : Spec.name` sits beside it, and
   `node scripts/library-proofs.mjs` checks the pair. Examples:
   - [library/Lasm/KV/Spec.lean](../library/Lasm/KV/Spec.lean)
-  - [library/Lasm/RPC/Spec.lean](../library/Lasm/RPC/Spec.lean)
   - [library/Lasm/UI/Spec.lean](../library/Lasm/UI/Spec.lean)
   - [library/Lasm/JS/Spec.lean](../library/Lasm/JS/Spec.lean)
   - [verification/cli/Lasm/Serverless/Spec.lean](../verification/cli/Lasm/Serverless/Spec.lean)
@@ -112,7 +111,7 @@ so that proving it later is a mechanical step:
 - **Tested propositions** go in a sibling file, `Candidates.lean`, in the same
   namespace and with the same form. The doc comment adds one line,
   `Tested by: <path>`, naming the test that checks it. They exist for
-  Lasm.UI, Lasm.Fetch and Lasm.RPC
+  Lasm.UI and Lasm.Fetch
   ([library/Lasm/UI/Candidates.lean](../library/Lasm/UI/Candidates.lean));
   the candidates list of [library/PROOFS.md](../library/PROOFS.md#candidates-not-yet-proved)
   is generated from them. Moving one to `Spec.lean` and adding its theorem
