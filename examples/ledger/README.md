@@ -28,7 +28,8 @@ server (`Node.serve`, `Deno.serve`, `Bun.serve`: [`ServerNode.lean`](ServerNode.
 [`ServerDeno.lean`](ServerDeno.lean), [`ServerBun.lean`](ServerBun.lean)), or the handler published
 with `exportDefault`, which Workers ([`ServerWorkers.lean`](ServerWorkers.lean)) and the function
 platforms ([`ServerFunction.lean`](ServerFunction.lean), built by `npm run build:function`) call
-for each request. No hand-written binding is left: every JavaScript API Ledger calls is generated. Each row is a CI job
+for each request. Every JavaScript API Ledger calls is generated, but one: node:sqlite's `new DatabaseSync`,
+which Lasm 0.9.0 does not generate (the next release does, and the binding goes then). Each row is a CI job
 ([ledger.yml](../../.github/workflows/ledger.yml) for Node,
 [ledger-platforms.yml](../../.github/workflows/ledger-platforms.yml) for the rest) that builds
 Ledger, serves it with the platform's own local tooling ([`test/platforms.mjs`](test/platforms.mjs))

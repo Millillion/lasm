@@ -6,4 +6,4 @@
   - The function platforms (Lambda .zip and container image, Vercel, Netlify, Azure, Google Cloud Functions) run `ServerFunction.lean`, whose handler is published with `exportDefault`. There is no HTTP server inside the function and no Lasm.Fetch.
   - The page loads with `Cmd.task` and the generated `fetch`.
   - On Workers, the embedded files are served without their Brotli copies (Cloudflare compresses), and commits rely on D1's atomic batch (0.5-8).
-  - No hand-written binding is left.
+  - No hand-written binding is left, except node:sqlite's `new DatabaseSync`, which Lasm 0.9.0 does not generate. It goes with the release that ships #352 (0.4-46), together with the NULL-capable parameter shapes (0.4-45).
