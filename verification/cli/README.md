@@ -237,7 +237,7 @@ theorem uses only Lean's standard axioms, and keeps the list under
 
 | Proposition | In plain English |
 | --- | --- |
-| [`segments_no_dot_segments`](Lasm/RequestPath/Spec.lean#L26) | **No path segment is `.` or `..`.** Whatever the request's URL (including escaped forms such as `%2e%2E`), no segment of `r.segments` is `.` or `..`: a handler that maps segments to files or keys never sees a parent reference. |
+| [`segments_no_dot_segments`](Lasm/RequestPath/Spec.lean#L22) | **No path segment is `.` or `..`.** Whatever the request's URL (including escaped forms such as `%2e%2E`), no segment of `r.segments` is `.` or `..`: a handler that maps segments to files or keys never sees a parent reference. |
 <!-- END PROPOSITIONS -->
 
 ## Candidates
