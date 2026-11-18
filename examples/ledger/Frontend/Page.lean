@@ -4,8 +4,9 @@ from the API. `update` and `view` are pure (the Elm architecture), so the
 proofs (`Proofs/Page.lean`) are about the functions the browser runs.
 -/
 import Lasm.UI
+import Lasm.JS.Web.Fetch
 import Ledger.Json
-open Lean Lasm.UI Ledger
+open Lean Lasm.UI Ledger Std.Async
 
 namespace Ledger.Page
 
@@ -18,10 +19,19 @@ structure Model where
   status : Option String := some "Loading…"
   deriving Inhabited
 
+/-- Why a request for the API failed. -/
+inductive LoadError where
+  /-- No response (the network, or the server unreachable). -/
+  | network (e : String)
+  /-- A response with an error status. -/
+  | status (code : Nat)
+  /-- A response whose body could not be read. -/
+  | body (e : String)
+
 inductive Msg where
   | refresh
-  | gotAccounts (r : Except Http.Error String)
-  | gotTransfers (r : Except Http.Error String)
+  | gotAccounts (r : Except LoadError String)
+  | gotTransfers (r : Except LoadError String)
   | showLedger (l : Option Nat)
 
 /-- A JSON array of `decode`d items. -/
@@ -30,14 +40,20 @@ def decodeList {α : Type} (decode : String → Json → Except String α) (body
   | .arr a => a.toList.mapM (decode "")
   | _ => throw "expected an array"
 
-/-- The requests that load the page. -/
-def load : Cmd Msg := Cmd.batch [
-  Http.get "/api/accounts" .gotAccounts,
-  Http.get "/api/transfers?limit=1000" .gotTransfers]
+/-- `GET url`'s body as text (the browser's `fetch`, Lasm.JS.Web.Fetch). -/
+def getText (url : String) : Async (Except LoadError String) := do
+  let r ← try Lasm.JS.Web.fetch (.usvString url) catch e => return .error (.network (toString e))
+  unless ← r.ok do return .error (.status (← r.status))
+  try return .ok (← r.text) catch e => return .error (.body (toString e))
 
-def errorText : Http.Error → String
+/-- The requests that load the page (`Cmd.task`: each delivers its message). -/
+def load : Cmd Msg := Cmd.batch [
+  Cmd.task do return .gotAccounts (← getText "/api/accounts"),
+  Cmd.task do return .gotTransfers (← getText "/api/transfers?limit=1000")]
+
+def errorText : LoadError → String
   | .network e => s!"network error: {e}"
-  | .status r => s!"HTTP {r.status}"
+  | .status code => s!"HTTP {code}"
   | .body e => s!"unreadable response: {e}"
 
 def update : Msg → Model → Model × Cmd Msg

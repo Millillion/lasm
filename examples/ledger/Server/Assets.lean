@@ -31,6 +31,12 @@ structure Assets where
   /-- The directory the files came from (read at run time when `files` is empty). -/
   dir : String := ""
 
+/-- The same files without their Brotli copies, served as they are. For Cloudflare
+Workers, which compresses responses itself following their Content-Encoding: a body
+already in `br` would be compressed twice (docs/api/decisions/0.5.md, 0.5-8). -/
+def Assets.withoutBrotli (a : Assets) : Assets :=
+  { a with files := a.files.map fun f => { f with br := none } }
+
 def contentTypeOf (path : String) : String :=
   let ext := (path.splitOn ".").getLast!
   match ext with

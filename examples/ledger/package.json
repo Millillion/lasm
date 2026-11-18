@@ -18,16 +18,17 @@
     "test:e2e": "playwright test -c test/playwright.config.mjs",
     "build:bun": "npm run build:client && bunx --bun lasm build ServerBun.lean --target bun",
     "start:bun": "bun bun/main.mjs",
-    "build:deno": "npm run build:client && lasm build ServerNode.lean --target deno",
+    "build:deno": "npm run build:client && lasm build ServerDeno.lean --target deno",
     "start:deno": "deno run -A deno/main.mjs",
     "build:workers": "npm run build:client && lasm build ServerWorkers.lean --target workers",
     "build:docker": "npm run build && docker build -t ledger .",
-    "build:lambda": "npm run build && lasm package dist/server --target lambda",
-    "build:lambda-image": "npm run build && docker build -f deploy/lambda-image/Dockerfile -t ledger-lambda:local .",
-    "build:vercel": "npm run build && lasm package dist/server --target vercel",
-    "build:netlify": "npm run build && lasm package dist/server --target netlify",
-    "build:azure": "npm run build && node deploy/package-hosted.mjs azure",
-    "build:gcf": "npm run build && node deploy/package-hosted.mjs gcf",
+    "build:function": "npm run build:client && lasm build ServerFunction.lean --output dist/function",
+    "build:lambda": "npm run build:function && lasm package dist/function --target lambda",
+    "build:lambda-image": "npm run build:lambda && rm -rf dist/lambda && mkdir -p dist/lambda && unzip -q lambda.zip -d dist/lambda && docker build -f deploy/lambda-image/Dockerfile -t ledger-lambda:local .",
+    "build:vercel": "npm run build:function && lasm package dist/function --target vercel",
+    "build:netlify": "npm run build:function && lasm package dist/function --target netlify",
+    "build:azure": "npm run build:function && node deploy/package-hosted.mjs azure",
+    "build:gcf": "npm run build:function && node deploy/package-hosted.mjs gcf",
     "build:wasi": "lasm build Verify.lean --target wasi",
     "test:platform": "node test/api.mjs --platform",
     "verify": "node test/verify.mjs",
@@ -38,7 +39,7 @@
     "node": ">=24"
   },
   "devDependencies": {
-    "@lasm/cli": "0.7.0",
+    "@lasm/cli": "0.9.0",
     "@playwright/test": "1.63.0"
   }
 }

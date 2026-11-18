@@ -160,9 +160,9 @@ test('handle types are per spec (Lasm.JS.Web.Types.<Spec>), importing only their
   assert.ok(!importsOf('Lasm.JS.Web.Fetch').includes('Lasm.JS.Web.Html'));
 });
 
-// Lasm.JS.Deno and Lasm.JS.Bun ship as source and compile on first import (docs/api/decisions/0.4.md, 0.4-20):
-// their prebuilt core is empty, since no template imports them (the examples that do compile them on first use).
-const denoBunCore = [];
+// Lasm.JS.Deno and Lasm.JS.Bun ship as source and compile on first import (docs/api/decisions/0.4.md, 0.4-20),
+// except their prebuilt core: Deno KV, which the templates use (0.4-47).
+const denoBunCore = ['Lasm.JS.Deno.Kv'];
 test('no Lasm.JS.Deno or Lasm.JS.Bun module is prebuilt beyond the declared core; every other one compiles on first import', () => {
   const lazy = lazyModules(libraryModules);
   for (const tier of ['Deno', 'Bun']) {
