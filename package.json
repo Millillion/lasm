@@ -16,8 +16,11 @@
     "./vite/client": {
       "types": "./src/vite/client.d.ts"
     },
-    "./package.json": "./package.json",
-    "./*": "./*"
+    "./lean": {
+      "types": "./src/lean.d.ts",
+      "default": "./src/lean.mjs"
+    },
+    "./package.json": "./package.json"
   },
   "scripts": {
     "setup": "node scripts/bootstrap.mjs",

@@ -107,7 +107,7 @@ test('lasm dev arguments', async () => {
   assert.equal(parseDevArguments(['--target', 'browser', '--release', '--no-watch']).watch, false);
   assert.throws(() => parseDevArguments(['--port', '8080']), /--port applies/);
   assert.throws(() => parseDevArguments(['--no-watch']), /--no-watch applies/);
-  assert.throws(() => parseDevArguments(['--target', 'lambda']), /accepts/);
+  assert.throws(() => parseDevArguments(['--target', 'lambda']), /Unknown lasm dev target "lambda"/);
   assert.throws(() => parseDevArguments(['--watch']), /Unknown lasm dev option/);
   assert.equal(parseDevArguments(['--help']).command, 'dev-help');
   assert.ok(relevantFile('src/A.lean') && relevantFile('lakefile.toml') && relevantFile('package.json') && !relevantFile('dist/main.mjs'));

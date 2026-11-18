@@ -31,13 +31,13 @@ test('lasm dev arguments: defaults, flags and their errors', () => {
   assert.deepEqual(outputs.outputs, [{ target: 'browser', input: 'Client.lean' }, { target: 'node', input: 'Client.lean' }]);
   assert.equal(parseDevArguments(['Main.lean', '--target', 'node=Server.lean']).input, 'Main.lean');
   assert.throws(() => parseDevArguments(['--target', 'node=Server.js']), /^Error: --target node=Server\.js: the source must be a \.lean file$/);
-  assert.throws(() => parseDevArguments(['--target', 'lambda']), new RegExp(`^Error: lasm dev --target accepts ${devTargets.join(', ')}, not "lambda"$`));
+  assert.throws(() => parseDevArguments(['--target', 'lambda']), { message: `Unknown lasm dev target "lambda". Choose one of: ${devTargets.join(', ')}` });
   // A near miss or another name for a dev target is suggested (0.7-23).
-  assert.throws(() => parseDevArguments(['--target', 'worker']), new RegExp(`^Error: lasm dev --target accepts ${devTargets.join(', ')}, not "worker" \\(did you mean --target workers\\?\\)$`));
-  assert.throws(() => parseDevArguments(['--target', 'node,brwser']), /not "brwser" \(did you mean --target browser\?\)$/);
-  assert.throws(() => parseDevArguments(['--target', 'cloudflare']), /not "cloudflare" \(did you mean --target workers\?\)$/);
+  assert.throws(() => parseDevArguments(['--target', 'worker']), { message: `Unknown lasm dev target "worker" (did you mean --target workers?). Choose one of: ${devTargets.join(', ')}` });
+  assert.throws(() => parseDevArguments(['--target', 'node,brwser']), /^Error: Unknown lasm dev target "brwser" \(did you mean --target browser\?\)\. Choose one of: /);
+  assert.throws(() => parseDevArguments(['--target', 'cloudflare']), /^Error: Unknown lasm dev target "cloudflare" \(did you mean --target workers\?\)\. /);
   // An alias of a target lasm dev does not build is no hint.
-  assert.throws(() => parseDevArguments(['--target', 'aws']), /not "aws"$/);
+  assert.throws(() => parseDevArguments(['--target', 'aws']), /^Error: Unknown lasm dev target "aws"\. Choose one of: /);
   assert.throws(() => parseDevArguments(['--target', 'bun,deno']), /^Error: lasm dev runs one program: choose one of node, bun and deno$/);
   assert.equal(parseDevArguments(['--target', 'node,workers']).outputs.length, 2);
   // Values: =, the next token; a missing value or another flag is an error with the usage.
@@ -56,7 +56,7 @@ test('lasm dev arguments: defaults, flags and their errors', () => {
   assert.throws(() => parseDevArguments(['--fast']), error => error.message === `Unknown lasm dev option: --fast. Program arguments follow --.\n\n${devUsage}`);
   assert.throws(() => parseDevArguments(['-x']), /Unknown lasm dev option: -x/);
   assert.throws(() => parseDevArguments(['A.lean', 'B.lean']), error => error.message === `lasm dev takes one Lean source.\n\n${devUsage}`);
-  assert.throws(() => parseDevArguments(['main.mjs']), /^Error: lasm dev expects a Lean source \(Main\.lean\), not main\.mjs$/);
+  assert.throws(() => parseDevArguments(['main.mjs']), /^Error: Expected a Lean source file \(Main\.lean\), not main\.mjs$/);
   assert.match(devUsage, /^Usage: lasm dev \[Main\.lean\] \[--target node\|bun\|deno\|workers\|vercel-edge\|netlify-edge\|deno-deploy\|supabase-edge\|browser\]/);
 });
 

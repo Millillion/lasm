@@ -52,8 +52,8 @@ test('package arguments: forms, values, repetition, unknown options and targets'
   assert.throws(() => parsePackageArguments(['a', 'b', '--target', 'lambda']), { message: packageUsage });
   assert.throws(() => parsePackageArguments(['a']), { message: '--target is required\n\n' + packageUsage });
   assert.throws(() => parsePackageArguments(['--target', 'heroku']),
-    { message: 'Unknown target "heroku". Choose one of: lambda, lambda-edge, vercel, netlify, azure-functions, cloud-functions, browser' });
-  assert.throws(() => parsePackageArguments(['--target', 'toString']), /Unknown target "toString"/);
+    { message: 'Unknown package target "heroku". Choose one of: lambda, lambda-edge, vercel, netlify, azure-functions, cloud-functions, browser' });
+  assert.throws(() => parsePackageArguments(['--target', 'toString']), /Unknown package target "toString"/);
   assert.throws(() => parsePackageArguments(['--target', 'browser', '--output', 'x']),
     { message: 'lasm package --target browser checks the build in place; --output does not apply' });
 });
@@ -139,7 +139,7 @@ test('builds without their entry, program, Wasm or build record, or without nati
   write('host/native/manifest.json', JSON.stringify({ deployment: { targets: ['darwin-arm64', 'win32-x64'] } }));
   assert.throws(() => packageApplication({ input: app, target: 'lambda', output: join(directory, 'x.zip') }),
     { message: `${app} carries no Linux native support (darwin-arm64, win32-x64). Rebuild it with the current Lasm.` });
-  assert.throws(() => packageApplication({ input: app, target: 'workers' }), { message: 'Unknown target "workers"' });
+  assert.throws(() => packageApplication({ input: app, target: 'workers' }), { message: 'Unknown package target "workers"' });
 });
 
 test('the output may neither be nor contain the build; a dev build is refused with the reason', t => {
@@ -332,6 +332,6 @@ test('the report of every target, from inside the build, with only the Linux tar
 test('a renamed or misspelled package target names the target (0.7-24)', () => {
   const list = 'lambda, lambda-edge, vercel, netlify, azure-functions, cloud-functions, browser';
   for (const [old, now] of [['azure', 'azure-functions'], ['gcf', 'cloud-functions'], ['lamda', 'lambda'], ['brwser', 'browser']])
-    assert.throws(() => parsePackageArguments(['--target', old]), { message: `Unknown target "${old}" (did you mean --target ${now}?). Choose one of: ${list}` });
-  assert.throws(() => parsePackageArguments(['--target', 'heroku']), { message: `Unknown target "heroku". Choose one of: ${list}` });
+    assert.throws(() => parsePackageArguments(['--target', old]), { message: `Unknown package target "${old}" (did you mean --target ${now}?). Choose one of: ${list}` });
+  assert.throws(() => parsePackageArguments(['--target', 'heroku']), { message: `Unknown package target "heroku". Choose one of: ${list}` });
 });

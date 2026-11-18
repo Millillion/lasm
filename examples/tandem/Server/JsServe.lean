@@ -1,23 +1,17 @@
 /-
 Tandem's HTTP handler on the JavaScript runtimes, through Lasm.JS.Web's
 `Request` and `Response` (docs/JS_BINDINGS.md, "Servers on JavaScript
-runtimes"): the conversions, and Cloudflare Workers' server, the program's
-default export `export default {fetch}` (`Lasm.JS.exportDefault`), which
-Lasm's generated entry serves. Deno (`Deno.serve`) and Bun (`Bun.serve`)
+runtimes"): the conversions. Cloudflare Workers serves `webHandler` as the
+`fetch` of an `ExportedHandler` (`ServerWorkers.lean`, Lasm.JS.Cloudflare). Deno (`Deno.serve`) and Bun (`Bun.serve`)
 serve it with their WebSockets in `Server/EdgeWs.lean`; Node in
 `Server/NodeWs.lean`.
 -/
 import Lasm.JS
-import Lasm.JS.Web
+import Lasm.JS.Web.Fetch
 import Server.Web
 open Lasm.JS Std.Async
 
 namespace Tandem.Server.JsServe
-
-/-- The platform's per-request environment on the edge (Cloudflare Workers'
-`env`: D1, variables, secrets), as the last request brought it;
-`.undefined` elsewhere. `Server/D1.lean` reads its database from it. -/
-initialize platformEnv : IO.Ref Data ← IO.mkRef .undefined
 
 /-- A web `Request` as Tandem's: its method, URL, headers and (except for
 `GET` and `HEAD`) its body. -/
@@ -41,19 +35,6 @@ def toResponse (method : String) (r : Web.Response) : IO Lasm.JS.Web.Response :=
 def webHandler (handler : Web.Handler) (request : Lasm.JS.Web.Request) : Async Lasm.JS.Web.Response := do
   let req ← toRequest request
   toResponse req.method (← Web.respond handler req)
-
-/-- The edge platforms: publishes `handler` as the program's default export,
-a function `(request, env, ctx) => Response`; `env` is kept in `platformEnv`. -/
-def serveEdge (handler : Web.Handler) : IO Unit := do
-  let fetch ← Function.ofFn fun args => do
-    -- Workers' env is a plain object (its bindings arrive as references); keep either form.
-    match (args[1]? : Option Data) with
-    | some env@(.ref _ _) | some env@(.object _) => platformEnv.set env
-    | _ => pure ()
-    let .ref request _ := args[0]?.getD .undefined
-      | throw (IO.userError "Tandem: the fetch handler expected a Request")
-    return toJS (← webHandler handler { val := request })
-  exportDefault fetch
 
 /-- `PORT` (else `default`) and `HOST` (else 0.0.0.0). -/
 def address (default : Nat) : IO (Nat × String) := do

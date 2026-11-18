@@ -6,6 +6,7 @@ document's name.
 import Lasm.UI
 import Lasm.JS.Json
 import Frontend.Ui
+import Frontend.Browser
 open Lean Lasm.UI Tandem.Ui
 
 def docOf (flags : Json) : String :=
@@ -14,8 +15,8 @@ def docOf (flags : Json) : String :=
   | .error _ => "welcome"
 
 def app : App Json Model Msg where
-  init flags _ := init (docOf flags)
-  update := update
+  init flags _ := let (m, fx) := init (docOf flags); (m, commands fx)
+  update msg m := let (m', fx) := update msg m; (m', commands fx)
   view := view
   subscriptions := subscriptions
 

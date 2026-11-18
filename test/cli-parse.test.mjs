@@ -354,7 +354,7 @@ test('--flag=value takes everything after =, line breaks included', () => {
 test('lasm init, dev and package: --flag=value also takes line breaks (not "unknown option")', () => {
   assert.throws(() => parseInitArguments(['app', '--template=a\nb']), { message: /^Unknown template "a\nb"/ });
   assert.throws(() => parseInitArguments(['app', '-t=a\u2028b']), { message: /^Unknown template "a\u2028b"/ });
-  assert.throws(() => parseInitArguments(['app', '--deploy=a\rb']), { message: /^--deploy accepts / });
+  assert.throws(() => parseInitArguments(['app', '--deploy=a\rb']), { message: /^Unknown deploy target "a\rb"/ });
   assert.equal(parseDevArguments(['--target=browser', '--output=out\ndir']).output, 'out\ndir');
   assert.equal(parseDevArguments(['--target=browser', '--host=a\nb']).host, 'a\nb');
   assert.equal(parsePackageArguments(['--target=lambda', '--output=out\ndir']).output, 'out\ndir');

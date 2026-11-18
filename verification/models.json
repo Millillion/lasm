@@ -517,6 +517,11 @@
       ],
       "reason": "leanAtLeast and the IO error policy leanIOError are modelled (lean_at_least_lexicographic proved), leanIOError with its tables (libuv's messages, Lean's CRT aliases, the Windows CRT cases: data, passed by the differential) and the host (platform, Node's errno names) parameters; checkLeanIOVersion is a list of reviewed releases and receiveSizeError a constant"
     },
+    "src/lean.mjs": {
+      "status": "exempt",
+      "kind": "io",
+      "reason": "`@lasm/cli/lean`: provisions the managed Lean (src/managed-lean.mjs, modelled where it is pure) and returns its paths; its effect is the installation, tested end to end"
+    },
     "src/link-driver/compile.mjs": {
       "status": "exempt",
       "kind": "io",

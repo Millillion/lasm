@@ -14,7 +14,7 @@ test('lasm init arguments', () => {
   assert.throws(() => parseLasmArguments(['init', '-t=std-http', 'x', '--deploy', 'lambda']), /has no --deploy targets/);
   assert.throws(() => parseLasmArguments(['init', 'x', '--deploy', 'lambda']), /needs a server template/);
   assert.deepEqual(parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=vercel', '--deploy', 'lambda-container', '--deploy', 'vercel']).deploy, ['vercel', 'lambda-container']);
-  assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=pages']), /--deploy accepts lambda, lambda-container, lambda-edge, vercel, netlify, azure-functions, cloud-functions, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge/);
+  assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=pages']), /Unknown deploy target "pages". Choose one of: lambda, lambda-container, lambda-edge, vercel, netlify, azure-functions, cloud-functions, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge/);
   // Cloudflare Workers (edge build): the Hono template only.
   assert.deepEqual(parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=workers']).deploy, ['workers']);
   assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'express', '--deploy', 'workers']), /--deploy workers supports the hono, fetch and fullstack templates, not express/);

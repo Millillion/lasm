@@ -146,10 +146,12 @@ test('lasm init arguments: every option form and every error message', () => {
   fails(['app', '-t', 'hono-'], `Unknown template "hono-" (did you mean --template hono?). Choose one of: ${Object.keys(templates).join(', ')}`);
   // Each option once; near misses suggested (0.7-23).
   fails(['app', '-t', 'hono', '--template=web'], 'Specify --template only once');
-  fails(['app', '--deploy', 'worker'], `--deploy accepts ${deployList} (did you mean --deploy workers?)\n\n` + initUsage);
-  fails(['app', '--deploy', 'cloudflare'], `--deploy accepts ${deployList} (did you mean --deploy workers?)\n\n` + initUsage);
-  for (const tokens of [['app', '--deploy'], ['app', '--deploy='], ['app', '--deploy', 'pages'], ['app', '-t', 'hono', '--deploy', 'constructor'], ['app', '--deploy', '__proto__']])
-    fails(tokens, `--deploy accepts ${deployList}\n\n` + initUsage);
+  fails(['app', '--deploy', 'worker'], `Unknown deploy target "worker" (did you mean --deploy workers?). Choose one of: ${deployList}`);
+  fails(['app', '--deploy', 'cloudflare'], `Unknown deploy target "cloudflare" (did you mean --deploy workers?). Choose one of: ${deployList}`);
+  for (const tokens of [['app', '--deploy'], ['app', '--deploy='], ['app', '--deploy', '-x'], ['app', '-t', 'hono', '--deploy', '--x']])
+    fails(tokens, '--deploy requires a value\n\n' + initUsage);
+  for (const value of ['pages', 'constructor', '__proto__'])
+    fails(['app', '-t', 'hono', '--deploy', value], `Unknown deploy target "${value}". Choose one of: ${deployList}`);
   for (const option of ['--templates', '-tx', '--deployment', '--rebuild', '-'])
     fails(['app', option], `Unknown lasm init option: ${option}\n\n${initUsage}`);
   fails([], initUsage);

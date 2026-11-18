@@ -65,7 +65,7 @@ export function parseDevArguments(tokens) {
         // own sources: --target node=Server.lean,browser=Client.lean.
         result.outputs = value.split(',').map(item => {
           const [target, input] = item.split('=');
-          if (!devTargets.includes(target)) throw new Error(`lasm dev --target accepts ${devTargets.join(', ')}, not "${target}"${targetHintAmong(target, devTargets)}`);
+          if (!devTargets.includes(target)) throw new Error(`Unknown lasm dev target "${target}"${targetHintAmong(target, devTargets)}. Choose one of: ${devTargets.join(', ')}`);
           if (input !== undefined && !input.endsWith('.lean')) throw new Error(`--target ${item}: the source must be a .lean file`);
           return { target, ...(input ? { input } : {}) };
         });
@@ -83,7 +83,7 @@ export function parseDevArguments(tokens) {
   if (positional.length > 1) throw new Error(`lasm dev takes one Lean source.\n\n${devUsage}`);
   // With per-output sources only (--target node=Server.lean,…), the first names the project.
   result.input = positional[0] ?? result.outputs?.find(o => o.input)?.input ?? 'Main.lean';
-  if (!result.input.endsWith('.lean')) throw new Error(`lasm dev expects a Lean source (Main.lean), not ${result.input}`);
+  if (!result.input.endsWith('.lean')) throw new Error(`Expected a Lean source file (Main.lean), not ${result.input}`);
   result.target ??= jsRuntime;
   result.outputs ??= [{ target: result.target }];
   for (const output of result.outputs) output.input ??= result.input;
@@ -317,9 +317,7 @@ export async function runDev(options, hooks = {}) {
   const target = options.target;
   // The browser target's dev server (docs/BROWSER.md) builds and serves dist/ itself.
   if (target === 'browser' && options.outputs.length === 1 && !hooks.routes && !hooks.onBuilt) {
-    let browserDev;
-    try { browserDev = await import('./browser/browser-dev.mjs'); }
-    catch (error) { if (error.code === 'ERR_MODULE_NOT_FOUND') throw new Error('The browser target is not part of this Lasm version yet (docs/BROWSER.md).'); throw error; }
+    const browserDev = await import('./browser/browser-dev.mjs');
     return browserDev.runBrowserDev({ input: options.input, release: options.profile === 'release', watch: options.watch ?? true,
       port: options.port ?? 5173, host: options.host ?? '127.0.0.1', output: options.output });
   }
