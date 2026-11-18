@@ -403,6 +403,14 @@ instance : ToJS XRMediaLayerInit := ⟨fun d => Internal.fields #[("space", toJS
   Lasm.JS.Binding.invoke XRLayerEvent { name := "Lasm.JS.Web.XRLayerEvent.new", module := "globalThis", path := "XRLayerEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, XRLayerEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def XRLayerEvent.new? (type : String) (eventInitDict : XRLayerEventInit) : IO (Option XRLayerEvent) := Internal.api "Lasm.JS.Web.XRLayerEvent.new?" do
+  if !(← Internal.hasGlobal ["XRLayerEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke XRLayerEvent { name := "Lasm.JS.Web.XRLayerEvent.new?", module := "globalThis", path := "XRLayerEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute XRLayer layer` -/
 @[macro_inline] def XRLayerEvent.layer (self : XRLayerEvent) : IO XRLayer := Internal.api "Lasm.JS.Web.XRLayerEvent.layer" do
   let r ← self.val.get "layer" Value
@@ -416,6 +424,14 @@ instance : ToJS XRMediaLayerInit := ⟨fun d => Internal.fields #[("space", toJS
 @[macro_inline] def XRMediaBinding.new (session : XRSession) : IO XRMediaBinding := Internal.api "Lasm.JS.Web.XRMediaBinding.new" do
   Lasm.JS.Binding.invoke XRMediaBinding { name := "Lasm.JS.Web.XRMediaBinding.new", module := "globalThis", path := "XRMediaBinding", construct := true, arity := 1 }
     (Internal.args #[toJS session]) (await := false)
+
+/-- `constructor(XRSession session)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def XRMediaBinding.new? (session : XRSession) : IO (Option XRMediaBinding) := Internal.api "Lasm.JS.Web.XRMediaBinding.new?" do
+  if !(← Internal.hasGlobal ["XRMediaBinding"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke XRMediaBinding { name := "Lasm.JS.Web.XRMediaBinding.new?", module := "globalThis", path := "XRMediaBinding", construct := true, arity := 1 }
+      (Internal.args #[toJS session]) (await := false)
+  return some lasmGuarded
 
 /-- `XRQuadLayer createQuadLayer(HTMLVideoElement video, optional XRMediaQuadLayerInit init)` -/
 @[macro_inline] def XRMediaBinding.createQuadLayer (self : XRMediaBinding) (video : HTMLVideoElement) (init : Option XRMediaQuadLayerInit := none) : IO XRQuadLayer := Internal.api "Lasm.JS.Web.XRMediaBinding.createQuadLayer" do
@@ -449,6 +465,14 @@ instance : ToJS XRMediaLayerInit := ⟨fun d => Internal.fields #[("space", toJS
 @[macro_inline] def XRWebGLBinding.new (session : XRSession) (context : XRWebGLRenderingContext) : IO XRWebGLBinding := Internal.api "Lasm.JS.Web.XRWebGLBinding.new" do
   Lasm.JS.Binding.invoke XRWebGLBinding { name := "Lasm.JS.Web.XRWebGLBinding.new", module := "globalThis", path := "XRWebGLBinding", construct := true, arity := 2 }
     (Internal.args #[toJS session, toJS context]) (await := false)
+
+/-- `constructor(XRSession session, XRWebGLRenderingContext context)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def XRWebGLBinding.new? (session : XRSession) (context : XRWebGLRenderingContext) : IO (Option XRWebGLBinding) := Internal.api "Lasm.JS.Web.XRWebGLBinding.new?" do
+  if !(← Internal.hasGlobal ["XRWebGLBinding"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke XRWebGLBinding { name := "Lasm.JS.Web.XRWebGLBinding.new?", module := "globalThis", path := "XRWebGLBinding", construct := true, arity := 2 }
+      (Internal.args #[toJS session, toJS context]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute double nativeProjectionScaleFactor` -/
 @[macro_inline] def XRWebGLBinding.nativeProjectionScaleFactor (self : XRWebGLBinding) : IO Float := Internal.api "Lasm.JS.Web.XRWebGLBinding.nativeProjectionScaleFactor" do

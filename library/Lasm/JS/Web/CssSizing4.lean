@@ -18,9 +18,25 @@ set_option compiler.extract_closed false
 @[macro_inline] def Window.requestResize (self : Window) : IO Unit := Internal.api "Lasm.JS.Web.Window.requestResize" do
   self.val.callMethod "requestResize" (Internal.args #[]) Unit
 
+/-- `undefined requestResize()` where the platform has it (`'requestResize' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.requestResize? (self' : Window) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Window.requestResize?" do
+  let self := self'
+  if !(← Internal.has self.val "requestResize") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "requestResize" (Internal.args #[]) Unit
+  return some lasmGuarded
+
 /-- `undefined requestResize()` (CSS Box Sizing Module Level 4 (https://drafts.csswg.org/css-sizing-4/)) -/
 @[macro_inline] def requestResize : IO Unit := Internal.api "Lasm.JS.Web.requestResize" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.requestResize", module := "globalThis", path := "requestResize", construct := false, arity := 0 }
     (Internal.args #[]) (await := false)
+
+/-- `undefined requestResize()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def requestResize? : IO (Option Unit) := Internal.api "Lasm.JS.Web.requestResize?" do
+  if !(← Internal.hasGlobal ["requestResize"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.requestResize?", module := "globalThis", path := "requestResize", construct := false, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
 
 end Lasm.JS.Web

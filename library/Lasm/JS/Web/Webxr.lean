@@ -301,6 +301,14 @@ instance : ToJS XRPermissionDescriptor := ⟨fun d => Internal.fields #[("name",
   Lasm.JS.Binding.invoke XRInputSourceEvent { name := "Lasm.JS.Web.XRInputSourceEvent.new", module := "globalThis", path := "XRInputSourceEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, XRInputSourceEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def XRInputSourceEvent.new? (type : String) (eventInitDict : XRInputSourceEventInit) : IO (Option XRInputSourceEvent) := Internal.api "Lasm.JS.Web.XRInputSourceEvent.new?" do
+  if !(← Internal.hasGlobal ["XRInputSourceEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke XRInputSourceEvent { name := "Lasm.JS.Web.XRInputSourceEvent.new?", module := "globalThis", path := "XRInputSourceEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute XRFrame frame` -/
 @[macro_inline] def XRInputSourceEvent.frame (self : XRInputSourceEvent) : IO XRFrame := Internal.api "Lasm.JS.Web.XRInputSourceEvent.frame" do
   let r ← self.val.get "frame" Value
@@ -319,6 +327,14 @@ instance : ToJS XRPermissionDescriptor := ⟨fun d => Internal.fields #[("name",
 @[macro_inline] def XRInputSourcesChangeEvent.new (type : String) (eventInitDict : XRInputSourcesChangeEventInit) : IO XRInputSourcesChangeEvent := Internal.api "Lasm.JS.Web.XRInputSourcesChangeEvent.new" do
   Lasm.JS.Binding.invoke XRInputSourcesChangeEvent { name := "Lasm.JS.Web.XRInputSourcesChangeEvent.new", module := "globalThis", path := "XRInputSourcesChangeEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, XRInputSourcesChangeEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def XRInputSourcesChangeEvent.new? (type : String) (eventInitDict : XRInputSourcesChangeEventInit) : IO (Option XRInputSourcesChangeEvent) := Internal.api "Lasm.JS.Web.XRInputSourcesChangeEvent.new?" do
+  if !(← Internal.hasGlobal ["XRInputSourcesChangeEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke XRInputSourcesChangeEvent { name := "Lasm.JS.Web.XRInputSourcesChangeEvent.new?", module := "globalThis", path := "XRInputSourcesChangeEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute XRSession session` -/
 @[macro_inline] def XRInputSourcesChangeEvent.session (self : XRInputSourcesChangeEvent) : IO XRSession := Internal.api "Lasm.JS.Web.XRInputSourcesChangeEvent.session" do
@@ -379,6 +395,14 @@ instance : ToJS XRPermissionDescriptor := ⟨fun d => Internal.fields #[("name",
   Lasm.JS.Binding.invoke XRReferenceSpaceEvent { name := "Lasm.JS.Web.XRReferenceSpaceEvent.new", module := "globalThis", path := "XRReferenceSpaceEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, XRReferenceSpaceEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def XRReferenceSpaceEvent.new? (type : String) (eventInitDict : XRReferenceSpaceEventInit) : IO (Option XRReferenceSpaceEvent) := Internal.api "Lasm.JS.Web.XRReferenceSpaceEvent.new?" do
+  if !(← Internal.hasGlobal ["XRReferenceSpaceEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke XRReferenceSpaceEvent { name := "Lasm.JS.Web.XRReferenceSpaceEvent.new?", module := "globalThis", path := "XRReferenceSpaceEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute XRReferenceSpace referenceSpace` -/
 @[macro_inline] def XRReferenceSpaceEvent.referenceSpace (self : XRReferenceSpaceEvent) : IO XRReferenceSpace := Internal.api "Lasm.JS.Web.XRReferenceSpaceEvent.referenceSpace" do
   let r ← self.val.get "referenceSpace" Value
@@ -420,6 +444,14 @@ instance : ToJS XRPermissionDescriptor := ⟨fun d => Internal.fields #[("name",
 @[macro_inline] def XRRigidTransform.new (position : Option DOMPointInit := none) (orientation : Option DOMPointInit := none) : IO XRRigidTransform := Internal.api "Lasm.JS.Web.XRRigidTransform.new" do
   Lasm.JS.Binding.invoke XRRigidTransform { name := "Lasm.JS.Web.XRRigidTransform.new", module := "globalThis", path := "XRRigidTransform", construct := true, arity := 2 }
     (Internal.args #[Internal.optional position, Internal.optional orientation]) (await := false)
+
+/-- `constructor(optional DOMPointInit position, optional DOMPointInit orientation)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def XRRigidTransform.new? (position : Option DOMPointInit := none) (orientation : Option DOMPointInit := none) : IO (Option XRRigidTransform) := Internal.api "Lasm.JS.Web.XRRigidTransform.new?" do
+  if !(← Internal.hasGlobal ["XRRigidTransform"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke XRRigidTransform { name := "Lasm.JS.Web.XRRigidTransform.new?", module := "globalThis", path := "XRRigidTransform", construct := true, arity := 2 }
+      (Internal.args #[Internal.optional position, Internal.optional orientation]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute DOMPointReadOnly position` -/
 @[macro_inline] def XRRigidTransform.position (self : XRRigidTransform) : IO DOMPointReadOnly := Internal.api "Lasm.JS.Web.XRRigidTransform.position" do
@@ -595,6 +627,14 @@ instance : ToJS XRPermissionDescriptor := ⟨fun d => Internal.fields #[("name",
   Lasm.JS.Binding.invoke XRSessionEvent { name := "Lasm.JS.Web.XRSessionEvent.new", module := "globalThis", path := "XRSessionEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, XRSessionEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def XRSessionEvent.new? (type : String) (eventInitDict : XRSessionEventInit) : IO (Option XRSessionEvent) := Internal.api "Lasm.JS.Web.XRSessionEvent.new?" do
+  if !(← Internal.hasGlobal ["XRSessionEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke XRSessionEvent { name := "Lasm.JS.Web.XRSessionEvent.new?", module := "globalThis", path := "XRSessionEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute XRSession session` -/
 @[macro_inline] def XRSessionEvent.session (self : XRSessionEvent) : IO XRSession := Internal.api "Lasm.JS.Web.XRSessionEvent.session" do
   let r ← self.val.get "session" Value
@@ -684,6 +724,14 @@ instance : ToJS XRPermissionDescriptor := ⟨fun d => Internal.fields #[("name",
   Lasm.JS.Binding.invoke XRVisibilityMaskChangeEvent { name := "Lasm.JS.Web.XRVisibilityMaskChangeEvent.new", module := "globalThis", path := "XRVisibilityMaskChangeEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, XRVisibilityMaskChangeEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def XRVisibilityMaskChangeEvent.new? (type : String) (eventInitDict : XRVisibilityMaskChangeEventInit) : IO (Option XRVisibilityMaskChangeEvent) := Internal.api "Lasm.JS.Web.XRVisibilityMaskChangeEvent.new?" do
+  if !(← Internal.hasGlobal ["XRVisibilityMaskChangeEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke XRVisibilityMaskChangeEvent { name := "Lasm.JS.Web.XRVisibilityMaskChangeEvent.new?", module := "globalThis", path := "XRVisibilityMaskChangeEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute XRSession session` -/
 @[macro_inline] def XRVisibilityMaskChangeEvent.session (self : XRVisibilityMaskChangeEvent) : IO XRSession := Internal.api "Lasm.JS.Web.XRVisibilityMaskChangeEvent.session" do
   let r ← self.val.get "session" Value
@@ -741,6 +789,14 @@ instance : ToJS XRPermissionDescriptor := ⟨fun d => Internal.fields #[("name",
   Lasm.JS.Binding.invoke XRWebGLLayer { name := "Lasm.JS.Web.XRWebGLLayer.new", module := "globalThis", path := "XRWebGLLayer", construct := true, arity := 3 }
     (Internal.args #[toJS session, toJS context, Internal.optional layerInit]) (await := false)
 
+/-- `constructor(XRSession session, XRWebGLRenderingContext context, optional XRWebGLLayerInit layerInit)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def XRWebGLLayer.new? (session : XRSession) (context : XRWebGLRenderingContext) (layerInit : Option XRWebGLLayerInit := none) : IO (Option XRWebGLLayer) := Internal.api "Lasm.JS.Web.XRWebGLLayer.new?" do
+  if !(← Internal.hasGlobal ["XRWebGLLayer"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke XRWebGLLayer { name := "Lasm.JS.Web.XRWebGLLayer.new?", module := "globalThis", path := "XRWebGLLayer", construct := true, arity := 3 }
+      (Internal.args #[toJS session, toJS context, Internal.optional layerInit]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute boolean antialias` -/
 @[macro_inline] def XRWebGLLayer.antialias (self : XRWebGLLayer) : IO Bool := Internal.api "Lasm.JS.Web.XRWebGLLayer.antialias" do
   self.val.get "antialias" Bool
@@ -778,6 +834,14 @@ instance : ToJS XRPermissionDescriptor := ⟨fun d => Internal.fields #[("name",
   Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Web.XRWebGLLayer.getNativeFramebufferScaleFactor", module := "globalThis", path := "XRWebGLLayer.getNativeFramebufferScaleFactor", construct := false, arity := 1 }
     (Internal.args #[toJS session]) (await := false)
 
+/-- `static double getNativeFramebufferScaleFactor(XRSession session)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def XRWebGLLayer.getNativeFramebufferScaleFactor? (session : XRSession) : IO (Option Float) := Internal.api "Lasm.JS.Web.XRWebGLLayer.getNativeFramebufferScaleFactor?" do
+  if !(← Internal.hasGlobal ["XRWebGLLayer", "getNativeFramebufferScaleFactor"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Float { name := "Lasm.JS.Web.XRWebGLLayer.getNativeFramebufferScaleFactor?", module := "globalThis", path := "XRWebGLLayer.getNativeFramebufferScaleFactor", construct := false, arity := 1 }
+      (Internal.args #[toJS session]) (await := false)
+  return some lasmGuarded
+
 /-- `v instanceof XRBoundedReferenceSpace`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `XRBoundedReferenceSpace`). -/
 @[macro_inline] def XRBoundedReferenceSpace.cast? (v : Value) : IO (Option XRBoundedReferenceSpace) := Internal.api "Lasm.JS.Web.XRBoundedReferenceSpace.cast?" do
   Internal.cast (Internal.getGlobal ["XRBoundedReferenceSpace"] Value) (fun x => { val := x }) v
@@ -791,12 +855,37 @@ instance : ToJS XRPermissionDescriptor := ⟨fun d => Internal.fields #[("name",
   let r ← self.val.get "xr" Value
   pure { val := r }
 
+/-- `readonly attribute XRSystem xr` where the platform has it (`'xr' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.xr? (self' : Navigator) : IO (Option XRSystem) := Internal.api "Lasm.JS.Web.Navigator.xr?" do
+  let self := self'
+  if !(← Internal.has self.val "xr") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "xr" Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `Promise<undefined> makeXRCompatible()` -/
 @[macro_inline] def WebGL2RenderingContext.makeXRCompatible (self : WebGL2RenderingContext) : Async Unit := Internal.api "Lasm.JS.Web.WebGL2RenderingContext.makeXRCompatible" do
   self.val.callMethodAwait "makeXRCompatible" (Internal.args #[]) Unit
 
+/-- `Promise<undefined> makeXRCompatible()` where the platform has it (`'makeXRCompatible' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebGL2RenderingContext.makeXRCompatible? (self' : WebGL2RenderingContext) : Async (Option Unit) := Internal.api "Lasm.JS.Web.WebGL2RenderingContext.makeXRCompatible?" do
+  let self := self'
+  if !(← Internal.has self.val "makeXRCompatible") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "makeXRCompatible" (Internal.args #[]) Unit
+  return some lasmGuarded
+
 /-- `Promise<undefined> makeXRCompatible()` -/
 @[macro_inline] def WebGLRenderingContext.makeXRCompatible (self : WebGLRenderingContext) : Async Unit := Internal.api "Lasm.JS.Web.WebGLRenderingContext.makeXRCompatible" do
   self.val.callMethodAwait "makeXRCompatible" (Internal.args #[]) Unit
+
+/-- `Promise<undefined> makeXRCompatible()` where the platform has it (`'makeXRCompatible' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebGLRenderingContext.makeXRCompatible? (self' : WebGLRenderingContext) : Async (Option Unit) := Internal.api "Lasm.JS.Web.WebGLRenderingContext.makeXRCompatible?" do
+  let self := self'
+  if !(← Internal.has self.val "makeXRCompatible") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "makeXRCompatible" (Internal.args #[]) Unit
+  return some lasmGuarded
 
 end Lasm.JS.Web

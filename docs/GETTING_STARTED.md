@@ -262,9 +262,9 @@ npx lasm build Main.lean --target vercel       # .vercel/output
 npx lasm build Main.lean --target netlify      # netlify/functions/lasm
 ```
 
-The other targets are `lambda-edge`, `azure` and `gcf`. `lasm init my-app
+The other targets are `lambda-edge`, `azure-functions` and `cloud-functions`. `lasm init my-app
 --template hono --deploy lambda` (or `vercel`, `netlify`, `lambda-edge`,
-`azure`, `gcf`) adds the platform files and a `npm run build:<target>` script.
+`azure-functions`, `cloud-functions`) adds the platform files and a `npm run build:<target>` script.
 Lasm builds for the platform; it never installs or starts the platform's own
 tools: test and deploy with the platform's CLI (`vercel`, `netlify`, `func`,
 `gcloud`, `aws`/`sam`). To package one `dist/` for several platforms, use

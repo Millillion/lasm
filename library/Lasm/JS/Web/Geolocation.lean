@@ -150,4 +150,13 @@ def GeolocationPositionError.TIMEOUT : Nat := 3
   let r ← self.val.get "geolocation" Value
   pure { val := r }
 
+/-- `readonly attribute Geolocation geolocation` where the platform has it (`'geolocation' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.geolocation? (self' : Navigator) : IO (Option Geolocation) := Internal.api "Lasm.JS.Web.Navigator.geolocation?" do
+  let self := self'
+  if !(← Internal.has self.val "geolocation") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "geolocation" Value
+    pure { val := r }
+  return some lasmGuarded
+
 end Lasm.JS.Web

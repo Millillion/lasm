@@ -34,4 +34,13 @@ instance : ToJS IsInputPendingOptions := ⟨fun d => Internal.fields #[("include
   let r ← self.val.get "scheduling" Value
   pure { val := r }
 
+/-- `readonly attribute Scheduling scheduling` where the platform has it (`'scheduling' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.scheduling? (self' : Navigator) : IO (Option Scheduling) := Internal.api "Lasm.JS.Web.Navigator.scheduling?" do
+  let self := self'
+  if !(← Internal.has self.val "scheduling") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "scheduling" Value
+    pure { val := r }
+  return some lasmGuarded
+
 end Lasm.JS.Web

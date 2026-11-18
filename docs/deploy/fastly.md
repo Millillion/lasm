@@ -97,7 +97,7 @@ Viceroy always allows them.
 `import Lasm.Fastly` binds Config Stores (`ConfigStore.open`, `get`), Secret
 Stores (`SecretStore.open`, `get`, `plaintext`) and KV Stores (`KvStore.open`,
 `lookup`/`lookupWaitV2`, `insert`/`insertWait`, `delete`/`deleteWait`, `list`,
-with metadata, generations and TTLs), and `Lasm.KV.open` uses a KV Store
+with metadata, generations and TTLs)
 ([WASI_FASTLY_BINDINGS.md](../WASI_FASTLY_BINDINGS.md)):
 
 ```lean

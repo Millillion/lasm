@@ -33,6 +33,14 @@ instance : ToJS InputDeviceCapabilitiesInit := ⟨fun d => Internal.fields #[("f
   Lasm.JS.Binding.invoke InputDeviceCapabilities { name := "Lasm.JS.Web.InputDeviceCapabilities.new", module := "globalThis", path := "InputDeviceCapabilities", construct := true, arity := 1 }
     (Internal.args #[Internal.optional deviceInitDict]) (await := false)
 
+/-- `constructor(optional InputDeviceCapabilitiesInit deviceInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def InputDeviceCapabilities.new? (deviceInitDict : Option InputDeviceCapabilitiesInit := none) : IO (Option InputDeviceCapabilities) := Internal.api "Lasm.JS.Web.InputDeviceCapabilities.new?" do
+  if !(← Internal.hasGlobal ["InputDeviceCapabilities"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke InputDeviceCapabilities { name := "Lasm.JS.Web.InputDeviceCapabilities.new?", module := "globalThis", path := "InputDeviceCapabilities", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional deviceInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute boolean firesTouchEvents` -/
 @[macro_inline] def InputDeviceCapabilities.firesTouchEvents (self : InputDeviceCapabilities) : IO Bool := Internal.api "Lasm.JS.Web.InputDeviceCapabilities.firesTouchEvents" do
   self.val.get "firesTouchEvents" Bool
@@ -44,5 +52,13 @@ instance : ToJS InputDeviceCapabilitiesInit := ⟨fun d => Internal.fields #[("f
 /-- `readonly attribute InputDeviceCapabilities? sourceCapabilities` -/
 @[macro_inline] def UIEvent.sourceCapabilities (self : UIEvent) : IO (Option InputDeviceCapabilities) := Internal.api "Lasm.JS.Web.UIEvent.sourceCapabilities" do
   self.val.get "sourceCapabilities" (Option InputDeviceCapabilities)
+
+/-- `readonly attribute InputDeviceCapabilities? sourceCapabilities` where the platform has it (`'sourceCapabilities' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def UIEvent.sourceCapabilities? (self' : UIEvent) : IO (Option (Option InputDeviceCapabilities)) := Internal.api "Lasm.JS.Web.UIEvent.sourceCapabilities?" do
+  let self := self'
+  if !(← Internal.has self.val "sourceCapabilities") then return none
+  let lasmGuarded ← do
+    self.val.get "sourceCapabilities" (Option InputDeviceCapabilities)
+  return some lasmGuarded
 
 end Lasm.JS.Web

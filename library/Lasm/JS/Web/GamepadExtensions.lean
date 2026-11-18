@@ -61,16 +61,48 @@ set_option compiler.extract_closed false
 @[macro_inline] def Gamepad.hand (self : Gamepad) : IO GamepadHand := Internal.api "Lasm.JS.Web.Gamepad.hand" do
   self.val.get "hand" GamepadHand
 
+/-- `readonly attribute GamepadHand hand` where the platform has it (`'hand' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Gamepad.hand? (self' : Gamepad) : IO (Option GamepadHand) := Internal.api "Lasm.JS.Web.Gamepad.hand?" do
+  let self := self'
+  if !(← Internal.has self.val "hand") then return none
+  let lasmGuarded ← do
+    self.val.get "hand" GamepadHand
+  return some lasmGuarded
+
 /-- `readonly attribute FrozenArray<GamepadHapticActuator> hapticActuators` -/
 @[macro_inline] def Gamepad.hapticActuators (self : Gamepad) : IO (Array GamepadHapticActuator) := Internal.api "Lasm.JS.Web.Gamepad.hapticActuators" do
   self.val.get "hapticActuators" (Array GamepadHapticActuator)
+
+/-- `readonly attribute FrozenArray<GamepadHapticActuator> hapticActuators` where the platform has it (`'hapticActuators' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Gamepad.hapticActuators? (self' : Gamepad) : IO (Option (Array GamepadHapticActuator)) := Internal.api "Lasm.JS.Web.Gamepad.hapticActuators?" do
+  let self := self'
+  if !(← Internal.has self.val "hapticActuators") then return none
+  let lasmGuarded ← do
+    self.val.get "hapticActuators" (Array GamepadHapticActuator)
+  return some lasmGuarded
 
 /-- `readonly attribute GamepadPose? pose` -/
 @[macro_inline] def Gamepad.pose (self : Gamepad) : IO (Option GamepadPose) := Internal.api "Lasm.JS.Web.Gamepad.pose" do
   self.val.get "pose" (Option GamepadPose)
 
+/-- `readonly attribute GamepadPose? pose` where the platform has it (`'pose' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Gamepad.pose? (self' : Gamepad) : IO (Option (Option GamepadPose)) := Internal.api "Lasm.JS.Web.Gamepad.pose?" do
+  let self := self'
+  if !(← Internal.has self.val "pose") then return none
+  let lasmGuarded ← do
+    self.val.get "pose" (Option GamepadPose)
+  return some lasmGuarded
+
 /-- `Promise<boolean> pulse(double value, double duration)` -/
 @[macro_inline] def GamepadHapticActuator.pulse (self : GamepadHapticActuator) (value : Float) (duration : Float) : Async Bool := Internal.api "Lasm.JS.Web.GamepadHapticActuator.pulse" do
   self.val.callMethodAwait "pulse" (Internal.args #[toJS value, toJS duration]) Bool
+
+/-- `Promise<boolean> pulse(double value, double duration)` where the platform has it (`'pulse' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def GamepadHapticActuator.pulse? (self' : GamepadHapticActuator) (value : Float) (duration : Float) : Async (Option Bool) := Internal.api "Lasm.JS.Web.GamepadHapticActuator.pulse?" do
+  let self := self'
+  if !(← Internal.has self.val "pulse") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "pulse" (Internal.args #[toJS value, toJS duration]) Bool
+  return some lasmGuarded
 
 end Lasm.JS.Web

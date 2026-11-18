@@ -74,7 +74,7 @@ def devOutput (item : String) : Except String (String × Option String) :=
   let parts := item.splitOn "="
   let target := parts.headD ""
   let input := parts[1]?
-  if target ∉ devTargets then .error ("lasm dev --target accepts " ++ ", ".intercalate devTargets ++ ", not \"" ++ target ++ "\"" ++ targetHintAmong target devTargets)
+  if target ∉ devTargets then .error ("Unknown lasm dev target \"" ++ target ++ "\"" ++ targetHintAmong target devTargets ++ ". Choose one of: " ++ ", ".intercalate devTargets)
   else if input.any (fun i => !i.endsWith ".lean") then .error ("--target " ++ item ++ ": the source must be a .lean file")
   else .ok (target, input.filter (· ≠ ""))
 
@@ -143,7 +143,7 @@ def devFinish (runtime : String) (st : DevState) : Except String Parsed :=
   if st.positional.length > 1 then .error ("lasm dev takes one Lean source.\n\n" ++ devUsage)
   else
     let input := st.positional.head?.getD (((st.outputs.getD []).findSome? (·.2)).getD "Main.lean")
-    if !input.endsWith ".lean" then .error ("lasm dev expects a Lean source (Main.lean), not " ++ input)
+    if !input.endsWith ".lean" then .error ("Expected a Lean source file (Main.lean), not " ++ input)
     else
       let target := st.result.target?.getD runtime
       let outputs := (st.outputs.getD [(target, none)]).map fun (t, i) => (t, i.getD input)

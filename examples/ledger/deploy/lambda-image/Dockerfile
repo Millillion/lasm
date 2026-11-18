@@ -1,16 +1,13 @@
-# Ledger on AWS Lambda as a container image: AWS's Node 24 base image with
-# the same handler as the .zip package (lasm-lambda.mjs, from @lasm/cli),
-# which starts the Node server in the function's process and turns each
-# invocation into a request to it.
-#   npm run build:lambda-image    (npm run build, then: docker build -f deploy/lambda-image/Dockerfile -t ledger-lambda:local .)
+# Ledger on AWS Lambda as a container image: AWS's Node 24 base image with the
+# files of the .zip package (lambda.zip, unpacked into dist/lambda): the image's
+# runtime interface client calls lasm-lambda.handler, which calls the handler
+# ServerFunction.lean publishes with exportDefault. No HTTP server runs inside
+# the function.
+#   npm run build:lambda-image    (npm run build:lambda, unzip, then: docker build -f deploy/lambda-image/Dockerfile -t ledger-lambda:local .)
 # The database is /tmp/ledger.db: it lasts as long as the function instance
 # (see the README). Tested in CI with AWS SAM CLI's sam local start-api.
-# (The AWS Lambda Web Adapter route, docs/deploy/lambda.md, also runs
-# Ledger's API; under sam local start-api its pages stall, because the
-# adapter passes on the Node server's Connection and Keep-Alive headers.)
 ARG LAMBDA_IMAGE=public.ecr.aws/lambda/nodejs:24
 FROM ${LAMBDA_IMAGE}
-COPY dist/server/ ${LAMBDA_TASK_ROOT}/
-COPY node_modules/@lasm/cli/src/serverless/lasm-lambda.mjs node_modules/@lasm/cli/src/serverless/lasm-server.mjs ${LAMBDA_TASK_ROOT}/
+COPY dist/lambda/ ${LAMBDA_TASK_ROOT}/
 ENV DATABASE_PATH=/tmp/ledger.db
 CMD ["lasm-lambda.handler"]

@@ -120,6 +120,14 @@ instance : ToJS MediaKeysPolicy := ⟨fun d => Internal.fields #[("minHdcpVersio
   Lasm.JS.Binding.invoke MediaEncryptedEvent { name := "Lasm.JS.Web.MediaEncryptedEvent.new", module := "globalThis", path := "MediaEncryptedEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional MediaEncryptedEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaEncryptedEvent.new? (type : String) (eventInitDict : Option MediaEncryptedEventInit := none) : IO (Option MediaEncryptedEvent) := Internal.api "Lasm.JS.Web.MediaEncryptedEvent.new?" do
+  if !(← Internal.hasGlobal ["MediaEncryptedEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke MediaEncryptedEvent { name := "Lasm.JS.Web.MediaEncryptedEvent.new?", module := "globalThis", path := "MediaEncryptedEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString initDataType` -/
 @[macro_inline] def MediaEncryptedEvent.initDataType (self : MediaEncryptedEvent) : IO String := Internal.api "Lasm.JS.Web.MediaEncryptedEvent.initDataType" do
   self.val.get "initDataType" String
@@ -137,6 +145,14 @@ instance : ToJS MediaKeysPolicy := ⟨fun d => Internal.fields #[("minHdcpVersio
 @[macro_inline] def MediaKeyMessageEvent.new (type : String) (eventInitDict : MediaKeyMessageEventInit) : IO MediaKeyMessageEvent := Internal.api "Lasm.JS.Web.MediaKeyMessageEvent.new" do
   Lasm.JS.Binding.invoke MediaKeyMessageEvent { name := "Lasm.JS.Web.MediaKeyMessageEvent.new", module := "globalThis", path := "MediaKeyMessageEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, MediaKeyMessageEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaKeyMessageEvent.new? (type : String) (eventInitDict : MediaKeyMessageEventInit) : IO (Option MediaKeyMessageEvent) := Internal.api "Lasm.JS.Web.MediaKeyMessageEvent.new?" do
+  if !(← Internal.hasGlobal ["MediaKeyMessageEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke MediaKeyMessageEvent { name := "Lasm.JS.Web.MediaKeyMessageEvent.new?", module := "globalThis", path := "MediaKeyMessageEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute MediaKeyMessageType messageType` -/
 @[macro_inline] def MediaKeyMessageEvent.messageType (self : MediaKeyMessageEvent) : IO MediaKeyMessageType := Internal.api "Lasm.JS.Web.MediaKeyMessageEvent.messageType" do
@@ -251,6 +267,14 @@ instance : ToJS MediaKeysPolicy := ⟨fun d => Internal.fields #[("minHdcpVersio
 @[macro_inline] def MediaKeys.getStatusForPolicy (self : MediaKeys) (policy : Option MediaKeysPolicy := none) : Async MediaKeyStatus := Internal.api "Lasm.JS.Web.MediaKeys.getStatusForPolicy" do
   self.val.callMethodAwait "getStatusForPolicy" (Internal.args #[Internal.optional policy]) MediaKeyStatus
 
+/-- `Promise<MediaKeyStatus> getStatusForPolicy(optional MediaKeysPolicy policy)` where the platform has it (`'getStatusForPolicy' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaKeys.getStatusForPolicy? (self' : MediaKeys) (policy : Option MediaKeysPolicy := none) : Async (Option MediaKeyStatus) := Internal.api "Lasm.JS.Web.MediaKeys.getStatusForPolicy?" do
+  let self := self'
+  if !(← Internal.has self.val "getStatusForPolicy") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "getStatusForPolicy" (Internal.args #[Internal.optional policy]) MediaKeyStatus
+  return some lasmGuarded
+
 /-- `Promise<boolean> setServerCertificate(BufferSource serverCertificate)` -/
 @[macro_inline] def MediaKeys.setServerCertificate (self : MediaKeys) (serverCertificate : ByteArray) : Async Bool := Internal.api "Lasm.JS.Web.MediaKeys.setServerCertificate" do
   self.val.callMethodAwait "setServerCertificate" (Internal.args #[toJS serverCertificate]) Bool
@@ -283,5 +307,14 @@ instance : ToJS MediaKeysPolicy := ⟨fun d => Internal.fields #[("minHdcpVersio
 @[macro_inline] def Navigator.requestMediaKeySystemAccess (self : Navigator) (keySystem : String) (supportedConfigurations : Array MediaKeySystemConfiguration) : Async MediaKeySystemAccess := Internal.api "Lasm.JS.Web.Navigator.requestMediaKeySystemAccess" do
   let r ← self.val.callMethodAwait "requestMediaKeySystemAccess" (Internal.args #[toJS keySystem, toJS supportedConfigurations]) Value
   pure { val := r }
+
+/-- `Promise<MediaKeySystemAccess> requestMediaKeySystemAccess(DOMString keySystem, sequence<MediaKeySystemConfiguration> supportedConfigurations)` where the platform has it (`'requestMediaKeySystemAccess' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.requestMediaKeySystemAccess? (self' : Navigator) (keySystem : String) (supportedConfigurations : Array MediaKeySystemConfiguration) : Async (Option MediaKeySystemAccess) := Internal.api "Lasm.JS.Web.Navigator.requestMediaKeySystemAccess?" do
+  let self := self'
+  if !(← Internal.has self.val "requestMediaKeySystemAccess") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethodAwait "requestMediaKeySystemAccess" (Internal.args #[toJS keySystem, toJS supportedConfigurations]) Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

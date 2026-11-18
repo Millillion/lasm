@@ -134,6 +134,14 @@ instance : FromJS ConstrainPoint2D where
   Lasm.JS.Binding.invoke ImageCapture { name := "Lasm.JS.Web.ImageCapture.new", module := "globalThis", path := "ImageCapture", construct := true, arity := 1 }
     (Internal.args #[toJS videoTrack]) (await := false)
 
+/-- `constructor(MediaStreamTrack videoTrack)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ImageCapture.new? (videoTrack : MediaStreamTrack) : IO (Option ImageCapture) := Internal.api "Lasm.JS.Web.ImageCapture.new?" do
+  if !(← Internal.hasGlobal ["ImageCapture"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ImageCapture { name := "Lasm.JS.Web.ImageCapture.new?", module := "globalThis", path := "ImageCapture", construct := true, arity := 1 }
+      (Internal.args #[toJS videoTrack]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute MediaStreamTrack track` -/
 @[macro_inline] def ImageCapture.track (self : ImageCapture) : IO MediaStreamTrack := Internal.api "Lasm.JS.Web.ImageCapture.track" do
   let r ← self.val.get "track" Value

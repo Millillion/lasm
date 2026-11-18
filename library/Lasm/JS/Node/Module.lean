@@ -92,6 +92,11 @@ instance instToJSModuleSetSourceMapsSupportOptions : ToJS module.SetSourceMapsSu
 @[macro_inline] def module.SourceMap.cast? (v : Value) : IO (Option module.SourceMap) := Internal.api "Lasm.JS.Node.module.SourceMap.cast?" do
   Internal.cast (Support.getExport "node:module" ["SourceMap"] Value) (fun x => { val := x }) v
 
+/-- **Experimental** in the Node.js 24.22.2 docs. `new SourceMap(payload[, { lineLengths }])` (added in Node.js v13.7.0, v12.17.0): `constructor(object payload, optional sequence<double> lineLengths)` -/
+@[macro_inline] def module.SourceMap.new (payload : Data) (lineLengths : Option (Array Float) := none) : IO module.SourceMap := Internal.api "Lasm.JS.Node.module.SourceMap.new" do
+  Lasm.JS.Binding.invoke module.SourceMap { name := "Lasm.JS.Node.module.SourceMap.new", module := "node:module", path := "SourceMap", construct := true, arity := 2 }
+    (Internal.args #[toJS payload, Internal.optional lineLengths]) (await := false)
+
 /-- **Not documented in Node.js 26.13.0** (removed or changed there). **Experimental** in the Node.js 24.22.2 docs. `sourceMap.payload`: `readonly attribute object payload` -/
 @[macro_inline] def module.SourceMap.payload (self : module.SourceMap) : IO Data := Internal.api "Lasm.JS.Node.module.SourceMap.payload" do
   self.val.get "payload" Data

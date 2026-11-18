@@ -19,7 +19,8 @@ import { tmpdir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { random } from '../helpers/property.mjs';
-import { buildTargets, closest, editDistance, parseLasmArguments, targetHint } from '../../src/cli-arguments.mjs';
+import { buildTargets, parseLasmArguments, targetHint } from '../../src/cli-arguments.mjs';
+import { closest, editDistance } from '../../src/cli-names.mjs';
 import { changedFiles, parseDevArguments } from '../../src/dev.mjs';
 import { lakeName, packageName, parseInitArguments, supabaseFunctionNameOf } from '../../src/init.mjs';
 import { jsRuntime } from '../../src/js-runtime.mjs';
@@ -193,11 +194,11 @@ function subcommandLine(r, options, values) {
 }
 const initValues = ['plain', 'express', 'hono', 'fastify', 'std-http', 'web', 'fetch', 'fullstack', 'constructor', '__proto__', 'lambda',
   'lambda-container', 'vercel', 'vercel-edge', 'netlify', 'netlify-edge', 'workers', 'wasi', 'wasi-http', 'spin', 'fastly', 'supabase-edge',
-  'deno-deploy', 'azure', 'gcf', '', '-x', '--x', 'a\nb', 'hon', 'Hono', 'worker', 'cloudflare', 'vercl', 'aws'];
+  'deno-deploy', 'azure-functions', 'cloud-functions', 'azure', 'gcf', '', '-x', '--x', 'a\nb', 'hon', 'Hono', 'worker', 'cloudflare', 'vercl', 'aws'];
 const devValues = ['node', 'bun', 'deno', 'browser', 'workers', 'node,browser', 'node=Server.lean,browser=Client.lean', 'browser=a.lean',
   'node,bun', 'node=', 'node=a', 'x', '', '--x', '-x', '80', '65535', '65536', '00080', '123456', 'a\nb', '127.0.0.1', 'out', 'deno=b.lean=c',
   'worker', 'cloudflare', 'brwser', 'node,brwser', 'aws', 'lambda'];
-const packageValues = ['lambda', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf', 'browser', 'constructor', '', '--x', '-x', 'out', 'a\nb'];
+const packageValues = ['lambda', 'lambda-edge', 'vercel', 'netlify', 'azure-functions', 'cloud-functions', 'browser', 'constructor', '', '--x', '-x', 'out', 'a\nb'];
 
 
 /** WebAssembly instructions as the lowering reads them: every immediate
@@ -474,13 +475,13 @@ const primDesc = v => typeof v === 'bigint' ? `${v}n` : v === undefined ? 'undef
 
 const models = [
   {
-    name: 'editDistance', source: 'src/cli-arguments.mjs', lean: 'Lasm.Cli.Model.CliArguments',
+    name: 'editDistance', source: 'src/cli-names.mjs', lean: 'Lasm.Cli.Model.CliArguments',
     generate: r => [r.string(letters, 0, 9), r.string(letters, 0, 9)],
     input: ([a, b]) => ({ a: hex(a), b: hex(b) }),
     js: ([a, b]) => editDistance(a, b),
   },
   {
-    name: 'closest', source: 'src/cli-arguments.mjs', lean: 'Lasm.Cli.Model.CliArguments',
+    name: 'closest', source: 'src/cli-names.mjs', lean: 'Lasm.Cli.Model.CliArguments',
     generate: r => ({ word: word(r), candidates: r.next() < 0.3 ? buildTargets : r.array(r.int(0, 5), () => word(r)) }),
     input: ({ word, candidates }) => ({ word: hex(word), candidates: candidates.map(hex) }),
     js: ({ word, candidates }) => { const c = closest(word, candidates); return c === undefined ? null : hex(c); },

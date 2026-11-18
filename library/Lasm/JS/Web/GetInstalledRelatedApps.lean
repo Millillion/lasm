@@ -40,4 +40,12 @@ instance : FromJS RelatedApplication where
 @[macro_inline] def Navigator.getInstalledRelatedApps (self : Navigator) : Async (Array RelatedApplication) := Internal.api "Lasm.JS.Web.Navigator.getInstalledRelatedApps" do
   self.val.callMethodAwait "getInstalledRelatedApps" (Internal.args #[]) (Array RelatedApplication)
 
+/-- `Promise<sequence<RelatedApplication>> getInstalledRelatedApps()` where the platform has it (`'getInstalledRelatedApps' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.getInstalledRelatedApps? (self' : Navigator) : Async (Option (Array RelatedApplication)) := Internal.api "Lasm.JS.Web.Navigator.getInstalledRelatedApps?" do
+  let self := self'
+  if !(← Internal.has self.val "getInstalledRelatedApps") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "getInstalledRelatedApps" (Internal.args #[]) (Array RelatedApplication)
+  return some lasmGuarded
+
 end Lasm.JS.Web

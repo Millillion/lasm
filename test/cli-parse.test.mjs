@@ -35,8 +35,8 @@ test('the target lists', () => {
   assert.ok(cliUsage.endsWith('Application arguments must follow --.'));
   for (const command of ['dev', 'build', 'init', 'package', 'editor', 'cache repair']) assert.ok(cliUsage.includes(`lasm ${command}`), command);
   // The target lists come from the tables (0.7-16).
-  assert.ok(cliUsage.includes('\n       lasm build <Main.lean> [--target node|lambda|lambda-edge|vercel|netlify|azure|gcf|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--output PATH] [--dev] [--allow-dev] [--suspend none|jspi] [--bundler]\n'));
-  assert.ok(cliUsage.includes('\n       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure|gcf|browser [--output PATH] [--allow-dev]\n'));
+  assert.ok(cliUsage.includes('\n       lasm build <Main.lean> [--target node|lambda|lambda-edge|vercel|netlify|azure-functions|cloud-functions|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--output PATH] [--dev] [--allow-dev] [--suspend none|jspi] [--bundler]\n'));
+  assert.ok(cliUsage.includes('\n       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure-functions|cloud-functions|browser [--output PATH] [--allow-dev]\n'));
 });
 
 test('targetHintAmong: an alias among the candidates, else the closest candidate (0.7-23)', () => {
@@ -154,8 +154,8 @@ test('option names match whole tokens only', () => {
 test('target hints: aliases, near misses, and nothing for inherited names', () => {
   for (const [alias, target] of [['cloudflare', 'workers'], ['cloudflare-workers', 'workers'], ['worker', 'workers'], ['aws', 'lambda'],
     ['aws-lambda', 'lambda'], ['cloudfront', 'lambda-edge'], ['supabase', 'supabase-edge'], ['deno-deploy-edge', 'deno-deploy'], ['spin', 'wasi-http'],
-    ['wasmtime', 'wasi'], ['web', 'browser'], ['vite', 'browser'], ['azure-functions', 'azure'], ['google-cloud-functions', 'gcf'],
-    ['cloud-functions', 'gcf'], ['vercel-functions', 'vercel'], ['netlify-functions', 'netlify'], ['AWS', 'lambda']])
+    ['wasmtime', 'wasi'], ['web', 'browser'], ['vite', 'browser'], ['azure', 'azure-functions'], ['gcf', 'cloud-functions'], ['google-cloud-functions', 'cloud-functions'],
+    ['cloud-run-functions', 'cloud-functions'], ['vercel-functions', 'vercel'], ['netlify-functions', 'netlify'], ['AWS', 'lambda']])
     assert.equal(targetHint(alias), ` (did you mean --target ${target}?)`, alias);
   assert.equal(targetHint('lambda-edg'), ' (did you mean --target lambda-edge?)');
   for (const word of ['constructor', 'toString', '__proto__', 'hasOwnProperty', 'kubernetes-cluster']) assert.equal(targetHint(word), '', word);
@@ -354,7 +354,7 @@ test('--flag=value takes everything after =, line breaks included', () => {
 test('lasm init, dev and package: --flag=value also takes line breaks (not "unknown option")', () => {
   assert.throws(() => parseInitArguments(['app', '--template=a\nb']), { message: /^Unknown template "a\nb"/ });
   assert.throws(() => parseInitArguments(['app', '-t=a\u2028b']), { message: /^Unknown template "a\u2028b"/ });
-  assert.throws(() => parseInitArguments(['app', '--deploy=a\rb']), { message: /^--deploy accepts / });
+  assert.throws(() => parseInitArguments(['app', '--deploy=a\rb']), { message: /^Unknown deploy target "a\rb"/ });
   assert.equal(parseDevArguments(['--target=browser', '--output=out\ndir']).output, 'out\ndir');
   assert.equal(parseDevArguments(['--target=browser', '--host=a\nb']).host, 'a\nb');
   assert.equal(parsePackageArguments(['--target=lambda', '--output=out\ndir']).output, 'out\ndir');

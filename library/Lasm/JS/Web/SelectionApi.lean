@@ -218,17 +218,47 @@ instance : ToJS GetComposedRangesOptions := ⟨fun d => Internal.fields #[("shad
 @[macro_inline] def Window.getSelection (self : Window) : IO (Option Selection) := Internal.api "Lasm.JS.Web.Window.getSelection" do
   self.val.callMethod "getSelection" (Internal.args #[]) (Option Selection)
 
+/-- `Selection? getSelection()` where the platform has it (`'getSelection' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.getSelection? (self' : Window) : IO (Option (Option Selection)) := Internal.api "Lasm.JS.Web.Window.getSelection?" do
+  let self := self'
+  if !(← Internal.has self.val "getSelection") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getSelection" (Internal.args #[]) (Option Selection)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onselectstart` (Selection API (https://w3c.github.io/selection-api/)) -/
 @[macro_inline] def onselectstart : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onselectstart" do
   Internal.getGlobal ["onselectstart"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onselectstart` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onselectstart? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onselectstart?" do
+  if !(← Internal.hasGlobal ["onselectstart"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onselectstart"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onselectionchange` (Selection API (https://w3c.github.io/selection-api/)) -/
 @[macro_inline] def onselectionchange : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onselectionchange" do
   Internal.getGlobal ["onselectionchange"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onselectionchange` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onselectionchange? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onselectionchange?" do
+  if !(← Internal.hasGlobal ["onselectionchange"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onselectionchange"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `Selection? getSelection()` (Selection API (https://w3c.github.io/selection-api/)) -/
 @[macro_inline] def getSelection : IO (Option Selection) := Internal.api "Lasm.JS.Web.getSelection" do
   Lasm.JS.Binding.invoke (Option Selection) { name := "Lasm.JS.Web.getSelection", module := "globalThis", path := "getSelection", construct := false, arity := 0 }
     (Internal.args #[]) (await := false)
+
+/-- `Selection? getSelection()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def getSelection? : IO (Option (Option Selection)) := Internal.api "Lasm.JS.Web.getSelection?" do
+  if !(← Internal.hasGlobal ["getSelection"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke (Option Selection) { name := "Lasm.JS.Web.getSelection?", module := "globalThis", path := "getSelection", construct := false, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
 
 end Lasm.JS.Web

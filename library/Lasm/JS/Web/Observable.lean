@@ -206,6 +206,14 @@ instance : ToJS ObservableEventListenerOptions := ⟨fun d => Internal.fields #[
   Lasm.JS.Binding.invoke Observable { name := "Lasm.JS.Web.Observable.new", module := "globalThis", path := "Observable", construct := true, arity := 1 }
     (Internal.args #[toJS callback]) (await := false)
 
+/-- `constructor(SubscribeCallback callback)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Observable.new? (callback : SubscribeCallback) : IO (Option Observable) := Internal.api "Lasm.JS.Web.Observable.new?" do
+  if !(← Internal.hasGlobal ["Observable"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Observable { name := "Lasm.JS.Web.Observable.new?", module := "globalThis", path := "Observable", construct := true, arity := 1 }
+      (Internal.args #[toJS callback]) (await := false)
+  return some lasmGuarded
+
 /-- `undefined subscribe(optional ObserverUnion observer, optional SubscribeOptions options)` -/
 @[macro_inline] def Observable.subscribe (self : Observable) (observer : Option ObserverUnion := none) (options : Option SubscribeOptions := none) : IO Unit := Internal.api "Lasm.JS.Web.Observable.subscribe" do
   self.val.callMethod "subscribe" (Internal.args #[Internal.optional observer, Internal.optional options]) Unit
@@ -215,6 +223,15 @@ instance : ToJS ObservableEventListenerOptions := ⟨fun d => Internal.fields #[
   let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.Observable.from", module := "globalThis", path := "Observable.from", construct := false, arity := 1 }
     (Internal.args #[toJS value]) (await := false)
   pure { val := r }
+
+/-- `static Observable from(any value)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Observable.«from?» (value : Data) : IO (Option Observable) := Internal.api "Lasm.JS.Web.Observable.from?" do
+  if !(← Internal.hasGlobal ["Observable", "from"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.Observable.from?", module := "globalThis", path := "Observable.from", construct := false, arity := 1 }
+      (Internal.args #[toJS value]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `Observable takeUntil(any value)` -/
 @[macro_inline] def Observable.takeUntil (self : Observable) (value : Data) : IO Observable := Internal.api "Lasm.JS.Web.Observable.takeUntil" do
@@ -331,5 +348,14 @@ instance : ToJS ObservableEventListenerOptions := ⟨fun d => Internal.fields #[
 @[macro_inline] def EventTarget.when (self : EventTarget) (type : String) (options : Option ObservableEventListenerOptions := none) : IO Observable := Internal.api "Lasm.JS.Web.EventTarget.when" do
   let r ← self.val.callMethod "when" (Internal.args #[toJS type, Internal.optional options]) Value
   pure { val := r }
+
+/-- `Observable when(DOMString type, optional ObservableEventListenerOptions options)` where the platform has it (`'when' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def EventTarget.when? (self' : EventTarget) (type : String) (options : Option ObservableEventListenerOptions := none) : IO (Option Observable) := Internal.api "Lasm.JS.Web.EventTarget.when?" do
+  let self := self'
+  if !(← Internal.has self.val "when") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethod "when" (Internal.args #[toJS type, Internal.optional options]) Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

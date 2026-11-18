@@ -4,6 +4,9 @@ later, no npm package). One binding, the rest is method calls. node:sqlite is
 synchronous, but requests run concurrently, so every call takes one lock:
 `batch` runs in `BEGIN IMMEDIATE … COMMIT`, and no other statement on the
 connection (a read included) runs in the middle of it.
+
+Still bound by hand, until the generated `Lasm.JS.Node.Sqlite` can bind SQL NULL parameters
+(Porter binds `null` for optional columns; reported to the 0.4 stream).
 -/
 import Lasm.JS
 import Std.Data.HashMap

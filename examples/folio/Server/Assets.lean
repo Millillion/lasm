@@ -9,7 +9,7 @@ read from the same directory at run time, so a rebuilt browser app is served
 without rebuilding the server.
 
 Written for this app (from what Lasm.Fetch.Assets did) when Lasm.Fetch was
-retired: Lasm 0.7.0 has no library for embedded static files.
+retired: Lasm has no library for embedded static files.
 -/
 import Server.Web
 open Std.Async

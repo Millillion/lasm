@@ -167,33 +167,92 @@ instance : ToJS Argon2Params := ⟨fun d => Internal.fields #[("name", toJS d.na
 @[macro_inline] def SubtleCrypto.encapsulateKey (self : SubtleCrypto) (encapsulationAlgorithm : AlgorithmIdentifier) (encapsulationKey : CryptoKey) (sharedKeyAlgorithm : AlgorithmIdentifier) (extractable : Bool) (keyUsages : Array KeyUsage) : Async Data := Internal.api "Lasm.JS.Web.SubtleCrypto.encapsulateKey" do
   self.val.callMethodAwait "encapsulateKey" (Internal.args #[toJS encapsulationAlgorithm, toJS encapsulationKey, toJS sharedKeyAlgorithm, toJS extractable, toJS keyUsages]) Data
 
+/-- `Promise<EncapsulatedKey> encapsulateKey(AlgorithmIdentifier encapsulationAlgorithm, CryptoKey encapsulationKey, AlgorithmIdentifier sharedKeyAlgorithm, boolean extractable, sequence<KeyUsage> keyUsages)` where the platform has it (`'encapsulateKey' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SubtleCrypto.encapsulateKey? (self' : SubtleCrypto) (encapsulationAlgorithm : AlgorithmIdentifier) (encapsulationKey : CryptoKey) (sharedKeyAlgorithm : AlgorithmIdentifier) (extractable : Bool) (keyUsages : Array KeyUsage) : Async (Option Data) := Internal.api "Lasm.JS.Web.SubtleCrypto.encapsulateKey?" do
+  let self := self'
+  if !(← Internal.has self.val "encapsulateKey") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "encapsulateKey" (Internal.args #[toJS encapsulationAlgorithm, toJS encapsulationKey, toJS sharedKeyAlgorithm, toJS extractable, toJS keyUsages]) Data
+  return some lasmGuarded
+
 /-- `Promise<EncapsulatedBits> encapsulateBits(AlgorithmIdentifier encapsulationAlgorithm, CryptoKey encapsulationKey)` -/
 @[macro_inline] def SubtleCrypto.encapsulateBits (self : SubtleCrypto) (encapsulationAlgorithm : AlgorithmIdentifier) (encapsulationKey : CryptoKey) : Async Data := Internal.api "Lasm.JS.Web.SubtleCrypto.encapsulateBits" do
   self.val.callMethodAwait "encapsulateBits" (Internal.args #[toJS encapsulationAlgorithm, toJS encapsulationKey]) Data
+
+/-- `Promise<EncapsulatedBits> encapsulateBits(AlgorithmIdentifier encapsulationAlgorithm, CryptoKey encapsulationKey)` where the platform has it (`'encapsulateBits' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SubtleCrypto.encapsulateBits? (self' : SubtleCrypto) (encapsulationAlgorithm : AlgorithmIdentifier) (encapsulationKey : CryptoKey) : Async (Option Data) := Internal.api "Lasm.JS.Web.SubtleCrypto.encapsulateBits?" do
+  let self := self'
+  if !(← Internal.has self.val "encapsulateBits") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "encapsulateBits" (Internal.args #[toJS encapsulationAlgorithm, toJS encapsulationKey]) Data
+  return some lasmGuarded
 
 /-- `Promise<CryptoKey> decapsulateKey(AlgorithmIdentifier decapsulationAlgorithm, CryptoKey decapsulationKey, BufferSource ciphertext, AlgorithmIdentifier sharedKeyAlgorithm, boolean extractable, sequence<KeyUsage> keyUsages)` -/
 @[macro_inline] def SubtleCrypto.decapsulateKey (self : SubtleCrypto) (decapsulationAlgorithm : AlgorithmIdentifier) (decapsulationKey : CryptoKey) (ciphertext : ByteArray) (sharedKeyAlgorithm : AlgorithmIdentifier) (extractable : Bool) (keyUsages : Array KeyUsage) : Async CryptoKey := Internal.api "Lasm.JS.Web.SubtleCrypto.decapsulateKey" do
   let r ← self.val.callMethodAwait "decapsulateKey" (Internal.args #[toJS decapsulationAlgorithm, toJS decapsulationKey, toJS ciphertext, toJS sharedKeyAlgorithm, toJS extractable, toJS keyUsages]) Value
   pure { val := r }
 
+/-- `Promise<CryptoKey> decapsulateKey(AlgorithmIdentifier decapsulationAlgorithm, CryptoKey decapsulationKey, BufferSource ciphertext, AlgorithmIdentifier sharedKeyAlgorithm, boolean extractable, sequence<KeyUsage> keyUsages)` where the platform has it (`'decapsulateKey' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SubtleCrypto.decapsulateKey? (self' : SubtleCrypto) (decapsulationAlgorithm : AlgorithmIdentifier) (decapsulationKey : CryptoKey) (ciphertext : ByteArray) (sharedKeyAlgorithm : AlgorithmIdentifier) (extractable : Bool) (keyUsages : Array KeyUsage) : Async (Option CryptoKey) := Internal.api "Lasm.JS.Web.SubtleCrypto.decapsulateKey?" do
+  let self := self'
+  if !(← Internal.has self.val "decapsulateKey") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethodAwait "decapsulateKey" (Internal.args #[toJS decapsulationAlgorithm, toJS decapsulationKey, toJS ciphertext, toJS sharedKeyAlgorithm, toJS extractable, toJS keyUsages]) Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `Promise<ArrayBuffer> decapsulateBits(AlgorithmIdentifier decapsulationAlgorithm, CryptoKey decapsulationKey, BufferSource ciphertext)` -/
 @[macro_inline] def SubtleCrypto.decapsulateBits (self : SubtleCrypto) (decapsulationAlgorithm : AlgorithmIdentifier) (decapsulationKey : CryptoKey) (ciphertext : ByteArray) : Async ByteArray := Internal.api "Lasm.JS.Web.SubtleCrypto.decapsulateBits" do
   let r ← self.val.callMethodAwait "decapsulateBits" (Internal.args #[toJS decapsulationAlgorithm, toJS decapsulationKey, toJS ciphertext]) Value
   Internal.arrayBufferBytes r
+
+/-- `Promise<ArrayBuffer> decapsulateBits(AlgorithmIdentifier decapsulationAlgorithm, CryptoKey decapsulationKey, BufferSource ciphertext)` where the platform has it (`'decapsulateBits' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SubtleCrypto.decapsulateBits? (self' : SubtleCrypto) (decapsulationAlgorithm : AlgorithmIdentifier) (decapsulationKey : CryptoKey) (ciphertext : ByteArray) : Async (Option ByteArray) := Internal.api "Lasm.JS.Web.SubtleCrypto.decapsulateBits?" do
+  let self := self'
+  if !(← Internal.has self.val "decapsulateBits") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethodAwait "decapsulateBits" (Internal.args #[toJS decapsulationAlgorithm, toJS decapsulationKey, toJS ciphertext]) Value
+    Internal.arrayBufferBytes r
+  return some lasmGuarded
 
 /-- `Promise<CryptoKey> getPublicKey(CryptoKey key, sequence<KeyUsage> keyUsages)` -/
 @[macro_inline] def SubtleCrypto.getPublicKey (self : SubtleCrypto) (key : CryptoKey) (keyUsages : Array KeyUsage) : Async CryptoKey := Internal.api "Lasm.JS.Web.SubtleCrypto.getPublicKey" do
   let r ← self.val.callMethodAwait "getPublicKey" (Internal.args #[toJS key, toJS keyUsages]) Value
   pure { val := r }
 
+/-- `Promise<CryptoKey> getPublicKey(CryptoKey key, sequence<KeyUsage> keyUsages)` where the platform has it (`'getPublicKey' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def SubtleCrypto.getPublicKey? (self' : SubtleCrypto) (key : CryptoKey) (keyUsages : Array KeyUsage) : Async (Option CryptoKey) := Internal.api "Lasm.JS.Web.SubtleCrypto.getPublicKey?" do
+  let self := self'
+  if !(← Internal.has self.val "getPublicKey") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethodAwait "getPublicKey" (Internal.args #[toJS key, toJS keyUsages]) Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `static boolean supports(DOMString operation, AlgorithmIdentifier algorithm, optional unsigned long? length)` -/
 @[macro_inline] def SubtleCrypto.supports (operation : String) (algorithm : AlgorithmIdentifier) (length : Option Nat := none) : IO Bool := Internal.api "Lasm.JS.Web.SubtleCrypto.supports" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.SubtleCrypto.supports", module := "globalThis", path := "SubtleCrypto.supports", construct := false, arity := 3 }
     (Internal.args #[toJS operation, toJS algorithm, Internal.optional length]) (await := false)
 
+/-- `static boolean supports(DOMString operation, AlgorithmIdentifier algorithm, optional unsigned long? length)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def SubtleCrypto.supports? (operation : String) (algorithm : AlgorithmIdentifier) (length : Option Nat := none) : IO (Option Bool) := Internal.api "Lasm.JS.Web.SubtleCrypto.supports?" do
+  if !(← Internal.hasGlobal ["SubtleCrypto", "supports"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.SubtleCrypto.supports?", module := "globalThis", path := "SubtleCrypto.supports", construct := false, arity := 3 }
+      (Internal.args #[toJS operation, toJS algorithm, Internal.optional length]) (await := false)
+  return some lasmGuarded
+
 /-- `static boolean supports(DOMString operation, AlgorithmIdentifier algorithm, AlgorithmIdentifier additionalAlgorithm)` -/
 @[macro_inline] def SubtleCrypto.supportsWithAdditionalAlgorithm (operation : String) (algorithm : AlgorithmIdentifier) (additionalAlgorithm : AlgorithmIdentifier) : IO Bool := Internal.api "Lasm.JS.Web.SubtleCrypto.supportsWithAdditionalAlgorithm" do
   Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.SubtleCrypto.supportsWithAdditionalAlgorithm", module := "globalThis", path := "SubtleCrypto.supports", construct := false, arity := 3 }
     (Internal.args #[toJS operation, toJS algorithm, toJS additionalAlgorithm]) (await := false)
+
+/-- `static boolean supports(DOMString operation, AlgorithmIdentifier algorithm, AlgorithmIdentifier additionalAlgorithm)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def SubtleCrypto.supportsWithAdditionalAlgorithm? (operation : String) (algorithm : AlgorithmIdentifier) (additionalAlgorithm : AlgorithmIdentifier) : IO (Option Bool) := Internal.api "Lasm.JS.Web.SubtleCrypto.supportsWithAdditionalAlgorithm?" do
+  if !(← Internal.hasGlobal ["SubtleCrypto", "supports"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Bool { name := "Lasm.JS.Web.SubtleCrypto.supportsWithAdditionalAlgorithm?", module := "globalThis", path := "SubtleCrypto.supports", construct := false, arity := 3 }
+      (Internal.args #[toJS operation, toJS algorithm, toJS additionalAlgorithm]) (await := false)
+  return some lasmGuarded
 
 end Lasm.JS.Web

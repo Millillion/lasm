@@ -1,24 +1,22 @@
-/- Ledger on Node and Deno with node:sqlite: `npm run build`, then `npm start` (DATABASE_PATH, PORT, HOST). -/
+/- Ledger on Node with node:sqlite: `npm run build`, then `npm start` (DATABASE_PATH, PORT, HOST). Also the Docker image. -/
+import Lasm.JS.Node.Serve
 import Server.App
 import Server.NodeSqlite
 import Server.Embed
-import Server.NodeServe
+import Server.JsServe
+open Lasm.JS
 
 /-- The browser page and its files (dist/public, from npm run build:client),
 embedded in the program so every target serves them. -/
 def assets : Ledger.Server.Web.Assets := embed_dir! "dist/public"
 
-
-/-- `DATABASE_PATH`, else `ledger.db` in the working directory, else (where
-that directory is read-only, as on function platforms) `ledger.db` in the
-temporary directory, which lasts only as long as the function's instance. -/
+/-- `DATABASE_PATH`, else `ledger.db` in the working directory. -/
 def database : IO Ledger.Server.Sql := do
-  if let some path ← IO.getEnv "DATABASE_PATH" then return ← Ledger.Server.NodeSqlite.open path
-  try Ledger.Server.NodeSqlite.open "ledger.db"
-  catch e =>
-    let tmp := (← IO.getEnv "TMPDIR").getD "/tmp"
-    IO.eprintln s!"ledger.db cannot be opened here ({e}); using {tmp}/ledger.db"
-    Ledger.Server.NodeSqlite.open s!"{tmp}/ledger.db"
+  Ledger.Server.NodeSqlite.open ((← IO.getEnv "DATABASE_PATH").getD "ledger.db")
 
+/-- `Node.serve` on $HOST:$PORT (default 0.0.0.0:3000); returns when the
+server stops (SIGTERM or SIGINT finish the requests in progress first). -/
 def main : IO Unit := do
-  Ledger.Server.NodeServe.serve (← Ledger.Server.handler (← database) assets)
+  let handler ← Ledger.Server.handler (← database) assets
+  let (port, hostname) ← Ledger.Server.JsServe.address 3000
+  Node.serve { fetch := Ledger.Server.JsServe.webHandler handler, port := some port, hostname := some hostname }

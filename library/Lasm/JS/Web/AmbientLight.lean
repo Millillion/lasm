@@ -25,6 +25,14 @@ set_option compiler.extract_closed false
   Lasm.JS.Binding.invoke AmbientLightSensor { name := "Lasm.JS.Web.AmbientLightSensor.new", module := "globalThis", path := "AmbientLightSensor", construct := true, arity := 1 }
     (Internal.args #[Internal.optional sensorOptions]) (await := false)
 
+/-- `constructor(optional SensorOptions sensorOptions)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def AmbientLightSensor.new? (sensorOptions : Option SensorOptions := none) : IO (Option AmbientLightSensor) := Internal.api "Lasm.JS.Web.AmbientLightSensor.new?" do
+  if !(← Internal.hasGlobal ["AmbientLightSensor"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke AmbientLightSensor { name := "Lasm.JS.Web.AmbientLightSensor.new?", module := "globalThis", path := "AmbientLightSensor", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional sensorOptions]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute double? illuminance` -/
 @[macro_inline] def AmbientLightSensor.illuminance (self : AmbientLightSensor) : IO (Option Float) := Internal.api "Lasm.JS.Web.AmbientLightSensor.illuminance" do
   self.val.get "illuminance" (Option Float)

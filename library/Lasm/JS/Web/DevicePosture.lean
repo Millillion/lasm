@@ -38,4 +38,13 @@ set_option compiler.extract_closed false
   let r ← self.val.get "devicePosture" Value
   pure { val := r }
 
+/-- `readonly attribute DevicePosture devicePosture` where the platform has it (`'devicePosture' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.devicePosture? (self' : Navigator) : IO (Option DevicePosture) := Internal.api "Lasm.JS.Web.Navigator.devicePosture?" do
+  let self := self'
+  if !(← Internal.has self.val "devicePosture") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "devicePosture" Value
+    pure { val := r }
+  return some lasmGuarded
+
 end Lasm.JS.Web

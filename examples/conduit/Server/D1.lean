@@ -1,54 +1,41 @@
 /-
-SQLite on Cloudflare Workers: D1, through the Worker's `DB` binding
-(wrangler.toml `[[d1_databases]]`). No module to import: the binding is an
-object in the Worker's `env`, and D1's methods return promises, awaited in
+SQLite on Cloudflare Workers: D1, through the generated bindings
+(Lasm.JS.Cloudflare.D1). The database is the Worker's `DB` binding
+(wrangler.toml `[[d1_databases]]`), which `ServerWorkers.lean` receives,
+typed, with every request. D1's methods return promises, awaited in
 `Async`. `batch` is D1's own `db.batch`, which runs as one transaction.
 -/
 import Lasm.JS
-import Server.JsServe
+import Lasm.JS.Cloudflare.D1
 import Server.Sql
-open Lasm.JS
+open Lasm.JS Lasm.JS.Cloudflare
 
 namespace Conduit.Server.D1
 
-/-- The D1 database bound as `name` in the Worker's `env` (it arrives with
-each request, so it is read on every call). -/
-def database (name : String) : IO Value := do
-  let found : Data ← match ← JsServe.platformEnv.get with
-    | .ref env _ => (try env.get name Data catch _ => pure .undefined)
-    | env@(.object _) => pure (env.field name)
-    | _ => pure .undefined
-  match found with
-  | .ref db _ => return db
-  | _ => throw (IO.userError s!"no D1 database bound as {name}: add [[d1_databases]] binding = \"{name}\" to wrangler.toml")
+/-- Whether this isolate has created the tables. -/
+initialize created : IO.Ref Bool ← IO.mkRef false
 
 /-- `db.prepare(sql).bind(...params)` -/
-def statement (db : Value) (sql : String) (params : Array Data) : IO Value := do
-  (← db.callMethod "prepare" #[toJS sql]).callMethod "bind" params
+def statement (db : D1Database) (sql : String) (params : Array Data) : IO D1PreparedStatement := do
+  (← db.prepare sql).bind params
 
-/-- The D1 binding `name` as a `Sql`. The tables are created on the first
-call in each isolate (`CREATE TABLE IF NOT EXISTS`, one batch). -/
-def «open» (name : String := "DB") : IO Sql := do
-  let ready ← IO.mkRef false
-  let ensure : Async Value := do
-    let db ← database name
-    unless ← ready.get do
-      let stmts ← schema.toArray.mapM fun sql => statement db sql #[]
-      let _ ← db.callMethodAwait "batch" #[.array (stmts.map (.ref · ""))] Data
-      ready.set true
-    return db
-  return {
-    all := fun sql params => do
-      let r ← (← statement (← ensure) sql params).callMethodAwait "all" #[] Data
-      match r.field "results" with
-      | .array rows => return rows
-      | _ => return #[]
-    run := fun sql params => do
-      let r ← (← statement (← ensure) sql params).callMethodAwait "run" #[] Data
-      return num (r.field "meta") "last_row_id"
-    batch := fun stmts => do
-      let db ← ensure
-      let prepared ← stmts.mapM fun (sql, params) => statement db sql params
-      let _ ← db.callMethodAwait "batch" #[.array (prepared.map (.ref · ""))] Data }
+/-- The tables, created on the first call in each isolate
+(`CREATE TABLE IF NOT EXISTS`, one batch). -/
+def ensure (db : D1Database) : Async Unit := do
+  unless ← created.get do
+    discard <| db.batch (← schema.toArray.mapM fun sql => statement db sql #[])
+    created.set true
+
+/-- The D1 database `db` as a `Sql`. -/
+def sql (db : D1Database) : Sql where
+  all sql params := do
+    ensure db
+    return (← (← statement db sql params).all).results
+  run sql params := do
+    ensure db
+    return (← (← statement db sql params).run).«meta».last_row_id.toUInt64.toNat
+  batch stmts := do
+    ensure db
+    discard <| db.batch (← stmts.mapM fun (sql, params) => statement db sql params)
 
 end Conduit.Server.D1

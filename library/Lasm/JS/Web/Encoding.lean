@@ -53,6 +53,14 @@ instance : FromJS TextEncoderEncodeIntoResult where
   Lasm.JS.Binding.invoke TextDecoder { name := "Lasm.JS.Web.TextDecoder.new", module := "globalThis", path := "TextDecoder", construct := true, arity := 2 }
     (Internal.args #[Internal.optional label, Internal.optional options]) (await := false)
 
+/-- `constructor(optional DOMString label, optional TextDecoderOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def TextDecoder.new? (label : Option String := none) (options : Option TextDecoderOptions := none) : IO (Option TextDecoder) := Internal.api "Lasm.JS.Web.TextDecoder.new?" do
+  if !(← Internal.hasGlobal ["TextDecoder"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke TextDecoder { name := "Lasm.JS.Web.TextDecoder.new?", module := "globalThis", path := "TextDecoder", construct := true, arity := 2 }
+      (Internal.args #[Internal.optional label, Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString encoding` -/
 @[macro_inline] def TextDecoder.encoding (self : TextDecoder) : IO String := Internal.api "Lasm.JS.Web.TextDecoder.encoding" do
   self.val.get "encoding" String
@@ -77,6 +85,14 @@ instance : FromJS TextEncoderEncodeIntoResult where
 @[macro_inline] def TextDecoderStream.new (label : Option String := none) (options : Option TextDecoderOptions := none) : IO TextDecoderStream := Internal.api "Lasm.JS.Web.TextDecoderStream.new" do
   Lasm.JS.Binding.invoke TextDecoderStream { name := "Lasm.JS.Web.TextDecoderStream.new", module := "globalThis", path := "TextDecoderStream", construct := true, arity := 2 }
     (Internal.args #[Internal.optional label, Internal.optional options]) (await := false)
+
+/-- `constructor(optional DOMString label, optional TextDecoderOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def TextDecoderStream.new? (label : Option String := none) (options : Option TextDecoderOptions := none) : IO (Option TextDecoderStream) := Internal.api "Lasm.JS.Web.TextDecoderStream.new?" do
+  if !(← Internal.hasGlobal ["TextDecoderStream"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke TextDecoderStream { name := "Lasm.JS.Web.TextDecoderStream.new?", module := "globalThis", path := "TextDecoderStream", construct := true, arity := 2 }
+      (Internal.args #[Internal.optional label, Internal.optional options]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString encoding` -/
 @[macro_inline] def TextDecoderStream.encoding (self : TextDecoderStream) : IO String := Internal.api "Lasm.JS.Web.TextDecoderStream.encoding" do
@@ -109,6 +125,14 @@ instance : FromJS TextEncoderEncodeIntoResult where
   Lasm.JS.Binding.invoke TextEncoder { name := "Lasm.JS.Web.TextEncoder.new", module := "globalThis", path := "TextEncoder", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def TextEncoder.new? : IO (Option TextEncoder) := Internal.api "Lasm.JS.Web.TextEncoder.new?" do
+  if !(← Internal.hasGlobal ["TextEncoder"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke TextEncoder { name := "Lasm.JS.Web.TextEncoder.new?", module := "globalThis", path := "TextEncoder", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString encoding` -/
 @[macro_inline] def TextEncoder.encoding (self : TextEncoder) : IO String := Internal.api "Lasm.JS.Web.TextEncoder.encoding" do
   self.val.get "encoding" String
@@ -129,6 +153,14 @@ instance : FromJS TextEncoderEncodeIntoResult where
 @[macro_inline] def TextEncoderStream.new : IO TextEncoderStream := Internal.api "Lasm.JS.Web.TextEncoderStream.new" do
   Lasm.JS.Binding.invoke TextEncoderStream { name := "Lasm.JS.Web.TextEncoderStream.new", module := "globalThis", path := "TextEncoderStream", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
+
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def TextEncoderStream.new? : IO (Option TextEncoderStream) := Internal.api "Lasm.JS.Web.TextEncoderStream.new?" do
+  if !(← Internal.hasGlobal ["TextEncoderStream"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke TextEncoderStream { name := "Lasm.JS.Web.TextEncoderStream.new?", module := "globalThis", path := "TextEncoderStream", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString encoding` -/
 @[macro_inline] def TextEncoderStream.encoding (self : TextEncoderStream) : IO String := Internal.api "Lasm.JS.Web.TextEncoderStream.encoding" do

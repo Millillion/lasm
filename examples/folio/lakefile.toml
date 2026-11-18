@@ -31,9 +31,12 @@ root = "Cli"
 [[lean_lib]]
 name = "Preview"
 
-# The servers' HTTP layer (requests and responses, embedded static files) and
-# each platform's own server: Lasm.JS.Web with Node's @hono/node-server,
-# Bun.serve, Deno.serve and the edge's default export; Lasm.Fastly. Lasm
-# builds it with PreviewServer.lean and ServerEdge.lean, the programs.
+# The servers' HTTP layer (requests and responses, embedded static files),
+# the preview's and the site's handlers, the conversion to the web's Request
+# and Response (Lasm.JS.Web.Fetch) and Fastly's server (Lasm.Fastly). Lasm
+# builds it with the programs, one entry file per serving model:
+# PreviewServer.lean (Node.serve), PreviewServerBun.lean (Bun.serve),
+# PreviewServerDeno.lean (Deno.serve), ServerWorkers.lean and
+# ServerDenoDeploy.lean (the default export), ServerFastly.lean.
 [[lean_lib]]
 name = "Server"

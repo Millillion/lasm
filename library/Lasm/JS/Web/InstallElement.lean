@@ -95,6 +95,14 @@ instance : ToJS InstallParams := ⟨fun d => Internal.fields #[("manifest", toJS
   Lasm.JS.Binding.invoke InstallResultEvent { name := "Lasm.JS.Web.InstallResultEvent.new", module := "globalThis", path := "InstallResultEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional InstallResultEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def InstallResultEvent.new? (type : String) (eventInitDict : Option InstallResultEventInit := none) : IO (Option InstallResultEvent) := Internal.api "Lasm.JS.Web.InstallResultEvent.new?" do
+  if !(← Internal.hasGlobal ["InstallResultEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke InstallResultEvent { name := "Lasm.JS.Web.InstallResultEvent.new?", module := "globalThis", path := "InstallResultEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute InstallResult result` -/
 @[macro_inline] def InstallResultEvent.result (self : InstallResultEvent) : IO InstallResult := Internal.api "Lasm.JS.Web.InstallResultEvent.result" do
   self.val.get "result" InstallResult
@@ -127,9 +135,25 @@ instance : ToJS InstallParams := ⟨fun d => Internal.fields #[("manifest", toJS
 @[macro_inline] def Navigator.install (self : Navigator) : Async WebInstallResult := Internal.api "Lasm.JS.Web.Navigator.install" do
   self.val.callMethodAwait "install" (Internal.args #[]) WebInstallResult
 
+/-- `Promise<WebInstallResult> install()` where the platform has it (`'install' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.install? (self' : Navigator) : Async (Option WebInstallResult) := Internal.api "Lasm.JS.Web.Navigator.install?" do
+  let self := self'
+  if !(← Internal.has self.val "install") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "install" (Internal.args #[]) WebInstallResult
+  return some lasmGuarded
+
 /-- `Promise<WebInstallResult> install(InstallParams options)` -/
 @[macro_inline] def Navigator.installWithOptions (self : Navigator) (options : InstallParams) : Async WebInstallResult := Internal.api "Lasm.JS.Web.Navigator.installWithOptions" do
   self.val.callMethodAwait "install" (Internal.args #[toJS options]) WebInstallResult
+
+/-- `Promise<WebInstallResult> install(InstallParams options)` where the platform has it (`'install' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.installWithOptions? (self' : Navigator) (options : InstallParams) : Async (Option WebInstallResult) := Internal.api "Lasm.JS.Web.Navigator.installWithOptions?" do
+  let self := self'
+  if !(← Internal.has self.val "install") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "install" (Internal.args #[toJS options]) WebInstallResult
+  return some lasmGuarded
 
 /-- `attribute EventHandler oninstallresult` -/
 @[macro_inline] def SVGElement.oninstallresult (self : SVGElement) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.SVGElement.oninstallresult" do
@@ -150,5 +174,12 @@ instance : ToJS InstallParams := ⟨fun d => Internal.fields #[("manifest", toJS
 /-- `attribute EventHandler oninstallresult` (Web Install (https://wicg.github.io/install-element/)) -/
 @[macro_inline] def oninstallresult : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.oninstallresult" do
   Internal.getGlobal ["oninstallresult"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler oninstallresult` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def oninstallresult? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.oninstallresult?" do
+  if !(← Internal.hasGlobal ["oninstallresult"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["oninstallresult"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 end Lasm.JS.Web

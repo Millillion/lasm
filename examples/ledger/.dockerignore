@@ -1,6 +1,6 @@
-# Both images (Dockerfile, deploy/lambda-image/Dockerfile) copy only the build
-# and Lasm's Lambda handler.
+# Both images copy only a build: Dockerfile the Node server (dist/server),
+# deploy/lambda-image/Dockerfile the Lambda package's files (dist/lambda,
+# unpacked from lambda.zip by npm run build:lambda-image).
 *
 !dist/server
-!node_modules/@lasm/cli/src/serverless/lasm-lambda.mjs
-!node_modules/@lasm/cli/src/serverless/lasm-server.mjs
+!dist/lambda

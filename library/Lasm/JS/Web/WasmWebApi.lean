@@ -22,9 +22,26 @@ set_option compiler.extract_closed false
     (Internal.args #[toJS source, Internal.optional options])
   pure { val := r }
 
+/-- `Promise<Module> compileStreaming(Promise<Response> source, optional WebAssemblyCompileOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebAssembly.compileStreaming? (source : Value) (options : Option WebAssemblyCompileOptions := none) : Async (Option WebAssembly.Module) := Internal.api "Lasm.JS.Web.WebAssembly.compileStreaming?" do
+  if !(← Internal.hasGlobal ["WebAssembly", "compileStreaming"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.WebAssembly.compileStreaming?", module := "globalThis", path := "WebAssembly.compileStreaming", construct := false, arity := 2 }
+      (Internal.args #[toJS source, Internal.optional options])
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `Promise<WebAssemblyInstantiatedSource> instantiateStreaming(Promise<Response> source, optional object importObject, optional WebAssemblyCompileOptions options)` (WebAssembly Web API (https://webassembly.github.io/spec/web-api/)) -/
 @[macro_inline] def WebAssembly.instantiateStreaming (source : Value) (importObject : Data := .undefined) (options : Option WebAssemblyCompileOptions := none) : Async WebAssemblyInstantiatedSource := Internal.api "Lasm.JS.Web.WebAssembly.instantiateStreaming" do
   Lasm.JS.Binding.invokeAsync WebAssemblyInstantiatedSource { name := "Lasm.JS.Web.WebAssembly.instantiateStreaming", module := "globalThis", path := "WebAssembly.instantiateStreaming", construct := false, arity := 3 }
     (Internal.args #[toJS source, importObject, Internal.optional options])
+
+/-- `Promise<WebAssemblyInstantiatedSource> instantiateStreaming(Promise<Response> source, optional object importObject, optional WebAssemblyCompileOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def WebAssembly.instantiateStreaming? (source : Value) (importObject : Data := .undefined) (options : Option WebAssemblyCompileOptions := none) : Async (Option WebAssemblyInstantiatedSource) := Internal.api "Lasm.JS.Web.WebAssembly.instantiateStreaming?" do
+  if !(← Internal.hasGlobal ["WebAssembly", "instantiateStreaming"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync WebAssemblyInstantiatedSource { name := "Lasm.JS.Web.WebAssembly.instantiateStreaming?", module := "globalThis", path := "WebAssembly.instantiateStreaming", construct := false, arity := 3 }
+      (Internal.args #[toJS source, importObject, Internal.optional options])
+  return some lasmGuarded
 
 end Lasm.JS.Web

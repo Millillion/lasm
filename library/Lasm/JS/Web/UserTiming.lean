@@ -73,6 +73,14 @@ instance : Coe PerformanceMeasureOptions DOMStringOrPerformanceMeasureOptions :=
   Lasm.JS.Binding.invoke PerformanceMark { name := "Lasm.JS.Web.PerformanceMark.new", module := "globalThis", path := "PerformanceMark", construct := true, arity := 2 }
     (Internal.args #[toJS markName, Internal.optional markOptions]) (await := false)
 
+/-- `constructor(DOMString markName, optional PerformanceMarkOptions markOptions)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PerformanceMark.new? (markName : String) (markOptions : Option PerformanceMarkOptions := none) : IO (Option PerformanceMark) := Internal.api "Lasm.JS.Web.PerformanceMark.new?" do
+  if !(← Internal.hasGlobal ["PerformanceMark"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PerformanceMark { name := "Lasm.JS.Web.PerformanceMark.new?", module := "globalThis", path := "PerformanceMark", construct := true, arity := 2 }
+      (Internal.args #[toJS markName, Internal.optional markOptions]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute any detail` -/
 @[macro_inline] def PerformanceMark.detail (self : PerformanceMark) : IO Data := Internal.api "Lasm.JS.Web.PerformanceMark.detail" do
   self.val.get "detail" Data
@@ -90,17 +98,51 @@ instance : Coe PerformanceMeasureOptions DOMStringOrPerformanceMeasureOptions :=
   let r ← self.val.callMethod "mark" (Internal.args #[toJS markName, Internal.optional markOptions]) Value
   pure { val := r }
 
+/-- `PerformanceMark mark(DOMString markName, optional PerformanceMarkOptions markOptions)` where the platform has it (`'mark' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Performance.mark? (self' : Performance) (markName : String) (markOptions : Option PerformanceMarkOptions := none) : IO (Option PerformanceMark) := Internal.api "Lasm.JS.Web.Performance.mark?" do
+  let self := self'
+  if !(← Internal.has self.val "mark") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethod "mark" (Internal.args #[toJS markName, Internal.optional markOptions]) Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `undefined clearMarks(optional DOMString markName)` -/
 @[macro_inline] def Performance.clearMarks (self : Performance) (markName : Option String := none) : IO Unit := Internal.api "Lasm.JS.Web.Performance.clearMarks" do
   self.val.callMethod "clearMarks" (Internal.args #[Internal.optional markName]) Unit
+
+/-- `undefined clearMarks(optional DOMString markName)` where the platform has it (`'clearMarks' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Performance.clearMarks? (self' : Performance) (markName : Option String := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Performance.clearMarks?" do
+  let self := self'
+  if !(← Internal.has self.val "clearMarks") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "clearMarks" (Internal.args #[Internal.optional markName]) Unit
+  return some lasmGuarded
 
 /-- `PerformanceMeasure measure(DOMString measureName, optional (DOMString or PerformanceMeasureOptions) startOrMeasureOptions, optional DOMString endMark)` -/
 @[macro_inline] def Performance.measure (self : Performance) (measureName : String) (startOrMeasureOptions : Option DOMStringOrPerformanceMeasureOptions := none) (endMark : Option String := none) : IO PerformanceMeasure := Internal.api "Lasm.JS.Web.Performance.measure" do
   let r ← self.val.callMethod "measure" (Internal.args #[toJS measureName, Internal.optional startOrMeasureOptions, Internal.optional endMark]) Value
   pure { val := r }
 
+/-- `PerformanceMeasure measure(DOMString measureName, optional (DOMString or PerformanceMeasureOptions) startOrMeasureOptions, optional DOMString endMark)` where the platform has it (`'measure' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Performance.measure? (self' : Performance) (measureName : String) (startOrMeasureOptions : Option DOMStringOrPerformanceMeasureOptions := none) (endMark : Option String := none) : IO (Option PerformanceMeasure) := Internal.api "Lasm.JS.Web.Performance.measure?" do
+  let self := self'
+  if !(← Internal.has self.val "measure") then return none
+  let lasmGuarded ← do
+    let r ← self.val.callMethod "measure" (Internal.args #[toJS measureName, Internal.optional startOrMeasureOptions, Internal.optional endMark]) Value
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `undefined clearMeasures(optional DOMString measureName)` -/
 @[macro_inline] def Performance.clearMeasures (self : Performance) (measureName : Option String := none) : IO Unit := Internal.api "Lasm.JS.Web.Performance.clearMeasures" do
   self.val.callMethod "clearMeasures" (Internal.args #[Internal.optional measureName]) Unit
+
+/-- `undefined clearMeasures(optional DOMString measureName)` where the platform has it (`'clearMeasures' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Performance.clearMeasures? (self' : Performance) (measureName : Option String := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Performance.clearMeasures?" do
+  let self := self'
+  if !(← Internal.has self.val "clearMeasures") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "clearMeasures" (Internal.args #[Internal.optional measureName]) Unit
+  return some lasmGuarded
 
 end Lasm.JS.Web

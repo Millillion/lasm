@@ -43,6 +43,14 @@ instance : ToJS SyncEventInit := ⟨fun d => Internal.fields #[("bubbles", Inter
   Lasm.JS.Binding.invoke SyncEvent { name := "Lasm.JS.Web.SyncEvent.new", module := "globalThis", path := "SyncEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS init]) (await := false)
 
+/-- `constructor(DOMString type, SyncEventInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def SyncEvent.new? (type : String) (init : SyncEventInit) : IO (Option SyncEvent) := Internal.api "Lasm.JS.Web.SyncEvent.new?" do
+  if !(← Internal.hasGlobal ["SyncEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke SyncEvent { name := "Lasm.JS.Web.SyncEvent.new?", module := "globalThis", path := "SyncEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS init]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString tag` -/
 @[macro_inline] def SyncEvent.tag (self : SyncEvent) : IO String := Internal.api "Lasm.JS.Web.SyncEvent.tag" do
   self.val.get "tag" String
@@ -67,6 +75,14 @@ instance : ToJS SyncEventInit := ⟨fun d => Internal.fields #[("bubbles", Inter
 @[macro_inline] def ServiceWorkerGlobalScope.onsync (self : ServiceWorkerGlobalScope) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onsync" do
   self.val.get "onsync" (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onsync` where the platform has it (`'onsync' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ServiceWorkerGlobalScope.onsync? (self' : ServiceWorkerGlobalScope) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.onsync?" do
+  let self := self'
+  if !(← Internal.has self.val "onsync") then return none
+  let lasmGuarded ← do
+    self.val.get "onsync" (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- Sets `onsync`: `attribute EventHandler onsync` -/
 @[macro_inline] def ServiceWorkerGlobalScope.setOnsync (self : ServiceWorkerGlobalScope) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.ServiceWorkerGlobalScope.setOnsync" do
   self.val.set "onsync" (toJS value)
@@ -75,5 +91,14 @@ instance : ToJS SyncEventInit := ⟨fun d => Internal.fields #[("bubbles", Inter
 @[macro_inline] def ServiceWorkerRegistration.sync (self : ServiceWorkerRegistration) : IO SyncManager := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.sync" do
   let r ← self.val.get "sync" Value
   pure { val := r }
+
+/-- `readonly attribute SyncManager sync` where the platform has it (`'sync' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ServiceWorkerRegistration.sync? (self' : ServiceWorkerRegistration) : IO (Option SyncManager) := Internal.api "Lasm.JS.Web.ServiceWorkerRegistration.sync?" do
+  let self := self'
+  if !(← Internal.has self.val "sync") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "sync" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

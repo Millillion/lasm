@@ -39,6 +39,14 @@ instance : ToJS ContentVisibilityAutoStateChangeEventInit := ⟨fun d => Interna
   Lasm.JS.Binding.invoke ContentVisibilityAutoStateChangeEvent { name := "Lasm.JS.Web.ContentVisibilityAutoStateChangeEvent.new", module := "globalThis", path := "ContentVisibilityAutoStateChangeEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional ContentVisibilityAutoStateChangeEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ContentVisibilityAutoStateChangeEvent.new? (type : String) (eventInitDict : Option ContentVisibilityAutoStateChangeEventInit := none) : IO (Option ContentVisibilityAutoStateChangeEvent) := Internal.api "Lasm.JS.Web.ContentVisibilityAutoStateChangeEvent.new?" do
+  if !(← Internal.hasGlobal ["ContentVisibilityAutoStateChangeEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ContentVisibilityAutoStateChangeEvent { name := "Lasm.JS.Web.ContentVisibilityAutoStateChangeEvent.new?", module := "globalThis", path := "ContentVisibilityAutoStateChangeEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute boolean skipped` -/
 @[macro_inline] def ContentVisibilityAutoStateChangeEvent.skipped (self : ContentVisibilityAutoStateChangeEvent) : IO Bool := Internal.api "Lasm.JS.Web.ContentVisibilityAutoStateChangeEvent.skipped" do
   self.val.get "skipped" Bool

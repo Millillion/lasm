@@ -90,6 +90,14 @@ instance : Coe String DocumentOrBlobOrBufferSourceOrFormDataOrURLSearchParamsOrU
   Lasm.JS.Binding.invoke FormData { name := "Lasm.JS.Web.FormData.new", module := "globalThis", path := "FormData", construct := true, arity := 2 }
     (Internal.args #[Internal.optional form, Internal.optional submitter]) (await := false)
 
+/-- `constructor(optional HTMLFormElement form, optional HTMLElement? submitter)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def FormData.new? (form : Option HTMLFormElement := none) (submitter : Option HTMLElement := none) : IO (Option FormData) := Internal.api "Lasm.JS.Web.FormData.new?" do
+  if !(← Internal.hasGlobal ["FormData"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke FormData { name := "Lasm.JS.Web.FormData.new?", module := "globalThis", path := "FormData", construct := true, arity := 2 }
+      (Internal.args #[Internal.optional form, Internal.optional submitter]) (await := false)
+  return some lasmGuarded
+
 /-- `undefined append(USVString name, USVString value)` -/
 @[macro_inline] def FormData.append (self : FormData) (name : String) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.FormData.append" do
   self.val.callMethod "append" (Internal.args #[toJS name, toJS value]) Unit
@@ -142,6 +150,14 @@ instance : Coe String DocumentOrBlobOrBufferSourceOrFormDataOrURLSearchParamsOrU
 @[macro_inline] def ProgressEvent.new (type : String) (eventInitDict : Option ProgressEventInit := none) : IO ProgressEvent := Internal.api "Lasm.JS.Web.ProgressEvent.new" do
   Lasm.JS.Binding.invoke ProgressEvent { name := "Lasm.JS.Web.ProgressEvent.new", module := "globalThis", path := "ProgressEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, optional ProgressEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ProgressEvent.new? (type : String) (eventInitDict : Option ProgressEventInit := none) : IO (Option ProgressEvent) := Internal.api "Lasm.JS.Web.ProgressEvent.new?" do
+  if !(← Internal.hasGlobal ["ProgressEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ProgressEvent { name := "Lasm.JS.Web.ProgressEvent.new?", module := "globalThis", path := "ProgressEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute boolean lengthComputable` -/
 @[macro_inline] def ProgressEvent.lengthComputable (self : ProgressEvent) : IO Bool := Internal.api "Lasm.JS.Web.ProgressEvent.lengthComputable" do
@@ -223,6 +239,14 @@ instance : Coe String DocumentOrBlobOrBufferSourceOrFormDataOrURLSearchParamsOrU
 @[macro_inline] def XMLHttpRequest.new : IO XMLHttpRequest := Internal.api "Lasm.JS.Web.XMLHttpRequest.new" do
   Lasm.JS.Binding.invoke XMLHttpRequest { name := "Lasm.JS.Web.XMLHttpRequest.new", module := "globalThis", path := "XMLHttpRequest", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
+
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def XMLHttpRequest.new? : IO (Option XMLHttpRequest) := Internal.api "Lasm.JS.Web.XMLHttpRequest.new?" do
+  if !(← Internal.hasGlobal ["XMLHttpRequest"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke XMLHttpRequest { name := "Lasm.JS.Web.XMLHttpRequest.new?", module := "globalThis", path := "XMLHttpRequest", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
 
 /-- `const unsigned short UNSENT = 0` -/
 def XMLHttpRequest.UNSENT : Nat := 0

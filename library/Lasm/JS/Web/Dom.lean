@@ -294,6 +294,14 @@ instance : ToJS ShadowRootInit := ⟨fun d => Internal.fields #[("mode", toJS d.
   Lasm.JS.Binding.invoke AbortController { name := "Lasm.JS.Web.AbortController.new", module := "globalThis", path := "AbortController", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def AbortController.new? : IO (Option AbortController) := Internal.api "Lasm.JS.Web.AbortController.new?" do
+  if !(← Internal.hasGlobal ["AbortController"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke AbortController { name := "Lasm.JS.Web.AbortController.new?", module := "globalThis", path := "AbortController", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute AbortSignal signal` -/
 @[macro_inline] def AbortController.signal (self : AbortController) : IO AbortSignal := Internal.api "Lasm.JS.Web.AbortController.signal" do
   let r ← self.val.get "signal" Value
@@ -413,6 +421,14 @@ instance : ToJS ShadowRootInit := ⟨fun d => Internal.fields #[("mode", toJS d.
   Lasm.JS.Binding.invoke Event { name := "Lasm.JS.Web.Event.new", module := "globalThis", path := "Event", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional EventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Event.new? (type : String) (eventInitDict : Option EventInit := none) : IO (Option Event) := Internal.api "Lasm.JS.Web.Event.new?" do
+  if !(← Internal.hasGlobal ["Event"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Event { name := "Lasm.JS.Web.Event.new?", module := "globalThis", path := "Event", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `const unsigned short NONE = 0` -/
 def Event.NONE : Nat := 0
 
@@ -505,6 +521,14 @@ def Event.BUBBLING_PHASE : Nat := 3
 @[macro_inline] def Event.initEvent (self : Event) (type : String) (bubbles : Option Bool := none) (cancelable : Option Bool := none) : IO Unit := Internal.api "Lasm.JS.Web.Event.initEvent" do
   self.val.callMethod "initEvent" (Internal.args #[toJS type, Internal.optional bubbles, Internal.optional cancelable]) Unit
 
+/-- `undefined initEvent(DOMString type, optional boolean bubbles, optional boolean cancelable)` where the platform has it (`'initEvent' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Event.initEvent? (self' : Event) (type : String) (bubbles : Option Bool := none) (cancelable : Option Bool := none) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Event.initEvent?" do
+  let self := self'
+  if !(← Internal.has self.val "initEvent") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "initEvent" (Internal.args #[toJS type, Internal.optional bubbles, Internal.optional cancelable]) Unit
+  return some lasmGuarded
+
 /-- `v instanceof EventTarget`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `EventTarget`). -/
 @[macro_inline] def EventTarget.cast? (v : Value) : IO (Option EventTarget) := Internal.api "Lasm.JS.Web.EventTarget.cast?" do
   Internal.cast (Internal.getGlobal ["EventTarget"] Value) (fun x => { val := x }) v
@@ -513,6 +537,14 @@ def Event.BUBBLING_PHASE : Nat := 3
 @[macro_inline] def EventTarget.new : IO EventTarget := Internal.api "Lasm.JS.Web.EventTarget.new" do
   Lasm.JS.Binding.invoke EventTarget { name := "Lasm.JS.Web.EventTarget.new", module := "globalThis", path := "EventTarget", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
+
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def EventTarget.new? : IO (Option EventTarget) := Internal.api "Lasm.JS.Web.EventTarget.new?" do
+  if !(← Internal.hasGlobal ["EventTarget"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke EventTarget { name := "Lasm.JS.Web.EventTarget.new?", module := "globalThis", path := "EventTarget", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
 
 /-- `undefined addEventListener(DOMString type, EventListener? callback, optional (AddEventListenerOptions or boolean) options)` -/
 @[macro_inline] def EventTarget.addEventListener (self : EventTarget) (type : String) (callback : Option EventListener) (options : Option AddEventListenerOptionsOrBoolean := none) : IO Unit := Internal.api "Lasm.JS.Web.EventTarget.addEventListener" do
@@ -550,6 +582,14 @@ def Event.BUBBLING_PHASE : Nat := 3
 @[macro_inline] def MutationObserver.new (callback : MutationCallback) : IO MutationObserver := Internal.api "Lasm.JS.Web.MutationObserver.new" do
   Lasm.JS.Binding.invoke MutationObserver { name := "Lasm.JS.Web.MutationObserver.new", module := "globalThis", path := "MutationObserver", construct := true, arity := 1 }
     (Internal.args #[toJS callback]) (await := false)
+
+/-- `constructor(MutationCallback callback)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def MutationObserver.new? (callback : MutationCallback) : IO (Option MutationObserver) := Internal.api "Lasm.JS.Web.MutationObserver.new?" do
+  if !(← Internal.hasGlobal ["MutationObserver"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke MutationObserver { name := "Lasm.JS.Web.MutationObserver.new?", module := "globalThis", path := "MutationObserver", construct := true, arity := 1 }
+      (Internal.args #[toJS callback]) (await := false)
+  return some lasmGuarded
 
 /-- `undefined observe(Node target, optional MutationObserverInit options)` -/
 @[macro_inline] def MutationObserver.observe (self : MutationObserver) (target : Node) (options : Option MutationObserverInit := none) : IO Unit := Internal.api "Lasm.JS.Web.MutationObserver.observe" do
@@ -761,6 +801,14 @@ def Event.BUBBLING_PHASE : Nat := 3
   Lasm.JS.Binding.invoke XPathEvaluator { name := "Lasm.JS.Web.XPathEvaluator.new", module := "globalThis", path := "XPathEvaluator", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def XPathEvaluator.new? : IO (Option XPathEvaluator) := Internal.api "Lasm.JS.Web.XPathEvaluator.new?" do
+  if !(← Internal.hasGlobal ["XPathEvaluator"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke XPathEvaluator { name := "Lasm.JS.Web.XPathEvaluator.new?", module := "globalThis", path := "XPathEvaluator", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `XPathExpression createExpression(DOMString expression, optional XPathNSResolver? resolver)` -/
 @[macro_inline] def XPathEvaluator.createExpression (self : XPathEvaluator) (expression : String) (resolver : Option XPathNSResolver := none) : IO XPathExpression := Internal.api "Lasm.JS.Web.XPathEvaluator.createExpression" do
   let r ← self.val.callMethod "createExpression" (Internal.args #[toJS expression, Internal.optional resolver]) Value
@@ -864,6 +912,14 @@ def XPathResult.FIRST_ORDERED_NODE_TYPE : Nat := 9
   Lasm.JS.Binding.invoke XSLTProcessor { name := "Lasm.JS.Web.XSLTProcessor.new", module := "globalThis", path := "XSLTProcessor", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def XSLTProcessor.new? : IO (Option XSLTProcessor) := Internal.api "Lasm.JS.Web.XSLTProcessor.new?" do
+  if !(← Internal.hasGlobal ["XSLTProcessor"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke XSLTProcessor { name := "Lasm.JS.Web.XSLTProcessor.new?", module := "globalThis", path := "XSLTProcessor", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `undefined importStylesheet(Node style)` -/
 @[macro_inline] def XSLTProcessor.importStylesheet (self : XSLTProcessor) (style : Node) : IO Unit := Internal.api "Lasm.JS.Web.XSLTProcessor.importStylesheet" do
   self.val.callMethod "importStylesheet" (Internal.args #[toJS style]) Unit
@@ -936,6 +992,15 @@ def XPathResult.FIRST_ORDERED_NODE_TYPE : Nat := 9
     (Internal.args #[toJS signals]) (await := false)
   pure { val := r }
 
+/-- `static AbortSignal any(sequence<AbortSignal> signals)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def AbortSignal.any? (signals : Array AbortSignal) : IO (Option AbortSignal) := Internal.api "Lasm.JS.Web.AbortSignal.any?" do
+  if !(← Internal.hasGlobal ["AbortSignal", "any"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invoke Value { name := "Lasm.JS.Web.AbortSignal.any?", module := "globalThis", path := "AbortSignal.any", construct := false, arity := 1 }
+      (Internal.args #[toJS signals]) (await := false)
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `undefined throwIfAborted()` -/
 @[macro_inline] def AbortSignal.throwIfAborted (self : AbortSignal) : IO Unit := Internal.api "Lasm.JS.Web.AbortSignal.throwIfAborted" do
   self.val.callMethod "throwIfAborted" (Internal.args #[]) Unit
@@ -949,6 +1014,14 @@ def XPathResult.FIRST_ORDERED_NODE_TYPE : Nat := 9
   Lasm.JS.Binding.invoke CustomEvent { name := "Lasm.JS.Web.CustomEvent.new", module := "globalThis", path := "CustomEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional CustomEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CustomEvent.new? (type : String) (eventInitDict : Option CustomEventInit := none) : IO (Option CustomEvent) := Internal.api "Lasm.JS.Web.CustomEvent.new?" do
+  if !(← Internal.hasGlobal ["CustomEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke CustomEvent { name := "Lasm.JS.Web.CustomEvent.new?", module := "globalThis", path := "CustomEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute any detail` -/
 @[macro_inline] def CustomEvent.detail (self : CustomEvent) : IO Data := Internal.api "Lasm.JS.Web.CustomEvent.detail" do
   self.val.get "detail" Data
@@ -956,6 +1029,14 @@ def XPathResult.FIRST_ORDERED_NODE_TYPE : Nat := 9
 /-- `undefined initCustomEvent(DOMString type, optional boolean bubbles, optional boolean cancelable, optional any detail)` -/
 @[macro_inline] def CustomEvent.initCustomEvent (self : CustomEvent) (type : String) (bubbles : Option Bool := none) (cancelable : Option Bool := none) (detail : Data := .undefined) : IO Unit := Internal.api "Lasm.JS.Web.CustomEvent.initCustomEvent" do
   self.val.callMethod "initCustomEvent" (Internal.args #[toJS type, Internal.optional bubbles, Internal.optional cancelable, detail]) Unit
+
+/-- `undefined initCustomEvent(DOMString type, optional boolean bubbles, optional boolean cancelable, optional any detail)` where the platform has it (`'initCustomEvent' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CustomEvent.initCustomEvent? (self' : CustomEvent) (type : String) (bubbles : Option Bool := none) (cancelable : Option Bool := none) (detail : Data := .undefined) : IO (Option Unit) := Internal.api "Lasm.JS.Web.CustomEvent.initCustomEvent?" do
+  let self := self'
+  if !(← Internal.has self.val "initCustomEvent") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "initCustomEvent" (Internal.args #[toJS type, Internal.optional bubbles, Internal.optional cancelable, detail]) Unit
+  return some lasmGuarded
 
 /-- `v instanceof Node`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Node`). -/
 @[macro_inline] def Node.cast? (v : Value) : IO (Option Node) := Internal.api "Lasm.JS.Web.Node.cast?" do
@@ -1155,6 +1236,14 @@ def Node.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC : Nat := 0x20
   Lasm.JS.Binding.invoke Range { name := "Lasm.JS.Web.Range.new", module := "globalThis", path := "Range", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Range.new? : IO (Option Range) := Internal.api "Lasm.JS.Web.Range.new?" do
+  if !(← Internal.hasGlobal ["Range"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Range { name := "Lasm.JS.Web.Range.new?", module := "globalThis", path := "Range", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `const unsigned short START_TO_START = 0` -/
 def Range.START_TO_START : Nat := 0
 
@@ -1268,6 +1357,14 @@ def Range.END_TO_START : Nat := 3
   Lasm.JS.Binding.invoke StaticRange { name := "Lasm.JS.Web.StaticRange.new", module := "globalThis", path := "StaticRange", construct := true, arity := 1 }
     (Internal.args #[toJS init]) (await := false)
 
+/-- `constructor(StaticRangeInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def StaticRange.new? (init : StaticRangeInit) : IO (Option StaticRange) := Internal.api "Lasm.JS.Web.StaticRange.new?" do
+  if !(← Internal.hasGlobal ["StaticRange"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke StaticRange { name := "Lasm.JS.Web.StaticRange.new?", module := "globalThis", path := "StaticRange", construct := true, arity := 1 }
+      (Internal.args #[toJS init]) (await := false)
+  return some lasmGuarded
+
 /-- `v instanceof Attr`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Attr`). -/
 @[macro_inline] def Attr.cast? (v : Value) : IO (Option Attr) := Internal.api "Lasm.JS.Web.Attr.cast?" do
   Internal.cast (Internal.getGlobal ["Attr"] Value) (fun x => { val := x }) v
@@ -1373,6 +1470,14 @@ def Range.END_TO_START : Nat := 3
   Lasm.JS.Binding.invoke Document { name := "Lasm.JS.Web.Document.new", module := "globalThis", path := "Document", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Document.new? : IO (Option Document) := Internal.api "Lasm.JS.Web.Document.new?" do
+  if !(← Internal.hasGlobal ["Document"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Document { name := "Lasm.JS.Web.Document.new?", module := "globalThis", path := "Document", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMImplementation implementation` -/
 @[macro_inline] def Document.implementation (self : Document) : IO DOMImplementation := Internal.api "Lasm.JS.Web.Document.implementation" do
   let r ← self.val.get "implementation" Value
@@ -1417,6 +1522,14 @@ def Range.END_TO_START : Nat := 3
 /-- `readonly attribute CustomElementRegistry? customElementRegistry` -/
 @[macro_inline] def Document.customElementRegistry (self : Document) : IO (Option CustomElementRegistry) := Internal.api "Lasm.JS.Web.Document.customElementRegistry" do
   self.val.get "customElementRegistry" (Option CustomElementRegistry)
+
+/-- `readonly attribute CustomElementRegistry? customElementRegistry` where the platform has it (`'customElementRegistry' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Document.customElementRegistry? (self' : Document) : IO (Option (Option CustomElementRegistry)) := Internal.api "Lasm.JS.Web.Document.customElementRegistry?" do
+  let self := self'
+  if !(← Internal.has self.val "customElementRegistry") then return none
+  let lasmGuarded ← do
+    self.val.get "customElementRegistry" (Option CustomElementRegistry)
+  return some lasmGuarded
 
 /-- `readonly attribute HTMLCollection children` -/
 @[macro_inline] def Document.children (self : Document) : IO HTMLCollection := Internal.api "Lasm.JS.Web.Document.children" do
@@ -1545,6 +1658,14 @@ def Range.END_TO_START : Nat := 3
 @[macro_inline] def Document.moveBefore (self : Document) (node : Node) (child : Option Node) : IO Unit := Internal.api "Lasm.JS.Web.Document.moveBefore" do
   self.val.callMethod "moveBefore" (Internal.args #[toJS node, toJS child]) Unit
 
+/-- `undefined moveBefore(Node node, Node? child)` where the platform has it (`'moveBefore' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Document.moveBefore? (self' : Document) (node : Node) (child : Option Node) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Document.moveBefore?" do
+  let self := self'
+  if !(← Internal.has self.val "moveBefore") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "moveBefore" (Internal.args #[toJS node, toJS child]) Unit
+  return some lasmGuarded
+
 /-- `Element? querySelector(DOMString selectors)` -/
 @[macro_inline] def Document.querySelector (self : Document) (selectors : String) : IO (Option Element) := Internal.api "Lasm.JS.Web.Document.querySelector" do
   self.val.callMethod "querySelector" (Internal.args #[toJS selectors]) (Option Element)
@@ -1577,6 +1698,14 @@ def Range.END_TO_START : Nat := 3
 @[macro_inline] def DocumentFragment.new : IO DocumentFragment := Internal.api "Lasm.JS.Web.DocumentFragment.new" do
   Lasm.JS.Binding.invoke DocumentFragment { name := "Lasm.JS.Web.DocumentFragment.new", module := "globalThis", path := "DocumentFragment", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
+
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DocumentFragment.new? : IO (Option DocumentFragment) := Internal.api "Lasm.JS.Web.DocumentFragment.new?" do
+  if !(← Internal.hasGlobal ["DocumentFragment"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke DocumentFragment { name := "Lasm.JS.Web.DocumentFragment.new?", module := "globalThis", path := "DocumentFragment", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute HTMLCollection children` -/
 @[macro_inline] def DocumentFragment.children (self : DocumentFragment) : IO HTMLCollection := Internal.api "Lasm.JS.Web.DocumentFragment.children" do
@@ -1614,6 +1743,14 @@ def Range.END_TO_START : Nat := 3
 /-- `undefined moveBefore(Node node, Node? child)` -/
 @[macro_inline] def DocumentFragment.moveBefore (self : DocumentFragment) (node : Node) (child : Option Node) : IO Unit := Internal.api "Lasm.JS.Web.DocumentFragment.moveBefore" do
   self.val.callMethod "moveBefore" (Internal.args #[toJS node, toJS child]) Unit
+
+/-- `undefined moveBefore(Node node, Node? child)` where the platform has it (`'moveBefore' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def DocumentFragment.moveBefore? (self' : DocumentFragment) (node : Node) (child : Option Node) : IO (Option Unit) := Internal.api "Lasm.JS.Web.DocumentFragment.moveBefore?" do
+  let self := self'
+  if !(← Internal.has self.val "moveBefore") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "moveBefore" (Internal.args #[toJS node, toJS child]) Unit
+  return some lasmGuarded
 
 /-- `Element? querySelector(DOMString selectors)` -/
 @[macro_inline] def DocumentFragment.querySelector (self : DocumentFragment) (selectors : String) : IO (Option Element) := Internal.api "Lasm.JS.Web.DocumentFragment.querySelector" do
@@ -1717,6 +1854,14 @@ def Range.END_TO_START : Nat := 3
 /-- `readonly attribute CustomElementRegistry? customElementRegistry` -/
 @[macro_inline] def Element.customElementRegistry (self : Element) : IO (Option CustomElementRegistry) := Internal.api "Lasm.JS.Web.Element.customElementRegistry" do
   self.val.get "customElementRegistry" (Option CustomElementRegistry)
+
+/-- `readonly attribute CustomElementRegistry? customElementRegistry` where the platform has it (`'customElementRegistry' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Element.customElementRegistry? (self' : Element) : IO (Option (Option CustomElementRegistry)) := Internal.api "Lasm.JS.Web.Element.customElementRegistry?" do
+  let self := self'
+  if !(← Internal.has self.val "customElementRegistry") then return none
+  let lasmGuarded ← do
+    self.val.get "customElementRegistry" (Option CustomElementRegistry)
+  return some lasmGuarded
 
 /-- `readonly attribute HTMLCollection children` -/
 @[macro_inline] def Element.children (self : Element) : IO HTMLCollection := Internal.api "Lasm.JS.Web.Element.children" do
@@ -1868,6 +2013,14 @@ def Range.END_TO_START : Nat := 3
 @[macro_inline] def Element.moveBefore (self : Element) (node : Node) (child : Option Node) : IO Unit := Internal.api "Lasm.JS.Web.Element.moveBefore" do
   self.val.callMethod "moveBefore" (Internal.args #[toJS node, toJS child]) Unit
 
+/-- `undefined moveBefore(Node node, Node? child)` where the platform has it (`'moveBefore' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Element.moveBefore? (self' : Element) (node : Node) (child : Option Node) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Element.moveBefore?" do
+  let self := self'
+  if !(← Internal.has self.val "moveBefore") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "moveBefore" (Internal.args #[toJS node, toJS child]) Unit
+  return some lasmGuarded
+
 /-- `Element? querySelector(DOMString selectors)` -/
 @[macro_inline] def Element.querySelector (self : Element) (selectors : String) : IO (Option Element) := Internal.api "Lasm.JS.Web.Element.querySelector" do
   self.val.callMethod "querySelector" (Internal.args #[toJS selectors]) (Option Element)
@@ -1902,6 +2055,14 @@ def Range.END_TO_START : Nat := 3
   Lasm.JS.Binding.invoke Comment { name := "Lasm.JS.Web.Comment.new", module := "globalThis", path := "Comment", construct := true, arity := 1 }
     (Internal.args #[Internal.optional data]) (await := false)
 
+/-- `constructor(optional DOMString data)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Comment.new? (data : Option String := none) : IO (Option Comment) := Internal.api "Lasm.JS.Web.Comment.new?" do
+  if !(← Internal.hasGlobal ["Comment"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Comment { name := "Lasm.JS.Web.Comment.new?", module := "globalThis", path := "Comment", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional data]) (await := false)
+  return some lasmGuarded
+
 /-- `v instanceof ProcessingInstruction`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ProcessingInstruction`). -/
 @[macro_inline] def ProcessingInstruction.cast? (v : Value) : IO (Option ProcessingInstruction) := Internal.api "Lasm.JS.Web.ProcessingInstruction.cast?" do
   Internal.cast (Internal.getGlobal ["ProcessingInstruction"] Value) (fun x => { val := x }) v
@@ -1911,6 +2072,14 @@ def Range.END_TO_START : Nat := 3
   Lasm.JS.Binding.invoke ProcessingInstruction { name := "Lasm.JS.Web.ProcessingInstruction.new", module := "globalThis", path := "ProcessingInstruction", construct := true, arity := 2 }
     (Internal.args #[toJS target, Internal.optional data]) (await := false)
 
+/-- `constructor(DOMString target, optional DOMString data)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ProcessingInstruction.new? (target : String) (data : Option String := none) : IO (Option ProcessingInstruction) := Internal.api "Lasm.JS.Web.ProcessingInstruction.new?" do
+  if !(← Internal.hasGlobal ["ProcessingInstruction"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ProcessingInstruction { name := "Lasm.JS.Web.ProcessingInstruction.new?", module := "globalThis", path := "ProcessingInstruction", construct := true, arity := 2 }
+      (Internal.args #[toJS target, Internal.optional data]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString target` -/
 @[macro_inline] def ProcessingInstruction.target (self : ProcessingInstruction) : IO String := Internal.api "Lasm.JS.Web.ProcessingInstruction.target" do
   self.val.get "target" String
@@ -1919,29 +2088,85 @@ def Range.END_TO_START : Nat := 3
 @[macro_inline] def ProcessingInstruction.hasAttributes (self : ProcessingInstruction) : IO Bool := Internal.api "Lasm.JS.Web.ProcessingInstruction.hasAttributes" do
   self.val.callMethod "hasAttributes" (Internal.args #[]) Bool
 
+/-- `boolean hasAttributes()` where the platform has it (`'hasAttributes' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ProcessingInstruction.hasAttributes? (self' : ProcessingInstruction) : IO (Option Bool) := Internal.api "Lasm.JS.Web.ProcessingInstruction.hasAttributes?" do
+  let self := self'
+  if !(← Internal.has self.val "hasAttributes") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "hasAttributes" (Internal.args #[]) Bool
+  return some lasmGuarded
+
 /-- `sequence<DOMString> getAttributeNames()` -/
 @[macro_inline] def ProcessingInstruction.getAttributeNames (self : ProcessingInstruction) : IO (Array String) := Internal.api "Lasm.JS.Web.ProcessingInstruction.getAttributeNames" do
   self.val.callMethod "getAttributeNames" (Internal.args #[]) (Array String)
+
+/-- `sequence<DOMString> getAttributeNames()` where the platform has it (`'getAttributeNames' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ProcessingInstruction.getAttributeNames? (self' : ProcessingInstruction) : IO (Option (Array String)) := Internal.api "Lasm.JS.Web.ProcessingInstruction.getAttributeNames?" do
+  let self := self'
+  if !(← Internal.has self.val "getAttributeNames") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getAttributeNames" (Internal.args #[]) (Array String)
+  return some lasmGuarded
 
 /-- `DOMString? getAttribute(DOMString name)` -/
 @[macro_inline] def ProcessingInstruction.getAttribute (self : ProcessingInstruction) (name : String) : IO (Option String) := Internal.api "Lasm.JS.Web.ProcessingInstruction.getAttribute" do
   self.val.callMethod "getAttribute" (Internal.args #[toJS name]) (Option String)
 
+/-- `DOMString? getAttribute(DOMString name)` where the platform has it (`'getAttribute' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ProcessingInstruction.getAttribute? (self' : ProcessingInstruction) (name : String) : IO (Option (Option String)) := Internal.api "Lasm.JS.Web.ProcessingInstruction.getAttribute?" do
+  let self := self'
+  if !(← Internal.has self.val "getAttribute") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "getAttribute" (Internal.args #[toJS name]) (Option String)
+  return some lasmGuarded
+
 /-- `undefined setAttribute(DOMString name, DOMString value)` -/
 @[macro_inline] def ProcessingInstruction.setAttribute (self : ProcessingInstruction) (name : String) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.ProcessingInstruction.setAttribute" do
   self.val.callMethod "setAttribute" (Internal.args #[toJS name, toJS value]) Unit
+
+/-- `undefined setAttribute(DOMString name, DOMString value)` where the platform has it (`'setAttribute' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ProcessingInstruction.setAttribute? (self' : ProcessingInstruction) (name : String) (value : String) : IO (Option Unit) := Internal.api "Lasm.JS.Web.ProcessingInstruction.setAttribute?" do
+  let self := self'
+  if !(← Internal.has self.val "setAttribute") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "setAttribute" (Internal.args #[toJS name, toJS value]) Unit
+  return some lasmGuarded
 
 /-- `undefined removeAttribute(DOMString name)` -/
 @[macro_inline] def ProcessingInstruction.removeAttribute (self : ProcessingInstruction) (name : String) : IO Unit := Internal.api "Lasm.JS.Web.ProcessingInstruction.removeAttribute" do
   self.val.callMethod "removeAttribute" (Internal.args #[toJS name]) Unit
 
+/-- `undefined removeAttribute(DOMString name)` where the platform has it (`'removeAttribute' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ProcessingInstruction.removeAttribute? (self' : ProcessingInstruction) (name : String) : IO (Option Unit) := Internal.api "Lasm.JS.Web.ProcessingInstruction.removeAttribute?" do
+  let self := self'
+  if !(← Internal.has self.val "removeAttribute") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "removeAttribute" (Internal.args #[toJS name]) Unit
+  return some lasmGuarded
+
 /-- `boolean toggleAttribute(DOMString name, optional boolean force)` -/
 @[macro_inline] def ProcessingInstruction.toggleAttribute (self : ProcessingInstruction) (name : String) (force : Option Bool := none) : IO Bool := Internal.api "Lasm.JS.Web.ProcessingInstruction.toggleAttribute" do
   self.val.callMethod "toggleAttribute" (Internal.args #[toJS name, Internal.optional force]) Bool
 
+/-- `boolean toggleAttribute(DOMString name, optional boolean force)` where the platform has it (`'toggleAttribute' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ProcessingInstruction.toggleAttribute? (self' : ProcessingInstruction) (name : String) (force : Option Bool := none) : IO (Option Bool) := Internal.api "Lasm.JS.Web.ProcessingInstruction.toggleAttribute?" do
+  let self := self'
+  if !(← Internal.has self.val "toggleAttribute") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "toggleAttribute" (Internal.args #[toJS name, Internal.optional force]) Bool
+  return some lasmGuarded
+
 /-- `boolean hasAttribute(DOMString name)` -/
 @[macro_inline] def ProcessingInstruction.hasAttribute (self : ProcessingInstruction) (name : String) : IO Bool := Internal.api "Lasm.JS.Web.ProcessingInstruction.hasAttribute" do
   self.val.callMethod "hasAttribute" (Internal.args #[toJS name]) Bool
+
+/-- `boolean hasAttribute(DOMString name)` where the platform has it (`'hasAttribute' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ProcessingInstruction.hasAttribute? (self' : ProcessingInstruction) (name : String) : IO (Option Bool) := Internal.api "Lasm.JS.Web.ProcessingInstruction.hasAttribute?" do
+  let self := self'
+  if !(← Internal.has self.val "hasAttribute") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "hasAttribute" (Internal.args #[toJS name]) Bool
+  return some lasmGuarded
 
 /-- `v instanceof ShadowRoot`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `ShadowRoot`). -/
 @[macro_inline] def ShadowRoot.cast? (v : Value) : IO (Option ShadowRoot) := Internal.api "Lasm.JS.Web.ShadowRoot.cast?" do
@@ -1984,6 +2209,14 @@ def Range.END_TO_START : Nat := 3
 @[macro_inline] def ShadowRoot.customElementRegistry (self : ShadowRoot) : IO (Option CustomElementRegistry) := Internal.api "Lasm.JS.Web.ShadowRoot.customElementRegistry" do
   self.val.get "customElementRegistry" (Option CustomElementRegistry)
 
+/-- `readonly attribute CustomElementRegistry? customElementRegistry` where the platform has it (`'customElementRegistry' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def ShadowRoot.customElementRegistry? (self' : ShadowRoot) : IO (Option (Option CustomElementRegistry)) := Internal.api "Lasm.JS.Web.ShadowRoot.customElementRegistry?" do
+  let self := self'
+  if !(← Internal.has self.val "customElementRegistry") then return none
+  let lasmGuarded ← do
+    self.val.get "customElementRegistry" (Option CustomElementRegistry)
+  return some lasmGuarded
+
 /-- `v instanceof Text`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Text`). -/
 @[macro_inline] def Text.cast? (v : Value) : IO (Option Text) := Internal.api "Lasm.JS.Web.Text.cast?" do
   Internal.cast (Internal.getGlobal ["Text"] Value) (fun x => { val := x }) v
@@ -1992,6 +2225,14 @@ def Range.END_TO_START : Nat := 3
 @[macro_inline] def Text.new (data : Option String := none) : IO Text := Internal.api "Lasm.JS.Web.Text.new" do
   Lasm.JS.Binding.invoke Text { name := "Lasm.JS.Web.Text.new", module := "globalThis", path := "Text", construct := true, arity := 1 }
     (Internal.args #[Internal.optional data]) (await := false)
+
+/-- `constructor(optional DOMString data)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Text.new? (data : Option String := none) : IO (Option Text) := Internal.api "Lasm.JS.Web.Text.new?" do
+  if !(← Internal.hasGlobal ["Text"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Text { name := "Lasm.JS.Web.Text.new?", module := "globalThis", path := "Text", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional data]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString wholeText` -/
 @[macro_inline] def Text.wholeText (self : Text) : IO String := Internal.api "Lasm.JS.Web.Text.wholeText" do
@@ -2018,8 +2259,23 @@ def Range.END_TO_START : Nat := 3
 @[macro_inline] def Window.event (self : Window) : IO (Option Event) := Internal.api "Lasm.JS.Web.Window.event" do
   self.val.get "event" (Option Event)
 
+/-- `readonly attribute (Event or undefined) event` where the platform has it (`'event' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.event? (self' : Window) : IO (Option (Option Event)) := Internal.api "Lasm.JS.Web.Window.event?" do
+  let self := self'
+  if !(← Internal.has self.val "event") then return none
+  let lasmGuarded ← do
+    self.val.get "event" (Option Event)
+  return some lasmGuarded
+
 /-- `readonly attribute (Event or undefined) event` (DOM Standard (https://dom.spec.whatwg.org/)) -/
 @[macro_inline] def event : IO (Option Event) := Internal.api "Lasm.JS.Web.event" do
   Internal.getGlobal ["event"] (Option Event)
+
+/-- `readonly attribute (Event or undefined) event` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def event? : IO (Option (Option Event)) := Internal.api "Lasm.JS.Web.event?" do
+  if !(← Internal.hasGlobal ["event"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["event"] (Option Event)
+  return some lasmGuarded
 
 end Lasm.JS.Web

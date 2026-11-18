@@ -14,7 +14,7 @@ test('lasm init arguments', () => {
   assert.throws(() => parseLasmArguments(['init', '-t=std-http', 'x', '--deploy', 'lambda']), /has no --deploy targets/);
   assert.throws(() => parseLasmArguments(['init', 'x', '--deploy', 'lambda']), /needs a server template/);
   assert.deepEqual(parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=vercel', '--deploy', 'lambda-container', '--deploy', 'vercel']).deploy, ['vercel', 'lambda-container']);
-  assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=pages']), /--deploy accepts lambda, lambda-container, lambda-edge, vercel, netlify, azure, gcf, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge/);
+  assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=pages']), /Unknown deploy target "pages". Choose one of: lambda, lambda-container, lambda-edge, vercel, netlify, azure-functions, cloud-functions, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge/);
   // Cloudflare Workers (edge build): the Hono template only.
   assert.deepEqual(parseLasmArguments(['init', 'x', '-t', 'hono', '--deploy=workers']).deploy, ['workers']);
   assert.throws(() => parseLasmArguments(['init', 'x', '-t', 'express', '--deploy', 'workers']), /--deploy workers supports the hono, fetch and fullstack templates, not express/);
@@ -75,11 +75,11 @@ test('every template creates a complete project', () => {
     assert.match(readFileSync(join(lambda, 'README.md'), 'utf8'), /Dockerfile\.lambda/);
     // Function platforms: npm scripts that build the default export (Export.lean) with lasm package, platform files and packages.
     const functions = join(root, 'functions');
-    const created = initProject({ directory: functions, template: 'fetch', deploy: ['lambda', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'] }).files;
+    const created = initProject({ directory: functions, template: 'fetch', deploy: ['lambda', 'lambda-edge', 'vercel', 'netlify', 'azure-functions', 'cloud-functions'] }).files;
     for (const file of ['vercel.json', 'netlify.toml', 'public/.gitkeep']) assert.ok(created.includes(file), file);
     assert.ok(!created.includes('Dockerfile.lambda'));
     const pkg = JSON.parse(readFileSync(join(functions, 'package.json'), 'utf8'));
-    for (const target of ['lambda', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'])
+    for (const target of ['lambda', 'lambda-edge', 'vercel', 'netlify', 'azure-functions', 'cloud-functions'])
       assert.equal(pkg.scripts[`build:${target}`], `lasm build Export.lean --target ${target}`);
     // Platform CLIs are the user's: never dependencies of a generated project.
     for (const cli of ['vercel', 'netlify-cli', 'aws-sam-cli', 'azure-functions-core-tools', '@google-cloud/functions-framework-cli'])
@@ -221,7 +221,7 @@ test('entryFile: Main.lean on Node, Export.lean for the default export, Fastly.l
   for (const template of ['fetch', 'hono']) {
     assert.equal(entryFile(template, 'node'), 'Main.lean', template);
     assert.equal(entryFile(template, undefined), 'Main.lean', template);
-    for (const platform of ['bun', 'deno', 'workers', 'vercel-edge', 'lambda', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'])
+    for (const platform of ['bun', 'deno', 'workers', 'vercel-edge', 'lambda', 'lambda-edge', 'vercel', 'netlify', 'azure-functions', 'cloud-functions'])
       assert.equal(entryFile(template, platform), 'Export.lean', `${template} ${platform}`);
   }
   assert.equal(entryFile('fetch', 'fastly'), 'Fastly.lean');
@@ -237,7 +237,7 @@ test('entryFile: Main.lean on Node, Export.lean for the default export, Fastly.l
 
 // Which templates the function platforms take (API decisions 0.2-10, 0.2-11).
 test('the function platforms and the Lambda image take only the templates with a handler', () => {
-  const functionTargets = ['lambda', 'lambda-container', 'lambda-edge', 'vercel', 'netlify', 'azure', 'gcf'];
+  const functionTargets = ['lambda', 'lambda-container', 'lambda-edge', 'vercel', 'netlify', 'azure-functions', 'cloud-functions'];
   for (const target of functionTargets) {
     assert.deepEqual(deployTargets[target].templates, ['hono', 'fetch'], target);
     for (const template of ['hono', 'fetch'])

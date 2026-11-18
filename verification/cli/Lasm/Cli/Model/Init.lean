@@ -47,8 +47,8 @@ def deployTable : List DeployTarget := [
   { name := "lambda-edge", summary := "Lambda@Edge .zip for CloudFront origin requests (npm run build:lambda-edge)", templates := functionTemplates },
   { name := "vercel", summary := "Vercel Function (vercel.json; Vercel runs the build)", templates := functionTemplates },
   { name := "netlify", summary := "Netlify Function (netlify.toml; Netlify runs the build)", templates := functionTemplates },
-  { name := "azure", summary := "Azure Functions app (npm run build:azure)", templates := functionTemplates },
-  { name := "gcf", summary := "Google Cloud Functions gen2 (npm run build:gcf)", templates := functionTemplates },
+  { name := "azure-functions", summary := "Azure Functions app (npm run build:azure-functions)", templates := functionTemplates },
+  { name := "cloud-functions", summary := "Google Cloud Functions gen2 (npm run build:cloud-functions)", templates := functionTemplates },
   { name := "workers", summary := "Cloudflare Workers (wrangler.toml; npm run build:workers, then npx wrangler dev)", templates := ["hono", "fetch", "fullstack"] },
   { name := "vercel-edge", summary := "Vercel Edge Function (vercel.json; Vercel runs npm run build:vercel-edge)", templates := ["hono", "fetch", "fullstack"], conflicts := ["vercel"] },
   { name := "netlify-edge", summary := "Netlify Edge Function (netlify.toml; Netlify runs npm run build:netlify-edge)", templates := ["hono", "fetch", "fullstack"], conflicts := ["netlify"] },
@@ -131,8 +131,9 @@ def initLoop (st : InitState) : List String → Except String (Option InitState)
           let next := takeValue inline rest
           have : next.2.length < rest.length + 1 := Nat.lt_succ_of_le (takeValue_length inline rest)
           let v := next.1.getD ""
-          if v ∉ deployTargets then
-            .error ("--deploy accepts " ++ ", ".intercalate deployTargets ++ (if v = "" then "" else targetHintAmong v deployTargets "--deploy") ++ "\n\n" ++ initUsage)
+          if v = "" ∨ v.startsWith "-" then .error ("--deploy requires a value\n\n" ++ initUsage)
+          else if v ∉ deployTargets then
+            .error ("Unknown deploy target \"" ++ v ++ "\"" ++ targetHintAmong v deployTargets "--deploy" ++ ". Choose one of: " ++ ", ".intercalate deployTargets)
           else initLoop { st with deploy := if v ∈ st.deploy then st.deploy else st.deploy ++ [v] } next.2
         | none =>
           if token.startsWith "-" then .error ("Unknown lasm init option: " ++ token ++ "\n\n" ++ initUsage)

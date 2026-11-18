@@ -43,9 +43,24 @@ instance : ToJS PressureObserverOptions := ⟨fun d => Internal.fields #[("sampl
   Lasm.JS.Binding.invoke PressureObserver { name := "Lasm.JS.Web.PressureObserver.new", module := "globalThis", path := "PressureObserver", construct := true, arity := 1 }
     (Internal.args #[toJS callback]) (await := false)
 
+/-- `constructor(PressureUpdateCallback callback)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PressureObserver.new? (callback : PressureUpdateCallback) : IO (Option PressureObserver) := Internal.api "Lasm.JS.Web.PressureObserver.new?" do
+  if !(← Internal.hasGlobal ["PressureObserver"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PressureObserver { name := "Lasm.JS.Web.PressureObserver.new?", module := "globalThis", path := "PressureObserver", construct := true, arity := 1 }
+      (Internal.args #[toJS callback]) (await := false)
+  return some lasmGuarded
+
 /-- `static readonly attribute FrozenArray<PressureSource> knownSources` -/
 @[macro_inline] def PressureObserver.knownSources : IO (Array PressureSource) := Internal.api "Lasm.JS.Web.PressureObserver.knownSources" do
   Internal.getGlobal ["PressureObserver", "knownSources"] (Array PressureSource)
+
+/-- `static readonly attribute FrozenArray<PressureSource> knownSources` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PressureObserver.knownSources? : IO (Option (Array PressureSource)) := Internal.api "Lasm.JS.Web.PressureObserver.knownSources?" do
+  if !(← Internal.hasGlobal ["PressureObserver", "knownSources"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["PressureObserver", "knownSources"] (Array PressureSource)
+  return some lasmGuarded
 
 /-- `Promise<undefined> observe(PressureSource source, optional PressureObserverOptions options)` -/
 @[macro_inline] def PressureObserver.observe (self : PressureObserver) (source : PressureSource) (options : Option PressureObserverOptions := none) : Async Unit := Internal.api "Lasm.JS.Web.PressureObserver.observe" do

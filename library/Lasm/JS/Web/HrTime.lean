@@ -32,6 +32,14 @@ set_option compiler.extract_closed false
 @[macro_inline] def Performance.toJSON (self : Performance) : IO Data := Internal.api "Lasm.JS.Web.Performance.toJSON" do
   self.val.callMethod "toJSON" (Internal.args #[]) Data
 
+/-- `object toJSON()` where the platform has it (`'toJSON' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Performance.toJSON? (self' : Performance) : IO (Option Data) := Internal.api "Lasm.JS.Web.Performance.toJSON?" do
+  let self := self'
+  if !(← Internal.has self.val "toJSON") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "toJSON" (Internal.args #[]) Data
+  return some lasmGuarded
+
 /-- `readonly attribute Performance performance` -/
 @[macro_inline] def Window.performance (self : Window) : IO Performance := Internal.api "Lasm.JS.Web.Window.performance" do
   let r ← self.val.get "performance" Value

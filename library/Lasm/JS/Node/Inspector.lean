@@ -41,6 +41,11 @@ def inspector.Session.InspectorNotificationListener.ofSyncFn (f : Data → IO Un
 @[macro_inline] def inspector.Session.cast? (v : Value) : IO (Option inspector.Session) := Internal.api "Lasm.JS.Node.inspector.Session.cast?" do
   Internal.cast (Support.getExport "node:inspector" ["Session"] Value) (fun x => { val := x }) v
 
+/-- **Experimental** in the Node.js 24.22.2 docs. `new inspector.Session()`: `constructor()` -/
+@[macro_inline] def inspector.Session.new : IO inspector.Session := Internal.api "Lasm.JS.Node.inspector.Session.new" do
+  Lasm.JS.Binding.invoke inspector.Session { name := "Lasm.JS.Node.inspector.Session.new", module := "node:inspector", path := "Session", construct := true, arity := 0 }
+    (Internal.args #[]) (await := false)
+
 /-- **Experimental** in the Node.js 24.22.2 docs. `Event: 'inspectorNotification'` (added in Node.js v8.0.0): `inspector.Session onInspectorNotification(inspector.Session.InspectorNotificationListener listener)`: calls `on("inspectorNotification", listener)` -/
 @[macro_inline] def inspector.Session.onInspectorNotification (self : inspector.Session) (listener : inspector.Session.InspectorNotificationListener) : IO inspector.Session := Internal.api "Lasm.JS.Node.inspector.Session.onInspectorNotification" do
   let r ← self.val.callMethod "on" (Internal.args #[toJS "inspectorNotification", toJS listener]) Value

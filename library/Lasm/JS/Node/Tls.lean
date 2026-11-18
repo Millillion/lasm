@@ -202,6 +202,54 @@ def tls.TLSSocket.SessionListener.ofFn (f : ByteArray → Async Unit) : IO tls.T
 def tls.TLSSocket.SessionListener.ofSyncFn (f : ByteArray → IO Unit) : IO tls.TLSSocket.SessionListener := do
   return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg ByteArray args 0)) }
 
+/-- `(net.Socket or stream.Duplex)`: one constructor per member type. -/
+inductive net.SocketOrDuplex where
+  /-- `net.Socket` -/
+  | socket (value : net.Socket)
+  /-- `stream.Duplex` -/
+  | duplex (value : stream.Duplex)
+instance instToJSNetSocketOrDuplex : ToJS net.SocketOrDuplex := ⟨fun
+  | .socket v => toJS v
+  | .duplex v => toJS v⟩
+instance instCoeNetSocketNetSocketOrDuplex : Coe net.Socket net.SocketOrDuplex := ⟨.socket⟩
+instance instCoeStreamDuplexNetSocketOrDuplex : Coe stream.Duplex net.SocketOrDuplex := ⟨.duplex⟩
+
+/-- `dictionary tls.TLSSocket.NewOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure tls.TLSSocket.NewOptions where
+  /-- `any enableTrace` -/
+  enableTrace : Data := .undefined
+  /-- `any isServer = false` -/
+  isServer : Data := .undefined
+  /-- `Node_net_Server server` -/
+  server : Option net.Server := none
+  /-- `any requestCert` -/
+  requestCert : Data := .undefined
+  /-- `any rejectUnauthorized` -/
+  rejectUnauthorized : Data := .undefined
+  /-- `any ALPNProtocols` -/
+  ALPNProtocols : Data := .undefined
+  /-- `any SNICallback` -/
+  SNICallback : Data := .undefined
+  /-- `any ALPNCallback` -/
+  ALPNCallback : Data := .undefined
+  /-- `Uint8Array session` -/
+  session : Option ByteArray := none
+  /-- `boolean requestOCSP` -/
+  requestOCSP : Option Bool := none
+  /-- `any secureContext` -/
+  secureContext : Data := .undefined
+instance instToJSTlsTLSSocketNewOptions : ToJS tls.TLSSocket.NewOptions := ⟨fun d => Internal.fields #[("enableTrace", d.enableTrace),
+    ("isServer", d.isServer),
+    ("server", Internal.optional d.server),
+    ("requestCert", d.requestCert),
+    ("rejectUnauthorized", d.rejectUnauthorized),
+    ("ALPNProtocols", d.ALPNProtocols),
+    ("SNICallback", d.SNICallback),
+    ("ALPNCallback", d.ALPNCallback),
+    ("session", Internal.optional d.session),
+    ("requestOCSP", Internal.optional d.requestOCSP),
+    ("secureContext", d.secureContext)]⟩
+
 /-- `dictionary tls.TLSSocket.RenegotiateOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure tls.TLSSocket.RenegotiateOptions where
   /-- `boolean rejectUnauthorized = true` -/
@@ -560,6 +608,11 @@ instance : Coe (Array ByteArray) SequenceOfDOMStringOrSequenceOfUint8Array := �
 /-- `v instanceof TLSSocket`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `TLSSocket`). -/
 @[macro_inline] def tls.TLSSocket.cast? (v : Value) : IO (Option tls.TLSSocket) := Internal.api "Lasm.JS.Node.tls.TLSSocket.cast?" do
   Internal.cast (Support.getExport "node:tls" ["TLSSocket"] Value) (fun x => { val := x }) v
+
+/-- `new tls.TLSSocket(socket[, options])` (added in Node.js v0.11.4): `constructor((net.Socket or stream.Duplex) socket, optional tls.TLSSocket.NewOptions options)` -/
+@[macro_inline] def tls.TLSSocket.new (socket : net.SocketOrDuplex) (options : Option tls.TLSSocket.NewOptions := none) : IO tls.TLSSocket := Internal.api "Lasm.JS.Node.tls.TLSSocket.new" do
+  Lasm.JS.Binding.invoke tls.TLSSocket { name := "Lasm.JS.Node.tls.TLSSocket.new", module := "node:tls", path := "TLSSocket", construct := true, arity := 2 }
+    (Internal.args #[toJS socket, Internal.optional options]) (await := false)
 
 /-- `tlsSocket.alpnProtocol` (added in Node.js v6.0.0): `readonly attribute (DOMString or boolean)? alpnProtocol` -/
 @[macro_inline] def tls.TLSSocket.alpnProtocol (self : tls.TLSSocket) : IO (Option DOMStringOrBoolean) := Internal.api "Lasm.JS.Node.tls.TLSSocket.alpnProtocol" do

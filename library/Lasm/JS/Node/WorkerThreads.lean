@@ -12,6 +12,7 @@ import Lasm.JS.Web.Types.Html
 import Lasm.JS.Web.Types.WebLocks
 import Lasm.JS.Node.Events
 import Lasm.JS.Node.Stream
+import Lasm.JS.Node.Fs
 
 namespace Lasm.JS.Node
 open Lasm.JS Lasm.JS.Web
@@ -96,6 +97,60 @@ def worker_threads.Worker.OnlineListener.ofFn (f : Async Unit) : IO worker_threa
 def worker_threads.Worker.OnlineListener.ofSyncFn (f : IO Unit) : IO worker_threads.Worker.OnlineListener := do
   return { val := ← Lasm.JS.Function.ofSyncFn fun _ => do return toJS (← f) }
 
+/-- `dictionary worker_threads.Worker.NewOptionsResourceLimits` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure worker_threads.Worker.NewOptionsResourceLimits where
+  /-- `double maxOldGenerationSizeMb` -/
+  maxOldGenerationSizeMb : Option Float := none
+  /-- `double maxYoungGenerationSizeMb` -/
+  maxYoungGenerationSizeMb : Option Float := none
+  /-- `double codeRangeSizeMb` -/
+  codeRangeSizeMb : Option Float := none
+  /-- `double stackSizeMb = 4` -/
+  stackSizeMb : Option Float := none
+instance instToJSWorker_threadsWorkerNewOptionsResourceLimits : ToJS worker_threads.Worker.NewOptionsResourceLimits := ⟨fun d => Internal.fields #[("maxOldGenerationSizeMb", Internal.optional d.maxOldGenerationSizeMb),
+    ("maxYoungGenerationSizeMb", Internal.optional d.maxYoungGenerationSizeMb),
+    ("codeRangeSizeMb", Internal.optional d.codeRangeSizeMb),
+    ("stackSizeMb", Internal.optional d.stackSizeMb)]⟩
+
+/-- `dictionary worker_threads.Worker.NewOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure worker_threads.Worker.NewOptions where
+  /-- `sequence<any> argv` -/
+  argv : Option (Array Data) := none
+  /-- `object env` -/
+  env : Data := .undefined
+  /-- `boolean eval` -/
+  eval : Option Bool := none
+  /-- `sequence<DOMString> execArgv` -/
+  execArgv : Option (Array String) := none
+  /-- `boolean stdin` -/
+  stdin : Option Bool := none
+  /-- `boolean stdout` -/
+  stdout : Option Bool := none
+  /-- `boolean stderr` -/
+  stderr : Option Bool := none
+  /-- `any workerData` -/
+  workerData : Data := .undefined
+  /-- `boolean trackUnmanagedFds = true` -/
+  trackUnmanagedFds : Option Bool := none
+  /-- `sequence<object> transferList` -/
+  transferList : Option (Array Data) := none
+  /-- `Node_worker_threads_Worker_NewOptionsResourceLimits resourceLimits` -/
+  resourceLimits : Option worker_threads.Worker.NewOptionsResourceLimits := none
+  /-- `DOMString name` -/
+  name : Option String := none
+instance instToJSWorker_threadsWorkerNewOptions : ToJS worker_threads.Worker.NewOptions := ⟨fun d => Internal.fields #[("argv", Internal.optional d.argv),
+    ("env", d.env),
+    ("eval", Internal.optional d.eval),
+    ("execArgv", Internal.optional d.execArgv),
+    ("stdin", Internal.optional d.stdin),
+    ("stdout", Internal.optional d.stdout),
+    ("stderr", Internal.optional d.stderr),
+    ("workerData", d.workerData),
+    ("trackUnmanagedFds", Internal.optional d.trackUnmanagedFds),
+    ("transferList", Internal.optional d.transferList),
+    ("resourceLimits", Internal.optional d.resourceLimits),
+    ("name", Internal.optional d.name)]⟩
+
 /-- `dictionary worker_threads.Worker.GetHeapSnapshotOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
 structure worker_threads.Worker.GetHeapSnapshotOptions where
   /-- `boolean exposeInternals = false` -/
@@ -147,6 +202,11 @@ instance : Coe BroadcastChannel MessagePortOrBroadcastChannel := ⟨.broadcastCh
 /-- `v instanceof Worker`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `Worker`). -/
 @[macro_inline] def worker_threads.Worker.cast? (v : Value) : IO (Option worker_threads.Worker) := Internal.api "Lasm.JS.Node.worker_threads.Worker.cast?" do
   Internal.cast (Support.getExport "node:worker_threads" ["Worker"] Value) (fun x => { val := x }) v
+
+/-- `new Worker(filename[, options])` (added in Node.js v10.5.0): `constructor((DOMString or URL) filename, optional worker_threads.Worker.NewOptions options)` -/
+@[macro_inline] def worker_threads.Worker.new (filename : DOMStringOrURL) (options : Option worker_threads.Worker.NewOptions := none) : IO worker_threads.Worker := Internal.api "Lasm.JS.Node.worker_threads.Worker.new" do
+  Lasm.JS.Binding.invoke worker_threads.Worker { name := "Lasm.JS.Node.worker_threads.Worker.new", module := "node:worker_threads", path := "Worker", construct := true, arity := 2 }
+    (Internal.args #[toJS filename, Internal.optional options]) (await := false)
 
 /-- `worker.performance` (added in Node.js v15.1.0, v14.17.0, v12.22.0): `readonly attribute any performance` -/
 @[macro_inline] def worker_threads.Worker.performance (self : worker_threads.Worker) : IO Data := Internal.api "Lasm.JS.Node.worker_threads.Worker.performance" do

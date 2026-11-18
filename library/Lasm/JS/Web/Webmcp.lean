@@ -218,6 +218,14 @@ instance : ToJS ToolCancelEventInit := ⟨fun d => Internal.fields #[("bubbles",
   Lasm.JS.Binding.invoke ToolActivatedEvent { name := "Lasm.JS.Web.ToolActivatedEvent.new", module := "globalThis", path := "ToolActivatedEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional ToolActivatedEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ToolActivatedEvent.new? (type : String) (eventInitDict : Option ToolActivatedEventInit := none) : IO (Option ToolActivatedEvent) := Internal.api "Lasm.JS.Web.ToolActivatedEvent.new?" do
+  if !(← Internal.hasGlobal ["ToolActivatedEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ToolActivatedEvent { name := "Lasm.JS.Web.ToolActivatedEvent.new?", module := "globalThis", path := "ToolActivatedEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString toolName` -/
 @[macro_inline] def ToolActivatedEvent.toolName (self : ToolActivatedEvent) : IO String := Internal.api "Lasm.JS.Web.ToolActivatedEvent.toolName" do
   self.val.get "toolName" String
@@ -230,6 +238,14 @@ instance : ToJS ToolCancelEventInit := ⟨fun d => Internal.fields #[("bubbles",
 @[macro_inline] def ToolCancelEvent.new (type : String) (eventInitDict : Option ToolCancelEventInit := none) : IO ToolCancelEvent := Internal.api "Lasm.JS.Web.ToolCancelEvent.new" do
   Lasm.JS.Binding.invoke ToolCancelEvent { name := "Lasm.JS.Web.ToolCancelEvent.new", module := "globalThis", path := "ToolCancelEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, optional ToolCancelEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def ToolCancelEvent.new? (type : String) (eventInitDict : Option ToolCancelEventInit := none) : IO (Option ToolCancelEvent) := Internal.api "Lasm.JS.Web.ToolCancelEvent.new?" do
+  if !(← Internal.hasGlobal ["ToolCancelEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke ToolCancelEvent { name := "Lasm.JS.Web.ToolCancelEvent.new?", module := "globalThis", path := "ToolCancelEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString toolName` -/
 @[macro_inline] def ToolCancelEvent.toolName (self : ToolCancelEvent) : IO String := Internal.api "Lasm.JS.Web.ToolCancelEvent.toolName" do

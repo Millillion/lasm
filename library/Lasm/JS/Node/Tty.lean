@@ -70,6 +70,11 @@ def tty.WriteStream.ResizeListener.ofSyncFn (f : IO Unit) : IO tty.WriteStream.R
 @[macro_inline] def tty.WriteStream.cast? (v : Value) : IO (Option tty.WriteStream) := Internal.api "Lasm.JS.Node.tty.WriteStream.cast?" do
   Internal.cast (Support.getExport "node:tty" ["WriteStream"] Value) (fun x => { val := x }) v
 
+/-- `new tty.WriteStream(fd)` (added in Node.js v0.5.8): `constructor(double /* integer: Nat */ fd)` -/
+@[macro_inline] def tty.WriteStream.new (fd : Nat) : IO tty.WriteStream := Internal.api "Lasm.JS.Node.tty.WriteStream.new" do
+  Lasm.JS.Binding.invoke tty.WriteStream { name := "Lasm.JS.Node.tty.WriteStream.new", module := "node:tty", path := "WriteStream", construct := true, arity := 1 }
+    (Internal.args #[toJS fd]) (await := false)
+
 /-- `writeStream.columns` (added in Node.js v0.7.7): `readonly attribute any columns` -/
 @[macro_inline] def tty.WriteStream.columns (self : tty.WriteStream) : IO Data := Internal.api "Lasm.JS.Node.tty.WriteStream.columns" do
   self.val.get "columns" Data

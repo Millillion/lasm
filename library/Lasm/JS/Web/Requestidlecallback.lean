@@ -51,18 +51,50 @@ instance : ToJS IdleRequestOptions := ⟨fun d => Internal.fields #[("timeout", 
 @[macro_inline] def Window.requestIdleCallback (self : Window) (callback : IdleRequestCallback) (options : Option IdleRequestOptions := none) : IO Nat := Internal.api "Lasm.JS.Web.Window.requestIdleCallback" do
   self.val.callMethod "requestIdleCallback" (Internal.args #[toJS callback, Internal.optional options]) Nat
 
+/-- `unsigned long requestIdleCallback(IdleRequestCallback callback, optional IdleRequestOptions options)` where the platform has it (`'requestIdleCallback' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.requestIdleCallback? (self' : Window) (callback : IdleRequestCallback) (options : Option IdleRequestOptions := none) : IO (Option Nat) := Internal.api "Lasm.JS.Web.Window.requestIdleCallback?" do
+  let self := self'
+  if !(← Internal.has self.val "requestIdleCallback") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "requestIdleCallback" (Internal.args #[toJS callback, Internal.optional options]) Nat
+  return some lasmGuarded
+
 /-- `undefined cancelIdleCallback(unsigned long handle)` -/
 @[macro_inline] def Window.cancelIdleCallback (self : Window) (handle : Nat) : IO Unit := Internal.api "Lasm.JS.Web.Window.cancelIdleCallback" do
   self.val.callMethod "cancelIdleCallback" (Internal.args #[toJS handle]) Unit
+
+/-- `undefined cancelIdleCallback(unsigned long handle)` where the platform has it (`'cancelIdleCallback' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Window.cancelIdleCallback? (self' : Window) (handle : Nat) : IO (Option Unit) := Internal.api "Lasm.JS.Web.Window.cancelIdleCallback?" do
+  let self := self'
+  if !(← Internal.has self.val "cancelIdleCallback") then return none
+  let lasmGuarded ← do
+    self.val.callMethod "cancelIdleCallback" (Internal.args #[toJS handle]) Unit
+  return some lasmGuarded
 
 /-- `unsigned long requestIdleCallback(IdleRequestCallback callback, optional IdleRequestOptions options)` (requestIdleCallback() (https://w3c.github.io/requestidlecallback/)) -/
 @[macro_inline] def requestIdleCallback (callback : IdleRequestCallback) (options : Option IdleRequestOptions := none) : IO Nat := Internal.api "Lasm.JS.Web.requestIdleCallback" do
   Lasm.JS.Binding.invoke Nat { name := "Lasm.JS.Web.requestIdleCallback", module := "globalThis", path := "requestIdleCallback", construct := false, arity := 2 }
     (Internal.args #[toJS callback, Internal.optional options]) (await := false)
 
+/-- `unsigned long requestIdleCallback(IdleRequestCallback callback, optional IdleRequestOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def requestIdleCallback? (callback : IdleRequestCallback) (options : Option IdleRequestOptions := none) : IO (Option Nat) := Internal.api "Lasm.JS.Web.requestIdleCallback?" do
+  if !(← Internal.hasGlobal ["requestIdleCallback"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Nat { name := "Lasm.JS.Web.requestIdleCallback?", module := "globalThis", path := "requestIdleCallback", construct := false, arity := 2 }
+      (Internal.args #[toJS callback, Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `undefined cancelIdleCallback(unsigned long handle)` (requestIdleCallback() (https://w3c.github.io/requestidlecallback/)) -/
 @[macro_inline] def cancelIdleCallback (handle : Nat) : IO Unit := Internal.api "Lasm.JS.Web.cancelIdleCallback" do
   Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.cancelIdleCallback", module := "globalThis", path := "cancelIdleCallback", construct := false, arity := 1 }
     (Internal.args #[toJS handle]) (await := false)
+
+/-- `undefined cancelIdleCallback(unsigned long handle)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def cancelIdleCallback? (handle : Nat) : IO (Option Unit) := Internal.api "Lasm.JS.Web.cancelIdleCallback?" do
+  if !(← Internal.hasGlobal ["cancelIdleCallback"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Unit { name := "Lasm.JS.Web.cancelIdleCallback?", module := "globalThis", path := "cancelIdleCallback", construct := false, arity := 1 }
+      (Internal.args #[toJS handle]) (await := false)
+  return some lasmGuarded
 
 end Lasm.JS.Web

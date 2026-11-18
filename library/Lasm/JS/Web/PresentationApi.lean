@@ -173,6 +173,14 @@ instance : ToJS PresentationConnectionCloseEventInit := ⟨fun d => Internal.fie
   Lasm.JS.Binding.invoke PresentationConnectionAvailableEvent { name := "Lasm.JS.Web.PresentationConnectionAvailableEvent.new", module := "globalThis", path := "PresentationConnectionAvailableEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, PresentationConnectionAvailableEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PresentationConnectionAvailableEvent.new? (type : String) (eventInitDict : PresentationConnectionAvailableEventInit) : IO (Option PresentationConnectionAvailableEvent) := Internal.api "Lasm.JS.Web.PresentationConnectionAvailableEvent.new?" do
+  if !(← Internal.hasGlobal ["PresentationConnectionAvailableEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PresentationConnectionAvailableEvent { name := "Lasm.JS.Web.PresentationConnectionAvailableEvent.new?", module := "globalThis", path := "PresentationConnectionAvailableEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute PresentationConnection connection` -/
 @[macro_inline] def PresentationConnectionAvailableEvent.connection (self : PresentationConnectionAvailableEvent) : IO PresentationConnection := Internal.api "Lasm.JS.Web.PresentationConnectionAvailableEvent.connection" do
   let r ← self.val.get "connection" Value
@@ -186,6 +194,14 @@ instance : ToJS PresentationConnectionCloseEventInit := ⟨fun d => Internal.fie
 @[macro_inline] def PresentationConnectionCloseEvent.new (type : String) (eventInitDict : PresentationConnectionCloseEventInit) : IO PresentationConnectionCloseEvent := Internal.api "Lasm.JS.Web.PresentationConnectionCloseEvent.new" do
   Lasm.JS.Binding.invoke PresentationConnectionCloseEvent { name := "Lasm.JS.Web.PresentationConnectionCloseEvent.new", module := "globalThis", path := "PresentationConnectionCloseEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+
+/-- `constructor(DOMString type, PresentationConnectionCloseEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PresentationConnectionCloseEvent.new? (type : String) (eventInitDict : PresentationConnectionCloseEventInit) : IO (Option PresentationConnectionCloseEvent) := Internal.api "Lasm.JS.Web.PresentationConnectionCloseEvent.new?" do
+  if !(← Internal.hasGlobal ["PresentationConnectionCloseEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PresentationConnectionCloseEvent { name := "Lasm.JS.Web.PresentationConnectionCloseEvent.new?", module := "globalThis", path := "PresentationConnectionCloseEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute PresentationConnectionCloseReason reason` -/
 @[macro_inline] def PresentationConnectionCloseEvent.reason (self : PresentationConnectionCloseEvent) : IO PresentationConnectionCloseReason := Internal.api "Lasm.JS.Web.PresentationConnectionCloseEvent.reason" do
@@ -230,10 +246,26 @@ instance : ToJS PresentationConnectionCloseEventInit := ⟨fun d => Internal.fie
   Lasm.JS.Binding.invoke PresentationRequest { name := "Lasm.JS.Web.PresentationRequest.new", module := "globalThis", path := "PresentationRequest", construct := true, arity := 1 }
     (Internal.args #[toJS url]) (await := false)
 
+/-- `constructor(USVString url)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PresentationRequest.new? (url : String) : IO (Option PresentationRequest) := Internal.api "Lasm.JS.Web.PresentationRequest.new?" do
+  if !(← Internal.hasGlobal ["PresentationRequest"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PresentationRequest { name := "Lasm.JS.Web.PresentationRequest.new?", module := "globalThis", path := "PresentationRequest", construct := true, arity := 1 }
+      (Internal.args #[toJS url]) (await := false)
+  return some lasmGuarded
+
 /-- `constructor(sequence<USVString> urls)` -/
 @[macro_inline] def PresentationRequest.newWithUrls (urls : Array String) : IO PresentationRequest := Internal.api "Lasm.JS.Web.PresentationRequest.newWithUrls" do
   Lasm.JS.Binding.invoke PresentationRequest { name := "Lasm.JS.Web.PresentationRequest.newWithUrls", module := "globalThis", path := "PresentationRequest", construct := true, arity := 1 }
     (Internal.args #[toJS urls]) (await := false)
+
+/-- `constructor(sequence<USVString> urls)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PresentationRequest.newWithUrls? (urls : Array String) : IO (Option PresentationRequest) := Internal.api "Lasm.JS.Web.PresentationRequest.newWithUrls?" do
+  if !(← Internal.hasGlobal ["PresentationRequest"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PresentationRequest { name := "Lasm.JS.Web.PresentationRequest.newWithUrls?", module := "globalThis", path := "PresentationRequest", construct := true, arity := 1 }
+      (Internal.args #[toJS urls]) (await := false)
+  return some lasmGuarded
 
 /-- `attribute EventHandler onconnectionavailable` -/
 @[macro_inline] def PresentationRequest.onconnectionavailable (self : PresentationRequest) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.PresentationRequest.onconnectionavailable" do
@@ -262,5 +294,14 @@ instance : ToJS PresentationConnectionCloseEventInit := ⟨fun d => Internal.fie
 @[macro_inline] def Navigator.presentation (self : Navigator) : IO Presentation := Internal.api "Lasm.JS.Web.Navigator.presentation" do
   let r ← self.val.get "presentation" Value
   pure { val := r }
+
+/-- `readonly attribute Presentation presentation` where the platform has it (`'presentation' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.presentation? (self' : Navigator) : IO (Option Presentation) := Internal.api "Lasm.JS.Web.Navigator.presentation?" do
+  let self := self'
+  if !(← Internal.has self.val "presentation") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "presentation" Value
+    pure { val := r }
+  return some lasmGuarded
 
 end Lasm.JS.Web

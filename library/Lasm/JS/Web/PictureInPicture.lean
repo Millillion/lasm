@@ -41,6 +41,14 @@ instance : ToJS PictureInPictureEventInit := ⟨fun d => Internal.fields #[("bub
   Lasm.JS.Binding.invoke PictureInPictureEvent { name := "Lasm.JS.Web.PictureInPictureEvent.new", module := "globalThis", path := "PictureInPictureEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, PictureInPictureEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def PictureInPictureEvent.new? (type : String) (eventInitDict : PictureInPictureEventInit) : IO (Option PictureInPictureEvent) := Internal.api "Lasm.JS.Web.PictureInPictureEvent.new?" do
+  if !(← Internal.hasGlobal ["PictureInPictureEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke PictureInPictureEvent { name := "Lasm.JS.Web.PictureInPictureEvent.new?", module := "globalThis", path := "PictureInPictureEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, toJS eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute PictureInPictureWindow pictureInPictureWindow` -/
 @[macro_inline] def PictureInPictureEvent.pictureInPictureWindow (self : PictureInPictureEvent) : IO PictureInPictureWindow := Internal.api "Lasm.JS.Web.PictureInPictureEvent.pictureInPictureWindow" do
   let r ← self.val.get "pictureInPictureWindow" Value

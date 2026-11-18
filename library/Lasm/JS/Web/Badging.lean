@@ -18,9 +18,25 @@ set_option compiler.extract_closed false
 @[macro_inline] def Navigator.setAppBadge (self : Navigator) (contents : Option Nat := none) : Async Unit := Internal.api "Lasm.JS.Web.Navigator.setAppBadge" do
   self.val.callMethodAwait "setAppBadge" (Internal.args #[Internal.optional contents]) Unit
 
+/-- `Promise<undefined> setAppBadge(optional unsigned long long contents)` where the platform has it (`'setAppBadge' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.setAppBadge? (self' : Navigator) (contents : Option Nat := none) : Async (Option Unit) := Internal.api "Lasm.JS.Web.Navigator.setAppBadge?" do
+  let self := self'
+  if !(← Internal.has self.val "setAppBadge") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "setAppBadge" (Internal.args #[Internal.optional contents]) Unit
+  return some lasmGuarded
+
 /-- `Promise<undefined> clearAppBadge()` -/
 @[macro_inline] def Navigator.clearAppBadge (self : Navigator) : Async Unit := Internal.api "Lasm.JS.Web.Navigator.clearAppBadge" do
   self.val.callMethodAwait "clearAppBadge" (Internal.args #[]) Unit
+
+/-- `Promise<undefined> clearAppBadge()` where the platform has it (`'clearAppBadge' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Navigator.clearAppBadge? (self' : Navigator) : Async (Option Unit) := Internal.api "Lasm.JS.Web.Navigator.clearAppBadge?" do
+  let self := self'
+  if !(← Internal.has self.val "clearAppBadge") then return none
+  let lasmGuarded ← do
+    self.val.callMethodAwait "clearAppBadge" (Internal.args #[]) Unit
+  return some lasmGuarded
 
 /-- `Promise<undefined> setAppBadge(optional unsigned long long contents)` -/
 @[macro_inline] def WorkerNavigator.setAppBadge (self : WorkerNavigator) (contents : Option Nat := none) : Async Unit := Internal.api "Lasm.JS.Web.WorkerNavigator.setAppBadge" do

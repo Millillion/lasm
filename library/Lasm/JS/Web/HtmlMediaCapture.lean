@@ -18,6 +18,14 @@ set_option compiler.extract_closed false
 @[macro_inline] def HTMLInputElement.capture (self : HTMLInputElement) : IO String := Internal.api "Lasm.JS.Web.HTMLInputElement.capture" do
   self.val.get "capture" String
 
+/-- `attribute DOMString capture` where the platform has it (`'capture' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def HTMLInputElement.capture? (self' : HTMLInputElement) : IO (Option String) := Internal.api "Lasm.JS.Web.HTMLInputElement.capture?" do
+  let self := self'
+  if !(← Internal.has self.val "capture") then return none
+  let lasmGuarded ← do
+    self.val.get "capture" String
+  return some lasmGuarded
+
 /-- Sets `capture`: `attribute DOMString capture` -/
 @[macro_inline] def HTMLInputElement.setCapture (self : HTMLInputElement) (value : String) : IO Unit := Internal.api "Lasm.JS.Web.HTMLInputElement.setCapture" do
   self.val.set "capture" (toJS value)

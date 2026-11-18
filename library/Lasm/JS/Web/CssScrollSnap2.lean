@@ -46,6 +46,14 @@ instance : ToJS SnapEventInit := ⟨fun d => Internal.fields #[("bubbles", Inter
   Lasm.JS.Binding.invoke SnapEvent { name := "Lasm.JS.Web.SnapEvent.new", module := "globalThis", path := "SnapEvent", construct := true, arity := 2 }
     (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
 
+/-- `constructor(DOMString type, optional SnapEventInit eventInitDict)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def SnapEvent.new? (type : String) (eventInitDict : Option SnapEventInit := none) : IO (Option SnapEvent) := Internal.api "Lasm.JS.Web.SnapEvent.new?" do
+  if !(← Internal.hasGlobal ["SnapEvent"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke SnapEvent { name := "Lasm.JS.Web.SnapEvent.new?", module := "globalThis", path := "SnapEvent", construct := true, arity := 2 }
+      (Internal.args #[toJS type, Internal.optional eventInitDict]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute Node? snapTargetBlock` -/
 @[macro_inline] def SnapEvent.snapTargetBlock (self : SnapEvent) : IO (Option Node) := Internal.api "Lasm.JS.Web.SnapEvent.snapTargetBlock" do
   self.val.get "snapTargetBlock" (Option Node)
@@ -138,8 +146,22 @@ instance : ToJS SnapEventInit := ⟨fun d => Internal.fields #[("bubbles", Inter
 @[macro_inline] def onsnapchanged : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onsnapchanged" do
   Internal.getGlobal ["onsnapchanged"] (Option EventHandlerNonNull)
 
+/-- `attribute EventHandler onsnapchanged` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onsnapchanged? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onsnapchanged?" do
+  if !(← Internal.hasGlobal ["onsnapchanged"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onsnapchanged"] (Option EventHandlerNonNull)
+  return some lasmGuarded
+
 /-- `attribute EventHandler onsnapchanging` (CSS Scroll Snap Module Level 2 (https://drafts.csswg.org/css-scroll-snap-2/)) -/
 @[macro_inline] def onsnapchanging : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.onsnapchanging" do
   Internal.getGlobal ["onsnapchanging"] (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onsnapchanging` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def onsnapchanging? : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.onsnapchanging?" do
+  if !(← Internal.hasGlobal ["onsnapchanging"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["onsnapchanging"] (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 end Lasm.JS.Web

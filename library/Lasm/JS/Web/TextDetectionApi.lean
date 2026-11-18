@@ -61,16 +61,41 @@ instance : FromJS DetectedText where
   Lasm.JS.Binding.invoke TextDetector { name := "Lasm.JS.Web.TextDetector.new", module := "globalThis", path := "TextDetector", construct := true, arity := 0 }
     (Internal.args #[]) (await := false)
 
+/-- `constructor()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def TextDetector.new? : IO (Option TextDetector) := Internal.api "Lasm.JS.Web.TextDetector.new?" do
+  if !(← Internal.hasGlobal ["TextDetector"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke TextDetector { name := "Lasm.JS.Web.TextDetector.new?", module := "globalThis", path := "TextDetector", construct := true, arity := 0 }
+      (Internal.args #[]) (await := false)
+  return some lasmGuarded
+
 /-- `static Promise<Availability> availability(TextDetectorOptions options)` -/
 @[macro_inline] def TextDetector.availability (options : TextDetectorOptions) : Async Availability := Internal.api "Lasm.JS.Web.TextDetector.availability" do
   Lasm.JS.Binding.invokeAsync Availability { name := "Lasm.JS.Web.TextDetector.availability", module := "globalThis", path := "TextDetector.availability", construct := false, arity := 1 }
     (Internal.args #[toJS options])
+
+/-- `static Promise<Availability> availability(TextDetectorOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def TextDetector.availability? (options : TextDetectorOptions) : Async (Option Availability) := Internal.api "Lasm.JS.Web.TextDetector.availability?" do
+  if !(← Internal.hasGlobal ["TextDetector", "availability"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Availability { name := "Lasm.JS.Web.TextDetector.availability?", module := "globalThis", path := "TextDetector.availability", construct := false, arity := 1 }
+      (Internal.args #[toJS options])
+  return some lasmGuarded
 
 /-- `static Promise<TextDetector> create(optional TextDetectorCreateOptions options)` -/
 @[macro_inline] def TextDetector.create (options : Option TextDetectorCreateOptions := none) : Async TextDetector := Internal.api "Lasm.JS.Web.TextDetector.create" do
   let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.TextDetector.create", module := "globalThis", path := "TextDetector.create", construct := false, arity := 1 }
     (Internal.args #[Internal.optional options])
   pure { val := r }
+
+/-- `static Promise<TextDetector> create(optional TextDetectorCreateOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def TextDetector.create? (options : Option TextDetectorCreateOptions := none) : Async (Option TextDetector) := Internal.api "Lasm.JS.Web.TextDetector.create?" do
+  if !(← Internal.hasGlobal ["TextDetector", "create"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.TextDetector.create?", module := "globalThis", path := "TextDetector.create", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional options])
+    pure { val := r }
+  return some lasmGuarded
 
 /-- `Promise<sequence<DetectedText>> detect(ImageBitmapSource image)` -/
 @[macro_inline] def TextDetector.detect (self : TextDetector) (image : ImageBitmapSource) : Async (Array DetectedText) := Internal.api "Lasm.JS.Web.TextDetector.detect" do

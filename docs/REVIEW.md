@@ -589,6 +589,13 @@ before; Workers uses the default export (`Lasm.JS.exportDefault`, D1 from
 - [ ] **0.8.0's template change:** `lasm init --template fetch` no longer uses
   `Lasm.Fetch` except on Node; Fastly, wasi:http/Spin and WASI get their own entry
   modules. Existing projects keep building ([0.8.0-notes.md](release/0.8.0-notes.md)).
+- [ ] **0.9.0's breaking changes (Stage 0):** the function platforms call the
+  program's `exportDefault` handler directly (no server inside the function),
+  the templates write one entry module per serving model, `lasm build` names its
+  output only with `--output`, `--deploy lambda` is the `.zip` setup, and the
+  generated bindings follow the binding rules (A9–A12). Each has a migration
+  note ([0.9.0-notes.md](release/0.9.0-notes.md)); the API decisions await
+  sign-off per milestone.
 
 ### Process
 - [ ] **The browser dev-rebuild budget is 2.5 s, was 2 s (2026-11-09).** It
@@ -757,7 +764,8 @@ docstrings, the propositions and the names.
   `@[export]` Lean functions with a byte-buffer ABI (a new attribute and calling
   convention to review); calling `_start` again on the same instance (WASI forbids
   it and Lean's runtime initializes twice). Your call: whether to add the flag, and
-  its name.
+  its name. Decided for Stage 0 (A55, docs/api/decisions/0.7.md): declined until a
+  concrete host-embedding use case exists; the entry lists what a later reactor needs.
 - [ ] **`lasm init -t fullstack` refuses the function platforms** (issue #168). `--deploy lambda`, `lambda-zip`, `lambda-edge`, `vercel`, `netlify`, `azure` and `gcf` with `--template fullstack` used to write a broken project (a `build:undefined` script, no `vercel.json`/`netlify.toml`/`Dockerfile.lambda`, no platform dependency). Claude chose to refuse them (fewer combinations to keep working before 1.0): the message names the templates the target takes and the targets the template takes, for example "--deploy lambda supports the express, hono, fastify, std-http and fetch templates, not fullstack. The fullstack template supports --deploy workers, vercel-edge, netlify-edge, deno-deploy, fastly, wasi-http, spin". The other server templates keep every function platform. If you would rather support them, each needs its platform files, the client build in the package, README text and a CI deploy test ([src/init.mjs](../src/init.mjs), `deployTargets`).
 
 ## 3. User-facing text that changed recently

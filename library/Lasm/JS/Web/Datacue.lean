@@ -24,6 +24,14 @@ set_option compiler.extract_closed false
   Lasm.JS.Binding.invoke DataCue { name := "Lasm.JS.Web.DataCue.new", module := "globalThis", path := "DataCue", construct := true, arity := 4 }
     (Internal.args #[toJS startTime, toJS endTime, toJS value, Internal.optional type]) (await := false)
 
+/-- `constructor(double startTime, unrestricted double endTime, any value, optional DOMString type)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def DataCue.new? (startTime : Float) (endTime : Float) (value : Data) (type : Option String := none) : IO (Option DataCue) := Internal.api "Lasm.JS.Web.DataCue.new?" do
+  if !(← Internal.hasGlobal ["DataCue"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke DataCue { name := "Lasm.JS.Web.DataCue.new?", module := "globalThis", path := "DataCue", construct := true, arity := 4 }
+      (Internal.args #[toJS startTime, toJS endTime, toJS value, Internal.optional type]) (await := false)
+  return some lasmGuarded
+
 /-- `attribute any value` -/
 @[macro_inline] def DataCue.value (self : DataCue) : IO Data := Internal.api "Lasm.JS.Web.DataCue.value" do
   self.val.get "value" Data

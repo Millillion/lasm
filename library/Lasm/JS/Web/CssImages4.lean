@@ -17,4 +17,11 @@ set_option compiler.extract_closed false
 @[macro_inline] def CSS.elementSources : IO Data := Internal.api "Lasm.JS.Web.CSS.elementSources" do
   Internal.getGlobal ["CSS", "elementSources"] Data
 
+/-- `readonly attribute any elementSources` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSS.elementSources? : IO (Option Data) := Internal.api "Lasm.JS.Web.CSS.elementSources?" do
+  if !(← Internal.hasGlobal ["CSS", "elementSources"]) then return none
+  let lasmGuarded ← do
+    Internal.getGlobal ["CSS", "elementSources"] Data
+  return some lasmGuarded
+
 end Lasm.JS.Web

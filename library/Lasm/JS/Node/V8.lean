@@ -172,6 +172,11 @@ instance instToJSPromiseHooksCreateHookCallbacks : ToJS promiseHooks.CreateHookC
 @[macro_inline] def v8.Serializer.cast? (v : Value) : IO (Option v8.Serializer) := Internal.api "Lasm.JS.Node.v8.Serializer.cast?" do
   Internal.cast (Support.getExport "node:v8" ["Serializer"] Value) (fun x => { val := x }) v
 
+/-- `new Serializer()` (added in Node.js v8.0.0): `constructor()` -/
+@[macro_inline] def v8.Serializer.new : IO v8.Serializer := Internal.api "Lasm.JS.Node.v8.Serializer.new" do
+  Lasm.JS.Binding.invoke v8.Serializer { name := "Lasm.JS.Node.v8.Serializer.new", module := "node:v8", path := "Serializer", construct := true, arity := 0 }
+    (Internal.args #[]) (await := false)
+
 /-- `serializer.writeHeader()`: `undefined writeHeader()` -/
 @[macro_inline] def v8.Serializer.writeHeader (self : v8.Serializer) : IO Unit := Internal.api "Lasm.JS.Node.v8.Serializer.writeHeader" do
   self.val.callMethod "writeHeader" (Internal.args #[]) Unit
@@ -216,6 +221,11 @@ instance instToJSPromiseHooksCreateHookCallbacks : ToJS promiseHooks.CreateHookC
 @[macro_inline] def v8.Deserializer.cast? (v : Value) : IO (Option v8.Deserializer) := Internal.api "Lasm.JS.Node.v8.Deserializer.cast?" do
   Internal.cast (Support.getExport "node:v8" ["Deserializer"] Value) (fun x => { val := x }) v
 
+/-- `new Deserializer(buffer)` (added in Node.js v8.0.0): `constructor(Uint8Array buffer)` -/
+@[macro_inline] def v8.Deserializer.new (buffer_ : ByteArray) : IO v8.Deserializer := Internal.api "Lasm.JS.Node.v8.Deserializer.new" do
+  Lasm.JS.Binding.invoke v8.Deserializer { name := "Lasm.JS.Node.v8.Deserializer.new", module := "node:v8", path := "Deserializer", construct := true, arity := 1 }
+    (Internal.args #[toJS buffer_]) (await := false)
+
 /-- `deserializer.readHeader()`: `undefined readHeader()` -/
 @[macro_inline] def v8.Deserializer.readHeader (self : v8.Deserializer) : IO Unit := Internal.api "Lasm.JS.Node.v8.Deserializer.readHeader" do
   self.val.callMethod "readHeader" (Internal.args #[]) Unit
@@ -259,6 +269,11 @@ instance instToJSPromiseHooksCreateHookCallbacks : ToJS promiseHooks.CreateHookC
 /-- `v instanceof GCProfiler`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `GCProfiler`). -/
 @[macro_inline] def v8.GCProfiler.cast? (v : Value) : IO (Option v8.GCProfiler) := Internal.api "Lasm.JS.Node.v8.GCProfiler.cast?" do
   Internal.cast (Support.getExport "node:v8" ["GCProfiler"] Value) (fun x => { val := x }) v
+
+/-- `new v8.GCProfiler()` (added in Node.js v19.6.0, v18.15.0): `constructor()` -/
+@[macro_inline] def v8.GCProfiler.new : IO v8.GCProfiler := Internal.api "Lasm.JS.Node.v8.GCProfiler.new" do
+  Lasm.JS.Binding.invoke v8.GCProfiler { name := "Lasm.JS.Node.v8.GCProfiler.new", module := "node:v8", path := "GCProfiler", construct := true, arity := 0 }
+    (Internal.args #[]) (await := false)
 
 /-- `profiler.start()` (added in Node.js v19.6.0, v18.15.0): `undefined start()` -/
 @[macro_inline] def v8.GCProfiler.start (self : v8.GCProfiler) : IO Unit := Internal.api "Lasm.JS.Node.v8.GCProfiler.start" do

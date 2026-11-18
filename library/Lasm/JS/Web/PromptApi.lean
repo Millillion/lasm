@@ -333,15 +333,40 @@ instance : ToJS LanguageModelToolSuccessInit := ⟨fun d => Internal.fields #[("
     (Internal.args #[Internal.optional options])
   pure { val := r }
 
+/-- `static Promise<LanguageModel> create(optional LanguageModelCreateOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def LanguageModel.create? (options : Option LanguageModelCreateOptions := none) : Async (Option LanguageModel) := Internal.api "Lasm.JS.Web.LanguageModel.create?" do
+  if !(← Internal.hasGlobal ["LanguageModel", "create"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.LanguageModel.create?", module := "globalThis", path := "LanguageModel.create", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional options])
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `static Promise<Availability> availability(optional LanguageModelCreateCoreOptions options)` -/
 @[macro_inline] def LanguageModel.availability (options : Option LanguageModelCreateCoreOptions := none) : Async Availability := Internal.api "Lasm.JS.Web.LanguageModel.availability" do
   Lasm.JS.Binding.invokeAsync Availability { name := "Lasm.JS.Web.LanguageModel.availability", module := "globalThis", path := "LanguageModel.availability", construct := false, arity := 1 }
     (Internal.args #[Internal.optional options])
 
+/-- `static Promise<Availability> availability(optional LanguageModelCreateCoreOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def LanguageModel.availability? (options : Option LanguageModelCreateCoreOptions := none) : Async (Option Availability) := Internal.api "Lasm.JS.Web.LanguageModel.availability?" do
+  if !(← Internal.hasGlobal ["LanguageModel", "availability"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync Availability { name := "Lasm.JS.Web.LanguageModel.availability?", module := "globalThis", path := "LanguageModel.availability", construct := false, arity := 1 }
+      (Internal.args #[Internal.optional options])
+  return some lasmGuarded
+
 /-- `static Promise<LanguageModelParams?> params()` -/
 @[macro_inline] def LanguageModel.params : Async (Option LanguageModelParams) := Internal.api "Lasm.JS.Web.LanguageModel.params" do
   Lasm.JS.Binding.invokeAsync (Option LanguageModelParams) { name := "Lasm.JS.Web.LanguageModel.params", module := "globalThis", path := "LanguageModel.params", construct := false, arity := 0 }
     (Internal.args #[])
+
+/-- `static Promise<LanguageModelParams?> params()` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def LanguageModel.params? : Async (Option (Option LanguageModelParams)) := Internal.api "Lasm.JS.Web.LanguageModel.params?" do
+  if !(← Internal.hasGlobal ["LanguageModel", "params"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invokeAsync (Option LanguageModelParams) { name := "Lasm.JS.Web.LanguageModel.params?", module := "globalThis", path := "LanguageModel.params", construct := false, arity := 0 }
+      (Internal.args #[])
+  return some lasmGuarded
 
 /-- `Promise<LanguageModelPromptResult> prompt(LanguageModelPrompt input, optional LanguageModelPromptOptions options)` -/
 @[macro_inline] def LanguageModel.prompt (self : LanguageModel) (input : LanguageModelPrompt) (options : Option LanguageModelPromptOptions := none) : Async Data := Internal.api "Lasm.JS.Web.LanguageModel.prompt" do
@@ -402,6 +427,14 @@ instance : ToJS LanguageModelToolSuccessInit := ⟨fun d => Internal.fields #[("
   Lasm.JS.Binding.invoke LanguageModelToolCall { name := "Lasm.JS.Web.LanguageModelToolCall.new", module := "globalThis", path := "LanguageModelToolCall", construct := true, arity := 1 }
     (Internal.args #[toJS init]) (await := false)
 
+/-- `constructor(LanguageModelToolCallInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def LanguageModelToolCall.new? (init : LanguageModelToolCallInit) : IO (Option LanguageModelToolCall) := Internal.api "Lasm.JS.Web.LanguageModelToolCall.new?" do
+  if !(← Internal.hasGlobal ["LanguageModelToolCall"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke LanguageModelToolCall { name := "Lasm.JS.Web.LanguageModelToolCall.new?", module := "globalThis", path := "LanguageModelToolCall", construct := true, arity := 1 }
+      (Internal.args #[toJS init]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString callId` -/
 @[macro_inline] def LanguageModelToolCall.callId (self : LanguageModelToolCall) : IO String := Internal.api "Lasm.JS.Web.LanguageModelToolCall.callId" do
   self.val.get "callId" String
@@ -423,6 +456,14 @@ instance : ToJS LanguageModelToolSuccessInit := ⟨fun d => Internal.fields #[("
   Lasm.JS.Binding.invoke LanguageModelToolError { name := "Lasm.JS.Web.LanguageModelToolError.new", module := "globalThis", path := "LanguageModelToolError", construct := true, arity := 1 }
     (Internal.args #[toJS init]) (await := false)
 
+/-- `constructor(LanguageModelToolErrorInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def LanguageModelToolError.new? (init : LanguageModelToolErrorInit) : IO (Option LanguageModelToolError) := Internal.api "Lasm.JS.Web.LanguageModelToolError.new?" do
+  if !(← Internal.hasGlobal ["LanguageModelToolError"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke LanguageModelToolError { name := "Lasm.JS.Web.LanguageModelToolError.new?", module := "globalThis", path := "LanguageModelToolError", construct := true, arity := 1 }
+      (Internal.args #[toJS init]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute DOMString callId` -/
 @[macro_inline] def LanguageModelToolError.callId (self : LanguageModelToolError) : IO String := Internal.api "Lasm.JS.Web.LanguageModelToolError.callId" do
   self.val.get "callId" String
@@ -443,6 +484,14 @@ instance : ToJS LanguageModelToolSuccessInit := ⟨fun d => Internal.fields #[("
 @[macro_inline] def LanguageModelToolSuccess.new (init : LanguageModelToolSuccessInit) : IO LanguageModelToolSuccess := Internal.api "Lasm.JS.Web.LanguageModelToolSuccess.new" do
   Lasm.JS.Binding.invoke LanguageModelToolSuccess { name := "Lasm.JS.Web.LanguageModelToolSuccess.new", module := "globalThis", path := "LanguageModelToolSuccess", construct := true, arity := 1 }
     (Internal.args #[toJS init]) (await := false)
+
+/-- `constructor(LanguageModelToolSuccessInit init)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def LanguageModelToolSuccess.new? (init : LanguageModelToolSuccessInit) : IO (Option LanguageModelToolSuccess) := Internal.api "Lasm.JS.Web.LanguageModelToolSuccess.new?" do
+  if !(← Internal.hasGlobal ["LanguageModelToolSuccess"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke LanguageModelToolSuccess { name := "Lasm.JS.Web.LanguageModelToolSuccess.new?", module := "globalThis", path := "LanguageModelToolSuccess", construct := true, arity := 1 }
+      (Internal.args #[toJS init]) (await := false)
+  return some lasmGuarded
 
 /-- `readonly attribute DOMString callId` -/
 @[macro_inline] def LanguageModelToolSuccess.callId (self : LanguageModelToolSuccess) : IO String := Internal.api "Lasm.JS.Web.LanguageModelToolSuccess.callId" do

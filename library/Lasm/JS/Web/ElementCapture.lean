@@ -26,6 +26,15 @@ set_option compiler.extract_closed false
     (Internal.args #[toJS element])
   pure { val := r }
 
+/-- `static Promise<RestrictionTarget> fromElement(Element element)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def RestrictionTarget.fromElement? (element : Element) : Async (Option RestrictionTarget) := Internal.api "Lasm.JS.Web.RestrictionTarget.fromElement?" do
+  if !(← Internal.hasGlobal ["RestrictionTarget", "fromElement"]) then return none
+  let lasmGuarded ← do
+    let r ← Lasm.JS.Binding.invokeAsync Value { name := "Lasm.JS.Web.RestrictionTarget.fromElement?", module := "globalThis", path := "RestrictionTarget.fromElement", construct := false, arity := 1 }
+      (Internal.args #[toJS element])
+    pure { val := r }
+  return some lasmGuarded
+
 /-- `Promise<undefined> restrictTo(RestrictionTarget? RestrictionTarget)` -/
 @[macro_inline] def BrowserCaptureMediaStreamTrack.restrictTo (self : BrowserCaptureMediaStreamTrack) (RestrictionTarget : Option RestrictionTarget) : Async Unit := Internal.api "Lasm.JS.Web.BrowserCaptureMediaStreamTrack.restrictTo" do
   self.val.callMethodAwait "restrictTo" (Internal.args #[toJS RestrictionTarget]) Unit

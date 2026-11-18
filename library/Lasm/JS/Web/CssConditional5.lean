@@ -46,6 +46,14 @@ instance : FromJS CSSContainerCondition where
 @[macro_inline] def CSSContainerRule.conditions (self : CSSContainerRule) : IO (Array CSSContainerCondition) := Internal.api "Lasm.JS.Web.CSSContainerRule.conditions" do
   self.val.get "conditions" (Array CSSContainerCondition)
 
+/-- `readonly attribute FrozenArray<CSSContainerCondition> conditions` where the platform has it (`'conditions' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def CSSContainerRule.conditions? (self' : CSSContainerRule) : IO (Option (Array CSSContainerCondition)) := Internal.api "Lasm.JS.Web.CSSContainerRule.conditions?" do
+  let self := self'
+  if !(← Internal.has self.val "conditions") then return none
+  let lasmGuarded ← do
+    self.val.get "conditions" (Array CSSContainerCondition)
+  return some lasmGuarded
+
 /-- `v instanceof CSSSupportsConditionRule`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `CSSSupportsConditionRule`). -/
 @[macro_inline] def CSSSupportsConditionRule.cast? (v : Value) : IO (Option CSSSupportsConditionRule) := Internal.api "Lasm.JS.Web.CSSSupportsConditionRule.cast?" do
   Internal.cast (Internal.getGlobal ["CSSSupportsConditionRule"] Value) (fun x => { val := x }) v

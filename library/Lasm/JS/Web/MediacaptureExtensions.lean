@@ -253,9 +253,26 @@ instance : ToJS MediaEffectInfo := ⟨fun d => Internal.fields #[("enabled", toJ
   let r ← self.val.get "stats" Data
   Internal.optionalValue r
 
+/-- `readonly attribute (MediaStreamTrackAudioStats or MediaStreamTrackVideoStats)? stats` where the platform has it (`'stats' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaStreamTrack.stats? (self' : MediaStreamTrack) : IO (Option (Option Value)) := Internal.api "Lasm.JS.Web.MediaStreamTrack.stats?" do
+  let self := self'
+  if !(← Internal.has self.val "stats") then return none
+  let lasmGuarded ← do
+    let r ← self.val.get "stats" Data
+    Internal.optionalValue r
+  return some lasmGuarded
+
 /-- `attribute EventHandler onconfigurationchange` -/
 @[macro_inline] def MediaStreamTrack.onconfigurationchange (self : MediaStreamTrack) : IO (Option EventHandlerNonNull) := Internal.api "Lasm.JS.Web.MediaStreamTrack.onconfigurationchange" do
   self.val.get "onconfigurationchange" (Option EventHandlerNonNull)
+
+/-- `attribute EventHandler onconfigurationchange` where the platform has it (`'onconfigurationchange' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def MediaStreamTrack.onconfigurationchange? (self' : MediaStreamTrack) : IO (Option (Option EventHandlerNonNull)) := Internal.api "Lasm.JS.Web.MediaStreamTrack.onconfigurationchange?" do
+  let self := self'
+  if !(← Internal.has self.val "onconfigurationchange") then return none
+  let lasmGuarded ← do
+    self.val.get "onconfigurationchange" (Option EventHandlerNonNull)
+  return some lasmGuarded
 
 /-- Sets `onconfigurationchange`: `attribute EventHandler onconfigurationchange` -/
 @[macro_inline] def MediaStreamTrack.setOnconfigurationchange (self : MediaStreamTrack) (value : Option EventHandlerNonNull) : IO Unit := Internal.api "Lasm.JS.Web.MediaStreamTrack.setOnconfigurationchange" do

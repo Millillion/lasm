@@ -33,6 +33,14 @@ instance : ToJS GyroscopeSensorOptions := ⟨fun d => Internal.fields #[("freque
   Lasm.JS.Binding.invoke Gyroscope { name := "Lasm.JS.Web.Gyroscope.new", module := "globalThis", path := "Gyroscope", construct := true, arity := 1 }
     (Internal.args #[Internal.optional sensorOptions]) (await := false)
 
+/-- `constructor(optional GyroscopeSensorOptions sensorOptions)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def Gyroscope.new? (sensorOptions : Option GyroscopeSensorOptions := none) : IO (Option Gyroscope) := Internal.api "Lasm.JS.Web.Gyroscope.new?" do
+  if !(← Internal.hasGlobal ["Gyroscope"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke Gyroscope { name := "Lasm.JS.Web.Gyroscope.new?", module := "globalThis", path := "Gyroscope", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional sensorOptions]) (await := false)
+  return some lasmGuarded
+
 /-- `readonly attribute double? x` -/
 @[macro_inline] def Gyroscope.x (self : Gyroscope) : IO (Option Float) := Internal.api "Lasm.JS.Web.Gyroscope.x" do
   self.val.get "x" (Option Float)

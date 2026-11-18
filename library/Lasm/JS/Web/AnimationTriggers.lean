@@ -46,6 +46,14 @@ instance : ToJS AnimationTriggerOptions := ⟨fun d => Internal.fields #[("timel
   Lasm.JS.Binding.invoke AnimationTrigger { name := "Lasm.JS.Web.AnimationTrigger.new", module := "globalThis", path := "AnimationTrigger", construct := true, arity := 1 }
     (Internal.args #[Internal.optional options]) (await := false)
 
+/-- `constructor(optional AnimationTriggerOptions options)` where the platform has it (its global), else `none` (rule 0.3-11). -/
+@[macro_inline] def AnimationTrigger.new? (options : Option AnimationTriggerOptions := none) : IO (Option AnimationTrigger) := Internal.api "Lasm.JS.Web.AnimationTrigger.new?" do
+  if !(← Internal.hasGlobal ["AnimationTrigger"]) then return none
+  let lasmGuarded ← do
+    Lasm.JS.Binding.invoke AnimationTrigger { name := "Lasm.JS.Web.AnimationTrigger.new?", module := "globalThis", path := "AnimationTrigger", construct := true, arity := 1 }
+      (Internal.args #[Internal.optional options]) (await := false)
+  return some lasmGuarded
+
 /-- `attribute AnimationTimeline timeline` -/
 @[macro_inline] def AnimationTrigger.timeline (self : AnimationTrigger) : IO AnimationTimeline := Internal.api "Lasm.JS.Web.AnimationTrigger.timeline" do
   let r ← self.val.get "timeline" Value

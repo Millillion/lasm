@@ -364,10 +364,10 @@ May interrupt any stage (Jordan, 2026-11-16).
 His words, 2026-11-02, from issue #21. The API questions in it are inventoried
 by milestone 0.1.
 
-- [ ] (J) Hone the propositions of Lasm's own library: 30 in [library/Lasm/UI/Spec.lean](library/Lasm/UI/Spec.lean), [RPC/Spec.lean](library/Lasm/RPC/Spec.lean), [KV/Spec.lean](library/Lasm/KV/Spec.lean) and [Fetch/Spec.lean](library/Lasm/Fetch/Spec.lean) ([library/PROOFS.md](library/PROOFS.md)).
+- [ ] (J) Hone the propositions of Lasm's own library: 30 in [library/Lasm/UI/Spec.lean](library/Lasm/UI/Spec.lean), [RPC/Spec.lean](library/Lasm/RPC/Spec.lean) and [Fetch/Spec.lean](library/Lasm/Fetch/Spec.lean) ([library/PROOFS.md](library/PROOFS.md)).
 - [ ] (J) Hone the Lean code of every example, especially the propositions and the theorem structure: Conduit first (52 propositions in [Proofs/Spec.lean](examples/conduit/Proofs/Spec.lean)), then Ledger (31 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean)).
 - [ ] (J) Review the whole `lasm` CLI: its UX, and that it works.
-- [ ] (J) Hone the libraries Lasm added: Lasm.UI, Lasm.JS (with the generated Lasm.JS.Web), Lasm.RPC, Lasm.KV.
+- [ ] (J) Hone the libraries Lasm added: Lasm.UI, Lasm.JS (with the generated Lasm.JS.Web), Lasm.RPC.
 - [ ] (J) Work out the whole front-end UI story.
 - [ ] (J) Play with Lasm, front end to back end, and hone what comes up.
 - [ ] (J) Hone the README, [TRUST.md](docs/proposals/TRUST.md) and every human-facing text, including [HOW_LASM_WORKS.md](docs/HOW_LASM_WORKS.md) and `llms.txt` (drafted 2026-11-06).
@@ -390,7 +390,7 @@ in the release notes ([docs/release/](docs/release/)). In short:
   coverage on Node, JS/npm interop, the Node launch (0.1.0), the edge isolates
   and Bun/Deno (0.2.0), WASI, wasi-http/Spin, Fastly and browsers (0.3.0).
   Complete; Lean as a runtime library stays parked ([After 1.0](#after-10)).
-- **Releases** 0.3.6 to 0.8.0 (published 2026-11-14).
+- **Releases** 0.3.6 to 0.9.0 (0.9.0, Stage 0's first API release: `Node.serve`, direct function handlers, `Lasm.JS.Cloudflare`, the binding rules, the templates per serving model, the CLI changes, `Lasm.UI`'s core cut, and the whole web platform, Node core, Deno, Bun and Cloudflare generated with no umbrella modules; [0.9.0-notes.md](docs/release/0.9.0-notes.md)).
 - **Five flagship apps:** Conduit, Ledger, Folio, Porter and Tandem, each on
   every platform it claims with its outside oracle, proofs and fuzzing.
 - **Testing:** the strategy (2026-11-09), differential testing against

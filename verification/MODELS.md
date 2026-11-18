@@ -34,9 +34,9 @@ How a module moves from pending to modelled:
 <!-- BEGIN MODELS -->
 <!-- Generated from verification/models.json by `node scripts/models.mjs --write`; do not edit by hand. -->
 
-**181 shipped modules**: 19 modelled, 28 pending, 134 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 28 modules still need a model.
+**183 shipped modules**: 20 modelled, 28 pending, 135 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 28 modules still need a model.
 
-### Modelled (19)
+### Modelled (20)
 
 | Module | Models (and their differentials) | Reason |
 | --- | --- | --- |
@@ -44,7 +44,8 @@ How a module moves from pending to modelled:
 | [`native/process-launcher.c`](../native/process-launcher.c) | [ProcessLauncher.lean](../verification/cli/Lasm/Cli/Model/ProcessLauncher.lean) (main's reading of the configuration (number, string, read_exact); [cli-differential.mjs](../test/models/cli-differential.mjs)) | its reading of the configuration is modelled, and the differential runs the compiled C (effects reported instead of performed, test/models/process-launcher-harness.c); what it then does (stdio flags, chdir, setsid, execvp) is I/O, tested end to end by test/process-launcher.test.mjs |
 | [`src/application-reachability.mjs`](../src/application-reachability.mjs) | [Reachability.lean](../verification/cli/Lasm/Cli/Model/Reachability.lean) (`applicationLinkRequirements`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the linker map reader is modelled, its regular expressions as matchers (link_map_static_sound proved); readApplicationLinkRequirements feeds the same reader lines from a stream, canSpecializeInitialization is the list of audited runtimes, and the C sources are constants |
 | [`src/browser/static-server.mjs`](../src/browser/static-server.mjs) | [StaticServer.lean](../verification/cli/Lasm/Cli/Model/StaticServer.lean) (`resolveStaticPath`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | request resolution is modelled with node:path's POSIX normalize, join and extname and the file system a parameter (static_inside_root proved); on Windows node:path's win32 rules apply instead (test/static-server.test.mjs on the Windows job); the rest serves the resolved file over HTTP (headers, live reload) and listenError picks a message from a table |
-| [`src/cli-arguments.mjs`](../src/cli-arguments.mjs) | [CliArguments.lean](../verification/cli/Lasm/Cli/Model/CliArguments.lean) (`asciiLower`, `editDistance`, `closest`, `targetHint`, `parseLasmArguments`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the whole parser is modelled (run_args_kept, unknown_flag_refused, edit_distance_metric, closest_nearest_first, build_options_commute, parse_known_or_refused proved, the last with the parsers of lasm init, dev and package it hands to); existsSync is the environment and jsRuntime one of node, bun and deno |
+| [`src/cli-arguments.mjs`](../src/cli-arguments.mjs) | [CliArguments.lean](../verification/cli/Lasm/Cli/Model/CliArguments.lean) (`targetHint`, `parseLasmArguments`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the whole parser is modelled (run_args_kept, unknown_flag_refused, edit_distance_metric, closest_nearest_first, build_options_commute, parse_known_or_refused proved, the last with the parsers of lasm init, dev and package it hands to); existsSync is the environment and jsRuntime one of node, bun and deno |
+| [`src/cli-names.mjs`](../src/cli-names.mjs) | [CliArguments.lean](../verification/cli/Lasm/Cli/Model/CliArguments.lean) (`asciiLower`, `editDistance`, `closest`, `targetHintAmong`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the names and "did you mean" hints of every command: asciiLower, editDistance and closest are modelled with the parser (edit_distance_metric, closest_nearest_first proved); targetHintAmong is checked through the parsers of lasm init, dev and package that call it |
 | [`src/edge/builtin-modules.mjs`](../src/edge/builtin-modules.mjs) | [BuiltinModules.lean](../verification/cli/Lasm/Cli/Model/BuiltinModules.lean) (`isBuiltinModule`, `builtinModuleClosure`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the closure is modelled, with the import forms it reads checked by the differential; `builtinModuleNames` and `builtinModuleFile` look a name up in the builtin directory (test/builtin-modules.test.mjs) |
 | [`src/edge/edge-initializers.mjs`](../src/edge/edge-initializers.mjs) | [EdgeInitializers.lean](../verification/cli/Lasm/Cli/Model/EdgeInitializers.lean) (`initializationSchedule`, `compactInitializerWrappers`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | both functions run as their Lean model, compiled by Lasm into the CLI's glue program (src/glue/glue.mjs, docs/proposals/M6_GLUE.md) through a proved fast version (verification/cli/Lasm/Cli/Fast/EdgeInitializers.lean, a csimp theorem); what remains here is the plan's shape check and the encoding of its fields, which the differential checks together with the compiled program |
 | [`src/handle-table.mjs`](../src/handle-table.mjs) | [HandleTable.lean](../verification/cli/Lasm/Cli/Model/HandleTable.lean) (HandleTable (constructor, allocate, and the Map's set and delete); [cli-differential.mjs](../test/models/cli-differential.mjs)) | the allocator is modelled; handle_fresh_in_range proved |
@@ -93,7 +94,7 @@ How a module moves from pending to modelled:
 | [`src/wasm-objects.mjs`](../src/wasm-objects.mjs) | — | a reader of relocatable Wasm objects: pure |
 | [`src/web-availability.mjs`](../src/web-availability.mjs) | — | lasm build --target's web API check: pure over the program's C texts and the generated availability table; model the lookup |
 
-### Exempt (134)
+### Exempt (135)
 
 | Module | Kind | Reason |
 | --- | --- | --- |
@@ -144,6 +145,7 @@ How a module moves from pending to modelled:
 | [`src/lasm-modules/app.mjs`](../src/lasm-modules/app.mjs) | runtime | the app instance of Lasm.UI.Mount; tested in browsers (ui.yml) |
 | [`src/lasm-modules/class.mjs`](../src/lasm-modules/class.mjs) | runtime | lasm:class, behind Lasm.JS.Class.define: a JavaScript class built by the language itself (extends, super, prototype methods); tested in test/lasm-class.test.mjs and on every JavaScript target (test/fixtures/js-core) |
 | [`src/launcher.mjs`](../src/launcher.mjs) | io | starts a built program |
+| [`src/lean.mjs`](../src/lean.mjs) | io | `@lasm/cli/lean`: provisions the managed Lean (src/managed-lean.mjs, modelled where it is pure) and returns its paths; its effect is the installation, tested end to end |
 | [`src/link-driver/compile.mjs`](../src/link-driver/compile.mjs) | io | compiles Lasm's C with the managed clang; orchestration of files, processes or the network: its effect is the behaviour, tested end to end |
 | [`src/link-driver/link.mjs`](../src/link-driver/link.mjs) | io | runs wasm-ld and the glue; orchestration of files, processes or the network: its effect is the behaviour, tested end to end |
 | [`src/link-driver/settings.mjs`](../src/link-driver/settings.mjs) | data | Emscripten link settings as data |

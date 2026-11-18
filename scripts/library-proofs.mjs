@@ -42,7 +42,7 @@ const jsonPath = process.env.LIBRARY_PROOFS_JSON ?? join(work, 'proofs.json');
 const proofModules = ['Lasm.UI.Proofs.Basic', 'Lasm.UI.Proofs.Lists', 'Lasm.UI.Proofs.Decode',
   'Lasm.UI.Proofs.Applier', 'Lasm.UI.Proofs.Conform', 'Lasm.UI.Proofs.Children', 'Lasm.UI.Proofs.TwoEnded',
   'Lasm.UI.Proofs.Diff', 'Lasm.UI.Proofs', 'Lasm.UI.Proofs.Wire', 'Lasm.UI.Proofs.Apply', 'Lasm.UI.Spec', 'Lasm.UI.Theorems',
-  'Lasm.UI.Candidates', 'Lasm.KV.Spec', 'Lasm.KV.Theorems',
+  'Lasm.UI.Candidates',
   'Lasm.Fetch.Spec', 'Lasm.Fetch.Theorems', 'Lasm.Fetch.Candidates',
   'Lasm.JS.Proofs.Wire', 'Lasm.JS.Spec', 'Lasm.JS.Theorems'];
 // The propositions about the CLI's JavaScript (verification/cli): the Lean
@@ -57,7 +57,7 @@ const cliModules = ['Lasm.Cli.Model.Zip', 'Lasm.Cli.Model.CliArguments', 'Lasm.C
   'Lasm.Serverless.Proofs.Model', 'Lasm.Serverless.Proofs.Mapping', 'Lasm.Serverless.Spec', 'Lasm.Serverless.Theorems',
   'Lasm.Serverless.Candidates'];
 const cliRoot = join(root, 'verification', 'cli');
-const libraries = ['Lasm.UI', 'Lasm.KV', 'Lasm.Fetch', 'Lasm.JS'];
+const libraries = ['Lasm.UI', 'Lasm.Fetch', 'Lasm.JS'];
 // The propositions verification/cli/README.md lists.
 const cliLibraries = ['Lasm.Cli', 'Lasm.Serverless'];
 const sourceOf = (module, base = library) => join(base, ...module.split('.')) + '.lean';

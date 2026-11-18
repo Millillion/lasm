@@ -724,6 +724,18 @@ def frames (record : Record) : Async Unit := do
 
 @[js "globalThis" "Reflect.has"] opaque reflectHas : Value → String → IO Bool
 @[js "globalThis" "JSON.parse"] opaque jsonParse : String → IO Data
+@[js "globalThis" "Object"] opaque toObject : Value → IO Value
+@[js "globalThis" "Object.is"] opaque objectIs : Value → Value → IO Bool
+
+/-- Whether `v` is an object or a function (`typeof` "object" but not null, or
+"function"): `Object(v)` is `v` itself exactly then. `Reflect.has` throws a
+TypeError on anything else (WebKit on Linux has surface globals whose value, or
+whose `prototype`, is not an object). -/
+def isObjectLike (v : Value) : IO Bool := do objectIs (← toObject v) v
+
+/-- `Reflect.has v m`, false when `v` is not an object or a function. -/
+def hasMember (v : Value) (m : String) : IO Bool := do
+  if ← isObjectLike v then reflectHas v m else return false
 
 def names (info : Data) (key : String) : Array String :=
   match info.field key with
@@ -737,13 +749,16 @@ def availability (record : Record) (root : Element) : IO Unit := do
   for (path, info) in entries do
     if ← reflectHas g path then
       let v ← g.get path Value
+      -- A global that is not an object or a function (Window's attributes: `name`,
+      -- `onclick`, `innerWidth`) is present; it lacks only the members expected on it.
       for m in names info "static" do
-        unless ← reflectHas v m do missing := missing.push s!"{path}.{m}"
+        unless ← hasMember v m do missing := missing.push s!"{path}.{m}"
       let proto := names info "prototype"
       unless proto.isEmpty do
-        let p ← v.get "prototype" Value
+        let p ← if ← isObjectLike v then v.get "prototype" Value else pure v
+        if (← isObjectLike v) && !(← isObjectLike p) then missing := missing.push s!"{path}.prototype (not an object)"
         for m in proto do
-          unless ← reflectHas p m do missing := missing.push s!"{path}.prototype.{m}"
+          unless ← hasMember p m do missing := missing.push s!"{path}.prototype.{m}"
     else missing := missing.push path
   let out ← make "pre"
   out.setId "bindings-missing"

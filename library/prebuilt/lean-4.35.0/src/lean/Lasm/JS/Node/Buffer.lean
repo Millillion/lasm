@@ -80,6 +80,11 @@ instance : FromJS LongLongOrDOMString where
 @[macro_inline] def SlowBuffer.cast? (v : Value) : IO (Option SlowBuffer) := Internal.api "Lasm.JS.Node.SlowBuffer.cast?" do
   Internal.cast (Support.getExport "node:buffer" ["SlowBuffer"] Value) (fun x => { val := x }) v
 
+/-- **Deprecated** in the Node.js 24.22.2 docs. `new SlowBuffer(size)`: `constructor(long long size)` -/
+@[macro_inline] def SlowBuffer.new (size : Int) : IO SlowBuffer := Internal.api "Lasm.JS.Node.SlowBuffer.new" do
+  Lasm.JS.Binding.invoke SlowBuffer { name := "Lasm.JS.Node.SlowBuffer.new", module := "node:buffer", path := "SlowBuffer", construct := true, arity := 1 }
+    (Internal.args #[toJS size]) (await := false)
+
 /-- `buf.compare(target[, targetStart[, targetEnd[, sourceStart[, sourceEnd]]]])` (added in Node.js v0.11.13): `long long compare(Uint8Array target, optional long long targetStart, optional long long targetEnd, optional long long sourceStart, optional long long sourceEnd)` -/
 @[macro_inline] def Buffer.compare (self : ByteArray) (target : ByteArray) (targetStart : Option Int := none) (targetEnd : Option Int := none) (sourceStart : Option Int := none) (sourceEnd : Option Int := none) : IO Int := Internal.api "Lasm.JS.Node.Buffer.compare" do
   Support.callOnBytes "node:buffer" "Buffer.prototype.compare" self (Internal.args #[toJS target, Internal.optional targetStart, Internal.optional targetEnd, Internal.optional sourceStart, Internal.optional sourceEnd]) Int

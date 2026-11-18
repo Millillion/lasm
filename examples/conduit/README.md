@@ -81,12 +81,12 @@ What differs between platforms, honestly:
   platforms (Lambda, Vercel, Netlify Functions, Azure, Google) give a function only a
   temporary directory, so there each instance has its own database, lost when the platform
   recycles the instance: fine for a demo, not for a site. For real data there, write a `Sql`
-  over a hosted database (Turso, D1 over HTTP) or a `Lasm.KV.Store` over a hosted key-value
+  over a hosted database (Turso, D1 over HTTP) or a `KvStore` over a hosted key-value
   store, as the other bindings do. Vercel Edge has no store of its own: memory, per isolate.
 - **The key-value stores** (Deno KV, Netlify Blobs, Fastly KV, PostgREST) hold the same rows
   as the SQL tables, one key per row and index ([`Server/Kv.lean`](Server/Kv.lean)). A list
   reads every article's keys, and one request's writes are not one transaction (no
-  compare-and-set in `Lasm.KV`): right for an example, slow and racy for a large, busy site.
+  compare-and-set in `KvStore`): right for an example, slow and racy for a large, busy site.
 - **No JavaScript** on Fastly and wasi-http: passwords and tokens are SHA-256, HMAC and PBKDF2
   written in Lean ([`Server/LeanCrypto.lean`](Server/LeanCrypto.lean), checked against Node's
   crypto by [`test/crypto-check.mjs`](test/crypto-check.mjs)). PBKDF2's 100,000 iterations
@@ -129,36 +129,41 @@ Frontend/             the browser app (Lasm.UI), also rendered by the server
   Model.lean          the app's state and messages; the flags the server hands over
   View.lean           every page, with the templates' markup
   Update.lean         what the app does: API calls, forms (validated as the server validates)
+  Cmd.lean            the app's commands as data (requests, storage, navigation), which the proofs read
 Server/               the server (Lasm.JS, Lasm.Fastly or Lasm.WASI.Http, per platform)
   Web.lean            requests and responses in pure Lean, the path read as a browser reads it
   Assets.lean         the browser app's files, embedded (Embed.lean: embed_dir!) and served
   Http.lean           HTTP: /api/… → Conduit.Api.handle, other URLs → their page (no JavaScript)
-  JsServe.lean        the JavaScript servers: the edge's default export, Deno.serve, Bun.serve
-  NodeServe.lean      Node's server: still Lasm.Fetch's, until Node serving is decided; Deno.serve on Deno
+  JsServe.lean        Conduit's handler as a fetch handler on the web's Request and Response; fetch
   FastlyServe.lean    Fastly Compute's server, on its host calls (Lasm.Fastly)
   WasiHttpServe.lean  the wasi:http server and outgoing requests (Lasm.WASI.Http)
   Pages.lean          server rendering: a URL's data from the API, `view` to HTML, flags
   Sql.lean            every SQL statement; Conduit's Store on a SQLite connection
-  Kv.lean             Conduit's Store on a key-value store (Lasm.KV.Store), the same rows as keys
+  Kv.lean             Conduit's Store on a key-value store (KvStore: get, put, delete), the same rows as keys
   NodeSqlite.lean     node:sqlite (Node, Deno, the Node function platforms) ┐
   D1.lean             Cloudflare D1 (Workers)                               │ the only
   BunSqlite.lean      bun:sqlite (Bun)                                      │ platform-specific
-  NetlifyBlobs.lean   Netlify Blobs (Netlify Edge), as a Lasm.KV.Store      │ code: a `Sql` or a
+  NetlifyBlobs.lean   Netlify Blobs (Netlify Edge), as a KvStore            │ code: a `Sql` or a
   Postgrest.lean      Postgres through PostgREST (Supabase, wasi-http)      ┘ key-value store
   Crypto.lean         PBKDF2 and JWT with Web Crypto
   LeanCrypto.lean     SHA-256, HMAC, PBKDF2 and JWT in pure Lean (Fastly, wasi-http)
   Base64.lean         base64url
   App.lean            the services (Web Crypto, the clock, JWT_SECRET) for the JavaScript targets
   BuildEnv.lean       build_env!: a build-time setting (wasi-http has no environment)
-ServerNode.lean       main for Node, Deno and the Node function platforms (node:sqlite) ┐ open the
-ServerWorkers.lean    main for Workers (D1)                                             │ store, embed
-ServerBun.lean        main for Bun (bun:sqlite)                                         │ dist/public,
-ServerEdge.lean       main for Deno Deploy and Vercel Edge (Lasm.KV: Deno KV, memory)   │ serve
-ServerNetlifyEdge.lean  main for Netlify Edge (Netlify Blobs)                           │
-ServerSupabase.lean   main for Supabase Edge Functions (Postgres)                       │
+ServerNode.lean       main for Node and Docker: Node.serve (node:sqlite)                ┐ one entry
+ServerDeno.lean       main for Deno: Deno.serve (node:sqlite)                           │ file per
+ServerBun.lean        main for Bun: Bun.serve (bun:sqlite)                              │ serving model:
+ServerFunction.lean   main for Lambda, Vercel, Netlify, Azure, Google: exportDefault    │ open the
+                      (node:sqlite in the temporary directory)                          │ store, embed
+ServerWorkers.lean    main for Workers: the fetch handler with its typed Env (D1)       │ dist/public,
+ServerDenoDeploy.lean main for Deno Deploy: exportDefault (Deno KV)                     │ serve
+ServerVercelEdge.lean main for Vercel Edge: exportDefault (memory)                      │
+ServerNetlifyEdge.lean  main for Netlify Edge: exportDefault (Netlify Blobs)            │
+ServerSupabase.lean   main for Supabase Edge Functions: exportDefault (Postgres)        │
 ServerFastly.lean     main for Fastly Compute (Fastly KV; Lean crypto)                  │
 ServerWasiHttp.lean   main for wasi-http (Postgres through PostgREST; Lean crypto)      ┘
-Client.lean           main for the browser: hydrate, run, window.__conduit_debug__
+Client.lean           main for the browser: hydrate, run, perform the app's commands
+                      (Cmd.task with fetch and localStorage), window.__conduit_debug__
 Proofs/               the theorems (PROOFS.md); Model.lean is the database as Lean lists
 public/               the RealWorld theme (styles.css), the default avatar, conduit.css
 Dockerfile            the Node server's image; deploy/ the other platforms' files:
@@ -206,40 +211,46 @@ until the app has started and knows the viewer; then it reloads what depends on 
 
 ## How the JavaScript bindings are written
 
-`Server/NodeSqlite.lean` is the whole Node database binding. One `@[js]` line declares the
-constructor; everything else is ordinary method calls on the JavaScript object:
+Conduit uses Lasm's generated bindings wherever they exist (docs/JS_BINDINGS.md): each entry
+file serves with its platform's own API, and each store module is a few calls on the
+platform's own store.
 
-```lean
-/-- `new DatabaseSync(path)` from node:sqlite. -/
-@[js "node:sqlite" "new DatabaseSync"] opaque openDatabase : String → IO Value
+- **Serving.** `Server/JsServe.lean` turns Conduit's handler into a fetch handler on the web's
+  `Request` and `Response` (Lasm.JS.Web.Fetch). Node serves it with `Node.serve`
+  (Lasm.JS.Node.Serve), Deno with `Deno.serve`, Bun with `Bun.serve`; the edge and function
+  platforms call it as the program's default export (`exportDefault`), in-process.
+- **SQLite.** Each binding module returns a `Sql` (three functions: `all`, `run`, `batch`), and
+  `Server/Sql.lean` builds Conduit's `Store` from it, so another SQLite is another `Sql`:
+  - `Server/NodeSqlite.lean`: node:sqlite through Lasm.JS.Node.Sqlite (`DatabaseSync.exec`,
+    `prepare`). Two calls are still by hand, because the generated module cannot express them
+    yet: the constructor (`@[js "node:sqlite" "new DatabaseSync"]`) and running a statement
+    whose parameters include SQL `NULL`. Deno runs the same module: Deno implements
+    `node:sqlite`.
+  - `Server/D1.lean`: Lasm.JS.Cloudflare.D1. The Worker's fetch handler receives its bindings
+    typed (`structure Env where DB : D1Database … deriving FromJS`, `ServerWorkers.lean`); D1's
+    methods return promises, awaited in `Async` (no Lean thread held), and `batch` is D1's
+    `db.batch` (one transaction).
+  - `Server/BunSqlite.lean`: Lasm.JS.Bun.Sqlite (`Database.new`, `query`, `run`, `all`), built
+    with Lasm running on Bun (`bunx --bun lasm build …`, as `npm run build:bun` does).
+- **Web Crypto.** `Server/Crypto.lean` calls Lasm.JS.Web.Webcrypto: `crypto.getRandomValues`,
+  `subtle.importKey`, `deriveBits`, `sign` and `verify`.
+- **The browser.** `update` returns the app's commands as data (`Frontend/Cmd.lean`), so the
+  proofs see every request it sends; `Client.lean` performs each one with Lasm.UI's
+  `Cmd.task` and the generated `fetch` and `localStorage`.
 
-let db ← openDatabase "conduit.db"
-let st ← db.callMethod "prepare" #[toJS "SELECT id, username FROM users WHERE email = ?"]
-let rows ← st.callMethod "all" #[toJS email] (Array Data)
-```
+Where there is no SQL, the store is `Server/Kv.lean` on a `KvStore` (get, put, delete), which
+each entry file makes from its platform's own store; a store it names that is missing is an
+error, never memory:
 
-It returns a `Sql` (three functions: `all`, `run`, `batch`), and `Server/Sql.lean` builds
-Conduit's `Store` from it, so another SQLite is another `Sql`:
-
-- `Server/D1.lean` imports nothing: D1 is an object in the Worker's `env`
-  (`JsServe.platformEnv`, kept from each request), its methods return promises that `callMethodAwait` awaits in
-  `Async` (no Lean thread held), and `batch` is D1's `db.batch` (one transaction).
-- `Server/BunSqlite.lean` binds `@[js "bun:sqlite" "new Database"]`. Lasm checks every binding
-  against the real module at build time, so this one is built with Lasm running on Bun
-  (`bunx --bun lasm build …`, as `npm run build:bun` does).
-- Deno runs the same `Server/NodeSqlite.lean`: Deno implements `node:sqlite`.
-- Web Crypto needs no binding: `Server/Crypto.lean` reads `globalThis.crypto.subtle` and calls
-  `importKey`, `deriveBits`, `sign` and `verify`.
-
-Where there is no SQL, the store is `Server/Kv.lean` on a `Lasm.KV.Store` (get, put, delete):
-
-- `Lasm.KV.open "conduit"` is Deno KV on Deno Deploy, the KV Store `conduit` on Fastly, and
-  memory elsewhere (Vercel Edge): no binding at all.
-- `Server/NetlifyBlobs.lean` binds `@[js "@netlify/blobs" "getStore"]` and calls `get`, `set`
-  and `delete` on the store.
-- `Server/Postgrest.lean` is plain HTTP to PostgREST, sent with the entry file's `send`:
-  Lasm.JS.Web's `fetch` on Supabase, wasi:http's outgoing-handler where there is no JavaScript
+- Deno Deploy: Deno KV through Lasm.JS.Deno.Kv (`openKv`, `Kv.get`, `set`, `delete`), keys
+  `["conduit", key]` (`ServerDenoDeploy.lean`).
+- Fastly: the KV Store `conduit` through Lasm.Fastly.KvStore (`ServerFastly.lean`).
+- `Server/NetlifyBlobs.lean` binds the npm package `@netlify/blobs`
+  (`@[js "@netlify/blobs" "getStore"]`) and calls `get`, `set` and `delete` on the store.
+- `Server/Postgrest.lean` is plain HTTP to PostgREST, sent with the entry file's `send`: the
+  web's `fetch` on Supabase, wasi:http's outgoing-handler where there is no JavaScript
   (wasi-http).
+- Vercel Edge has no store of its own: `KvStore.memory`, one copy per isolate.
 
 Each target has its own entry file because Lasm bundles a program's bound modules: the Workers
 build must not mention `node:sqlite`. The full guide is [docs/JS_BINDINGS.md](../../docs/JS_BINDINGS.md).
@@ -257,7 +268,8 @@ build must not mention `node:sqlite`. The full guide is [docs/JS_BINDINGS.md](..
 
 - **Node**: `npm run build` writes `dist/server` (the program, the Lean runtime, the browser
   app embedded, and `main.mjs`); run `node dist/server/main.mjs` on any machine with Node 24+,
-  in a container or a VM. Keep `DATABASE_PATH` on a persistent disk.
+  in a container or a VM; it serves with `Node.serve` and stops cleanly on SIGTERM. Keep
+  `DATABASE_PATH` on a persistent disk.
 - **Cloudflare Workers**: `npx wrangler d1 create conduit` and put its id in `wrangler.toml`,
   `npx wrangler secret put JWT_SECRET`, then `npm run build:workers` and `npx wrangler deploy`.
   Conduit creates its tables on first use. PBKDF2 with 100,000 iterations takes a few ms of
@@ -266,14 +278,20 @@ build must not mention `node:sqlite`. The full guide is [docs/JS_BINDINGS.md](..
   `JWT_SECRET`). **Deno**: `npm run build:deno` writes `deno/`; run `deno run -A deno/main.mjs`.
 - **Docker**: `npm run build:docker`, then `docker run -p 3000:3000 -v conduit-data:/data -e
   JWT_SECRET=… conduit`.
-- **AWS Lambda**: `npm run build:lambda`, then `sam deploy --guided -t
-  deploy/lambda/template.yaml` (.zip); or `npm run build:lambda-image`, push the image to ECR and
-  set `ImageUri` in `deploy/lambda-image/template.yaml`.
+- **Function platforms** (Lambda, Vercel, Netlify, Azure, Google) build
+  [`ServerFunction.lean`](ServerFunction.lean), whose handler is the program's default export:
+  the platform's generated handler calls it in-process, with no HTTP server.
+- **AWS Lambda**: `npm run build:lambda` (`lasm build ServerFunction.lean --target lambda`:
+  `lambda.zip`), then `sam deploy --guided -t deploy/lambda/template.yaml`; or
+  `npm run build:lambda-image` (the same files, unpacked onto Lambda's Node 24 base image,
+  `CMD ["lasm-lambda.handler"]`), push the image to ECR and set `ImageUri` in
+  `deploy/lambda-image/template.yaml`.
 - **Vercel / Netlify**: connect the repository; [`vercel.json`](vercel.json) and
   [`netlify.toml`](netlify.toml) run the build. For their edge runtimes use
   `deploy/vercel-edge/vercel.json` and `deploy/netlify-edge/netlify.toml` instead.
 - **Azure Functions / Google Cloud Functions**: `npm run build:azure` writes `azure-functions/`
-  (`func azure functionapp publish APP` there); `npm run build:gcf` writes `gcf/` (`gcloud
+  (`func azure functionapp publish APP` there; [`deploy/package-hosted.mjs`](deploy/package-hosted.mjs) builds
+  `ServerFunction.lean` and adds the platform's own npm package); `npm run build:gcf` writes `gcf/` (`gcloud
   functions deploy conduit --gen2 --runtime nodejs24 --trigger-http --entry-point lasm --source gcf`).
 - **Deno Deploy**: `npm run build:deno-deploy`; the entrypoint is `deno/main.mjs`.
 - **Supabase**: `npx supabase link`, `npx supabase db push` (the table), `npm run

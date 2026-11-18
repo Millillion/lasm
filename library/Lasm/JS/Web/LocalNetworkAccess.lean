@@ -19,4 +19,12 @@ set_option compiler.extract_closed false
 @[macro_inline] def Request.targetAddressSpace (self : Request) : IO IPAddressSpace := Internal.api "Lasm.JS.Web.Request.targetAddressSpace" do
   self.val.get "targetAddressSpace" IPAddressSpace
 
+/-- `readonly attribute IPAddressSpace targetAddressSpace` where the platform has it (`'targetAddressSpace' in self`), else `none` (rule 0.3-11). -/
+@[macro_inline] def Request.targetAddressSpace? (self' : Request) : IO (Option IPAddressSpace) := Internal.api "Lasm.JS.Web.Request.targetAddressSpace?" do
+  let self := self'
+  if !(← Internal.has self.val "targetAddressSpace") then return none
+  let lasmGuarded ← do
+    self.val.get "targetAddressSpace" IPAddressSpace
+  return some lasmGuarded
+
 end Lasm.JS.Web

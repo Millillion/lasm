@@ -1,13 +1,13 @@
 # Lasm
 
-> Lasm compiles Lean 4.35.0 programs ahead of time to WebAssembly for Node servers, serverless functions (AWS Lambda, Vercel, Netlify, Azure, Google Cloud Functions), edge functions (Cloudflare Workers, Vercel Edge, Netlify Edge, Deno Deploy, Supabase), Bun, Deno, Fastly Compute, WASI/wasi-http/Spin and browsers. It ships on npm as `@lasm/cli` (bin `lasm`, current version 0.8.0) and installs Lean and all build tools itself; the only prerequisite is Node 24+ (or Bun/Deno). Lean code calls JavaScript and npm through `import Lasm.JS` with one `@[js "module" "export"]` declaration per function. Proofs and tactics run at build time; a deployed program cannot elaborate or evaluate new Lean.
+> Lasm compiles Lean 4.35.0 programs ahead of time to WebAssembly for Node servers, serverless functions (AWS Lambda, Vercel, Netlify, Azure, Google Cloud Functions), edge functions (Cloudflare Workers, Vercel Edge, Netlify Edge, Deno Deploy, Supabase), Bun, Deno, Fastly Compute, WASI/wasi-http/Spin and browsers. It ships on npm as `@lasm/cli` (bin `lasm`, current version 0.9.0) and installs Lean and all build tools itself; the only prerequisite is Node 24+ (or Bun/Deno). Lean code calls JavaScript and npm through `import Lasm.JS` with one `@[js "module" "export"]` declaration per function. Proofs and tactics run at build time; a deployed program cannot elaborate or evaluate new Lean.
 
 Key commands:
 
 - New project: `npm create @lasm@latest my-app -- --template <plain|express|hono|fastify|std-http|web|fetch|fullstack> [--deploy <target>]…`
 - Develop: `npm run dev` (= `lasm dev`: rebuild about 2 s after each save, restart, keep the last good build on errors)
 - Run a file: `npx @lasm/cli Main.lean [-- args]`; build: `npx @lasm/cli build Main.lean [--target <target>] [--output PATH]` (`--output` names what is deployed: `dist/` for `node`, the platform's own place, such as `lambda.zip` or `workers/`, for other targets)
-- Targets: node (default), lambda, lambda-edge, vercel, netlify, azure, gcf, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge, bun, deno, wasi, wasi-http, fastly, browser
+- Targets: node (default), lambda, lambda-edge, vercel, netlify, azure-functions, cloud-functions, workers, vercel-edge, netlify-edge, deno-deploy, supabase-edge, bun, deno, wasi, wasi-http, fastly, browser
 - Editor support for `import Lasm.*`: `npx lasm editor`; version for bug reports: `npx lasm --version`
 
 ## Getting started
@@ -21,7 +21,7 @@ Key commands:
 
 ## CLI
 
-- [CLI reference](https://github.com/Millillion/lasm/blob/main/README.md#cli-reference): every command, option and environment variable
+- [CLI reference](https://github.com/Millillion/lasm/blob/main/README.md#cli-reference): every command, option and environment variable; the package exports only `@lasm/cli/vite`, `@lasm/cli/vite/client`, `@lasm/cli/lean` (`lasmLean(source)`: Lasm's own `lean` and `lake`) and `@lasm/cli/package.json`
 - [Templates](https://github.com/Millillion/lasm/tree/main/templates): what `npm create @lasm` and `lasm init --template` create (plain, express, hono, fastify, std-http, web, fetch, fullstack)
 - [Tool cache and requirements](https://github.com/Millillion/lasm/blob/main/docs/NODE_SUPPORT.md): where Lasm keeps Lean and its tools, and how to recover
 - [Installation hardening](https://github.com/Millillion/lasm/blob/main/docs/INSTALLATION_HARDENING.md): retries, offline repair, proxies and private CAs

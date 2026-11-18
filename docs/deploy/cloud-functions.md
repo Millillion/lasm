@@ -5,14 +5,14 @@ the `nodejs24` runtime with the Functions Framework. (A container on
 [Cloud Run](cloud-run.md) needs no adapter and remains the simpler choice.)
 
 ```sh
-npx lasm init my-app --template hono --deploy gcf   # adds @google-cloud/functions-framework
+npx lasm init my-app --template hono --deploy cloud-functions   # adds @google-cloud/functions-framework
 cd my-app && npm install
-npm run build:gcf                                   # lasm build --target gcf: gcf/
+npm run build:cloud-functions                                   # lasm build --target cloud-functions: cloud-functions/
 gcloud functions deploy my-app --gen2 --runtime nodejs24 --region REGION \
-  --trigger-http --entry-point lasm --source gcf --memory 1Gi
+  --trigger-http --entry-point lasm --source cloud-functions --memory 1Gi
 ```
 
-`lasm build --target gcf` (or `lasm package --target gcf` for an existing build) writes a source directory: `dist/` with its
+`lasm build --target cloud-functions` (or `lasm package --target cloud-functions` for an existing build) writes a source directory: `dist/` with its
 production `node_modules` (which must include
 `@google-cloud/functions-framework`), the handler `lasm-gcf.mjs` (HTTP function
 `lasm`), and a `package.json` whose `main` is the handler and whose
@@ -27,7 +27,7 @@ loads and pipes each request to it.
   [DigitalOcean](digitalocean.md)).
 
 Locally: `node node_modules/@google-cloud/functions-framework/build/src/main.js
---target=lasm` in `gcf/`.
+--target=lasm` in `cloud-functions/`.
 
 **Tested in CI** (`.github/workflows/serverless.yml`, Linux x64; no Google
 account): for the hono and fetch templates (each publishes its handler with `exportDefault`), the Functions Framework 5.0.5 serves the
