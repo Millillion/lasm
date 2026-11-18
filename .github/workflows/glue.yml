@@ -97,17 +97,20 @@ jobs:
           git worktree add "$RUNNER_TEMP/main" origin/main
           ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/main/node_modules"
           git show a50e5c57d46a17383f734d0a6e32c318e276e57a:src/edge/edge-initializers.mjs > "$RUNNER_TEMP/baseline.mjs"
-          # The JavaScript the second slice replaced, beside main's component template.
-          git show 69d3d4c59d85b05826e6ad77885e89901fe07608:src/wasi/wasi-component.mjs > "$RUNNER_TEMP/main/src/wasi/wasi-component-baseline.mjs"
+          # The JavaScript the second slice replaced, beside this checkout's component template
+          # (the template is data both read: a PR that remakes it compares like with like).
+          mkdir -p "$RUNNER_TEMP/component-baseline/component"
+          git show 69d3d4c59d85b05826e6ad77885e89901fe07608:src/wasi/wasi-component.mjs > "$RUNNER_TEMP/component-baseline/wasi-component-baseline.mjs"
+          cp src/wasi/component/proxy-template.wasm "$RUNNER_TEMP/component-baseline/component/"
       - name: Bun and Deno
         run: |
           set -euo pipefail
           npm install --prefix .work/host-tools --no-audit --no-fund deno@2.9.6 bun@1.4.4
-          node scripts/glue/smoke.mjs "$RUNNER_TEMP/baseline.mjs" "$RUNNER_TEMP/main/src/wasi/wasi-component-baseline.mjs"
-          .work/host-tools/node_modules/.bin/bun scripts/glue/smoke.mjs "$RUNNER_TEMP/baseline.mjs" "$RUNNER_TEMP/main/src/wasi/wasi-component-baseline.mjs"
-          .work/host-tools/node_modules/.bin/deno run -A scripts/glue/smoke.mjs "$RUNNER_TEMP/baseline.mjs" "$RUNNER_TEMP/main/src/wasi/wasi-component-baseline.mjs"
+          node scripts/glue/smoke.mjs "$RUNNER_TEMP/baseline.mjs" "$RUNNER_TEMP/component-baseline/wasi-component-baseline.mjs"
+          .work/host-tools/node_modules/.bin/bun scripts/glue/smoke.mjs "$RUNNER_TEMP/baseline.mjs" "$RUNNER_TEMP/component-baseline/wasi-component-baseline.mjs"
+          .work/host-tools/node_modules/.bin/deno run -A scripts/glue/smoke.mjs "$RUNNER_TEMP/baseline.mjs" "$RUNNER_TEMP/component-baseline/wasi-component-baseline.mjs"
       - name: The bar (docs/proposals/M6_GLUE.md §3)
-        run: node scripts/glue/measure.mjs --baseline "$RUNNER_TEMP/baseline.mjs" --component-baseline "$RUNNER_TEMP/main/src/wasi/wasi-component-baseline.mjs" --main-checkout "$RUNNER_TEMP/main" --json .work/glue-measurements.json
+        run: node scripts/glue/measure.mjs --baseline "$RUNNER_TEMP/baseline.mjs" --component-baseline "$RUNNER_TEMP/component-baseline/wasi-component-baseline.mjs" --main-checkout "$RUNNER_TEMP/main" --json .work/glue-measurements.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
