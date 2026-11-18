@@ -13,7 +13,7 @@
 //
 // ENGINE is the build that renders them (test/batch.mjs): node (the
 // default), native, wasmtime, wasmer, node-wasi, chromium, firefox, webkit,
-// or the URL of a running edge server (ServerEdge.lean's POST /api/render).
+// or the URL of a running edge server (Server/Edge.lean's POST /api/render).
 //
 // It fails (exit 1) unless both hold, and prints the counts by section.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';

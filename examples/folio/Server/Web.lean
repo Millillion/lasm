@@ -6,7 +6,7 @@ runtimes, `Server/FastlyServe.lean`) and what they answer. The request's path is
 segments to keys never sees a parent reference (`segments_no_dot_segments`).
 
 Written for this app when Lasm.Fetch, which used to provide these types, was
-retired (Lasm 0.7.0 moved servers onto each platform's own bindings).
+retired (servers moved onto each platform's own bindings).
 -/
 import Std.Async.Basic
 

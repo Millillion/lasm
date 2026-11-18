@@ -110,9 +110,11 @@ type, the HTML text below. The renderer runs in the page, as WebAssembly. Its HT
 elements directly, one element per tree element, so the browser's HTML parser never sees anything
 from the Markdown; `preview_safe` proves that whatever is typed, the preview creates only Folio's
 elements and attributes, never an event handler or an unsafe URL.
-[`PreviewServer.lean`](PreviewServer.lean) serves the page and `POST /api/render` (the same
-function on the server's runtime), with `Bun.serve` and `Deno.serve` on Bun and Deno, and for now `Lasm.Fetch`'s server on
-Node ([`Server/`](Server)).
+The preview server serves the page and `POST /api/render` (the same function on the server's
+runtime; [`Server/Preview.lean`](Server/Preview.lean)), with one entry file per runtime, each on its
+runtime's own server: [`PreviewServer.lean`](PreviewServer.lean) with `Node.serve`
+(`Lasm.JS.Node.Serve`), [`PreviewServerBun.lean`](PreviewServerBun.lean) with `Bun.serve` and
+[`PreviewServerDeno.lean`](PreviewServerDeno.lean) with `Deno.serve`.
 
 | Server | Build | Run | Checked in CI by |
 | --- | --- | --- | --- |
@@ -127,14 +129,18 @@ no script or frame element, no handler attribute, every element one of Folio's.
 
 ## At the edge
 
-[`ServerEdge.lean`](ServerEdge.lean) serves a site from the platform's key-value store
-(`Lasm.KV.open "folio"`). Every request builds the site from the store with `Folio.Site.build`, the
+The site server ([`Server/Edge.lean`](Server/Edge.lean)) serves a site from the platform's
+key-value store. Every request builds the site from the store with `Folio.Site.build`, the
 function `folio build` runs, and answers with the page it asks for. `GET /` serves the index,
 `/feed.xml` the feed and `/SLUG/` a page (`/SLUG` redirects there). `POST /api/render` renders the
 request's body: by default with the safe defaults, as HTML; with `?raw_html=1` with raw HTML
 enabled, as text. No request writes to the store. The site changes when its files in the store
-change. Workers and Deno Deploy run it as the program's default export (`export default {fetch}`),
-Fastly on its own host calls ([`Server/`](Server)).
+change. Each platform has its own entry file, on its store's generated binding:
+[`ServerWorkers.lean`](ServerWorkers.lean) is the Worker's default export, whose fetch handler
+receives its bindings typed (`Env`, with the KV namespace `folio` as Lasm.JS.Cloudflare's
+`KVNamespace`); [`ServerDenoDeploy.lean`](ServerDenoDeploy.lean) is the default export on Deno KV
+(Lasm.JS.Deno's `Kv`); [`ServerFastly.lean`](ServerFastly.lean) runs on Fastly's own host calls and
+its KV Store (Lasm.Fastly). A missing store is an error that names it, never a store in memory.
 
 The store holds each file of the site's directory under its path (`index.md`, `content/hello.md`,
 `layouts/page.html`), and `files`, the list of those paths, one per line.
@@ -156,21 +162,19 @@ methods get 405. A changed site in a new store (a new page with a new layout, an
 page made a draft) must be served the same way. Then the 652 examples and the pathological inputs
 run on the server through `POST /api/render`.
 
-On Fastly, two pathological inputs are skipped, because Fastly Compute gives an instance a
+On Fastly, one pathological input is skipped, because Fastly Compute gives an instance a
 [128 MB heap](https://docs.fastly.com/products/compute-resource-limits) ("Maximum memory
-consumption: 1M bytes stack, 128MB heap", per execution) and Folio needs more for them: unclosed
-`<!--` (1.2 million characters) needs 192 to 256 MiB, backticks (3.1 million characters) 256 to
-384 MiB, measured on the WASI build with `wasmtime run -W max-memory-size=…` (issue #234). Every
-other case fits in 128 MiB; the largest that passes on Viceroy, `![[]()` repeated (960,000
-characters), used 112 MB. Viceroy enforces the same 128 MiB ([its `Limiter`](https://github.com/fastly/Viceroy/blob/v0.21.1/src/linking.rs)),
+consumption: 1M bytes stack, 128MB heap", per execution) and Folio needs more for it: backticks
+(3.1 million characters) needs about 290 MiB, measured on the WASI build with
+`wasmtime run -W max-memory-size=…` (issue #234). Every other case fits in 128 MiB. Unclosed `<!--`
+(1.2 million characters) needed 192 to 256 MiB before Lasm's mimalloc build (@lasm/cli 0.8.0, issue
+#246) and now passes on Viceroy at about 127 MB. Viceroy enforces the same 128 MiB ([its `Limiter`](https://github.com/fastly/Viceroy/blob/v0.21.1/src/linking.rs)),
 so over the limit it stops the instance (`INTERNAL PANIC: out of memory`, exit status 1) and
-answers 500. After @lasm/cli 0.7.0 the Fastly build uses less memory (issue #246): unclosed `<!--`
-then passes on Viceroy at 127 MB, so its skip goes once Folio moves to that release; backticks still
-needs about 290 MiB. The body's size is not the limit (Fastly lists no request body limit, and the
+answers 500. The body's size is not the limit (Fastly lists no request body limit, and the
 body is a few MB of the heap): the renderer's working set is. Reading the body as a stream would
-not help, since rendering needs the whole document. The skips and their reasons are in
+not help, since rendering needs the whole document. The skip and its reason are in
 [`test/platforms.mjs`](test/platforms.mjs) (`pathologicalSkip`); `test/pathological.mjs --skip`
-prints each one.
+prints it.
 
 ## Untrusted input can't crash it or stall it
 
@@ -254,9 +258,9 @@ fuzzing and twenty differential seeds of larger documents.
 | [`Proofs/Spec.lean`](Proofs/Spec.lean) | Every proposition, in plain English, without proofs |
 | [`Proofs/`](Proofs) | The proofs, and the HTML tokenizer the propositions use |
 | [`Cli.lean`](Cli.lean), [`site/`](site) | The `folio` command, and an example site |
-| [`Preview/Page.lean`](Preview/Page.lean), [`PreviewClient.lean`](PreviewClient.lean), [`PreviewServer.lean`](PreviewServer.lean) | The live preview and its server |
-| [`ServerEdge.lean`](ServerEdge.lean), [`tools/kv.mjs`](tools/kv.mjs) | The site server for Fastly, Workers and Deno Deploy, and the store's entries for a site |
-| [`Server/`](Server) | The servers' HTTP layer: requests and responses, the embedded page files, and each platform's server (Lasm.JS.Web with `Bun.serve`, `Deno.serve` and the edge's default export; Lasm.Fastly; Node still on `Lasm.Fetch`'s server) |
+| [`Preview/Page.lean`](Preview/Page.lean), [`PreviewClient.lean`](PreviewClient.lean), [`PreviewServer.lean`](PreviewServer.lean), [`PreviewServerBun.lean`](PreviewServerBun.lean), [`PreviewServerDeno.lean`](PreviewServerDeno.lean) | The live preview and its server on Node, Bun and Deno |
+| [`ServerFastly.lean`](ServerFastly.lean), [`ServerWorkers.lean`](ServerWorkers.lean), [`ServerDenoDeploy.lean`](ServerDenoDeploy.lean), [`tools/kv.mjs`](tools/kv.mjs) | The site server for Fastly, Workers and Deno Deploy, and the store's entries for a site |
+| [`Server/`](Server) | The servers' HTTP layer: requests and responses, the embedded page files, the preview's and the site's handlers, the conversion to the web's `Request` and `Response` (Lasm.JS.Web.Fetch), and Fastly's server (Lasm.Fastly) |
 | [`Batch.lean`](Batch.lean), [`BatchBrowser.lean`](BatchBrowser.lean), [`Folio/Batch.lean`](Folio/Batch.lean) | Renders many documents in one run (Node, WASI, the browser), for the tests |
 | [`test/`](test) | The specification's examples, the edge platforms' tests, the differential test, the pathological inputs and the fuzzer, the command's checks, the proof checks |
 

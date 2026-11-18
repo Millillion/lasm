@@ -1,5 +1,5 @@
 // The site's files as the entries of the edge server's key-value store
-// (ServerEdge.lean): each file of the site's directory (index.md,
+// (Server/Edge.lean): each file of the site's directory (index.md,
 // content/**/*.md, layouts/*.html) under its path, and `files`, the list of
 // those paths, one per line.
 //
@@ -13,7 +13,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-/** The store's name (ServerEdge.lean's `storeName`). */
+/** The store's name (Server/Edge.lean's `storeName`). */
 export const storeName = 'folio';
 
 /** The store's entries for the site in `dir`: [{ key, value }], `files` last. */

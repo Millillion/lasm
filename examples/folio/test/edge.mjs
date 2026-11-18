@@ -1,4 +1,4 @@
-// The site server (ServerEdge.lean) on an edge platform's local tooling
+// The site server (Server/Edge.lean; ServerFastly.lean, ServerWorkers.lean, ServerDenoDeploy.lean) on an edge platform's local tooling
 // (test/platforms.mjs): the example site is put in the platform's store, and
 // every page the server answers must be byte for byte the page `folio build`
 // writes for the same files (the Node build, dist/cli, `npm run build`).
