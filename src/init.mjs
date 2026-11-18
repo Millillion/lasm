@@ -108,7 +108,8 @@ export function parseInitArguments(tokens) {
     const deploy = /^--deploy(?:=(.*))?$/s.exec(token);
     if (deploy) {
       const value = deploy[1] ?? tokens[++i];
-      if (!Object.hasOwn(deployTargets, value ?? '')) throw new Error(`--deploy accepts ${Object.keys(deployTargets).join(', ')}${value ? targetHintAmong(value, Object.keys(deployTargets), '--deploy') : ''}\n\n` + initUsage);
+      if (!value || value.startsWith('-')) throw new Error('--deploy requires a value\n\n' + initUsage);
+      if (!Object.hasOwn(deployTargets, value)) throw new Error(`Unknown deploy target "${value}"${targetHintAmong(value, Object.keys(deployTargets), '--deploy')}. Choose one of: ${Object.keys(deployTargets).join(', ')}`);
       if (!result.deploy.includes(value)) result.deploy.push(value);
       continue;
     }

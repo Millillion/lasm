@@ -131,8 +131,9 @@ def initLoop (st : InitState) : List String → Except String (Option InitState)
           let next := takeValue inline rest
           have : next.2.length < rest.length + 1 := Nat.lt_succ_of_le (takeValue_length inline rest)
           let v := next.1.getD ""
-          if v ∉ deployTargets then
-            .error ("--deploy accepts " ++ ", ".intercalate deployTargets ++ (if v = "" then "" else targetHintAmong v deployTargets "--deploy") ++ "\n\n" ++ initUsage)
+          if v = "" ∨ v.startsWith "-" then .error ("--deploy requires a value\n\n" ++ initUsage)
+          else if v ∉ deployTargets then
+            .error ("Unknown deploy target \"" ++ v ++ "\"" ++ targetHintAmong v deployTargets "--deploy" ++ ". Choose one of: " ++ ", ".intercalate deployTargets)
           else initLoop { st with deploy := if v ∈ st.deploy then st.deploy else st.deploy ++ [v] } next.2
         | none =>
           if token.startsWith "-" then .error ("Unknown lasm init option: " ++ token ++ "\n\n" ++ initUsage)

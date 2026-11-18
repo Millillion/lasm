@@ -31,7 +31,7 @@ test('lasm package arguments', () => {
   assert.deepEqual(parseLasmArguments(['package', 'out', '--target=vercel', '--output', 'x']), { command: 'package', target: 'vercel', output: 'x', input: 'out' });
   assert.deepEqual(parseLasmArguments(['package', '--help']), { command: 'package-help' });
   assert.throws(() => parseLasmArguments(['package']), /--target is required/);
-  assert.throws(() => parseLasmArguments(['package', '--target', 'workers']), /Unknown target "workers"/);
+  assert.throws(() => parseLasmArguments(['package', '--target', 'workers']), /Unknown package target "workers"/);
   assert.throws(() => parseLasmArguments(['package', 'a', 'b', '--target', 'lambda']), /Usage: lasm package/);
   assert.throws(() => parseLasmArguments(['package', '--target', 'lambda', '--target', 'vercel']), /only once/);
   assert.throws(() => parseLasmArguments(['package', '--target', 'lambda', '--zip']), /Unknown lasm package option/);

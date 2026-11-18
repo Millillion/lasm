@@ -469,7 +469,11 @@ preserved. `npx lasm --version` (`-v`) prints the version, Lean release, JavaScr
 runtime and platform (include it in bug reports). There is no install, clean or
 uninstall subcommand. Every command refuses a repeated option (`Specify --target
 only once`), and `--dev` with `--release`; an unknown target, template or deploy
-target names the closest one (`did you mean --target workers?`).
+target is named with the closest one and the list (`Unknown build target "gcf"
+(did you mean --target cloud-functions?). Choose one of: …`). **Exit status:** 0 on
+success (and for `--help`, `--version`), 1 for every Lasm error, and under `lasm run`
+(`lasm Main.lean`) the program's own status (128 plus the signal number if a
+signal ended it).
 
 **Build profiles.** Both link the same program with the same libraries and are
 deterministic. **release** (`lasm build`, `lasm Main.lean --release`): the full
