@@ -6,6 +6,7 @@ document's name.
 import Lasm.UI
 import Lasm.JS.Json
 import Frontend.Ui
+import Frontend.Browser
 open Lean Lasm.UI Tandem.Ui
 
 def docOf (flags : Json) : String :=
