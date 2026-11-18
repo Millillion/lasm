@@ -19,7 +19,8 @@ import { tmpdir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { random } from '../helpers/property.mjs';
-import { buildTargets, closest, editDistance, parseLasmArguments, targetHint } from '../../src/cli-arguments.mjs';
+import { buildTargets, parseLasmArguments, targetHint } from '../../src/cli-arguments.mjs';
+import { closest, editDistance } from '../../src/cli-names.mjs';
 import { changedFiles, parseDevArguments } from '../../src/dev.mjs';
 import { lakeName, packageName, parseInitArguments, supabaseFunctionNameOf } from '../../src/init.mjs';
 import { jsRuntime } from '../../src/js-runtime.mjs';
@@ -474,13 +475,13 @@ const primDesc = v => typeof v === 'bigint' ? `${v}n` : v === undefined ? 'undef
 
 const models = [
   {
-    name: 'editDistance', source: 'src/cli-arguments.mjs', lean: 'Lasm.Cli.Model.CliArguments',
+    name: 'editDistance', source: 'src/cli-names.mjs', lean: 'Lasm.Cli.Model.CliArguments',
     generate: r => [r.string(letters, 0, 9), r.string(letters, 0, 9)],
     input: ([a, b]) => ({ a: hex(a), b: hex(b) }),
     js: ([a, b]) => editDistance(a, b),
   },
   {
-    name: 'closest', source: 'src/cli-arguments.mjs', lean: 'Lasm.Cli.Model.CliArguments',
+    name: 'closest', source: 'src/cli-names.mjs', lean: 'Lasm.Cli.Model.CliArguments',
     generate: r => ({ word: word(r), candidates: r.next() < 0.3 ? buildTargets : r.array(r.int(0, 5), () => word(r)) }),
     input: ({ word, candidates }) => ({ word: hex(word), candidates: candidates.map(hex) }),
     js: ({ word, candidates }) => { const c = closest(word, candidates); return c === undefined ? null : hex(c); },

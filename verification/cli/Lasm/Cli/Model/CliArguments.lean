@@ -1,5 +1,5 @@
 /-
-# src/cli-arguments.mjs, in Lean: the command-line parser
+# src/cli-arguments.mjs and src/cli-names.mjs, in Lean: the command-line parser
 
 A model of the JavaScript, written to mirror it statement for statement,
 and checked against it on generated inputs by
@@ -9,10 +9,11 @@ Lasm.Cli.Theorems proves its propositions.
 | JavaScript (src/cli-arguments.mjs) | Lean |
 | --- | --- |
 | `buildTargets`, `suspendModes`, `fixedLayoutTargets`, `commandNames`, `cliUsage` | the definitions of the same names |
-| `targetAliases`, `targetHint(value)`, `targetHintAmong(value, candidates, option)` | `targetAliases`, `targetHint`, `targetHintAmong` |
-| `asciiLower(text)` | `asciiLower` |
-| `editDistance(a, b)` | `editDistance` (the row, `nextCells`) |
-| `closest(word, candidates)` | `closest` |
+| `targetHint(value)` | `targetHint` |
+| src/cli-names.mjs: `targetAliases`, `targetHintAmong(value, candidates, option)` | `targetAliases`, `targetHintAmong` |
+| src/cli-names.mjs: `asciiLower(text)` | `asciiLower` |
+| src/cli-names.mjs: `editDistance(a, b)` | `editDistance` (the row, `nextCells`) |
+| src/cli-names.mjs: `closest(word, candidates)` | `closest` |
 | `parseLasmArguments(argv)` | `parseLasmArgumentsWith` (the option loop, `optionLoop`; Interface.lean's `parseLasmArguments` is it with the imports) |
 
 What the module imports is a parameter, `ArgumentsEnv`: whether a file
