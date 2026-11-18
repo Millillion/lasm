@@ -5,6 +5,7 @@ import Server.Embed
 import Server.JsServe
 import Server.BunSqlite
 import Lasm.JS.Bun.Serve
+import Lasm.JS.Web.Url
 open Lasm.JS
 
 /-- The browser app and its files (dist/public, from npm run build:client),
