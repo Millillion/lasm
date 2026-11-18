@@ -13,7 +13,7 @@ name = "Porter"
 [[lean_lib]]
 name = "Proofs"
 
-# The server's modules (Lasm.JS; Lasm.Fetch only for Node's server): the SQL
+# The server's modules (Lasm.JS; Node.serve for Node's server): the SQL
 # layer, Web Crypto, the configuration, the HTTP glue (requests, responses,
 # embedded files, each platform's server), and one SQLite binding module per
 # target.

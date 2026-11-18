@@ -2,15 +2,15 @@
 // with the edge runtime's single-threaded Lean runtime and Lasm's C WASI host
 // into a standard wasi_snapshot_preview1 command module, with no JavaScript.
 //
-//   1. clang compiles the WASI host (lasm_wasi.c, lasm_wasi_libc.c) and
-//      Lasm.Fetch's WASI glue (lasm_fetch_wasi.c; Fastly's host calls with
-//      --target fastly; Lasm.WASI.Http's and lasm_wasi_http.c with --target
-//      wasi-http) for wasm64, as the application objects are, and Lasm's
+//   1. clang compiles the WASI host (lasm_wasi.c, lasm_wasi_libc.c; with
+//      --target fastly, Fastly's ABI handshake; with --target wasi-http,
+//      the incoming handler's export in lasm_wasi_http.c and Lasm.WASI.Http's
+//      glue) for wasm64, as the application objects are, and Lasm's
 //      build of mimalloc (src/mimalloc) with smaller arenas than Emscripten's.
 //   2. wasm-ld links them with the objects, the standard-library archives of
 //      the Node runtime, the edge runtime's three archives and its
-//      single-threaded Emscripten system libraries. Lasm.JS's and Lasm.Fetch's
-//      JavaScript glue objects are replaced by the WASI ones.
+//      single-threaded Emscripten system libraries. Lasm.JS's JavaScript glue
+//      object is replaced by the WASI host.
 //   3. lower-atomics.mjs turns the archives' atomics into plain memory
 //      instructions (one thread, unshared memory).
 //   4. wasm-opt strips exception handling (a C++ throw ends the program, see
@@ -31,7 +31,7 @@ import { componentize, httpHandlerExport } from './wasi-component.mjs';
 import { mimallocSettings, mimallocSources, mimallocClangArguments, mimallocUnits } from '../mimalloc/mimalloc.mjs';
 
 const here = fileURLToPath(new URL('./', import.meta.url));
-export const wasiSources = ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_fetch_wasi.c', 'lasm_wasi_http.c', 'lasm_wasi.h', 'wasi-link.mjs', 'lower-atomics.mjs',
+export const wasiSources = ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_wasi_http.c', 'lasm_wasi.h', 'wasi-link.mjs', 'lower-atomics.mjs',
   'wasi-component.mjs', 'component/proxy-template.wasm', 'lasm_wasi_http_imports.h', '../../library/c/lasm_fastly.c',
   '../../library/c/lasm_wasi_http_bindings.c', ...mimallocSources.map(file => `../mimalloc/${file}`)];
 
@@ -50,7 +50,7 @@ export const wasiLinkSettings = Object.freeze({
   'wasi-http': Object.freeze({ stackMiB: 1, initialMiB: 4, maximumMiB: 2048, mimalloc, optimize: '-Oz' }),
 });
 // The C sources and defines of each target.
-const targetSources = { wasi: ['lasm_fetch_wasi.c'], fastly: ['lasm_fetch_wasi.c'], 'wasi-http': ['lasm_wasi_http.c'] };
+const targetSources = { wasi: [], fastly: [], 'wasi-http': ['lasm_wasi_http.c'] };
 const targetDefines = { wasi: [], fastly: ['-DLASM_WASI_FASTLY'], 'wasi-http': ['-DLASM_WASI_HTTP'] };
 // Emscripten's single-threaded system libraries, from the edge runtime.
 const systemLibraries = ['c_optz', 'stubs', 'noexit', 'c', 'mimalloc', 'clang_rt.builtins-legacysjlj', 'c++-legacyexcept',
@@ -82,7 +82,7 @@ export function linkWasiProgram({ toolchain, nodeRuntime, edge, linkWork, out, t
   const run = (name, args) => execFileSync(tool(name), args, { env: toolchain.env, stdio, timeout: 1_800_000, maxBuffer: 256 << 20, windowsHide: true });
   mkdirSync(out, { recursive: true });
 
-  // 1. The WASI host and Lasm.Fetch glue.
+  // 1. The WASI host.
   const sysroot = join(toolchain.cache, 'sysroot');
   const objects = [];
   for (const source of ['lasm_wasi.c', 'lasm_wasi_libc.c', ...targetSources[target]]) {
@@ -100,7 +100,7 @@ export function linkWasiProgram({ toolchain, nodeRuntime, edge, linkWork, out, t
     objects.push(object);
   }
 
-  // 2. The link. Lasm.JS's and Lasm.Fetch's JavaScript glue objects are replaced.
+  // 2. The link. Lasm.JS's JavaScript glue object is replaced.
   const rsp = readResponse(join(linkWork, 'link.rsp'));
   const nm = file => execFileSync(tool('llvm-nm'), ['--defined-only', '--just-symbol-name', file],
     { encoding: 'utf8', maxBuffer: 64 << 20, windowsHide: true });
@@ -113,7 +113,7 @@ export function linkWasiProgram({ toolchain, nodeRuntime, edge, linkWork, out, t
   // The Node glue's wraps (glueLinkFlags) go with it.
   const inputs = rsp.filter(arg => arg.endsWith('.o') && basename(arg) !== 'reachability.o' && !arg.endsWith('.lasm-member.o')
     || arg.startsWith('-Wl,--wrap=') && !glueLinkFlags.includes(arg))
-    .filter(arg => !(arg.endsWith('.o') && /^(?:lasm_js_available|lasm_fetch_platform)$/m.test(nm(arg))))
+    .filter(arg => !(arg.endsWith('.o') && /^lasm_js_available$/m.test(nm(arg))))
     .map(arg => arg.startsWith('-Wl,') ? arg.slice(4) : arg);
   // Lasm.Fastly's glue (library/c/lasm_fastly.c), in programs that use it: --target fastly
   // compiles it with its host imports in place of the Node build's copy, whose calls fail.

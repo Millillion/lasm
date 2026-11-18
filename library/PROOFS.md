@@ -1,10 +1,11 @@
 # What is proved about Lasm's library
 
-Lasm's own Lean library (Lasm.UI, Lasm.Fetch, Lasm.JS) is ordinary
+Lasm's own Lean library (Lasm.UI, Lasm.JS) is ordinary
 Lean code, and programs run exactly that code. So some of its guarantees are
 proved, for every possible input, rather than only tested. (The propositions
 about the function-platform shims, src/serverless/, are about a model of the
-CLI's JavaScript: they are in [verification/cli](../verification/cli/README.md).)
+CLI's JavaScript, and those about request paths are about the request-path
+model: both are in [verification/cli](../verification/cli/README.md).)
 This page lists
 each proved proposition in plain English. The propositions are for Jordan to
 hone (issue #21); Conduit's [PROOFS.md](../examples/conduit/PROOFS.md) is the
@@ -22,7 +23,6 @@ Each library has a `Spec.lean` that states its propositions, each a named
 proofs in that file:
 
 - [`Lasm/UI/Spec.lean`](Lasm/UI/Spec.lean): the diff and the commands;
-- [`Lasm/Fetch/Spec.lean`](Lasm/Fetch/Spec.lean): request paths;
 - [`Lasm/JS/Spec.lean`](Lasm/JS/Spec.lean): the value codec between Lean and JavaScript;
 
 A reviewer can read those files and ignore the proofs: the check fails unless
@@ -42,15 +42,12 @@ managed Lean 4.35.0 and only Lean's own library (no Mathlib).
 ## Where the proofs live, and what ships
 
 The propositions are about the shipped code (`Lasm.UI.diff`,
-`Lasm.Fetch.Request.segments`, …). The Spec,
+Lasm.JS's value codec, …). The Spec,
 Theorems, `Lasm/UI/Proofs*` and `Lasm/JS/Proofs*` modules are a proofs-only target: they are not
 in the shipped library (`libraryModules` in
 [src/lasm-library.mjs](../src/lasm-library.mjs)), so they are not compiled
 into the Lean prefix or [prebuilt/](prebuilt), cost a program's build
 nothing, and changing a proposition never makes the prebuilt library stale.
-A few theorems that the library itself uses sit beside its code
-(`decodeRequest_valid`, which `serve` hands to every handler;
-`call_invalid`; `segments_no_dot_segments`); the Theorems files cite them.
 
 What is modelled, and so outside the theorems: the DOM (Lasm.UI.Model), and
 what the JavaScript applier does to it, which is written in Lean as the
@@ -73,7 +70,7 @@ store's table; and the platform stores and HTTP stacks, which Lasm only calls.
 <!-- BEGIN PROPOSITIONS -->
 <!-- Generated from the Spec.lean files by `node scripts/library-proofs.mjs --write`; do not edit by hand. -->
 
-**17 proved propositions (332 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
+**16 proved propositions (329 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
 
 ## Lasm.UI (14)
 
@@ -111,14 +108,6 @@ store's table; and the platform stores and HTTP stacks, which Lasm only calls.
 | [`cmd_map_id`](Lasm/UI/Spec.lean#L206) | **Mapping by the identity changes nothing.** |
 | [`cmd_map_batch`](Lasm/UI/Spec.lean#L210) | **Mapping commutes with batching.** Mapping a batch of commands is the batch of the mapped commands: no effect is lost, duplicated or reordered. |
 
-## Lasm.Fetch (1)
-
-### Request paths
-
-| Proposition | In plain English |
-| --- | --- |
-| [`segments_no_dot_segments`](Lasm/Fetch/Spec.lean#L22) | **No path segment is `.` or `..`.** Whatever the request's URL, on every platform (including escaped forms such as `%2e%2E`), no segment of `r.segments` is `.` or `..`: a handler that maps segments to files or keys never sees a parent reference. |
-
 ## Lasm.JS (2)
 
 ### The value codec: every value crosses intact
@@ -146,17 +135,7 @@ the CLI's JavaScript (`Lasm.Cli`) are listed in
 <!-- BEGIN CANDIDATES -->
 <!-- Generated from the Candidates.lean files by `node scripts/propositions.mjs --write`; do not edit by hand. -->
 
-**10 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
-
-### Lasm.Fetch (5)
-
-| Candidate | In plain English | Tested by |
-| --- | --- | --- |
-| [`segments_nonempty`](Lasm/Fetch/Candidates.lean#L19) | **No path segment is empty.** Whatever the request's URL (`//`, a trailing `/`, escapes that decode to nothing printable), no segment of `r.segments` is the empty string. | [test/fuzz/native/LasmFuzz.lean](../test/fuzz/native/LasmFuzz.lean) |
-| [`percent_round_trip`](Lasm/Fetch/Candidates.lean#L26) | **A server decodes what a Lasm.UI page encodes.** For every string, `Lasm.Fetch.percentDecode` reads `Lasm.UI.Url.percentEncode`'s output back as that string: a path segment or query value a page builds reaches the server's handler unchanged. | [test/fuzz/native/LasmFuzz.lean](../test/fuzz/native/LasmFuzz.lean) |
-| [`fastly_request_read`](Lasm/Fetch/Candidates.lean#L116) | **The Fastly host reads the request as Fastly holds it.** Whatever an honest host chooses within the ABI (one name per call or many, short reads, BUFLEN), the program gets the method, the URI, the headers grouped as the host lists them, and the body, byte for byte. | [test/fuzz/native/fastly_driver.c](../test/fuzz/native/fastly_driver.c) |
-| [`fastly_response_written`](Lasm/Fetch/Candidates.lean#L124) | **The Fastly host sends the response as the program wrote it.** Whatever part of each write an honest host takes, it receives the status, every header in order and the body, byte for byte, sent once. | [test/fuzz/native/fastly_driver.c](../test/fuzz/native/fastly_driver.c) |
-| [`fastly_backend_authority`](Lasm/Fetch/Candidates.lean#L133) | **A fetch's dynamic backend is the URL's authority.** For every URL RFC 3986 allows, the backend targets its host and port (the scheme's default when there is none, or it is empty) and overrides the Host with the host name, whatever the userinfo, path, query or fragment hold. | [test/fuzz/native/fastly_driver.c](../test/fuzz/native/fastly_driver.c) |
+**5 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
 
 ### Lasm.UI (5)
 

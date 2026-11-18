@@ -41,6 +41,18 @@ This directory holds them:
   input; Node's base64, `Date.parse` and the platforms themselves are left
   outside it. It was the library namespace `Lasm.Serverless` until 2026-11-16,
   when it moved here: it has no runtime API (API_DECISIONS.md A23).
+- [Lasm/RequestPath/](Lasm/RequestPath): the request-path model: how a
+  server reads a URL's path (split at `/` and `\`, dot segments resolved as
+  a browser resolves them, percent-decoded) and query
+  ([Model.lean](Lasm/RequestPath/Model.lean)), the proposition proved of it
+  ([Spec.lean](Lasm/RequestPath/Spec.lean), with
+  [Theorems.lean](Lasm/RequestPath/Theorems.lean)) and its candidates, which
+  [test/library-proofs/RequestPath.lean](../../test/library-proofs/RequestPath.lean)
+  checks on generated URLs (`lean --run`, from `scripts/library-proofs.mjs`).
+  It is the pure request model of the HTTP handler library Lasm's library
+  shipped until 0.9.0, moved here when that library was removed
+  (docs/api/decisions/0.2.md, A45): nothing in Lasm runs it now; it is the
+  specification an application's own path handling can be held to.
 - [Lasm/Cli/Spec.lean](Lasm/Cli/Spec.lean) and
   [Lasm/Cli/Theorems.lean](Lasm/Cli/Theorems.lean): the propositions proved
   of the models, each with its theorem (as a library's `Spec.lean` and
@@ -78,7 +90,7 @@ theorem uses only Lean's standard axioms, and keeps the list under
 <!-- BEGIN PROPOSITIONS -->
 <!-- Generated from the Spec.lean files by `node scripts/library-proofs.mjs --write`; do not edit by hand. -->
 
-**50 proved propositions (415 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
+**51 proved propositions (418 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
 
 ## Lasm.Cli (30)
 
@@ -189,7 +201,7 @@ theorem uses only Lean's standard axioms, and keeps the list under
 | Proposition | In plain English |
 | --- | --- |
 | [`host_once`](Lasm/Serverless/Spec.lean#L83) | **Exactly one Host, a plain one.** Whatever fields an event carries (none, several, or a forged `Host: x/admin#`), forward() and pipe() send exactly one Host field, and its value is a plain `host[:port]`: visible ASCII without `/ ? # \ @` (the first such Host of the event, else the default host). |
-| [`host_url`](Lasm/Serverless/Spec.lean#L92) | **A plain Host cannot move the path.** A server that builds its URL from the Host field and the target (`http://` + host + target, as Hono's Node adapter and Lasm.Fetch's Node host do) reads back exactly that host and that target, for every plain host and every target that starts with `/`. Together with `host_once` and `target_split`: no client can change the path or query a server sees through Host (`Host: x/admin#` once made `/public` read as `/admin` in Lasm.Fetch). |
+| [`host_url`](Lasm/Serverless/Spec.lean#L92) | **A plain Host cannot move the path.** A server that builds its URL from the Host field and the target (`http://` + host + target, as Hono's Node adapter and Node.serve do) reads back exactly that host and that target, for every plain host and every target that starts with `/`. Together with `host_once` and `target_split`: no client can change the path or query a server sees through Host (`Host: x/admin#` once made `/public` read as `/admin` in Lasm's former HTTP library). |
 
 ### Query strings
 
@@ -218,6 +230,14 @@ theorem uses only Lean's standard axioms, and keeps the list under
 | [`cloudfront_headers`](Lasm/Serverless/Spec.lean#L193) | **A CloudFront response holds every field CloudFront accepts**, each name with all its values in order, and none it refuses in a generated response (Content-Length, Via, `x-amz-cf-…`, …). |
 | [`web_null_body`](Lasm/Serverless/Spec.lean#L200) | **A Netlify response to a HEAD, or with a null-body status, has no body** (a Response with one would throw). |
 | [`azure_exact`](Lasm/Serverless/Spec.lean#L206) | **Every cookie object Azure gets arrives unchanged** when at most one Set-Cookie of the reply would change in Azure's `cookies` list (which percent-encodes values and has no field for some attributes): that one stays a Set-Cookie header, and every cookie object sent is one `cookies` carries exactly. |
+
+## Lasm.RequestPath (1)
+
+### Request paths
+
+| Proposition | In plain English |
+| --- | --- |
+| [`segments_no_dot_segments`](Lasm/RequestPath/Spec.lean#L22) | **No path segment is `.` or `..`.** Whatever the request's URL (including escaped forms such as `%2e%2E`), no segment of `r.segments` is `.` or `..`: a handler that maps segments to files or keys never sees a parent reference. |
 <!-- END PROPOSITIONS -->
 
 ## Candidates
@@ -225,7 +245,7 @@ theorem uses only Lean's standard axioms, and keeps the list under
 <!-- BEGIN CANDIDATES -->
 <!-- Generated from the Candidates.lean files by `node scripts/propositions.mjs --write`; do not edit by hand. -->
 
-**21 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
+**23 candidates**, each a `def … : Prop` in a `Candidates.lean`, checked on generated inputs by the test its `Tested by:` line names (which cites it with a `Proposition:` line), not yet proved.
 
 ### Lasm.Cli (20)
 
@@ -251,6 +271,13 @@ theorem uses only Lean's standard axioms, and keeps the list under
 | [`glue_fields_round_trip`](Lasm/Cli/Candidates.lean#L236) | **The glue's fields round-trip.** Any list of fields, encoded as the glue program reads its request, is read back exactly as the same list, whatever the fields hold (digits, `:`, line ends, non-ASCII, nothing). | [test/glue.test.mjs](../../test/glue.test.mjs) |
 | [`glue_request_fields`](Lasm/Cli/Candidates.lean#L243) | **A glue request carries its fields.** Lists of fields, encoded as a request, carry exactly their fields in order, whichever format the encoding chose (a table of distinct fields, or lengths when a field holds a 0 byte). | [test/glue.test.mjs](../../test/glue.test.mjs) |
 | [`origin_form_url`](Lasm/Cli/Candidates.lean#L254) | **An origin-form target is the URL's path and query; only a plain Host is its authority.** For a target that starts with `/` (printable ASCII without `#`, space or backslash), `requestUrl` answers a URL that ends with the target, whose host is the Host field's when that is plain and parses as an authority, and the fallback's otherwise. | [test/node-serve.test.mjs](../../test/node-serve.test.mjs) |
+
+### Lasm.RequestPath (2)
+
+| Candidate | In plain English | Tested by |
+| --- | --- | --- |
+| [`segments_nonempty`](Lasm/RequestPath/Candidates.lean#L19) | **No path segment is empty.** Whatever the request's URL (`//`, a trailing `/`, escapes that decode to nothing printable), no segment of `r.segments` is the empty string. | [test/library-proofs/RequestPath.lean](../../test/library-proofs/RequestPath.lean) |
+| [`percent_round_trip`](Lasm/RequestPath/Candidates.lean#L26) | **A server decodes what a Lasm.UI page encodes.** For every string, the model's `percentDecode` reads `Lasm.UI.Url.percentEncode`'s output back as that string: a path segment or query value a page builds reaches a server that decodes as the model does unchanged. | [test/library-proofs/RequestPath.lean](../../test/library-proofs/RequestPath.lean) |
 
 ### Lasm.Serverless (1)
 

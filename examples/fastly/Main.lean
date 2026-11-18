@@ -3,8 +3,8 @@ An HTTP server on Fastly Compute's own host calls (Lasm.Fastly, generated from
 Fastly's witx; docs/WASI_FASTLY_BINDINGS.md): `lasm build Main.lean --target fastly`,
 then `fastly compute serve` (Viceroy) or `fastly compute deploy`.
 
-It answers the routes of examples/fetch (the Lasm.Fetch handler) with the ABI
-itself: the downstream request and its body, responses, streamed bodies,
+It answers the HTTP routes CI checks (scripts/wasi/wasi-ci.mjs; examples/wasi-http
+answers them on wasi:http) with the ABI itself: the downstream request and its body, responses, streamed bodies,
 backend requests (named and dynamic, three at once), Config, Secret and KV
 Stores. CI (.github/workflows/wasi.yml, scripts/wasi/wasi-ci.mjs) checks every
 route under Viceroy, Fastly's local simulator; Lasm.Fastly's own conformance
@@ -101,7 +101,7 @@ def send (r : Reply) (head : Bool) : IO Unit := do
   unless head do writeAll body r.body
   HttpResp.sendDownstream resp body 0
 
-/-! ## The routes of examples/fetch -/
+/-! ## The routes -/
 
 def fib : Nat → Nat
   | 0 => 0 | 1 => 1 | n + 2 => fib n + fib (n + 1)

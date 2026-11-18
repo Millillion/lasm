@@ -1,5 +1,5 @@
 // WASI targets (docs/WASI.md): atomics lowering, import checks, the CLI and
-// `lasm init` surface, and Lasm.Fetch's library wiring. The built programs
+// `lasm init` surface, and the library wiring of Lasm.WASI.Http and Lasm.Fastly. The built programs
 // themselves are checked by .github/workflows/wasi.yml (scripts/wasi/wasi-ci.mjs).
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -142,12 +142,13 @@ test('lasm init --template fetch --deploy fastly|spin|workers', () => {
 
 // It reads the real library: where library/ is absent (the init mutation module's sandbox, which this test does not
 // serve), it is skipped; every unit run has it.
-test('Lasm.Fetch is part of Lasm\'s Lean library', { skip: !existsSync(new URL('../library/Lasm/JS/Web/modules.json', import.meta.url)) && 'no library/ here' }, () => {
-  assert.ok(libraryModules.includes('Lasm.Fetch'));
-  assert.ok(libraryOutputs().includes('lib/lasm/c/Lasm/Fetch.c'));
-  const directory = mkdtempSync(join(tmpdir(), 'lasm-fetch-import-'));
+test('Lasm.WASI.Http and Lasm.Fastly are part of Lasm\'s Lean library; the HTTP handler library is gone (A44)', { skip: !existsSync(new URL('../library/Lasm/JS/Web/modules.json', import.meta.url)) && 'no library/ here' }, () => {
+  assert.ok(libraryModules.includes('Lasm.WASI.Http') && libraryModules.includes('Lasm.Fastly'));
+  assert.ok(libraryOutputs().includes('lib/lasm/c/Lasm/WASI/Http.c'));
+  assert.ok(!existsSync(new URL('../library/Lasm/Fetch.lean', import.meta.url)) && !existsSync(new URL('../src/wasi/lasm_fetch_wasi.c', import.meta.url)));
+  const directory = mkdtempSync(join(tmpdir(), 'lasm-wasi-http-import-'));
   try {
-    writeFileSync(join(directory, 'Main.c'), 'lean_object* initialize_Lasm_Fetch(uint8_t builtin);\n');
+    writeFileSync(join(directory, 'Main.c'), 'lean_object* initialize_Lasm_WASI_Http(uint8_t builtin);\n');
     writeFileSync(join(directory, 'Other.c'), 'int x;\n');
     assert.equal(importsLibrary([join(directory, 'Main.c')]), true);
     assert.equal(importsLibrary([join(directory, 'Other.c')]), false);

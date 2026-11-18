@@ -71,7 +71,7 @@ export const templates = {
   // routes on Fastly's (Lasm.Fastly) and wasi:http's (Lasm.WASI.Http) own interfaces.
   fetch: { summary: 'an HTTP handler on the web\'s Request and Response (Lasm.JS.Web) for Node, the edge, Bun, Deno and the function platforms, and on Fastly Compute and wasi-http (Spin) through their own interfaces', server: true, interop: false, library: 'Lasm.JS.Web', portable: true, handler: 'Handler' },
   // The whole stack in Lean (templates/fullstack): shared types, API and validation; a
-  // Lasm.Fetch server with server-side rendering; a Lasm.UI app that hydrates it.
+  // REST server (Node.serve, exportDefault) with server-side rendering; a Lasm.UI app that hydrates it.
   fullstack: { summary: 'a full-stack Lean app: shared types and validation, a REST server that renders the first page, a browser app (Lasm.UI) that hydrates it; Node, Workers, Bun, Deno, and every edge --deploy target', server: true, interop: false, fullstack: true },
 };
 

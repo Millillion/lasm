@@ -169,7 +169,8 @@ ${moduleMap(modules)}
 ${lazyStart('wasmModule', "Object.fromEntries(Object.entries(globalThis.process?.env ?? {}).filter(([, value]) => typeof value === 'string'))")}
 // Vercel's edge runtime drops a response's Content-Encoding (Vercel compresses
 // responses itself), so the handler must not see Accept-Encoding: otherwise
-// Lasm.Fetch.Assets would answer with Brotli bytes labelled as plain ones.
+// a handler that serves precompressed files (the fullstack template's Http.Assets)
+// would answer with Brotli bytes labelled as plain ones.
 const identity = request => {
   if (!request.headers.has('accept-encoding')) return request;
   const headers = new Headers(request.headers);

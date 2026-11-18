@@ -6,7 +6,7 @@ kind: tutorial
 order: 3
 sources:
   - https://github.com/Millillion/lasm/blob/main/README.md
-  - https://github.com/Millillion/lasm/blob/main/docs/FETCH.md
+  - https://github.com/Millillion/lasm/blob/main/docs/JS_BINDINGS.md
   - https://github.com/Millillion/lasm/blob/main/examples/conduit/PROOFS.md
   - https://github.com/Millillion/lasm/blob/main/.github/workflows/content.yml
 aiGenerated: true

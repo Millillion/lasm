@@ -8,7 +8,7 @@ import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, wr
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { compileLibrary, eagerWebModules, lazyArray, fetchGlueSource, asyncGlueSource, glueLinkFlags, glueSource, importsLibrary, libraryIdentity, libraryLeanVersions,
+import { compileLibrary, eagerWebModules, lazyArray, asyncGlueSource, glueLinkFlags, glueSource, importsLibrary, libraryIdentity, libraryLeanVersions,
   libraryModules, libraryOutputs, librarySources, linkedLibraryModules, prebuiltLibrary } from '../src/lasm-library.mjs';
 import { toolchainCatalog } from '../src/managed-lean.mjs';
 
@@ -19,8 +19,8 @@ const put = (file, text) => { mkdirSync(dirname(file), { recursive: true }); wri
 
 test('the glue, its link flags and the outputs of every module relative to a prefix', () => {
   assert.equal(glueSource, join(library, 'c', 'lasm_js.c'));
-  assert.equal(fetchGlueSource, join(library, 'c', 'lasm_fetch.c'));
-  assert.ok(existsSync(glueSource) && existsSync(fetchGlueSource));
+  assert.ok(existsSync(glueSource) && existsSync(asyncGlueSource));
+  assert.ok(!existsSync(join(library, 'c', 'lasm_fetch.c')), 'the removed HTTP handler library has no glue (A44)');
   assert.deepEqual(glueLinkFlags, ['-Wl,--wrap=lean_task_get', '-Wl,--wrap=lean_io_wait_any_core', '-Wl,--wrap=emscripten_futex_wait']);
   assert.deepEqual(libraryLeanVersions, ['4.35.0']);
   const outputs = libraryOutputs();
@@ -115,12 +115,11 @@ test('the library sources a program links come from the prefix, with the glue, a
   put(program, call('Lasm.JS'));
   const result = librarySources(lean, [program]);
   assert.deepEqual(result.modules, ['Lasm.JS.Core', 'Lasm.JS']);
-  assert.deepEqual(result.sources, [c('Lasm.JS.Core'), c('Lasm.JS'), glueSource, fetchGlueSource, asyncGlueSource]);
+  assert.deepEqual(result.sources, [c('Lasm.JS.Core'), c('Lasm.JS'), glueSource, asyncGlueSource]);
   assert.deepEqual(result.inputs, [
     { module: '+Lasm.JS.Core', source: join(prefix, 'src', 'lean', 'Lasm', 'JS', 'Core.lean') },
     { module: '+Lasm.JS', source: join(prefix, 'src', 'lean', 'Lasm', 'JS.lean') },
-    { module: 'lasm_js.c', source: glueSource }, { module: 'lasm_fetch.c', source: fetchGlueSource },
-    { module: 'lasm_async.c', source: asyncGlueSource }]);
+    { module: 'lasm_js.c', source: glueSource }, { module: 'lasm_async.c', source: asyncGlueSource }]);
   assert.deepEqual(result.oleans, [join(prefix, 'lib', 'lean', 'Lasm', 'JS', 'Core.olean'), join(prefix, 'lib', 'lean', 'Lasm', 'JS.olean')]);
   // A module the program's sources already compile (Lake built it from Lasm's Lake package, 0.3-7) is not linked again;
   // what it imports still is.
@@ -131,7 +130,7 @@ test('the library sources a program links come from the prefix, with the glue, a
   put(join(prefix, 'lib', 'lasm', 'lazy', 'Lasm.JS.Web.IndexedDB.json'), '{}');
   assert.deepEqual(librarySources(lean, [program, lakeC], { supplied: ['Main', 'Lasm.JS.Web.IndexedDB'] }).modules, ['Lasm.JS.Core', 'Lasm.JS']);
   rmSync(c('Lasm.UI'));
-  assert.throws(() => librarySources(lean, [program]), { message: `This program imports Lasm's library (Lasm.JS, Lasm.Fetch, Lasm.UI), which needs Lean 4.35.0 or Lean's elaborator libraries (the extended tier); it is missing from ${prefix}`.replace('4.35.0 or Lean', '4.35.0 with Lean') });
+  assert.throws(() => librarySources(lean, [program]), { message: `This program imports Lasm's library (Lasm.JS, Lasm.UI, …), which needs Lean 4.35.0 or Lean's elaborator libraries (the extended tier); it is missing from ${prefix}`.replace('4.35.0 or Lean', '4.35.0 with Lean') });
 });
 
 

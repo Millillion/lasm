@@ -7,12 +7,12 @@ name: Fuzz
 # verification/cli/Lasm/Serverless/Proofs/Model.lean, and Lean's own codec), the
 # Lasm.UI applier's reading against Lean's reference decoder (ui-decode), Lasm's
 # tar reader against Python's tarfile (tar), and
-# Lasm.Fetch's request parsing, the WASI C host's CGI
-# request and the Fastly host against an honest host (libFuzzer, ASan; UBSan for the C hosts).
+# the Lasm.JS value codec's Lean half natively, against its proved round trip
+# (lean-js-wire: libFuzzer, ASan).
 #   - pull requests and pushes to main: the committed corpus and regressions,
 #     once each (seconds); the native targets when their sources change;
 #   - nightly: 10 minutes per target; weekly (Saturday): 60 minutes per target (10 for
-#     dev-proxy, project-files, edge-request and fastly-host).
+#     dev-proxy, project-files and edge-request).
 # A campaign fails on any failing input (a crash, a hang, a broken property)
 # and uploads its new corpus entries and failing inputs as an artifact.
 on:
@@ -89,7 +89,7 @@ jobs:
           BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
         shell: bash
         run: |
-          if [ "$GITHUB_EVENT_NAME" = push ] || git diff --name-only "$BASE" HEAD | grep -E '^(library/|src/wasi/|src/managed-lean\.mjs|src/lasm-library\.mjs|src/toolchains\.json|test/fuzz/|\.github/workflows/fuzz\.yml)' >/dev/null; then
+          if [ "$GITHUB_EVENT_NAME" = push ] || git diff --name-only "$BASE" HEAD | grep -E '^(library/|src/managed-lean\.mjs|src/lasm-library\.mjs|src/toolchains\.json|test/fuzz/|\.github/workflows/fuzz\.yml)' >/dev/null; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
       - name: libFuzzer runtime
@@ -100,7 +100,7 @@ jobs:
         run: node test/fuzz/native/build.mjs
       - name: Native targets
         if: steps.native.outputs.changed == 'true'
-        run: node test/fuzz/run.mjs replay lean-fetch-request wasi-cgi fastly-host
+        run: node test/fuzz/run.mjs replay lean-js-wire
 
   campaign:
     needs: sunday
@@ -112,7 +112,7 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        target: [cli-arguments, serverless-http, ui-patch, ui-decode, lasm-js-wire, dev-proxy, project-files, edge-request, tar, lean-fetch-request, wasi-cgi, fastly-host]
+        target: [cli-arguments, serverless-http, ui-patch, ui-decode, lasm-js-wire, dev-proxy, project-files, edge-request, tar, lean-js-wire]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -143,7 +143,7 @@ jobs:
           node test/fuzz/support/lean-header-model.mjs
           echo "LASM_LEAN_HEADER_MODEL=required" >> "$GITHUB_ENV"
       - name: Native target
-        if: startsWith(matrix.target, 'lean-') || matrix.target == 'wasi-cgi' || matrix.target == 'fastly-host'
+        if: startsWith(matrix.target, 'lean-')
         run: |
           scripts/fuzz/ensure-libfuzzer.sh
           node test/fuzz/native/build.mjs ${{ matrix.target }}
@@ -154,7 +154,7 @@ jobs:
         # which keeps the weekly tier within its budget (docs/CI.md).
         run: |
           seconds="$SECONDS_PER_TARGET"
-          case "${{ matrix.target }}" in dev-proxy|project-files|edge-request|fastly-host) [ "$seconds" -gt 600 ] && seconds=600 ;; esac
+          case "${{ matrix.target }}" in dev-proxy|project-files|edge-request) [ "$seconds" -gt 600 ] && seconds=600 ;; esac
           node test/fuzz/run.mjs fuzz --seconds "$seconds" --seed "$((GITHUB_RUN_ID % 2147483647))" ${{ matrix.target }}
       - name: New corpus entries and failing inputs
         if: always()

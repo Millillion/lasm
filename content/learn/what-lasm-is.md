@@ -35,8 +35,9 @@ cd my-app && npm install && npm run dev
   sockets. The other targets run Lean single-threaded, without sockets or
   processes, and without files except on WASI. The rest of Lean works.
 - **Lean code can call JavaScript and npm packages** with `Lasm.JS`, one
-  `@[js]` line per function. It also comes with libraries for HTTP handlers
-  (`Lasm.Fetch`), and browser apps (`Lasm.UI`).
+  `@[js]` line per function, and serve HTTP with the web's own `Request` and
+  `Response` (`Lasm.JS.Web`). It also comes with a library for browser apps
+  (`Lasm.UI`).
 - **The flagship example is [Conduit](../../examples/conduit),** the RealWorld
   app written entirely in Lean. It comes with 294 theorems about the code
   that runs ([PROOFS.md](../../examples/conduit/PROOFS.md)), and it passes
@@ -94,7 +95,7 @@ Differential testing has found real bugs. Each one is written up:
 
 ### Target equivalence
 
-One `Lasm.Fetch` server, built for Node, Deno, Bun, wasi-http and Workers,
+One server (the `fetch` template), built for Node, Deno, Bun, wasi-http and Workers,
 must answer a recorded set of requests the same way on every target: the same
 status, headers and body bytes. This found a request path that routed
 differently on different platforms. Its fix comes with a theorem

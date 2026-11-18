@@ -12,22 +12,23 @@ Compute's host calls, in the layout `fastly compute serve|deploy` uses.
 | Output | `wasi/main.wasm` (+ `build-info.json`, `THIRD_PARTY_NOTICES.txt`, also embedded in the Wasm as its `lasm.notices` section) | `wasi-http/main.wasm`, a component | `bin/main.wasm`, `pkg/<name>.tar.gz`; `fastly.toml` when the project has none |
 | Runs on | wasmtime, wasmer, Node's `node:wasi`, any preview 1 host | `wasmtime serve`, Spin's HTTP trigger, any wasi:http/proxy@0.2 host | Fastly Compute; Viceroy (`fastly compute serve`) locally |
 | `main` | A command: arguments, environment, standard streams, exit status | Runs once per request | Runs once per request |
+| HTTP served | None: `--target wasi` is for command-line and batch programs (the CGI server mode was removed after 0.9.0; serve HTTP with `--target wasi-http`) | [`Lasm.WASI.Http`](WASI_FASTLY_BINDINGS.md): wasi:http/incoming-handler | [`Lasm.Fastly`](WASI_FASTLY_BINDINGS.md): Fastly's downstream request |
+| HTTP sent | Not available (no sockets) | `Lasm.WASI.Http`: wasi:http/outgoing-handler | `Lasm.Fastly`: backend requests |
+| Imports | `wasi_snapshot_preview1` | wasi:http, wasi:io, wasi:clocks, wasi:random, wasi:cli 0.2.12 | `wasi_snapshot_preview1` and Fastly's `fastly_*` modules |
 
 `--output DIR` puts the target's directory (the one holding `main.wasm`) at
 `DIR` instead (from 0.5.0; Fastly's `pkg/<name>.tar.gz` stays in the project).
 The Node build that the WASI link reuses stays in the build cache
 (`.lake/lasm/applications/`); nothing is written to `dist/`.
-| HTTP served | One CGI request per run (WAGI: the CGI variables and standard input, read with Lean's `IO`) | [`Lasm.WASI.Http`](WASI_FASTLY_BINDINGS.md): wasi:http/incoming-handler | [`Lasm.Fastly`](WASI_FASTLY_BINDINGS.md): Fastly's downstream request |
-| HTTP sent | Not available (no sockets) | `Lasm.WASI.Http`: wasi:http/outgoing-handler | `Lasm.Fastly`: backend requests |
-| Imports | `wasi_snapshot_preview1` | wasi:http, wasi:io, wasi:clocks, wasi:random, wasi:cli 0.2.12 | `wasi_snapshot_preview1` and Fastly's `fastly_*` modules |
 
 CI ([`wasi.yml`](../.github/workflows/wasi.yml),
 [`scripts/wasi/wasi-ci.mjs`](../scripts/wasi/wasi-ci.mjs)) builds
-[`examples/wasi-cli`](../examples/wasi-cli/Main.lean) and
-[`examples/fetch`](../examples/fetch/Main.lean), [`examples/fastly`](../examples/fastly/Main.lean)
-(on [Lasm.Fastly](WASI_FASTLY_BINDINGS.md)) and Lasm.Fastly's conformance fixture from source on every change
+[`examples/wasi-cli`](../examples/wasi-cli/Main.lean),
+[`examples/fastly`](../examples/fastly/Main.lean) (on [Lasm.Fastly](WASI_FASTLY_BINDINGS.md)),
+[`examples/wasi-http`](../examples/wasi-http/Main.lean) (on Lasm.WASI.Http), both bindings' conformance
+fixtures and the fetch template's `Fastly.lean` and `WasiHttp.lean` from source on every change
 and checks them on pinned wasmtime 49.0.4 (`run` and `serve`), wasmer 7.4.2,
-Node 26.12.1's `node:wasi`, Spin 4.2.2 (HTTP trigger and wagi) and Viceroy
+Node 26.12.1's `node:wasi`, Spin 4.2.2 (HTTP trigger) and Viceroy
 0.21.1. The command-line program's output
 and exit status must equal native Lean's (`lean --run`) on every engine.
 
@@ -92,7 +93,7 @@ this script.)
 | `IO.sleep`, `Std.Async` (`async`, `await`, `sleep`, timers), `Async.block` | ✓ | An event loop over `poll_oneoff` |
 | `Task.spawn`, `IO.asTask`, `Task.get`, `IO.wait`, `IO.waitAny`, `IO.Promise`, `Std.Mutex`, condition variables | ✓ | Cooperative, on one thread (see below) |
 | Lean exceptions (`throw`, `try`/`catch`), panics | ✓ | |
-| HTTP serving | ✓ | As a CGI program: the request from the CGI environment variables and standard input, the response on standard output |
+| HTTP serving | — | Removed after 0.9.0 (the CGI server mode, API decision A44): serve HTTP with `--target wasi-http` |
 | Sockets, DNS (`Std.Net`, `Std.Http` server), processes, signals | — | Not in WASI preview 1: clear `unsupportedOperation` errors |
 | `Lasm.JS` | — | No JavaScript: `Lasm.JS.isAvailable` is false and calls fail clearly |
 | Deep recursion | Bounded | By the engine's Wasm stack and an 8 MiB C stack (1 MiB on Fastly). With default settings, a small non-tail recursive function (`deepSum n = (n + 1) + deepSum n`) passes 10,910 frames on wasmtime 49.0.4, 8,177 on wasmtime 30.0.2 and 9,651 on `node:wasi` (Node 24.22.1), measured 2026-10-31; larger frames get less. `wasmtime run -W max-wasm-stack=4194304` (4 MiB) passes 50,000 frames of it, 8 MiB 100,000. Lean's formatter recurses about twice per element, so `repr` of an Array prints at most 1,801 elements on wasmtime 49.0.4 and 3,914 on `node:wasi` (measured 2026-11-10); `toString` has no such limit, and `-W max-wasm-stack=1073741824` prints 100,000 ([FUNDAMENTAL_LIMITATIONS.md](../FUNDAMENTAL_LIMITATIONS.md#printing-a-large-value-with-repr-issue-179)) |
@@ -155,11 +156,11 @@ Lean ─▶ C ─▶ wasm64 objects (the Node build, cached) ──┐
 ### The wasi-http component
 
 `--target wasi-http` links the same program with
-[`lasm_wasi_http.c`](../src/wasi/lasm_wasi_http.c) instead of the CGI glue:
+[`lasm_wasi_http.c`](../src/wasi/lasm_wasi_http.c) and Lasm.WASI.Http's glue:
 the core module exports wasi:http/incoming-handler@0.2.12's `handle` (which
 runs `main` for the request) and `cabi_realloc`, and imports wasi:http's
 `types` and `outgoing-handler`, `wasi:io` and the monotonic clock directly,
-with hand-written canonical ABI bindings (wit-bindgen's C uses native
+with generated canonical ABI bindings (wit-bindgen's C uses native
 pointers, which the wasm64 code cannot). libc's preview 1 calls go through
 Wasmtime's `wasi_snapshot_preview1.proxy.wasm` adapter.
 
@@ -174,8 +175,9 @@ the template and requires the build's component to equal wasm-tools' own
 output byte for byte.
 
 One instance serves one request (as `wasmtime serve` and Spin run it): the
-Lean runtime starts, `main` runs, and `serve` answers through the response
-outparam. The proxy world has no environment, arguments or files, so
+Lean runtime starts, `main` runs, and the program answers through the
+response outparam (`Lasm.WASI.Http.IncomingHandler.serve`, then `respond`);
+when `main` returns without taking the request, the host answers 500. The proxy world has no environment, arguments or files, so
 `IO.getEnv` sees nothing and file operations fail.
 
 The decisions and their alternatives are rows in [DECISIONS.md](DECISIONS.md).
@@ -192,9 +194,8 @@ first measurements, before outbound requests and streaming, are in
 | Module | `main.wasm` | gzip -9 |
 | --- | --- | --- |
 | `examples/wasi-cli` (`--target wasi`) | 841,251 bytes (0.80 MiB) | 211,920 |
-| `examples/fetch` (`--target wasi`) | 946,505 bytes (0.90 MiB) | 230,384 |
-| `examples/fetch` (`--target fastly`) | 956,924 bytes; `pkg/*.tar.gz` 235,101 | 234,528 |
-| `examples/fetch` (`--target wasi-http`, a component) | 989,738 bytes (0.94 MiB) | 244,247 |
+| The HTTP example (`--target fastly`) | 956,924 bytes; `pkg/*.tar.gz` 235,101 | 234,528 |
+| The HTTP example (`--target wasi-http`, a component) | 989,738 bytes (0.94 MiB) | 244,247 |
 
 **Build.** 30–34 s from a clean checkout for the Node build plus the WASI link
 (the link itself is about 5 s); another target reuses the Node build (13 s),
@@ -210,10 +211,11 @@ two sleeps of 25 and 20 ms, tasks, Std.Time):
 | wasmer 7.4.2 | 27.9 ms | 405 ms |
 | Node 26.12.1 `node:wasi` (includes Node's own start) | 60.4 ms | 109 ms |
 
-**HTTP** (`examples/fetch`): 25–29 checks per host (the routes, `HEAD`,
-outbound requests where the host has them, Fastly's stores on Viceroy, and a
-streaming check). Per request: 50 sequential `GET /` over HTTP; CGI runs
-start one engine process per request. Streaming: `GET /stream/out/40` sends
+**HTTP** (the HTTP example of the time, one handler on every host; its routes
+are now answered by `examples/fastly` and `examples/wasi-http`): 25–29 checks
+per host (the routes, `HEAD`, outbound requests where the host has them,
+Fastly's stores on Viceroy, and a streaming check). Per request: 50 sequential
+`GET /` over HTTP. Streaming: `GET /stream/out/40` sends
 40 chunks 5 ms apart; the table shows when the first arrived and when the
 body ended.
 
@@ -222,12 +224,8 @@ body ended.
 | Viceroy 0.21.1 (Fastly; a fresh instance per request) | 1.17 / 1.30 ms | 408 ms | 211 ms | 1 / 244 ms |
 | `wasmtime serve` (wasi-http; a fresh instance per request) | 1.04 / 1.15 ms | 608 ms | 211 ms | 1 / 247 ms |
 | Spin 4.2.2, HTTP trigger (wasi-http) | 1.38 / 1.49 ms | 1,034 ms | 217 ms | 1 / 245 ms |
-| Spin 4.2.2, wagi (CGI build) | 1.40 / 1.53 ms | 1,017 ms | 216 ms | (collected by Spin) |
 | Node (`lasm build`, `node:http`) | 0.62 / 0.73 ms | 232 ms | 212 ms | 1 / 219 ms |
 | Deno 2.9.6 (`--target deno`) | 0.56 / 0.74 ms | 211 ms | 210 ms | 1 / 275 ms |
-| CGI under wasmtime (process per request) | 15.9 ms mean | — | — | — |
-| CGI under wasmer | 31.1 ms mean | — | — | — |
-| CGI under `node:wasi` | 56.6 ms mean | — | — | — |
 
 Viceroy, `wasmtime serve` and Spin start a new instance of the module for
 every request and still answer in about a millisecond: Lean's initialization

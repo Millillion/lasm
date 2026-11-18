@@ -617,7 +617,8 @@ The wrapper is linked into every program that imports Lasm's library; on Node
 its limit is 16,384, since Node runs Lean on threads with 1 GiB stacks.
 
 **Measured** (`scripts/ci/async-depth.mjs`, the `async-depth` job of
-`differential.yml`, [run 42615416214](https://github.com/Millillion/lasm/actions/runs/42615416214), 2026-11-09, Linux x64). Time for one Lasm.Fetch request
+`differential.yml`, [run 42615416214](https://github.com/Millillion/lasm/actions/runs/42615416214), 2026-11-09, Linux x64; the app was then a handler of the HTTP library removed after 0.9.0,
+and is now a `Lasm.JS.Web` handler on `Node.serve` and `exportDefault`). Time for one request
 running N steps one after another, with no pause:
 
 | Step (N = 100,000 / 1,000,000) | Node | Deno 2.9.6 | Bun 1.4.4 | Workers (workerd, `wrangler dev` 4.152.0) |
@@ -653,10 +654,10 @@ host calls is still faster: each host call costs microseconds.
     function, so one `main` serves both.
   - `waitForever` returns at once on the edge, because the isolate's lifetime
     is the platform's.
-- **Done (2026-10-26, [FETCH.md](FETCH.md)): a pure-Lean `Lasm.Fetch` handler API.** `Lasm.Fetch.serve
-  (handler : Request → Async Response)` with Lean `Request`/`Response`
-  structures (method, URL, headers, body bytes). It would be implemented on
-  `Lasm.JS` and work on Node too: the "pure Lean" path with no npm package.
+- **Done (2026-10-26), then removed after 0.9.0: a pure-Lean handler API** with Lean
+  `Request`/`Response` structures. Programs now write a handler on the web's own
+  `Request` and `Response` (`Lasm.JS.Web`) and publish it with `exportDefault`
+  (`Node.serve` on Node).
 - **Module resolution.** The build collects the modules named by `@[js "m" …]`
   bindings, plus modules listed in configuration (`lasm.edge.modules` in
   `package.json`) for dynamic `require "m"`. It imports them statically in the

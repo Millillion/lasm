@@ -19,7 +19,7 @@ deploys Lean with Lasm. The [README](../README.md) has the complete reference;
 - **Lake projects** work as usual (local modules, Reservoir/Git dependencies). Pure
   modules without `Lasm.*` imports also build natively with `lake build`.
 - **`Lasm.*` libraries ship inside Lasm** (`Lasm.JS` with its generated
-  `Lasm.JS.Web`, `Lasm.Fetch`, `Lasm.UI`, `Lasm.Fastly`). Never add them as Lake
+  `Lasm.JS.Web`, `Lasm.UI`, `Lasm.Fastly`, `Lasm.WASI.Http`). Never add them as Lake
   dependencies. For the editor, run `npx lasm editor`.
 
 ## Rules
@@ -41,7 +41,8 @@ deploys Lean with Lasm. The [README](../README.md) has the complete reference;
 4. **Minimize JS calls.** Each one costs about 24 µs. Read many fields at once
    (`getFields`) and return replies with `Function.Reply` rather than calling back.
 5. **Pick the HTTP layer by target.** For Node in production, use Hono, Express or
-   Fastify with Lean handlers, or `Lasm.Fetch` (scheduled for removal). For Fastly Compute,
+   Fastify with Lean handlers, or `Node.serve` with a `Lasm.JS.Web` handler (on Bun,
+   Deno, the edge and the function platforms, `exportDefault` of the same handler). For Fastly Compute,
    use `Lasm.Fastly` (Fastly's host ABI, generated: `HttpReq.bodyDownstreamGet`,
    `HttpResp.sendDownstream`, the stores; [WASI_FASTLY_BINDINGS.md](WASI_FASTLY_BINDINGS.md)).
    For wasi-http (wasmtime serve, Spin), use `Lasm.WASI.Http` (the WIT's own interfaces,
@@ -72,7 +73,7 @@ deploys Lean with Lasm. The [README](../README.md) has the complete reference;
 | --- | --- | --- |
 | A complete real-world app (API, frontend, auth, SQL) with proofs | [examples/conduit/README.md](../examples/conduit/README.md), [PROOFS.md](../examples/conduit/PROOFS.md) | [examples/conduit](../examples/conduit) (proofs over a `Store` model: `Proofs/Model.lean`) |
 | Server with npm framework | [GETTING_STARTED](GETTING_STARTED.md) | `--template hono`, [examples/js-crud](../examples/js-crud) |
-| Pure-Lean HTTP on any target | [FETCH.md](FETCH.md) | `--template fetch`, [examples/fetch](../examples/fetch) |
+| Pure-Lean HTTP on any target | [JS_BINDINGS.md](JS_BINDINGS.md#serving-http-on-node-nodeserve), [WASI_FASTLY_BINDINGS.md](WASI_FASTLY_BINDINGS.md) | `--template fetch`, [templates/fetch](../templates/fetch) |
 | Browser UI | [UI.md](UI.md) | `--template web`, [examples/ui](../examples/ui) |
 | Full stack with proofs | [templates/fullstack](../templates/fullstack) | `--template fullstack` |
 | Bindings to an npm package | [JS_BINDINGS.md](JS_BINDINGS.md) | [examples/js-fetch](../examples/js-fetch) |

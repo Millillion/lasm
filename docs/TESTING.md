@@ -38,7 +38,7 @@ strategy [TESTING_STRATEGY.md](TESTING_STRATEGY.md).
 | Upstream Lean suite | Lean's own tests, run through the installed package | `language-coverage-baseline.yml`, `nightly.yml` ([UPSTREAM_APPLICATION_TESTS.md](UPSTREAM_APPLICATION_TESTS.md)) | nightly, release |
 | Example apps | Conduit against the official RealWorld API and Playwright suites | `conduit.yml` | PR (paths) |
 | [Dependable tooling](#dependable-tooling) | Every user-triggerable error prints a clear message (error corpus); incremental, repeated, renamed and touched builds give the clean build's bytes (metamorphic); killed, offline, full-disk, read-only and corrupted runs end in success or a clear error (fault injection) | `scripts/tooling/`, `tooling.yml` | PR (corpus), nightly (all) |
-| [Fuzzing at boundaries](#fuzzing-at-the-boundaries) | Parsers and decoders never crash, hang or accept garbage: the CLI's arguments, tar archives, `lasm dev`'s proxy, project files, the edge entries' request mapping, the function platforms' HTTP mapping, the Lasm.UI patch decoder, Lasm.Fetch's request parsing, Lasm.RPC's decoding, the WASI C host's CGI request, the Fastly host | `test/fuzz/`, `fuzz.yml` | PR (replay), nightly, weekly |
+| [Fuzzing at boundaries](#fuzzing-at-the-boundaries) | Parsers and decoders never crash, hang or accept garbage: the CLI's arguments, tar archives, `lasm dev`'s proxy, project files, the edge entries' request mapping, the function platforms' HTTP mapping, the Lasm.UI patch decoder and its reading against Lean's decoder, the Lasm.JS value codec (its JavaScript half against Lean's, and Lean's natively) | `test/fuzz/`, `fuzz.yml` | PR (replay), nightly, weekly |
 | [Model checking and schedule fuzzing](#deterministic-simulation-and-schedule-fuzzing) | The host bridge has no lost wake-ups, lost or doubly served requests, or deadlocks; the code follows the model | `verification/host-bridge/`, `scripts/bridge-fuzz/`, `bridge-verification.yml`, `lasm-js-stress.yml`, `test/node-js.test.mjs` | PR (paths), nightly, release |
 | [Deterministic simulation of the example apps](#deterministic-simulation-of-the-example-apps) | Tandem, Ledger and Porter keep their guarantees (no lost acknowledged edit, convergence, conservation of money, single-use codes and tokens, exact expiry) under simulated network, storage and clock faults; every failure replays from its seed | `scripts/sim/`, `examples/{tandem,ledger,porter}/Sim.lean` and `examples/*/test/dst/`, `tandem.yml`, `ledger.yml`, `porter.yml`, `dst-nightly.yml` | PR (paths, 30 fixed seeds), nightly (random seeds) |
 | Proofs | Lean theorems of Lasm.UI, Conduit, … (`#print axioms`) | `ui.yml`, `conduit.yml` | PR (paths), release |
@@ -462,7 +462,7 @@ request of a recorded corpus with the same status, the same app-set headers
 (`content-type`, `location`, `set-cookie`, the app's own) and the same body bytes.
 
 [`scripts/equivalence/run.mjs`](../scripts/equivalence/run.mjs) creates the
-`fetch` template with `lasm init` (black box) or copies `examples/fetch`, builds
+`fetch` template with `lasm init` (black box), builds
 it for `node`, `deno`, `bun`, `wasi-http` (wasmtime serve) and, in CI, `workers`
 (wrangler dev, local workerd), serves each on a free port and replays
 [`test/equivalence/<app>.json`](../test/equivalence/). The corpus holds the
@@ -882,9 +882,7 @@ where they are; these cover the libraries and hosts every app shares.
 | `project-files` | the project files Lasm reads itself: a Lean source's import header (`leanHeader`, the key of the build's reuse of Lake's configuration; `importClosure`, what `lasm dev` rebuilds after an edit), lake-manifest.json and lakefile.lean (`lakeConfigurationKey`), package.json (`edgeModules`, `supabaseFunctionName`, `fastlyName`) | JavaScript | against Lean's own header parser (`Lean.Elab.parseImports`, `test/fuzz/support/LeanHeaderModel.lean`, run with `lean --run` by `test/fuzz/support/lean-header-model.mjs`, required in CI): whenever Lean reads a header without error, `leanHeader` of the source has exactly its imports and `importClosure` reaches every imported file; a manifest is a key or no reuse, never a throw; package.json is read, or refused with a plain `Error` naming it (`Lasm.Cli.Candidates`: `lean_header_keeps_imports`, `import_closure_covers_imports`, `lake_key_total`, `package_readers_clear`). Lean 4.35 reads a header broken by a bare CR as no imports and no error, so texts with one have no verdict on `leanHeader` |
 | `edge-request` | the edge entries' request mapping (`src/edge/edge-build.mjs`): the Supabase entry's `route` (Supabase hands the function `/NAME/PATH`) and the Vercel Edge entry's `identity`, taken from the generated entries' text and run on Node's `Request` | JavaScript (every script's blocks count: the generated functions are `new Function` scripts) | `route` removes exactly the function's name from a path that is the name or starts with it and `/` (the name alone becomes `/`), keeping the origin, query, method, headers and body, and leaves any other request unchanged; `identity` changes nothing but Accept-Encoding (`Lasm.Cli.Candidates`: `supabase_route_strips_name`, `vercel_identity_drops_encoding`) |
 | `tar` | Lasm's tar reader and writer (`src/tar.mjs`): every tool archive, npm package and CI tree Lasm reads, and the Fastly package it writes | JavaScript | whatever Lasm's reader accepts, Python's `tarfile` accepts and reads as the same entries (paths, types, permission bits, sizes, link paths, each file's bytes); Lasm may only be stricter, and refuses with a plain `Invalid tar archive` error; what the writer writes, the reader reads back exactly. Inputs are raw archives (optionally with every expected header's checksum recomputed, to reach the fields behind it) or entries built from fields. Normalizations: trailing slashes, and no verdict for a non-POSIX header with a prefix field (tarfile joins it, POSIX and GNU tar do not). The oracle runs in one `python3 -I` process (`test/fuzz/support/tar-oracle.py`, required in CI) |
-| `lean-fetch-request` | `Lasm.Fetch`'s request parsing as Node's host builds requests (`nodeRequestUrl`, `path`, `segments`, `query`, `queryParams`, `header?`, `percentDecode`, `joinCookies`, `splitCookieCommas`) | libFuzzer, ASan | the path starts with `/` and holds no `?`, `#`, `\`; the Host header never moves the path; the target alone has the same path; resolving again changes nothing; no dot segments; one Cookie header |
-| `wasi-cgi` | the WASI C host's CGI request and response (`src/wasi/lasm_fetch_wasi.c`), compiled natively | libFuzzer, ASan, UBSan | strings handed to Lean are valid UTF-8; the method is `REQUEST_METHOD`; the Host or `SERVER_NAME` never moves the path; the response head is one line per header, no CR, LF or NUL inside a line |
-| `fastly-host` | the Fastly Compute host (`src/wasi/lasm_fetch_wasi.c` with `-DLASM_WASI_FASTLY`), compiled natively through `test/fuzz/native/fastly_driver.c`, which plays an honest Fastly host: it answers each ABI call as the ABI allows, choosing from the input how many header names or values a call returns, how short a read is, how much of a write it takes, and answering BUFLEN with the length it needs | libFuzzer, ASan, UBSan | the program gets the request's method, URI, headers (grouped by name as the host lists them) and body byte for byte, taken whole or as a head and reads of any size; the host receives the response's status, headers in order and body byte for byte, sent once and ended as the program asked; a fetch's dynamic backend targets the URL's host and port (the scheme's default when there is none or it is empty) and overrides the Host with the host name, for every URL RFC 3986 allows (`Lasm.Fetch.Candidates`: `fastly_request_read`, `fastly_response_written`, `fastly_backend_authority`) |
+| `lean-js-wire` | the Lasm.JS value codec's Lean half (`Wire` in `library/Lasm/JS/Core.lean`: `Wire.decodeWith` and `Wire.encode`) on arbitrary bytes, compiled natively | libFuzzer, ASan | the reader never panics or overruns: it refuses the bytes cleanly or reads a value; a value read is accepted by `encode`, the bytes `encode` writes are read back without error (`Lasm.JS.Spec.decode_encode`), and writing what was read back gives the same bytes |
 
 **Engines.** The JavaScript targets run in a worker under V8's block coverage
 (`node:inspector` `Profiler.takePreciseCoverage`, read after each run): an
@@ -907,7 +905,12 @@ linked with the C of the Lasm modules it imports, Lasm's native C glue and
 Lean's runtime, under libFuzzer (`test/fuzz/native/build.mjs`); a Lean panic
 fails the run (`lean_set_exit_on_panic`). This is coverage-guided fuzzing of
 the compiled Lean code itself, where Plausible would be random property
-testing; the Wasm build shares the same C.
+testing; the Wasm build shares the same C. Until 0.9.0 three more native
+targets fuzzed the removed HTTP library's Lean request parsing and its WASI
+CGI and Fastly C hosts (deleted with them, API decisions A44 and A45); the
+pure request-path model they checked lives on in verification/cli
+(Lasm.RequestPath), with its candidates checked on generated URLs by
+`test/library-proofs/RequestPath.lean`.
 
 **Inputs.** `test/fuzz/corpus/<target>/` holds the seeds and the inputs past
 campaigns found interesting; `test/fuzz/regressions/<target>/` holds every
@@ -929,9 +932,9 @@ a fix, or an issue.
 
 **CI** ([fuzz.yml](../.github/workflows/fuzz.yml)): every pull request and push
 to `main` replays the committed corpus and regressions of the JavaScript
-targets, and of the native targets when `library/`, `src/wasi/`, the Lean
-provisioning or `test/fuzz/` change (also `test/fuzz-replay.test.mjs` in the
-unit suite); nightly (02:23 UTC) a 10-minute campaign per target; weekly
+targets, and of the native targets when `library/`, the Lean provisioning or
+`test/fuzz/` change (also `test/fuzz-replay.test.mjs` in the unit suite);
+nightly (02:23 UTC) a 10-minute campaign per target; weekly
 (Saturday 06:41 UTC) a 60-minute campaign per target. A campaign fails on any
 failing input and uploads its new corpus entries and failing inputs (artifact
 `fuzz-<target>`, 30 days).
@@ -1294,8 +1297,8 @@ candidates list (generated from the Candidates files; `--write` updates it) is
 stale. It also counts the fuzz oracles and the `forAll` properties that name
 a proposition (`--json` prints the inventory): exit bar 7 needs all of them.
 Since 2026-11-11 every `forAll` property does, and every fuzz oracle except
-`wasi-cgi` (the WASI C host's CGI boundary, which goes with Lasm.Fetch);
-`test/propositions.test.mjs` fails if a new one does not.
+`tar` (whose oracle is Python's tarfile, an outside reference implementation,
+exempt by rule); `test/propositions.test.mjs` fails if a new one does not.
 The Candidates files compile with the proofs (`scripts/library-proofs.mjs`).
 
 The CLI is JavaScript, so its propositions live in
@@ -1411,9 +1414,9 @@ tracked file under `bin/`, `native/`, `src/` and `library/c/` has an entry
 `generated`, `data`, `deleting`), and every model and differential it names
 exists and names the module. M4's exit check is met when none is pending.
 
-The Lean candidates are checked in `test/ui/DiffModel.lean` (`ui.yml`) and in
-the `lean-fetch-request` fuzz target
-(`test/fuzz/native/LasmFuzz.lean`, `fuzz.yml`).
+The Lean candidates are checked in `test/ui/DiffModel.lean` (`ui.yml`) and,
+for the request-path model, in `test/library-proofs/RequestPath.lean`
+(`library-proofs.yml`).
 
 ### Translation validation of the toolchain
 
@@ -1507,7 +1510,7 @@ tier and why that is safe, and the PR-tier measurements. In short:
 
 | Tier | When | What this page's layers add there |
 | --- | --- | --- |
-| PR | every pull request (path-filtered), then the push to `main` unfiltered | the unit suite; boundary fuzzing: the committed corpus and regressions replayed (seconds; native targets when their sources change); host bridge: the model (about 1 s), 20 schedule-fuzzed runs per stress program on Linux and their traces' conformance; differential: regressions + three seeded program pairs (525 cases) and the two fixed-seed [feature programs](#differential-fuzzing) (160 cases) on node, wasi, node:wasi, edge, plus the interpreter, `node-O0` and the edge `.wasm` on Node, Bun and SpiderMonkey; target equivalence of the fetch template and `examples/fetch` on node, deno, bun, wasi-http, workers; recursion depth on Linux and Windows. macOS only when macOS-specific code changes. Skipped for a change to docs or the flagship apps only (they have their own workflows) |
+| PR | every pull request (path-filtered), then the push to `main` unfiltered | the unit suite; boundary fuzzing: the committed corpus and regressions replayed (seconds; native targets when their sources change); host bridge: the model (about 1 s), 20 schedule-fuzzed runs per stress program on Linux and their traces' conformance; differential: regressions + three seeded program pairs (525 cases) and the two fixed-seed [feature programs](#differential-fuzzing) (160 cases) on node, wasi, node:wasi, edge, plus the interpreter, `node-O0` and the edge `.wasm` on Node, Bun and SpiderMonkey; target equivalence of the fetch template on node, deno, bun, wasi-http, workers; recursion depth on Linux and Windows. macOS only when macOS-specific code changes. Skipped for a change to docs or the flagship apps only (they have their own workflows) |
 | Nightly | 01:07 to 09:17 UTC | the release suites (`ci-nightly.yml`: unit, browser, edge and Bun/Deno, WASI, UI, fullstack, dev loop, Lasm.JS stress); boundary fuzzing: 10 minutes per target (`fuzz.yml`); host bridge: 200 schedule-fuzzed runs per stress program on four platforms; differential: 60-minute campaigns for the release and the dev profile, every oracle, a feature program per seed, and the macOS jobs (recursion depth, the C tier on three macOS runners); tooling metamorphic and fault runs; mutation on every module; the example apps' DST with random seeds and campaigns; the nightly upstream suite (`nightly.yml`) |
 | Weekly | Saturday 06:41 and 12:07 UTC | differential: 100-minute campaigns in both profiles (a feature program per seed), and the Lasm.JS soak (200 runs per program on four platforms) (`ci-weekly.yml`); boundary fuzzing: 60 minutes per target (`fuzz.yml`) |
 | Release | a version bump (`release-checks`) | every launch workflow, Lasm.JS stress, unit suite, npm rehearsal (unchanged) |
@@ -2024,7 +2027,7 @@ injection into `node:fs/promises` (`test/application-files-faults.test.mjs`).
 | --- | --- | --- |
 | Differential testing, seed 1 (`wasi-node`) | **WASI:** libc's environment lost every variable after the third: `__wasi_environ_get` in `src/wasi/lasm_wasi_libc.c` widened the 32-bit WASI pointers in place with typed loads and stores that alias, which clang `-O2` may reorder. The Lean runtime's `LEAN_BACKTRACE` and `LEAN_ABORT_ON_PANIC` (and any libc `getenv`) were ignored unless among the first three variables; `IO.getEnv` was unaffected | Fixed in #25 (char-typed copies); regression `r_wasi_env_backtrace` |
 | Differential testing, regression replay (`deno`) | **Edge profile:** the C runtime's `getenv` sees none of the host's variables, so `LEAN_BACKTRACE=0` and `LEAN_ABORT_ON_PANIC` have no effect on the edge targets, Bun, Deno and the browser | Fixed ([#26](https://github.com/Millillion/lasm/issues/26)): the embedder's string variables are copied into Emscripten's `ENV` before libc reads it (`src/edge/edge-library.js`, `src/edge/edge-start.mjs`); regression `r_edge_env_backtrace`; [EDGE.md](EDGE.md#environment-variables) |
-| Target equivalence (fetch template, `examples/fetch`) | `GET /hello/../hello/Ada`: Node, Deno and wasi-http route the raw dot segments (404); Bun and Workers remove them first (200). Same handler, different routing per platform, and `..` reaches handlers on Node | [#27](https://github.com/Millillion/lasm/issues/27) (proposal: `remove_dot_segments` in `Request.path`), listed as `known` |
+| Target equivalence (fetch template, `examples/fetch`, since deleted) | `GET /hello/../hello/Ada`: Node, Deno and wasi-http route the raw dot segments (404); Bun and Workers remove them first (200). Same handler, different routing per platform, and `..` reaches handlers on Node | [#27](https://github.com/Millillion/lasm/issues/27) (proposal: `remove_dot_segments` in `Request.path`), listed as `known` |
 | Differential testing, `deep` and `ending` cases | wasmtime turns an exit status of 126–255 into exit 1 with an error (docs/WASI.md says modulo 256); edge and WASI recursion stops just below 10,000 frames of a small function (docs/EDGE.md says 10,000 pass) | Documented ([#30](https://github.com/Millillion/lasm/issues/30)): measured bounds in [WASI.md](WASI.md) and [EDGE.md](EDGE.md); wasmtime's status limit stays in `KNOWN` (a host limit); generator bound 5,000 |
 | Target equivalence, first CI run | Bun answered some requests with "socket hang up", among them `/hello/a%2Fb` (the only one in the template's run, 41233271298): the harness sent `Connection: close` through Node's pooled keep-alive agent, which then reused the socket Bun had closed as asked. Not Bun and not Lasm: every run since answers `Hello, a/b` on Bun (e.g. 41650866547) | Harness fix (fresh connections, b88e671); a `keepAlive` corpus case now sends `/hello/a%2Fb` three times among five requests on one persistent connection, on every target |
 | Conduit traffic equivalence, first CI run (42329506498) | Vercel Functions answered five bodiless `POST`s (favorite, follow) with 500 "invalid transfer-encoding header" from Vercel's launcher: the recording proxy forwarded hurl's bodiless `POST` (no `Content-Length`) with Node's default `Transfer-Encoding: chunked`. The harness's, not Vercel's or Lasm's: hurl sends no framing there and passes on Vercel directly | Harness fix: the proxy keeps the client's framing (a length when it sent a body or a length, none otherwise) |

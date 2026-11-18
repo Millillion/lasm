@@ -1,4 +1,4 @@
-// Lasm's own Lean library (`import Lasm.JS`, `import Lasm.Fetch`, `import Lasm.UI`), shipped with the compiler package
+// Lasm's own Lean library (`import Lasm.JS`, `import Lasm.UI`, `import Lasm.Fastly`, `import Lasm.WASI.Http`), shipped with the compiler package
 // in library/ and compiled into the managed Lean prefix when Lasm assembles it
 // (so `import Lasm.JS` resolves like a standard library module, from standalone
 // sources and Lake projects alike, with no Lake dependency). The generated C of
@@ -62,14 +62,12 @@ export function lazyArray(compute) {
 export const libraryModules = lazyArray(() => ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS',
   // Lasm.JS.Class (docs/JS_BINDINGS.md, "JavaScript classes"): not imported by Lasm.JS.
   'Lasm.JS.Class',
-  // Lasm.Fetch (docs/FETCH.md): one HTTP handler for Node, WASI, Fastly and the edge.
   // Lasm.Fastly (docs/WASI_FASTLY_BINDINGS.md): Fastly Compute's host ABI, generated from its witx
   // by scripts/bindings/generate-fastly.mjs (fastlyModules, in import order).
   ...fastlyModules,
   // Lasm.WASI.Http (docs/WASI_FASTLY_BINDINGS.md): the wasi:http proxy world, generated from the
   // WASI 0.2.12 WIT by scripts/bindings/generate-wasi-http.mjs (wasiHttpModules, in import order).
   ...wasiHttpModules,
-  'Lasm.Fetch', 'Lasm.Fetch.Assets', 'Lasm.Fetch.Embed',
   // Lasm.JS.Web (docs/JS_BINDINGS.md, "Lasm.JS.Web"): the whole web platform, generated from the WebIDL of
   // @webref/idl by scripts/bindings/generate-web.mjs (eagerWebModules, in import order).
   'Lasm.JS.Web.Support', ...eagerWebModules(),
@@ -103,8 +101,6 @@ export const glueHeaders = [join(root, 'c', 'lasm_js_framing.h')];
 // task waits and Emscripten's futex wait, wrapped by the glue (waits inside
 // synchronous callbacks). The edge and WASI links replace the glue, so they drop these.
 export const glueLinkFlags = ['lean_task_get', 'lean_io_wait_any_core', 'emscripten_futex_wait'].map(name => `-Wl,--wrap=${name}`);
-// Lasm.Fetch's glue on Node and the edge (WASI builds link src/wasi/lasm_fetch_wasi.c).
-export const fetchGlueSource = join(root, 'c', 'lasm_fetch.c');
 // Std.Async binds of steps that complete at once, bounded in depth (#90): kept by
 // every link, with its wrap (asyncLinkFlags), unlike the Node glue's.
 export const asyncGlueSource = join(root, 'c', 'lasm_async.c');
@@ -223,7 +219,7 @@ export function importsLibrary(sources) {
  * the program's own sources already compile (Lake built them, src/lake-library.mjs), linked from there only. */
 export function librarySources(lean, programSources, { supplied } = {}) {
   const missing = module => !existsSync(libraryC(lean, module));
-  if (libraryModules.some(missing)) throw new Error(`This program imports Lasm's library (Lasm.JS, Lasm.Fetch, Lasm.UI), which needs Lean ${libraryLeanVersions.join(' or ')} with Lean's elaborator libraries (the extended tier); it is missing from ${lean.prefix}`);
+  if (libraryModules.some(missing)) throw new Error(`This program imports Lasm's library (Lasm.JS, Lasm.UI, …), which needs Lean ${libraryLeanVersions.join(' or ')} with Lean's elaborator libraries (the extended tier); it is missing from ${lean.prefix}`);
   const cache = new Map();
   const libraryText = module => { if (!cache.has(module)) cache.set(module, readFileSync(libraryC(lean, module), 'latin1')); return cache.get(module); };
   // The prefix's library: the modules compiled with it, then those compiled on first import.
@@ -234,9 +230,8 @@ export function librarySources(lean, programSources, { supplied } = {}) {
   for (const module of modules) {
     sources.push(libraryC(lean, module)); inputs.push({ module: '+' + module, source: join(lean.prefix, 'src', 'lean', ...module.split('.')) + '.lean' });
   }
-  sources.push(glueSource, fetchGlueSource, asyncGlueSource);
-  inputs.push({ module: 'lasm_js.c', source: glueSource }, { module: 'lasm_fetch.c', source: fetchGlueSource },
-    { module: 'lasm_async.c', source: asyncGlueSource });
+  sources.push(glueSource, asyncGlueSource);
+  inputs.push({ module: 'lasm_js.c', source: glueSource }, { module: 'lasm_async.c', source: asyncGlueSource });
   if (modules.some(module => module.startsWith('Lasm.Fastly.'))) {
     sources.push(fastlyGlueSource);
     inputs.push({ module: 'lasm_fastly.c', source: fastlyGlueSource });

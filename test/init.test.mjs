@@ -172,12 +172,12 @@ test('the fullstack template: shared, server and client modules; Node and Worker
     assert.match(read('Deno.lean'), /Deno KV is not available/);
     for (const file of result.files.filter(f => f.endsWith('.lean'))) assert.doesNotMatch(read(file), /Lasm\.KV/, file);
     assert.match(read('wrangler.toml'), /\[assets\]\ndirectory = "\.\/dist\/public"/);
-    // Plain REST (no Lasm.RPC, no Lasm.Fetch): Node.serve on Node, fetch in the browser.
+    // Plain REST: Node.serve on Node, fetch in the browser.
     assert.match(read('Server.lean'), /Node\.serve \{ fetch := JsSite\.handle kv \}/);
     assert.match(read('Export.lean'), /exportDefault \(JsSite\.handle \(← Site\.Kv\.memory\)\)/);
     assert.match(read('Workers.lean'), /ExportedHandlerFetchHandler\.ofFn fun request \(env : Env\)/);
     assert.match(read('Client.lean'), /Lasm\.JS\.Web\.fetch/);
-    for (const file of result.files.filter(f => f.endsWith('.lean'))) assert.doesNotMatch(read(file), /^import Lasm\.(RPC|Fetch)/m, file);
+    for (const file of result.files.filter(f => f.endsWith('.lean'))) assert.doesNotMatch(read(file), /^import Lasm\.RPC\b/m, file);
     assert.match(read('lakefile.toml'), /name = "Shared"/);
     // Every other target: the browser app is embedded in the server program (Site.lean).
     const all = initProject({ directory: join(root, 'all'), template: 'fullstack', deploy: ['fastly', 'wasi-http', 'vercel-edge', 'netlify-edge', 'deno-deploy', 'spin'] });

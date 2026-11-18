@@ -30,12 +30,12 @@ test('missing or repeated pre-js labels are rejected', () => {
 test('programs with Lasm.JS\'s Node glue link with its wait wraps; others do not', () => {
   const flags = ['-Wl,--wrap=lean_task_get', '-Wl,--wrap=lean_io_wait_any_core', '-Wl,--wrap=emscripten_futex_wait'];
   assert.deepEqual(glueLinkFlags, flags);
-  assert.deepEqual(lasmJsLinkFlags(['/w/Main.c', '/pkg/library/c/lasm_js.c', '/pkg/library/c/lasm_fetch.c']), flags);
+  assert.deepEqual(lasmJsLinkFlags(['/w/Main.c', '/pkg/library/c/lasm_js.c', '/pkg/library/c/lasm_fastly.c']), flags);
   assert.deepEqual(lasmJsLinkFlags(['C:\\pkg\\library\\c\\lasm_js.c']), flags);
   assert.deepEqual(lasmJsLinkFlags(['lasm_js.c']), flags);
   // A copy is returned (the link appends to it).
   assert.notEqual(lasmJsLinkFlags(['lasm_js.c']), glueLinkFlags);
-  assert.deepEqual(lasmJsLinkFlags(['/w/Main.c', '/w/xlasm_js.c', '/w/lasm_js.c.o', '/w/lasm_fetch.c']), []);
+  assert.deepEqual(lasmJsLinkFlags(['/w/Main.c', '/w/xlasm_js.c', '/w/lasm_js.c.o', '/w/lasm_fastly.c']), []);
 });
 
 test('programs with Lasm\'s Async glue wrap Std.Async\'s bind (#90); the edge and WASI links keep the wrap', () => {
@@ -45,7 +45,7 @@ test('programs with Lasm\'s Async glue wrap Std.Async\'s bind (#90); the edge an
   assert.ok(!glueLinkFlags.includes(wrap));
   assert.deepEqual(lasmJsLinkFlags(['/w/Main.c', '/pkg/library/c/lasm_async.c']), [wrap]);
   assert.deepEqual(lasmJsLinkFlags(['C:\\pkg\\library\\c\\lasm_async.c']), [wrap]);
-  assert.deepEqual(lasmJsLinkFlags(['/pkg/library/c/lasm_js.c', '/pkg/library/c/lasm_fetch.c', '/pkg/library/c/lasm_async.c']),
+  assert.deepEqual(lasmJsLinkFlags(['/pkg/library/c/lasm_js.c', '/pkg/library/c/lasm_fastly.c', '/pkg/library/c/lasm_async.c']),
     [...glueLinkFlags, wrap]);
   assert.deepEqual(lasmJsLinkFlags(['/w/xlasm_async.c', '/w/lasm_async.c.o']), []);
 });

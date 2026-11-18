@@ -75,7 +75,7 @@ test('with CI results, each measured fact links its run, and failures show', () 
     fuzz: { run: run(6), targets: [job('Fuzz lean-rpc', 'success', { seconds: 600, runs: 1234567, seed: 7 })] },
     dst: { run: run(7), apps: [job('tandem, random seeds', 'success', { seeds: 900, failing: 0 })] },
     differential: { run: run(8), jobs: [job('differential (release)', 'success', { programs: 80, cases: 9500, divergences: 0, coverage: { features: 2400, new: 120, newFromMutants: 70, nights: [{ date: '2026-11-11', new: 120, cumulative: 1020 }] } })] },
-    equivalence: { fetch: { run: run(9), jobs: [job('equivalence (fetch-example)')] }, conduit: { run: run(10), jobs: [job('API on Node 24')] }, conduitPlatforms: { run: null, jobs: [] } },
+    equivalence: { fetch: { run: run(9), jobs: [job('equivalence (fetch-template)')] }, conduit: { run: run(10), jobs: [job('API on Node 24')] }, conduitPlatforms: { run: null, jobs: [] } },
   };
   const summary = summarize(repo, ci, at);
   assert.deepEqual(summary.ci.platforms[0].unmet, [{ level: 'L1', workflow: 'w.yml', job: '^x$', why: 'x: failure', run: 'https://r/9' }]);

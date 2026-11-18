@@ -13,7 +13,7 @@ test('importClosure follows project imports only; affects picks the outputs to r
     writeFileSync(join(project, 'Shared.lean'), 'import Lean.Data.Json\n\ndef x := 1\n');
     writeFileSync(join(project, 'View.lean'), '/- a comment\nimport Nope -/\nimport Shared\nimport Lasm.UI\n\ndef v := 2\nimport NotAHeader\n');
     writeFileSync(join(project, 'App/Util.lean'), 'module\n\npublic import Shared\n');
-    writeFileSync(join(project, 'Server.lean'), 'import Lasm.Fetch\nimport View\n');
+    writeFileSync(join(project, 'Server.lean'), 'import Lasm.JS.Node.Serve\nimport View\n');
     writeFileSync(join(project, 'Client.lean'), '-- the browser app\nimport View App.Util\n');
     writeFileSync(join(project, 'Tool.lean'), 'def main : IO Unit := pure ()\n');
     const names = entry => [...importClosure(project, join(project, entry))].map(f => f.slice(project.length + 1)).sort();

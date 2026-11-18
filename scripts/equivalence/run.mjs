@@ -3,15 +3,15 @@
 // run; every response must equal the recorded one (status, the headers the app
 // sets, and the body bytes).
 //
-//   node scripts/equivalence/run.mjs --lasm PATH/bin/lasm.mjs --work NEW_DIR --app fetch-template|fetch-example
+//   node scripts/equivalence/run.mjs --lasm PATH/bin/lasm.mjs --work NEW_DIR --app fetch-template
 //     [--targets node,deno,bun,wasi-http,workers] [--deno PATH] [--bun PATH] [--wasmtime PATH]
 //     [--wrangler PATH] [--record] [--wrap "CMD ARGS --"]
 //
-// Apps (black box: the template comes from `lasm init`, the example is copied out
-// of the checkout): test/equivalence/<app>.json holds the requests and, after
+// The app (black box: the template comes from `lasm init`):
+// test/equivalence/<app>.json holds the requests and, after
 // --record (from the node target), the expected responses.
 import { spawn, spawnSync } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { Agent, request } from 'node:http';
 import { createServer } from 'node:net';
 import { createHash } from 'node:crypto';
@@ -41,8 +41,7 @@ if (!existsSync(project)) {
   if (app === 'fetch-template') {
     const r = spawnSync(process.execPath, [lasm, 'init', project, '--template', 'fetch', '--deploy', 'wasi-http'], { env, encoding: 'utf8' });
     if (r.status !== 0) throw new Error(`lasm init failed: ${r.stdout}${r.stderr}`);
-  } else if (app === 'fetch-example') cpSync(join(root, 'examples/fetch'), project, { recursive: true });
-  else throw new Error(`unknown app ${app}`);
+  } else throw new Error(`unknown app ${app}`);
   // The npm packages the app binds (the fetch template's Node server: @hono/node-server).
   if (JSON.parse(readFileSync(join(project, 'package.json'), 'utf8')).dependencies) {
     const npm = spawnSync(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['install', '--omit=dev', '--no-audit', '--no-fund'], { cwd: project, env, encoding: 'utf8', shell: process.platform === 'win32' });

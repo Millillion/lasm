@@ -104,11 +104,6 @@ static void read_vector(bool environment, char ***out, size_t *count) {
     free(small);
     *out = vector; *count = n;
 }
-/* For src/wasi/lasm_fetch_wasi.c. */
-bool lasm_wasi_stdout_to_stderr;
-static const char *env_lookup(const char *name, size_t length);
-const char *lasm_wasi_getenv(const char *name) { return env_lookup(name, strlen(name)); }
-size_t lasm_wasi_environment(const char *const **entries) { *entries = (const char *const *)env_entries; return env_count; }
 static const char *env_lookup(const char *name, size_t length) {
     for (size_t i = 0; i < env_count; i++)
         if (!strncmp(env_entries[i], name, length) && env_entries[i][length] == '=') return env_entries[i] + length + 1;
@@ -413,9 +408,7 @@ static int64_t get_line(resource *f) {
 }
 static int64_t write_file(resource *f, const uint8_t *data, size_t size) {
     if (f->fd == (uint32_t)-1) return reply_error(2, 9, "bad file descriptor");
-    /* While Lasm.Fetch answers a CGI request, standard output carries the
-       response: Lean's own output goes to standard error. */
-    uint32_t fd = f == &standard[1] && lasm_wasi_stdout_to_stderr ? 2 : f->fd;
+    uint32_t fd = f->fd;
     while (size) {
         wiovec v = { P(data), (uint32_t)(size > (1u << 30) ? (1u << 30) : size) };
         uint32_t written = 0, error = w_fd_write(fd, P(&v), 1, P(&written));
@@ -552,17 +545,6 @@ static void complete(const uint8_t header[24], bool failed, const void *data, si
     put_u64(&completions, failed ? 1 : 0);
     put(&completions, data, size);
 }
-void lasm_wasi_complete(const uint8_t header[24], bool failed, const void *data, size_t size) { complete(header, failed, data, size); }
-void lasm_wasi_complete_error(const uint8_t header[24], uint64_t kind, uint64_t code, const char *message) {
-    buffer b = { 0 };
-    put_u64(&b, kind); put_u64(&b, code); put_text(&b, message);
-    complete(header, true, b.data, b.size);
-    free(b.data);
-}
-/* Host I/O of the target (src/wasi/lasm_fetch_wasi.c: Fastly's pending backend requests). */
-bool lasm_wasi_io_poll(void);
-bool lasm_wasi_io_pending(void);
-void lasm_wasi_io_wait(uint64_t timeout_ns, bool bounded);
 
 /* Asynchronous waits for a timer's current promise (op 72 through op 94). */
 typedef struct { uint8_t header[24]; uint32_t timer; uint64_t generation; } waiter;
@@ -629,14 +611,11 @@ int lasm_edge_wait(void) {
     for (;;) {
         if (completions.size || (blocking_count && blocked_ready(&blocking[blocking_count - 1]))) return 1;
         if (fire_timers()) return 1;
-        if (lasm_wasi_io_poll()) return 1;
         uint64_t due;
-        bool timed = next_deadline(&due), io = lasm_wasi_io_pending();
-        if (!timed && !io)
-            lasm_wasi_fail("Lasm WASI: Lean is waiting for an event that cannot happen (no timer, sleep or request is pending): "
+        if (!next_deadline(&due))
+            lasm_wasi_fail("Lasm WASI: Lean is waiting for an event that cannot happen (no timer or sleep is pending): "
                 "a task waits for a promise or task that nothing will complete (deadlock)");
         uint64_t now = now_ns();
-        if (io) { lasm_wasi_io_wait(timed && due > now ? due - now : 0, timed); continue; }
         if (due > now) {
             /* poll_oneoff: one relative monotonic clock subscription. */
             struct { uint64_t userdata; uint8_t tag; uint8_t pad[7]; uint32_t id; uint32_t pad2; uint64_t timeout, precision; uint16_t flags; uint8_t pad3[6]; } in;
@@ -727,7 +706,6 @@ int64_t lasm_node_call(uint32_t op, uint32_t id, uint64_t arg, const uint8_t *by
     }
     if (op == 95) {
         fire_timers();
-        lasm_wasi_io_poll();
         int64_t r = reply_bytes(completions.data, completions.size);
         completions.size = 0;
         return r;
@@ -983,7 +961,13 @@ static void initialize_host(void) {
     read_preopens();
     for (uint32_t fd = 0; fd < 3; fd++) { standard[fd].type = R_FILE; standard[fd].fd = fd; }
 }
-void lasm_fastly_initialize(void);
+#ifdef LASM_WASI_FASTLY
+/* Fastly's ABI version handshake, which its SDKs make before any other host call. */
+__attribute__((import_module("fastly_abi"), import_name("init"))) uint32_t lasm_wasi_fastly_abi_init(uint64_t version);
+static void lasm_fastly_initialize(void) { (void)lasm_wasi_fastly_abi_init(1); }
+#else
+static void lasm_fastly_initialize(void) {}
+#endif
 /* Runs Lean's main once (the command's _start, or a wasi-http request). */
 int lasm_wasi_run_main(void) {
     static bool initialized = false;

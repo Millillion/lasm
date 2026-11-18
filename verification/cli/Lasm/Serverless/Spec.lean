@@ -91,11 +91,11 @@ def host_once : Prop :=
 
 /-- **A plain Host cannot move the path.** A server that builds its URL
 from the Host field and the target (`http://` + host + target, as Hono's
-Node adapter and Lasm.Fetch's Node host do) reads back exactly that host and that
+Node adapter and Node.serve do) reads back exactly that host and that
 target, for every plain host and every target that starts with `/`. Together
 with `host_once` and `target_split`: no client can change the path or query
 a server sees through Host (`Host: x/admin#` once made `/public` read as
-`/admin` in Lasm.Fetch). -/
+`/admin` in Lasm's former HTTP library). -/
 def host_url : Prop :=
   ∀ h t : String, plainHost h = true → t.toList.head? = some '/' → urlHost ("http://" ++ h ++ t) = some (h, t)
 

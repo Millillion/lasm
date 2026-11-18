@@ -7,9 +7,8 @@
 //     glue (library/c/: every JavaScript operation fails cleanly there). Any
 //     other host function the objects name is a stub that aborts: the code
 //     under test is pure, so a call to one is itself a finding.
-//   - wasi-cgi: src/wasi/lasm_fetch_wasi.c's CGI request and response code
-//     natively, through cgi_driver.c; fastly-host: its Fastly half
-//     (-DLASM_WASI_FASTLY), through fastly_driver.c, which plays Fastly's host.
+//   - kind "c": a C driver (`driver`, with `defines`) built with ASan and
+//     UBSan, for C code that runs natively (none at the moment).
 //   node test/fuzz/native/build.mjs [--out DIR] [--lean-prefix DIR] [target…]
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
@@ -84,9 +83,9 @@ function buildLean() {
   for (const key of Object.keys(env)) if (/^(?:LAKE_|ELAN_)/.test(key)) delete env[key];
   run(join(prefix, 'bin', 'lean'), ['-c', join(dir, 'LasmFuzz.c'), harness], { env, cwd: here });
   const sources = [join(dir, 'LasmFuzz.c'), ...[...lasmImports(harness)].map(m => join(prefix, 'lib', 'lasm', 'c', ...m.split('.')) + '.c'),
-    join(root, 'library/c/lasm_js.c'), join(root, 'library/c/lasm_fetch.c')];
+    join(root, 'library/c/lasm_js.c')];
   leanObjects = sources.map((source, i) => { const object = join(dir, `${i}.o`); compile(source, object); return object; });
-  console.log(`  Lean: ${sources.length} C files (LasmFuzz, ${sources.length - 3} Lasm modules, the native C glue)`);
+  console.log(`  Lean: ${sources.length} C files (LasmFuzz, ${sources.length - 2} Lasm modules, the native C glue)`);
   return leanObjects;
 }
 

@@ -72,7 +72,7 @@ a core tier (`Init`, `Std`), an extended tier (Lean's elaborator, which
 `Lasm.JS`'s `@[js]` attribute needs) and a C tier (Lean's clang and headers, only
 for Lake packages with C code). Lasm assembles these tiers into one prefix,
 keyed by every component's hash ([src/managed-lean.mjs](../src/managed-lean.mjs)).
-Lasm's own library (`Lasm.JS`, `Lasm.Fetch`, `Lasm.UI`, …) is compiled into that
+Lasm's own library (`Lasm.JS`, `Lasm.UI`, `Lasm.Fastly`, …) is compiled into that
 prefix, so `import Lasm.JS` resolves like a standard library module
 ([src/lasm-library.mjs](../src/lasm-library.mjs); prebuilt in
 [library/prebuilt/](../library/prebuilt)).
@@ -386,7 +386,6 @@ linked only into programs that import them.
 | Library | What it is | Where it runs |
 | --- | --- | --- |
 | `Lasm.JS` ([JS.lean](../library/Lasm/JS.lean), [JS_BINDINGS.md](JS_BINDINGS.md)) | Calls JavaScript and npm from Lean: one `@[js "module" "export"]` declaration per function, `Async` for promises, callbacks both ways | Node (threads, [lasm_js.c](../library/c/lasm_js.c), [src/node-js.mjs](../src/node-js.mjs)); edge, Bun/Deno and browser (the same operations without threads: [src/edge/edge-js.mjs](../src/edge/edge-js.mjs), [lasm_js_edge.c](../src/edge/lasm_js_edge.c)). On WASI and Fastly every call fails with a clear error ([src/wasi/lasm_wasi.c](../src/wasi/lasm_wasi.c)) |
-| `Lasm.Fetch` ([Fetch.lean](../library/Lasm/Fetch.lean), [FETCH.md](FETCH.md)) | One `Request → Async Response` handler | Node: a `node:http` server, through `Lasm.JS`. Edge, Bun, Deno: the platform's fetch handler. Fastly: its host calls. WASI: one CGI (WAGI) request on stdin/stdout ([lasm_fetch_wasi.c](../src/wasi/lasm_fetch_wasi.c)). wasi-http: the component's handler |
 | `Lasm.JS.Web` ([JS/Web.lean](../library/Lasm/JS/Web.lean), [JS_BINDINGS.md](JS_BINDINGS.md#standard-bindings-lasmjsweb)) | Bindings of the whole web platform, generated from the WebIDL of every spec (one module per spec); `lasm build --target` refuses an API the target lacks | Every JavaScript target, per API |
 | `Lasm.UI` ([UI.lean](../library/Lasm/UI.lean), [UI.md](UI.md)) | The Elm architecture, `html!`, routing, SSR and hydration. The diff runs in Lean and is proved correct ([UI/Proofs.lean](../library/Lasm/UI/Proofs.lean)) | Browser; rendering to HTML also on the server |
 | `Lasm.Fastly` ([Fastly/](../library/Lasm/Fastly), [WASI_FASTLY_BINDINGS.md](WASI_FASTLY_BINDINGS.md)) | Fastly Compute's host ABI, generated from its witx: requests, responses, bodies, backends, stores, cache, geolocation, rate limiting | `--target fastly` (generated C glue, [lasm_fastly.c](../library/c/lasm_fastly.c)); elsewhere every call fails with `FastlyStatus.unsupported` |

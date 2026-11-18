@@ -95,9 +95,12 @@ the final APIs; no hand-written binding remains where a generated one exists.
   (`Lasm.Fastly.*`), wasi-http (`Lasm.WASI.Http`) and WASI; the templates,
   Conduit and Folio off `Lasm.Fetch` on every target; then `Lasm.Fetch` deleted
   ([IRREDUCIBLE.md](docs/proposals/IRREDUCIBLE.md#3-ranked-removal-list),
-  removal 18). Held PRs: #222 (`Node.serve` and direct function handlers) and
-  #213 (fullstack template with `Lasm.RPC.dispatch` and
-  `Lasm.KV.setWorkersEnv`). Questions A19–A23 and A41–A46.
+  removal 18). Done in source: `Node.serve` and `exportDefault` (#222), the
+  templates, Conduit, Folio and Porter on them; `Lasm.Fetch` deleted with its
+  C hosts, the WASI CGI server mode and its native fuzz targets, its request
+  model and proofs moved to `verification/cli/Lasm/RequestPath` (A44–A46,
+  0.2-1, 0.2-2, 0.2-9; ships in the release after 0.9.0). Ledger and Tandem
+  move under 0.4. Questions A19–A23 and A41–A46.
 - [ ] **0.3 `Lasm.JS.Web`.** The WinterTC common web APIs are generated
   (0.6.1, #172) and the browser tier replaced `Lasm.Web` (0.7.0); remaining:
   the rest of the web platform, and the generated-binding mapping rules
@@ -364,7 +367,7 @@ May interrupt any stage (Jordan, 2026-11-16).
 His words, 2026-11-02, from issue #21. The API questions in it are inventoried
 by milestone 0.1.
 
-- [ ] (J) Hone the propositions of Lasm's own library: 30 in [library/Lasm/UI/Spec.lean](library/Lasm/UI/Spec.lean), [RPC/Spec.lean](library/Lasm/RPC/Spec.lean) and [Fetch/Spec.lean](library/Lasm/Fetch/Spec.lean) ([library/PROOFS.md](library/PROOFS.md)).
+- [ ] (J) Hone the propositions of Lasm's own library: 30 in [library/Lasm/UI/Spec.lean](library/Lasm/UI/Spec.lean), [RPC/Spec.lean](library/Lasm/RPC/Spec.lean) and the request-path model's [Spec.lean](verification/cli/Lasm/RequestPath/Spec.lean) ([library/PROOFS.md](library/PROOFS.md)).
 - [ ] (J) Hone the Lean code of every example, especially the propositions and the theorem structure: Conduit first (52 propositions in [Proofs/Spec.lean](examples/conduit/Proofs/Spec.lean)), then Ledger (31 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean)).
 - [ ] (J) Review the whole `lasm` CLI: its UX, and that it works.
 - [ ] (J) Hone the libraries Lasm added: Lasm.UI, Lasm.JS (with the generated Lasm.JS.Web), Lasm.RPC.

@@ -57,7 +57,7 @@
       "path": "content/learn/proof-in-a-fetch-handler.md",
       "sources": [
         "https://github.com/Millillion/lasm/blob/main/README.md",
-        "https://github.com/Millillion/lasm/blob/main/docs/FETCH.md",
+        "https://github.com/Millillion/lasm/blob/main/docs/JS_BINDINGS.md",
         "https://github.com/Millillion/lasm/blob/main/examples/conduit/PROOFS.md",
         "https://github.com/Millillion/lasm/blob/main/.github/workflows/content.yml"
       ]
@@ -134,7 +134,7 @@
         "https://github.com/Millillion/lasm/issues/27",
         "https://github.com/Millillion/lasm/pull/47",
         "https://github.com/Millillion/lasm/blob/main/docs/TESTING.md",
-        "https://github.com/Millillion/lasm/blob/main/docs/FETCH.md"
+        "https://github.com/Millillion/lasm/blob/main/verification/cli/README.md"
       ]
     },
     {
