@@ -16,14 +16,23 @@ The editor in the browser: a `Lasm.UI` app around one `Tandem.Replica`.
 - When remote text arrives, the caret stays beside the character it was
   beside.
 
-The app writes the text area's value itself (`Cmd.io`), with the selection,
-rather than through a `value` property in the view, so that the caret is
-set in the same step as the text.
+The app writes the text area's value itself (`Effect.showText`), with the
+selection, rather than through a `value` property in the view, so that the
+caret is set in the same step as the text.
+
+`update` returns its effects as data (`Effect`: docs/UI.md, "Effects you can
+test"), and `perform` turns each into a `Cmd.task` over the generated browser
+bindings (Lasm.JS.Web: `fetch`, `localStorage`, `WebSocket`,
+`crypto.getRandomValues`, the text area). So the deterministic simulation
+(`Sim.lean`) runs the same `update` and plays its effects in its world.
 -/
 import Lasm.UI
 import Lasm.JS.Json
-import Lasm.JS.Web.WebSocket
-import Lasm.JS.Web.Messaging
+import Lasm.JS.Web.Dom
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Html
+import Lasm.JS.Web.Webcrypto
+import Lasm.JS.Web.Websockets
 import Tandem
 open Lean Lasm.UI Lasm.JS Tandem
 
@@ -126,22 +135,50 @@ where
 
 def editorId : String := "tandem-editor"
 
-/-- Writes the text area's value and selection. -/
-def showText (text : List Char) (sel : Nat × Nat) : Cmd Msg :=
-  Cmd.io fun _ => do
-    let doc ← (← global).get "document"
-    match ← doc.callMethod "getElementById" #[toJS editorId] Data with
-    | .ref el _ =>
-      el.set "value" (String.ofList text)
-      let _ : Data ← el.callMethod "setSelectionRange" #[toJS sel.1, toJS sel.2] Data
-    | _ => pure ()
+/-- What the editor asks the page to do: data, so that the simulation
+(`Sim.lean`) can play it in its world; `perform` does it in the browser. -/
+inductive Effect where
+  /-- Delivers `msg` after `ms` milliseconds. -/
+  | delay (ms : Nat) (msg : Msg)
+  /-- A random replica number in [1, 2^48): `gotReplica`. -/
+  | randomReplica
+  /-- Reads the saved state of `key` from `localStorage`: `loaded`. -/
+  | load (key : String)
+  /-- Saves `value` as `key` in `localStorage`. -/
+  | save (key value : String)
+  /-- Writes the text area's value and selection. -/
+  | showText (text : List Char) (sel : Nat × Nat)
+  /-- Opens the document's WebSocket: `wsOpen`, then `pushed` for each push,
+  and `wsClosed` at the end. -/
+  | connect (doc : String)
+  /-- `POST /doc/<doc>/sync` with `body`, `sent` operations: `synced`. -/
+  | sync (doc body : String) (sent : Nat)
+  /-- `GET /doc/<doc>/poll?cursor=…`: `polled`. -/
+  | poll (doc : String) (cursor : Nat)
 
-/-- `ws:` or `wss:` URL of the document's socket, from the page's location. -/
-def connectSocket (doc : String) : Cmd Msg :=
-  Cmd.io fun dispatch => do
-    let loc ← (← global).get "location"
-    let protocol ← loc.get "protocol" String
-    let host ← loc.get "host" String
+/-- The body of a 2xx response, or why there is none. -/
+def bodyOf (r : Lasm.JS.Web.Response) : Async (Except String String) := do
+  if ← r.ok then return .ok (← r.text) else return .error s!"HTTP {← r.status}"
+
+/-- The browser: each effect through the generated bindings (`Cmd.task`). -/
+def perform : Effect → Cmd Msg
+  | .delay ms msg => Cmd.delay ms msg
+  | .randomReplica => Cmd.task do
+    let b ← (← Lasm.JS.Web.crypto).getRandomValues (ByteArray.mk (Array.replicate 6 0))
+    let n := b.foldl (fun n x => n * 256 + x.toNat) 0
+    return .gotReplica (n % 281474976710655 + 1)
+  | .load key => Cmd.task do return .loaded (← (← Lasm.JS.Web.localStorage).getItem key)
+  | .save key value => Cmd.ofEffect (.task fun _ => do (← Lasm.JS.Web.localStorage).setItem key value)
+  | .showText text sel => Cmd.ofEffect (.task fun _ => do
+    if let some el ← (← Lasm.JS.Web.document).getElementById editorId then
+      -- The view renders it as a `textarea`.
+      let area : Lasm.JS.Web.HTMLTextAreaElement := { val := el.val }
+      area.setValue (String.ofList text)
+      area.setSelectionRange sel.1 sel.2)
+  | .connect doc => Cmd.ofEffect (.task fun dispatch => do
+    let loc ← Lasm.JS.Web.location
+    let protocol ← loc.protocol
+    let host ← loc.host
     let scheme := if protocol == "https:" then "wss:" else "ws:"
     let opened ← IO.mkRef false
     try
@@ -153,58 +190,66 @@ def connectSocket (doc : String) : Cmd Msg :=
         -- Text frames arrive as strings (the server sends no binary frames).
         if let .string t ← ({ val := e.val } : Lasm.JS.Web.MessageEvent).data then dispatch (.pushed t)
       on "close" fun _ => do dispatch (.wsClosed (← opened.get))
-    catch _ => dispatch (.wsClosed false)
+    catch _ => dispatch (.wsClosed false))
+  | .sync doc body sent => Cmd.task do
+    try
+      let r ← Lasm.JS.Web.fetch (.usvString s!"/doc/{doc}/sync") (some {
+        method := some "POST", body := some (.usvString body),
+        headers := some (.record ⟨#[("content-type", "text/plain")]⟩) })
+      return .synced sent (← bodyOf r)
+    catch e => return .synced sent (.error (toString e))
+  | .poll doc cursor => Cmd.task do
+    try return .polled (← bodyOf (← Lasm.JS.Web.fetch (.usvString s!"/doc/{doc}/poll?cursor={cursor}")))
+    catch e => return .polled (.error (toString e))
 
-def syncCmd (m : Model) : Model × Cmd Msg :=
-  if m.inflight.isSome || !m.ready then (m, .none)
+def syncCmd (m : Model) : Model × List Effect :=
+  if m.inflight.isSome || !m.ready then (m, [])
   else
     let req := m.rp.request
     ({ m with inflight := some req.ops.length, behind := false },
-     Http.post s!"/doc/{m.doc}/sync" (Wire.encodeRequest req) (fun r => .synced req.ops.length (r.mapError (·.toString)))
-       (contentType := "text/plain"))
+     [.sync m.doc (Wire.encodeRequest req) req.ops.length])
 
-def pollCmd (m : Model) : Model × Cmd Msg :=
-  if m.polling || m.live != .poll || !m.ready then (m, .none)
-  else ({ m with polling := true },
-        Http.get s!"/doc/{m.doc}/poll?cursor={m.rp.cursor}" fun r => .polled (r.mapError (·.toString)))
+def pollCmd (m : Model) : Model × List Effect :=
+  if m.polling || m.live != .poll || !m.ready then (m, [])
+  else ({ m with polling := true }, [.poll m.doc m.rp.cursor])
 
 /-- After the replica's document changed from outside: the text area follows,
 the caret stays beside its characters, and the state is saved soon. -/
-def refresh (before : Model) (m : Model) : Model × Cmd Msg :=
+def refresh (before : Model) (m : Model) : Model × List Effect :=
   let text := m.rp.doc.chars
-  if text == before.text then ({ m with dirty := true }, Cmd.delay 400 .save)
+  if text == before.text then ({ m with dirty := true }, [.delay 400 .save])
   else
     let a := anchorAt before.rp.doc before.sel.1
     let b := anchorAt before.rp.doc before.sel.2
     let sel := (positionAfter m.rp.doc a, positionAfter m.rp.doc b)
-    ({ m with text, sel, dirty := true }, showText text sel ++ Cmd.delay 400 .save)
+    ({ m with text, sel, dirty := true }, [.showText text sel, .delay 400 .save])
 
 /-- Starts what should run and is not running: a sync if anything is pending, a poll. -/
-def kick (m : Model) (cmd : Cmd Msg) : Model × Cmd Msg :=
-  let (m, c1) := if m.rp.pending.isEmpty then (m, .none) else syncCmd m
+def kick (m : Model) (fx : List Effect) : Model × List Effect :=
+  let (m, c1) := if m.rp.pending.isEmpty then (m, []) else syncCmd m
   let (m, c2) := pollCmd m
-  (m, cmd ++ c1 ++ c2)
+  (m, fx ++ c1 ++ c2)
 
-def init (doc : String) : Model × Cmd Msg :=
-  ({ doc }, Cmd.randomNat 1 281474976710655 .gotReplica)
+def init (doc : String) : Model × List Effect :=
+  ({ doc }, [.randomReplica])
 
-def update (msg : Msg) (m : Model) : Model × Cmd Msg :=
+def update (msg : Msg) (m : Model) : Model × List Effect :=
   match msg with
   | .gotReplica r =>
-    ({ m with rp := { m.rp with replica := r } }, Cmd.storageGet (storageKey m.doc) .loaded)
+    ({ m with rp := { m.rp with replica := r } }, [.load (storageKey m.doc)])
   | .loaded saved =>
     let rp := (saved.bind (decodeState m.rp.replica)).getD m.rp
     let m := { m with rp, ready := true, text := rp.doc.chars }
     let (m, c) := syncCmd m
-    (m, showText m.text (0, 0) ++ connectSocket m.doc ++ c)
+    (m, [.showText m.text (0, 0), .connect m.doc] ++ c)
   | .input value start stop =>
-    if !m.ready then (m, .none) else
+    if !m.ready then (m, []) else
     let rp := m.rp.edit value.toList
     let m := { m with rp, text := value.toList, sel := (start, stop), dirty := true }
     -- Offline, the retry timer syncs (every two seconds), not every keystroke.
-    let (m, c) := if m.offline then (m, .none) else syncCmd m
-    (m, c ++ Cmd.delay 400 .save)
-  | .select start stop => ({ m with sel := (start, stop) }, .none)
+    let (m, c) := if m.offline then (m, []) else syncCmd m
+    (m, c ++ [.delay 400 .save])
+  | .select start stop => ({ m with sel := (start, stop) }, [])
   -- The retry after a failed sync: sync even with nothing pending (the failed
   -- one may have been a catch-up), so the editor leaves "offline" and gets
   -- what it missed.
@@ -219,8 +264,8 @@ def update (msg : Msg) (m : Model) : Model × Cmd Msg :=
       let (m2, c) := refresh m m1
       let more := !m2.rp.pending.isEmpty || Replica.full reply || m.behind
       if more then let (m3, c2) := syncCmd m2; (m3, c ++ c2) else (m2, c)
-    | .error _ => ({ m0 with offline := true }, Cmd.delay 2000 .syncNow)
-  | .synced _ (.error _) => ({ m with inflight := none, offline := true }, Cmd.delay 2000 .syncNow)
+    | .error _ => ({ m0 with offline := true }, [.delay 2000 .syncNow])
+  | .synced _ (.error _) => ({ m with inflight := none, offline := true }, [.delay 2000 .syncNow])
   | .pushed text =>
     match Wire.decodeReply text with
     | .ok reply =>
@@ -231,32 +276,35 @@ def update (msg : Msg) (m : Model) : Model × Cmd Msg :=
         -- one is in flight would let the first reply's `sent` drop operations
         -- the second carries from `pending`: found by the deterministic
         -- simulation, test/dst.mjs.)
-        if m.inflight.isSome then ({ m with behind := true }, .none)
+        if m.inflight.isSome then ({ m with behind := true }, [])
         else
           let (m, c) := syncCmd m
           kick m c
       else refresh m { m with rp }
-    | .error _ => (m, .none)
+    | .error _ => (m, [])
   | .wsOpen =>
     let (m, c) := syncCmd { m with live := .socket, wsFailures := 0, offline := false }
     (m, c)
   | .wsClosed opened =>
     let failures := if opened then 0 else m.wsFailures + 1
     -- Twice refused before opening: the server has no WebSockets; long-poll.
-    if failures ≥ 2 then kick { m with live := .poll, wsFailures := failures } .none
-    else ({ m with live := .connecting, wsFailures := failures }, Cmd.delay 2000 .reconnect)
-  | .reconnect => (m, connectSocket m.doc)
+    if failures ≥ 2 then kick { m with live := .poll, wsFailures := failures } []
+    else ({ m with live := .connecting, wsFailures := failures }, [.delay 2000 .reconnect])
+  | .reconnect => (m, [.connect m.doc])
   | .polled (.ok body) =>
     let m0 := { m with polling := false, offline := false }
     match Wire.decodeReply body with
     | .ok reply =>
       let (m1, c) := refresh m { m0 with rp := m0.rp.onPush reply }
       kick m1 c
-    | .error _ => (m0, Cmd.delay 2000 .syncNow)
-  | .polled (.error _) => ({ m with polling := false, offline := true }, Cmd.delay 2000 .syncNow)
-  | .online => kick { m with offline := false } .none
+    | .error _ => (m0, [.delay 2000 .syncNow])
+  | .polled (.error _) => ({ m with polling := false, offline := true }, [.delay 2000 .syncNow])
+  | .online => kick { m with offline := false } []
   | .save =>
-    if m.dirty then ({ m with dirty := false }, Cmd.storageSet (storageKey m.doc) (encodeState m.rp)) else (m, .none)
+    if m.dirty then ({ m with dirty := false }, [.save (storageKey m.doc) (encodeState m.rp)]) else (m, [])
+
+/-- The effects as the browser's commands. -/
+def commands (fx : List Effect) : Cmd Msg := Cmd.batch (fx.map perform)
 
 /-! The view -/
 
