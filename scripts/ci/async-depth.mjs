@@ -6,7 +6,9 @@
 // and about 1,900-8,100 overflowed it. Lasm's link now bounds that nesting
 // (library/c/lasm_async.c): every step kind must reach N = 1,000,000.
 //
-// One Lasm.Fetch app, built for each target with an installed Lasm CLI and served
+// One app, a Lasm.JS.Web handler (Handler.lean) served by `Node.serve` on Node
+// (Main.lean) and published with `exportDefault` on Deno, Bun and workerd
+// (Export.lean), built for each target with an installed Lasm CLI and served
 // locally (workerd through `wrangler dev`, offline; CI only), answers
 //   GET /loop?n=N&mode=await|sync|awaitsync|io|pure&k=K&pause=sleep0|sleep1|iosleep0
 // by running N steps one after another in `Async`: `await Promise.resolve(1)`
@@ -43,10 +45,13 @@ const MODES = ['sync', 'awaitsync', 'io', 'pure'];
 
 rmSync(work, { recursive: true, force: true });
 mkdirSync(work, { recursive: true });
-writeFileSync(join(work, 'Main.lean'), `import Std.Async
-import Lasm.Fetch
+writeFileSync(join(work, 'Handler.lean'), `import Std.Async
 import Lasm.JS
-open Lasm.Fetch
+import Lasm.JS.Web.Fetch
+import Lasm.JS.Web.Url
+open Lasm.JS Lasm.JS.Web
+
+namespace Handler
 
 /-- \`n\` host calls one after another in \`Async\`, \`pause\` after every \`k\`-th (\`k = 0\`: never). -/
 def loop (call : Async Nat) (pause : Async Unit) (k : Nat) : Nat → Nat → Async Nat
@@ -64,16 +69,26 @@ def runAll (db : Lasm.JS.Value) (i : Nat := 0) : List String → Async Unit
     if i % 100 == 99 then Std.Async.sleep 0   -- yield to the event loop
     runAll db (i + 1) rest
 
-def handle (req : Request) : Async Response := do
-  match req.method, req.segments with
-  | "GET", ["loop"] =>
-    let q (name d : String) : String := (req.queryParam? name).getD d
-    let n := (q "n" "0").toNat!
-    let k := (q "k" "0").toNat!
+/-- A response with a status, a content type and a text body. -/
+def reply (status : Nat) (contentType body : String) : IO Response :=
+  Response.new (some (.bufferSource body.toUTF8))
+    (some { status := some status, headers := some (.record ⟨#[("content-type", contentType)]⟩) })
+
+def handle (request : Request) : Async Response := do
+  let url ← URL.new (← request.url)
+  let path ← url.pathname
+  let params ← url.searchParams
+  match ← request.method, path with
+  | "GET", "/loop" =>
+    let q (name d : String) : IO String := do return (← params.get name).getD d
+    let n := (← q "n" "0").toNat!
+    let k := (← q "k" "0").toNat!
+    let mode ← q "mode" "await"
+    let pauseName ← q "pause" "sleep0"
     let g ← Lasm.JS.global
     let promise ← g.get "Promise" Lasm.JS.Value
     let math ← g.get "Math" Lasm.JS.Value
-    let call : Async Nat := match q "mode" "await" with
+    let call : Async Nat := match mode with
       -- await Math.abs(1): an await of a value that is not a promise.
       | "awaitsync" => math.callMethodAwait "abs" #[.number 1] Nat
       -- Math.abs(1), synchronous.
@@ -83,25 +98,28 @@ def handle (req : Request) : Async Response := do
       | "pure" => pure 1
       -- await Promise.resolve(1).
       | _ => promise.callMethodAwait "resolve" #[.number 1] Nat
-    let pause : Async Unit := match q "pause" "sleep0" with
+    let pause : Async Unit := match pauseName with
       | "sleep1" => Std.Async.sleep 1
       | "iosleep0" => monadLift (IO.sleep 0 : IO Unit)
       | _ => Std.Async.sleep 0
     try
       let sum ← loop call pause k n 0
-      return .json s!"\\{\\"sum\\":{sum}}"
-    catch e => return Response.text s!"error: {e}\\n" 500
-  | _, _ => return .json "{\\"ready\\":true}"
+      reply 200 "application/json" s!"\\{\\"sum\\":{sum}}"
+    catch e => reply 500 "text/plain; charset=utf-8" s!"error: {e}\\n"
+  | _, _ => reply 200 "application/json" "{\\"ready\\":true}"
 
-def main : IO Unit := serve handle
+end Handler
 `);
+// Node: Node.serve on $PORT. Deno, Bun and workerd: the program's default export.
+writeFileSync(join(work, 'Main.lean'), 'import Handler\nimport Lasm.JS.Node.Serve\nopen Lasm.JS\n\ndef main : IO Unit := Node.serve { fetch := Handler.handle }\n');
+writeFileSync(join(work, 'Export.lean'), 'import Handler\nimport Lasm.JS\nopen Lasm.JS\n\ndef main : IO Unit := exportDefault Handler.handle\n');
 
 const TARGETS = {
-  node: { build: [], serve: port => [process.execPath, ['dist/main.mjs'], { PORT: String(port), HOST: '127.0.0.1' }] },
-  deno: { build: ['--target', 'deno'], tool: 'deno', serve: port => [tools.deno, ['run', '-A', '--no-lock', 'deno/main.mjs'], { PORT: String(port) }] },
-  bun: { build: ['--target', 'bun'], tool: 'bun', serve: port => [tools.bun, ['bun/main.mjs'], { PORT: String(port) }] },
+  node: { entry: 'Main.lean', build: [], serve: port => [process.execPath, ['dist/main.mjs'], { PORT: String(port), HOST: '127.0.0.1' }] },
+  deno: { entry: 'Export.lean', build: ['--target', 'deno'], tool: 'deno', serve: port => [tools.deno, ['run', '-A', '--no-lock', 'deno/main.mjs'], { PORT: String(port) }] },
+  bun: { entry: 'Export.lean', build: ['--target', 'bun'], tool: 'bun', serve: port => [tools.bun, ['bun/main.mjs'], { PORT: String(port) }] },
   // CI only (never run platform CLIs locally): workerd through wrangler dev, offline.
-  workers: { build: ['--target', 'workers'], tool: 'wrangler', serve: port => [tools.wrangler, ['dev', '--cwd', 'workers', '--port', String(port), '--ip', '127.0.0.1', '--show-interactive-dev-session=false'], {}] },
+  workers: { entry: 'Export.lean', build: ['--target', 'workers'], tool: 'wrangler', serve: port => [tools.wrangler, ['dev', '--cwd', 'workers', '--port', String(port), '--ip', '127.0.0.1', '--show-interactive-dev-session=false'], {}] },
 };
 for (const t of targets) if (!TARGETS[t]) { console.error(`unknown target ${t}`); process.exit(2); }
 
@@ -132,7 +150,7 @@ for (const target of targets) {
   report.targets[target] = {};
   const t = TARGETS[target];
   if (t.tool && spawnSync(tools[t.tool], ['--version']).status !== 0) { expect(target, `${tools[t.tool]} is installed`, false, 'missing'); continue; }
-  const b = spawnSync(process.execPath, [lasm, 'build', 'Main.lean', ...t.build], { cwd: work, env, encoding: 'utf8', timeout: 40 * 60_000 });
+  const b = spawnSync(process.execPath, [lasm, 'build', t.entry, ...t.build], { cwd: work, env, encoding: 'utf8', timeout: 40 * 60_000 });
   if (b.status !== 0) { expect(target, 'builds', false, (b.stdout + b.stderr).slice(-3000)); continue; }
   const port = await freePort();
   const [cmd, args, extra] = t.serve(port);
@@ -188,5 +206,5 @@ const pauses = r => MODES.map(m => ['sleep0', 'sleep1', 'iosleep0'].map(p => r.p
 const table = `| Target | await Promise.resolve(1) | ${MODES.join(' | ')} | ${BIG} steps, sleep 0 / sleep 1 / IO.sleep 0 every ${EVERY} (${MODES.join(', ')}) |\n| --- | --- | ${MODES.map(() => '---').join(' | ')} | --- |\n`
   + Object.entries(report.targets).map(([t, r]) => `| ${t} | ${cell(r, 'await')} | ${MODES.map(m => cell(r, m)).join(' | ')} | ${pauses(r)} |`).join('\n');
 console.log(`\n${table}\n\n${failures.length} failures.`);
-if (process.env.GITHUB_STEP_SUMMARY) writeFileSync(process.env.GITHUB_STEP_SUMMARY, `### Async loop depth (issue #90)\n\nTime for N = ${BIG} / ${HUGE} steps one after another in \`Async\`, in one Lasm.Fetch request (await: ${BIG} only):\n\n${table}\n\n${failures.length} failures.\n`, { flag: 'a' });
+if (process.env.GITHUB_STEP_SUMMARY) writeFileSync(process.env.GITHUB_STEP_SUMMARY, `### Async loop depth (issue #90)\n\nTime for N = ${BIG} / ${HUGE} steps one after another in \`Async\`, in one request (await: ${BIG} only):\n\n${table}\n\n${failures.length} failures.\n`, { flag: 'a' });
 process.exit(failures.length ? 1 : 0);

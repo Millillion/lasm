@@ -87,9 +87,7 @@ export function matrixList(yaml, key) {
 }
 
 function fuzzTargets() {
-  const native = JSON.parse(read('test/fuzz/native/targets.json'));
   return matrixList(read('.github/workflows/fuzz.yml'), 'target').map(name => {
-    if (native[name]) return { name, engine: 'libFuzzer', description: native[name].description };
     const file = `test/fuzz/targets/${name}.mjs`;
     const comment = existsSync(join(root, file)) ? read(file).split('\n').filter(l => l.startsWith('//')).map(l => l.slice(2).trim()).join(' ') : '';
     return { name, engine: 'JavaScript (V8 block coverage)', description: (/^(.*?\.)(\s|$)/.exec(comment)?.[1] ?? comment).replace(/^The /, 'the ') };

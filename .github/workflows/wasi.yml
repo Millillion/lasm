@@ -1,13 +1,13 @@
 name: WASI and Fastly Compute
-# The WASI targets (docs/WASI.md, docs/FETCH.md): builds the single-threaded
-# runtime (edge-runtime.yml, or reuses a run's archive), then
-# examples/wasi-cli and examples/fetch with `lasm build --target wasi|fastly`
-# from this source checkout, and checks them with pinned wasmtime, wasmer,
-# Node's node:wasi, Spin (wagi executor) and Viceroy, Fastly's local
-# simulator; Lasm.Fetch also on Node and Deno; examples/fastly and Lasm.Fastly's
-# conformance fixture (test/fixtures/fastly-abi) under Viceroy; examples/wasi-http and
+# The WASI targets (docs/WASI.md): builds the single-threaded
+# runtime (edge-runtime.yml, or reuses a run's archive), then, with
+# `lasm build --target wasi|fastly|wasi-http` from this source checkout:
+# examples/wasi-cli under pinned wasmtime, wasmer and Node's node:wasi;
+# examples/fastly and Lasm.Fastly's conformance fixture (test/fixtures/fastly-abi)
+# under Viceroy, Fastly's local simulator; examples/wasi-http and
 # Lasm.WASI.Http's conformance fixture (test/fixtures/wasi-http-abi) under
-# wasmtime serve (scripts/wasi/wasi-ci.mjs).
+# wasmtime serve and Spin; and the fetch template's Fastly.lean and
+# WasiHttp.lean (scripts/wasi/wasi-ci.mjs).
 # Linux only, free runners, no account, no deployment and no publication.
 on:
   workflow_dispatch:
@@ -121,13 +121,13 @@ jobs:
           node -e "const a=require('./.work/edge-archive/artifact.json'), c=require('./src/edge-runtimes.json').lean['4.35.0']; if (a.sha256!==c.sha256) throw new Error('edge runtime archive '+a.sha256+' is not the cataloged '+c.sha256)"
           echo "$(node -p "require('./src/edge-runtimes.json').lean['4.35.0'].sha256")  .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst" | sha256sum -c
           mkdir -p .work/edge-runtime-packaged && tar --zstd -xf .work/edge-archive/lean-4.35.0-wasm64-edge.tar.zst -C .work/edge-runtime-packaged
-      - name: Unit tests (atomics lowering, WASI targets, Lasm.Fetch, init)
+      - name: Unit tests (atomics lowering, WASI targets, library wiring, init)
         run: node --test test/wasi.test.mjs
       - name: Lasm.Fastly is what its generator makes from the pinned witx
         run: node scripts/bindings/generate-fastly.mjs --check
       - name: Lasm.WASI.Http is what its generator makes from the pinned WIT
         run: node scripts/bindings/generate-wasi-http.mjs --check
-      - name: Pinned tools (wasmtime, wasmer, Viceroy, Spin; Deno from npm)
+      - name: Pinned tools (wasmtime, wasmer, Viceroy, Spin, wasm-tools)
         run: |
           set -euo pipefail
           T=.work/wasi-tools; mkdir -p $T/dl $T/wasmtime $T/wasmer $T/viceroy $T/spin $T/wasm-tools $T/adapter
@@ -145,9 +145,8 @@ jobs:
           get "https://github.com/bytecodealliance/wasmtime/releases/download/$WASMTIME_VERSION/wasi_snapshot_preview1.proxy.wasm" proxy.wasm "$PROXY_ADAPTER_SHA256"
           cp $T/dl/proxy.wasm $T/adapter/wasi_snapshot_preview1.proxy.wasm
           rm -rf $T/dl
-          npm install --prefix $T --no-audit --no-fund deno@2.9.6
           ls -la $T/wasmtime $T/wasmer/bin $T/viceroy $T/spin
-      - name: Build and check on wasmtime, wasmer, node:wasi, Spin, Viceroy, Node and Deno
+      - name: Build and check on wasmtime, wasmer, node:wasi, Spin and Viceroy
         env:
           LASM_APPLICATION_RUNTIME: ${{ github.workspace }}/.work/node-runtime-restored/runtime
           LASM_EDGE_RUNTIME: ${{ github.workspace }}/.work/edge-runtime-packaged/lean-4.35.0-wasm64-edge
@@ -161,15 +160,12 @@ jobs:
           name: wasi-results
           path: |
             .work/wasi-apps/wasi-results.json
-            .work/wasi-apps/fetch/wasi/main.wasm
-            .work/wasi-apps/fetch/bin/main.wasm
-            .work/wasi-apps/fetch/wasi-http/main.wasm
-            .work/wasi-apps/fetch/pkg/*.tar.gz
             .work/wasi-apps/cli/wasi/main.wasm
             .work/wasi-apps/fastly/bin/main.wasm
+            .work/wasi-apps/fastly/pkg/*.tar.gz
             .work/wasi-apps/fastly-abi/bin/main.wasm
             .work/wasi-apps/wasi-http/wasi-http/main.wasm
             .work/wasi-apps/wasi-http-abi/wasi-http/main.wasm
-            .work/wasi-apps/fetch-core.wasm
+            .work/wasi-apps/wasi-http-core.wasm
             .work/wasi-apps/proxy-template.wasm
           retention-days: 14

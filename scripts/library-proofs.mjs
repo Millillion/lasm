@@ -7,11 +7,13 @@
 //    not yet proved: they must elaborate; scripts/propositions.mjs checks their
 //    tests), and verification/cli's Interface.lean and Candidates.lean (the
 //    propositions about the CLI's JavaScript, with Lasm/Serverless, the model of
-//    src/serverless/) against Lasm's compiled library with the
-//    managed Lean 4.35.0, then runs test/library-proofs/Axioms.lean, which
-//    fails unless every proposition of a Spec.lean has its theorem (of
-//    exactly that type) and every theorem uses only propext, Classical.choice
-//    and Quot.sound (no sorry);
+//    src/serverless/, and Lasm/RequestPath, the request-path model) against
+//    Lasm's compiled library with the managed Lean 4.35.0, then runs
+//    test/library-proofs/Axioms.lean, which fails unless every proposition of
+//    a Spec.lean has its theorem (of exactly that type) and every theorem uses
+//    only propext, Classical.choice and Quot.sound (no sorry), and
+//    test/library-proofs/RequestPath.lean (`lean --run`), the property test of
+//    the request-path model's candidates;
 // 2. regenerates the proposition tables of library/PROOFS.md from the Spec
 //    files (their doc comments, as Lean recorded them) and fails if
 //    PROOFS.md is out of date.
@@ -43,7 +45,6 @@ const proofModules = ['Lasm.UI.Proofs.Basic', 'Lasm.UI.Proofs.Lists', 'Lasm.UI.P
   'Lasm.UI.Proofs.Applier', 'Lasm.UI.Proofs.Conform', 'Lasm.UI.Proofs.Children', 'Lasm.UI.Proofs.TwoEnded',
   'Lasm.UI.Proofs.Diff', 'Lasm.UI.Proofs', 'Lasm.UI.Proofs.Wire', 'Lasm.UI.Proofs.Apply', 'Lasm.UI.Spec', 'Lasm.UI.Theorems',
   'Lasm.UI.Candidates',
-  'Lasm.Fetch.Spec', 'Lasm.Fetch.Theorems', 'Lasm.Fetch.Candidates',
   'Lasm.JS.Proofs.Wire', 'Lasm.JS.Spec', 'Lasm.JS.Theorems'];
 // The propositions about the CLI's JavaScript (verification/cli): the Lean
 // models of its modules (Lasm/Cli/Model/, checked against the JavaScript by
@@ -55,11 +56,13 @@ const cliModules = ['Lasm.Cli.Model.Zip', 'Lasm.Cli.Model.CliArguments', 'Lasm.C
   'Lasm.Cli.Interface', 'Lasm.Cli.Candidates', 'Lasm.Cli.Spec', 'Lasm.Cli.Theorems',
   // The function platforms' request and response mapping (src/serverless/): its model and propositions.
   'Lasm.Serverless.Proofs.Model', 'Lasm.Serverless.Proofs.Mapping', 'Lasm.Serverless.Spec', 'Lasm.Serverless.Theorems',
-  'Lasm.Serverless.Candidates'];
+  'Lasm.Serverless.Candidates',
+  // The request-path model (the pure request model of the removed HTTP handler library, API decision A45).
+  'Lasm.RequestPath.Model', 'Lasm.RequestPath.Spec', 'Lasm.RequestPath.Theorems', 'Lasm.RequestPath.Candidates'];
 const cliRoot = join(root, 'verification', 'cli');
-const libraries = ['Lasm.UI', 'Lasm.Fetch', 'Lasm.JS'];
+const libraries = ['Lasm.UI', 'Lasm.JS'];
 // The propositions verification/cli/README.md lists.
-const cliLibraries = ['Lasm.Cli', 'Lasm.Serverless'];
+const cliLibraries = ['Lasm.Cli', 'Lasm.Serverless', 'Lasm.RequestPath'];
 const sourceOf = (module, base = library) => join(base, ...module.split('.')) + '.lean';
 
 async function check() {
@@ -89,6 +92,8 @@ async function check() {
   const log = run(['test/library-proofs/Axioms.lean']);
   process.stdout.write(log);
   if (/sorry/.test(log)) throw new Error('a proof uses sorry');
+  // The request-path model's candidates, on generated URLs (it exits non-zero on a counterexample).
+  process.stdout.write(run(['--run', 'test/library-proofs/RequestPath.lean']));
 }
 
 /** The sections (`/-! ## … -/`) of a Spec file and the line each starts on. */
@@ -106,7 +111,7 @@ const cell = s => s.replace(/\s+/g, ' ').replace(/\|/g, '\\|').trim();
 /** The generated part of PROOFS.md (`libs`, from `base`), or of verification/cli/README.md. */
 function generated(data, libs = libraries, base = library) {
   const props = data.propositions.filter(p => libs.includes(p.library));
-  // The theorems of these libraries: verification/cli's (Lasm.Cli.…, Lasm.Serverless.…) or all the others.
+  // The theorems of these libraries: verification/cli's (Lasm.Cli.…, Lasm.Serverless.…, Lasm.RequestPath.…) or all the others.
   const cli = libs.includes('Lasm.Cli');
   const theorems = data.theoremNames.filter(n => cliLibraries.some(l => n.startsWith(l + '.')) === cli).length;
   let out = `<!-- Generated from the Spec.lean files by \`node scripts/library-proofs.mjs --write\`; do not edit by hand. -->\n\n`;

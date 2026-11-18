@@ -26,7 +26,7 @@ build tools.
 | `hono` | Hono with Lean request handlers; also runs on the edge, Bun and Deno | 0.1.0 |
 | `std-http` | An HTTP server in pure Lean (`Std.Http`) | 0.1.0 |
 | `fastify` | Fastify 5 with Lean route handlers | 0.3.0 |
-| `fetch` | One pure-Lean HTTP handler (`Lasm.Fetch`) for Node, the edge, Bun, Deno, Fastly, WASI and Spin | 0.3.0 |
+| `fetch` | One pure-Lean HTTP handler on the web's `Request` and `Response` (`Lasm.JS.Web`) for Node, the edge, Bun, Deno and the function platforms, with `--deploy fastly` and `wasi-http` (Spin) entry modules | 0.3.0 |
 | `web` | A browser app in Lean (`Lasm.UI`) | 0.3.0 |
 | `fullstack` | Server, browser app and a typed API, validation proved once for both sides | 0.3.0 |
 

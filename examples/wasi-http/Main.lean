@@ -4,12 +4,11 @@ generated from the WASI 0.2.12 WIT; docs/WASI_FASTLY_BINDINGS.md):
 `lasm build Main.lean --target wasi-http`, then `wasmtime serve wasi-http/main.wasm`
 (or Spin, or any wasi:http@0.2 host).
 
-It answers the routes of examples/fetch (the Lasm.Fetch handler) with the
-interfaces themselves: the incoming request and its body stream, responses
+It answers the routes of examples/fastly with the interfaces themselves: the incoming request and its body stream, responses
 through the response outparam, streamed bodies, outgoing requests
 (`wasi:http/outgoing-handler`, three at once through `wasi:io/poll`). CI
 (.github/workflows/wasi.yml, scripts/wasi/wasi-ci.mjs) checks every route under
-`wasmtime serve`; Lasm.WASI.Http's own conformance checks are
+`wasmtime serve` and Spin; Lasm.WASI.Http's own conformance checks are
 test/fixtures/wasi-http-abi.
 -/
 import Std.Data.HashMap
@@ -156,7 +155,7 @@ def awaitResponse (future : FutureIncomingResponse) : IO IncomingResponse := do
   | some (.ok (.error e)) => throw (IO.userError s!"the request failed: {repr e}")
   | _ => throw (IO.userError "the response was not ready after its pollable was")
 
-/-! ## The routes of examples/fetch -/
+/-! ## The routes -/
 
 def fib : Nat → Nat
   | 0 => 0 | 1 => 1 | n + 2 => fib n + fib (n + 1)

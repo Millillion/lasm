@@ -3,7 +3,7 @@ The proof check behind `node scripts/library-proofs.mjs`, for Lasm's own
 library (library/PROOFS.md):
 
 - every proposition of a library's `Spec.lean` (each `Lasm.L.Spec.x : Prop`,
-  for L = UI, Fetch, JS, Serverless, and Lasm.Cli.Spec.x about the
+  for L = UI, JS, Serverless, RequestPath, and Lasm.Cli.Spec.x about the
   models of the CLI's JavaScript in verification/cli) has a theorem `Lasm.L.Theorems.x` whose type
   is exactly `Lasm.L.Spec.x`, and a doc comment;
 - every theorem written in Lasm's library and its proofs uses only Lean's
@@ -16,9 +16,9 @@ and theorem's axioms, and the theorem count) as JSON to the file named by
 -/
 import Lean
 import Lasm.UI.Theorems
-import Lasm.Fetch.Theorems
 import Lasm.JS.Theorems
 import Lasm.Serverless.Theorems
+import Lasm.RequestPath.Theorems
 import Lasm.Cli.Theorems
 import Lasm.Cli.Glue
 open Lean Elab Command

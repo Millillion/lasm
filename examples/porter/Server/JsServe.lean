@@ -6,8 +6,7 @@ on JavaScript runtimes"):
 - Cloudflare Workers: `ServerWorkers.lean` publishes an `ExportedHandler`
   (Lasm.JS.Cloudflare) whose `fetch` is `webHandler`;
 - Deno: `Deno.serve` (Lasm.JS.Deno); Bun: `Bun.serve` (Lasm.JS.Bun);
-- Node: `Server/NodeServe.lean` (still Lasm.Fetch's server, until how Lean
-  servers run on Node is decided).
+- Node: `Server/NodeServe.lean` (`Node.serve`, Lasm.JS.Node.Serve).
 -/
 import Lasm.JS
 import Lasm.JS.Web.Fetch

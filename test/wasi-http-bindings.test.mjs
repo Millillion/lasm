@@ -3,7 +3,7 @@
 // module in import order, the Lean declarations and the C glue (with host
 // imports for --target wasi-http, failing elsewhere) agree, and the canonical
 // ABI's core signatures are those wit-bindgen 0.63 gives the same functions
-// (the 45 the hand-written Lasm.Fetch glue declared before the generator).
+// (the 45 Lasm's former hand-written wasi-http glue declared before the generator).
 // The host itself is checked under wasmtime serve by wasi.yml.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -49,7 +49,8 @@ test('every extern has its C function with host imports and as a failing stub, w
   assert.deepEqual(imports.sort(), surface.interfaces.flatMap(i => i.bound.map(f => `${i.wit} ${f}`)).sort());
   const used = /lasm_wasi_http_bound_imports\[\] = \{([^}]*)\}/.exec(real)[1].match(/\w+/g).filter(w => w.startsWith('lasm_wit_'));
   assert.equal(used.length, surface.total.bound);
-  // The hand-written Lasm.Fetch glue declares the same imports through the generated header.
+  // The hand-written wasi-http host (the export, the 500 it answers when main does not) declares
+  // the same imports through the generated header.
   assert.equal(read('src/wasi/lasm_wasi_http_imports.h').match(/import_module/g).length, surface.total.bound);
   assert.doesNotMatch(read('src/wasi/lasm_wasi_http.c'), /import_module/);
 });

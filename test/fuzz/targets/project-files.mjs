@@ -48,7 +48,7 @@ import { modelDirectory, start } from '../support/lean-header-model.mjs';
 export const sources = ['src/application-sources.mjs', 'src/dev-proxy.mjs', 'src/edge/edge-build.mjs', 'src/wasi/wasi-build.mjs', 'src/application-npm.mjs'];
 export const maxLength = 1024;
 export const dictionary = ['import ', 'import\n', 'public ', 'private ', 'meta ', 'all ', 'module\n', 'prelude\n', '--', '/-', '-/', '/--', '/-!',
-  '«', '»', '«A B»', '.', 'A.B', 'Lean', 'Lasm.Fetch', '\r\n', '\t', 'def x := 1\n', 'theorem t : True := trivial\n', 'open A\n', '#eval 1\n',
+  '«', '»', '«A B»', '.', 'A.B', 'Lean', 'Lasm.JS.Web', '\r\n', '\t', 'def x := 1\n', 'theorem t : True := trivial\n', 'open A\n', '#eval 1\n',
   'α', 'λ', 'x₁', "x'", 'x!', 'x?', '_', 'importx', 'set_option', 'null', '[]', '{}', '"packages"', '"packagesDir"', '"type"', '"path"',
   '"dir"', '"name"', '"lasm"', '"edge"', '"modules"', '"exclude"', '"@scope/name"', '"__proto__"', '"constructor"', 'true', '5', ':', ','];
 

@@ -5,9 +5,7 @@ A Lean HTTP handler runs on Fastly Compute as a standard WebAssembly module:
 `pkg/<name>.tar.gz` that `fastly compute deploy` uploads. The program calls
 Fastly's host ABI through [`Lasm.Fastly`](../WASI_FASTLY_BINDINGS.md#lasmfastly),
 generated from Fastly's witx (every HTTP, backend, store, cache, geolocation
-and rate-limiting call); there is no JavaScript and no Fastly SDK. (A
-[`Lasm.Fetch`](../FETCH.md) handler still runs here until Lasm.Fetch is
-removed; new programs use Lasm.Fastly.)
+and rate-limiting call); there is no JavaScript and no Fastly SDK.
 
 CI ([`wasi.yml`](../../.github/workflows/wasi.yml)) serves
 [`examples/fastly`](../../examples/fastly/Main.lean) (Lasm.Fastly) with
@@ -22,7 +20,7 @@ deployed to a Fastly account by Lasm or its CI.
 ```sh
 npx lasm init my-service --template fetch --deploy fastly
 cd my-service && npm install
-npm run build:fastly        # lasm build Main.lean --target fastly
+npm run build:fastly        # lasm build Fastly.lean --target fastly
 fastly compute serve        # local: Viceroy on http://127.0.0.1:7676
 fastly compute deploy       # your Fastly account
 ```

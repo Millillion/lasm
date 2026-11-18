@@ -30,7 +30,6 @@ Key commands:
 ## Libraries
 
 - [Lasm.JS](https://github.com/Millillion/lasm/blob/main/docs/JS_BINDINGS.md): `@[js]` declarations, type conversions, `Async`, callbacks, errors, a checklist for agents
-- [Lasm.Fetch](https://github.com/Millillion/lasm/blob/main/docs/FETCH.md): one `Request → Async Response` handler for every server target, outbound `fetch`, streaming
 - [Lasm.UI](https://github.com/Millillion/lasm/blob/main/docs/UI.md): browser apps (Elm architecture, `html!`, commands, subscriptions, routing, SSR, hydration, what is proved)
 - [Full stack](https://github.com/Millillion/lasm/tree/main/templates/fullstack): `lasm init --template fullstack`, a server with plain REST routes and a `Lasm.UI` app that calls them with `Cmd.task` and `Lasm.JS.Web.fetch`, sharing Lean types
 - [Browser apps](https://github.com/Millillion/lasm/blob/main/docs/BROWSER.md): the browser loader and mount API (`Lasm.UI.Mount`), the Vite plugin; DOM and web APIs through the generated `Lasm.JS.Web.Browser` ([JS_BINDINGS.md](https://github.com/Millillion/lasm/blob/main/docs/JS_BINDINGS.md))
@@ -53,7 +52,7 @@ Key commands:
 - [tandem](https://github.com/Millillion/lasm/tree/main/examples/tandem) (flagship): a collaborative editor on a sequence CRDT, the same Lean in the browser and the sync server, with proved convergence
 - [folio](https://github.com/Millillion/lasm/tree/main/examples/folio): a CommonMark renderer and static-site generator with proofs that Markdown cannot inject HTML
 - [porter](https://github.com/Millillion/lasm/tree/main/examples/porter) and [ledger](https://github.com/Millillion/lasm/tree/main/examples/ledger) (in progress): an OpenID Connect provider and a double-entry ledger, proofs first
-- [hello](https://github.com/Millillion/lasm/tree/main/examples/hello), [js-fetch](https://github.com/Millillion/lasm/tree/main/examples/js-fetch) (a `@[js]` binding), [js-crud](https://github.com/Millillion/lasm/tree/main/examples/js-crud) (Express/Hono + Postgres + JWT), [fetch](https://github.com/Millillion/lasm/tree/main/examples/fetch) (pure Lean HTTP everywhere), [edge-pure](https://github.com/Millillion/lasm/tree/main/examples/edge-pure), [wasi-cli](https://github.com/Millillion/lasm/tree/main/examples/wasi-cli), [ui](https://github.com/Millillion/lasm/tree/main/examples/ui) (counter, TodoMVC with proofs)
+- [hello](https://github.com/Millillion/lasm/tree/main/examples/hello), [js-fetch](https://github.com/Millillion/lasm/tree/main/examples/js-fetch) (a `@[js]` binding), [js-crud](https://github.com/Millillion/lasm/tree/main/examples/js-crud) (Express/Hono + Postgres + JWT), [edge-pure](https://github.com/Millillion/lasm/tree/main/examples/edge-pure), [wasi-cli](https://github.com/Millillion/lasm/tree/main/examples/wasi-cli), [ui](https://github.com/Millillion/lasm/tree/main/examples/ui) (counter, TodoMVC with proofs)
 - [templates/fullstack](https://github.com/Millillion/lasm/tree/main/templates/fullstack): server + browser + verified API (what `--template fullstack` creates)
 
 ## Testing and evidence

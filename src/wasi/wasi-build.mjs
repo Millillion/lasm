@@ -22,11 +22,11 @@ const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 const sourceDate = new Date(315532800 * 1000);
 
 export const wasiTargets = {
-  wasi: { label: 'WASI', summary: 'WASI command module: wasi/main.wasm (wasmtime, wasmer, node:wasi, Spin; Lasm.Fetch serves one CGI request per run)',
+  wasi: { label: 'WASI', summary: 'WASI command module: wasi/main.wasm (wasmtime, wasmer, node:wasi; command-line and batch programs)',
     output: 'wasi' },
   fastly: { label: 'Fastly Compute', summary: 'Fastly Compute: bin/main.wasm and pkg/<name>.tar.gz (fastly compute serve|deploy; fastly.toml when the project has none)',
     output: 'bin' },
-  'wasi-http': { label: 'wasi-http', summary: 'wasi-http component: wasi-http/main.wasm (wasmtime serve, Spin; Lasm.Fetch serves each request, fetch uses outgoing-handler)',
+  'wasi-http': { label: 'wasi-http', summary: 'wasi-http component: wasi-http/main.wasm (wasmtime serve, Spin; Lasm.WASI.Http serves each request)',
     output: 'wasi-http' },
 };
 

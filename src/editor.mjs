@@ -1,5 +1,5 @@
 // Editor support (docs/GETTING_STARTED.md#editor): Lasm's Lean library
-// (`import Lasm.UI`, `Lasm.Fetch`, …) is compiled into Lasm's own managed Lean
+// (`import Lasm.UI`, `Lasm.JS.Web`, …) is compiled into Lasm's own managed Lean
 // prefix, not into the official toolchain the Lean editor extension runs. Lasm
 // links that prefix as an elan toolchain and sets it as the project's elan
 // override, so `lake serve` (the language server) resolves every `Lasm.*`

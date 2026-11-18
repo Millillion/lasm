@@ -21,9 +21,9 @@ function fixture() {
   put(join(root, 'Lasm/JS/Web/B.lean'), 'import Lasm.JS.Web.Core\n');
   put(join(root, 'Lasm/JS/Web/A.lean'), '/- a comment\nimport Not.This -/\nimport Lasm.JS.Web.B\n');
   put(join(root, 'Lasm/JS/Web/C.lean'), 'public import Lasm.JS.Web.A Lasm.JS.Web.B\n');
-  put(join(root, 'Lasm/Fetch.lean'), 'import Lasm.JS\n');
+  put(join(root, 'Lasm/UI.lean'), 'import Lasm.JS\n');
   mkdirSync(join(tree, 'lib', 'lean'), { recursive: true });
-  return { dir, root, tree, eager: ['Lasm.JS', 'Lasm.JS.Web.Core', 'Lasm.Fetch'] };
+  return { dir, root, tree, eager: ['Lasm.JS', 'Lasm.JS.Web.Core', 'Lasm.UI'] };
 }
 /** A compile that writes its -o and -c outputs, recording what ran and how many ran at once. */
 function fakeCompile({ fail = new Set(), delay = 5 } = {}) {
@@ -52,7 +52,7 @@ test('imports, namespaces and dependency order come from the sources', () => {
   const { root, eager, dir } = fixture();
   try {
     assert.deepEqual(lazyModules(eager, root), ['Lasm.JS.Web.A', 'Lasm.JS.Web.B', 'Lasm.JS.Web.C']);
-    const { order, deps } = lazyClosure(['Lasm.JS.Web.C', 'Lasm.Fetch'], { isLazy: m => lazyModules(eager, root).includes(m),
+    const { order, deps } = lazyClosure(['Lasm.JS.Web.C', 'Lasm.UI'], { isLazy: m => lazyModules(eager, root).includes(m),
       read: m => readFileSync(join(root, ...m.split('.')) + '.lean', 'utf8') });
     assert.deepEqual(order, ['Lasm.JS.Web.B', 'Lasm.JS.Web.A', 'Lasm.JS.Web.C']);
     assert.deepEqual(deps.get('Lasm.JS.Web.C'), ['Lasm.JS.Web.A', 'Lasm.JS.Web.B']);

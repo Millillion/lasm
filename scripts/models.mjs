@@ -33,7 +33,7 @@ export const kinds = {
   io: 'orchestration of files, processes or the network, tested end to end',
   generated: 'generated from a description by a script',
   data: 'constants and configuration',
-  deleting: 'deleted with Lasm.Fetch',
+  deleting: 'to be deleted (its reason says with what)',
 };
 
 const tracked = (root, paths) => execFileSync('git', ['ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', ...paths],

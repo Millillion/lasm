@@ -33,20 +33,19 @@ function fixture({ objects: extra = [] } = {}) {
   const object = (name, spec) => { const file = join(linkWork, name); mkdirSync(dirname(file), { recursive: true }); writeFileSync(file, wasmObject(spec)); return file; };
   const main = object('module-0.o', { functions: [{ name: '__main_argc_argv', refs: ['fd_write'] }], imports: { fd_write: 'wasi_snapshot_preview1' } });
   const jsGlue = object('lasm-js.o', { functions: [{ name: 'lasm_js_available' }, { name: 'js_glue', refs: ['js_call'] }], imports: { js_call: 'bad_module' } });
-  const fetchGlue = object('lasm-fetch.o', { functions: [{ name: 'lasm_fetch_platform' }] });
   const marker = object('reachability.o', { functions: [{ name: 'lasm_lookup_lean_symbol' }] });
   const member = object('libInit-112.lasm-member.o', { functions: [{ name: 'initialize_Init' }] });
   // A path the response file must quote and escape; names that only contain the glue markers.
   const second = object(join('with "quote" and space', 'module-1.o'), { functions: [{ name: 'l_helper', refs: ['random_get'] }, { name: 'xlasm_js_available' },
-    { name: 'lasm_fetch_platform_x' }], imports: { random_get: 'wasi_snapshot_preview1' } });
+    { name: 'lasm_js_available_x' }], imports: { random_get: 'wasi_snapshot_preview1' } });
   const extras = extra.map(([name, spec]) => object(name, spec));
   // Lasm.JS's Node glue comes with its wraps, which the WASI link drops with it.
-  writeFileSync(join(linkWork, 'link.rsp'), responseFile([main, jsGlue, ...glueLinkFlags, '-Wl,--wrap=initialize_Main', marker, fetchGlue, member, second, ...extras,
+  writeFileSync(join(linkWork, 'link.rsp'), responseFile([main, jsGlue, ...glueLinkFlags, '-Wl,--wrap=initialize_Main', marker, member, second, ...extras,
     '-Oz', '-Wl,-Map=' + join(linkWork, 'final.map'), '-sMEMORY64=1', '/runtime/lib/libInit.a', 'program.cjs']));
   const nodeRuntime = { directory: join(base, 'node-runtime'), manifest: { libraries: ['lib/libInit.a', 'lib/liblasmsymbols.a', 'lib/libleanrt.a', 'lib/libLake.a'] } };
   const edge = { sysroot: { cache: join(base, 'edge-cache'), directory: 'wasm64-emscripten' },
     libraries: { 'libleanrt.a': join(base, 'edge', 'libleanrt.a'), 'libInit.a': join(base, 'edge', 'libInit.a') } };
-  return { base, tools, toolchain, linkWork, out, nodeRuntime, edge, objects: { main, jsGlue, fetchGlue, marker, member, second, extras } };
+  return { base, tools, toolchain, linkWork, out, nodeRuntime, edge, objects: { main, jsGlue, marker, member, second, extras } };
 }
 
 test('the WASI link compiles the host, links the application objects with the edge runtime and optimizes', { skip: !posix }, () => {
@@ -54,15 +53,15 @@ test('the WASI link compiles the host, links the application objects with the ed
   const result = linkWasiProgram({ toolchain: f.toolchain, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: f.out });
   const program = join(f.out, 'main.wasm');
   assert.deepEqual(result, { program, bytes: readFileSync(program).length });
-  // 1. The WASI host and Lasm.Fetch's WASI glue, compiled as the application objects are.
+  // 1. The WASI host, compiled as the application objects are.
   const sysroot = join(f.toolchain.cache, 'sysroot');
   const compiled = f.tools.calls('clang').filter(args => !isMimalloc(args));
-  assert.deepEqual(compiled.map(args => args[args.indexOf('-c') + 1]), ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_fetch_wasi.c'].map(name => join(here, name)));
+  assert.deepEqual(compiled.map(args => args[args.indexOf('-c') + 1]), ['lasm_wasi.c', 'lasm_wasi_libc.c'].map(name => join(here, name)));
   assert.deepEqual(compiled[0], ['-target', 'wasm64-unknown-emscripten', `--sysroot=${sysroot}`, '-Xclang', '-iwithsysroot/include/compat',
     '-O2', '-DNDEBUG', '-DLEAN_EMSCRIPTEN', '-DLASM_WASI_MAXIMUM_MEMORY=2048',
     '-ffunction-sections', '-fdata-sections', `-ffile-prefix-map=${here}=lasm/`, '-I', join(f.nodeRuntime.directory, 'include'), '-I', here,
     '-c', join(here, 'lasm_wasi.c'), '-o', join(f.out, 'lasm_wasi.o')]);
-  for (const name of ['lasm_wasi', 'lasm_wasi_libc', 'lasm_fetch_wasi']) assert.ok(existsSync(join(f.out, `${name}.o`)));
+  for (const name of ['lasm_wasi', 'lasm_wasi_libc']) assert.ok(existsSync(join(f.out, `${name}.o`)));
   // mimalloc with 8 KiB slices and 2 MiB arenas (#246, src/mimalloc): its single-file build, then Emscripten's prim.c on its own.
   const shared = fileURLToPath(new URL('../src/mimalloc', import.meta.url)), mimalloc = join(shared, 'emscripten');
   assert.deepEqual(f.tools.calls('clang').filter(isMimalloc), [[join(shared, 'lasm_mimalloc.c'), 'lasm_mimalloc.o'], [join(mimalloc, 'src/prim/prim.c'), 'lasm_mimalloc_prim.o']]
@@ -80,7 +79,7 @@ test('the WASI link compiles the host, links the application objects with the ed
   // 2. Only application objects (no lookup marker, runtime members or JavaScript glue) and the wraps.
   const MiB = 1048576;
   const expected = ['-o', join(f.out, 'linked.wasm'), f.objects.main, '--wrap=initialize_Main', f.objects.second,
-    ...['lasm_wasi', 'lasm_wasi_libc', 'lasm_fetch_wasi', 'lasm_mimalloc', 'lasm_mimalloc_prim'].map(name => join(f.out, `${name}.o`)),
+    ...['lasm_wasi', 'lasm_wasi_libc', 'lasm_mimalloc', 'lasm_mimalloc_prim'].map(name => join(f.out, `${name}.o`)),
     '--wrap=lean_io_mark_end_initialization', '--wrap=__cxa_throw',
     f.edge.libraries['libInit.a'], f.edge.libraries['libleanrt.a'], join(f.nodeRuntime.directory, 'lib', 'libLake.a'),
     `-L${join(f.edge.sysroot.cache, 'sysroot', 'lib', 'wasm64-emscripten')}`,
@@ -105,7 +104,7 @@ test('Fastly and wasi-http targets: their defines, sources, memory and allowed i
   const f = fixture({ objects: [['fastly.o', { functions: [{ name: 'fastly_send', refs: ['send'] }], imports: { send: 'fastly_http_req' } }]] });
   linkWasiProgram({ toolchain: f.toolchain, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: f.out, target: 'fastly' });
   const compiled = f.tools.calls('clang').filter(args => !isMimalloc(args));
-  assert.deepEqual(compiled.map(args => args.at(-3)), ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_fetch_wasi.c'].map(name => join(here, name)));
+  assert.deepEqual(compiled.map(args => args.at(-3)), ['lasm_wasi.c', 'lasm_wasi_libc.c'].map(name => join(here, name)));
   for (const args of compiled) assert.deepEqual(args.slice(8, 10), ['-DLASM_WASI_MAXIMUM_MEMORY=2048', '-DLASM_WASI_FASTLY']);
   const [link] = f.tools.calls('wasm-ld');
   assert.deepEqual(link.slice(-6), ['--stack-first', '-z', 'stack-size=1048576', '--initial-memory=4194304', '--max-memory=2147483648', '--table-base=1']);
@@ -265,7 +264,7 @@ test('WASI targets: settings, the sources of the cache identity, and the host in
   const MiB = { stackMiB: 1, initialMiB: 4, maximumMiB: 2048, mimalloc, optimize: '-Oz' };
   assert.deepEqual(wasiLinkSettings, { wasi: { stackMiB: 8, initialMiB: 16, maximumMiB: 2048, mimalloc, optimize: '-Oz' }, fastly: MiB, 'wasi-http': MiB });
   // Every file the WASI link reads is part of the program's cache identity.
-  assert.deepEqual(wasiSources, ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_fetch_wasi.c', 'lasm_wasi_http.c', 'lasm_wasi.h', 'wasi-link.mjs', 'lower-atomics.mjs',
+  assert.deepEqual(wasiSources, ['lasm_wasi.c', 'lasm_wasi_libc.c', 'lasm_wasi_http.c', 'lasm_wasi.h', 'wasi-link.mjs', 'lower-atomics.mjs',
     'wasi-component.mjs', 'component/proxy-template.wasm', 'lasm_wasi_http_imports.h', '../../library/c/lasm_fastly.c',
     '../../library/c/lasm_wasi_http_bindings.c', ...['mimalloc.mjs', 'lasm_mimalloc.c', ...mimallocVendored].map(file => `../mimalloc/${file}`)]);
   assert.deepEqual(mimallocSources, ['mimalloc.mjs', 'lasm_mimalloc.c', ...mimallocVendored]);

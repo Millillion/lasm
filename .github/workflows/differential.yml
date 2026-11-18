@@ -501,8 +501,8 @@ jobs:
           retention-days: 30
           if-no-files-found: ignore
   # Target equivalence (docs/TESTING.md#target-equivalence): the fetch template
-  # (from `lasm init`) and examples/fetch built for every server target this
-  # runner can serve locally, the recorded corpus replayed on each.
+  # (from `lasm init`) built for every server target this runner can serve
+  # locally, the recorded corpus replayed on each.
   equivalence:
     if: needs.sunday.outputs.skip != 'true'
     needs: [sunday, pack]
@@ -511,7 +511,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        app: [fetch-template, fetch-example]
+        app: [fetch-template]
     env:
       CI: '1'
       BROWSER: 'none'

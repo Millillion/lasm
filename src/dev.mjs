@@ -324,7 +324,7 @@ export async function runDev(options, hooks = {}) {
       port: options.port ?? 5173, host: options.host ?? '127.0.0.1', output: options.output });
   }
   // Servers built by lasm dev read their static files at run time instead of
-  // embedding them (Lasm.Fetch's embed_dir!), so a rebuilt browser app needs no
+  // embedding them (the fullstack template's embed_dir!), so a rebuilt browser app needs no
   // server rebuild. Set before the build worker starts (it copies the environment).
   process.env.LASM_DEV_SERVER = '1';
   // Several outputs build at once, one long-lived worker each, when memory allows

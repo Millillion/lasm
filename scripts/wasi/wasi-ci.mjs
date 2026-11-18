@@ -1,26 +1,25 @@
-// WASI and Fastly CI (.github/workflows/wasi.yml, docs/WASI.md, docs/FETCH.md).
-// Builds examples/wasi-cli and examples/fetch from this source checkout and
-// checks them on every host:
-//   - the command-line program (`--target wasi`) under wasmtime, wasmer and
-//     Node's node:wasi, against native Lean (`lean --run`): arguments,
-//     environment, files in the preopened directory, standard input, exit
-//     statuses, errors, sleeps, Std.Async, tasks, Std.Time;
-//   - the Lasm.Fetch handler as a CGI program (`--target wasi`) under the same
-//     three engines, served by Spin (wagi executor), as Fastly Compute
-//     (`--target fastly`) under Viceroy, and on Node (`lasm build`) and Deno
-//     (`--target deno`): routes, bodies, headers, statuses, async waits and errors;
-//   - examples/fastly, the same routes on Lasm.Fastly (Fastly's host ABI,
-//     generated from its witx), under Viceroy, and test/fixtures/fastly-abi:
-//     Lasm.Fastly's conformance checks, in a module that imports every bound
-//     host function (Viceroy checks each import when it loads the module);
+// WASI and Fastly CI (.github/workflows/wasi.yml, docs/WASI.md).
+// Builds the WASI examples from this source checkout and checks them on every host:
+//   - examples/wasi-cli, the command-line program (`--target wasi`), under
+//     wasmtime, wasmer and Node's node:wasi, against native Lean (`lean --run`):
+//     arguments, environment, files in the preopened directory, standard input,
+//     exit statuses, errors, sleeps, Std.Async, tasks, Std.Time;
+//   - examples/fastly, an HTTP server on Lasm.Fastly (Fastly's host ABI,
+//     generated from its witx), under Viceroy: routes, bodies, headers,
+//     statuses, streamed bodies, async waits, backend requests and errors; and
+//     test/fixtures/fastly-abi: Lasm.Fastly's conformance checks, in a module
+//     that imports every bound host function (Viceroy checks each import when
+//     it loads the module);
 //   - examples/wasi-http, the same routes on Lasm.WASI.Http (the wasi:http
 //     proxy world's own interfaces, generated from the WASI 0.2.12 WIT), under
-//     `wasmtime serve`, and test/fixtures/wasi-http-abi: Lasm.WASI.Http's
-//     conformance checks;
+//     `wasmtime serve` and Spin's HTTP trigger, and
+//     test/fixtures/wasi-http-abi: Lasm.WASI.Http's conformance checks;
+//   - the fetch template's Fastly.lean and WasiHttp.lean (`lasm init --template
+//     fetch --deploy fastly --deploy wasi-http`), under Viceroy and wasmtime serve;
 //   - sizes, startup and per-request times, written to WORK/wasi-results.json.
-//   node scripts/wasi/wasi-ci.mjs WORK TOOLS [--engines wasmtime,wasmer,node,spin,viceroy,lasm-node,deno]
+//   node scripts/wasi/wasi-ci.mjs WORK TOOLS [--engines wasmtime,wasmer,node,spin,viceroy,component]
 // TOOLS holds the pinned tools (the workflow installs them): wasmtime/wasmtime,
-// wasmer/bin/wasmer, viceroy/viceroy, spin/spin, node_modules/.bin/deno.
+// wasmer/bin/wasmer, viceroy/viceroy, spin/spin.
 // Needs LASM_APPLICATION_RUNTIME and LASM_EDGE_RUNTIME (as scripts/edge/workers-ci.mjs).
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
@@ -38,14 +37,14 @@ const engineList = option('--engines');
 const [workArg, toolsArg] = argv;
 if (!workArg || !toolsArg) { console.error('Usage: node scripts/wasi/wasi-ci.mjs WORK TOOLS [--engines …]'); process.exit(2); }
 const work = resolve(workArg), tools = resolve(toolsArg);
-const engines = new Set((engineList ?? 'wasmtime,wasmer,node,spin,viceroy,lasm-node,deno,component').split(','));
+const engines = new Set((engineList ?? 'wasmtime,wasmer,node,spin,viceroy,component').split(','));
 mkdirSync(work, { recursive: true });
 const results = { started: new Date().toISOString(), host: `${process.platform}-${process.arch}`, node: process.version, tools: {}, builds: {}, cli: {}, fetch: {}, failures: [] };
 const save = () => writeFileSync(join(work, 'wasi-results.json'), JSON.stringify(results, null, 2) + '\n');
 const fail = (where, error) => { results.failures.push({ where, error: String(error?.stack ?? error) }); console.error(`FAIL ${where}: ${error?.message ?? error}`); };
 
 const toolPath = { wasmtime: join(tools, 'wasmtime/wasmtime'), wasmer: join(tools, 'wasmer/bin/wasmer'), viceroy: join(tools, 'viceroy/viceroy'),
-  spin: join(tools, 'spin/spin'), deno: join(tools, 'node_modules/.bin/deno') };
+  spin: join(tools, 'spin/spin') };
 for (const [name, path] of Object.entries(toolPath)) {
   if (!existsSync(path)) { if (engines.has(name)) { console.error(`${name} is not installed in ${tools}; skipping it`); engines.delete(name); } continue; }
   try { results.tools[name] = execFileSync(path, ['--version'], { encoding: 'utf8', env: headlessEnvironment() }).trim().split('\n')[0]; } catch { /* reported below */ }
@@ -55,9 +54,9 @@ for (const [name, path] of Object.entries(toolPath)) {
 const passed = ['LASM_APPLICATION_RUNTIME', 'LASM_EDGE_RUNTIME', 'LASM_BUILD_JOBS', 'LASM_KEEP_LINK_WORK'].filter(key => process.env[key])
   .map(key => `${key}=${key === 'LASM_BUILD_JOBS' ? process.env[key] : resolve(process.env[key])}`);
 const bounded = [join(root, 'scripts/full-lean/run-bounded.mjs'), '--', 'python3', join(root, 'scripts/full-lean/base-pages.py'), 'env', ...passed];
-const cli = join(work, 'cli'), fetchApp = join(work, 'fetch'), fastlyApp = join(work, 'fastly'), fastlyAbi = join(work, 'fastly-abi');
+const cli = join(work, 'cli'), fastlyApp = join(work, 'fastly'), fastlyAbi = join(work, 'fastly-abi');
 const wasiHttpApp = join(work, 'wasi-http'), wasiHttpAbi = join(work, 'wasi-http-abi');
-for (const [from, to] of [['examples/wasi-cli', cli], ['examples/fetch', fetchApp], ['examples/fastly', fastlyApp], ['test/fixtures/fastly-abi', fastlyAbi],
+for (const [from, to] of [['examples/wasi-cli', cli], ['examples/fastly', fastlyApp], ['test/fixtures/fastly-abi', fastlyAbi],
   ['examples/wasi-http', wasiHttpApp], ['test/fixtures/wasi-http-abi', wasiHttpAbi]]) {
   rmSync(to, { recursive: true, force: true });
   cpSync(join(root, from), to, { recursive: true });
@@ -70,16 +69,11 @@ function lasm(project, args, label) {
 const sizes = file => { const bytes = readFileSync(file); return { bytes: bytes.length, gzipBytes: gzipSync(bytes, { level: 9 }).length }; };
 lasm(cli, ['build', 'Main.lean', '--target', 'wasi'], 'cli-wasi');
 Object.assign(results.builds['cli-wasi'], sizes(join(cli, 'wasi/main.wasm')));
-lasm(fetchApp, ['build', 'Main.lean', '--target', 'wasi'], 'fetch-wasi');
-Object.assign(results.builds['fetch-wasi'], sizes(join(fetchApp, 'wasi/main.wasm')));
-lasm(fetchApp, ['build', 'Main.lean', '--target', 'fastly'], 'fetch-fastly');
-lasm(fetchApp, ['build', 'Main.lean', '--target', 'wasi-http'], 'fetch-wasi-http');
 // Lasm.Fastly: the example server and the conformance fixture.
 lasm(fastlyApp, ['build', 'Main.lean', '--target', 'fastly'], 'fastly-example');
-Object.assign(results.builds['fastly-example'], sizes(join(fastlyApp, 'bin/main.wasm')));
+Object.assign(results.builds['fastly-example'], sizes(join(fastlyApp, 'bin/main.wasm')), { package: statSync(join(fastlyApp, 'pkg/lasm-fastly-example.tar.gz')).size });
 lasm(fastlyAbi, ['build', 'Main.lean', '--target', 'fastly'], 'fastly-abi');
 Object.assign(results.builds['fastly-abi'], sizes(join(fastlyAbi, 'bin/main.wasm')));
-Object.assign(results.builds['fetch-wasi-http'], sizes(join(fetchApp, 'wasi-http/main.wasm')));
 // Lasm.WASI.Http: the example server and the conformance fixture.
 lasm(wasiHttpApp, ['build', 'Main.lean', '--target', 'wasi-http'], 'wasi-http-example');
 Object.assign(results.builds['wasi-http-example'], sizes(join(wasiHttpApp, 'wasi-http/main.wasm')));
@@ -89,15 +83,15 @@ Object.assign(results.builds['wasi-http-abi'], sizes(join(wasiHttpAbi, 'wasi-htt
 // build must equal wasm-tools' own component (scripts/wasi/make-component-template.mjs).
 if (engines.has('component')) {
   const { extractCore } = await import(join(root, 'src/wasi/wasi-component.mjs'));
-  const coreFile = join(work, 'fetch-core.wasm');
-  writeFileSync(coreFile, extractCore(readFileSync(join(fetchApp, 'wasi-http/main.wasm'))));
+  const coreFile = join(work, 'wasi-http-core.wasm');
+  writeFileSync(coreFile, extractCore(readFileSync(join(wasiHttpApp, 'wasi-http/main.wasm'))));
   try {
     // Every wasi-http program imports the same functions (Lasm.WASI.Http's glue references all of
-    // them), so the one template serves Lasm.Fetch, Lasm.WASI.Http and its fixture alike.
+    // them), so the one template serves every program alike: the example and the fixture.
     execFileSync(process.execPath, [join(root, 'scripts/wasi/make-component-template.mjs'), '--wasm-tools', join(tools, 'wasm-tools/wasm-tools'),
-      '--adapter', join(tools, 'adapter/wasi_snapshot_preview1.proxy.wasm'), coreFile, '--check', join(fetchApp, 'wasi-http/main.wasm'),
-      '--check', join(wasiHttpApp, 'wasi-http/main.wasm'), '--check', join(wasiHttpAbi, 'wasi-http/main.wasm')], { stdio: 'inherit' });
-    results.builds['fetch-wasi-http'].matchesWasmTools = true;
+      '--adapter', join(tools, 'adapter/wasi_snapshot_preview1.proxy.wasm'), coreFile, '--check', join(wasiHttpApp, 'wasi-http/main.wasm'),
+      '--check', join(wasiHttpAbi, 'wasi-http/main.wasm')], { stdio: 'inherit' });
+    results.builds['wasi-http-example'].matchesWasmTools = true;
   } catch (error) {
     fail('component template', error);
     // The template wasm-tools makes from this core module, for review (the wasi-results artifact).
@@ -107,11 +101,8 @@ if (engines.has('component')) {
     } catch (e) { fail('component template (remaking it)', e); }
   }
 }
-Object.assign(results.builds['fetch-fastly'], sizes(join(fetchApp, 'bin/main.wasm')), { package: statSync(join(fetchApp, 'pkg/lasm-fetch-example.tar.gz')).size });
 // An unchanged second build reuses the cached program.
-lasm(fetchApp, ['build', 'Main.lean', '--target', 'wasi'], 'fetch-wasi-cached');
-if (engines.has('lasm-node')) lasm(fetchApp, ['build', 'Main.lean'], 'fetch-node');
-if (engines.has('deno')) lasm(fetchApp, ['build', 'Main.lean', '--target', 'deno'], 'fetch-deno');
+lasm(cli, ['build', 'Main.lean', '--target', 'wasi'], 'cli-wasi-cached');
 save();
 
 // ---- The command-line program ----
@@ -165,7 +156,7 @@ for (const engine of ['wasmtime', 'wasmer', 'node'].filter(e => engines.has(e)))
   save();
 }
 
-// ---- Lasm.Fetch ----
+// ---- HTTP servers: examples/fastly and examples/wasi-http ----
 const MiB = 1048576;
 // The origin server for outbound requests.
 const http = await import('node:http');
@@ -178,7 +169,8 @@ const originServer = http.createServer(async (req, res) => {
 await new Promise(r => originServer.listen(3110, '127.0.0.1', r));
 const origin = 'http://127.0.0.1:3110';
 const bytes = Uint8Array.from({ length: 256 }, (_, i) => i);
-// The routes of examples/fetch/Main.lean. `skip` names hosts where a check does not apply.
+// The routes examples/fastly and examples/wasi-http answer alike. `skip` names hosts where a check
+// does not apply, `only` the hosts where it does.
 const routes = [
   { path: '/', status: 200, json: { message: 'Hello from Lean!' }, type: /^application\/json/ },
   { path: '/hello/Ada', json: { message: 'Hello, Ada, from Lean!' } },
@@ -206,19 +198,17 @@ const routes = [
   { path: '/stream/out/5', text: Array.from({ length: 5 }, (_, i) => `chunk ${i}\n`).join('') },
   { path: '/stream/in', method: 'POST', body: new Uint8Array(300000).fill(7), headers: { 'content-type': 'application/octet-stream' }, json: { bytes: 300000, chunks: true } },
   { path: '/stream/echo', method: 'POST', body: bytes, headers: { 'content-type': 'application/x-lasm-test' }, bytes },
-  // Outbound HTTP (Lasm.Fetch.fetch) to the harness's origin server; WASI preview 1 has no sockets.
+  // Outbound HTTP (Fastly's send_async, wasi:http's outgoing-handler) to the harness's origin server.
   { path: `/outbound?url=${encodeURIComponent(origin + '/origin/echo')}`, json: { status: 200, body: 'POST:ping', echoed: 'POST' }, outbound: true },
   { path: `/outbound-parallel?url=${encodeURIComponent(origin + '/origin/slow')}`, outbound: true,
     check: body => { const r = JSON.parse(body); assert.deepEqual(r.statuses, [200, 200, 200]); assert.ok(r.ms < 400, `three 150 ms requests took ${r.ms} ms`); } },
   { path: `/outbound?url=${encodeURIComponent(origin + '/origin/echo')}&backend=origin`, json: { status: 200, body: 'POST:ping', echoed: 'POST' }, only: ['viceroy'] },
-  { path: `/outbound?url=${encodeURIComponent(origin + '/origin/echo')}`, status: 500, text: 'Internal Server Error\n', only: ['cgi-wasmtime', 'cgi-wasmer', 'cgi-node', 'spin-wagi'] },
 ];
 // examples/fastly (host lasm-fastly) runs under Viceroy and examples/wasi-http (host lasm-wasi-http)
 // under wasmtime serve: their engine's skips and checks apply to them too.
 const engineOf = host => host === 'lasm-fastly' ? 'viceroy' : host === 'lasm-wasi-http' ? 'wasmtime-serve' : host;
 const applies = (host, route) => !(route.skip?.includes(engineOf(host))
-  || route.only && !route.only.includes(host) && !(host !== engineOf(host) && route.only.includes(engineOf(host)))
-  || route.outbound && ['cgi-wasmtime', 'cgi-wasmer', 'cgi-node', 'spin-wagi'].includes(host));
+  || route.only && !route.only.includes(host) && !(host !== engineOf(host) && route.only.includes(engineOf(host))));
 function checkResponse(host, route, { status, headers, body }) {
   const where = `${host} ${route.method ?? 'GET'} ${route.path}`;
   assert.equal(status, route.status ?? 200, `${where}: status ${status}\n${new TextDecoder().decode(body).slice(0, 2000)}`);
@@ -228,45 +218,10 @@ function checkResponse(host, route, { status, headers, body }) {
   if (route.check) route.check(new TextDecoder().decode(body));
   if (route.type) assert.match(headers.get('content-type') ?? '', route.type, `${where}: content-type`);
   for (const [k, v] of Object.entries(route.reply ?? {})) assert.equal(headers.get(k), v, `${where}: header ${k}`);
-  // Spin's wagi executor keeps one value per header name (crates/http/src/wagi).
-  if (route.cookies) assert.equal(headers.getSetCookie().length, host === 'spin-wagi' ? 1 : route.cookies, `${where}: set-cookie`);
+  if (route.cookies) assert.equal(headers.getSetCookie().length, route.cookies, `${where}: set-cookie`);
 }
 
-// CGI under the three engines: one run per request.
-function cgi(engine, route) {
-  const url = new URL(route.path, 'http://localhost:8080');
-  const env = { REQUEST_METHOD: route.method ?? 'GET', X_FULL_URL: url.href, SERVER_NAME: 'localhost', SERVER_PORT: '8080',
-    PATH_INFO: url.pathname, QUERY_STRING: url.search.slice(1), GREETING: 'hello from the host', HTTP_HOST: 'localhost:8080' };
-  for (const [k, v] of Object.entries(route.headers ?? {})) env[k === 'content-type' ? 'CONTENT_TYPE' : 'HTTP_' + k.toUpperCase().replaceAll('-', '_')] = v;
-  if (route.body) env.CONTENT_LENGTH = String(route.body.length);
-  const got = run(engine, fetchApp, 'wasi/main.wasm', [], { env, input: route.body ? Buffer.from(route.body) : '' });
-  if (got.status !== 0) throw new Error(`${engine} CGI ${route.path}: exit ${got.status}: ${got.stderr}`);
-  const out = got.stdout, split = out.indexOf('\r\n\r\n');
-  if (split < 0) throw new Error(`${engine} CGI ${route.path}: no CGI header block`);
-  const headers = new Headers();
-  let status = 200;
-  for (const line of out.subarray(0, split).toString().split('\r\n')) {
-    const colon = line.indexOf(':'), name = line.slice(0, colon).trim(), value = line.slice(colon + 1).trim();
-    if (name.toLowerCase() === 'status') status = Number(value.split(' ')[0]);
-    else headers.append(name, value);
-  }
-  return { status, headers, body: new Uint8Array(out.subarray(split + 4)), ms: got.ms };
-}
-for (const engine of ['wasmtime', 'wasmer', 'node'].filter(e => engines.has(e))) {
-  const out = results.fetch[`cgi-${engine}`] = { passed: 0 };
-  for (const route of routes) {
-    if (!applies(`cgi-${engine}`, route)) continue;
-    try { checkResponse(`cgi-${engine}`, route, cgi(engine, route)); out.passed++; } catch (error) { fail(`fetch cgi-${engine} ${route.path}`, error); }
-  }
-  try {
-    const times = [];
-    for (let i = 0; i < 10; i++) times.push(cgi(engine, routes[0]).ms);
-    out.perRequestMs = { min: Math.round(Math.min(...times) * 10) / 10, mean: Math.round(times.reduce((a, b) => a + b) / times.length * 10) / 10 };
-  } catch (error) { fail(`fetch cgi-${engine} timing`, error); }
-  save();
-}
-
-// HTTP servers: Spin (wagi), Viceroy (Fastly), Node, Deno.
+// The servers: Spin and wasmtime serve (wasi-http), Viceroy (Fastly).
 // Viceroy's log line for each request (RUST_LOG viceroy_lib::execute=info): the heap the instance used.
 const heapUsed = log => [...log.matchAll(/using ([\d.]+) MB of WebAssembly heap/g)].map(m => Number(m[1]));
 // heapLimitMB: Viceroy only. Every request must use at most this much heap (issue #246).
@@ -298,9 +253,8 @@ async function serveAndCheck(name, command, args, { cwd, port, env = {}, skipHea
         assert.equal(response.status, 200); assert.equal((await response.arrayBuffer()).byteLength, 0); out.passed++;
       } catch (error) { fail(`fetch ${name} HEAD /`, error); }
     }
-    // A streamed response arrives in pieces: the first chunk well before the last
-    // (Spin's wagi executor collects a CGI program's whole output first).
-    if (name !== 'spin-wagi') {
+    // A streamed response arrives in pieces: the first chunk well before the last.
+    {
       try {
         const t0 = performance.now();
         const reader = (await fetch(base + '/stream/out/40')).body.getReader();
@@ -339,30 +293,26 @@ async function serveAndCheck(name, command, args, { cwd, port, env = {}, skipHea
   }
 }
 if (engines.has('spin')) {
-  // Spin's HTTP trigger with the wasi-http component, and its wagi executor with the CGI build.
-  const spinToml = (source, executor) => `spin_manifest_version = 2
+  // Spin's HTTP trigger with examples/wasi-http's component.
+  writeFileSync(join(wasiHttpApp, 'spin.toml'), `spin_manifest_version = 2
 
 [application]
-name = "lasm-fetch"
+name = "lasm-wasi-http"
 version = "0.1.0"
 
 [[trigger.http]]
 route = "/..."
 component = "lasm"
-${executor}
+
 [component.lasm]
-source = "${source}"
+source = "wasi-http/main.wasm"
 environment = { GREETING = "hello from the host" }
 allowed_outbound_hosts = ["${origin}"]
-`;
-  writeFileSync(join(fetchApp, 'spin.toml'), spinToml('wasi-http/main.wasm', ''));
-  await serveAndCheck('spin', toolPath.spin, ['up', '--listen', '127.0.0.1:3101'], { cwd: fetchApp, port: 3101, env: { SPIN_HOME: join(work, 'spin-home') } });
-  writeFileSync(join(fetchApp, 'spin.toml'), spinToml('wasi/main.wasm', 'executor = { type = "wagi" }\n'));
-  await serveAndCheck('spin-wagi', toolPath.spin, ['up', '--listen', '127.0.0.1:3106'], { cwd: fetchApp, port: 3106, env: { SPIN_HOME: join(work, 'spin-home') } });
+`);
+  await serveAndCheck('spin', toolPath.spin, ['up', '--listen', '127.0.0.1:3101'], { cwd: wasiHttpApp, port: 3101, env: { SPIN_HOME: join(work, 'spin-home') } });
 }
 if (engines.has('wasmtime')) {
-  await serveAndCheck('wasmtime-serve', toolPath.wasmtime, ['serve', '--addr', '127.0.0.1:3105', 'wasi-http/main.wasm'], { cwd: fetchApp, port: 3105 });
-  // examples/wasi-http: the same routes on Lasm.WASI.Http.
+  // examples/wasi-http under wasmtime serve.
   await serveAndCheck('lasm-wasi-http', toolPath.wasmtime, ['serve', '--addr', '127.0.0.1:3111', 'wasi-http/main.wasm'], { cwd: wasiHttpApp, port: 3111 });
   // Lasm.WASI.Http's conformance checks. Instantiating the component checks every bound
   // host function's import (every wasi-http module imports each one).
@@ -395,17 +345,15 @@ if (engines.has('wasmtime')) {
     save();
   }
 }
-// Viceroy's local service: a named backend (FetchOptions.backend; Fastly services name
-// theirs), a Config Store, a Secret Store and a KV Store.
+// Viceroy's local service: a named backend (Fastly services name theirs), a Config Store, a
+// Secret Store and a KV Store.
 const localServer = app => writeFileSync(join(app, 'fastly.toml'), readFileSync(join(app, 'fastly.toml'), 'utf8')
     + `\n[local_server]\n  [local_server.backends]\n    [local_server.backends.origin]\n      url = "${origin}"\n`
     + `  [local_server.config_stores]\n    [local_server.config_stores.settings]\n      format = "inline-toml"\n    [local_server.config_stores.settings.contents]\n      color = "blue"\n`
     + `  [local_server.secret_stores]\n    [[local_server.secret_stores.secrets]]\n      key = "token"\n      data = "s3cret"\n`
     + `  [local_server.kv_stores]\n    [[local_server.kv_stores.kv]]\n      key = "greeting"\n      data = "hello kv"\n`);
 if (engines.has('viceroy')) {
-  localServer(fetchApp);
-  await serveAndCheck('viceroy', toolPath.viceroy, ['serve', '--addr', '127.0.0.1:3102', '-C', 'fastly.toml', 'bin/main.wasm'], { cwd: fetchApp, port: 3102 });
-  // examples/fastly: the same routes on Lasm.Fastly.
+  // examples/fastly under Viceroy.
   localServer(fastlyApp);
   // Its heap per request: Emscripten's mimalloc made every request use about 28 MB (16 MiB arenas), Lasm's build about 4.2 MB (#246).
   await serveAndCheck('lasm-fastly', toolPath.viceroy, ['serve', '--addr', '127.0.0.1:3107', '-C', 'fastly.toml', 'bin/main.wasm'],
@@ -441,10 +389,6 @@ if (engines.has('viceroy')) {
     save();
   }
 }
-if (engines.has('lasm-node'))
-  await serveAndCheck('lasm-node', process.execPath, ['dist/main.mjs'], { cwd: fetchApp, port: 3103, env: { PORT: '3103', HOST: '127.0.0.1', GREETING: 'hello from the host' } });
-if (engines.has('deno'))
-  await serveAndCheck('deno', toolPath.deno, ['run', '-A', 'deno/main.mjs'], { cwd: fetchApp, port: 3104, env: { PORT: '3104', GREETING: 'hello from the host' } });
 
 // ---- The fetch template's WASI programs ----
 // `lasm init --template fetch --deploy fastly --deploy wasi-http` writes

@@ -106,21 +106,6 @@ export function inventory(root, read) {
   const oracles = [];
   for (const f of tracked(root, 'test/fuzz/targets').filter(f => f.endsWith('.mjs')))
     oracles.push({ id: f.replace(/^test\/fuzz\/targets\/|\.mjs$/g, ''), file: f, named: readCitations(read(f)).length > 0 });
-  const native = JSON.parse(read('test/fuzz/native/targets.json'));
-  const lean = read('test/fuzz/native/LasmFuzz.lean');
-  const entries = [...lean.matchAll(/@\[export (\w+)\]/g)].map(m => ({ entry: m[1], at: m.index }));
-  for (const [id, target] of Object.entries(native)) {
-    if (target.kind === 'lean') {
-      const i = entries.findIndex(e => e.entry === target.entry);
-      const start = i < 0 ? 0 : (i > 0 ? entries[i - 1].at : 0);
-      const end = i < 0 ? 0 : (entries[i + 1]?.at ?? lean.length);
-      // The entry's doc comment comes before its @[export]: from the previous entry on.
-      oracles.push({ id, file: 'test/fuzz/native/LasmFuzz.lean', named: readCitations(lean.slice(start, end)).length > 0 });
-    } else {
-      const file = `test/fuzz/native/${target.driver ?? 'cgi_driver.c'}`;
-      oracles.push({ id, file, named: existsSync(join(root, file)) && readCitations(read(file)).length > 0 });
-    }
-  }
   const properties = [];
   for (const f of tracked(root, 'test').filter(f => f.endsWith('.test.mjs') && !fixtures.has(f))) {
     const lines = read(f).split('\n');

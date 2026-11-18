@@ -62,6 +62,5 @@ test("TESTING.md's fuzz table lists exactly the targets fuzz.yml runs", () => {
   assert.deepEqual([...rows].sort(), [...campaign].sort());
   // Every target that has a file is run in the campaigns.
   const files = readdirSync(join(root, 'test/fuzz/targets')).filter(f => f.endsWith('.mjs')).map(f => f.slice(0, -4));
-  const native = Object.keys(JSON.parse(read('test/fuzz/native/targets.json')));
-  assert.deepEqual([...files, ...native].sort(), [...campaign].sort());
+  assert.deepEqual([...files].sort(), [...campaign].sort());
 });

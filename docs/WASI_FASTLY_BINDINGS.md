@@ -19,12 +19,11 @@ no overloads or callbacks, so no override applies here yet.
 | `Lasm.Fastly.*` | The witx of Fastly Compute's host ABI that Viceroy v0.21.1 ships (`scripts/fastly/witx/`) | [`scripts/bindings/generate-fastly.mjs`](../scripts/bindings/generate-fastly.mjs) | Released in 0.7.0: 244 of 252 functions |
 | `Lasm.WASI.Http` | The WASI 0.2.12 WIT that Wasmtime v49.0.4 ships (`scripts/wasi/wit/deps/`) | [`scripts/bindings/generate-wasi-http.mjs`](../scripts/bindings/generate-wasi-http.mjs) | Released in 0.7.0: every stable function of the wasi:http proxy world's imports (90) and its export |
 
-`Lasm.Fetch` is being removed (Jordan, 2026-11-10): Fastly and WASI programs
-move to these bindings now; its JavaScript-host parts move to `Lasm.JS.*` in a
-later step. Until then `Lasm.Fetch.serve` keeps working on every target.
-Nothing replaces it as a single cross-target handler (Jordan, 2026-11-10):
-each target's server is a small entry module on its own bindings, sharing
-pure Lean app logic.
+Fastly and wasi-http programs serve HTTP through these bindings. Lasm has no
+single cross-target handler library (Jordan, 2026-11-10; the one it had was
+removed after 0.9.0): each target's server is a small entry module on its own
+bindings, sharing pure Lean app logic, as the fetch template's `Fastly.lean`
+and `WasiHttp.lean` do.
 
 ## Lasm.Fastly
 
@@ -53,7 +52,7 @@ def main : IO Unit := do
   HttpResp.sendDownstream resp out 0                    -- 0: whole; 1: streamed, then write and close
 ```
 
-A complete server — every route of `examples/fetch`, streamed bodies, named
+A complete server — routes with JSON, bodies, headers and redirects, streamed bodies, named
 and dynamic backends, three backend requests at once, Config, Secret and KV
 Stores — is [`examples/fastly/Main.lean`](../examples/fastly/Main.lean).
 
@@ -177,9 +176,8 @@ regenerate `library/prebuilt` (`gh workflow run library-prebuilt.yml --ref
   comments: Viceroy 0.21.1 answers `header_value_get` for a name that is not
   present with `$inval` instead of `$none`, so header removal is checked
   through `headerNamesGet`; `found?` still maps `$none` where the host sends it.
-- [`examples/fastly`](../examples/fastly/Main.lean) answers the same route
-  checks as `examples/fetch` under Viceroy (`scripts/wasi/wasi-ci.mjs`, host
-  `lasm-fastly`).
+- [`examples/fastly`](../examples/fastly/Main.lean) answers the HTTP route
+  checks under Viceroy (`scripts/wasi/wasi-ci.mjs`, host `lasm-fastly`).
 
 [`fastly-bindings.yml`](../.github/workflows/fastly-bindings.yml) runs the
 drift check and the unit tests on pull requests that touch them, and
@@ -308,9 +306,9 @@ resolves the bound interfaces and writes:
   byte lists are passed in place); a result holding lists or strings is
   allocated by `cabi_realloc`, armed around that call only;
 - `src/wasi/lasm_wasi_http_imports.h`, the same import declarations for the
-  hand-written Lasm.Fetch glue ([`src/wasi/lasm_wasi_http.c`](../src/wasi/lasm_wasi_http.c),
-  which keeps the export, `cabi_realloc` and Lasm.Fetch's own calls until
-  Lasm.Fetch is deleted), so both name each import by one symbol;
+  hand-written wasi-http host ([`src/wasi/lasm_wasi_http.c`](../src/wasi/lasm_wasi_http.c),
+  which keeps the export, its 500 when `main` does not answer, and
+  `cabi_realloc`), so both name each import by one symbol;
 - `test/fixtures/wasi-http-abi/Fixture/EveryCall.lean` and
   `scripts/bindings/wasi-http-surface.json`.
 
@@ -320,7 +318,7 @@ references every import (`lasm_wasi_http_bound_imports`), so every program's
 core module imports the same 90 functions and the one component template
 (`src/wasi/component/proxy-template.wasm`) serves them all: CI's
 `make-component-template.mjs --check` requires the template, and each build of
-`examples/fetch`, `examples/wasi-http` and the fixture, to be byte for byte what
+`examples/wasi-http` and the fixture, to be byte for byte what
 wasm-tools makes. Other builds of a program that imports Lasm.WASI.Http link
 the glue's failing stubs.
 
@@ -336,7 +334,7 @@ check fails) and `library/prebuilt`.
   module in import order; every extern has its C function with host imports
   and as a stub with the same parameters; the surface report counts every
   import; and the core signatures equal wit-bindgen 0.63's for the 45
-  functions the hand-written glue declared before.
+  functions Lasm's hand-written glue declared before.
 - [`test/fixtures/wasi-http-abi`](../test/fixtures/wasi-http-abi): 35
   conformance checks under `wasmtime serve`, each stating its Lean proposition
   in a comment (`∀ n v, (Fields.new >>= fun f => f.append n v *> f.get n) = pure #[v]`,
@@ -345,8 +343,8 @@ check fails) and `library/prebuilt`.
   timeouts, nested `option<result<result<…>>>` futures, `poll`, the clock, a
   full outgoing exchange, a 300,000-byte body, `connection-refused`).
 - [`examples/wasi-http`](../examples/wasi-http/Main.lean) answers the same
-  route checks as `examples/fetch` under `wasmtime serve`
-  (`scripts/wasi/wasi-ci.mjs`, host `lasm-wasi-http`).
+  route checks as `examples/fastly` under `wasmtime serve` and Spin
+  (`scripts/wasi/wasi-ci.mjs`, hosts `lasm-wasi-http` and `spin`).
 
 [`wasi-http-bindings.yml`](../.github/workflows/wasi-http-bindings.yml) runs
 the drift check and the unit tests on pull requests that touch them, and

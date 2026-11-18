@@ -7,15 +7,21 @@ sources:
   - https://github.com/Millillion/lasm/issues/27
   - https://github.com/Millillion/lasm/pull/47
   - https://github.com/Millillion/lasm/blob/main/docs/TESTING.md
-  - https://github.com/Millillion/lasm/blob/main/docs/FETCH.md
+  - https://github.com/Millillion/lasm/blob/main/verification/cli/README.md
 aiGenerated: true
 ---
 
 # New in 0.3.9: a theorem that request paths never contain `.` or `..`
 
 This change shipped in Lasm 0.3.9
-([PR #47](https://github.com/Millillion/lasm/pull/47)). Upgrade with
-`npm install -D @lasm/cli@0.3.9`.
+([PR #47](https://github.com/Millillion/lasm/pull/47)).
+
+> **Update:** the HTTP library this page is about, `Lasm.Fetch`, was removed
+> in the release after 0.9.0. Handlers now use the web's own `Request` and
+> `Response` (`Lasm.JS.Web`), whose URL parser resolves dot segments on every
+> target. The request model and this theorem moved, unchanged, to
+> [verification/cli/Lasm/RequestPath](../../verification/cli/Lasm/RequestPath/Model.lean),
+> as a specification an application's own path handling can be held to.
 
 ## Same handler, different routes
 
@@ -61,7 +67,8 @@ backslash separator.
 
 ## The theorem
 
-The change comes with a theorem in `library/Lasm/Fetch.lean`:
+The change came with a theorem in `library/Lasm/Fetch.lean` (now in
+`verification/cli/Lasm/RequestPath/Model.lean`):
 
 ```lean
 theorem segments_no_dot_segments (r : Request) :
@@ -78,9 +85,8 @@ For every request, every segment a handler sees is neither `.` nor `..`.
 - **It is about `Request.segments` itself,** the function every `Lasm.Fetch`
   handler calls, compiled by Lasm for every target.
 
-The helper functions and lemmas are private, so the theorem is the only new
-public name. [FETCH.md](../../docs/FETCH.md) documents the new behaviour in
-the PR.
+The helper functions and lemmas were private, so the theorem was the only new
+public name.
 
 ## What it means for a handler
 
