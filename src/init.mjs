@@ -698,7 +698,7 @@ export function initProject({ directory, template, deploy = [] }) {
     const files = fullstackFiles(name, deploy);
     if (deploy.includes('vercel-edge')) { files['vercel.json'] = vercelEdgeJson; files['public/lasm.txt'] = 'Requests are served by the Lean edge function api/lasm.mjs.\n'; }
     if (deploy.includes('netlify-edge')) { files['netlify.toml'] = netlifyEdgeToml; files['public/.gitkeep'] = ''; }
-    // Fastly: the TODOS KV Store (Lasm.KV); Viceroy's local copy starts empty.
+    // Fastly: the TODOS KV Store (Lasm.Fastly.KvStore); Viceroy's local copy starts empty.
     if (deploy.includes('fastly')) files['fastly.toml'] = fastlyToml(fastlyName(target)) + '\n[local_server.kv_stores]\n  TODOS = []\n';
     if (deploy.includes('spin')) files['spin.toml'] = spinToml(spinName(name));
     return writeFiles(target, name, files);

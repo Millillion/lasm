@@ -1,6 +1,6 @@
 # What is proved about Lasm's library
 
-Lasm's own Lean library (Lasm.UI, Lasm.KV, Lasm.Fetch, Lasm.JS) is ordinary
+Lasm's own Lean library (Lasm.UI, Lasm.Fetch, Lasm.JS) is ordinary
 Lean code, and programs run exactly that code. So some of its guarantees are
 proved, for every possible input, rather than only tested. (The propositions
 about the function-platform shims, src/serverless/, are about a model of the
@@ -22,7 +22,6 @@ Each library has a `Spec.lean` that states its propositions, each a named
 proofs in that file:
 
 - [`Lasm/UI/Spec.lean`](Lasm/UI/Spec.lean): the diff and the commands;
-- [`Lasm/KV/Spec.lean`](Lasm/KV/Spec.lean): the memory store;
 - [`Lasm/Fetch/Spec.lean`](Lasm/Fetch/Spec.lean): request paths;
 - [`Lasm/JS/Spec.lean`](Lasm/JS/Spec.lean): the value codec between Lean and JavaScript;
 
@@ -43,7 +42,7 @@ managed Lean 4.35.0 and only Lean's own library (no Mathlib).
 ## Where the proofs live, and what ships
 
 The propositions are about the shipped code (`Lasm.UI.diff`,
-`Lasm.KV.Table.write`, …). The Spec,
+`Lasm.Fetch.Request.segments`, …). The Spec,
 Theorems, `Lasm/UI/Proofs*` and `Lasm/JS/Proofs*` modules are a proofs-only target: they are not
 in the shipped library (`libraryModules` in
 [src/lasm-library.mjs](../src/lasm-library.mjs)), so they are not compiled
@@ -74,7 +73,7 @@ store's table; and the platform stores and HTTP stacks, which Lasm only calls.
 <!-- BEGIN PROPOSITIONS -->
 <!-- Generated from the Spec.lean files by `node scripts/library-proofs.mjs --write`; do not edit by hand. -->
 
-**23 proved propositions (338 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
+**17 proved propositions (332 theorems)**: each proposition below is proved by the theorem of the same name in its library's `Theorems.lean`, and the other theorems are the lemmas their proofs are built from. Every one uses only Lean's standard axioms.
 
 ## Lasm.UI (14)
 
@@ -111,19 +110,6 @@ store's table; and the platform stores and HTTP stacks, which Lasm only calls.
 | [`cmd_map_effects`](Lasm/UI/Spec.lean#L198) | **Mapping commands keeps their effects.** Mapping a command by any `f` keeps exactly its effects, in order, each of the same kind with the same data (the same delay, the same URL, the same task): with the messages they deliver forgotten (`Effect.forget`), the effects before and after are equal. Only the messages change. |
 | [`cmd_map_id`](Lasm/UI/Spec.lean#L206) | **Mapping by the identity changes nothing.** |
 | [`cmd_map_batch`](Lasm/UI/Spec.lean#L210) | **Mapping commutes with batching.** Mapping a batch of commands is the batch of the mapped commands: no effect is lost, duplicated or reordered. |
-
-## Lasm.KV (6)
-
-### The memory store
-
-| Proposition | In plain English |
-| --- | --- |
-| [`read_empty`](Lasm/KV/Spec.lean#L26) | **A new store is empty.** The table a new memory store starts with has no value for any key. |
-| [`read_write_self`](Lasm/KV/Spec.lean#L31) | **Reading a key after writing it gives what was written.** |
-| [`read_write_other`](Lasm/KV/Spec.lean#L35) | **Writing a key changes no other key.** |
-| [`read_remove_self`](Lasm/KV/Spec.lean#L39) | **Reading a key after deleting it gives nothing.** |
-| [`read_remove_other`](Lasm/KV/Spec.lean#L43) | **Deleting a key changes no other key.** |
-| [`write_write`](Lasm/KV/Spec.lean#L47) | **The last write wins** *(consequence)*. Writing a key twice reads the same, for every key, as writing only the second value. |
 
 ## Lasm.Fetch (1)
 
@@ -199,7 +185,3 @@ Lean model" that §4 leaves to tests until a model exists.
   DOM that renders the view (`Applier.Rendered`) needs a model of the HTML
   parser (tested: the fixture sessions hydrate their server-rendered HTML
   in the differential, and the Playwright suites).
-- **Lasm.KV: the stores behave as the table.** That `get`, `put` and
-  `delete` of the memory store read and replace the table in its `IO.Ref`
-  (Lean's runtime is not modelled), and that the platform stores agree
-  (tested per platform in CI).
