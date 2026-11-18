@@ -781,8 +781,8 @@ methods also receive the cron triggers and queue batches
 - Edge builds (`lasm build --target workers`, Bun, Deno and the other edge
   targets): the platform's requests go to it, after `main` returns.
 - Function platforms on Node (`lasm package` / `lasm build --target netlify`,
-  `vercel`, `lambda`, `lambda-edge`, `azure`, `gcf`): the platform's handler calls
-  it directly (no HTTP server, no port). `exportDefault` then does not return:
+  `vercel`, `lambda`, `lambda-edge`, `azure-functions`, `cloud-functions`):
+  the platform's handler calls it directly (no HTTP server, no port). `exportDefault` then does not return:
   the Lean runtime ends with `main`, so `main` stays here and serves the calls.
 - Elsewhere on Node (`lasm run`, `node dist/main.mjs`) it only records the value
   (`globalThis.__lasmDefaultExport`) and returns; to serve HTTP on Node, use
