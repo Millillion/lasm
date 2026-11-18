@@ -98,6 +98,21 @@ def EventEmitter.RemoveListenerListener.ofFn (f : DOMStringOrSymbol → JSFuncti
 def EventEmitter.RemoveListenerListener.ofSyncFn (f : DOMStringOrSymbol → JSFunction → IO Unit) : IO EventEmitter.RemoveListenerListener := do
   return { val := ← Lasm.JS.Function.ofSyncFn fun args => do return toJS (← f (← Internal.arg DOMStringOrSymbol args 0) (← Internal.arg JSFunction args 1)) }
 
+/-- `dictionary events.EventEmitterAsyncResource.NewOptions` (Node.js 24.22.2 documentation); members that are not `required` are `Option`s, `none` leaving them out. -/
+structure events.EventEmitterAsyncResource.NewOptions where
+  /-- `boolean captureRejections = false` -/
+  captureRejections : Option Bool := none
+  /-- `DOMString name` -/
+  name : Option String := none
+  /-- `double triggerAsyncId` -/
+  triggerAsyncId : Option Float := none
+  /-- `boolean requireManualDestroy = false` -/
+  requireManualDestroy : Option Bool := none
+instance instToJSEventsEventEmitterAsyncResourceNewOptions : ToJS events.EventEmitterAsyncResource.NewOptions := ⟨fun d => Internal.fields #[("captureRejections", Internal.optional d.captureRejections),
+    ("name", Internal.optional d.name),
+    ("triggerAsyncId", Internal.optional d.triggerAsyncId),
+    ("requireManualDestroy", Internal.optional d.requireManualDestroy)]⟩
+
 /-- `(EventEmitter or EventTarget)`: one constructor per member type. -/
 inductive EventEmitterOrEventTarget where
   /-- `EventEmitter` -/
@@ -276,6 +291,11 @@ instance instToJSEventsOnOptions : ToJS events.OnOptions := ⟨fun d => Internal
 /-- `v instanceof EventEmitterAsyncResource`: `some` handle to `v` when it is one, else `none` (also when the runtime has no `EventEmitterAsyncResource`). -/
 @[macro_inline] def events.EventEmitterAsyncResource.cast? (v : Value) : IO (Option events.EventEmitterAsyncResource) := Internal.api "Lasm.JS.Node.events.EventEmitterAsyncResource.cast?" do
   Internal.cast (Support.getExport "node:events" ["EventEmitterAsyncResource"] Value) (fun x => { val := x }) v
+
+/-- `new events.EventEmitterAsyncResource([options])` (added in Node.js v17.4.0, v16.14.0): `constructor(optional events.EventEmitterAsyncResource.NewOptions options)` -/
+@[macro_inline] def events.EventEmitterAsyncResource.new (options : Option events.EventEmitterAsyncResource.NewOptions := none) : IO events.EventEmitterAsyncResource := Internal.api "Lasm.JS.Node.events.EventEmitterAsyncResource.new" do
+  Lasm.JS.Binding.invoke events.EventEmitterAsyncResource { name := "Lasm.JS.Node.events.EventEmitterAsyncResource.new", module := "node:events", path := "EventEmitterAsyncResource", construct := true, arity := 1 }
+    (Internal.args #[Internal.optional options]) (await := false)
 
 /-- `eventemitterasyncresource.asyncId`: `readonly attribute double asyncId` -/
 @[macro_inline] def events.EventEmitterAsyncResource.asyncId (self : events.EventEmitterAsyncResource) : IO Float := Internal.api "Lasm.JS.Node.events.EventEmitterAsyncResource.asyncId" do
