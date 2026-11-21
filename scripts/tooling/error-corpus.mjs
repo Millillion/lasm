@@ -144,10 +144,19 @@ export const cases = [
   { id: 'lean-error-with-lake-notice', kind: 'build', args: ['build', 'Main.lean'], fixedIn: '0.10.1',
     files: project({ 'Main.lean': 'def main : IO Unit := IO.println undefinedName\n', 'dep-repo/lakefile.toml': 'name = "dep"\nversion = "0.1.0"\n',
       'dep-repo/lean-toolchain': 'leanprover/lean4:v4.35.0\n' }),
+    // The project as after its first build: the dependency cloned and pinned in lake-manifest.json, so every Lake
+    // run, the failing one included, prints the notice (a first build prints "materializing new dependency" instead).
     setup: dir => {
-      const git = args => execFileSync('git', ['-c', 'user.name=corpus', '-c', 'user.email=corpus@example.invalid', '-c', 'commit.gpgsign=false', ...args], { cwd: join(dir, 'dep-repo'), stdio: 'ignore' });
+      const root = dir.replace(/\\/g, '/'), alias = `${root}/dep-alias`, clone = join(dir, '.lake', 'packages', 'dep');
+      const git = (args, cwd = join(dir, 'dep-repo')) => execFileSync('git', ['-c', 'user.name=corpus', '-c', 'user.email=corpus@example.invalid', '-c', 'commit.gpgsign=false', ...args], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
       git(['init', '-q', '-b', 'main']); git(['add', '-A']); git(['commit', '-qm', 'dep']);
-      writeFileSync(join(dir, 'lakefile.toml'), lakefile + `\n[[require]]\nname = "dep"\ngit = ${JSON.stringify(dir.replace(/\\/g, '/') + '/dep-alias')}\nrev = "main"\n`);
+      const rev = git(['rev-parse', 'HEAD']).trim();
+      mkdirSync(join(dir, '.lake', 'packages'), { recursive: true });
+      git(['clone', '-q', join(dir, 'dep-repo'), clone], dir);
+      git(['remote', 'set-url', 'origin', alias], clone);
+      writeFileSync(join(dir, 'lakefile.toml'), lakefile + `\n[[require]]\nname = "dep"\ngit = ${JSON.stringify(alias)}\nrev = "main"\n`);
+      writeFileSync(join(dir, 'lake-manifest.json'), JSON.stringify({ version: '1.3.0', packagesDir: '.lake/packages', packages: [{ url: alias, type: 'git', subDir: null,
+        scope: '', rev, name: 'dep', manifestFile: 'lake-manifest.json', inputRev: 'main', inherited: false, configFile: 'lakefile.toml' }], name: 'app', lakeDir: '.lake', fixedToolchain: false }, null, 1) + '\n');
     },
     env: dir => ({ GIT_CONFIG_COUNT: '1', GIT_CONFIG_KEY_0: `url.${dir.replace(/\\/g, '/')}/dep-repo.insteadOf`, GIT_CONFIG_VALUE_0: `${dir.replace(/\\/g, '/')}/dep-alias` }),
     expect: /remote URL changed[\s\S]*Main\.lean:1:\d+: error: Unknown identifier `undefinedName`[\s\S]*Build failed\. Fix the error above/ },
