@@ -9,6 +9,7 @@ import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { evalCommand } from './js-runtime.mjs';
+import { stepOutput } from './step-output.mjs';
 
 const reader = fileURLToPath(new URL('./lasm-js-bindings.lean', import.meta.url));
 // Lasm's builtin JavaScript modules (lasm:<name>; src/edge/builtin-modules.mjs).
@@ -34,7 +35,7 @@ export async function readBindingsAsync(lean, env, oleans, { cache } = {}) {
   }
   const bindings = await new Promise((resolve, reject) =>
     execFile(lean.lean, ['--run', reader, ...files], { env, encoding: 'utf8', windowsHide: true, timeout: 300_000, maxBuffer: 16 * 1024 * 1024 },
-      (error, stdout, stderr) => error ? reject(error.code === 'ENOENT' || error.killed ? error : new Error(`Cannot read Lasm.JS bindings: ${stderr || stdout}`))
+      (error, stdout, stderr) => error ? reject(error.code === 'ENOENT' || error.killed ? error : new Error(`Cannot read Lasm.JS bindings: ${stepOutput({ stderr, stdout })}`))
         : resolve(parseBindings(stdout))));
   if (record) {
     try {

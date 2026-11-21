@@ -34,7 +34,7 @@ How a module moves from pending to modelled:
 <!-- BEGIN MODELS -->
 <!-- Generated from verification/models.json by `node scripts/models.mjs --write`; do not edit by hand. -->
 
-**181 shipped modules**: 20 modelled, 27 pending, 134 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 27 modules still need a model.
+**182 shipped modules**: 20 modelled, 28 pending, 134 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 28 modules still need a model.
 
 ### Modelled (20)
 
@@ -61,7 +61,7 @@ How a module moves from pending to modelled:
 | [`src/wasi/lower-atomics.mjs`](../src/wasi/lower-atomics.mjs) | [LowerAtomics.lean](../verification/cli/Lasm/Cli/Model/LowerAtomics.lean) (`lowerAtomics`, `moduleImports`, `keepExports`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the whole module is modelled (lowerAtomics with its readers, moduleImports, keepExports); candidates lowering_rewrites_atomics, lowering_leaves_no_atomics and lowering_keeps_runs are stated over the model, the last two also over WebAssembly validation and execution (outside semantics) |
 | [`src/wasi/wasi-component.mjs`](../src/wasi/wasi-component.mjs) | [WasiComponent.lean](../verification/cli/Lasm/Cli/Model/WasiComponent.lean) (`replaceCoreModule`, `placeholderModule`, `componentize`, `makeTemplate`, `extractCore`, `withoutComponentType`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | every function runs as its Lean model, compiled by Lasm into the CLI's glue program (src/glue/glue.mjs, docs/proposals/M6_GLUE.md) through proved fast versions over byte arrays (verification/cli/Lasm/Cli/Fast/WasiComponent.lean, csimp theorems); what remains here is reading the template (component/proxy-template.wasm, an argument of the model) and taking any array of bytes, which the differential checks together with the compiled program; replace_one_core_module, drops_only_component_type and componentize_inverse proved |
 
-### Pending (27)
+### Pending (28)
 
 | Module | Models (and their differentials) | Reason |
 | --- | --- | --- |
@@ -89,6 +89,7 @@ How a module moves from pending to modelled:
 | [`src/node-host.mjs`](../src/node-host.mjs) | [NodeHost.lean](../verification/cli/Lasm/Cli/Model/NodeHost.lean) (`numbers`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the Node host of Lean's runtime primitives (Lean's runtime primitives on this host: their meaning is native Lean's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md)); its pure helpers are modelled one by one |
 | [`src/node-js.mjs`](../src/node-js.mjs) | [Core.lean](../library/Lasm/JS/Core.lean) (the value codec (Writer, reader); [lasm-js-wire.mjs](../test/fuzz/targets/lasm-js-wire.mjs)); [JsFraming.lean](../verification/cli/Lasm/Cli/Model/JsFraming.lean) (`encodeEvents`, `splitRequest`, `intoPrefix`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | Lasm.JS on Node: the value codec's JavaScript half is checked against Lean's proved codec (lasm-js-wire) and the framing (encodeEvents, splitRequest, intoPrefix) against its model (JsFraming.lean); the host operations (calls, properties, callbacks, references) are not modelled (IRREDUCIBLE.md M4) |
 | [`src/project-modules.mjs`](../src/project-modules.mjs) | — | the project's JavaScript files (A6.1): pure over the binding records and the files, resolving each against its Lean file, the relative-import closure and the refusals; model it as BuiltinModules.lean models the builtin closure (tested in test/project-modules.test.mjs) |
+| [`src/step-output.mjs`](../src/step-output.mjs) | — | a failed step's reported output (stderr, then stdout, each once; issue #315): a pure function of two strings, to model |
 | [`src/tar.mjs`](../src/tar.mjs) | — | the tar reader and writer (tool archives, npm packages, the Fastly package): fuzzed against Python's tarfile, an independent implementation (test/fuzz/targets/tar.mjs); a Lean model of the reader's header and pax parsing is due (IRREDUCIBLE.md M4) |
 | [`src/wasm-objects.mjs`](../src/wasm-objects.mjs) | — | a reader of relocatable Wasm objects: pure |
 | [`src/web-availability.mjs`](../src/web-availability.mjs) | — | lasm build --target's web API check: pure over the program's C texts and the generated availability table; model the lookup |

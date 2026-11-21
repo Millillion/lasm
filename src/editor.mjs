@@ -16,6 +16,7 @@ import { homedir } from 'node:os';
 import { basename, delimiter, join, resolve } from 'node:path';
 import { requiresLakePackage } from './lake-library.mjs';
 import { programLibraryImports } from './lazy-library.mjs';
+import { stepOutput } from './step-output.mjs';
 
 const markerFile = project => join(project, '.lake', 'lasm', 'editor.json');
 const readMarker = project => { try { return JSON.parse(readFileSync(markerFile(project), 'utf8')); } catch { return undefined; } };
@@ -69,7 +70,7 @@ export function removeLasmOverride({ project, elan, log = console.error, run = e
     run(elan.executable, ['override', 'unset', '--path', project],
       { cwd: project, env: { ...env, ELAN_HOME: elan.home }, stdio: ['ignore', 'pipe', 'pipe'], timeout: 60_000, windowsHide: true });
   } catch (error) {
-    const message = String(error.stderr || error.message).trim().split('\n')[0];
+    const message = (stepOutput(error) || String(error.message)).trim().split('\n')[0];
     log(`[lasm] Editor: could not remove this directory's elan override to Lasm's toolchain ${toolchain} (${message}); `
       + 'run `elan override unset` here, so that `lake` and the editor use the project\'s lean-toolchain.');
     return { status: 'failed', toolchain, message };
