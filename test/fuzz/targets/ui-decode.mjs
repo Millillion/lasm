@@ -257,6 +257,10 @@ export async function run(bytes) {
   const { root, state, records } = recordingDom();
   const ui = createUi({ root, window: { addEventListener() {}, removeEventListener() {}, location: { href: 'https://app.test/' } } });
   const seen = [];
+  // Every slot name of every frame's DOM: the model reads its slots only at
+  // these and at its interned names, and a name sent inline (not interned)
+  // may be gone from the DOM by the last frame.
+  const all = new Set();
   let refused = false;
   try {
     for (const frame of frames) {
@@ -268,10 +272,9 @@ export async function run(bytes) {
       }
       if (state.anomaly) return; // the DOM, not the bytes, decides: no verdict
       seen.push(jsTree(records.get(root), ui.decodersForTest()));
+      names(records.get(root), all);
     }
     if (!model) return;
-    const all = new Set();
-    names(records.get(root), all);
     const lean = await model.ask({ frames: frames.slice(0, seen.length + (refused ? 1 : 0)).map(f => Buffer.from(f).toString('hex')), names: [...all] });
     if (lean.fault) fail(`the model failed: ${lean.fault}`, { frames });
     const answers = lean.frames;
