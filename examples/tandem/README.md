@@ -125,13 +125,13 @@ loser runs again on the longer log.
 On Node the WebSockets come from the `ws` package
 ([`Server/NodeWs.lean`](Server/NodeWs.lean)), with Tandem's own `node:http`
 server (the generated `Lasm.JS.Node.Http`) around the same handler: Node has
-no WebSocket server, and `Node.serve` no upgrade hook yet. On Deno and Bun
+no WebSocket server, and `Node.serve` has no upgrade hook (0.4-7.3). On Deno and Bun
 they come from the generated `Deno.upgradeWebSocket` and `Bun.serve`'s
 `websocket` handlers ([`Server/EdgeWs.lean`](Server/EdgeWs.lean)). Every
 other platform API Tandem uses is a generated binding (`Lasm.JS.Node.Sqlite`,
-`Lasm.JS.Bun.Sqlite`, `Lasm.JS.Cloudflare.D1`, Lasm.JS.Web). Two hand-written
-bindings remain, each with its reason in its file: `ws`, and `node:sqlite`'s
-`new DatabaseSync`, which the generated binding does not have yet.
+`Lasm.JS.Bun.Sqlite`, `Lasm.JS.Cloudflare.D1`, Lasm.JS.Web). One hand-written
+binding remains, with its reason in its file: `ws` (Node has no WebSocket server
+to generate; docs/api/decisions/0.4.md, 0.4-7.3).
 
 A replica ([`Tandem/Client.lean`](Tandem/Client.lean), what the browser
 runs) keeps its document, the operations not yet acknowledged and its
