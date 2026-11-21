@@ -21,15 +21,23 @@ context-dependent tricks or loopback adapters (Jordan, 2026-11-11).
 Each entry has:
 - **Id and area.** The seeded entries keep A1–A56; a refinement of one takes a
   sub-id (A9.1, A9.2, …). New entries take the id of the milestone that owns
-  them: `0.1-1`, `0.1-2`, … through `0.7-n` (never a bare A57+). Each
-  milestone's entries go in its own file, `docs/api/decisions/0.N.md`.
+  them: `0.1-1`, `0.1-2`, … through `0.7-n` (never a bare A57+), and their
+  refinements `0.N-M.K` (`0.4-17.1`). Each milestone's entries go in its own
+  file, `docs/api/decisions/0.N.md`. Every entry has a table row, except a
+  sub-id, which may be only a detail heading (`### 0.4-17.1 …`) under an
+  entry that has a row.
 - **Decision:** the shape, with real code examples in the linked detail.
 - **Why**, and the alternatives considered.
 - **Where:** the PR and the release it shipped in (or "proposed").
-- **Status:** `pending sign-off`, `signed off (date)`, or `changed by Jordan
-  (date): …`. The inventory (milestone 0.1) also uses `decided, pending
-  sign-off` (a shape that exists and nobody questioned), `open` (undecided)
-  and `to remove` (slated for deletion).
+- **Status:** `pending sign-off`, `signed off (date)` (also written `signed
+  off by Jordan (date)`), or `changed by Jordan (date): …`. The inventory
+  (milestone 0.1) also uses `decided, pending sign-off` (a shape that exists
+  and nobody questioned), `open` (undecided) and `to remove` (slated for
+  deletion); an entry that has been carried out reads `removed, pending
+  sign-off: …`, `replaced, pending sign-off: …` or `superseded by <id>`.
+  Every status that is not signed off or superseded says `pending sign-off`.
+- **Where** lines name the PR and the release it shipped in (`PR #319,
+  released in 0.9.0`), never "next release" once a release has shipped it.
 
 The inventory is kept complete by `scripts/api/inventory.mjs`, which the unit
 job runs (`test/api-inventory.test.mjs`): it lists every Lean module and
@@ -37,7 +45,11 @@ job runs (`test/api-inventory.test.mjs`): it lists every Lean module and
 template, every `LASM_*` environment variable the CLI reads, the builtin
 `lasm:*` modules and the npm entry points, and fails when one is not named
 here or in `docs/api/decisions/*.md` in backticks (a module may be covered by a family glob such as
-`Lasm.Fastly.*`). It also rejects malformed, duplicate and A57+ ids.
+`Lasm.Fastly.*`). It also rejects malformed, duplicate and A57+ ids, and
+checks the ids that detail headings open with: each is well-formed, and one
+without a table row must be a sub-id of an entry that has one, defined by one
+heading only (a `(continued)` heading adds to it). It counts both: "N entries,
+M detail sub-entries".
 
 ## Contents by milestone
 
