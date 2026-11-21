@@ -11,6 +11,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync, realpathSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { stepOutput } from '../step-output.mjs';
 
 const suffix = '?lasm';
 const virtualPrefix = '\0lasm:';
@@ -62,7 +63,7 @@ export default function lasm(options = {}) {
       await service.build(source, { profile: dev ? 'dev' : 'release', output, bundler: true, ...(options.suspend ? { suspend: options.suspend } : {}) },
         { target: 'browser', onLog: text => process.stderr.write(text + '\n') });
     } catch (error) {
-      const detail = [error.stdout, error.stderr].filter(Boolean).join('\n').trim();
+      const detail = stepOutput(error);
       throw new Error(`lasm build ${relative(config.root, source)} failed:\n${(detail || error.message).slice(-8000)}`);
     }
   };
