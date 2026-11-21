@@ -62,7 +62,8 @@ replays the proofs through Lean's kernel and the external checkers Lean ships.
 
 The same Lean runs on each platform below; only the SQLite binding module differs
 ([`Server/NodeSqlite.lean`](Server/NodeSqlite.lean), [`Server/BunSqlite.lean`](Server/BunSqlite.lean),
-[`Server/D1.lean`](Server/D1.lean), on Lasm.JS.Cloudflare's generated `D1Database`), and every one
+[`Server/D1.lean`](Server/D1.lean), on the generated `Lasm.JS.Node.Sqlite`, `Lasm.JS.Bun.Sqlite`
+and Lasm.JS.Cloudflare's `D1Database`; Porter writes no JavaScript binding of its own), and every one
 signs with its own Web Crypto (Lasm.JS.Web's generated bindings). Each platform serves Porter
 its own way: Node with `Node.serve` ([`ServerNode.lean`](ServerNode.lean)), Bun with `Bun.serve`,
 Cloudflare Workers with a typed `Env` and its fetch handler ([`ServerWorkers.lean`](ServerWorkers.lean)),
@@ -84,8 +85,8 @@ Porter's own server takes the HTTP requests). No account, nothing deployed.
 | AWS Lambda (.zip and container image) | `npm run build:lambda`, `build:lambda-image` | `sam local start-api` | `node:sqlite` in `/tmp`, per instance |
 | Vercel Functions | `vercel build` | Vercel's Node launcher | `node:sqlite` in `/tmp`, per instance |
 | Netlify Functions | `netlify build` | Netlify's bootstrap in the Lambda image | `node:sqlite` in `/tmp`, per instance |
-| Azure Functions | `npm run build:azure` | `func start` | `node:sqlite` in the temporary directory, per instance |
-| Google Cloud Functions | `npm run build:gcf` | Functions Framework | `node:sqlite` in the temporary directory, per instance |
+| Azure Functions | `npm run build:azure-functions` | `func start` | `node:sqlite` in the temporary directory, per instance |
+| Google Cloud Functions | `npm run build:cloud-functions` | Functions Framework | `node:sqlite` in the temporary directory, per instance |
 
 Each platform takes `ISSUER` (the provider's origin) and `PORTER_CONFIG` (the clients and
 users) its own way: the environment, `docker run -e`, the Lambda template's variables, or the

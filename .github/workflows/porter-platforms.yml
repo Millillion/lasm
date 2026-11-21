@@ -70,10 +70,10 @@ jobs:
             build: netlify build --offline
           - platform: azure
             title: Azure Functions (func start)
-            build: npm run build:azure
+            build: npm run build:azure-functions
           - platform: gcf
             title: Google Cloud Functions (Functions Framework)
-            build: npm run build:gcf
+            build: npm run build:cloud-functions
     env:
       SAM_CLI_TELEMETRY: '0'
       AWS_REGION: us-east-1
