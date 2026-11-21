@@ -152,7 +152,7 @@ export async function linkProjectLibrary(project, { cachedOnly = true, provision
 /** `lasm editor [directory]`: Lasm's Lake package required, linked and up to date, the project's lean-toolchain, and
  * no elan override from an older Lasm. Exit code 0 when the editor can resolve `import Lasm.*`. */
 export async function runEditor({ input = '.' } = {}, { provision, env = process.env, run = execFileSync, log = console.error } = {}) {
-  const { findApplicationProject } = await import('./application-sources.mjs');
+  const { findApplicationProject, lakeNativePackages } = await import('./application-sources.mjs');
   const directory = resolve(input);
   const project = existsSync(join(directory, 'lakefile.toml')) || existsSync(join(directory, 'lakefile.lean')) ? directory : findApplicationProject(join(directory, 'Main.lean'));
   if (!project) throw new Error(`lasm editor works in a Lake project (a directory with lakefile.toml); ${input} is not in one.`);
@@ -161,6 +161,12 @@ export async function runEditor({ input = '.' } = {}, { provision, env = process
   let lean;
   try { lean = await (provision ?? (await import('./managed-lean.mjs')).provisionLean)(project, { progress: event => progress.update(event) }); }
   finally { progress.finish(); }
+  // Without a manifest, Lake resolves the workspace once (writing lake-manifest.json with the project's other
+  // dependencies) before Lasm's entry is added to it: the editor's `lake setup-file` never writes the manifest.
+  if (!existsSync(join(project, 'lake-manifest.json'))) {
+    try { lakeNativePackages(project, lean); }
+    catch (error) { log(`[lasm] Editor: Lake could not resolve this project's dependencies (${String(error.message).split('\n')[0]}); run \`lake update\` here.`); }
+  }
   // Lasm's library as a Lake package (0.3-7): the lakefile requires it, so Lake builds the modules compiled on first import.
   const { addLakeRequire, lakefileOf } = await import('./lake-library.mjs');
   if (addLakeRequire(project)) log(`[lasm] Editor: added Lasm's library to ${basename(lakefileOf(project))} ([[require]] "lasm", path .lake/lasm-library), so Lake builds its modules on first import, in the editor too.`);

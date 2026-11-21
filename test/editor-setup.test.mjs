@@ -13,7 +13,8 @@ const stubs = {
   './lake-library.mjs': 'export const addLakeRequire = (...a) => globalThis.editorStandIns.addLakeRequire(...a);\nexport const lakefileOf = () => "lakefile.toml";\n'
     + 'export const ensureLakeLibrary = (...a) => globalThis.editorStandIns.ensureLakeLibrary(...a);\n'
     + 'export const requiresLakePackage = (...a) => globalThis.editorStandIns.requiresLakePackage(...a);',
-  './application-sources.mjs': 'export const findApplicationProject = (...a) => globalThis.editorStandIns.findApplicationProject(...a);',
+  './application-sources.mjs': 'export const findApplicationProject = (...a) => globalThis.editorStandIns.findApplicationProject(...a);\n'
+    + 'export const lakeNativePackages = (...a) => globalThis.editorStandIns.lakeNativePackages(...a);',
 };
 registerHooks({
   resolve(specifier, context, next) {
@@ -41,6 +42,7 @@ beforeEach(() => {
   globalThis.editorStandIns = {
     findApplicationProject: () => undefined,
     lakeCalls: [],
+    lakeNativePackages: (project, found) => { globalThis.editorStandIns.lakeCalls.push(['lakeNativePackages', project, found]); return []; },
     requiresLakePackage: () => true,
     addLakeRequire: project => { globalThis.editorStandIns.lakeCalls.push(['addLakeRequire', project]); return true; },
     ensureLakeLibrary: (project, prefix) => { globalThis.editorStandIns.lakeCalls.push(['ensureLakeLibrary', project, prefix]); return { required: true }; },
@@ -86,8 +88,20 @@ test('lasm editor: the directory with a lakefile, or the project around it; its 
       "[lasm] Editor: the Lean editor resolves `import Lasm.*` in app with the project's own Lean (lean-toolchain, through elan) and Lasm's Lake package (.lake/lasm-library); restart its Lean server if it is open. Lasm changes nothing in elan."]);
     assert.equal(readFileSync(join(project, 'lean-toolchain'), 'utf8'), 'leanprover/lean4:v4.35.0\n');
     // Lasm's Lake package: required in the lakefile, linked, and left to Lake.
-    assert.deepEqual(globalThis.editorStandIns.lakeCalls.slice(-2), [['addLakeRequire', project], ['ensureLakeLibrary', project, lean.prefix]]);
+    // No lake-manifest.json: Lake resolves the workspace first (the project's other dependencies), then Lasm's package.
+    assert.deepEqual(globalThis.editorStandIns.lakeCalls.slice(-3), [['lakeNativePackages', project, lean], ['addLakeRequire', project], ['ensureLakeLibrary', project, lean.prefix]]);
   }
+  // With a manifest, Lake is not run; a failure to resolve is one line and lasm editor goes on.
+  writeFileSync(join(project, 'lake-manifest.json'), '{}');
+  globalThis.editorStandIns.lakeCalls.length = 0;
+  assert.equal(await runEditor({ input: project }, options), 0);
+  assert.deepEqual(globalThis.editorStandIns.lakeCalls.map(call => call[0]), ['addLakeRequire', 'ensureLakeLibrary']);
+  rmSync(join(project, 'lake-manifest.json'));
+  globalThis.editorStandIns.lakeNativePackages = () => { throw new Error('dependency dep: git failed\ndetails'); };
+  printed.length = 0;
+  assert.equal(await runEditor({ input: project }, options), 0);
+  assert.ok(printed.includes("[lasm] Editor: Lake could not resolve this project's dependencies (dependency dep: git failed); run `lake update` here."), printed.join('\n'));
+  writeFileSync(join(project, 'lake-manifest.json'), '{}');
   // A project's own lean-toolchain stays; a require already there is not added again; elan is never called.
   writeFileSync(join(project, 'lean-toolchain'), 'leanprover/lean4:v4.35.0 # mine\n');
   globalThis.editorStandIns.addLakeRequire = () => false;
