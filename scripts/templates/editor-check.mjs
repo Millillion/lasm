@@ -1,8 +1,9 @@
 // What the Lean editor sees in a `lasm init` project: starts `lake serve` (the
 // Lean language server the VS Code extension runs), opens every .lean file of
 // the project and fails on any error diagnostic (for example an unknown
-// `import Lasm.UI`). The editor runs Lasm's own Lean (`lasm editor` links it with
-// elan); here LAKE names that toolchain's lake directly, so no elan is needed.
+// `import Lasm.UI`). The editor runs the project's own toolchain (lean-toolchain)
+// and finds Lasm's library through its Lake package; LAKE is the lake to start
+// (elan's proxy, as the VS Code extension uses, or a toolchain's lake).
 //   node editor-check.mjs PROJECT_DIR LAKE [TIMEOUT_SECONDS]
 import { spawn } from 'node:child_process';
 import { readdirSync, readFileSync } from 'node:fs';
