@@ -4,16 +4,16 @@
 // package (@azure/functions, @google-cloud/functions-framework), so it is
 // installed into the build first, alone, and `lasm package` then writes
 // azure-functions/ or gcf/ with it.
-//   node deploy/package-hosted.mjs azure|gcf     (npm run build:azure, npm run build:gcf)
+//   node deploy/package-hosted.mjs azure-functions|cloud-functions     (npm run build:azure-functions, npm run build:cloud-functions)
 import { spawnSync } from 'node:child_process';
 import { rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const dependency = { azure: '@azure/functions@4.17.0', gcf: '@google-cloud/functions-framework@5.0.5' };
+const dependency = { 'azure-functions': '@azure/functions@4.17.0', 'cloud-functions': '@google-cloud/functions-framework@5.0.5' };
 const target = process.argv[2];
-if (!dependency[target]) throw new Error('Usage: node deploy/package-hosted.mjs azure|gcf');
+if (!dependency[target]) throw new Error('Usage: node deploy/package-hosted.mjs azure-functions|cloud-functions');
 const run = (command, args) => {
   const r = spawnSync(command, args, { cwd: root, stdio: 'inherit', shell: process.platform === 'win32' });
   if (r.status !== 0) process.exit(r.status ?? 1);
