@@ -4,6 +4,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { insideDirectory } from './platform.mjs';
+import { stepOutput } from './step-output.mjs';
 
 // Lean's Windows source inventory expands DOS 8.3 aliases. Node's JS realpath
 // can retain them, so use the OS path identity before comparing source roots.
@@ -314,7 +315,7 @@ export function lakeNativePackages(project, lean) {
   { cwd: project, env: nativeLeanEnvironment(lean), windowsHide: true, encoding: 'utf8', timeout: 900_000, maxBuffer: 32 * 1024 * 1024,
     stdio: ['ignore', 'pipe', 'pipe'] });
   if (result.error) throw result.error;
-  if (result.status !== 0) throw new Error(`Lake could not load the workspace: ${(result.stderr || result.stdout || '').trim().split('\n').slice(-3).join(' ')}`);
+  if (result.status !== 0) throw new Error(`Lake could not load the workspace: ${stepOutput(result).split('\n').slice(-3).join(' ')}`);
   const entry = JSON.parse(result.stdout.trim().split(/\r?\n/).filter(Boolean).pop());
   if (!Array.isArray(entry?.native) || entry.native.some(item => typeof item?.package !== 'string'))
     throw new Error('Unexpected Lake native-package inventory');

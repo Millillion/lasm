@@ -12,6 +12,7 @@ import { basename, dirname, join, relative, resolve } from 'node:path';
 import { jsRuntime } from './js-runtime.mjs';
 import { targetHintAmong } from './cli-names.mjs';
 import { missingImportHints } from './import-hints.mjs';
+import { stepOutput } from './step-output.mjs';
 
 const runtimeTargets = ['node', 'bun', 'deno'];
 const edgeOnlyTargets = ['workers', 'vercel-edge', 'netlify-edge', 'deno-deploy', 'supabase-edge'];
@@ -452,7 +453,7 @@ export async function runDev(options, hooks = {}) {
       }
     } catch (error) {
       clearStatus();
-      const detail = [error.stdout, error.stderr].filter(Boolean).join('\n').trim();
+      const detail = stepOutput(error);
       const text = formatLeanDiagnostics(detail || error.message, project);
       process.stderr.write(text.slice(-12000) + '\n');
       if (detail && !text.includes(error.message.split('\n')[0]) && !/Command failed/.test(error.message)) process.stderr.write(error.message.split('\n')[0] + '\n');

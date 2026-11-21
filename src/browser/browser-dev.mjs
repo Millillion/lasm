@@ -8,6 +8,7 @@ import { existsSync } from 'node:fs';
 import { dirname, join, resolve, relative } from 'node:path';
 
 import { startStaticServer } from './static-server.mjs';
+import { stepOutput } from '../step-output.mjs';
 
 // lasm dev's arguments, --target browser's among them, are parsed by
 // src/dev.mjs (parseDevArguments), which calls runBrowserDev with them.
@@ -34,7 +35,7 @@ export async function runBrowserDev(options) {
         onLog: text => process.stderr.write(text + '\n') });
       return { ok: true, seconds: (Date.now() - started) / 1000 };
     } catch (error) {
-      const errors = formatLeanDiagnostics([error.stdout, error.stderr].filter(Boolean).join('\n').trim() || error.message, project);
+      const errors = formatLeanDiagnostics(stepOutput(error) || error.message, project);
       process.stderr.write(errors + '\n');
       return { ok: false, seconds: (Date.now() - started) / 1000, errors };
     }

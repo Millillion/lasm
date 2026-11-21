@@ -14,6 +14,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { basename, delimiter, join } from 'node:path';
+import { stepOutput } from './step-output.mjs';
 
 const markerFile = project => join(project, '.lake', 'lasm', 'editor.json');
 const readMarker = project => { try { return JSON.parse(readFileSync(markerFile(project), 'utf8')); } catch { return undefined; } };
@@ -58,7 +59,7 @@ export function setupEditor({ project, prefix, version, native = [], log = conso
     if (!linked) run(elan.executable, ['toolchain', 'link', toolchain, prefix], options);
     run(elan.executable, ['override', 'set', toolchain], options);
   } catch (error) {
-    const message = String(error.stderr ?? error.message).trim().split('\n')[0];
+    const message = (stepOutput(error) || String(error.message)).trim().split('\n')[0];
     log(`[lasm] Editor: could not set up elan toolchain ${toolchain}: ${message}`);
     return { status: 'failed', toolchain, message };
   }

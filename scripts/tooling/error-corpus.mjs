@@ -15,6 +15,7 @@
 // published package before the fix was released).
 import { mkdirSync, chmodSync, existsSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:net';
+import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { runLasm, messageProblems, temporaryDirectory, writeTree, removeTree, options, versionAtLeast, summary, tail } from './lib.mjs';
 import { inventoryCoverage } from './error-inventory.mjs';
@@ -136,6 +137,20 @@ export const cases = [
   // A web API the target lacks, used without its availability guard (0.3-10, 0.3-11): refused, with the guard to use.
   { id: 'web-api-unguarded', kind: 'build', args: ['build', 'Main.lean'], files: { 'Main.lean': 'import Lasm.JS\nimport Lasm.JS.Web.Html\nimport Lasm.JS.Web.Webgpu\nopen Lasm.JS Lasm.JS.Web\ndef main : IO Unit := do\n  let gpu ← (← navigator).gpu\n  IO.println (← gpu.getPreferredCanvasFormat).val\n' },
     expect: /Lasm\.JS\.Web\.Navigator\.gpu \(api\.Navigator\.gpu\) is not available on --target node[\s\S]*availability guard/, fixedIn: '0.10.0' },
+  // Lake notices on stderr ("info: dep: remote URL changed", as a Git insteadOf
+  // rewrite prints on every run) beside the entry module's Lean error, which
+  // `lake lean` writes to stdout: both are reported (#315). The dependency is a
+  // local Git repository reached through the rewrite; it is never imported.
+  { id: 'lean-error-with-lake-notice', kind: 'build', args: ['build', 'Main.lean'], fixedIn: '0.10.1',
+    files: project({ 'Main.lean': 'def main : IO Unit := IO.println undefinedName\n', 'dep-repo/lakefile.toml': 'name = "dep"\nversion = "0.1.0"\n',
+      'dep-repo/lean-toolchain': 'leanprover/lean4:v4.35.0\n' }),
+    setup: dir => {
+      const git = args => execFileSync('git', ['-c', 'user.name=corpus', '-c', 'user.email=corpus@example.invalid', '-c', 'commit.gpgsign=false', ...args], { cwd: join(dir, 'dep-repo'), stdio: 'ignore' });
+      git(['init', '-q', '-b', 'main']); git(['add', '-A']); git(['commit', '-qm', 'dep']);
+      writeFileSync(join(dir, 'lakefile.toml'), lakefile + `\n[[require]]\nname = "dep"\ngit = ${JSON.stringify(dir.replace(/\\/g, '/') + '/dep-alias')}\nrev = "main"\n`);
+    },
+    env: dir => ({ GIT_CONFIG_COUNT: '1', GIT_CONFIG_KEY_0: `url.${dir.replace(/\\/g, '/')}/dep-repo.insteadOf`, GIT_CONFIG_VALUE_0: `${dir.replace(/\\/g, '/')}/dep-alias` }),
+    expect: /remote URL changed[\s\S]*Main\.lean:1:\d+: error: Unknown identifier `undefinedName`[\s\S]*Build failed\. Fix the error above/ },
   { id: 'lean-type-error', kind: 'build', args: ['build', 'Main.lean'], files: project({ 'Main.lean': 'def main : IO Unit := IO.println (1 + "x")\n' }), expect: /Main\.lean:1:\d+: error/ },
   { id: 'lean-syntax-error', kind: 'build', args: ['build', 'Main.lean'], files: { 'Main.lean': 'def main : IO Unit :=\n  IO.println "hi" (\n' }, expect: /Main\.lean:\d+:\d+: error/ },
   { id: 'lean-invalid-utf8', kind: 'build', args: ['build', 'Main.lean'], files: { 'Main.lean': Buffer.from([0xff, 0xfe, 0x20, 0x0a]) }, expect: /Main\.lean:1:0: error/ },
