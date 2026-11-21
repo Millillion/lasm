@@ -86,37 +86,17 @@ a command-line program. See [which HTTP server to use](#which-http-server-to-use
 ### Editor
 
 Lean's editor support (the [Lean 4 extension for VS Code](https://marketplace.visualstudio.com/items?itemName=leanprover.lean4),
-or any editor running Lean's language server) works on Lasm projects once the
-editor uses Lasm's own Lean, whose standard library includes `Lasm.JS`,
-`Lasm.UI` and the rest (0.3.0):
+or any editor running Lean's language server) works on Lasm projects with the
+project's own Lean toolchain: `lean-toolchain` says `leanprover/lean4:v4.35.0`,
+which is exactly the Lean that Lasm uses, and elan (which the extension
+installs) provides it. The project's `lakefile.toml` requires Lasm's library
+(`Lasm.JS`, `Lasm.UI` and the rest) as a Lake package. `lasm init` writes this
+in the templates that use the library, and `lasm editor` adds it to an
+existing project:
 
 ```sh
-npx lasm editor        # in the project; lasm init, lasm dev and lasm build also do it
+npx lasm editor        # in the project, once
 ```
-
-`lasm editor` links Lasm's Lean 4.35.0 (with its library) as an
-[elan](https://github.com/leanprover/elan) toolchain named `lasm-4.35.0-…` and sets
-it as this directory's elan override. The editor then resolves every
-`import Lasm.*`, with hovers, completion and go-to-definition, using exactly the
-Lean that `lasm build` uses. Your files are not changed (`lean-toolchain` stays
-`leanprover/lean4:v4.35.0`); the override is per machine and per directory, and
-`elan override unset` removes it. When the project's Lake packages have C code
-(`extern_lib`, `precompileModules`, for example UnicodeBasic), it links Lean with
-its C compiler and headers, as `lasm build` uses for them, so `lake build` and the
-editor's `lake setup-file` can compile that C; run `lasm editor` again after the
-project gains or loses C code. `lasm init` does it up front when Lasm's Lean is
-already installed on the machine (it never downloads); otherwise the first build
-does. Each project gets one line saying what was done; later runs are silent. After it runs the first time, restart the Lean
-server in the editor (VS Code: *Lean 4: Restart Server*). elan comes with the
-VS Code extension; without elan, `lasm` prints how to get it. `LASM_EDITOR=0`
-stops `lasm init`, `lasm dev` and `lasm build` from doing this automatically (they never do it
-on CI).
-
-Most of `Lasm.JS.Web`, `Lasm.JS.Node` and the other generated bindings ship as
-source and are compiled the first time a program imports them. In the editor,
-Lake builds them: the project's `lakefile.toml` requires Lasm's library as a
-Lake package (`lasm init` writes this in the templates that use it, `lasm editor` adds it to an existing
-project):
 
 ```toml
 [[require]]
@@ -127,7 +107,23 @@ path = ".lake/lasm-library"
 `.lake/lasm-library` is a link that every lasm command (`lasm init`, `lasm dev`,
 `lasm build`, `lasm editor`) makes or repairs; `.lake/` is not in git. **On a
 fresh clone, run any lasm command once** (`npm run dev`, `npx lasm editor`): a
-plain `lake build` needs the link.
+plain `lake build` needs the link. The editor then resolves every
+`import Lasm.*`, with hovers, completion and go-to-definition. Most of
+`Lasm.JS.Web`, `Lasm.JS.Node` and the other generated bindings ship as source,
+and Lake builds each one the first time a file imports it, in the editor too.
+Restart the Lean server after the first setup (VS Code: *Lean 4: Restart Server*).
+
+Lasm changes nothing in elan, so `lake build` of your native targets (a
+`lean_exe`, tests) keeps using Lean's own toolchain, C compiler included.
+Lasm 0.3.0 to 0.10.0 instead set an elan override to Lasm's toolchain
+(`lasm-4.35.0-…`) on the project directory, which left a native `lake build` of a
+`lean_exe` without Lean's C compiler (issue #343). `lasm build`, `lasm dev`,
+`lasm init` and `lasm editor` remove that override and print one line when they
+do (`elan override unset` in the project does the same). `lasm build` and
+`lasm dev` also say once when a project imports `Lasm.*` but its lakefile does
+not require Lasm's package yet. `LASM_EDITOR=0` turns both off, and they never
+run on CI. `lasm editor` also writes `lean-toolchain` if the project has none.
+Without elan, `lasm` prints how to get it.
 
 ## 3. Call an npm package from Lean
 

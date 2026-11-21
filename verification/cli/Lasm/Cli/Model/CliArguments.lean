@@ -109,7 +109,7 @@ Profiles: lasm build makes release builds (optimized, byte-reproducible, for
 deployment); --dev skips the size optimizations for a faster build. lasm run
 (lasm Main.lean) and lasm dev make dev builds; --release makes a release build.
 lasm dev watches the sources, rebuilds and restarts the program after each change.
-lasm editor makes the Lean editor resolve import Lasm.* (elan toolchain for this project).
+lasm editor makes the Lean editor resolve import Lasm.* (Lasm's Lake package for this project).
 Application arguments must follow --."
 
 /-- `text.replace(/[A-Z]/g, c => c.toLowerCase())`. -/
