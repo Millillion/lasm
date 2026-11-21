@@ -283,7 +283,7 @@ export async function run(bytes) {
       catch (error) { if (error instanceof DomRefusal) return; throw error; }
       const expected = modelTree(modelRoot), got = seen[i];
       if (JSON.stringify(expected) !== JSON.stringify(got))
-        fail(`frame ${i}: the applier's DOM is not the decoder's`, { ...firstDifference(got, expected), frames, ops: a.ok });
+        fail(`frame ${i}: the applier's DOM is not the decoder's at ${JSON.stringify(firstDifference(got, expected))}`, { frames, ops: a.ok });
     }
     if (refused && !answers[seen.length]?.error) fail(`frame ${seen.length}: the applier refuses what the decoder reads`, { frames, decoder: answers[seen.length] });
   } finally { ui.unmount(); }
