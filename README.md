@@ -27,10 +27,10 @@ account, so "tested" means the platform's local tooling, not production
 | Platform | Build with `--target` | Tested in CI with | Since | How well tested |
 | --- | --- | --- | --- | --- |
 | Node.js 24+ (Linux, macOS, Windows; Docker, Kubernetes, Cloud Run, Fly.io, Railway, Render, Heroku) | `node` (default) | Node 24 and 26 on Linux (x64, arm64), macOS (x64, arm64) and Windows x64; Docker images, read-only, 512 MB | 0.1.0 | L3 |
-| Bun / Deno | `bun` / `deno` | Bun 1.4.4 and Deno 2.9.6 on the same five platforms | 0.2.0 | L2 |
+| Bun / Deno | `bun` / `deno` | Bun 1.4.4 and Deno 2.9.6 on the same five platforms | 0.2.0 | L0 |
 | Cloudflare Workers | `workers` | `wrangler dev` (workerd), Free-plan budgets enforced | 0.2.0 | L3 |
 | Vercel Functions / Vercel Edge | `vercel` / `vercel-edge` | `vercel build` offline; Lambda Node 24 image; Vercel's `edge-runtime` | 0.1.0 / 0.2.0 | L2 |
-| Netlify Functions / Netlify Edge | `netlify` / `netlify-edge` | `netlify build` and `netlify dev`, offline | 0.1.0 / 0.2.0 | L2 |
+| Netlify Functions / Netlify Edge | `netlify` / `netlify-edge` | `netlify build` and `netlify dev`, offline | 0.1.0 / 0.2.0 | — |
 | Deno Deploy | `deno-deploy` | Deno 2.9.6 | 0.2.0 | L2 |
 | Supabase Edge Functions | `supabase-edge` | Supabase's `edge-runtime` image | 0.2.0 | L2 |
 | AWS Lambda (.zip or container) / Lambda@Edge | `lambda` / `lambda-edge` | `public.ecr.aws/lambda/nodejs:24` via the Runtime Interface Emulator, x86_64 and arm64; `sam local` | 0.1.0 | L2 |
