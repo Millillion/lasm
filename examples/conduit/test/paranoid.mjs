@@ -13,7 +13,7 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { createWriteStream, existsSync, mkdirSync, readFileSync, statSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { join } from 'node:path';
 import { pipeline } from 'node:stream/promises';
 import { Readable } from 'node:stream';
 import { fileURLToPath } from 'node:url';
@@ -43,11 +43,11 @@ if (!existsSync(join(official, 'bin', 'lake'))) {
   execFileSync('tar', ['--zstd', '-xf', archive, '-C', cache], { stdio: 'inherit' });
 }
 
-const { provisionLean } = await import('@lasm/cli/src/managed-lean.mjs');
-const lasmLean = await provisionLean(join(root, 'Conduit.lean'), { modules: 'extended' });
-const lasmLib = join(dirname(dirname(lasmLean.lake)), 'lib', 'lean');
+const { lasmLean: provision } = await import('@lasm/cli/lean');
+const lasmLean = await provision(join(root, 'Conduit.lean'));
+const lasmLib = lasmLean.libraryDirectory;
 const version = bin => execFileSync(bin, ['--version'], { encoding: 'utf8' }).trim();
-const a = version(join(official, 'bin', 'lean')), b = version(join(dirname(lasmLean.lake), 'lean'));
+const a = version(join(official, 'bin', 'lean')), b = version(lasmLean.lean);
 if (a.match(/commit (\w+)/)?.[1] !== b.match(/commit (\w+)/)?.[1]) throw new Error(`different Lean builds: ${a} / ${b}`);
 
 const env = { ...process.env, LEAN_PATH: [lasmLib, join(root, '.lake', 'build', 'lib', 'lean')].join(':'),

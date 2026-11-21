@@ -36,8 +36,8 @@ function lean() {
   let lake;
   return (async () => {
     try {
-      const { provisionLean } = await import('@lasm/cli/src/managed-lean.mjs');
-      const l = await provisionLean(join(root, 'Conduit.lean'), { modules: 'extended',
+      const { lasmLean } = await import('@lasm/cli/lean');
+      const l = await lasmLean(join(root, 'Conduit.lean'), {
         progress: ({ stage }) => stage && console.error(`[lean] ${stage}`) });
       lake = l.lake;
     } catch (error) {
