@@ -24,12 +24,17 @@
 //   the values differ between runs, while their order (which event came
 //   first) is still compared. Their count and that each is above 10^18 are
 //   compared as facts.
+// - The browser page's bundle names (app.<hash>.js, app.<hash>.wasm in GET / and
+//   GET /app.js) become app.<hash>.js: the hash is a fingerprint of the compiled
+//   client, which changes with every Lasm release and every edit of the page; the
+//   rest of both bodies is still compared byte for byte.
 // Nothing else is: ids, amounts, balances and statuses are the API test's own
 // and the same everywhere.
 import { fileURLToPath } from 'node:url';
 import { decodeBody, main, normalizeWith, selfTestCompare } from '../../../scripts/equivalence/traffic.mjs';
 
 const TIMESTAMP = /"timestamp":"(\d+)"/g;
+const BUNDLE = /\bapp\.[0-9a-f]{12}\.(js|wasm)\b/g;
 
 export function normalize({ exchanges }, target = 'node') {
   // The rank of each timestamp among all the responses carried.
@@ -45,7 +50,7 @@ export function normalize({ exchanges }, target = 'node') {
   const ts = n => (rank.has(n) ? `<ts#${rank.get(n)}>` : n);
   const scrub = (text, where) => where === 'path'
     ? text.replace(/([?&]after=)(\d+)/g, (_, k, n) => k + ts(n))
-    : text.replace(TIMESTAMP, (_, n) => `"timestamp":"${ts(n)}"`);
+    : text.replace(TIMESTAMP, (_, n) => `"timestamp":"${ts(n)}"`).replace(BUNDLE, (_, ext) => `app.<hash>.${ext}`);
   return normalizeWith(exchanges, target, {
     scrub,
     facts: () => ({ timestamps: { count: sorted.length, allAbove1e18: sorted.every(n => BigInt(n) > 10n ** 18n) } }),
