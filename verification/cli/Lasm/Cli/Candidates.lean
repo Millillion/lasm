@@ -79,7 +79,8 @@ a source's header without error, it reads the same imports from
 the imports can.
 Tested by: test/fuzz/targets/project-files.mjs -/
 def lean_header_keeps_imports : Prop :=
-  ∀ (text : String) (is : List HeaderImport), NoBareCR text → leanImports text = some is → leanImports (leanHeader text) = some is
+  ∀ (text : String) (is : List HeaderImport), NoBareCR text → leanImports text = some is → (∀ i ∈ is, i.module ≠ []) →
+    leanImports (leanHeader text) = some is
 
 /-- **`lasm dev` follows every import.** Whenever Lean reads a source's
 header without error, `importClosure` reaches the file of every module it

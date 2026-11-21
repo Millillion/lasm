@@ -227,6 +227,16 @@ function modelTree(t) {
   return ['e', t.id, t.ns, t.tag, slots, t.kids.map(modelTree)];
 }
 
+// Where two trees first differ: the path of child indexes, and both nodes
+// there without their children (the failure's detail stays short enough to read).
+function firstDifference(applier, decoder, path = []) {
+  const shallow = t => t[0] === 'e' ? t.slice(0, 5).concat([`${t[5].length} children`]) : t;
+  if (applier[0] === 'e' && decoder[0] === 'e' && JSON.stringify(shallow(applier)) === JSON.stringify(shallow(decoder)))
+    for (let k = 0; k < applier[5].length; k++)
+      if (JSON.stringify(applier[5][k]) !== JSON.stringify(decoder[5][k])) return firstDifference(applier[5][k], decoder[5][k], [...path, k]);
+  return { at: path, applier: shallow(applier), decoder: shallow(decoder) };
+}
+
 // ---- The run ----
 function chunks(bytes) {
   const out = [];
@@ -272,7 +282,8 @@ export async function run(bytes) {
       try { for (const op of a.ok) applyModel(modelRoot, op); }
       catch (error) { if (error instanceof DomRefusal) return; throw error; }
       const expected = modelTree(modelRoot), got = seen[i];
-      if (JSON.stringify(expected) !== JSON.stringify(got)) fail(`frame ${i}: the applier's DOM is not the decoder's`, { frames, applier: got, decoder: expected, ops: a.ok });
+      if (JSON.stringify(expected) !== JSON.stringify(got))
+        fail(`frame ${i}: the applier's DOM is not the decoder's`, { ...firstDifference(got, expected), frames, ops: a.ok });
     }
     if (refused && !answers[seen.length]?.error) fail(`frame ${seen.length}: the applier refuses what the decoder reads`, { frames, decoder: answers[seen.length] });
   } finally { ui.unmount(); }
