@@ -1065,6 +1065,10 @@
       ],
       "reason": "the writer is modelled byte for byte, with node:zlib (deflateRawSync, crc32) a parameter; zip_deterministic proved; zip_reads_back stays a candidate (its ZIP reader is the test's, an outside oracle)"
     },
+    "src/step-output.mjs": {
+      "status": "pending",
+      "reason": "a failed step's reported output (stderr, then stdout, each once; issue #315): a pure function of two strings, to model"
+    },
     "src/system-git.mjs": {
       "status": "exempt",
       "kind": "io",

@@ -172,7 +172,7 @@ test('Vite plugin, development: builds in a long-lived worker, hot updates, erro
     // A failing rebuild goes to Vite's error overlay.
     state.fail = Object.assign(new Error('worker message'), { stdout: 'out', stderr: 'Main.lean:1:0: error: oops' });
     assert.deepEqual(await p.handleHotUpdate({ file: source, server }), []);
-    assert.deepEqual(sent[1], { type: 'error', err: { message: `lasm build ${join('src', 'Main.lean')} failed:\nout\nMain.lean:1:0: error: oops`, stack: '', plugin: 'lasm' } });
+    assert.deepEqual(sent[1], { type: 'error', err: { message: `lasm build ${join('src', 'Main.lean')} failed:\nMain.lean:1:0: error: oops\nout`, stack: '', plugin: 'lasm' } });
     state.fail = new Error('only a message');
     await p.handleHotUpdate({ file: source, server });
     assert.equal(sent[2].err.message, `lasm build ${join('src', 'Main.lean')} failed:\nonly a message`);
