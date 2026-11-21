@@ -132,14 +132,14 @@ export const platforms = {
     serve: 'node test/netlify-serve.mjs {port}',
     store: 'node:sqlite in the temporary directory (per instance)',
   },
-  azure: {
-    build: 'build:azure',
+  'azure-functions': {
+    build: 'build:azure-functions',
     serve: 'cd azure-functions && func start --port {port}',
     store: 'node:sqlite in the temporary directory (per instance)',
   },
-  gcf: {
-    build: 'build:gcf',
-    serve: 'cd gcf && node node_modules/@google-cloud/functions-framework/build/src/main.js --target=lasm --port={port}',
+  'cloud-functions': {
+    build: 'build:cloud-functions',
+    serve: 'cd cloud-functions && node node_modules/@google-cloud/functions-framework/build/src/main.js --target=lasm --port={port}',
     store: 'node:sqlite in the temporary directory (per instance)',
   },
 };

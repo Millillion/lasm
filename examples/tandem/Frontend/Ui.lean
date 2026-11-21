@@ -232,9 +232,14 @@ def update (msg : Msg) (m : Model) : Model × List Effect :=
           kick m c
       else refresh m { m with rp }
     | .error _ => (m, [])
+  -- The socket is open: catch up with what was pushed before it opened. If
+  -- a sync is in flight, the server may have answered it before the socket
+  -- opened (its reply is the log as it was then, and later commits were
+  -- pushed to no socket of this tab), so sync again when it returns (#369).
   | .wsOpen =>
-    let (m, c) := syncCmd { m with live := .socket, wsFailures := 0, offline := false }
-    (m, c)
+    let m := { m with live := .socket, wsFailures := 0, offline := false }
+    if m.inflight.isSome then ({ m with behind := true }, [])
+    else syncCmd m
   | .wsClosed opened =>
     let failures := if opened then 0 else m.wsFailures + 1
     -- Twice refused before opening: the server has no WebSockets; long-poll.

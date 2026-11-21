@@ -63,8 +63,8 @@ account, nothing deployed.
 | AWS Lambda (container image) | `npm run build:lambda-image` | `sam local start-api` ([`deploy/lambda-image/`](deploy/lambda-image/)) | `node:sqlite` in `/tmp` (per instance) |
 | Vercel Functions | `vercel build` ([`vercel.json`](vercel.json)) | Vercel's Node launcher (`@vercel/node`, what `vercel dev` runs) in AWS's Lambda Node 24 image | `node:sqlite` in `/tmp` (per instance) |
 | Netlify Functions | `netlify build --offline` ([`netlify.toml`](netlify.toml)) | the zip it bundles, with Netlify's bootstrap, in AWS's Lambda Node 24 image (Netlify Functions run on Lambda) | `node:sqlite` in `/tmp` (per instance) |
-| Azure Functions | `npm run build:azure` | Azure Functions Core Tools 4.16 `func start` | `node:sqlite` in the temporary directory (per instance) |
-| Google Cloud Functions | `npm run build:gcf` | the Functions Framework | `node:sqlite` in the temporary directory (per instance) |
+| Azure Functions | `npm run build:azure-functions` | Azure Functions Core Tools 4.16 `func start` | `node:sqlite` in the temporary directory (per instance) |
+| Google Cloud Functions | `npm run build:cloud-functions` | the Functions Framework | `node:sqlite` in the temporary directory (per instance) |
 | Cloudflare Workers | `npm run build:workers` | `wrangler dev` (workerd) | Cloudflare D1 (local) |
 | Vercel Edge | `vercel build` ([`deploy/vercel-edge/vercel.json`](deploy/vercel-edge/vercel.json)) | Vercel's `edge-runtime` package | memory (per isolate) |
 | Netlify Edge | `netlify build --offline` ([`deploy/netlify-edge/netlify.toml`](deploy/netlify-edge/netlify.toml)) | the edge function in Deno with `@netlify/blobs`' local server, as `netlify dev` runs it | Netlify Blobs (local) |
@@ -222,9 +222,8 @@ platform's own store.
 - **SQLite.** Each binding module returns a `Sql` (three functions: `all`, `run`, `batch`), and
   `Server/Sql.lean` builds Conduit's `Store` from it, so another SQLite is another `Sql`:
   - `Server/NodeSqlite.lean`: node:sqlite through Lasm.JS.Node.Sqlite (`DatabaseSync.exec`,
-    `prepare`). Two calls are still by hand, because the generated module cannot express them
-    yet: the constructor (`@[js "node:sqlite" "new DatabaseSync"]`) and running a statement
-    whose parameters include SQL `NULL`. Deno runs the same module: Deno implements
+    `DatabaseSync.new`, `prepare`, and `StatementSync.run`/`all`, whose parameters are
+    `Option`s: `none` is SQL `NULL`). Deno runs the same module: Deno implements
     `node:sqlite`.
   - `Server/D1.lean`: Lasm.JS.Cloudflare.D1. The Worker's fetch handler receives its bindings
     typed (`structure Env where DB : D1Database … deriving FromJS`, `ServerWorkers.lean`); D1's
@@ -289,10 +288,10 @@ build must not mention `node:sqlite`. The full guide is [docs/JS_BINDINGS.md](..
 - **Vercel / Netlify**: connect the repository; [`vercel.json`](vercel.json) and
   [`netlify.toml`](netlify.toml) run the build. For their edge runtimes use
   `deploy/vercel-edge/vercel.json` and `deploy/netlify-edge/netlify.toml` instead.
-- **Azure Functions / Google Cloud Functions**: `npm run build:azure` writes `azure-functions/`
+- **Azure Functions / Google Cloud Functions**: `npm run build:azure-functions` writes `azure-functions/`
   (`func azure functionapp publish APP` there; [`deploy/package-hosted.mjs`](deploy/package-hosted.mjs) builds
-  `ServerFunction.lean` and adds the platform's own npm package); `npm run build:gcf` writes `gcf/` (`gcloud
-  functions deploy conduit --gen2 --runtime nodejs24 --trigger-http --entry-point lasm --source gcf`).
+  `ServerFunction.lean` and adds the platform's own npm package); `npm run build:cloud-functions` writes `cloud-functions/` (`gcloud
+  functions deploy conduit --gen2 --runtime nodejs24 --trigger-http --entry-point lasm --source cloud-functions`).
 - **Deno Deploy**: `npm run build:deno-deploy`; the entrypoint is `deno/main.mjs`.
 - **Supabase**: `npx supabase link`, `npx supabase db push` (the table), `npm run
   build:supabase-edge`, then `npx supabase functions deploy conduit`.

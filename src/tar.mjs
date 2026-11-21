@@ -8,7 +8,8 @@
 // link names (`L`, `K`), base-256 numbers, signed or unsigned checksums.
 // Entries are regular files (`0`, `\0`, `7`), directories, symbolic links, hard
 // links, devices and FIFOs; the last three are reported for callers to refuse.
-// Everything else is refused: a bad checksum, an unknown entry type, a sparse
+// Everything else is refused: a bad checksum, a numeric field that is not a
+// number in any header (an extended header's included), an unknown entry type, a sparse
 // file, data on an entry that cannot have any, a name that is not UTF-8, a pax
 // record that does not parse or is empty, an extended header not padded with NULs, an archive that ends before its end-of-archive
 // block. Where several extended headers name one field, the first wins, as in
@@ -141,6 +142,16 @@ export class TarParser {
     if (!checksumMatches(header)) fail('a header checksum does not match');
     const flag = String.fromCharCode(header[156]);
     const size = number(header.subarray(124, 136), 'a size');
+    // Every header's numeric fields must be numbers, an extended header's too
+    // (whose own mode, owner, time and device numbers mean nothing), as tarfile
+    // and GNU tar read them.
+    const numbers = {
+      mode: number(header.subarray(100, 108), 'a mode') & 0o7777,
+      uid: number(header.subarray(108, 116), 'a uid'),
+      gid: number(header.subarray(116, 124), 'a gid'),
+      mtime: number(header.subarray(136, 148), 'a time'),
+    };
+    for (const at of [329, 337]) number(header.subarray(at, at + 8), 'a device number');
     if (flag === 'x' || flag === 'g' || flag === 'L' || flag === 'K') {
       if (size > maximumMetaBytes) fail('an extended header is too large');
       // The padding is read with the data, and must be NULs.
@@ -157,15 +168,14 @@ export class TarParser {
     const prefix = ustar ? text(header.subarray(345, 500)) : '';
     const pending = this.#pending;
     this.#pending = {};
-    for (const at of [329, 337]) number(header.subarray(at, at + 8), 'a device number');
     const entry = {
       path: pending.path ?? (prefix ? `${prefix}/${name}` : name),
       type,
-      mode: number(header.subarray(100, 108), 'a mode') & 0o7777,
-      uid: number(header.subarray(108, 116), 'a uid'),
-      gid: number(header.subarray(116, 124), 'a gid'),
+      mode: numbers.mode,
+      uid: numbers.uid,
+      gid: numbers.gid,
       size: pending.size ?? size,
-      mtime: pending.mtime ?? number(header.subarray(136, 148), 'a time'),
+      mtime: pending.mtime ?? numbers.mtime,
       linkpath: pending.linkpath ?? text(header.subarray(157, 257)),
     };
     if (type !== 'File' && entry.size !== 0) fail(`a ${type} entry has data`);
