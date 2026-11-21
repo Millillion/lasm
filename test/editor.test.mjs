@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { autoSetupEditor, compileProjectLibrary, directoryOverride, lasmToolchainPattern, linkProjectLibrary, removeLasmOverride, setupEditor } from '../src/editor.mjs';
@@ -109,7 +109,9 @@ const elanFixture = (root, overrides = {}) => {
 test('Lasm\'s own toolchain names, as older versions linked them', () => {
   for (const name of ['lasm-4.35.0-a88ecf8bf14e', 'lasm-4.35.0-c4a12e5df32a', 'lasm-4.36.0-rc2-0123456789ab'])
     assert.match(name, lasmToolchainPattern);
-  for (const name of ['leanprover/lean4:v4.35.0', 'lasm', 'lasm-4.35.0', 'my-lasm-4.35.0-a88ecf8bf14e', 'lasm-4.35.0-A88ECF8BF14E', 'lasm-4.35.0-a88ecf8bf14', 'lasm-x-a88ecf8bf14e'])
+  for (const name of ['lasm-14.35.0-a88ecf8bf14e', 'lasm-4.35.10-a88ecf8bf14e', 'lasm-10.0.0-a88ecf8bf14e']) assert.match(name, lasmToolchainPattern);
+  for (const name of ['leanprover/lean4:v4.35.0', 'lasm', 'lasm-4.35.0', 'my-lasm-4.35.0-a88ecf8bf14e', 'lasm-4.35.0-A88ECF8BF14E', 'lasm-4.35.0-a88ecf8bf14', 'lasm-x-a88ecf8bf14e',
+    'lasm-4.35.0-a88ecf8bf14e0', 'lasm-4.35.0-a88ecf8bf14e-x'])
     assert.doesNotMatch(name, lasmToolchainPattern);
 });
 
@@ -127,6 +129,19 @@ test('directoryOverride reads elan\'s override for exactly this directory', () =
     assert.equal(directoryOverride(home, '/x'), undefined);
     assert.equal(directoryOverride(home, 'C:\\Users\\me\\APP', 'win32'), 'b');
     assert.equal(directoryOverride(home, 'C:\\Users\\me\\APP', 'linux'), undefined);
+    assert.equal(directoryOverride(home, 'C:\\Users\\me\\other', 'win32'), undefined);
+    // Entries before any table, other keys, comments, spacing, a bad escape: as TOML reads them.
+    writeFileSync(join(home, 'settings.toml'), [`${JSON.stringify(project)} = "top"`, '[ overrides ]  # elan\'s', 'junk=[1]', 'more = [2]',
+      `#${JSON.stringify(project)} = "commented"`, '"bad\\q" = "x"', `x ${JSON.stringify(project)} = "prefixed"`, `${JSON.stringify(project)} = "mine"  # set by me`].join('\n'));
+    assert.equal(directoryOverride(home, project), 'mine');
+    assert.equal(directoryOverride(home, join(root, 'none')), undefined);
+    // elan records the real path: a symbolic link to the project, or a path that does not exist, compares as resolved.
+    if (process.platform !== 'win32') {
+      symlinkSync(project, join(root, 'link'));
+      assert.equal(directoryOverride(home, join(root, 'link')), 'mine');
+      writeFileSync(join(home, 'settings.toml'), `[overrides]\n${JSON.stringify(join(root, 'gone'))} = "g"\n`);
+      assert.equal(directoryOverride(home, join(root, 'gone', '..', 'gone')), 'g');
+    }
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
@@ -145,7 +160,7 @@ test('removeLasmOverride unsets only an override to Lasm\'s own toolchain, with 
     // elan fails: one line with the command to run, from stderr or the message.
     lines.length = 0;
     const failing = error => () => { throw error; };
-    assert.deepEqual(removeLasmOverride({ project, elan: { home, executable }, run: failing(Object.assign(new Error('Command failed'), { stderr: Buffer.from('error: locked\nmore') })), log: line => lines.push(line) }),
+    assert.deepEqual(removeLasmOverride({ project, elan: { home, executable }, run: failing(Object.assign(new Error('Command failed'), { stderr: Buffer.from('  error: locked\nmore') })), log: line => lines.push(line) }),
       { status: 'failed', toolchain: 'lasm-4.35.0-a88ecf8bf14e', message: 'error: locked' });
     assert.match(lines[0], /^\[lasm\] Editor: could not remove this directory's elan override to Lasm's toolchain lasm-4\.35\.0-a88ecf8bf14e \(error: locked\); run `elan override unset` here/);
     assert.equal(removeLasmOverride({ project, elan: { home, executable }, run: failing(Object.assign(new Error('spawn elan ETIMEDOUT\nstack'), { stderr: '' })), log: () => {} }).message, 'spawn elan ETIMEDOUT');

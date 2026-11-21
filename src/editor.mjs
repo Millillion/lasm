@@ -46,9 +46,9 @@ export function directoryOverride(elanHome, directory, platform = process.platfo
   const wanted = [directory, resolve(directory), canonical(directory)];
   let overrides = false;
   for (const line of text.split(/\r?\n/)) {
-    const table = /^\s*\[([^\]]*)\]\s*$/.exec(line);
+    const table = /^\s*\[([^\]]*)\]\s*(?:#.*)?$/.exec(line);
     if (table) { overrides = table[1].trim() === 'overrides'; continue; }
-    const entry = overrides && /^\s*"((?:[^"\\]|\\.)*)"\s*=\s*"([^"]*)"\s*$/.exec(line);
+    const entry = overrides && /^\s*"((?:[^"\\]|\\.)*)"\s*=\s*"([^"]*)"\s*(?:#.*)?$/.exec(line);
     if (!entry) continue;
     let path;
     try { path = JSON.parse(`"${entry[1]}"`); } catch { continue; }

@@ -65,6 +65,13 @@ test('findElan: PATH (or Path) first, then ELAN_HOME/bin, then ~/.elan', () => {
   // No ELAN_HOME: ~/.elan.
   const found = findElan({ PATH: '' });
   if (found) assert.equal(found.home, join(homedir(), '.elan'));
+  if (process.platform !== 'win32') {
+    const saved = process.env.HOME, home = join(base, 'home');
+    mkdirSync(join(home, '.elan', 'bin'), { recursive: true }); writeFileSync(join(home, '.elan', 'bin', elanName), '');
+    process.env.HOME = home;
+    try { assert.deepEqual(findElan({ PATH: '' }), { home: join(home, '.elan'), executable: join(home, '.elan', 'bin', elanName) }); }
+    finally { if (saved === undefined) delete process.env.HOME; else process.env.HOME = saved; }
+  }
 });
 
 test('lasm editor: the directory with a lakefile, or the project around it; its exit code', async () => {
@@ -135,5 +142,9 @@ test('lasm editor removes an older Lasm\'s elan override, and exits 1 when elan 
   printed.length = 0;
   assert.equal(await runEditor({ input: bare.project }, { ...options, env: { ELAN_HOME: join(bare.base, 'none'), PATH: '' } }), 1);
   assert.match(printed.at(-1), /install the Lean 4 extension for VS Code \(it installs elan\), then run `npx lasm editor`/);
+  // lasm editor always says it, also after a lasm build did once.
+  printed.length = 0;
+  assert.equal(await runEditor({ input: bare.project }, { ...options, env: { ELAN_HOME: join(bare.base, 'none'), PATH: '' } }), 1);
+  assert.match(printed.at(-1), /install the Lean 4 extension/);
   assert.ok(existsSync(join(bare.project, 'lean-toolchain')));
 });
