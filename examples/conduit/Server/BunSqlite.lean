@@ -28,13 +28,13 @@ def «open» (path : String) : IO Sql := do
   let locked {α : Type} (act : IO α) : IO α := do
     lock.lock
     try act finally lock.unlock
-  -- The parameters go as one array: `statement.run([a, b])` binds `a` and `b`.
+  -- `statement.run(a, b)` binds `a` and `b`; `Data.null` is SQL `NULL`.
   let runOne (sql : String) (params : Array Data) : IO Nat := do
-    return rowId (← (← db.query sql).run #[params]).lastInsertRowid
+    return rowId (← (← db.query sql).run params).lastInsertRowid
   let sql : Sql := {
     -- Reads take the lock too: on this one connection, a read between a
     -- batch's statements would see its uncommitted writes.
-    all := fun sql params => locked do (← db.query sql).all #[params]
+    all := fun sql params => locked do (← db.query sql).all params
     run := fun sql params => locked (runOne sql params)
     batch := fun stmts => locked do
       discard <| db.run "BEGIN IMMEDIATE"

@@ -71,12 +71,12 @@ jobs:
           - platform: netlify
             title: Netlify Functions (netlify build offline; Netlify's bootstrap in the Lambda Node 24 image)
             build: netlify build --offline
-          - platform: azure
+          - platform: azure-functions
             title: Azure Functions (func start)
-            build: npm run build:azure
-          - platform: gcf
+            build: npm run build:azure-functions
+          - platform: cloud-functions
             title: Google Cloud Functions (Functions Framework)
-            build: npm run build:gcf
+            build: npm run build:cloud-functions
           - platform: deno-deploy
             title: Deno Deploy (Deno 2.9.6, Deno KV)
             build: npm run build:deno-deploy
@@ -169,7 +169,7 @@ jobs:
                   ln -s "$RUNNER_TEMP/wasi-tools/spin" "$T/node_modules/.bin/spin" ;;
               esac ;;
             netlify|netlify-edge) npm install --prefix "$T" --no-audit --no-fund netlify-cli@27.14.2 deno@2.9.6 ;;
-            azure)
+            azure-functions)
               # Azure Functions Core Tools 4.16.0, the archive its npm package downloads
               # (npm 11 skips that package's install script), checked by SHA-256.
               curl -fsSL --retry 3 -o "$RUNNER_TEMP/func.zip" https://cdn.functions.azure.com/public/4.0.308342/Azure.Functions.Cli.linux-x64.4.16.0.zip

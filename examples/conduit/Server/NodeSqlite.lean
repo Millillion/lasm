@@ -7,12 +7,8 @@ run concurrently, so every call takes one lock: `batch` runs in
 included) runs in the middle of it. Whole requests are isolated from each
 other by `Isolation` (`Server/Http.lean`).
 
-Two calls are not the generated ones, because the generated module cannot
-express them yet: `new DatabaseSync(path)` (Node documents the constructor,
-but the bindings have none: `openDatabase` below), and running a statement
-with SQL `NULL` among its parameters (`StatementSync.run`/`all` take
-`(double or bigint or boolean or DOMString or Uint8Array)...`, without the
-`null` Node accepts: `exec` below).
+SQL `NULL` is a parameter of `none` (the generated `run` and `all` take
+`Array (Option …)`).
 -/
 import Lasm.JS
 import Lasm.JS.Node.Sqlite
@@ -23,17 +19,19 @@ open Lasm.JS Lasm.JS.Node
 
 namespace Conduit.Server.NodeSqlite
 
-/-- `new DatabaseSync(path)` from node:sqlite (no generated constructor yet). -/
-@[js "node:sqlite" "new DatabaseSync"] opaque openDatabase : String → IO Value
-
-/-- `statement.<method>(...params)` with any parameters, `null` included
-(the generated `run` and `all` leave `null` out). -/
-def exec (st : StatementSync) (method : String) (params : Array Data) : IO Data :=
-  st.val.callMethod method params Data
+/-- A statement parameter: `none` is SQL `NULL`. -/
+def param : Data → IO (Option DoubleOrBigintOrBooleanOrDOMStringOrUint8Array)
+  | .null | .undefined => pure none
+  | .number n => pure (some (.double n))
+  | .bigint i => pure (some (.bigint i))
+  | .bool b => pure (some (.boolean b))
+  | .string s => pure (some (.domString s))
+  | .bytes b => pure (some (.uint8Array b))
+  | d => throw (IO.userError s!"node:sqlite: a statement parameter cannot be {d.describe}")
 
 /-- Opens (or creates) the database file and its tables. -/
 def «open» (path : String) : IO Sql := do
-  let db : DatabaseSync := { val := ← openDatabase path }
+  let db ← DatabaseSync.new (.domString path)
   for pragma in ["PRAGMA journal_mode = WAL", "PRAGMA foreign_keys = ON", "PRAGMA busy_timeout = 5000"] do
     db.exec pragma
   -- Prepared statements, by SQL text.
@@ -48,14 +46,12 @@ def «open» (path : String) : IO Sql := do
     lock.lock
     try act finally lock.unlock
   let runOne (sql : String) (params : Array Data) : IO Nat := do
-    return num (← exec (← prepare sql) "run" params) "lastInsertRowid"
+    return num (← (← prepare sql).run (← params.mapM param)) "lastInsertRowid"
   let sql : Sql := {
     -- Reads take the lock too: on this one connection, a read between a
     -- batch's statements would see its uncommitted writes.
     all := fun sql params => locked do
-      match ← exec (← prepare sql) "all" params with
-      | .array rows => return rows
-      | _ => return #[]
+      (← prepare sql).all (← params.mapM param)
     run := fun sql params => locked (runOne sql params)
     batch := fun stmts => locked do
       db.exec "BEGIN IMMEDIATE"
