@@ -87,22 +87,20 @@ def handleSync (env : Env) (doc : String) (body : String) : Async String := do
     -- Some operations of the request were in the log already. Usually an
     -- earlier request of this client appended and pushed them, but one whose
     -- commit succeeded and then reported an error appended them without a
-    -- push (found by the deterministic simulation, test/dst.mjs; also when
-    -- the retry carries newly typed operations too, #190). So push the reply,
-    -- the log from the client's cursor, which holds them (within one chunk):
-    -- a tab that is not typing hears of them, one that has them ignores it,
-    -- one that is behind catches up.
-    let known := added.length < req.ops.length
-    let replyPushed ← if known then
-        match reply with
-        | .ops _ _ (_ :: _) => do env.push doc (Wire.encodeReply reply); pure true
-        | _ => pure false
-      else pure false
-    -- What this request appended, unless the reply just pushed holds it all.
-    let covered := match reply with
-      | .ops start stop _ => replyPushed && start ≤ n && n + added.length ≤ stop
-      | .error _ => false
-    if !added.isEmpty && !covered then
+    -- push (found by the deterministic simulation, test/dst.mjs). So push
+    -- them again, from where the log holds them: a tab that is not typing
+    -- hears of them, one that has them ignores it, one that is behind
+    -- catches up. Not the reply (the log from this client's cursor): the
+    -- client may have them already, from a long-poll or a push of a later
+    -- commit, so its cursor can be past them (#369), or they can be more
+    -- than a chunk behind it (#190 pushed the reply).
+    if added.length < req.ops.length then
+      if let .ops .. := reply then
+        let earlier := (← positions env.db doc req.ops).filter fun (s, _) => s < n || n + added.length ≤ s
+        for (a, b, ops) in runs earlier do
+          env.push doc (Wire.encodeReply (.ops a b ops))
+    -- What this request appended.
+    if !added.isEmpty then
       env.push doc (Wire.encodeReply (.ops n (n + added.length) added))
     return Wire.encodeReply reply
 
