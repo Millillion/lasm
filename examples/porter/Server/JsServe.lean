@@ -68,10 +68,4 @@ def serveBun (handler : Web.Handler) : IO Unit := do
   IO.eprintln s!"Listening on {← (← server.url).href}"
   forever
 
-/-- `Reflect.has(globalThis, name)`. -/
-@[js "globalThis" "Reflect.has"] opaque reflectHas : Value → String → IO Bool
-
-/-- Whether the program runs on Deno. -/
-def onDeno : IO Bool := do reflectHas (← global) "Deno"
-
 end Porter.Server.JsServe
