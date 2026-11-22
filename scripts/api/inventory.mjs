@@ -17,7 +17,9 @@
 // - a builtin JavaScript module: `lasm:name`;
 // - an npm entry point: `@lasm/cli`, `@lasm/cli/<subpath>`, `@lasm/create`, and each bin name.
 // Entry ids follow the brief's scheme: A1–A56 (seeded), sub-ids A9.1, and
-// milestone-prefixed ids 0.1-1 … 0.7-n.
+// milestone-prefixed ids 0.1-1 … 0.7-n with sub-ids 0.4-17.1. An entry has a
+// table row; a detail heading (`### 0.4-17.1 …`) may define a sub-id of an
+// entry without a row of its own, and those are counted and checked too.
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -166,18 +168,59 @@ export function mentioned({ kind, name }, spans) {
   return spans.has(name);
 }
 
-/** Entry ids (first table cells starting with A or a digit), and malformed
- * ones (not A<n>, A<n>.<m> or 0.<milestone>-<n>). */
+/** A well-formed id: A<n>, A<n>.<m>, 0.<milestone>-<n> or 0.<milestone>-<n>.<m>. */
+export const idPattern = /^(A[1-9][0-9]*|0\.[1-7]-[1-9][0-9]*)(\.[1-9][0-9]*)?$/;
+
+/** Entry ids (first table cells starting with A or a digit), and malformed ones. */
 export function entryIds(markdown) {
   const ids = [], malformed = [];
   for (const m of markdown.matchAll(/^\|\s*([^|\s]+)\s*\|/gm)) {
     const id = m[1];
     // Header and separator rows, and tables whose first column is not an id.
     if (!/^[A0-9]/.test(id)) continue;
-    if (/^(A[1-9][0-9]*(\.[1-9][0-9]*)?|0\.[1-7]-[1-9][0-9]*)$/.test(id)) ids.push(id);
+    if (idPattern.test(id)) ids.push(id);
     else malformed.push(id);
   }
   return { ids, malformed };
+}
+
+/** The ids each detail heading opens with (`### 0.7-1 and 0.7-16: …`,
+ * `#### A8, A47, A48: …`, `### A41–A43: …`, `### 0.4-17.1 …`), with whether
+ * the heading continues an earlier one (`… (continued)`). Headings that do not
+ * start with an id-like token (`## 0.4 Node, Bun and Deno`) are skipped. */
+export function detailHeadings(markdown) {
+  const out = [];
+  for (const m of markdown.matchAll(/^#{2,6}[ \t]+(.*)$/gm)) {
+    const text = m[1];
+    const lead = /^((?:A\d|0\.\d+-)[^\s:,(]*(?:(?:,\s*|\s+and\s+|–)(?:A\d|0\.\d+-)[^\s:,(]*)*)/.exec(text);
+    if (!lead) continue;
+    const ids = lead[1].split(/,\s*|\s+and\s+|–/).map(id => id.replace(/[.:]+$/, ''));
+    out.push({ ids, continued: /\(continued\)/.test(text), heading: text });
+  }
+  return out;
+}
+
+/** Detail-only ids (defined by a heading, with no table row) and the problems
+ * with detail headings: a malformed id, a detail-only id that is not a sub-id
+ * of an entry with a row, and a detail-only id two headings define. */
+export function detailIds(markdown, tableIds = entryIds(markdown).ids) {
+  const rows = new Set(tableIds);
+  const ids = [], problems = [], seen = new Set();
+  for (const { ids: headingIds, continued } of detailHeadings(markdown)) {
+    for (const id of headingIds) {
+      if (!idPattern.test(id)) { problems.push(`detail id ${id} is not A<n>, A<n>.<m>, 0.<milestone>-<n> or 0.<milestone>-<n>.<m>`); continue; }
+      if (rows.has(id)) continue;
+      const parent = id.replace(/\.[1-9][0-9]*$/, '');
+      if (parent === id || !rows.has(parent)) {
+        problems.push(`detail id ${id} has no table row: give it one, or make it a sub-id of an entry that has one`);
+        continue;
+      }
+      if (seen.has(id)) { if (!continued) problems.push(`detail id ${id} is defined by two headings`); continue; }
+      seen.add(id);
+      ids.push(id);
+    }
+  }
+  return { ids, problems };
 }
 
 /** Problems: surfaces the inventory misses, bare A57+ ids, malformed and duplicate ids. */
@@ -191,7 +234,9 @@ export async function check(base = root, markdown = readDecisions(base)) {
   for (const id of ids) if (/^A\d+$/.test(id) && Number(id.slice(1)) > 56) problems.push(`entry id ${id}: new entries take milestone-prefixed ids (0.1-1, 0.7-1, …), not A57+`);
   const seen = new Set();
   for (const id of ids) { if (seen.has(id)) problems.push(`entry id ${id} is used twice`); seen.add(id); }
-  return { problems, surfaces: all, missing, ids };
+  const details = detailIds(markdown, ids);
+  problems.push(...details.problems);
+  return { problems, surfaces: all, missing, ids, detailIds: details.ids };
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
@@ -200,7 +245,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   else {
     const byKind = Map.groupBy(result.surfaces, s => s.kind);
     for (const [kind, list] of byKind) console.log(`${kind} (${list.length}): ${list.map(s => s.name).join(', ')}`);
-    console.log(`\n${result.ids.length} entries; ${result.problems.length} problems`);
+    console.log(`\n${result.ids.length} entries, ${result.detailIds.length} detail sub-entries; ${result.problems.length} problems`);
     for (const p of result.problems) console.log('  ' + p);
   }
   process.exitCode = result.problems.length ? 1 : 0;

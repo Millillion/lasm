@@ -51,7 +51,9 @@ apps. From then on, no stage may regress beyond the ratchet unless it records
 an explicit trade-off for Jordan (as #293 did). Stage 2 also keeps its own
 budget as a gate (no slower than the Clang path). Stage 5 sets the targets.
 
-**Current stage: none started.** Stage 0 starts when Jordan says go.
+**Current stage: Stage 0, the API surface** (started 2026-11-16). Its code is
+released in 0.9.0 and 0.10.0; what remains is the example apps' move to 0.10.0
+and Jordan's sign-off of each milestone (`STAGE0_SIGNOFF_PACKET.md`).
 
 ## Who decides what
 
@@ -78,55 +80,67 @@ stage hardens, shrinks, models and proves the final surface (Jordan,
 released, and signed off by Jordan; the example apps and templates use only
 the final APIs; no hand-written binding remains where a generated one exists.
 
-- [ ] **0.1 Inventory.** List every public surface in `docs/API_DECISIONS.md`:
-  every `Lasm.*` namespace and generated binding, the CLI's commands and
-  flags, project configuration, what `lasm init` generates, and the platform
-  output layout. Seeded on 2026-11-16 with the 46 questions of the
-  [API shapes review](docs/api/SHAPES_REVIEW_2026-11-11.md) and the API items
-  of REVIEW.md. Also inventories the API proposals in
-  [Jordan's checklist](#jordans-checklist) (Ledger's, Folio's, Porter's and
-  Tandem's). Listed on 2026-11-16 (74 entries, `0.1-1` to `0.7-22`, beside
-  A1–A56); `scripts/api/inventory.mjs` fails the unit job when a public
-  surface is missing. Awaiting Jordan's sign-off.
-- [ ] **0.2 Serving model, and `Lasm.Fetch` deleted.** `Node.serve` (in
-  `Lasm.JS.Node.Serve`, shaped like `Bun.serve`); function platforms call
-  `exportDefault`, and the generated platform file calls the handler directly
-  (Jordan, 2026-11-11); a small entry module per target for Fastly
-  (`Lasm.Fastly.*`), wasi-http (`Lasm.WASI.Http`) and WASI; the templates,
-  Conduit and Folio off `Lasm.Fetch` on every target; then `Lasm.Fetch` deleted
-  ([IRREDUCIBLE.md](docs/proposals/IRREDUCIBLE.md#3-ranked-removal-list),
-  removal 18). Done in source: `Node.serve` and `exportDefault` (#222), the
-  templates, Conduit, Folio and Porter on them; `Lasm.Fetch` deleted with its
-  C hosts, the WASI CGI server mode and its native fuzz targets, its request
-  model and proofs moved to `verification/cli/Lasm/RequestPath` (A44–A46,
-  0.2-1, 0.2-2, 0.2-9; ships in the release after 0.9.0). Ledger and Tandem
-  move under 0.4. Questions A19–A23 and A41–A46.
-- [ ] **0.3 `Lasm.JS.Web`.** The WinterTC common web APIs are generated
-  (0.6.1, #172) and the browser tier replaced `Lasm.Web` (0.7.0); remaining:
-  the rest of the web platform, and the generated-binding mapping rules
-  (A9–A13). Tested with web-platform-tests and official vectors on every
-  JavaScript target.
-- [ ] **0.4 Node, Bun and Deno.** `Lasm.JS.Node` (held PR #220: `node:net`,
-  `node:http`, `node:https`; then `node:worker_threads`, `node:zlib`,
-  `node:util`); the rest of `Lasm.JS.Bun` and `Lasm.JS.Deno` (Unix sockets,
-  WebSockets, Bun's routes). **Deno is under deliberation, leaning yes**
-  (Jordan, 2026-11-16: people use it now, and nobody knows what Cloudflare's
-  acquisition will mean); A1–A3, A17, A18, A24, A25.
+`[~]` on a milestone below means built and released, awaiting Jordan's
+sign-off; it becomes `[x]` when he signs it off.
+
+- [~] **0.1 Inventory.** Every public surface is listed in
+  [docs/API_DECISIONS.md](docs/API_DECISIONS.md) and its per-milestone files
+  `docs/api/decisions/0.N.md`: every `Lasm.*` namespace and generated
+  binding, the CLI's commands and flags, project configuration, what
+  `lasm init` generates, and the platform output layout. Seeded on 2026-11-16
+  with the 46 questions of the
+  [API shapes review](docs/api/SHAPES_REVIEW_2026-11-11.md) (A1–A46), the API
+  items of REVIEW.md (A47–A56) and the apps' API proposals in
+  [Jordan's checklist](#jordans-checklist); first listed with 74 entries
+  (`0.1-1` to `0.7-22`), since grown by each milestone's decisions.
+  `node scripts/api/inventory.mjs` prints the current count (entries and
+  detail sub-entries) and fails the unit job when a public surface is missing
+  or an id is malformed, duplicated or without a parent row.
+- [~] **0.2 Serving model, and `Lasm.Fetch` deleted.** `Node.serve` (in
+  `Lasm.JS.Node.Serve`, shaped like `Bun.serve`) and function platforms
+  calling the `exportDefault` handler directly (#222), one entry module per
+  serving model in the templates and the Lambda container image on Lambda's
+  own Node image (#322), `Lasm.Serverless` moved to `verification/cli`
+  (#324), and the fullstack template on plain REST and each platform's own
+  store (#331, #344): all in 0.9.0. `Lasm.Fetch` deleted with its C hosts, the
+  WASI CGI server mode and its native fuzz targets, its request model and
+  proofs moved to `verification/cli/Lasm/RequestPath` (#359, 0.10.0).
+  A7, A19–A23, A41–A46, A53; 0.2-1 to 0.2-13.
+- [~] **0.3 `Lasm.JS.Web`.** The whole web platform of the pinned
+  `@webref/idl`, one module per spec with no umbrella module and no browser
+  tier (#319), the generated-binding rules A9–A12 and their override table
+  (#301), availability checked per target with the `X?` guards (#319, #337),
+  modules compiled on first import, in Lake projects too (#313, #332): all in
+  0.9.0. A9–A16, A51; 0.3-1 to 0.3-20.
+- [~] **0.4 Node, Bun and Deno.** `Lasm.JS.Node` generated from Node's doc
+  JSON, every core module (#220, #317), the whole `Lasm.JS.Bun` (#312) and
+  `Lasm.JS.Deno` (#307), with Unix sockets and the Deno and Bun WebSocket
+  APIs, and no umbrella modules (#329): all in 0.9.0; constructors for every
+  documented Node class and SQL NULL in `node:sqlite`/`bun:sqlite` (#352,
+  #356, 0.10.0). Deno has full support, `--target deno` and
+  `--target deno-deploy` included (Jordan, 2026-11-16). Tandem's WebSockets
+  are on the generated Deno and Bun APIs; on Node it binds the npm `ws`
+  package with `@[js]`, and `Node.serve` gets no upgrade hook in Stage 0
+  (0.4-7.3, pending Jordan's sign-off). A1–A3, A17, A18, A24, A25.
 - [~] **0.5 Cloudflare, and the apps off hand-written bindings.**
-  `Lasm.JS.Cloudflare` from Cloudflare's workers-types (KV, D1, R2, Durable
-  Objects, env bindings; held PR #216); Porter and Ledger move off their
-  hand-written D1 bindings, and Tandem's WebSocket client moves from
-  `Lasm.Web.WebSocket` to `Lasm.JS.Web.WebSocket`; A26–A29.
-- [ ] **0.6 The `Lasm.*` libraries.** Review `Lasm.UI`, `Lasm.RPC`, `Lasm.KV`
-  (with the decision on its Deno and Workers backends), the `Lasm.JS` interop
-  core (including its known weaknesses: no inline JavaScript, no JavaScript
-  classes from Lean, the synchronous-callback limits, the per-call cost;
-  [REVIEW.md](docs/REVIEW.md#high-priority-work-to-define-with-jordan)),
-  `Lasm.Fastly` and `Lasm.WASI`; and where the libraries live (`@lasm/cli` or
-  separate packages). A4–A8, A14–A16, A30–A40.
-- [ ] **0.7 The CLI and configuration.** Commands, flags, `lasm init` output,
-  the platform output layout, error text (Jordan's checklist: "Review the
-  whole `lasm` CLI").
+  `Lasm.JS.Cloudflare` from Cloudflare's workers-types (#216), then every
+  declaration of Cloudflare's own (#320, #336), with the typed `Env` and
+  `Async.toPromise` (0.9.0); `Lasm.KV` deleted (#346, 0.10.0). The apps use
+  the generated D1, Web Crypto and serving APIs (#348, #350, #351, #354,
+  #355). A26–A29, A39, A40.
+- [~] **0.6 The `Lasm.*` libraries.** The `Lasm.JS` core gained project
+  JavaScript files and `Lasm.JS.Class.define` (#309), `Lasm.UI` is cut to
+  its core with `Cmd.task` (#311), `Lasm.RPC` is deleted (#341), and the
+  `Lasm.WASI.Http` helpers are in (#306): all in 0.9.0. Every `Lasm.*`
+  library stays inside `@lasm/cli` (A56.1 by Jordan for Lasm.UI; A56.2 for
+  the rest, pending his sign-off). A4–A8, A14–A16, A30–A38, A47–A50, A52,
+  A54, A56.
+- [~] **0.7 The CLI and configuration.** One help text and no
+  `lasm version`, `--output` as the only output name, consistent option rules
+  (#304), `--deploy` names equal to the targets (#316), `lasm package`'s usage
+  (#318): 0.9.0. The function-platform targets named `azure-functions` and
+  `cloud-functions` (#339), and `@lasm/cli` exporting only its public entry
+  points with one error shape (#353): 0.10.0. A55.
 
 ## Stage 1: initial robustness
 
@@ -347,7 +361,7 @@ May interrupt any stage (Jordan, 2026-11-16).
   [docs/LEAN_UPGRADE.md](docs/LEAN_UPGRADE.md) on that branch. The two
   StackOverflow differences compare the advice text, not Lean's exact output
   (Jordan, 2026-11-16).
-- [ ] The example apps move to `@lasm/cli` 0.8.0.
+- [~] The example apps move to `@lasm/cli` 0.10.0 (on main they pin 0.9.0; the bump PRs are in flight). Stage 0's definition of done needs it.
 - Outside bug reports are fixed as they come.
 - Releases follow [docs/RELEASING.md](docs/RELEASING.md).
 
@@ -357,8 +371,8 @@ May interrupt any stage (Jordan, 2026-11-16).
 - [ ] (J) Where Lasm's educational content is published: the Lasm repo's
   `content/` directory as the source, the Millillion website as the place
   it's read (Claude's recommendation, 2026-11-02).
-- [ ] (J) Deno: generate and keep `Lasm.JS.Deno` and the Deno targets
-  (leaning yes; milestone 0.4).
+- [x] (J) Deno: generate and keep `Lasm.JS.Deno` and the Deno targets.
+  Decided by Jordan, 2026-11-16: full support (A1, A2; milestone 0.4).
 - [ ] (J) Stage 2's performance budget, if not "no slower than the Clang path";
   Stage 5's targets.
 
@@ -367,10 +381,10 @@ May interrupt any stage (Jordan, 2026-11-16).
 His words, 2026-11-02, from issue #21. The API questions in it are inventoried
 by milestone 0.1.
 
-- [ ] (J) Hone the propositions of Lasm's own library: 30 in [library/Lasm/UI/Spec.lean](library/Lasm/UI/Spec.lean), [RPC/Spec.lean](library/Lasm/RPC/Spec.lean) and the request-path model's [Spec.lean](verification/cli/Lasm/RequestPath/Spec.lean) ([library/PROOFS.md](library/PROOFS.md)).
+- [ ] (J) Hone the propositions of Lasm's own library: 30 in [library/Lasm/UI/Spec.lean](library/Lasm/UI/Spec.lean), RPC/Spec.lean (deleted with Lasm.RPC in 0.9.0, #341) and the request-path model's [Spec.lean](verification/cli/Lasm/RequestPath/Spec.lean) ([library/PROOFS.md](library/PROOFS.md)).
 - [ ] (J) Hone the Lean code of every example, especially the propositions and the theorem structure: Conduit first (52 propositions in [Proofs/Spec.lean](examples/conduit/Proofs/Spec.lean)), then Ledger (31 propositions in [Proofs/Spec.lean](examples/ledger/Proofs/Spec.lean)).
 - [ ] (J) Review the whole `lasm` CLI: its UX, and that it works.
-- [ ] (J) Hone the libraries Lasm added: Lasm.UI, Lasm.JS (with the generated Lasm.JS.Web), Lasm.RPC.
+- [ ] (J) Hone the libraries Lasm added: Lasm.UI, Lasm.JS (with the generated Lasm.JS.Web); Lasm.RPC was deleted in 0.9.0 (#341).
 - [ ] (J) Work out the whole front-end UI story.
 - [ ] (J) Play with Lasm, front end to back end, and hone what comes up.
 - [ ] (J) Hone the README, [TRUST.md](docs/proposals/TRUST.md) and every human-facing text, including [HOW_LASM_WORKS.md](docs/HOW_LASM_WORKS.md) and `llms.txt` (drafted 2026-11-06).
