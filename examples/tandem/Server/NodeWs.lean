@@ -4,12 +4,13 @@ Node: an HTTP server (`node:http`, through the generated
 accepts WebSocket upgrades on `/doc/<name>/ws` with the `ws` package.
 
 Why not `Node.serve` (Lasm.JS.Node.Serve), Lasm's server for Node: it has no
-WebSocket upgrade hook yet (docs/api/decisions/0.4.md, 0.4-7: one upgrade
-hook and server-side WebSocket type for Node, Bun and Deno is open). Why the
-`ws` package, bound by hand: Node has a WebSocket client and no WebSocket
-server, so no generated binding exists for one. Its three calls
-(`new WebSocketServer`, `handleUpgrade`, a connection's `on`/`send`) are the
-only hand-written binding left in Tandem's Node server besides `node:sqlite`'s constructor (Server/NodeSqlite.lean).
+WebSocket upgrade hook, by decision (docs/api/decisions/0.4.md, 0.4-7.3: a
+Node program that serves WebSockets binds an npm package such as `ws` with
+`@[js]`). Why the `ws` package, bound by hand: Node has a WebSocket client
+and no WebSocket server, so no generated binding exists for one. Its three
+calls (`new WebSocketServer`, `handleUpgrade`, a connection's `on`/`send`)
+are the only hand-written binding left in Tandem's Node server; `node:sqlite`
+is the generated `Lasm.JS.Node.Sqlite` (Server/NodeSqlite.lean).
 -/
 import Lasm.JS
 import Lasm.JS.Node.Buffer
