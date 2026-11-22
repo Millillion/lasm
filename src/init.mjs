@@ -905,8 +905,8 @@ npm run build      # dist/public (the browser app), then dist/server (Node) with
 npm start          # serves the release build on http://localhost:3000 (PORT)
 \`\`\`
 
-The Lean editor resolves \`import Lasm.*\` once \`npx lasm editor\` (also run by \`npm run dev\`)
-has linked Lasm's Lean for this directory; restart the Lean server in your editor afterwards
+The Lean editor resolves \`import Lasm.*\` once a lasm command (\`npm run dev\`, \`npx lasm editor\`)
+has linked Lasm's library for this directory; restart the Lean server in your editor afterwards
 ([editor setup](https://github.com/Millillion/lasm/blob/main/docs/GETTING_STARTED.md#editor)).
 \`lakefile.toml\` requires Lasm's library as a Lake package at \`.lake/lasm-library\`, a link every lasm
 command makes: on a fresh clone, run any lasm command once (\`npm run dev\`, \`npx lasm editor\`); a plain
@@ -940,11 +940,11 @@ export async function runInit(options) {
 
 Next:
 ${cd}${nextSteps(options.template, jsRuntime)}`);
-  // Editor support up front when Lasm's Lean is already on this machine (no download here); Lasm's Lake
-  // package link (.lake/lasm-library, 0.3-7) too, also when the editor setup is off (CI, LASM_EDITOR=0).
+  // Lasm's Lake package link (.lake/lasm-library, 0.3-7) when Lasm's Lean is already on this machine (no download
+  // here; otherwise the first build makes it), then the editor's side of the project (src/editor.mjs).
   const editor = await import('./editor.mjs');
-  if (await editor.autoSetupEditor(join(result.directory, 'Main.lean'), { cachedOnly: true }) === undefined)
-    await editor.linkProjectLibrary(result.directory, { cachedOnly: true });
+  await editor.linkProjectLibrary(result.directory, { cachedOnly: true });
+  await editor.autoSetupEditor(join(result.directory, 'Main.lean'));
   return 0;
 }
 

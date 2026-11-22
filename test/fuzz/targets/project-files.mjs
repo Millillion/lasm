@@ -20,7 +20,8 @@
 //     package.json: modules are distinct non-empty strings, and the Supabase
 //     and Fastly names are ones those platforms accept.
 // Proposition: Lasm.Cli.Candidates.lean_header_keeps_imports
-//    ∀ (text : String) (is : List HeaderImport), NoBareCR text → leanImports text = some is → leanImports (leanHeader text) = some is
+//    ∀ (text : String) (is : List HeaderImport), NoBareCR text → leanImports text = some is → (∀ i ∈ is, i.module ≠ []) →
+//      leanImports (leanHeader text) = some is
 // Proposition: Lasm.Cli.Candidates.import_closure_covers_imports
 //    ∀ (text : String) (is : List HeaderImport), leanImports text = some is →
 //      (∀ i ∈ is, i.module ≠ [] ∧ i.module ≠ ["Main"] ∧ ∀ c ∈ i.module, FileComponent c) →
@@ -76,6 +77,11 @@ async function header(text) {
   if (lean.fault) fail(`the Lean header model failed: ${lean.fault}`, { text });
   if (!lean.ok) return; // Lean refuses the header: nothing to compare
   const imports = withoutInit(lean.ok);
+  // Lean's header parser reads an antiquotation (`import A\n$x`, `import\n$A`)
+  // as an import of the anonymous name, and Lean then refuses the file
+  // ("import failed, trying to import module with anonymous name"): no build
+  // can reuse a configuration keyed by such a header, so it has no verdict.
+  if (imports.some(([module]) => !module.length)) return;
   // lean_header_keeps_imports. Lean 4.35 reads a header that a bare CR
   // breaks (`prelude\nimport \n\rx`) as no imports and no error, where the
   // same text without the CR is an error: such texts have no verdict.

@@ -22,10 +22,9 @@ def «open» (path : String) : IO Sql := do
     lock.lock
     try act finally lock.unlock
   let runOne (sql : String) (params : Array Data) : IO Unit := do
-    -- One array argument, which bun:sqlite takes as the bindings (Lasm 0.9.0's shape; 0.4-45 flattens it).
-    discard <| (← db.query sql).run #[params]
+    discard <| (← db.query sql).run params
   let sql : Sql := {
-    all := fun sql params => locked do (← db.query sql).all #[params]
+    all := fun sql params => locked do (← db.query sql).all params
     run := fun sql params => locked (runOne sql params)
     batch := fun stmts => locked do
       discard <| db.run "BEGIN IMMEDIATE"

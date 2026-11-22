@@ -788,11 +788,12 @@ dtest('browser dev server: serves the build, rebuilds on content changes only, r
     assert.equal((await nextEvent(reader)), 'event: error-report\ndata: "just a message"\n\n');
     // Both of a failure's outputs, a line each.
     stderr.reset();
+    // Both streams, stderr first (Lake's notices, then the Lean error; #315).
     failure = Object.assign(new Error('m'), { stdout: 'from stdout', stderr: 'from stderr' });
     writeFileSync(main, '-- 7\n');
     event();
-    assert.equal((await nextEvent(reader)), 'event: error-report\ndata: "from stdout\\nfrom stderr"\n\n');
-    assert.ok(stderr.text().includes('from stdout\nfrom stderr\n'), stderr.text());
+    assert.equal((await nextEvent(reader)), 'event: error-report\ndata: "from stderr\\nfrom stdout"\n\n');
+    assert.ok(stderr.text().includes('from stderr\nfrom stdout\n'), stderr.text());
     await server.close();
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });

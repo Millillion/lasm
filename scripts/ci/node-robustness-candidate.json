@@ -1,11 +1,11 @@
 {
   "active": true,
-  "version": "0.1.0-experimental.40131225697",
-  "sha256": "fdc1e4389cd813b93dbe7364cb59f79aea07c05eaf3673a1486ee88a87f99e22",
-  "sourceRevision": "453ac4219c54c91c12d4c8aa0c1d542c4fd99144",
-  "release": "node-linux-candidate-40131225697",
-  "baselineRunId": "40131225697",
-  "node": "26.12.1",
+  "version": "0.1.0-experimental.44256850233",
+  "sha256": "d9650337b0d0bf19519778f988319d93f06152fe9f8ae523e4da86c90b9c36eb",
+  "sourceRevision": "c0dbd71b96210d7d9513030423663f4084f6a2b1",
+  "release": "node-linux-candidate-44256850233",
+  "baselineRunId": "44256850233",
+  "node": "26.13.1",
   "lean": "4.35.0",
-  "reason": "0.1.0 launch gate, cold-installation part: the build-speed code-freeze candidate (453ac42; release bytes identical to gate candidate 6df8706, adds the shipped analysis file, faster first build and the machine-wide planning cache), retained by acceptance run 40131225697. The rest of the gate runs on 6df8706 (0.1.0-experimental.40121836396)."
+  "reason": "0.10.0: the candidate release.yml published as @lasm/cli 0.10.0 (c0dbd71, merge of #361), retained by release-checks run 44256850233. The 0.1.0 code-freeze candidate 40131225697 it replaces still depended on tar, which integration/node-installed.mjs has refused since a2aad8c (2026-11-13), so every nightly since failed on a check of the current suite, not of the archive."
 }

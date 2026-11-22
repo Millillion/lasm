@@ -3,7 +3,7 @@
   "reasons": {
     "src/cli-arguments.mjs: (dynamic message, line 126)": "The usage text (cliUsage, built from a variable): corpus cases no-arguments and build-without-source print it.",
     "src/cli-arguments.mjs: (dynamic message, line 133)": "One of two messages chosen by the command (a conditional expression): corpus cases build-positional-output and extra-positional print them.",
-    "src/application-cli.mjs: (dynamic message, line 22)": "A helper program missing from the installation (missingMessage, a variable); not reachable with a complete npm install.",
+    "src/application-cli.mjs: (dynamic message, line 23)": "A helper program missing from the installation (missingMessage, a variable); not reachable with a complete npm install.",
     "src/init.mjs: (dynamic message, line 119)": "The usage text (initUsage, a variable): corpus cases init-without-directory and init-two-directories print it.",
     "src/package.mjs: (dynamic message, line 68)": "The usage text (packageUsage, a variable): corpus case package-two-builds prints it.",
     "src/package.mjs: ). Rebuild it with the current Lasm.": "A build made by an older Lasm without native support manifests; a current lasm build always writes one. Not tested.",
@@ -22,7 +22,7 @@
     "src/edge/edge-build.mjs: Unknown edge target": "The CLI refuses an unknown --target first (unknown-target); this is the writer's own check.",
     "src/edge/edge-build.mjs: The edge output directory must not contain the Lean sources": "The CLI refuses an output that holds the sources earlier; this is the edge writer's own check.",
     "src/cache-repair.mjs: Cache namespace must be an ordinary directory:": "A tool cache whose namespace is a file or link: a damaged cache, which fault injection covers (faults.mjs, corrupted caches); not tested on its own.",
-    "src/application-sources.mjs: (dynamic message, line 63)": "macOS only (no Xcode Command Line Tools SDK); the corpus runs on Linux. test/managed-lean-tiers.test.mjs tests the SDK lookup.",
+    "src/application-sources.mjs: (dynamic message, line 64)": "macOS only (no Xcode Command Line Tools SDK); the corpus runs on Linux. test/managed-lean-tiers.test.mjs tests the SDK lookup.",
     "src/application-sources.mjs: Lake could not load the workspace:": "Lake failing to load a workspace in a way Lean does not report as a diagnostic; broken lakefiles are covered by bad-lakefile-toml and bad-lakefile-lean.",
     "src/application-sources.mjs: Unexpected Lake native-package inventory": "Internal invariant: a broken installation, cache or tool, not a user action; it is reported as an error, never a stack trace (reportCliError).",
     "src/application-sources.mjs: Command failed:": "A failed Lean or Lake command without a diagnostic (its output is printed); the Lean cases cover failures with diagnostics.",

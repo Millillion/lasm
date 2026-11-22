@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { applicationSupport } from './application-support.mjs';
 import { assertSupportedHost } from './platform.mjs';
 import { formatLeanDiagnostics } from './dev.mjs';
+import { stepOutput } from './step-output.mjs';
 import { existsSync, readdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 
@@ -94,7 +95,9 @@ export function reportCliError(error) {
     console.error(bugReportLine);
     return;
   }
-  const text = (error.stderr?.toString() || error.stdout?.toString() || error.message);
+  // Both streams of the failed step (#315): Lake's notices on stderr must not
+  // hide the Lean error `lake lean` writes to stdout.
+  const text = stepOutput(error) || error.message;
   // Lean and Lake errors: file:line, the source line and a caret, without Lake's
   // command traces (as lasm dev prints them).
   if (/\.lean:\d+:\d+|^trace: |^error: build failed$/m.test(text)) {

@@ -73,6 +73,35 @@ def reads (db : Sql) (doc : String) : Sync.Reads Async where
     if decoded.any Option.isNone then throw (IO.userError "the store holds an invalid operation")
     return decoded.filterMap id
 
+/-- Where the log holds these operations: (position, operation), in log
+order, each position once. (Not a query of `Sync.sync`: the server uses it to
+push operations a request finds already stored, `handleSync`.) -/
+def positions (db : Sql) (doc : String) (ops : List Op) : Async (List (Nat × Op)) := do
+  -- At most 90 operations per query (D1 binds at most 100 values).
+  let lines := (ops.map Wire.encodeOp).toArray
+  let mut found : Array (Nat × String) := #[]
+  let mut i := 0
+  while i < lines.size do
+    let part := lines.extract i (i + 90)
+    let marks := ", ".intercalate (part.toList.map fun _ => "?")
+    let rows ← db.all s!"SELECT seq, op FROM ops WHERE doc = ? AND op IN ({marks})" (#[toJS doc] ++ part.map toJS)
+    found := found ++ rows.map fun r => (nat r "seq", str r "op")
+    i := i + 90
+  let sorted := found.toList.mergeSort fun a b => a.1 ≤ b.1
+  return sorted.filterMap fun (s, line) => (Wire.decodeOp line.toList).map (s, ·)
+
+/-- Positions in log order, as runs of consecutive positions: `(start, stop,
+operations)` (a position seen twice counts once). Tail-recursive. -/
+def runs (ps : List (Nat × Op)) : List (Nat × Nat × List Op) :=
+  let step (acc : List (Nat × Nat × List Op)) (p : Nat × Op) : List (Nat × Nat × List Op) :=
+    match acc with
+    | (a, b, ops) :: rest =>
+      if p.1 == b then (a, b + 1, p.2 :: ops) :: rest
+      else if p.1 < b then acc
+      else (p.1, p.1 + 1, [p.2]) :: acc
+    | [] => [(p.1, p.1 + 1, [p.2])]
+  (ps.foldl step []).reverse.map fun (a, b, ops) => (a, b, ops.reverse)
+
 /-- The statements that append `ops` to the log after position `n`. -/
 def commitStatements (doc : String) (n : Nat) (ops : List Op) : Array (String × Array Data) :=
   (ops.zipIdx n).toArray.map fun (op, i) =>

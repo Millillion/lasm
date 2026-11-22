@@ -1,7 +1,7 @@
 /- Porter as the program's default export (`Lasm.JS.exportDefault`), with node:sqlite:
 Deno (`npm run build:deno`; Deno's entry serves it on $PORT) and the function platforms
 (`npm run build:lambda`, `build:lambda-image`, `build:vercel`, `build:netlify`,
-`build:azure`, `build:gcf`), whose generated entry calls the handler for each request.
+`build:azure-functions`, `build:cloud-functions`), whose generated entry calls the handler for each request.
 DATABASE_PATH, else porter.db here, else (a read-only directory, as on function
 platforms) porter.db in the temporary directory, for as long as the instance lasts. -/
 import Server.App

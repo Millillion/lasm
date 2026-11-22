@@ -24,6 +24,7 @@ import { connectLeanSymbolLoader } from '../scripts/full-lean/lean-symbol-loader
 import { indexFunctionTable } from '../scripts/full-lean/function-table-index.mjs';
 import { optimizeMainTableGrowth } from '../scripts/full-lean/table-growth.mjs';
 import { liveMembers, memberFiles, wasmImports } from './application-live-members.mjs';
+import { stepOutput } from './step-output.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 
@@ -411,7 +412,7 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
       } catch (error) {
         // Code a package needs only natively (a tactic's C++ backend) need not compile
         // for Wasm; the link reports it if the program actually reaches its symbols.
-        const reason = String(error.stderr ?? error.message).split(/\r?\n/).find(line => /error/.test(line))?.trim();
+        const reason = (stepOutput(error) || String(error.message)).split(/\r?\n/).find(line => /error/.test(line))?.trim();
         nativeUnavailable.push({ package: item.package, library: item.source,
           reason: `does not compile for WebAssembly${reason ? ': ' + reason.slice(0, 200) : ''}` });
         continue;

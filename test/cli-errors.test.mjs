@@ -32,6 +32,25 @@ test('the bug report line follows internal errors only', () => {
   assert.ok(!captured(Object.assign(new Error('boom'), { name: 'LeanIOError' })).includes(bugReportLine));
 });
 
+test('a failed step reports both streams: a Lake notice on stderr does not hide the Lean error on stdout (#315)', () => {
+  const notice = 'info: Cli: remote URL changed\n  old: https://github.com/leanprover/lean4-cli.git\n  new: https://github.com/leanprover/lean4-cli\n';
+  const lean = "Main.lean:2:33: error: Unknown identifier `undefinedName`\n";
+  const failed = (stderr, stdout) => Object.assign(new Error(`Command failed: lake lean Main.lean\n${stderr}`), { status: 1, stderr, stdout });
+  const shown = captured(failed(notice, lean));
+  assert.match(shown, /info: Cli: remote URL changed/);
+  assert.match(shown, /Main\.lean:2:33: error: Unknown identifier `undefinedName`/);
+  assert.ok(shown.indexOf('remote URL changed') < shown.indexOf('Unknown identifier'), 'the notice, then the error');
+  assert.match(shown, /\[lasm\] Build failed\. Fix the error above and run the command again\.$/);
+  // Any stderr at all, even a blank line, used to hide stdout.
+  assert.match(captured(failed('\n', lean)), /Unknown identifier `undefinedName`[\s\S]*Build failed/);
+  // The same text on both streams is printed once.
+  assert.equal(captured(failed(lean, lean)).match(/Unknown identifier/g).length, 1);
+  // Only stderr (errors in imported modules): unchanged.
+  assert.match(captured(failed('Helper.lean:1:25: error: type mismatch\n', '')), /Helper\.lean:1:25: error: type mismatch[\s\S]*Build failed/);
+  // Nothing printed: the error's message.
+  assert.match(captured(Object.assign(new Error('Lake could not load the workspace'), { stderr: '', stdout: '' })), /Lake could not load the workspace/);
+});
+
 test('lasm --version', async () => {
   for (const flag of ['--version', '-v']) assert.deepEqual(parseLasmArguments([flag]), { command: 'version' });
   assert.match(await versionText(), /^lasm \d+\.\d+\.\d+\S* \(@lasm\/\S+; Lean 4\.\d+\.\d+; (?:Node|Bun|Deno) \S+; [a-z0-9]+-[a-z0-9]+\)$/);

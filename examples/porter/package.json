@@ -21,8 +21,8 @@
     "build:lambda-image": "npm run build:export && docker build -f deploy/lambda-image/Dockerfile -t porter-lambda:local .",
     "build:vercel": "npm run build:export && lasm package dist/export --target vercel",
     "build:netlify": "npm run build:export && lasm package dist/export --target netlify",
-    "build:azure": "npm run build:export && node deploy/package-hosted.mjs azure",
-    "build:gcf": "npm run build:export && node deploy/package-hosted.mjs gcf",
+    "build:azure-functions": "npm run build:export && node deploy/package-hosted.mjs azure-functions",
+    "build:cloud-functions": "npm run build:export && node deploy/package-hosted.mjs cloud-functions",
     "proofs": "node test/proofs.mjs",
     "proofs:paranoid": "node test/paranoid.mjs",
     "build:client": "lasm build Client.lean --target browser --output dist/public/ui",
@@ -34,7 +34,7 @@
     "node": ">=24"
   },
   "devDependencies": {
-    "@lasm/cli": "0.9.0",
+    "@lasm/cli": "0.10.0",
     "@playwright/test": "1.63.0",
     "jose": "6.2.12",
     "oauth4webapi": "3.8.8",
