@@ -52,8 +52,8 @@ an explicit trade-off for Jordan (as #293 did). Stage 2 also keeps its own
 budget as a gate (no slower than the Clang path). Stage 5 sets the targets.
 
 **Current stage: Stage 0, the API surface** (started 2026-11-16). Its code is
-released in 0.9.0 and 0.10.0; what remains is the example apps' move to 0.10.0
-and Jordan's sign-off of each milestone (`STAGE0_SIGNOFF_PACKET.md`).
+released in 0.9.0 and 0.10.0, and the five example apps pin 0.10.0; what
+remains is Jordan's sign-off of each milestone (`STAGE0_SIGNOFF_PACKET.md`).
 
 ## Who decides what
 
@@ -361,7 +361,7 @@ May interrupt any stage (Jordan, 2026-11-16).
   [docs/LEAN_UPGRADE.md](docs/LEAN_UPGRADE.md) on that branch. The two
   StackOverflow differences compare the advice text, not Lean's exact output
   (Jordan, 2026-11-16).
-- [~] The example apps move to `@lasm/cli` 0.10.0 (on main they pin 0.9.0; the bump PRs are in flight). Stage 0's definition of done needs it.
+- [x] The example apps move to `@lasm/cli` 0.10.0: all five pin it (Folio #363, Conduit #362, Porter #364, Ledger #367, Tandem #370).
 - Outside bug reports are fixed as they come.
 - Releases follow [docs/RELEASING.md](docs/RELEASING.md).
 
