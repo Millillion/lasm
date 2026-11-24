@@ -598,6 +598,21 @@ def childProcesses (r : Checks) : Async Unit := do
     let some web := web | throw (IO.userError "no body")
     let node ← stream.Readable.fromWeb web
     expect r s!"stream round trip {i}" (bytesEq (← streamBytes (← stream.Readable.toWeb node)) b) ""
+  -- stream.Transform from an options object, no subclass (docs/JS_BINDINGS.md, "JavaScript classes"):
+  -- transform(chunk, encoding, callback) is a Lean function, and the output is each chunk upper-cased
+  let upper ← JSFunction.ofFn fun args => do
+    let chunk ← decodeAs Value "chunk" (args[0]?.getD .undefined)
+    let callback ← decodeAs Value "callback" (args[2]?.getD .undefined)
+    let text ← chunk.callMethod "toString" #[] String
+    discard <| callback.call #[.null, toJS text.toUpper] Data
+    return .undefined
+  let t ← stream.Transform.new (some { transform := some upper })
+  let out ← stream.Readable.toWeb { val := t.val }
+  let input : stream.Writable := { val := t.val }
+  discard <| input.write (toJS "lean ")
+  discard <| input.«end» (toJS "streams")
+  let text := String.fromUTF8! (← streamBytes out)
+  expect r "Transform options object" (text == "LEAN STREAMS") (repr text).pretty
 
 /-! node:net, node:http and node:https: servers and clients on 127.0.0.1 -/
 

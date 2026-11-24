@@ -142,9 +142,9 @@
     },
     {
       "name": "project-files",
-      "description": "The project's own JavaScript files (@[js \"./ffi/x.mjs\" …]: resolution, the relative-import closure, refusals, the binding check's plan) and lasm:class (Lasm.JS.Class.define)",
-      "mutate": ["src/project-modules.mjs", "src/lasm-modules/class.mjs"],
-      "tests": ["test/project-modules.test.mjs", "test/lasm-class.test.mjs"]
+      "description": "The project's own JavaScript files (@[js \"./ffi/x.mjs\" …]: resolution, the relative-import closure, refusals, the binding check's plan)",
+      "mutate": ["src/project-modules.mjs"],
+      "tests": ["test/project-modules.test.mjs"]
     }
   ]
 }

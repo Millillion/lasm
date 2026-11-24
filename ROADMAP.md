@@ -129,7 +129,7 @@ sign-off; it becomes `[x]` when he signs it off.
   the generated D1, Web Crypto and serving APIs (#348, #350, #351, #354,
   #355). A26–A29, A39, A40.
 - [~] **0.6 The `Lasm.*` libraries.** The `Lasm.JS` core gained project
-  JavaScript files and `Lasm.JS.Class.define` (#309), `Lasm.UI` is cut to
+  JavaScript files (#309; its `Lasm.JS.Class.define` is deleted, A6.2), `Lasm.UI` is cut to
   its core with `Cmd.task` (#311), `Lasm.RPC` is deleted (#341), and the
   `Lasm.WASI.Http` helpers are in (#306): all in 0.9.0. Every `Lasm.*`
   library stays inside `@lasm/cli` (A56.1 by Jordan for Lasm.UI; A56.2 for

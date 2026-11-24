@@ -415,44 +415,92 @@ let _ ← app.callMethod "use" #[toJS handler]
 A server's `main` must not return while JavaScript serves requests: end it with
 `Lasm.JS.waitForever`.
 
-## JavaScript classes: `Lasm.JS.Class.define`
+## JavaScript classes
 
-Some APIs take a class, not a function: `customElements.define`, subclasses
-of `Error`, `EventTarget` or Node's streams, frameworks that call `new` on
-what you pass. `Lasm.JS.Class.define` (`import Lasm.JS.Class`) makes a real
-`class Name extends Base` from Lean, without `eval`, so it works on every
-JavaScript target:
+Some APIs take a class, not a function: `customElements.define`, `instanceof`
+checks on `Error` subclasses, Cloudflare's Durable Objects, frameworks that call
+`new` on what you pass. Write the class in JavaScript, in an `.mjs` file of
+your project ([Your own JavaScript files](#your-own-javascript-files)). It is a
+few lines, and its methods call Lean functions: either bindings, or Lean
+callbacks (`Function.ofFn`, `Function.ofSyncFn`) that the class receives. The
+recipes below are built and run by CI: [test/fixtures/js-core](../test/fixtures/js-core)
+on every JavaScript target (the custom element in Chromium), and
+[test/fixtures/js-node](../test/fixtures/js-node) on Node, Bun and Deno for the
+stream. Typed classes generated at build time are being explored in
+[#379](https://github.com/Millillion/lasm/issues/379).
 
-```lean
-import Lasm.JS.Class
-open Lasm.JS
+**A custom element.** The element's lifecycle callbacks call Lean functions.
+JavaScript uses their result at once, so they are synchronous (`ofSyncFn`):
 
-def errorClass : IO Value := do (← global).get "Error"   -- the class itself; a binding would call it
-
-def notFound : IO Value := do
-  Class.define {
-    name := "NotFound"
-    extends? := some (← errorClass)                    -- super(...args) runs first
-    constructor := some fun self _ => self.set "status" (404 : Nat)
-    methods := #[("describe", .sync fun self _ => do
-      return toJS s!"{← self.get "message" String} ({← self.get "status" Nat})")]
-    getters := #[("retryable", fun _ => return .bool false)] }
--- In JavaScript: const e = new NotFound("no such page"); e instanceof Error; e.describe()
+```js
+// ffi/classes.mjs
+export function defineGreeting(tag, connected, attributeChanged) {
+  customElements.define(tag, class extends HTMLElement {
+    static observedAttributes = ['name'];
+    connectedCallback() { connected(this); }
+    attributeChangedCallback(name, oldValue, newValue) { attributeChanged(this, name, newValue); }
+  });
+}
 ```
 
-- Each constructor, method and getter is a Lean function of the instance
-  (`self`, JavaScript's `this`) and the call's arguments.
-- `.sync` methods and getters follow `Function.ofSyncFn`'s rules (JavaScript
-  waits for them, and they cannot wait for JavaScript); `.async` methods
-  return a promise and follow `Function.ofFn`'s. Choose per method: a DOM
-  lifecycle callback or a method whose result is used at once is `.sync`.
-- `statics` sets properties of the class itself (`observedAttributes`).
-- Each call of a method is a JavaScript → Lean call (about 20 µs on Node).
-  Per-instance state lives on the instance (`self.set`), or in Lean keyed by
-  a field.
-- Classes a platform finds by export name (Cloudflare Durable Objects,
-  Workers RPC entrypoints) must exist when the module loads, before Lean
-  runs: `define` cannot make those.
+```lean
+@[js "./ffi/classes.mjs" "defineGreeting"] opaque defineGreeting : String → Value → Value → IO Unit
+
+let onConnected ← Function.ofSyncFn fun _ => do IO.println "connected"; return .undefined
+let onChanged ← Function.ofSyncFn fun args => do
+  let self ← decodeAs Value "this" (args[0]?.getD .undefined)
+  let value ← decodeAs (Option String) "newValue" (args[2]?.getD .undefined)
+  self.set "textContent" s!"hello, {value.getD "nobody"}"
+  return .undefined
+defineGreeting "lean-greeting" onConnected onChanged
+-- <lean-greeting name="Lean"></lean-greeting> now reads "hello, Lean"
+```
+
+**An `Error` subclass**, so that JavaScript code can test `e instanceof NotFound`:
+
+```js
+// ffi/classes.mjs
+export class NotFound extends Error {
+  constructor(path) { super(`no such page: ${path}`); this.name = 'NotFound'; this.path = path; }
+}
+```
+
+```lean
+@[js "./ffi/classes.mjs" "new NotFound"] opaque newNotFound : String → IO Value
+
+let e ← newNotFound "/missing"   -- pass it to JavaScript, which can throw it or test instanceof
+```
+
+When JavaScript throws a `NotFound`, Lean gets an `IO.userError` that contains
+`NotFound: no such page: /missing` ([Errors](#errors)).
+
+**Node streams.** Node's stream classes take their methods in an options
+object, so no subclass and no JavaScript file is needed. `new Transform({ transform })`
+from Lean, with the generated `Lasm.JS.Node.Stream`:
+
+```lean
+import Lasm.JS.Node.Stream
+
+let upper ← JSFunction.ofFn fun args => do   -- transform(chunk, encoding, callback)
+  let chunk ← decodeAs Value "chunk" (args[0]?.getD .undefined)
+  let callback ← decodeAs Value "callback" (args[2]?.getD .undefined)
+  let text ← chunk.callMethod "toString" #[] String
+  discard <| callback.call #[.null, toJS text.toUpper] Data
+  return .undefined
+let t ← stream.Transform.new (some { transform := some upper })
+let out ← stream.Readable.toWeb { val := t.val }    -- reads "LEAN STREAMS"
+let input : stream.Writable := { val := t.val }
+discard <| input.write (toJS "lean ")
+discard <| input.«end» (toJS "streams")
+```
+
+`Readable`, `Writable` and `Duplex` take `read`, `write` and the other methods
+the same way.
+
+**Durable Objects.** Workers finds a Durable Object by the class the main module
+exports, so it is a JavaScript class in the project whose methods call Lean
+functions: see [Durable Objects: a class in JavaScript](#durable-objects-a-class-in-javascript)
+(decisions A28 and 0.5-7 in [docs/api/decisions/0.5.md](api/decisions/0.5.md)).
 
 ## Errors
 
