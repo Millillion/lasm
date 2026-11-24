@@ -2,7 +2,7 @@
   "schema": 1,
   "lean": "4.35.0",
   "leanCommit": "eb6cafb7290e8bd5f2937522d8d804f58f02bafc",
-  "library": "0fcf58c31d90432964e43df7e756487aadcfb593d82abb57f81665ff0138c29e",
+  "library": "abfb898416b1295c992d3d7ea18c1bc9661a24b1a1cc7f15d64e34563fdec506",
   "files": {
     "lib/lean/Lasm/JS/Core.olean": "454c968449e3f43c02b7320564d1eacb9b5e5bdcaf7b281674bc2f814b2a00ff",
     "lib/lasm/c/Lasm/JS/Core.c": "3d231a6c8b6ea37e73393bb30eb00674d5d6ac378fa40586e36107958e418552",
@@ -16,9 +16,6 @@
     "lib/lean/Lasm/JS.olean": "86ff7b086af66cf3c25d463e485195ac7f9ac9cb56274e40b6d3fc31a9f50e6f",
     "lib/lasm/c/Lasm/JS.c": "85410094cc88632811356f78a6e7beca93d2e13c19a8881b4aaec7f7dfaa1300",
     "src/lean/Lasm/JS.lean": "31a530025e0258d3fb0ec89852a17f359e75a51a89f54623ed324ea52466c3a2",
-    "lib/lean/Lasm/JS/Class.olean": "a9893cf06fd2ec6393b9e785d7823ff77f904e6c09c01ee851a92ad686e42bb9",
-    "lib/lasm/c/Lasm/JS/Class.c": "402c4e29d376fa3d5ea7c18435e26d5c2ff549faba5269decbca7d59130a8b9b",
-    "src/lean/Lasm/JS/Class.lean": "424fc59284eadb32d78c17ea35cca263b4cc84524458d8496d836b7749585212",
     "lib/lean/Lasm/Fastly/Types.olean": "6ec2aa0c95fa87032afcd5723ac8698ca7fa1545aa66db7c401f75f7176b4a3a",
     "lib/lasm/c/Lasm/Fastly/Types.c": "4cf5caf4454e4dbd694f73f309895b28bf28f18ea80ba4d606e07afdd033fc88",
     "src/lean/Lasm/Fastly/Types.lean": "0ae49ff1a2537cd61966486c0e2a7fb2452ab0bca38be11d5774d4399e603d4e",
