@@ -287,17 +287,15 @@ if (args.scenario.startsWith('launch-')) {
     npxRun(`npx lasm build ${entry} --target ${target}`, ['lasm', 'build', entry, '--target', target], { cwd: fetchApp });
     assert.ok(existsSync(join(fetchApp, output)), `--target ${target} wrote no ${output}`);
   }
-  // Editor support with Lean already cached: a stub elan records the link and the override.
+  // Editor support with Lean already cached: a stub elan records any call; Lasm makes none (decision 0.7-25).
   const elanHome = join(directory, 'elan-home'), stub = join(directory, 'elan-stub'), calls = join(directory, 'elan-calls.txt');
   mkdirSync(join(elanHome, 'toolchains'), { recursive: true }); mkdirSync(stub, { recursive: true });
   if (process.platform !== 'win32') {
     writeFileSync(join(stub, 'elan'), `#!/bin/sh\necho "$@" >> '${calls}'\n`, { mode: 0o755 });
     const editorEnv = environment({ ELAN_HOME: elanHome, PATH: `${stub}${process.platform === 'win32' ? ';' : ':'}${process.env.PATH}` });
     npxRun('npx lasm editor (Lean cached)', ['lasm', 'editor'], { cwd: fetchApp, env: editorEnv });
-    const lines = readFileSync(calls, 'utf8');
-    assert.match(lines, /^toolchain link lasm-\S+ \S+/m, `elan was not asked to link Lasm's Lean: ${lines}`);
-    assert.match(lines, /^override set lasm-/m, `elan was not asked to set the override: ${lines}`);
-    report.launch.editor = lines.trim().split('\n');
+    assert.ok(!existsSync(calls), `lasm editor called elan: ${existsSync(calls) ? readFileSync(calls, 'utf8') : ''}`);
+    report.launch.editor = 'no elan calls';
   } else {
     // No stub executable on Windows: without elan, lasm editor explains how to get it.
     const result = npxRun('npx lasm editor (no elan)', ['lasm', 'editor'], { cwd: fetchApp, env: environment({ ELAN_HOME: elanHome }), expectFailure: true });

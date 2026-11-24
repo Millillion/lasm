@@ -10,12 +10,5 @@
   (`[[require]] lasm`, path `.lake/lasm-library`). `lasm editor`
   adds the require when it is missing and writes `lean-toolchain` when there is
   none. Thanks to @paulbutcher for the report and the analysis.
-- **Migration:** nothing to do. The first `lasm build`, `lasm dev`, `lasm init`
-  or `lasm editor` in a project removes the override an older Lasm set, and
-  prints one line saying so. An override you set to another toolchain stays.
-  These automatic steps don't run on CI or with `LASM_EDITOR=0`; run
-  `elan override unset` in the project there. If the editor stops resolving
-  `import Lasm.*` in a project whose lakefile doesn't require Lasm's package,
-  run `npx lasm editor` once (`lasm build` also says so). The `lasm-4.35.0-…`
-  toolchains stay linked in elan, unused; `elan toolchain uninstall <name>`
-  removes them.
+- **Migration:** if an older Lasm set an elan override in your project, run
+  `elan override unset` there once.

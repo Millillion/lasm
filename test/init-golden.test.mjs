@@ -277,7 +277,7 @@ test('runInit prints what it created and the next commands', async t => {
   process.chdir(root);
   assert.equal(await runInit({ directory: 'my-app', template: 'plain', deploy: [] }), 0);
   // Lasm's Lake package is linked only from what is already cached (no download during lasm init, 0.3-7),
-  // then the editor's side of the project (it needs no Lean; it touches elan only to remove an older Lasm's override).
+  // then the editor's side of the project (it needs no Lean and changes nothing in elan).
   assert.deepEqual(globalThis.initLinkCalls, [[join(process.cwd(), 'my-app'), { cachedOnly: true }]]);
   assert.deepEqual(globalThis.initEditorCalls, [[join(process.cwd(), 'my-app', 'Main.lean')]]);
   assert.equal(output[0], `Created my-app (template plain):\n  ${initProjectFiles('plain').join(', ')}\n\nNext:\n  cd my-app\n${nextSteps('plain')}`);
