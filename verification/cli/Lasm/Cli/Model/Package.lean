@@ -37,20 +37,21 @@ def packageTargets : List String := packageTable.map (·.name)
 
 def packageUsage : String := "Usage: lasm package [dist] --target " ++ "|".intercalate packageTargets ++ "|browser [--output PATH] [--allow-dev]
 
-Packages a built Lasm program (lasm build output, default dist/) for a
-function platform. Its main publishes a fetch handler with
+Packages a built Lasm program (default dist/) for the function platform it
+is linked for (lasm build Main.lean --target <target>: Lasm.target reports it,
+so a build is packaged for its own target only). Its main publishes a fetch handler with
 Lasm.JS.exportDefault (Request → Async Response), which the platform's handler
 calls directly. Writes, by target:
 " ++ "\n".intercalate (packageTable.map fun t => "  " ++ padEnd t.name 15 ++ " " ++ padEnd t.output 23 ++ " " ++ t.summary) ++ "
   " ++ padEnd "browser" 15 ++ " " ++ padEnd "(in place)" 23 ++ " a browser build (lasm build --target browser): checked against its manifest, _headers added
 
-lasm build Main.lean --target <target> builds and packages in one step; use
-lasm package to package one build for several platforms. Lasm never installs
+lasm build Main.lean --target <target> builds and packages in one step;
+lasm package packages such a build again. Lasm never installs
 or starts a platform's own tools: test and deploy with the platform's CLI.
 Packages hold release builds; a dev build (lasm build --dev, lasm run) is
 refused unless --allow-dev is given.
 
-Example: npx lasm build Main.lean && npx lasm package --target lambda"
+Example: npx lasm build Main.lean --target lambda"
 
 /-- The `for` loop: `.ok none` is the early `return { command: 'package-help' }`. -/
 def packageLoop (r : Parsed) (positional : List String) : List String → Except String (Option (Parsed × List String))
