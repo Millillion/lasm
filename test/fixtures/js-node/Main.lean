@@ -601,9 +601,9 @@ def childProcesses (r : Checks) : Async Unit := do
   -- stream.Transform from an options object, no subclass (docs/JS_BINDINGS.md, "JavaScript classes"):
   -- transform(chunk, encoding, callback) is a Lean function, and the output is each chunk upper-cased
   let upper ← JSFunction.ofFn fun args => do
-    let chunk ← decodeAs Value "chunk" (args[0]?.getD .undefined)
+    let chunk ← decodeAs ByteArray "chunk" (args[0]?.getD .undefined)   -- a Buffer
     let callback ← decodeAs Value "callback" (args[2]?.getD .undefined)
-    let text ← chunk.callMethod "toString" #[] String
+    let text := String.fromUTF8! chunk
     discard <| callback.call #[.null, toJS text.toUpper] Data
     return .undefined
   let t ← stream.Transform.new (some { transform := some upper })
