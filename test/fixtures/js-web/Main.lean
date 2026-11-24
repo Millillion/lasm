@@ -19,6 +19,7 @@ Output: a line `FAIL <check>: <detail>` per failed check, a line
 of the response to any request (Workers allow timers and I/O only inside one).
 -/
 import Lasm.JS
+import Lasm.Target
 import Lasm.JS.Web.Compression
 import Lasm.JS.Web.Console
 import Lasm.JS.Web.Dom
@@ -971,12 +972,8 @@ def checks : Async (String × Nat) := do
   let s ← r.get
   return ("\n".intercalate (s.lines.push s!"summary {s.passed} {s.failed}").toList ++ "\n", s.failed)
 
-def onWorkers : IO Bool := do
-  if !(← onEdge) then return false
-  return (← (← navigator).userAgent) == "Cloudflare-Workers"
-
 def main : IO UInt32 := do
-  if ← onWorkers then
+  if Lasm.target == .workers then
     -- Workers allow timers and I/O only while a request is handled.
     let handler ← Lasm.JS.Function.ofFn fun _ => do
       let (text, _) ← checks

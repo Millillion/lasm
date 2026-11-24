@@ -412,10 +412,10 @@ const linkSources = ['edge-link.mjs', 'edge-initializers.mjs', '../glue/glue.mjs
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 
 /** The edge program's cache identity: the Node build's signature (its objects
- * and initializer plan), the edge runtime, the edge link and its settings. */
-export function edgeProgramKey({ result, edge, suspend = 'jspi' }) {
-  // Schema 1 keys (JSPI) are unchanged.
-  return sha256(JSON.stringify({ schema: 1, node: result.signature, runtime: edge.identity, settings: edgeLinkSettings, suspend,
+ * and initializer plan), the edge runtime, the edge link and its settings, and
+ * the target it is linked for (Lasm.target, src/target-stamp.mjs). */
+export function edgeProgramKey({ result, edge, suspend = 'jspi', target }) {
+  return sha256(JSON.stringify({ schema: 1, node: result.signature, runtime: edge.identity, settings: edgeLinkSettings, suspend, target,
     sources: Object.fromEntries(linkSources.map(file => [file, sha256(readFileSync(join(here, file)))])) }));
 }
 
@@ -434,9 +434,9 @@ function cachedProgram(result, key) {
 }
 
 /** Phase 1 of an edge build: the cached program for an unchanged Node build, or null. */
-export async function findEdgeProgram({ result, nodeRuntime, suspend = 'jspi' }) {
+export async function findEdgeProgram({ result, nodeRuntime, suspend = 'jspi', target }) {
   const edge = await edgeRuntime(nodeRuntime);
-  const key = edgeProgramKey({ result, edge, suspend });
+  const key = edgeProgramKey({ result, edge, suspend, target });
   return { edge, key, suspend, cached: cachedProgram(result, key) };
 }
 
@@ -460,13 +460,13 @@ function edgeMembers(root, edge) {
 }
 
 /** Phase 2 (cache miss): link the program from a build made with keepLinkWork and cache it. */
-export function linkCachedEdgeProgram({ result, nodeRuntime, edge, key, sdk, suspend = 'jspi', verbose = false }) {
+export function linkCachedEdgeProgram({ result, nodeRuntime, edge, key, sdk, suspend = 'jspi', target, verbose = false }) {
   if (!result.linkWork) throw new Error('The edge build needs the Node build\'s link inputs (internal error)');
   const root = cacheRoot(result), directory = join(root, key), staging = join(root, '.' + key + '.' + process.pid + '.partial');
   rmSync(staging, { recursive: true, force: true });
   let link;
   // A dev Node build (lasm dev) gets the edge link's dev profile; deployable edge builds are release builds.
-  try { link = linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork: result.linkWork, out: join(staging, '.link'), suspend, verbose,
+  try { link = linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork: result.linkWork, out: join(staging, '.link'), suspend, target, verbose,
     optimize: result.profile !== 'dev' && !testUnoptimized(), stepCache: edgeStepCache(), members: result.profile === 'dev' ? edgeMembers(root, edge) : undefined }); }
   catch (error) { rmSync(staging, { recursive: true, force: true }); throw error; }
   copyFileSync(link.program, join(staging, 'program.mjs'));
@@ -474,11 +474,13 @@ export function linkCachedEdgeProgram({ result, nodeRuntime, edge, key, sdk, sus
   // LASM_KEEP_LINK_WORK keeps the link's intermediates (its -Map file, for size analysis).
   if (process.env.LASM_KEEP_LINK_WORK) renameSync(join(staging, '.link'), join(staging, 'link-work'));
   else rmSync(join(staging, '.link'), { recursive: true, force: true });
-  const meta = { key, suspend: link.suspend, files: Object.fromEntries(['program.mjs', 'program.wasm'].map(file => [file, sha256(readFileSync(join(staging, file)))])) };
+  const meta = { key, suspend: link.suspend, ...(target ? { target } : {}), files: Object.fromEntries(['program.mjs', 'program.wasm'].map(file => [file, sha256(readFileSync(join(staging, file)))])) };
   writeFileSync(join(staging, 'program.json'), JSON.stringify(meta, null, 2) + '\n');
-  // One cached program per application and suspension: older keys are superseded.
+  // One cached program per application, suspension and target: older keys are superseded.
   // Dev builds (lasm dev) keep the two before it too, so undoing an edit reuses its program.
-  const suspendOf = entry => { try { return JSON.parse(readFileSync(join(root, entry, 'program.json'), 'utf8')).suspend; } catch { return null; } };
+  const recordOf = entry => { try { return JSON.parse(readFileSync(join(root, entry, 'program.json'), 'utf8')); } catch { return null; } };
+  // An unreadable record (an older layout): null, superseded too; another target's program: kept.
+  const suspendOf = entry => { const record = recordOf(entry); return !record ? null : record.target === meta.target ? record.suspend : undefined; };
   const mtime = entry => { try { return statSync(join(root, entry)).mtimeMs; } catch { return 0; } };
   const older = readdirSync(root).filter(entry => entry !== key && !entry.startsWith('.') && [link.suspend, null].includes(suspendOf(entry)))
     .sort((a, b) => mtime(b) - mtime(a));

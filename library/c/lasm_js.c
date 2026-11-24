@@ -227,10 +227,10 @@ LEAN_EXPORT lean_obj_res lasm_js_start(lean_obj_arg dispatch) {
 }
 /* : IO Bool (no world argument in Lean 4.35's C) -- `waitForever` on the thread that runs `main`: unless
    a poller exists already, this thread becomes it and never returns. Elsewhere
-   (a task, or a poller already started) it returns false at once, and the caller
-   waits as before. */
+   (a task, or a poller already started) it returns true at once: the caller
+   blocks. (The edge glue returns false: the caller returns.) */
 LEAN_EXPORT lean_obj_res lasm_js_park(void) {
-    if (!lasm_main_thread_is_current() || !claim_poller()) return lean_io_result_mk_ok(lean_box(0));
+    if (!lasm_main_thread_is_current() || !claim_poller()) return lean_io_result_mk_ok(lean_box(1));
     interop_loop();
     return lean_io_result_mk_ok(lean_box(1));
 }
@@ -477,7 +477,8 @@ LEAN_EXPORT lean_obj_res lasm_js_call(uint32_t op, uint32_t handle, uint64_t arg
 LEAN_EXPORT lean_obj_res lasm_js_value_of_handle(uint32_t handle) { (void)handle; return unavailable(); }
 LEAN_EXPORT uint32_t lasm_js_value_handle(b_lean_obj_arg v) { (void)v; return 0; }
 LEAN_EXPORT lean_obj_res lasm_js_start(lean_obj_arg dispatch) { lean_dec(dispatch); return unavailable(); }
-LEAN_EXPORT lean_obj_res lasm_js_park(void) { return lean_io_result_mk_ok(lean_box(0)); }
+/* waitForever natively: the caller blocks. */
+LEAN_EXPORT lean_obj_res lasm_js_park(void) { return lean_io_result_mk_ok(lean_box(1)); }
 LEAN_EXPORT lean_obj_res lasm_js_await_into(b_lean_obj_arg p, b_lean_obj_arg v, b_lean_obj_arg k) { (void)p; (void)v; (void)k; return unavailable(); }
 LEAN_EXPORT lean_obj_res lasm_js_call_into(b_lean_obj_arg p, uint32_t op, uint32_t handle, uint64_t arg, b_lean_obj_arg input, b_lean_obj_arg keep) {
     (void)p; (void)op; (void)handle; (void)arg; (void)input; (void)keep; return unavailable();

@@ -7,7 +7,9 @@ its specification (docs/JS_BINDINGS.md):
 - project files: `@[js "./ffi/files.mjs" …]` binds the project's own ES module,
   relative to this file, and the files it imports by relative path ship with it;
 - classes: `Lasm.JS.Class.define` makes a real class extending a base, whose
-  constructor, methods and getters are Lean functions given `this`.
+  constructor, methods and getters are Lean functions given `this`;
+- target: `Lasm.target` is the target the program is built for, which the host's
+  own globals show (ffi/host.mjs).
 
 Output: a line `FAIL <check>: <detail>` per failed check, a line
 `section <name>: <passed> passed, <failed> failed` per section, and
@@ -15,6 +17,7 @@ Output: a line `FAIL <check>: <detail>` per failed check, a line
 -/
 import Lasm.JS
 import Lasm.JS.Class
+import Lasm.Target
 open Lasm.JS
 
 structure Report where
@@ -95,21 +98,25 @@ def classes (r : Checks) : IO Unit := runSection r "classes" do
   let n ← inst.get "count" Nat
   expect r "new from Lean" (n == 2) s!"{n}"
 
+/-! Lasm.target: the build's target, against the host the program runs on. -/
+
+@[js "./ffi/host.mjs" "host"] opaque jsHost : IO String
+
+def targetSection (r : Checks) : IO Unit := runSection r "target" do
+  let host ← jsHost
+  expect r "Lasm.target" (Lasm.target.name == host) s!"built for {Lasm.target}, running on {host}"
+
 def checks : IO String := do
   let r : Checks ← IO.mkRef {}
   projectFiles r
   classes r
+  targetSection r
   let s ← r.get
   return "\n".intercalate (s.lines.push s!"summary {s.passed} {s.failed}").toList ++ "\n"
 
-/-- Cloudflare Workers (`navigator.userAgent`), where a program runs its checks in a request. -/
-def onWorkers : IO Bool := do
-  if !(← onEdge) then return false
-  let nav ← (← global).get "navigator"
-  return (← nav.get "userAgent" (Option String)) == some "Cloudflare-Workers"
-
 def main : IO Unit := do
-  if ← onWorkers then
+  -- On Cloudflare Workers, a program runs its checks in a request.
+  if Lasm.target == .workers then
     -- On Workers, the checks run in the first request and answer its body.
     let handler ← Function.ofFn fun _ => do
       let text ← checks

@@ -3,8 +3,8 @@ import { parseInitArguments } from './init.mjs';
 import { parsePackageArguments, packageTargets } from './package.mjs';
 import { jsRuntime } from './js-runtime.mjs';
 import { parseDevArguments } from './dev.mjs';
-import { asciiLower, closest, targetAliases } from './cli-names.mjs';
-export { asciiLower, closest, editDistance, targetHintAmong } from './cli-names.mjs';
+import { asciiLower, buildTargets, closest, targetAliases } from './cli-names.mjs';
+export { asciiLower, buildTargets, closest, editDistance, targetHintAmong } from './cli-names.mjs';
 
 // `lasm build --target`: `node` writes dist/ only; a function platform also
 // packages it (src/package.mjs). Lasm builds for the platform; it never
@@ -16,7 +16,7 @@ export const edgeBuildTargets = ['workers', 'vercel-edge', 'netlify-edge', 'bun'
 // list equals src/wasi/wasi-build.mjs wasiTargets (test/wasi.test.mjs).
 export const wasiBuildTargets = ['wasi', 'fastly', 'wasi-http'];
 // The browser (docs/BROWSER.md): the edge program as a static web app.
-export const buildTargets = ['node', ...Object.keys(packageTargets), ...edgeBuildTargets, ...wasiBuildTargets, 'browser'];
+// buildTargets (src/cli-names.mjs) is node, packageTargets, these and the browser.
 // Every target but node writes what is deployed: --output names it (default:
 // the platform's own place in the project, such as workers/, wasi/ or
 // lambda.zip), and the Node build it is made from stays in the build cache

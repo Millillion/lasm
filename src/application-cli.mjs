@@ -138,7 +138,7 @@ export async function buildEdge(input, target, buildOptions, verbose, { build, l
   // globals of the target runtime that Node lacks only warn.
   buildOptions = { ...buildOptions, webTarget: target, bindingTarget: target };
   let result = await buildApplicationWithProgress(input, { ...buildOptions, keepLinkWork: 'if-built', linkOnly });
-  const found = await findEdgeProgram({ result, nodeRuntime, suspend });
+  const found = await findEdgeProgram({ result, nodeRuntime, suspend, target });
   let program = found.cached;
   if (program && result.linkWork && !process.env.LASM_KEEP_LINK_WORK) await rm(result.linkWork, { recursive: true, force: true });
   if (!program) {
@@ -150,7 +150,7 @@ export async function buildEdge(input, target, buildOptions, verbose, { build, l
       const { provisionEdgeLinker } = await import('./edge/edge-link.mjs');
       const sdk = await provisionEdgeLinker(found.edge, { log: message => log('[lasm] ' + message) }, process.env, suspend);
       const stopTicker = (await import('./elapsed-ticker.mjs')).startElapsedTicker(browser ? 'Linking for the browser' : 'Linking the single-threaded program');
-      try { program = linkCachedEdgeProgram({ result, nodeRuntime, edge: found.edge, key: found.key, sdk, suspend, verbose }); }
+      try { program = linkCachedEdgeProgram({ result, nodeRuntime, edge: found.edge, key: found.key, sdk, suspend, target, verbose }); }
       finally { stopTicker(); }
     } finally {
       if (result.linkWork && !process.env.LASM_KEEP_LINK_WORK) await rm(result.linkWork, { recursive: true, force: true });
@@ -284,7 +284,8 @@ export async function runApplicationCli(argv) {
   // (The arguments always name a target: node by default under Node, src/cli-arguments.mjs.)
   const functionPlatform = target !== 'node';
   const { output, ...cachedOptions } = buildOptions;
-  const result = await buildApplicationWithProgress(options.input, { ...(functionPlatform ? cachedOptions : buildOptions), webTarget: target });
+  // A function platform's build is linked for it (Lasm.target, src/target-stamp.mjs).
+  const result = await buildApplicationWithProgress(options.input, { ...(functionPlatform ? cachedOptions : buildOptions), webTarget: target, target });
   await editor();
   const profileNote = result.profile === 'dev' ? ' (dev profile: size optimizations skipped, not for deployment)' : ' (release profile)';
   if (options.command === 'build') {

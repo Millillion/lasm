@@ -13,7 +13,7 @@
 // minute); network adds an unreachable download. A case with `fixedIn` is
 // reported as known, not failed, when the CLI under test is older (the
 // published package before the fix was released).
-import { mkdirSync, chmodSync, existsSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs';
+import { mkdirSync, chmodSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:net';
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
@@ -214,13 +214,11 @@ export const cases = [
   { id: 'generated-file-edited', kind: 'build', args: ['build', 'Main.lean'], files: { 'Main.lean': main }, prepare: ['build', 'Main.lean'],
     afterPrepare: dir => writeFileSync(join(dir, 'dist/main.mjs'), readFileSync(join(dir, 'dist/main.mjs'), 'utf8') + '// my edit\n'),
     expect: /Generated application file was modified: .*main\.mjs\. Preserve the edit or choose a different output directory/ },
-  { id: 'package-needs-an-npm-package', kind: 'build', args: ['package', 'dist', '--target', 'azure-functions'], files: { 'Main.lean': main }, prepare: ['build', 'Main.lean'],
+  { id: 'package-needs-an-npm-package', kind: 'build', args: ['build', 'Main.lean', '--target', 'azure-functions'], files: { 'Main.lean': main },
     expect: /This target needs the npm package @azure\/functions in the build\. Run npm install @azure\/functions next to package\.json/, fixedIn: '0.10.0' },
-  { id: 'package-a-link', kind: 'build', posixUser: true, args: ['package', 'dist', '--target', 'lambda'], files: { 'Main.lean': main }, prepare: ['build', 'Main.lean'],
-    afterPrepare: dir => symlinkSync('main.mjs', join(dir, 'dist/link.mjs')), expect: /link\.mjs is not a regular file; function packages hold regular files only/ },
-  { id: 'package-over-the-build', kind: 'build', args: ['package', 'dist', '--target', 'vercel', '--output', '.'], files: { 'Main.lean': main }, prepare: ['build', 'Main.lean'],
-    expect: /The output must not contain the build directory/ },
-  { id: 'package-a-dev-build', kind: 'build', args: ['package', 'dist', '--target', 'lambda'], files: { 'Main.lean': main }, prepare: ['build', 'Main.lean', '--dev'], expect: /dev build/i },
+  // Lasm.target is stamped in at link time: a Node build is not packaged for a function platform.
+  { id: 'package-another-target', kind: 'build', args: ['package', 'dist', '--target', 'lambda'], files: { 'Main.lean': main }, prepare: ['build', 'Main.lean'],
+    expect: /dist is linked for --target node, not lambda: Lasm\.target reports the target a program is linked for\. Build it with lasm build <Main\.lean> --target lambda\./ },
 
   // lasm dev: a Lean error in the first build and in a rebuild (printed with
   // its file and line; lasm dev keeps watching, so the case ends with Ctrl+C,

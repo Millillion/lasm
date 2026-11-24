@@ -3,6 +3,15 @@
 // imports: src/package.mjs, src/init.mjs and src/dev.mjs use it while
 // src/cli-arguments.mjs is still loading them.
 
+// Every `--target`, in order: node, the function platforms (src/package.mjs
+// packageTargets), the edge targets, the WASI targets and the browser
+// (src/cli-arguments.mjs re-exports it; test/cli-parse.test.mjs checks it
+// against those lists). Lasm.Target's constructors are these, in this order:
+// a build links the target's index (src/target-stamp.mjs), and
+// test/lasm-target.test.mjs fails on drift.
+export const buildTargets = Object.freeze(['node', 'lambda', 'lambda-edge', 'vercel', 'netlify', 'azure-functions', 'cloud-functions',
+  'workers', 'vercel-edge', 'netlify-edge', 'bun', 'deno', 'deno-deploy', 'supabase-edge', 'wasi', 'fastly', 'wasi-http', 'browser']);
+
 // Names people try for a target, and the target they mean.
 export const targetAliases = { cloudflare: 'workers', 'cloudflare-workers': 'workers', worker: 'workers', aws: 'lambda', 'aws-lambda': 'lambda',
   cloudfront: 'lambda-edge', supabase: 'supabase-edge', 'deno-deploy-edge': 'deno-deploy', spin: 'wasi-http', wasmtime: 'wasi', web: 'browser',

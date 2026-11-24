@@ -33,20 +33,21 @@ export const packageTargets = {
 
 export const packageUsage = `Usage: lasm package [dist] --target ${Object.keys(packageTargets).join('|')}|browser [--output PATH] [--allow-dev]
 
-Packages a built Lasm program (lasm build output, default dist/) for a
-function platform. Its main publishes a fetch handler with
+Packages a built Lasm program (default dist/) for the function platform it
+is linked for (lasm build Main.lean --target <target>: Lasm.target reports it,
+so a build is packaged for its own target only). Its main publishes a fetch handler with
 Lasm.JS.exportDefault (Request → Async Response), which the platform's handler
 calls directly. Writes, by target:
 ${Object.entries(packageTargets).map(([name, t]) => `  ${name.padEnd(15)} ${t.output.padEnd(23)} ${t.summary}`).join('\n')}
   ${'browser'.padEnd(15)} ${'(in place)'.padEnd(23)} a browser build (lasm build --target browser): checked against its manifest, _headers added
 
-lasm build Main.lean --target <target> builds and packages in one step; use
-lasm package to package one build for several platforms. Lasm never installs
+lasm build Main.lean --target <target> builds and packages in one step;
+lasm package packages such a build again. Lasm never installs
 or starts a platform's own tools: test and deploy with the platform's CLI.
 Packages hold release builds; a dev build (lasm build --dev, lasm run) is
 refused unless --allow-dev is given.
 
-Example: npx lasm build Main.lean && npx lasm package --target lambda`;
+Example: npx lasm build Main.lean --target lambda`;
 
 export function parsePackageArguments(tokens) {
   const result = { command: 'package' };
@@ -165,6 +166,11 @@ export function packageApplication({ input = 'dist', target, output, allowDev = 
   if (!spec) throw new Error(`Unknown package target "${target}"`);
   input = resolve(input);
   const nativeTargets = checkApplication(input);
+  // Lasm.target is stamped in when the program is linked (src/target-stamp.mjs): a build is packaged for its own target.
+  const linked = JSON.parse(readFileSync(join(input, 'build-info.json'), 'utf8')).target;
+  if (linked !== target)
+    throw new Error(`${input} is linked for --target ${linked ?? 'node'}, not ${target}: Lasm.target reports the target a program is linked for. `
+      + `Build it with lasm build <Main.lean> --target ${target}.`);
   // Dev builds (lasm run, lasm build --dev) skip Binaryen's size optimization:
   // larger and not the reproducible release artifact. Deploy release builds.
   const profile = buildProfile(input);

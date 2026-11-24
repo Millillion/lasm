@@ -25,6 +25,7 @@ import { indexFunctionTable } from '../scripts/full-lean/function-table-index.mj
 import { optimizeMainTableGrowth } from '../scripts/full-lean/table-growth.mjs';
 import { liveMembers, memberFiles, wasmImports } from './application-live-members.mjs';
 import { stepOutput } from './step-output.mjs';
+import { targetStampObject, targetStampSource } from './target-stamp.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 
@@ -233,7 +234,7 @@ function readInitializationSeed(file, runtime) {
 
 async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVersion, memoryMode, verbose = true, progress,
   linkDriver = selectedLinkDriver(), linkIntermediates, objectCache, sharedCache, analysisCache, profile = 'release', initialization = process.env.LASM_INITIALIZATION, nativeCompilations = [], nativeUnavailable: declaredUnavailable = [],
-  initializationSeed, timings, linkOnly = false }, seedRecord) {
+  initializationSeed, timings, linkOnly = false, target = 'node' }, seedRecord) {
   const seed = seedRecord && new Set(seedRecord.keep);
   const nativeUnavailable = [...declaredUnavailable];
   const time = (name, start) => { if (timings) timings[name] = (timings[name] ?? 0) + performance.now() - start; };
@@ -465,6 +466,11 @@ async function linkApplicationOnce({ sources, sdk, runtime, work, dist, leanVers
     compile(entryC, entryObject, { shared: true });
     initializationInputs.push(entryObject);
   }
+  // Lasm.target: the target this program is linked for (src/target-stamp.mjs).
+  const stampC = join(work, 'lasm-target.c'), stampObject = join(work, targetStampObject);
+  await writeFile(stampC, targetStampSource(target));
+  compile(stampC, stampObject, { shared: true });
+  initializationInputs.push(stampObject);
   const exportsFile = join(work, 'exports.json');
   // Explicit application C exports remain roots. Ordinary Lean declarations,
   // data and imported standard libraries follow the linker's reachability.

@@ -27,6 +27,9 @@ import { join, resolve } from 'node:path';
 import { packageApplication } from '../../src/package.mjs';
 import { sessionCookies, standInApplication } from './stand-in-app.mjs';
 
+// The stand-in build, linked for the platform it is packaged for (Lasm.target: src/package.mjs packages a build for its own target).
+const packageFor = options => { writeFileSync(join(options.input, 'build-info.json'), JSON.stringify({ target: options.target })); return packageApplication(options); };
+
 const [platform, workArg, resultArg] = process.argv.slice(2);
 const platforms = ['lambda', 'vercel', 'netlify', 'azure', 'gcf'];
 assert.ok(platforms.includes(platform) && workArg && resultArg, `Usage: node adapter-platforms.mjs ${platforms.join('|')} WORK_DIR RESULT.json`);
@@ -153,7 +156,7 @@ let ok;
 if (platform === 'lambda') {
   const directory = join(work, 'sam');
   mkdirSync(directory);
-  packageApplication({ input: dist, target: 'lambda', output: join(directory, 'lambda.zip') });
+  packageFor({ input: dist, target: 'lambda', output: join(directory, 'lambda.zip') });
   const architecture = process.arch === 'arm64' ? 'arm64' : 'x86_64';
   writeFileSync(join(directory, 'template.yaml'), `AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
@@ -190,7 +193,7 @@ Resources:
     [await checkAll(`http://127.0.0.1:${port}/v2`, 'AWS Lambda, API Gateway HTTP API (payload 2.0), sam local start-api'),
       await checkAll(`http://127.0.0.1:${port}/v1`, 'AWS Lambda, API Gateway REST API (payload 1.0), sam local start-api')].every(Boolean), { stop: samStop });
 } else if (platform === 'vercel') {
-  const output = packageApplication({ input: dist, target: 'vercel', output: join(work, 'site/.vercel/output') }).output;
+  const output = packageFor({ input: dist, target: 'vercel', output: join(work, 'site/.vercel/output') }).output;
   const func = join(output, 'functions/index.func');
   const modules = process.env.VERCEL_NODE_MODULES;
   assert.ok(modules && existsSync(join(modules, '@vercel/node/dist/dev-server.mjs')), 'set VERCEL_NODE_MODULES to the vercel CLI\'s node_modules');
@@ -206,7 +209,7 @@ Resources:
   mkdirSync(join(project, 'public'), { recursive: true });
   writeFileSync(join(project, 'public/index.html'), '<!doctype html>\n');
   writeFileSync(join(project, 'netlify.toml'), '[build]\n  command = "true"\n  publish = "public"\n\n[functions]\n  directory = "netlify/functions"\n  included_files = ["netlify/functions/lasm/**"]\n');
-  packageApplication({ input: dist, target: 'netlify', output: join(project, 'netlify/functions/lasm') });
+  packageFor({ input: dist, target: 'netlify', output: join(project, 'netlify/functions/lasm') });
   run('netlify', ['build', '--offline'], { cwd: project });
   const task = mkdtempSync(join(tmpdir(), 'lasm-adapters-netlify-'));
   execFileSync('unzip', ['-q', join(project, '.netlify/functions/lasm.zip'), '-d', task]);
@@ -250,12 +253,12 @@ Resources:
     front.close(); spawnSync('docker', ['rm', '-f', id]); rmSync(task, { recursive: true, force: true });
   }
 } else if (platform === 'azure') {
-  const output = packageApplication({ input: dist, target: 'azure-functions', output: join(work, 'azure-functions') }).output;
+  const output = packageFor({ input: dist, target: 'azure-functions', output: join(work, 'azure-functions') }).output;
   const port = await freePort();
   ok = await serving('func', ['start', '--port', String(port)], { cwd: output }, port,
     () => checkAll(`http://127.0.0.1:${port}`, 'Azure Functions: Core Tools func start'));
 } else if (platform === 'gcf') {
-  const output = packageApplication({ input: dist, target: 'cloud-functions', output: join(work, 'cloud-functions') }).output;
+  const output = packageFor({ input: dist, target: 'cloud-functions', output: join(work, 'cloud-functions') }).output;
   const port = await freePort();
   ok = await serving(process.execPath, [join(output, 'node_modules/@google-cloud/functions-framework/build/src/main.js'), '--target=lasm', `--port=${port}`],
     { cwd: output }, port, () => checkAll(`http://127.0.0.1:${port}`, 'Google Cloud Functions: the Functions Framework'));

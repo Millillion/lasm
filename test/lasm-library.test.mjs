@@ -25,7 +25,7 @@ test('the glue, its link flags and the outputs of every module relative to a pre
   assert.deepEqual(libraryLeanVersions, ['4.35.0']);
   const outputs = libraryOutputs();
   assert.equal(outputs.length, 3 * libraryModules.length);
-  assert.deepEqual(outputs.slice(0, 3), ['lib/lean/Lasm/JS/Core.olean', 'lib/lasm/c/Lasm/JS/Core.c', 'src/lean/Lasm/JS/Core.lean']);
+  assert.deepEqual(outputs.slice(0, 3), ['lib/lean/Lasm/Target.olean', 'lib/lasm/c/Lasm/Target.c', 'src/lean/Lasm/Target.lean']);
   assert.deepEqual(outputs.slice(-3), ['lib/lean/Lasm/UI.olean', 'lib/lasm/c/Lasm/UI.c', 'src/lean/Lasm/UI.lean']);
   for (const module of libraryModules) assert.ok(existsSync(join(library, ...module.split('.')) + '.lean'), module);
   assert.equal(new Set(libraryModules).size, libraryModules.length);

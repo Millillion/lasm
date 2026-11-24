@@ -196,7 +196,7 @@ test('dev builds for deployment targets are refused before building unless --all
 test('lasm build for Node: the build, its summary line, the editor, and packaging for a function platform', async () => {
   assert.equal(await cli(['build', source, '--rebuild']), 0);
   // webTarget: the target whose web APIs the build checks (src/web-availability.mjs).
-  assert.deepEqual(named('build'), [[source, { command: 'build', rebuild: true, verbose: false, args: [], input: source, profile: 'release', output: 'dist', webTarget: 'node' }]]);
+  assert.deepEqual(named('build'), [[source, { command: 'build', rebuild: true, verbose: false, args: [], input: source, profile: 'release', output: 'dist', webTarget: 'node', target: 'node' }]]);
   assert.deepEqual(lines.error, [`Built Lean 4.99.0 for Node (release profile): ${program}`]);
   assert.deepEqual(named('autoSetupEditor'), [[source]]);
   assert.deepEqual(named('runPackage'), []);
@@ -213,6 +213,8 @@ test('lasm build for Node: the build, its summary line, the editor, and packagin
   globalThis.cliStandIns.build.buildApplicationWithProgress = record('build', { output: 'out', lean: '4.98.0', profile: 'release', cacheHit: true });
   assert.equal(await cli(['build', source, '--target', 'vercel', '--output', 'v']), 9);
   assert.equal(named('build').at(-1)[1].output, undefined);
+  // A function platform's Node build is linked for it (Lasm.target).
+  assert.equal(named('build').at(-1)[1].target, 'vercel');
   assert.equal(await cli(['build', source, '--output', 'n']), 0);
   assert.equal(named('build').at(-1)[1].output, 'n');
 });
@@ -285,8 +287,9 @@ test('edge targets link a new edge program, building again when the Node build k
   assert.equal(edge, 'edge-runtime'); assert.equal(env, process.env); assert.equal(suspend, 'asyncify');
   assert.deepEqual(named('startElapsedTicker'), [['Linking the single-threaded program']]);
   assert.deepEqual(named('stopTicker'), [['Linking the single-threaded program']]);
+  assert.equal(named('findEdgeProgram')[0][0].target, 'supabase-edge', 'the edge program is linked and cached for its target');
   const [[link]] = named('linkCachedEdgeProgram');
-  assert.deepEqual({ ...link, result: undefined }, { result: undefined, nodeRuntime: 'node-runtime', edge: 'edge-runtime', key: 'edge-key', sdk: 'sdk', suspend: 'asyncify', verbose: true });
+  assert.deepEqual({ ...link, result: undefined }, { result: undefined, nodeRuntime: 'node-runtime', edge: 'edge-runtime', key: 'edge-key', sdk: 'sdk', suspend: 'asyncify', target: 'supabase-edge', verbose: true });
   assert.ok(!existsSync(link.result.linkWork), 'the link inputs are removed after the link');
   const [[written]] = named('writeEdgeOutput');
   assert.equal(written.program, 'linked-program'); assert.equal(written.cacheHit, false); assert.equal(written.output, 'fn');

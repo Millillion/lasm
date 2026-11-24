@@ -382,8 +382,12 @@ private initialize registry : IO.Ref Registry ← IO.mkRef {}
 
 @[extern "lasm_js_start"] private opaque startThread (dispatch : UInt8 → UInt32 → UInt64 → ByteArray → IO Unit) : IO Unit
 @[extern "lasm_js_await_into"] private opaque awaitInto (p : @& IO.Promise (Except String ByteArray)) (value : @& ByteArray) (keep : @& Data) : IO Unit
-/-- On the thread running `main`, becomes Lasm.JS's interop poller and never
-returns; elsewhere (or once a poller runs) returns `false`. -/
+/-- The host's half of `waitForever`, which each host's glue decides: whether
+the caller blocks. On Node, on the thread running `main`, becomes Lasm.JS's
+interop poller and never returns; elsewhere on Node (or once a poller runs),
+natively and on WASI returns `true`, and the caller blocks. The edge glue
+(Workers, Bun, Deno, the other edge targets and the browser) returns `false`:
+the platform owns the isolate's lifetime. -/
 @[extern "lasm_js_park"] private opaque park : IO Bool
 @[extern "lasm_js_sync_start"] private opaque startSync (dispatch : UInt32 → ByteArray → IO (ByteArray × Data)) : IO Unit
 
@@ -734,24 +738,17 @@ instance [ToJS α] [Bindable β] : Bindable (α → β) where
   arity := Bindable.arity β + 1
   bind b args := fun a => Bindable.bind b (args.push (toJS a))
 
-/-- Whether this program runs in Lasm's edge build (`lasm build --target workers`:
-an isolate such as Cloudflare Workers, single-threaded, no files) rather than on
-Node. The edge host answers the protocol query (op 200) with a second word, 1. -/
-def onEdge : IO Bool := do
-  if !isAvailable then return false
-  let reply ← hostCall 200 0 0 .empty
-  return reply.size ≥ 8 && reply.get! 4 == 1
-
 /-- Blocks the calling thread forever, for servers whose work happens in
 JavaScript callbacks (stop them with `IO.Process.exit` from a callback, or a signal).
-In an edge build it returns at once: the platform owns the isolate's lifetime,
-and requests arrive after `main` has returned. -/
+In an edge build (Workers, Bun, Deno, the other edge targets and the browser)
+it returns at once: the platform owns the isolate's lifetime, and requests
+arrive after `main` has returned. -/
 def waitForever : IO Unit := do
-  if ← onEdge then return
-  -- On the thread running `main`, serve JavaScript's events here (Lasm.JS's
-  -- interop loop, which never returns) rather than in a thread of their own:
-  -- each thread is a Node Worker that costs start-up time. Elsewhere, wait.
-  if ← park then return
+  -- Each host's glue decides (`park`): on Node, the thread running `main` serves
+  -- JavaScript's events here (Lasm.JS's interop loop, which never returns) rather
+  -- than in a thread of their own, as each thread is a Node Worker that costs
+  -- start-up time; the edge glue returns at once. Elsewhere, wait.
+  if !(← park) then return
   let p : IO.Promise Unit ← IO.Promise.new
   -- Keep `p` alive: a dropped promise would resolve `result?` with `none`.
   let r ← IO.mkRef (some p)
@@ -791,10 +788,9 @@ def exportDefault [DefaultExport α] (x : α) : IO Unit := do
   let v ← DefaultExport.toDefaultExport x
   let g ← global
   g.set "__lasmDefaultExport" v
-  if ← onEdge then return
   -- The function platforms' entry (src/serverless/lasm-function.mjs) sets
   -- `globalThis.__lasmFunctionHost`, a function that receives the handler, and
-  -- takes requests once it has it.
+  -- takes requests once it has it. No edge entry sets it.
   match ← g.get "__lasmFunctionHost" Data with
   | .ref publish _ =>
     let _ : Data ← publish.call #[v] Data
