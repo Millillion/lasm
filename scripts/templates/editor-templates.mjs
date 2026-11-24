@@ -13,15 +13,13 @@
 // that module through Lake (decision 0.3-7).
 // The `lean-exe` project (not a template; issue #343, decision 0.7-25) is `lake
 // new hello exe`: a native `lake build` of its lean_exe, with no C compiler on
-// PATH but a `cc` that fails, works before `lasm build`, fails under the elan
-// override an older Lasm set (Lasm's toolchain without Lean's clang), and works
-// again after `lasm build` (with the editor setup on, LASM_EDITOR=1) has removed
-// that override; a second `lasm build` leaves elan alone.
+// PATH but a `cc` that fails, works before and after `lasm build` (with the
+// editor setup on, LASM_EDITOR=1), and lasm build sets no elan override.
 // Needs elan on PATH.
 //   node editor-templates.mjs CANDIDATE_TGZ WORK_DIR RESULT.json [--templates a,b]
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { copyFileSync, existsSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { delimiter, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -77,20 +75,8 @@ const lasm = [process.execPath, join(work, 'cli', 'node_modules', '@lasm', 'comp
 let failed = 0;
 // lean-exe (#343): no C compiler on PATH, only elan and a `cc` that fails and leaves a mark when run.
 const elanHome = process.env.ELAN_HOME || join(homedir(), '.elan');
-const elan = join(dirname(lake), exe('elan'));
 const poison = join(work, 'poisoned-cc');
 const nativeEnv = { PATH: [poison, dirname(lake)].join(delimiter) };
-/** The elan toolchain an older Lasm linked and set as the override: Lean 4.35.0 without Lean's clang (only lean, lake and their libraries). */
-function olderLasmOverride(app) {
-  const official = join(elanHome, 'toolchains', 'leanprover--lean4---v4.35.0'), older = join(work, 'older-lasm-toolchain');
-  mkdirSync(join(older, 'bin'), { recursive: true });
-  for (const tool of ['lean', 'lake']) copyFileSync(join(official, 'bin', exe(tool)), join(older, 'bin', exe(tool)));
-  for (const directory of ['lib', 'include']) if (!existsSync(join(older, directory))) symlinkSync(join(official, directory), join(older, directory));
-  for (const args of [['toolchain', 'link', 'lasm-4.35.0-0123456789ab', older], ['override', 'set', 'lasm-4.35.0-0123456789ab']]) {
-    const r = spawnSync(elan, args, { cwd: app, encoding: 'utf8' });
-    assert.equal(r.status, 0, `elan ${args.join(' ')}: ${r.stderr}`);
-  }
-}
 const overrideOf = app => { try { return readFileSync(join(elanHome, 'settings.toml'), 'utf8').split('\n').find(line => line.startsWith(JSON.stringify(app))); } catch { return undefined; } };
 for (const template of templates) {
   const app = join(work, `app-${template}`), entry = { template, steps: [] };
@@ -106,34 +92,25 @@ for (const template of templates) {
   const requireAdded = (label, r) => /added Lasm's library to lakefile\.toml/.test(r.stderr ?? '') ? undefined : `${label}: expected the require of Lasm's Lake package to be added`;
   const noOverride = (label, r) => overrideOf(app) ? `${label}: an elan override is set for ${app}: ${overrideOf(app)}`
     : /elan override set|elan toolchain lasm-/.test(r.stderr ?? '') ? `${label}: Lasm reported changing elan` : undefined;
-  const removed = (label, r) => /removed this directory's elan override to Lasm's toolchain lasm-4\.35\.0-0123456789ab/.test(r.stderr ?? '')
-    ? noOverride(label, { stderr: '' }) : `${label}: expected lasm build to remove the older Lasm's elan override`;
   const nativeBuilt = (label, r) => existsSync(join(poison, 'used')) ? `${label}: the system \`cc\` was run (${readFileSync(join(poison, 'used'), 'utf8').trim()})`
     : existsSync(join(app, '.lake', 'build', 'bin', exe('hello'))) ? undefined : `${label}: no hello executable`;
   const clean = ['clean the native build', process.execPath, ['-e', `require('node:fs').rmSync(${JSON.stringify(join(app, '.lake', 'build'))}, { recursive: true, force: true }); require('node:fs').rmSync(${JSON.stringify(join(poison, 'used'))}, { force: true })`], app];
   const steps = leanExe ? [
     ['lake build (native, before lasm)', lake, ['build'], app, nativeBuilt, nativeEnv],
-    ['an older Lasm\'s elan override', process.execPath, ['-e', ''], app, () => { olderLasmOverride(app); }],
-    clean,
-    // The issue's failure, which the steps below must remove: Lake falls back to the failing `cc`.
-    ['lake build (native, under the older override)', lake, ['build'], app, (label, r) => r.status !== 0 && existsSync(join(poison, 'used')) ? undefined : `${label}: expected the build to fail on cc`, nativeEnv, true],
-    ['lasm build', lasm[0], [lasm[1], 'build', 'Main.lean'], app, removed, { LASM_EDITOR: '1' }],
+    ['lasm build', lasm[0], [lasm[1], 'build', 'Main.lean'], app, noOverride, { LASM_EDITOR: '1' }],
     clean,
     ['lake build (native, after lasm build)', lake, ['build'], app, nativeBuilt, nativeEnv],
-    ['lasm build (again)', lasm[0], [lasm[1], 'build', 'Main.lean'], app, noOverride, { LASM_EDITOR: '1' }],
-    clean,
-    ['lake build (native, after the second lasm build)', lake, ['build'], app, nativeBuilt, nativeEnv],
   ] : [
     ...(cPackage || lakeLibrary ? [] : [['init', lasm[0], [lasm[1], 'init', app, '--template', template], work]]),
     ['lasm editor', lasm[0], [lasm[1], 'editor'], app, lakeLibrary ? (label, r) => requireAdded(label, r) ?? noOverride(label, r) : noOverride],
     ...(cPackage ? [['lake setup-file', lake, ['setup-file', join(app, 'App.lean')], app]] : []),
     ['language server', process.execPath, [check, app, lake, '900'], app]];
-  for (const [label, command, argv, cwd, verify, env, expectFailure] of steps) {
+  for (const [label, command, argv, cwd, verify, env] of steps) {
     const { r, step } = run(`${template}: ${label}`, command, argv, cwd ?? app, env);
-    const problem = r.status === 0 || expectFailure ? verify?.(label, r) : undefined;
+    const problem = r.status === 0 ? verify?.(label, r) : undefined;
     if (problem) { step.problem = problem; console.log(problem); }
     entry.steps.push(step); save();
-    if ((r.status !== 0 && !expectFailure) || problem) { failed++; entry.passed = false; break; }
+    if (r.status !== 0 || problem) { failed++; entry.passed = false; break; }
   }
   entry.passed ??= true; save();
 }

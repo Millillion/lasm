@@ -5,7 +5,7 @@ import { resolve, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn, spawnSync } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
-import { GiB, hostMemory, currentCgroup } from './resource-guard.mjs';
+import { GiB, hostMemory, currentCgroup, workingSetBytes } from './resource-guard.mjs';
 import { completedCgroupRemoval } from './completed-cgroup.mjs';
 
 const args = process.argv.slice(2);
@@ -37,9 +37,11 @@ function counters(file) {
 }
 function usage(path) {
   const number = name => Number(readFileSync(join(path, name), 'utf8'));
-  return { memoryBytes: number('memory.current'), peakMemoryBytes: number('memory.peak'),
+  const stat = counters(join(path, 'memory.stat'));
+  const memoryBytes = number('memory.current');
+  return { memoryBytes, workingSetBytes: workingSetBytes(memoryBytes, stat), peakMemoryBytes: number('memory.peak'),
     swapBytes: number('memory.swap.current'), tasks: number('pids.current'),
-    memoryBreakdown: Object.fromEntries(Object.entries(counters(join(path, 'memory.stat')))
+    memoryBreakdown: Object.fromEntries(Object.entries(stat)
       .filter(([key]) => ['anon', 'file', 'shmem', 'kernel', 'slab', 'file_mapped', 'inactive_file'].includes(key))),
     pressureSomeAvg10: Number(readFileSync(join(path, 'memory.pressure'), 'utf8').match(/^some avg10=([\d.]+)/m)?.[1] ?? 0),
     memoryEvents: counters(join(path, 'memory.events')) };
@@ -85,7 +87,7 @@ if (args[0] === '--capture') {
   mkdirSync(dirname(report), { recursive: true });
   const evidence = { startedAt: new Date().toISOString(), command, cwd: process.cwd(), unit, id,
     limits: { memoryMax: limit, memoryHigh: 'infinity', stopMemoryBytes: Math.floor(limit * 0.8), memorySwapMax: 0, tasksMax: 1024, nice: 0, coreFileBytes: 0 },
-    hostAtStart: memory, minimumHostAvailable: memory.available, peakMemoryBytes: 0, peakTasks: 0,
+    hostAtStart: memory, minimumHostAvailable: memory.available, peakMemoryBytes: 0, peakWorkingSetBytes: 0, peakTasks: 0,
     report, status: 'starting' };
   const save = () => writeFileSync(report, JSON.stringify(evidence, null, 2) + '\n');
   save();
@@ -154,13 +156,18 @@ if (args[0] === '--capture') {
       }
       evidence.status = 'running'; evidence.cgroup = cgroup;
       evidence.peakMemoryBytes = Math.max(evidence.peakMemoryBytes, sample.peakMemoryBytes);
+      if (sample.workingSetBytes > evidence.peakWorkingSetBytes)
+        Object.assign(evidence, { peakWorkingSetBytes: sample.workingSetBytes, peakWorkingSetBreakdown: sample.memoryBreakdown });
       evidence.peakTasks = Math.max(evidence.peakTasks, sample.tasks);
       evidence.lastSample = { at: new Date().toISOString(), ...sample };
       evidence.minimumHostAvailable = Math.min(evidence.minimumHostAvailable, hostMemory().available);
-      if (sample.memoryBytes >= evidence.limits.stopMemoryBytes) stop('Workload reached its proactive memory budget');
+      // The proactive budget counts the working set, not reclaimable cache
+      // (workingSetBytes). MemoryMax stays the kernel backstop over all of it,
+      // and the pressure and host-headroom stops below catch reclaim trouble.
+      if (sample.workingSetBytes >= evidence.limits.stopMemoryBytes) stop('Workload reached its proactive memory budget');
       if (sample.pressureSomeAvg10 >= 5) stop('Workload memory pressure reached 5 percent');
       if (evidence.minimumHostAvailable < 8 * GiB) stop('Host available memory fell below 8 GiB');
-      if (!stopping && !evidence.highWaterProcesses && sample.memoryBytes >= limit * 0.6)
+      if (!stopping && !evidence.highWaterProcesses && sample.workingSetBytes >= limit * 0.6)
         evidence.highWaterProcesses = { at: sample.at ?? new Date().toISOString(), processes: processMemory(cgroup) };
       save();
     } catch (error) {
@@ -192,6 +199,9 @@ if (args[0] === '--capture') {
     || (evidence.service?.memoryEvents?.oom_kill ?? 0) > 0;
   evidence.memoryThrottled = (evidence.service?.memoryEvents?.high ?? 0) > 0;
   save();
-  console.error(`[lasm] Peak ${(evidence.peakMemoryBytes / GiB).toFixed(2)} GiB; ${evidence.service?.serviceResult ?? 'launch failed'}${evidence.resourceLimited ? '; resource-limited run, not a conformance result' : ''}`);
+  const breakdown = evidence.peakWorkingSetBreakdown ?? {};
+  console.error(`[lasm] Peak ${(evidence.peakMemoryBytes / GiB).toFixed(2)} GiB with cache, working set ${(evidence.peakWorkingSetBytes / GiB).toFixed(2)} GiB`
+    + ` (anon ${((breakdown.anon ?? 0) / GiB).toFixed(2)}, file ${((breakdown.file ?? 0) / GiB).toFixed(2)}, inactive file ${((breakdown.inactive_file ?? 0) / GiB).toFixed(2)} GiB)`
+    + ` of a ${(evidence.limits.stopMemoryBytes / GiB).toFixed(2)} GiB budget; ${evidence.service?.serviceResult ?? 'launch failed'}${evidence.resourceLimited ? '; resource-limited run, not a conformance result' : ''}`);
   process.exitCode = evidence.resourceLimited || evidence.monitorError ? 125 : result.code ?? 1;
 }
