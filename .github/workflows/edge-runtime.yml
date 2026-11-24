@@ -52,7 +52,7 @@ jobs:
       - name: Managed SDK
         run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sdk-resources.json -- node scripts/ci/application-runtime-source.mjs sdk
       - name: Pinned public sources
-        run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sources-resources.json -- node scripts/ci/application-runtime-source.mjs sources
+        uses: ./.github/actions/verified-sources
       - name: Fetch the pinned Node runtime (standard-library archives to reuse)
         env:
           GH_TOKEN: ${{ github.token }}

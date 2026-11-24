@@ -83,9 +83,9 @@ jobs:
           package-manager-cache: false
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - uses: ./.github/actions/process-guard
+      - uses: ./.github/actions/verified-sources
       - name: Native host pieces (koffi, helpers)
         run: |
-          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sources-resources.json -- node scripts/ci/application-runtime-source.mjs sources
           node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/hosts-resources.json -- node scripts/ci/application-runtime-source.mjs hosts
       - run: tar -cf .work/native-host.tar -C .cache native-host
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

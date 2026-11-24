@@ -1,18 +1,16 @@
 // Reproduce the AOT runtime from public source on an isolated CI runner.
 // This is a maintainer control, not npm publication or an installed-package gate.
 import assert from 'node:assert/strict';
-import { createWriteStream, existsSync, mkdirSync, readFileSync, writeFileSync, renameSync, statfsSync } from 'node:fs';
+import { constants, copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync, renameSync, statfsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { Readable, Transform } from 'node:stream';
-import { pipeline } from 'node:stream/promises';
-import { createHash } from 'node:crypto';
 import { ensureResourceGuard } from '../full-lean/resource-guard.mjs';
 import { maintainerSdk } from '../full-lean/maintainer-sdk.mjs';
 import { provisionLean } from '../../src/managed-lean.mjs';
 import { hashFile } from '../../src/managed-artifacts.mjs';
 import { verifyApplicationRuntime, applicationRuntimeCatalog } from '../../src/application-runtime.mjs';
 import { buildApplication } from '../../src/application-build.mjs';
+import { candidateUrls, obtainVerified, zigMirrors } from './verified-download.mjs';
 
 await ensureResourceGuard();
 assert.equal(process.platform + '-' + process.arch, 'linux-x64');
@@ -55,20 +53,20 @@ try {
         sha256: zig.officialSha256, directory: 'zig-x86_64-linux-0.16.0' },
     ];
     mkdirSync('.cache/downloads', { recursive: true });
+    // Verified store restored by .github/actions/verified-sources; Zig comes
+    // from its community mirrors first (scripts/ci/verified-download.mjs).
+    const store = resolve('.cache/verified-sources');
     for (const input of inputs) {
       const file = resolve('.cache/downloads', input.name);
       assert.ok(!existsSync(file), 'Cold source CI must not reuse unverified local inputs');
-      const response = await fetch(input.url, { signal: AbortSignal.timeout(180_000) });
-      assert.ok(response.ok && response.body && new URL(response.url).protocol === 'https:');
-      let bytes = 0; const hash = createHash('sha256');
-      const check = new Transform({ transform(chunk, _, callback) {
-        bytes += chunk.length; hash.update(chunk);
-        callback(bytes > input.bytes ? new Error('Source download exceeds its pinned size') : null, chunk);
-      } });
-      await pipeline(Readable.fromWeb(response.body), check, createWriteStream(file + '.partial', { flags: 'wx' }));
-      const observed = { ...input, observedBytes: bytes, observedSha256: hash.digest('hex') };
+      const candidates = input.name.startsWith('zig-') ? candidateUrls(input.url, await zigMirrors()) : [input.url, input.url, input.url];
+      const got = await obtainVerified(input, { store, candidates });
+      copyFileSync(got.path, file + '.partial', constants.COPYFILE_EXCL);
+      const copied = await hashFile(file + '.partial');
+      const observed = { ...input, observedBytes: got.bytes, observedSha256: copied, source: got.source, failedSources: got.failures };
       (result.downloads ??= []).push(observed); record();
-      assert.equal(bytes, input.bytes, input.name + ': pinned source size');
+      assert.equal(got.bytes, input.bytes, input.name + ': pinned source size');
+      assert.equal(got.sha256, input.sha256, input.name + ': pinned source checksum');
       assert.equal(observed.observedSha256, input.sha256, input.name + ': pinned source checksum');
       renameSync(file + '.partial', file);
       if (input.directory) {

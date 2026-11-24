@@ -49,9 +49,9 @@ jobs:
           package-manager-cache: false
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - uses: ./.github/actions/process-guard
+      - uses: ./.github/actions/verified-sources
       - name: Native host pieces (koffi, helpers)
         run: |
-          node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sources-resources.json -- node scripts/ci/application-runtime-source.mjs sources
           node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/hosts-resources.json -- node scripts/ci/application-runtime-source.mjs hosts
       - name: Fetch the pinned Node runtime
         env:
