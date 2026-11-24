@@ -41,7 +41,7 @@ name: Standard bindings (Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno, Lasm.JS.Bun, L
 #   - conformance also builds test/fixtures/js-core, Lasm.JS's own features (the
 #     project's JavaScript files, @[js "./ffi/x.mjs" …], Lasm.target against the
 #     host's own globals), for every target;
-#   - target-report: Lasm.target (docs/api/decisions/0.6.md, 0.6-33) on every
+#   - target-report: Lasm.target (docs/api/decisions/0.6.md, 0.6-20) on every
 #     --target but the browser (js-core's): the same candidate builds
 #     test/fixtures/target for each and runs it, which must print its own target
 #     (scripts/ci/target-report.mjs; wasi-http under wasmtime serve).

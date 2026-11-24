@@ -1,5 +1,6 @@
-// `lasm package`: turns a built application (`lasm build` output, default
-// dist/) into a function-platform deployment. File operations only: no
+// `lasm package`: turns a built application linked for a function platform
+// (`lasm build --target <platform>`; Lasm.target, src/target-stamp.mjs) into
+// that platform's deployment. File operations only: no
 // network, no Lean toolchain. Each target adds a small handler shim
 // (src/serverless/) that starts the Lean program inside the platform's Node
 // process and calls the fetch handler it publishes (Lasm.JS.exportDefault)

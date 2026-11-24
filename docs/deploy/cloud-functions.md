@@ -12,7 +12,7 @@ gcloud functions deploy my-app --gen2 --runtime nodejs24 --region REGION \
   --trigger-http --entry-point lasm --source cloud-functions --memory 1Gi
 ```
 
-`lasm build --target cloud-functions` (or `lasm package --target cloud-functions` for an existing build) writes a source directory: `dist/` with its
+`lasm build --target cloud-functions` writes a source directory: `dist/` with its
 production `node_modules` (which must include
 `@google-cloud/functions-framework`), the handler `lasm-gcf.mjs` (HTTP function
 `lasm`), and a `package.json` whose `main` is the handler and whose

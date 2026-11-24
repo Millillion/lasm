@@ -1,4 +1,4 @@
-// Lasm.target on every target (docs/api/decisions/0.6.md, 0.6-33;
+// Lasm.target on every target (docs/api/decisions/0.6.md, 0.6-20;
 // .github/workflows/web-bindings.yml job target-report): an installed candidate
 // builds test/fixtures/target for each `--target` and runs what it built, and
 // the program must report that target ("lasm target <name>"):

@@ -15,8 +15,7 @@ aws lambda create-function-url-config --function-name my-app --auth-type AWS_IAM
 ```
 
 With `lasm init my-app --template hono --deploy lambda` the project has
-`npm run build:lambda` for the first step. `npx lasm package --target lambda`
-packages an existing `dist/` without rebuilding.
+`npm run build:lambda` for the first step.
 
 **How it works.** `lambda.zip` is `dist/` plus three small files:
 `lasm-function.mjs`, `lasm-node-serve.mjs`, and the handler `lasm-lambda.mjs`.

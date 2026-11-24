@@ -55,8 +55,9 @@ The same build also runs on Node 26.13.1, Deno 2.9.6 and **Bun 1.4.4**.
   and `wrangler.toml` when the project has none.
 - **The template.** `lasm init --template hono --deploy workers` produces one
   `Main.lean` for Node and Workers.
-- **The API.** `Lasm.JS.onEdge` and `Lasm.JS.exportDefault` are new.
-  `waitForever` returns at once on the edge.
+- **The API.** `Lasm.JS.exportDefault` is new. `waitForever` returns at once
+  on the edge (the edge glue decides). A program that needs to know its
+  target reads `Lasm.target` ([JS_BINDINGS.md](JS_BINDINGS.md#the-target-a-program-is-built-for-lasmtarget)).
 - **The read-only VFS** serves the UTC zone (`Std.Time` works).
 - **Instance restart** after a stop.
 - **CI.** [`workers.yml`](../.github/workflows/workers.yml) runs on Linux:
@@ -673,7 +674,6 @@ host calls is still faster: each host call costs microseconds.
     `program.wasm`, `program.mjs`, the host modules, the entry module and the
     platform config (`wrangler.toml`), but no `node_modules` copy: the
     platform's bundler resolves npm imports.
-  - `lasm package --target …` re-packages an existing build.
   - Lasm never runs `wrangler dev` or `deploy`; CI does, locally.
 - **Link.** The same application objects as the Node build; only the final link
   differs:

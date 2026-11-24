@@ -12,6 +12,7 @@ import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { linkEdgeProgram, mimallocSourceDigest, withoutIncludePaths, provisionEdgeLinker, edgeLinkSettings, edgeRecipe, edgeRecipeHas, edgeRecipeMode, asyncifyStackBytes } from '../src/edge/edge-link.mjs';
 import { compactInitializerWrappers } from '../src/edge/edge-initializers.mjs';
+import { targetStampSource } from '../src/target-stamp.mjs';
 import { responseFile } from '../src/platform.mjs';
 import { glueLinkFlags } from '../src/lasm-library.mjs';
 import { installTools, wasmObject, archive, temporaryDirectory } from './fixtures/link-stand-ins/toolchain.mjs';
@@ -437,4 +438,25 @@ test('the mimalloc objects are keyed by every vendored source file', () => {
   const files = mimallocSources.map(file => [file, sha256(readFileSync(join(shared, file)))]);
   assert.ok(files.length > 20 && files.some(([file]) => file === 'lasm_mimalloc.c') && files.some(([file]) => file.endsWith('src/prim/prim.c')));
   assert.equal(mimallocSourceDigest(), sha256(JSON.stringify(files)));
+});
+
+test('Lasm.target: the Node build\'s stamp is replaced by one compiled for the edge target, at its place', { skip: !posix }, () => {
+  const f = fixture();
+  const nodeStamp = join(f.linkWork, 'lasm-target.o');
+  writeFileSync(nodeStamp, wasmObject({ functions: [{ name: 'lasm_target' }] }));
+  const rsp = readFileSync(join(f.linkWork, 'link.rsp'), 'utf8').split('\n');
+  writeFileSync(join(f.linkWork, 'link.rsp'), [rsp[0], JSON.stringify(nodeStamp), ...rsp.slice(1)].join('\n'));
+  linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: f.out, target: 'deno' });
+  const source = join(f.out, 'lasm-target.c'), stamp = join(f.out, 'lasm-target.o');
+  assert.equal(readFileSync(source, 'utf8'), targetStampSource('deno'));
+  const compiles = f.executed.filter(item => item.tool === 'emcc' && item.args.includes(source));
+  assert.deepEqual(compiles.map(item => item.args), [['-O2', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-fPIC', '-DLEAN_EMSCRIPTEN', '-sMEMORY64=1',
+    '-ffunction-sections', '-fdata-sections', '-I', join(f.nodeRuntime.directory, 'include'), '-c', source, '-o', stamp]]);
+  const { args } = f.executed.at(-1);
+  assert.ok(!args.includes(nodeStamp), 'the Node build\'s stamp is not linked');
+  assert.deepEqual(args.slice(0, 2), [f.objects.main, stamp], 'at the Node stamp\'s place');
+  // Another target's stamp is another object (cached by content, not reused across targets).
+  linkEdgeProgram({ sdk: f.sdk, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: join(f.base, 'workers'), target: 'workers' });
+  assert.equal(readFileSync(join(f.base, 'workers', 'lasm-target.c'), 'utf8'), targetStampSource('workers'));
+  assert.equal(f.executed.filter(item => item.tool === 'emcc' && item.args.includes(join(f.base, 'workers', 'lasm-target.c'))).length, 1);
 });

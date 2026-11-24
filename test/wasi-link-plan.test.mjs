@@ -16,6 +16,7 @@ import { extractCore } from '../src/wasi/wasi-component.mjs';
 import { responseFile } from '../src/platform.mjs';
 import { fastlyGlueSource, wasiHttpGlueSource, glueLinkFlags } from '../src/lasm-library.mjs';
 import { installTools, wasmObject, archive, temporaryDirectory, programModule } from './fixtures/link-stand-ins/toolchain.mjs';
+import { targetStampSource } from '../src/target-stamp.mjs';
 
 const posix = process.platform !== 'win32';
 const here = fileURLToPath(new URL('../src/wasi/', import.meta.url));
@@ -315,4 +316,17 @@ test('on Windows the wasm-ld arguments go through a response file', { skip: !pos
   assert.deepEqual(f.tools.calls('wasm-ld'), [recorded], 'the stand-in reads the response file back');
   assert.ok(readFileSync(responseFile, 'utf8').includes('"' + f.objects.second.replaceAll('\\', '\\\\').replaceAll('"', '\\"') + '"'));
   assert.equal(readFileSync(join(f.out, 'link-args.json'), 'utf8').includes('wasm-ld.rsp'), false);
+});
+
+test('Lasm.target: the Node build\'s stamp is replaced by one compiled for the WASI target, at its place', { skip: !posix }, () => {
+  const f = fixture({ objects: [['lasm-target.o', { functions: [{ name: 'lasm_target' }] }]] });
+  const nodeStamp = f.objects.extras[0];
+  linkWasiProgram({ toolchain: f.toolchain, nodeRuntime: f.nodeRuntime, edge: f.edge, linkWork: f.linkWork, out: f.out, target: 'fastly' });
+  const source = join(f.out, 'lasm-target.c'), stamp = join(f.out, 'lasm-target.o');
+  assert.equal(readFileSync(source, 'utf8'), targetStampSource('fastly'));
+  assert.deepEqual(f.tools.calls('clang').filter(args => args.includes(source)), [['-target', 'wasm64-unknown-emscripten',
+    `--sysroot=${join(f.toolchain.cache, 'sysroot')}`, '-O2', '-DNDEBUG', '-ffunction-sections', '-fdata-sections', '-c', source, '-o', stamp]]);
+  const [args] = f.tools.calls('wasm-ld');
+  assert.ok(!args.includes(nodeStamp), 'the Node build\'s stamp is not linked');
+  assert.equal(args.indexOf(stamp), args.indexOf(f.objects.second) + 1, 'at the Node stamp\'s place');
 });

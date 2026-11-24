@@ -263,8 +263,8 @@ The other targets are `lambda-edge`, `azure-functions` and `cloud-functions`. `l
 `azure-functions`, `cloud-functions`) adds the platform files and a `npm run build:<target>` script.
 Lasm builds for the platform; it never installs or starts the platform's own
 tools: test and deploy with the platform's CLI (`vercel`, `netlify`, `func`,
-`gcloud`, `aws`/`sam`). To package one `dist/` for several platforms, use
-`npx lasm package --target <target>`. Guides: [deploy/](deploy/README.md).
+`gcloud`, `aws`/`sam`). Each platform is its own `lasm build --target`: the
+build is linked for its target, which the program reads as `Lasm.target`. Guides: [deploy/](deploy/README.md).
 
 ## Which HTTP server to use
 

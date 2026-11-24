@@ -1,6 +1,6 @@
 /-
 `Lasm.target`: the `--target` a program is built for (docs/api/decisions/0.6.md,
-0.6-33). Every target has it, the JavaScript hosts and WASI, wasi-http and
+0.6-20). Every target has it, the JavaScript hosts and WASI, wasi-http and
 Fastly alike: the build links it in (src/target-stamp.mjs).
 -/
 namespace Lasm

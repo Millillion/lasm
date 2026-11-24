@@ -21,7 +21,7 @@ export const wasiBuildTargets = ['wasi', 'fastly', 'wasi-http'];
 // the platform's own place in the project, such as workers/, wasi/ or
 // lambda.zip), and the Node build it is made from stays in the build cache
 // (.lake/lasm/applications/). node writes the Node build to --output (default
-// dist/), which `lasm package` reads.
+// dist/). A function platform's Node build is linked for it (Lasm.target).
 // Targets whose layout the platform fixes (api/ for Vercel, netlify/ for
 // Netlify): the entry module imports the program by a fixed relative path.
 export const fixedLayoutTargets = ['vercel-edge', 'netlify-edge'];

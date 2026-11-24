@@ -8,7 +8,7 @@ npx lasm build Main.lean --target vercel   # Main.lean calls exportDefault; writ
 vercel deploy --prebuilt                   # Vercel's own CLI uploads exactly that output
 ```
 
-`lasm build --target vercel` (or `lasm package --target vercel` for an existing build) writes `.vercel/output/functions/index.func/`
+`lasm build --target vercel` writes `.vercel/output/functions/index.func/`
 (the whole `dist/` plus a handler, `lasm-vercel.mjs`, runtime `nodejs24.x`) and a
 `config.json` that routes every path to it after static files. Every file the
 Lean program loads at run time (`program.wasm`, `host/**`, the native pieces) is

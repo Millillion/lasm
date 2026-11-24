@@ -1,4 +1,4 @@
-// Lasm.target (library/Lasm/Target.lean, docs/api/decisions/0.6.md 0.6-33): its
+// Lasm.target (library/Lasm/Target.lean, docs/api/decisions/0.6.md 0.6-20): its
 // constructors are the CLI's targets (src/cli-names.mjs buildTargets) in order,
 // lowerCamelCase, and Target.name gives each target's CLI name; the build's stamp
 // (src/target-stamp.mjs) returns that order's index. Fails on any drift.
