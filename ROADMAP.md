@@ -158,7 +158,7 @@ breaking and gets a migration note):
   pass #380); Durable Objects stay a class in the project (A28; #379).
   A26–A29, A39, A40.
 - [x] **0.6 The `Lasm.*` libraries.** The `Lasm.JS` core gained project
-  JavaScript files and `Lasm.JS.Class.define` (#309), `Lasm.UI` is cut to
+  JavaScript files (#309), `Lasm.UI` is cut to
   its core with `Cmd.task` (#311), `Lasm.RPC` is deleted (#341), and the
   `Lasm.WASI.Http` helpers are in (#306): all in 0.9.0. Every `Lasm.*`
   library stays inside `@lasm/cli` (A56.1, A56.2; separate packages later
