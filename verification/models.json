@@ -1078,6 +1078,10 @@
       "status": "pending",
       "reason": "the tar reader and writer (tool archives, npm packages, the Fastly package): fuzzed against Python's tarfile, an independent implementation (test/fuzz/targets/tar.mjs); a Lean model of the reader's header and pax parsing is due (IRREDUCIBLE.md M4)"
     },
+    "src/target-stamp.mjs": {
+      "status": "pending",
+      "reason": "Lasm.target's stamp (the C source returning the target's index in buildTargets): a pure function of the target, checked against Lasm.Target's constructors by test/lasm-target.test.mjs and on every target by web-bindings.yml's target-report job; a Lean model is due with the CLI models"
+    },
     "src/test-switches.mjs": {
       "status": "exempt",
       "kind": "data",

@@ -264,7 +264,7 @@ test('timers: one-shot, repeating, reset, cancel and close', async () => {
 test('Lasm.JS operations go to the edge bridge; its handles are released through the host', () => {
   const { h, req } = host({ modules: { lib: { f: () => 1 } } });
   const protocol = ok(req(200, 0, 0, numbers(0).subarray(0, 4)));
-  assert.deepEqual([...new Uint32Array(protocol.slice().buffer)], [1, 1]);
+  assert.deepEqual([...new Uint32Array(protocol.slice().buffer)], [1]);
   const ref = ok(req(201, 0, 1, new Uint8Array([0, 0, 0, 0, ...text('lib')])));
   const handle = new DataView(ref.buffer, ref.byteOffset).getUint32(1, true);
   assert.equal(h.js.snapshot().values, 1);
