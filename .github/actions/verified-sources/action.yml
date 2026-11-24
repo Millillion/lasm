@@ -1,0 +1,45 @@
+name: Verified source archives
+description: >-
+  Runs `application-runtime-source.mjs sources`: the pinned Lean source archive
+  and the Zig toolchain, each checked against its pinned size and sha256. The
+  verified archives (.cache/verified-sources/<sha256>) are cached under a key
+  made of the pinned sha256 values, and are checked again before use. On a
+  miss, Zig is fetched from its community mirrors first, then ziglang.org
+  (scripts/ci/verified-download.mjs), with a stall timeout per source rather
+  than a total one. Caches are saved on main only (as apt-cache): pull
+  requests restore main's. Needs process-guard first. docs/CI.md#verified-source-archives.
+runs:
+  using: composite
+  steps:
+    - name: The cache key (pinned sha256 values)
+      id: key
+      shell: bash
+      run: |
+        node --input-type=module -e "
+          import { readFileSync } from 'node:fs';
+          const json = path => JSON.parse(readFileSync(path, 'utf8'));
+          const lean = json('scripts/ci/acceptance-versions.json').lean;
+          const sha = [json('scripts/full-lean/lean-sources.json')[lean].sha256,
+            json('experiments/feasibility/toolchains.json').zig.officialSha256];
+          if (!sha.every(s => /^[0-9a-f]{64}$/.test(s))) throw new Error('Missing a sha256 pin');
+          console.log('key=verified-sources-v1-' + sha.join('-'));
+        " >> "$GITHUB_OUTPUT"
+    - name: Restore the verified archives
+      id: restore
+      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: .cache/verified-sources
+        key: ${{ steps.key.outputs.key }}
+    - name: Download (on a miss) and verify the pinned public sources
+      shell: bash
+      run: node scripts/full-lean/run-bounded.mjs --report .work/ci-application-runtime/sources-resources.json -- node scripts/ci/application-runtime-source.mjs sources
+    # Saved on main only: a pull request's cache is readable by that pull
+    # request alone, so it would only take room in the cache budget
+    # (scripts/ci/cache-budget.mjs).
+    - name: Save the verified archives
+      if: steps.restore.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
+      continue-on-error: true
+      uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: .cache/verified-sources
+        key: ${{ steps.key.outputs.key }}

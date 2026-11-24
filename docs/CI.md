@@ -130,6 +130,7 @@ many files:
 | `apt-cache` | a bare `sudo apt-get install` (bubblewrap) or Playwright's `install-deps`: the installed `.deb` files are cached per runner image ([apt packages](#apt-packages)) | `playwright`; conduit, folio, ledger, porter, tandem (bubblewrap for `lake check --paranoid`) |
 | `upstream-lean` | the pinned upstream Lean 4.35.0 archive (the differential oracle and the bridge model checker), with its digest check and cache | differential, bridge-verification |
 | `install-candidate` | download the packed candidate artifact and `npm install` it into a fresh directory, as a user does | differential, tooling |
+| `verified-sources` | the `application-runtime-source.mjs sources` step (the pinned Lean source archive and Zig), with a cache keyed on the pinned sha256 values and Zig's community mirrors ([verified source archives](#verified-source-archives)) | unit, wasi, workers, browser, fullstack, edge-runtime, node-linux-runtime, application-runtime-source |
 | `process-guard` | `loginctl enable-linger` plus `XDG_RUNTIME_DIR` and `DBUS_SESSION_BUS_ADDRESS` for `run-bounded.mjs` | the workflows above that use it |
 
 The tier orchestrators (`ci-nightly.yml`, `ci-weekly.yml`) call the existing
@@ -177,6 +178,31 @@ The packages installed are the same as before; only where they come from
 changes, so no test loses coverage. `scripts/fuzz/ensure-libfuzzer.sh` still
 calls apt-get directly: the images already have the libFuzzer runtimes, so it
 installs nothing.
+
+### Verified source archives
+
+The native host pieces are built with the pinned Zig 0.16.0 toolchain
+(55 MB), and the runtime builds also need the pinned Lean source archive
+(90 MB). On 2026-11-24 ziglang.org served about 300 KB/s, so a fresh download
+reached the old 180-second total timeout and failed the unit, wasi / native and
+wasi / runtime jobs. `.github/actions/verified-sources` runs the `sources`
+phase of `scripts/ci/application-runtime-source.mjs`:
+
+- `.cache/verified-sources/<sha256>` is cached under
+  `verified-sources-v1-<lean sha256>-<zig sha256>`, saved on `main` only (pull
+  requests restore it). A restored file is used only after its size and sha256
+  match the pins again; a mismatching one is discarded.
+- On a miss, Zig is tried from its
+  [community mirrors](https://ziglang.org/download/community-mirrors.txt) in
+  random order (the live list, else a committed snapshot), then from
+  ziglang.org, as Zig asks CI to do. The Lean archive is tried from GitHub up
+  to three times.
+- Each attempt is aborted when no bytes arrive for 60 seconds, not after a
+  fixed total time. An attempt that fails, exceeds or misses the pinned size,
+  or has another sha256 is discarded and the next source is tried
+  (`scripts/ci/verified-download.mjs`, tested in
+  `test/verified-download.test.mjs`). The phase report records which source
+  served each archive and which failed.
 
 ## Inventory
 
