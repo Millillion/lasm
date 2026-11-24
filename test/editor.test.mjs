@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { autoSetupEditor, compileProjectLibrary, directoryOverride, lasmToolchainPattern, linkProjectLibrary, removeLasmOverride, setupEditor } from '../src/editor.mjs';
+import { autoSetupEditor, compileProjectLibrary, linkProjectLibrary, setupEditor } from '../src/editor.mjs';
 import { lakeConfigurationKey } from '../src/application-sources.mjs';
 
 const scratch = () => mkdtempSync(join(tmpdir(), 'lasm-editor-'));
@@ -96,7 +96,7 @@ test('lasm init links Lasm\'s Lake package when Lasm\'s Lean is on this machine,
   assert.equal(calls.length, 1);
 });
 
-// Issue #343: Lasm no longer sets an elan override (decision 0.7-25); it removes the one Lasm 0.3.0 to 0.10.0 set.
+// Decision 0.7-25: Lasm changes nothing in elan; the project's lean-toolchain rules.
 const elanFixture = (root, overrides = {}) => {
   const home = join(root, 'elan'), project = join(root, 'app');
   mkdirSync(join(home, 'bin'), { recursive: true }); mkdirSync(project, { recursive: true });
@@ -106,86 +106,15 @@ const elanFixture = (root, overrides = {}) => {
   return { home, project, executable: join(home, 'bin', process.platform === 'win32' ? 'elan.exe' : 'elan'), env: { ELAN_HOME: home, PATH: '' } };
 };
 
-test('Lasm\'s own toolchain names, as older versions linked them', () => {
-  for (const name of ['lasm-4.35.0-a88ecf8bf14e', 'lasm-4.35.0-c4a12e5df32a', 'lasm-4.36.0-rc2-0123456789ab'])
-    assert.match(name, lasmToolchainPattern);
-  for (const name of ['lasm-14.35.0-a88ecf8bf14e', 'lasm-4.35.10-a88ecf8bf14e', 'lasm-10.0.0-a88ecf8bf14e']) assert.match(name, lasmToolchainPattern);
-  for (const name of ['leanprover/lean4:v4.35.0', 'lasm', 'lasm-4.35.0', 'my-lasm-4.35.0-a88ecf8bf14e', 'lasm-4.35.0-A88ECF8BF14E', 'lasm-4.35.0-a88ecf8bf14', 'lasm-x-a88ecf8bf14e',
-    'lasm-4.35.0-a88ecf8bf14e0', 'lasm-4.35.0-a88ecf8bf14e-x'])
-    assert.doesNotMatch(name, lasmToolchainPattern);
-});
-
-test('directoryOverride reads elan\'s override for exactly this directory', () => {
+test('the editor setup leaves elan alone, whatever override the directory has (0.7-25)', async () => {
   const root = scratch();
   try {
-    const { home, project } = elanFixture(root, { [join(root, 'other')]: 'lasm-4.35.0-111111111111', '.': 'lasm-4.35.0-a88ecf8bf14e', [join(root, 'app', 'sub')]: 'x' });
-    assert.equal(directoryOverride(home, project), 'lasm-4.35.0-a88ecf8bf14e');
-    assert.equal(directoryOverride(home, join(project, 'sub')), 'x');
-    assert.equal(directoryOverride(home, root), undefined);
-    assert.equal(directoryOverride(join(root, 'no-elan'), project), undefined);
-    // Only the [overrides] table counts; TOML escapes (Windows paths) are read; Windows compares without case.
-    writeFileSync(join(home, 'settings.toml'), `[other]\n${JSON.stringify(project)} = "a"\n[overrides]\n"C:\\\\Users\\\\Me\\\\app" = "b"\n  ${JSON.stringify(project)}  =  "c"  \n[later]\n"/x" = "d"\n"bad\\q" = "e"\n`);
-    assert.equal(directoryOverride(home, project), 'c');
-    assert.equal(directoryOverride(home, '/x'), undefined);
-    assert.equal(directoryOverride(home, 'C:\\Users\\me\\APP', 'win32'), 'b');
-    assert.equal(directoryOverride(home, 'C:\\Users\\me\\APP', 'linux'), undefined);
-    assert.equal(directoryOverride(home, 'C:\\Users\\me\\other', 'win32'), undefined);
-    // Entries before any table, other keys, comments, spacing, a bad escape: as TOML reads them.
-    writeFileSync(join(home, 'settings.toml'), [`${JSON.stringify(project)} = "top"`, '[ overrides ]  # elan\'s', 'junk=[1]', 'more = [2]',
-      `#${JSON.stringify(project)} = "commented"`, '"bad\\q" = "x"', `x ${JSON.stringify(project)} = "prefixed"`, `${JSON.stringify(project)} = "mine"  # set by me`].join('\n'));
-    assert.equal(directoryOverride(home, project), 'mine');
-    assert.equal(directoryOverride(home, join(root, 'none')), undefined);
-    // elan records the real path: a symbolic link to the project, or a path that does not exist, compares as resolved.
-    if (process.platform !== 'win32') {
-      symlinkSync(project, join(root, 'link'));
-      assert.equal(directoryOverride(home, join(root, 'link')), 'mine');
-      writeFileSync(join(home, 'settings.toml'), `[overrides]\n${JSON.stringify(join(root, 'gone'))} = "g"\n`);
-      assert.equal(directoryOverride(home, join(root, 'gone', '..', 'gone')), 'g');
-    }
-  } finally { rmSync(root, { recursive: true, force: true }); }
-});
-
-test('removeLasmOverride unsets only an override to Lasm\'s own toolchain, with elan, and says so', () => {
-  const root = scratch();
-  try {
-    const { home, project, executable, env } = elanFixture(root, { '.': 'lasm-4.35.0-a88ecf8bf14e' });
-    const calls = [], lines = [];
-    const run = (file, args, options) => calls.push({ file, args, options });
-    assert.deepEqual(removeLasmOverride({ project, elan: { home, executable }, run, log: line => lines.push(line), env: { ...env, OTHER: '1' } }),
-      { status: 'removed', toolchain: 'lasm-4.35.0-a88ecf8bf14e' });
-    assert.deepEqual(calls, [{ file: executable, args: ['override', 'unset', '--path', project],
-      options: { cwd: project, env: { ELAN_HOME: home, PATH: '', OTHER: '1' }, stdio: ['ignore', 'pipe', 'pipe'], timeout: 60_000, windowsHide: true } }]);
-    assert.deepEqual(lines, ['[lasm] Editor: removed this directory\'s elan override to Lasm\'s toolchain lasm-4.35.0-a88ecf8bf14e, which an older Lasm set: '
-      + '`lake` and the Lean editor now use the project\'s lean-toolchain, with Lean\'s own C compiler, and Lasm\'s library comes from its Lake package (restart the Lean server if it is open).']);
-    // elan fails: one line with the command to run, from stderr or the message.
-    lines.length = 0;
-    const failing = error => () => { throw error; };
-    assert.deepEqual(removeLasmOverride({ project, elan: { home, executable }, run: failing(Object.assign(new Error('Command failed'), { stderr: Buffer.from('  error: locked\nmore') })), log: line => lines.push(line) }),
-      { status: 'failed', toolchain: 'lasm-4.35.0-a88ecf8bf14e', message: 'error: locked' });
-    assert.match(lines[0], /^\[lasm\] Editor: could not remove this directory's elan override to Lasm's toolchain lasm-4\.35\.0-a88ecf8bf14e \(error: locked\); run `elan override unset` here/);
-    assert.equal(removeLasmOverride({ project, elan: { home, executable }, run: failing(Object.assign(new Error('spawn elan ETIMEDOUT\nstack'), { stderr: '' })), log: () => {} }).message, 'spawn elan ETIMEDOUT');
-    // The user's own override, or none: untouched, nothing printed.
-    for (const overrides of [{ '.': 'leanprover/lean4:v4.35.0' }, { '.': 'my-toolchain' }, {}]) {
-      const other = elanFixture(join(root, String(calls.length + lines.length + Object.keys(overrides).length) + JSON.stringify(overrides).length), overrides);
-      assert.equal(removeLasmOverride({ project: other.project, elan: other, run: () => assert.fail('no elan call'), log: () => assert.fail('no line') }), undefined);
-    }
-  } finally { rmSync(root, { recursive: true, force: true }); }
-});
-
-test('the editor setup never sets an elan override or links a toolchain (#343)', async () => {
-  const root = scratch();
-  try {
-    const { project, env } = elanFixture(root, { '.': 'lasm-4.35.0-a88ecf8bf14e' });
+    const { project, env, home } = elanFixture(root, { '.': 'lasm-4.35.0-a88ecf8bf14e' });
     writeFileSync(join(project, 'lakefile.toml'), 'name = "app"\n\n[[require]]\nname = "lasm"\npath = ".lake/lasm-library"\n');
-    const calls = [];
-    const run = (file, args) => calls.push(args);
+    const settings = readFileSync(join(home, 'settings.toml'), 'utf8');
     const find = source => { assert.equal(source, join(project, 'Main.lean')); return project; };
-    assert.equal((await autoSetupEditor(join(project, 'Main.lean'), { env, run, find, log: () => {} })).status, 'removed');
-    assert.deepEqual(calls, [['override', 'unset', '--path', project]]);
-    // Once removed (elan rewrote its settings), later builds find nothing to do.
-    writeFileSync(join(env.ELAN_HOME, 'settings.toml'), 'version = "12"\n\n[overrides]\n');
-    for (let i = 0; i < 3; i++) assert.deepEqual(await autoSetupEditor(join(project, 'Main.lean'), { env, run, find, log: line => assert.fail(line) }), { status: 'ready' });
-    assert.equal(calls.length, 1);
+    for (let i = 0; i < 3; i++) assert.deepEqual(await autoSetupEditor(join(project, 'Main.lean'), { env, find, log: line => assert.fail(line) }), { status: 'ready' });
+    assert.equal(readFileSync(join(home, 'settings.toml'), 'utf8'), settings);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
@@ -194,7 +123,7 @@ test('setupEditor: without the require of Lasm\'s package, one hint, only for a 
   try {
     const { project, env } = elanFixture(root);
     const lines = [];
-    const setup = (options = {}) => setupEditor({ project, env, run: () => assert.fail('no elan call'), log: line => lines.push(line), ...options });
+    const setup = (options = {}) => setupEditor({ project, env, log: line => lines.push(line), ...options });
     writeFileSync(join(project, 'lakefile.toml'), 'name = "app"\n');
     writeFileSync(join(project, 'Main.lean'), 'def main : IO Unit := pure ()\n');
     assert.deepEqual(setup(), { status: 'no-require' });

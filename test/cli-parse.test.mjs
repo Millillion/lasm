@@ -154,11 +154,13 @@ test('option names match whole tokens only', () => {
 test('target hints: aliases, near misses, and nothing for inherited names', () => {
   for (const [alias, target] of [['cloudflare', 'workers'], ['cloudflare-workers', 'workers'], ['worker', 'workers'], ['aws', 'lambda'],
     ['aws-lambda', 'lambda'], ['cloudfront', 'lambda-edge'], ['supabase', 'supabase-edge'], ['deno-deploy-edge', 'deno-deploy'], ['spin', 'wasi-http'],
-    ['wasmtime', 'wasi'], ['web', 'browser'], ['vite', 'browser'], ['azure', 'azure-functions'], ['gcf', 'cloud-functions'], ['google-cloud-functions', 'cloud-functions'],
+    ['wasmtime', 'wasi'], ['web', 'browser'], ['vite', 'browser'], ['google-cloud-functions', 'cloud-functions'],
     ['cloud-run-functions', 'cloud-functions'], ['vercel-functions', 'vercel'], ['netlify-functions', 'netlify'], ['AWS', 'lambda']])
     assert.equal(targetHint(alias), ` (did you mean --target ${target}?)`, alias);
   assert.equal(targetHint('lambda-edg'), ' (did you mean --target lambda-edge?)');
   for (const word of ['constructor', 'toString', '__proto__', 'hasOwnProperty', 'kubernetes-cluster']) assert.equal(targetHint(word), '', word);
+  // Names Lasm itself used before (azure, gcf, lambda-zip) get no hint of their own: no compatibility hints (0.7-24).
+  for (const word of ['azure', 'gcf', 'lambda-zip']) assert.equal(targetHint(word), '', word);
 });
 
 test('--suspend', () => {

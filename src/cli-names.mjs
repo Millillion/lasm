@@ -3,10 +3,11 @@
 // imports: src/package.mjs, src/init.mjs and src/dev.mjs use it while
 // src/cli-arguments.mjs is still loading them.
 
-// Names people try for a target, and the target they mean.
+// Names people try for a target, and the target they mean: the platforms'
+// own names, never a name Lasm used before (no compatibility hints).
 export const targetAliases = { cloudflare: 'workers', 'cloudflare-workers': 'workers', worker: 'workers', aws: 'lambda', 'aws-lambda': 'lambda',
   cloudfront: 'lambda-edge', supabase: 'supabase-edge', 'deno-deploy-edge': 'deno-deploy', spin: 'wasi-http', wasmtime: 'wasi', web: 'browser',
-  vite: 'browser', azure: 'azure-functions', gcf: 'cloud-functions', 'google-cloud-functions': 'cloud-functions', 'cloud-run-functions': 'cloud-functions', 'vercel-functions': 'vercel', 'netlify-functions': 'netlify', 'lambda-zip': 'lambda' };
+  vite: 'browser', 'google-cloud-functions': 'cloud-functions', 'cloud-run-functions': 'cloud-functions', 'vercel-functions': 'vercel', 'netlify-functions': 'netlify' };
 /** ASCII letters lowercased, every other character kept: command and target
  * names are ASCII (and Unicode case mapping would match the Kelvin sign K to k). */
 export const asciiLower = text => text.replace(/[A-Z]/g, c => c.toLowerCase());

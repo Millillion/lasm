@@ -5,18 +5,13 @@
 // project's lakefile requires (decision 0.3-7, src/lake-library.mjs). Lasm's
 // Lean is that same official Lean 4.35.0, so the editor, a native `lake build`
 // and `lasm build` share one toolchain and Lake reuses each other's builds.
-// Lasm changes nothing in elan (decision 0.7-25, issue #343): Lasm 0.3.0 to
-// 0.10.0 linked Lasm's Lean as an elan toolchain (`lasm-4.35.0-…`) and set it
-// as the project directory's elan override, which left a native `lake build`
-// of a `lean_exe` without Lean's C compiler. lasm build, dev, init and editor
-// remove such an override from the project's directory.
-import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
+// Lasm changes nothing in elan (decision 0.7-25): no toolchain link, no
+// override; the project's lean-toolchain rules.
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { basename, delimiter, join, resolve } from 'node:path';
 import { requiresLakePackage } from './lake-library.mjs';
 import { programLibraryImports } from './lazy-library.mjs';
-import { stepOutput } from './step-output.mjs';
 
 const markerFile = project => join(project, '.lake', 'lasm', 'editor.json');
 const readMarker = project => { try { return JSON.parse(readFileSync(markerFile(project), 'utf8')); } catch { return undefined; } };
@@ -33,61 +28,12 @@ export function findElan(env = process.env, platform = process.platform) {
   return executable ? { home, executable } : undefined;
 }
 
-/** The elan toolchain names Lasm 0.3.0 to 0.10.0 linked: `lasm-<Lean version>-<12 hex digits of its prefix>`. */
-export const lasmToolchainPattern = /^lasm-\d+\.\d+\.\d+(?:-[0-9A-Za-z.]+)?-[0-9a-f]{12}$/;
-
-const samePath = (a, b, platform) => platform === 'win32' ? a.toLowerCase() === b.toLowerCase() : a === b;
-const canonical = path => { try { return realpathSync(path); } catch { return resolve(path); } };
-
-/** The toolchain of elan's override for exactly this directory, from `$ELAN_HOME/settings.toml`
- * (`[overrides]`, `"<directory>" = "<toolchain>"`), or undefined. */
-export function directoryOverride(elanHome, directory, platform = process.platform) {
-  let text;
-  try { text = readFileSync(join(elanHome, 'settings.toml'), 'utf8'); } catch { return undefined; }
-  const wanted = [directory, resolve(directory), canonical(directory)];
-  let overrides = false;
-  for (const line of text.split(/\r?\n/)) {
-    const table = /^\s*\[([^\]]*)\]\s*(?:#.*)?$/.exec(line);
-    if (table) { overrides = table[1].trim() === 'overrides'; continue; }
-    const entry = overrides && /^\s*"((?:[^"\\]|\\.)*)"\s*=\s*"([^"]*)"\s*(?:#.*)?$/.exec(line);
-    if (!entry) continue;
-    let path;
-    try { path = JSON.parse(`"${entry[1]}"`); } catch { continue; }
-    if (wanted.some(candidate => samePath(candidate, path, platform))) return entry[2];
-  }
-  return undefined;
-}
-
 /**
- * Removes the elan override to Lasm's own toolchain that Lasm 0.3.0 to 0.10.0 set on the project's directory
- * (issue #343). An override to any other toolchain is the user's and stays. Returns
- * { status: 'removed' | 'failed', toolchain, message? }, or undefined when there is none.
+ * The editor's side of a Lake project, after a lasm command: when the lakefile does not require Lasm's Lake
+ * package but the project imports `Lasm.*`, says once how to add it (`lasm editor`). Without elan, says once
+ * how to get the editor (always when explicit). Returns { status: 'ready' | 'no-require' | 'no-elan' }.
  */
-export function removeLasmOverride({ project, elan, log = console.error, run = execFileSync, env = process.env }) {
-  const toolchain = directoryOverride(elan.home, project);
-  if (!toolchain || !lasmToolchainPattern.test(toolchain)) return undefined;
-  try {
-    run(elan.executable, ['override', 'unset', '--path', project],
-      { cwd: project, env: { ...env, ELAN_HOME: elan.home }, stdio: ['ignore', 'pipe', 'pipe'], timeout: 60_000, windowsHide: true });
-  } catch (error) {
-    const message = (stepOutput(error) || String(error.message)).trim().split('\n')[0];
-    log(`[lasm] Editor: could not remove this directory's elan override to Lasm's toolchain ${toolchain} (${message}); `
-      + 'run `elan override unset` here, so that `lake` and the editor use the project\'s lean-toolchain.');
-    return { status: 'failed', toolchain, message };
-  }
-  log(`[lasm] Editor: removed this directory's elan override to Lasm's toolchain ${toolchain}, which an older Lasm set: `
-    + '`lake` and the Lean editor now use the project\'s lean-toolchain, with Lean\'s own C compiler, and Lasm\'s library comes from '
-    + 'its Lake package (restart the Lean server if it is open).');
-  return { status: 'removed', toolchain };
-}
-
-/**
- * The editor's side of a Lake project, after a lasm command: removes an elan override an older Lasm set
- * (removeLasmOverride), and when the lakefile does not require Lasm's Lake package but the project imports
- * `Lasm.*`, says once how to add it (`lasm editor`). Without elan, says once how to get the editor (always
- * when explicit). Returns { status: 'ready' | 'no-require' | 'no-elan' | 'removed' | 'failed', toolchain?, message? }.
- */
-export function setupEditor({ project, log = console.error, env = process.env, run = execFileSync, explicit = false, requires = requiresLakePackage,
+export function setupEditor({ project, log = console.error, env = process.env, explicit = false, requires = requiresLakePackage,
   imports = programLibraryImports }) {
   const elan = findElan(env);
   const marker = readMarker(project);
@@ -99,8 +45,6 @@ export function setupEditor({ project, log = console.error, env = process.env, r
     }
     return { status: 'no-elan' };
   }
-  const removed = removeLasmOverride({ project, elan, log, run, env });
-  if (removed) return removed;
   if (requires(project)) return { status: 'ready' };
   if (!explicit && !marker?.requireHinted && imports(project).length) {
     log('[lasm] Editor: this project imports Lasm\'s library, which the Lean editor finds through Lasm\'s Lake package: '
@@ -112,12 +56,12 @@ export function setupEditor({ project, log = console.error, env = process.env, r
 
 /** After a good build: the editor's side of a Lake project (setupEditor), unless disabled (LASM_EDITOR=0) or on
  * CI. Needs no Lean: the build (or lasm init) has made Lasm's Lake package link. Never fails the build. */
-export async function autoSetupEditor(source, { log = console.error, env = process.env, run = execFileSync, find } = {}) {
+export async function autoSetupEditor(source, { log = console.error, env = process.env, find } = {}) {
   if (env.LASM_EDITOR === '0' || (env.CI && env.CI !== 'false' && env.LASM_EDITOR !== '1')) return undefined;
   try {
     const project = (find ?? (await import('./application-sources.mjs')).findApplicationProject)(source);
     if (!project) return undefined;
-    return setupEditor({ project, log, env, run });
+    return setupEditor({ project, log, env });
   } catch (error) {
     log(`[lasm] Editor setup skipped: ${String(error.message).split('\n')[0]}`);
     return { status: 'failed' };
@@ -150,9 +94,9 @@ export async function linkProjectLibrary(project, { cachedOnly = true, provision
   } catch { return false; }
 }
 
-/** `lasm editor [directory]`: Lasm's Lake package required, linked and up to date, the project's lean-toolchain, and
- * no elan override from an older Lasm. Exit code 0 when the editor can resolve `import Lasm.*`. */
-export async function runEditor({ input = '.' } = {}, { provision, env = process.env, run = execFileSync, log = console.error } = {}) {
+/** `lasm editor [directory]`: Lasm's Lake package required, linked and up to date, and the project's lean-toolchain.
+ * Exit code 0 when the editor can resolve `import Lasm.*`. */
+export async function runEditor({ input = '.' } = {}, { provision, env = process.env, log = console.error } = {}) {
   const { findApplicationProject, lakeNativePackages } = await import('./application-sources.mjs');
   const directory = resolve(input);
   const project = existsSync(join(directory, 'lakefile.toml')) || existsSync(join(directory, 'lakefile.lean')) ? directory : findApplicationProject(join(directory, 'Main.lean'));
@@ -178,8 +122,7 @@ export async function runEditor({ input = '.' } = {}, { provision, env = process
     writeFileSync(pin, `leanprover/lean4:v${lean.version}\n`);
     log(`[lasm] Editor: wrote lean-toolchain (leanprover/lean4:v${lean.version}), the Lean that Lasm's library is compiled with.`);
   }
-  const result = setupEditor({ project, log, env, run, explicit: true });
-  if (result.status === 'no-elan' || result.status === 'failed') return 1;
+  if (setupEditor({ project, log, env, explicit: true }).status === 'no-elan') return 1;
   log(`[lasm] Editor: the Lean editor resolves \`import Lasm.*\` in ${basename(project)} with the project's own Lean (lean-toolchain, through elan) `
     + 'and Lasm\'s Lake package (.lake/lasm-library); restart its Lean server if it is open. Lasm changes nothing in elan.');
   return 0;
