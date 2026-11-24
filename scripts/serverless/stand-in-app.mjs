@@ -1,7 +1,7 @@
 // A stand-in for a Lasm Node build (dist/): main.mjs publishes a fetch
 // handler as a Lean program's main does with Lasm.JS.exportDefault (it hands
 // it to globalThis.__lasmFunctionHost when a function platform's shim set
-// one), so `lasm package` and the function-platform shims can be tested
+// one), so the function-platform packaging (src/package.mjs) and shims can be tested
 // without a Lean toolchain (test/serverless.test.mjs) and on each platform's
 // own local runtime (scripts/serverless/adapter-platforms.mjs). It echoes
 // each request as JSON; /binary, /cookies, /session, /empty, /see-other and

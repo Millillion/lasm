@@ -47,11 +47,10 @@ a name that is empty or holds `=` is refused, a repeated name is replaced in pla
   parseLasmArguments  {"argv": ["<hex>", …], "existing": ["<hex>", …], "runtime": "node"}
                                                     → {"parsed": {…}} | {"error": "<hex>"}
 (the parsed object has the fields the JavaScript's has, text fields as hex;
-`existing` are the paths `existsSync` finds; the parsers of `lasm init`,
-`lasm dev` and `lasm package` answer `{"error": hex "delegated:<command>"}`)
+`existing` are the paths `existsSync` finds; the parsers of `lasm init`
+and `lasm dev` answer `{"error": hex "delegated:<command>"}`)
   parseInitArguments  ["<hex>", …]                 → (the same)
   parseDevArguments   {"tokens": ["<hex>", …], "runtime": "node"}  → (the same)
-  parsePackageArguments  ["<hex>", …]              → (the same)
   leanAtLeast    {"version": "<hex>", "minimum": "<hex>"}  → true | false
   fileMessage    {"move": b, "value": V}            → {"message": M, "transfer": [R, …], "decoded": D}
 (V: {"prim": "…"} | {"buffer": id, "shared": b} | {"view": id, "shared": b, "whole": b, "length": n} | {"array": [V, …]} | {"record": [["key", V], …]};
@@ -111,7 +110,6 @@ import Lasm.Cli.Model.Initialization
 import Lasm.Cli.Model.FileMessage
 import Lean.Compiler.NameMangling
 import Lasm.Cli.Model.NodeHost
-import Lasm.Cli.Model.Package
 import Lasm.Cli.Model.Platform
 import Lasm.Cli.Model.ProcessLauncher
 import Lasm.Cli.Model.Python
@@ -394,7 +392,7 @@ def answer (j : Json) : Except String Json := do
     let existing ← texts (← input.getObjVal? "existing")
     let delegated := fun (c : String) (_ : List String) => (Except.error ("delegated:" ++ c) : Except String Parsed)
     let runtime ← (← input.getObjVal? "runtime").getStr?
-    let env : ArgumentsEnv := ⟨fun f => existing.contains f, runtime, delegated "init", delegated "dev", delegated "package"⟩
+    let env : ArgumentsEnv := ⟨fun f => existing.contains f, runtime, delegated "init", delegated "dev"⟩
     return ofResult (parseLasmArgumentsWith env (← texts (← input.getObjVal? "argv")))
   | "encodeEvents" =>
     let (batch, left) := encodeEvents (← (← input.getArr?).toList.mapM eventOf)
@@ -505,7 +503,6 @@ def answer (j : Json) : Except String Json := do
   | "parseInitArguments" => return ofResult (parseInitArguments (← texts input))
   | "parseDevArguments" =>
     return ofResult (parseDevArgumentsWith (← (← input.getObjVal? "runtime").getStr?) (← texts (← input.getObjVal? "tokens")))
-  | "parsePackageArguments" => return ofResult (parsePackageArguments (← texts input))
   | m => throw s!"no model {m}"
 
 def main : IO Unit := do

@@ -1,6 +1,6 @@
 // Azure Functions and Google Cloud Functions with no cloud account:
 //   Azure: Azure Functions Core Tools `func start` (Node.js v4 programming
-//   model) on the `lasm package --target azure-functions` app;
+//   model) on the `lasm build --target azure-functions` app;
 //   Google: the Functions Framework on the `--target cloud-functions` source directory,
 //   and that directory built by Google Cloud's buildpacks (`pack build` with
 //   the google-24 builder, as Cloud Run functions build Node 24 sources), the

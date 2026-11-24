@@ -47,7 +47,7 @@ for every path.
   Vercel's `edge-runtime`).
 
 **Tested in CI** (`.github/workflows/serverless.yml`, Linux x64; no Vercel
-account): for the hono and fetch templates (each publishes its handler with `exportDefault`), the `lasm package` output is checked
+account): for the hono and fetch templates (each publishes its handler with `exportDefault`), the `lasm build --target vercel` output is checked
 (config, every file, permissions, size); Vercel CLI 65.2.0 `vercel build` runs
 offline in the `lasm init --deploy vercel` project, with a local
 `.vercel/project.json` in place of `vercel link`; the built function then runs

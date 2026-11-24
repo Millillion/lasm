@@ -1,4 +1,4 @@
-// `lasm package` and the function-platform shims, with a stand-in application:
+// The function-platform packages of `lasm build --target <platform>` (src/package.mjs) and their shims, with a stand-in application:
 // a JavaScript program that publishes a fetch handler, as a Lean program does
 // with Lasm.JS.exportDefault, in place of a Lean build (no toolchain needed).
 // The shims call it directly: no server, no port. The real Lean builds run in
@@ -15,13 +15,7 @@ import { packageApplication, packageTargets } from '../src/package.mjs';
 import { zip } from '../src/serverless/zip.mjs';
 import { standInApplication } from '../scripts/serverless/stand-in-app.mjs';
 
-/** A build linked for `target` (Lasm.target, src/target-stamp.mjs): `lasm package` packages a build for its own target only. */
-function linkFor(input = 'dist', target) {
-  const file = join(input, 'build-info.json');
-  if (existsSync(file)) writeFileSync(file, JSON.stringify({ ...JSON.parse(readFileSync(file, 'utf8')), target }));
-}
-const pack = options => { linkFor(options.input, options.target); return packageApplication(options); };
-const runPack = options => { linkFor(options.input, options.target); return runPackage(options); };
+const pack = packageApplication;
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 
@@ -34,17 +28,6 @@ function inProcess(script, cwd) {
   return JSON.parse(run.stdout.trim().split('\n').at(-1));
 }
 
-test('lasm package arguments', () => {
-  assert.deepEqual(parseLasmArguments(['package', '--target', 'lambda']), { command: 'package', target: 'lambda', input: 'dist' });
-  assert.deepEqual(parseLasmArguments(['package', 'out', '--target=vercel', '--output', 'x']), { command: 'package', target: 'vercel', output: 'x', input: 'out' });
-  assert.deepEqual(parseLasmArguments(['package', '--help']), { command: 'package-help' });
-  assert.throws(() => parseLasmArguments(['package']), /--target is required/);
-  assert.throws(() => parseLasmArguments(['package', '--target', 'workers']), /Unknown package target "workers"/);
-  assert.throws(() => parseLasmArguments(['package', 'a', 'b', '--target', 'lambda']), /Usage: lasm package/);
-  assert.throws(() => parseLasmArguments(['package', '--target', 'lambda', '--target', 'vercel']), /only once/);
-  assert.throws(() => parseLasmArguments(['package', '--target', 'lambda', '--zip']), /Unknown lasm package option/);
-});
-
 test('zip entries keep the given permissions and extract with unzip', { skip: process.platform === 'win32' }, () => {
   const directory = mkdtempSync(join(tmpdir(), 'lasm-zip-'));
   const archive = zip([{ name: 'a/run', data: Buffer.from('#!/bin/sh\n'), mode: 0o755 }, { name: 'b.txt', data: Buffer.alloc(5000, 97), mode: 0o644 }]);
@@ -56,9 +39,9 @@ test('zip entries keep the given permissions and extract with unzip', { skip: pr
   assert.equal(readFileSync(join(directory, 'out/b.txt'), 'utf8'), 'a'.repeat(5000));
 });
 
-test('lasm package refuses what is not a Linux-capable Lasm build', () => {
+test('a function package refuses a build without Linux native support', () => {
   const directory = mkdtempSync(join(tmpdir(), 'lasm-package-'));
-  assert.throws(() => pack({ input: directory, target: 'lambda', output: join(directory, '..', 'x.zip') }), /is not a Lasm build/);
+  assert.throws(() => pack({ input: directory, target: 'lambda', output: join(directory, '..', 'x.zip') }), /carries no Linux native support \(none\)/);
   const app = fakeApplication(join(directory, 'dist'));
   writeFileSync(join(app, 'host/native/manifest.json'), JSON.stringify({ deployment: { targets: ['darwin-arm64'] } }));
   assert.throws(() => pack({ input: app, target: 'lambda', output: join(directory, 'x.zip') }), /no Linux native support/);
@@ -67,18 +50,19 @@ test('lasm package refuses what is not a Linux-capable Lasm build', () => {
   assert.throws(() => pack({ input: app, target: 'vercel', output: directory }), /must not contain the build/);
 });
 
-test('lasm package refuses a dev-profile build unless --allow-dev', () => {
+test('a dev-profile build (lasm build --dev --allow-dev) is packaged with a warning', () => {
   const directory = mkdtempSync(join(tmpdir(), 'lasm-package-dev-'));
   const app = fakeApplication(join(directory, 'dist'));
   writeFileSync(join(app, 'build-info.json'), JSON.stringify({ profile: 'dev' }));
-  assert.throws(() => pack({ input: app, target: 'netlify', output: join(directory, 'nf') }), /is a dev build.*--allow-dev/);
-  const allowed = pack({ input: app, target: 'netlify', output: join(directory, 'nf'), allowDev: true });
+  const allowed = pack({ input: app, target: 'netlify', output: join(directory, 'nf') });
   assert.equal(allowed.profile, 'dev');
   assert.match(allowed.warnings.join('\n'), /dev build/);
   writeFileSync(join(app, 'build-info.json'), JSON.stringify({ profile: 'release' }));
   const release = pack({ input: app, target: 'netlify', output: join(directory, 'nf2') });
   assert.equal(release.profile, 'release'); assert.deepEqual(release.warnings, []);
-  assert.deepEqual(parseLasmArguments(['package', '--target', 'lambda', '--allow-dev']), { command: 'package', target: 'lambda', input: 'dist', allowDev: true });
+  assert.deepEqual(parseLasmArguments(['build', 'Main.lean', '--target', 'lambda', '--dev', '--allow-dev']),
+    { command: 'build', rebuild: false, verbose: false, args: [], target: 'lambda', profile: 'dev', allowDev: true, input: 'Main.lean' });
+  assert.throws(() => parseLasmArguments(['package']), /Unknown command "package"/);
 });
 
 test('Lambda zip: every event shape reaches the handler and returns its response shape', { skip: process.platform === 'win32' || spawnSync('unzip', ['-v']).status !== 0 }, () => {

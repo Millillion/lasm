@@ -23,8 +23,8 @@ Builds also carry the musl native pieces
 Dockerfile, change the final stage to `FROM node:24-alpine`; the build stage
 stays `node:24-trixie` (the Lasm compiler itself needs glibc). With
 [`deploy/Dockerfile`](../../deploy/Dockerfile): `docker build --build-arg
-NODE_IMAGE=node:24-alpine -t my-app .`. `lasm package` leaves the musl pieces
-out of function packages, whose platforms all use glibc.
+NODE_IMAGE=node:24-alpine -t my-app .`. `lasm build --target <function platform>` leaves the musl
+pieces out of function packages, whose platforms all use glibc.
 
 **No time zone database** (Alpine without `tzdata`, distroless): Lean's
 `Std.Time` reads `/etc/localtime` and `/usr/share/zoneinfo`, and `Std.Http`

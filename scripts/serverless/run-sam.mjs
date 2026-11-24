@@ -1,4 +1,4 @@
-// AWS SAM CLI with no AWS credentials: each `lasm package --target lambda`
+// AWS SAM CLI with no AWS credentials: each `lasm build --target lambda`
 // zip as the CodeUri of an AWS::Serverless::Function (nodejs24.x, the runner's
 // architecture), `sam local invoke` with API Gateway REST and HTTP API events,
 // and `sam local start-api` answering real HTTP requests.

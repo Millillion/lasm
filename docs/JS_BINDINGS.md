@@ -524,8 +524,8 @@ def main : IO Unit := do
   target, so it is a plain value, fixed for the whole run.
 - `lasm run`, `lasm build` and `lasm dev` without `--target` build for `node`
   (under Bun or Deno, the CLI's default target is that runtime).
-- A function platform's build is linked for its platform: `lasm package`
-  packages a build for its own target only.
+- A function platform's build is linked for its platform: each platform is
+  its own `lasm build --target`.
 - A program that serves differently per target still uses one entry module per
   serving model ([0.2-4](api/decisions/0.2.md)): the build checks every binding
   a program links against its target, reachable or not.

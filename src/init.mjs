@@ -21,8 +21,8 @@ const npm = {
 export const templateDependencies = npm;
 
 // `--deploy` targets. Function platforms call the handler the program
-// publishes with `exportDefault` (Export.lean), through `lasm package`
-// (src/package.mjs); azure-functions and cloud-functions also deploy the platform's npm package. So
+// publishes with `exportDefault` (Export.lean), packaged by `lasm build --target`
+// (src/package.mjs); azure-functions and cloud-functions also depend on the platform's npm package. So
 // they take the templates with a handler (hono, fetch), not the ones that bring
 // their own server (express, fastify, std-http), and not fullstack: its init
 // writes no platform files for them (issue #168). The Lambda container image
@@ -386,7 +386,7 @@ dist/
 `;
 
 // Vercel and Netlify run `npm run build` on their build machines (Linux x64),
-// then `lasm package` writes the function exactly as tested in CI.
+// then `lasm build --target` writes the function exactly as tested in CI.
 // `routes` sends every path to the function first: `vercel build` puts these
 // ahead of the zero-config routes it adds to .vercel/output/config.json.
 const vercelJson = JSON.stringify({

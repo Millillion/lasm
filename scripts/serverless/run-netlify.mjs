@@ -1,5 +1,5 @@
 // Netlify Functions with no Netlify account:
-//   1. `lasm package --target netlify` output (a v2 function directory) is checked;
+//   1. `lasm build --target netlify` output (a v2 function directory) is checked;
 //   2. `netlify build --offline` runs netlify.toml's build command and bundles
 //      the function exactly as for a deploy (.netlify/functions/lasm.zip): the
 //      zip must hold the Wasm program, host and native pieces (included_files)
@@ -53,7 +53,7 @@ for (const app of apps.filter(app => app.packages.netlify)) {
     catch (error) { run.checks.push({ name, ok: false, error: error.message.slice(0, 2000) }); }
   };
   const fn = app.packages.netlify.path;
-  await check('lasm package output: a v2 function serving every path', () => {
+  await check('lasm build --target netlify output: a v2 function serving every path', () => {
     const source = readFileSync(join(fn, 'lasm.mjs'), 'utf8');
     assert.match(source, /export const config = \{ path: '\/\*', preferStatic: true \}/);
     for (const file of ['lasm-function.mjs', 'main.mjs', 'program.wasm', 'host/node-host.mjs']) assert.ok(existsSync(join(fn, file)), file);

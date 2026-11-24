@@ -1,11 +1,13 @@
 {
   "comment": "Why each CLI error message the error corpus does not print is not in it (scripts/tooling/error-inventory.mjs). Keys: file and the message's longest fixed piece.",
   "reasons": {
-    "src/cli-arguments.mjs: (dynamic message, line 126)": "The usage text (cliUsage, built from a variable): corpus cases no-arguments and build-without-source print it.",
-    "src/cli-arguments.mjs: (dynamic message, line 133)": "One of two messages chosen by the command (a conditional expression): corpus cases build-positional-output and extra-positional print them.",
+    "src/cli-arguments.mjs: (dynamic message, line 123)": "The usage text (cliUsage, built from a variable): corpus cases no-arguments and build-without-source print it.",
+    "src/cli-arguments.mjs: (dynamic message, line 130)": "One of two messages chosen by the command (a conditional expression): corpus cases build-positional-output and extra-positional print them.",
     "src/application-cli.mjs: (dynamic message, line 23)": "A helper program missing from the installation (missingMessage, a variable); not reachable with a complete npm install.",
     "src/init.mjs: (dynamic message, line 119)": "The usage text (initUsage, a variable): corpus cases init-without-directory and init-two-directories print it.",
-    "src/package.mjs: (dynamic message, line 68)": "The usage text (packageUsage, a variable): corpus case package-two-builds prints it.",
+    "src/package.mjs: is not a regular file; function packages hold regular files only.": "Needs a symbolic link in the Node build, which lasm build never writes; test/package.test.mjs reaches it.",
+    "src/package.mjs: Unknown package target \"": "Internal invariant: lasm build calls the packager only for a function platform; test/package.test.mjs reaches it.",
+    "src/package.mjs: The output must not contain the build directory": "Needs --output to name a directory that holds the build cache (.lake/lasm/applications/); test/package.test.mjs reaches it.",
     "src/package.mjs: ). Rebuild it with the current Lasm.": "A build made by an older Lasm without native support manifests; a current lasm build always writes one. Not tested.",
     "src/package.mjs: The package is": "Needs a build over a platform size limit (50 MB zipped): too large for the corpus. Not tested.",
     "src/package.mjs: Lambda@Edge runs on x86_64; this build has no linux-x64 native support.": "Lambda@Edge from a build without linux-x64 support: only a build made on another host architecture; the corpus runs on linux-x64.",

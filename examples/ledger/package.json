@@ -22,13 +22,12 @@
     "start:deno": "deno run -A deno/main.mjs",
     "build:workers": "npm run build:client && lasm build ServerWorkers.lean --target workers",
     "build:docker": "npm run build && docker build -t ledger .",
-    "build:function": "npm run build:client && lasm build ServerFunction.lean --output dist/function",
-    "build:lambda": "npm run build:function && lasm package dist/function --target lambda",
+    "build:lambda": "npm run build:client && lasm build ServerFunction.lean --target lambda",
     "build:lambda-image": "npm run build:lambda && rm -rf dist/lambda && mkdir -p dist/lambda && unzip -q lambda.zip -d dist/lambda && docker build -f deploy/lambda-image/Dockerfile -t ledger-lambda:local .",
-    "build:vercel": "npm run build:function && lasm package dist/function --target vercel",
-    "build:netlify": "npm run build:function && lasm package dist/function --target netlify",
-    "build:azure-functions": "npm run build:function && node deploy/package-hosted.mjs azure-functions",
-    "build:cloud-functions": "npm run build:function && node deploy/package-hosted.mjs cloud-functions",
+    "build:vercel": "npm run build:client && lasm build ServerFunction.lean --target vercel",
+    "build:netlify": "npm run build:client && lasm build ServerFunction.lean --target netlify",
+    "build:azure-functions": "npm run build:client && lasm build ServerFunction.lean --target azure-functions",
+    "build:cloud-functions": "npm run build:client && lasm build ServerFunction.lean --target cloud-functions",
     "build:wasi": "lasm build Verify.lean --target wasi",
     "test:platform": "node test/api.mjs --platform",
     "verify": "node test/verify.mjs",
@@ -41,5 +40,9 @@
   "devDependencies": {
     "@lasm/cli": "0.10.0",
     "@playwright/test": "1.63.0"
+  },
+  "dependencies": {
+    "@azure/functions": "4.17.0",
+    "@google-cloud/functions-framework": "5.0.5"
   }
 }

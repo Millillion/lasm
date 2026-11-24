@@ -56,7 +56,7 @@ notices. Lasm writes them automatically:
 
 | Target | Where the notices are |
 | --- | --- |
-| `node` (and `lasm package` zips and images) | `dist/THIRD_PARTY_NOTICES.txt` and `dist/licenses/` (shipped with `dist/`) |
+| `node` (and the function platforms' zips and images) | `dist/THIRD_PARTY_NOTICES.txt` and `dist/licenses/` (shipped with `dist/`) |
 | Edge targets (Workers, Vercel Edge, Netlify Edge, Deno, Deno Deploy, Bun, Supabase) | `THIRD_PARTY_NOTICES.txt` in the output directory; a short `/*! … */` licence banner on `lasm/program.mjs`; and the whole notices text inside `program.wasm` (its `lasm.notices` custom section), so it is part of every deployment |
 | `browser` | `THIRD_PARTY_NOTICES.txt` beside `index.html` (served with the app) and a licence banner at the top of `app.<hash>.js` that names it |
 | Vite plugin (`@lasm/cli/vite`) | `THIRD_PARTY_NOTICES.lasm.txt` in Vite's output directory |

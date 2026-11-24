@@ -13,7 +13,7 @@ import {
   parseLasmArguments, buildTargets, edgeBuildTargets, wasiBuildTargets, fixedLayoutTargets, suspendModes,
   targetHint, targetHintAmong, cliUsage, commandNames, editDistance, closest,
 } from '../src/cli-arguments.mjs';
-import { packageTargets, parsePackageArguments } from '../src/package.mjs';
+import { packageTargets } from '../src/package.mjs';
 import { parseInitArguments } from '../src/init.mjs';
 import { parseDevArguments } from '../src/dev.mjs';
 import { originalArguments } from '../src/posix-arguments.mjs';
@@ -30,13 +30,13 @@ test('the target lists', () => {
   assert.deepEqual(buildTargets, ['node', ...Object.keys(packageTargets), ...edgeBuildTargets, ...wasiBuildTargets, 'browser']);
   assert.deepEqual(fixedLayoutTargets, ['vercel-edge', 'netlify-edge']);
   assert.deepEqual(suspendModes, ['none', 'jspi']);
-  assert.deepEqual(commandNames, ['build', 'run', 'dev', 'init', 'package', 'editor', 'cache']);
+  assert.deepEqual(commandNames, ['build', 'run', 'dev', 'init', 'editor', 'cache']);
   assert.ok(cliUsage.startsWith('Usage: lasm <Main.lean> [--release] [-- arguments…]\n'));
   assert.ok(cliUsage.endsWith('Application arguments must follow --.'));
-  for (const command of ['dev', 'build', 'init', 'package', 'editor', 'cache repair']) assert.ok(cliUsage.includes(`lasm ${command}`), command);
+  for (const command of ['dev', 'build', 'init', 'editor', 'cache repair']) assert.ok(cliUsage.includes(`lasm ${command}`), command);
   // The target lists come from the tables (0.7-16).
   assert.ok(cliUsage.includes('\n       lasm build <Main.lean> [--target node|lambda|lambda-edge|vercel|netlify|azure-functions|cloud-functions|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--output PATH] [--dev] [--allow-dev] [--suspend none|jspi] [--bundler]\n'));
-  assert.ok(cliUsage.includes('\n       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure-functions|cloud-functions|browser [--output PATH] [--allow-dev]\n'));
+  assert.ok(!cliUsage.includes('lasm package'));
 });
 
 test('targetHintAmong: an alias among the candidates, else the closest candidate (0.7-23)', () => {
@@ -56,7 +56,7 @@ test('targetHintAmong: an alias among the candidates, else the closest candidate
 test('version: one token only', () => {
   for (const flag of ['--version', '-v']) assert.deepEqual(parseLasmArguments([flag]), { command: 'version' });
   // The bare word is no command (0.7-1).
-  fails(['version'], 'Unknown command "version". Commands: build, run, dev, init, package, editor, cache; or run a program with lasm Main.lean.');
+  fails(['version'], 'Unknown command "version". Commands: build, run, dev, init, editor, cache; or run a program with lasm Main.lean.');
   fails(['--version', 'Main.lean'], 'Unknown Lasm option: --version. Application arguments must follow --.');
   fails(['-v', 'Main.lean'], 'Unknown Lasm option: -v. Application arguments must follow --.');
   assert.throws(() => parseLasmArguments(['version', 'Main.lean']), /^Error: Unknown command "version"/);
@@ -81,10 +81,11 @@ test('lasm cache repair', () => {
   for (const argv of [['cache'], ['cache', 'clean'], ['cache', 'repair', 'now'], ['cache', 'Repair']]) fails(argv, 'Usage: lasm cache repair');
 });
 
-test('init, dev and package go to their own parsers', () => {
+test('init and dev go to their own parsers', () => {
   assert.equal(parseLasmArguments(['init', 'app']).command, 'init');
   assert.equal(parseLasmArguments(['dev']).command, 'dev');
-  assert.equal(parseLasmArguments(['package', '--target', 'lambda']).command, 'package');
+  // There is no lasm package: lasm build --target packages for a function platform.
+  fails(['package', 'dist'], 'Unknown command "package". Commands: build, run, dev, init, editor, cache; or run a program with lasm Main.lean.');
   // Only as the first token: elsewhere they are words.
   assert.throws(() => parseLasmArguments(['Main.lean', 'init']), /Unexpected positional arguments/);
 });
@@ -147,8 +148,6 @@ test('option names match whole tokens only', () => {
     fails(['build', 'Main.lean', flag, 'node'], `Unknown Lasm option: ${flag}. Application arguments must follow --.`);
   for (const input of ['x--target.lean', 'x--suspend.lean', 'x--output.lean'])
     assert.equal(parseLasmArguments(['build', input]).input, input);
-  // lasm package reads its own arguments, not the word package.
-  assert.equal(parseLasmArguments(['package', '--target', 'lambda']).input, parseLasmArguments(['package', 'dist', '--target', 'lambda']).input);
 });
 
 test('target hints: aliases, near misses, and nothing for inherited names', () => {
@@ -184,7 +183,7 @@ test('--bundler and --allow-dev', () => {
   for (const target of buildTargets.filter(target => target !== 'node'))
     assert.equal(parseLasmArguments(['build', 'Main.lean', '--target', target, '--allow-dev']).allowDev, true, target);
   for (const argv of [['build', 'Main.lean', '--allow-dev'], ['build', 'Main.lean', '--target', 'node', '--allow-dev'], ['Main.lean', '--allow-dev']])
-    fails(argv, '--allow-dev applies to lasm build --target <platform> and lasm package');
+    fails(argv, '--allow-dev applies to lasm build --target <platform>');
 });
 
 test('--output, and no positional output (0.7-2)', () => {
@@ -353,13 +352,12 @@ test('--flag=value takes everything after =, line breaks included', () => {
   assert.equal(parseLasmArguments(['build', 'Main.lean', '--output', 'out\ndir']).output, 'out\ndir');
 });
 
-test('lasm init, dev and package: --flag=value also takes line breaks (not "unknown option")', () => {
+test('lasm init and dev: --flag=value also takes line breaks (not "unknown option")', () => {
   assert.throws(() => parseInitArguments(['app', '--template=a\nb']), { message: /^Unknown template "a\nb"/ });
   assert.throws(() => parseInitArguments(['app', '-t=a\u2028b']), { message: /^Unknown template "a\u2028b"/ });
   assert.throws(() => parseInitArguments(['app', '--deploy=a\rb']), { message: /^Unknown deploy target "a\rb"/ });
   assert.equal(parseDevArguments(['--target=browser', '--output=out\ndir']).output, 'out\ndir');
   assert.equal(parseDevArguments(['--target=browser', '--host=a\nb']).host, 'a\nb');
-  assert.equal(parsePackageArguments(['--target=lambda', '--output=out\ndir']).output, 'out\ndir');
 });
 
 test('closest: the nearest candidate within max(2, ⌊length/3⌋) edits, ignoring case; the first of equals', () => {

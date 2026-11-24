@@ -39,7 +39,10 @@ and the browser CI runs every engine against it.
 - **GitHub Pages, GitLab Pages, Cloudflare Pages, Netlify, Vercel, Firebase
   Hosting, S3 + CloudFront, Azure Static Web Apps:** upload `dist/`. They serve
   `.wasm` as `application/wasm` and compress on the fly. To get the caching rules:
-  - Netlify and Cloudflare Pages: a `public/_headers` file (copied into `dist/`):
+  - Netlify and Cloudflare Pages: `lasm build --target browser` writes
+    `dist/_headers` with these rules for the hashed files (and `no-cache` for
+    `index.html`, `app.js` and `lasm-manifest.json`); a `public/_headers` of
+    your own is copied into `dist/` and kept instead:
     ```
     /app.*.js
       Cache-Control: public, max-age=31536000, immutable

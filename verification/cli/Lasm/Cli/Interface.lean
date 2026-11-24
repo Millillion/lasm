@@ -42,7 +42,6 @@ import Lasm.Cli.Model.Reachability
 import Lasm.Cli.Model.Initialization
 import Lasm.Cli.Model.FileMessage
 import Lasm.Cli.Model.NodeHost
-import Lasm.Cli.Model.Package
 import Lasm.Cli.Model.Platform
 import Lasm.Cli.Model.ProcessLauncher
 import Lasm.Cli.Model.Python
@@ -109,10 +108,9 @@ def utf16 (s : String) : List Nat :=
 -- `parseLasmArguments`, `editDistance`, `closest`, `buildTargets` and what
 -- `parseLasmArguments` returns (`Parsed`, a structure of the object's
 -- fields) are modelled in Model/CliArguments.lean; the parsers of `lasm
--- init`, `lasm dev` and `lasm package` (`parseInitArguments`,
--- `parseDevArgumentsWith`, `parsePackageArguments`) and their tables
--- (`templates`, `deployTargets`, `devTargets`, `packageTargets`) in
--- Model/Init.lean, Model/Dev.lean and Model/Package.lean. The models take
+-- init` and `lasm dev` (`parseInitArguments`, `parseDevArgumentsWith`) and
+-- their tables (`templates`, `deployTargets`, `devTargets`) in
+-- Model/Init.lean and Model/Dev.lean. The models take
 -- what they import from outside as a parameter; here it is the constants
 -- below.
 
@@ -131,7 +129,7 @@ def parseDevArguments : List String → Except String Parsed := parseDevArgument
 /-- `parseLasmArguments(argv)`: the parse, or the message of the `Error` it
 throws. -/
 def parseLasmArguments (argv : List String) : Except String Parsed :=
-  parseLasmArgumentsWith ⟨fileExists, jsRuntime, parseInitArguments, parseDevArguments, parsePackageArguments⟩ argv
+  parseLasmArgumentsWith ⟨fileExists, jsRuntime, parseInitArguments, parseDevArguments⟩ argv
 
 /-- `parsed.input` (`""` when absent). -/
 def Parsed.input (p : Parsed) : String := p.input?.getD ""
@@ -154,7 +152,7 @@ def Parsed.outputs (p : Parsed) : List (String × String) := p.outputs?.getD []
 
 /-- The commands a parse can name. -/
 def commands : List String :=
-  ["version", "help", "run", "build", "init", "init-help", "dev", "dev-help", "package", "package-help", "editor", "cache-repair"]
+  ["version", "help", "run", "build", "init", "init-help", "dev", "dev-help", "editor", "cache-repair"]
 
 /-- The options of `lasm build` and of running a program. -/
 def knownFlags : List String :=

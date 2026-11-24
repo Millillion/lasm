@@ -9,7 +9,7 @@
 // Platforms (CI only: platform CLIs never run on a developer's machine):
 //   lambda   AWS SAM `sam local start-api`: an HTTP API (payload 2.0) on /v2/…
 //            and a REST API (payload 1.0) on /v1/…, nodejs24.x
-//   vercel   `lasm package --target vercel` output under Vercel's own Node
+//   vercel   `lasm build --target vercel` output under Vercel's own Node
 //            launcher (@vercel/node's dev server) in AWS Lambda's Node 24 image
 //   netlify  the zip `netlify build --offline` bundles, with Netlify's bootstrap
 //            (___netlify-entry-point.handler) in AWS Lambda's Node 24 image
@@ -27,8 +27,8 @@ import { join, resolve } from 'node:path';
 import { packageApplication } from '../../src/package.mjs';
 import { sessionCookies, standInApplication } from './stand-in-app.mjs';
 
-// The stand-in build, linked for the platform it is packaged for (Lasm.target: src/package.mjs packages a build for its own target).
-const packageFor = options => { writeFileSync(join(options.input, 'build-info.json'), JSON.stringify({ target: options.target })); return packageApplication(options); };
+// The stand-in build, packaged as lasm build --target packages it (src/package.mjs).
+const packageFor = packageApplication;
 
 const [platform, workArg, resultArg] = process.argv.slice(2);
 const platforms = ['lambda', 'vercel', 'netlify', 'azure', 'gcf'];

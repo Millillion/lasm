@@ -169,7 +169,7 @@ SHA-256); the restructured initializer wrappers then changed the bytes once
 - the **dev profile** (`lasm Main.lean`, `npm run dev`, `lasm build --dev`)
   skips `wasm-opt -Oz`, metadce and the JavaScript dead-code passes. It is
   deterministic, labelled in `build-info.json` (`"profile"`) and on the summary
-  line, about 15–20 % larger, and refused by `lasm package` without `--allow-dev`.
+  line, about 15–20 % larger, and refused by `lasm build --target <platform>` without `--allow-dev`.
 
 Measured on the maintainer host (Linux x64, inside the resource guard: base
 pages and **one** Binaryen thread, so the `wasm-opt` part is the single-thread

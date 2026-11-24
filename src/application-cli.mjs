@@ -232,8 +232,6 @@ export async function runApplicationCli(argv) {
   if (options.command === 'init-help') { console.log((await import('./init.mjs')).initUsage); return 0; }
   if (options.command === 'dev-help') { console.log((await import('./dev.mjs')).devUsage); return 0; }
   if (options.command === 'init') return (await import('./init.mjs')).runInit(options);
-  if (options.command === 'package-help') { console.log((await import('./package.mjs')).packageUsage); return 0; }
-  if (options.command === 'package') return (await import('./package.mjs')).runPackage(options);
   assertSupportedHost();
   if (options.command === 'editor') return (await import('./editor.mjs')).runEditor(options);
   if (options.input?.endsWith('.lean') && options.command !== 'dev') assertSourceExists(options.input);
@@ -290,7 +288,7 @@ export async function runApplicationCli(argv) {
   const profileNote = result.profile === 'dev' ? ' (dev profile: size optimizations skipped, not for deployment)' : ' (release profile)';
   if (options.command === 'build') {
     console.error(`${result.cacheHit ? 'Reused' : 'Built'} Lean ${result.lean} for Node${profileNote}: ${result.output}`);
-    if (functionPlatform) return (await import('./package.mjs')).runPackage({ input: result.output, target, allowDev, ...(output === undefined ? {} : { output }) });
+    if (functionPlatform) return (await import('./package.mjs')).packageFunction({ input: result.output, target, ...(output === undefined ? {} : { output }) });
     return 0;
   }
   console.error('[lasm] Running ' + options.input + (result.profile === 'dev' ? ' (dev build)' : ' (release build)') + '…');

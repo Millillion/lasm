@@ -10,6 +10,8 @@
 //                     generated page when the project has none
 //   public/**         the project's public/ files, copied as they are
 //   lasm-manifest.json  file names, sizes, digests and transfer totals
+//   _headers          caching and the Wasm type for Netlify and Cloudflare Pages
+//                     (kept when public/ has its own)
 import { mkdirSync, readFileSync, writeFileSync, copyFileSync, existsSync, rmSync, renameSync, readdirSync, statSync, cpSync } from 'node:fs';
 import { basename, join, relative, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -21,6 +23,7 @@ import { edgeModules } from '../edge/edge-build.mjs';
 import { copyProjectModules, isProjectModule, projectModuleName, projectModules } from '../project-modules.mjs';
 import { noticeBanner, targetNotices } from '../notices.mjs';
 import { foreignOutputError, replaceOutputDirectory } from '../output-directory.mjs';
+import { checkBrowserOutput } from './browser-package.mjs';
 
 const here = fileURLToPath(new URL('./', import.meta.url));
 const edge = fileURLToPath(new URL('../edge/', import.meta.url));
@@ -182,6 +185,8 @@ export function writeBrowserOutput({ source, projectDirectory, result, program, 
     transfer, files, programKey: program.meta.key, nodeBuildSignature: result.signature };
   writeFileSync(join(staging, 'lasm-manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
   replaceOutputDirectory(staging, destination);
+  // The output against its manifest, and _headers for static hosts (src/browser/browser-package.mjs).
+  checkBrowserOutput({ input: destination, manifest, log });
   const kib = n => (n / 1024).toFixed(1) + ' KiB';
   log(`${cacheHit ? 'Reused' : 'Built'} ${relative(process.cwd(), source) || source} for the browser: ${relative(process.cwd(), destination) || destination}`
     + ` (${entry} + ${wasm}: ${precompress ? `${kib(transfer.brotli)} brotli, ${kib(transfer.gzip)} gzip, ` : 'dev build, not precompressed, '}${kib(transfer.uncompressed)} uncompressed)`);

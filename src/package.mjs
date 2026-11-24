@@ -1,7 +1,6 @@
-// `lasm package`: turns a built application linked for a function platform
-// (`lasm build --target <platform>`; Lasm.target, src/target-stamp.mjs) into
-// that platform's deployment. File operations only: no
-// network, no Lean toolchain. Each target adds a small handler shim
+// The last step of `lasm build --target <function platform>`: turns the Node
+// build linked for the platform (Lasm.target, src/target-stamp.mjs) into that
+// platform's deployment. File operations only: no network, no Lean toolchain. Each target adds a small handler shim
 // (src/serverless/) that starts the Lean program inside the platform's Node
 // process and calls the fetch handler it publishes (Lasm.JS.exportDefault)
 // directly: no HTTP server, no port.
@@ -9,14 +8,13 @@ import { chmodSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSy
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { zip } from './serverless/zip.mjs';
-import { targetHintAmong } from './cli-names.mjs';
 
 const serverless = fileURLToPath(new URL('./serverless/', import.meta.url));
 // Node req/res ↔ web Request/Response (lasm:node-serve), copied as the shims' lasm-node-serve.mjs.
 const nodeServe = fileURLToPath(new URL('./lasm-modules/node-serve.mjs', import.meta.url));
 const MB = 1024 * 1024;
 
-// Platform limits checked by `lasm package` (see docs/deploy/*.md for sources).
+// The function platforms, with the limits a package is checked against (see docs/deploy/*.md for sources).
 export const packageTargets = {
   lambda: { summary: 'AWS Lambda .zip for the nodejs24.x runtime (x86_64 or arm64)', output: 'lambda.zip',
     shim: 'lasm-lambda.mjs', zipped: 50 * MB, unzipped: 250 * MB, zippedHard: false },
@@ -31,49 +29,6 @@ export const packageTargets = {
   'cloud-functions': { summary: 'Google Cloud Functions (gen2, Functions Framework) source directory', output: 'cloud-functions',
     shim: 'lasm-gcf.mjs', dependency: '@google-cloud/functions-framework' },
 };
-
-export const packageUsage = `Usage: lasm package [dist] --target ${Object.keys(packageTargets).join('|')}|browser [--output PATH] [--allow-dev]
-
-Packages a built Lasm program (default dist/) for the function platform it
-is linked for (lasm build Main.lean --target <target>: Lasm.target reports it,
-so a build is packaged for its own target only). Its main publishes a fetch handler with
-Lasm.JS.exportDefault (Request → Async Response), which the platform's handler
-calls directly. Writes, by target:
-${Object.entries(packageTargets).map(([name, t]) => `  ${name.padEnd(15)} ${t.output.padEnd(23)} ${t.summary}`).join('\n')}
-  ${'browser'.padEnd(15)} ${'(in place)'.padEnd(23)} a browser build (lasm build --target browser): checked against its manifest, _headers added
-
-lasm build Main.lean --target <target> builds and packages in one step;
-lasm package packages such a build again. Lasm never installs
-or starts a platform's own tools: test and deploy with the platform's CLI.
-Packages hold release builds; a dev build (lasm build --dev, lasm run) is
-refused unless --allow-dev is given.
-
-Example: npx lasm build Main.lean --target lambda`;
-
-export function parsePackageArguments(tokens) {
-  const result = { command: 'package' };
-  const positional = [];
-  for (let i = 0; i < tokens.length; i++) {
-    const token = tokens[i];
-    if (token === '--help' || token === '-h') return { command: 'package-help' };
-    if (token === '--allow-dev') { result.allowDev = true; continue; }
-    const match = /^--(target|output)(?:=(.*))?$/s.exec(token);
-    if (match) {
-      const value = match[2] ?? tokens[++i];
-      if (!value || value.startsWith('--')) throw new Error(`--${match[1]} requires a value\n\n${packageUsage}`);
-      if (result[match[1]] !== undefined) throw new Error(`Specify --${match[1]} only once`);
-      result[match[1]] = value; continue;
-    }
-    if (token.startsWith('-')) throw new Error(`Unknown lasm package option: ${token}\n\n${packageUsage}`);
-    positional.push(token);
-  }
-  if (positional.length > 1) throw new Error(packageUsage);
-  if (!result.target) throw new Error('--target is required\n\n' + packageUsage);
-  if (!Object.hasOwn(packageTargets, result.target) && result.target !== 'browser') throw new Error(`Unknown package target "${result.target}"${targetHintAmong(result.target, [...Object.keys(packageTargets), 'browser'])}. Choose one of: ${[...Object.keys(packageTargets), 'browser'].join(', ')}`);
-  if (result.target === 'browser' && result.output !== undefined) throw new Error('lasm package --target browser checks the build in place; --output does not apply');
-  result.input = positional[0] ?? 'dist';
-  return result;
-}
 
 const format = bytes => (bytes / MB).toFixed(1) + ' MB';
 
@@ -104,8 +59,6 @@ export function buildProfile(input) {
 }
 
 function checkApplication(input) {
-  for (const file of ['main.mjs', 'program.cjs', 'program.wasm', 'build-info.json'])
-    if (!existsSync(join(input, file))) throw new Error(`${input} is not a Lasm build (no ${file}). Run lasm build Main.lean first.`);
   let targets = [];
   try { targets = JSON.parse(readFileSync(join(input, 'host/native/manifest.json'), 'utf8')).deployment?.targets ?? []; } catch { /* below */ }
   const linux = targets.filter(target => target.startsWith('linux-'));
@@ -157,27 +110,19 @@ const sizeOf = files => files.reduce((total, file) => total + (file.data?.length
 
 function dependencyPackage(input, name) {
   const path = join(input, 'node_modules', ...name.split('/'), 'package.json');
-  if (!existsSync(path)) throw new Error(`This target needs the npm package ${name} in the build. Run npm install ${name} next to package.json, then lasm build again.`);
+  if (!existsSync(path)) throw new Error(`This target needs the npm package ${name}: add it to package.json's dependencies (npm install ${name}), then lasm build again.`);
   return JSON.parse(readFileSync(path, 'utf8')).version;
 }
 
 /** Packages `input` for `target`; returns a summary for the CLI and tests. */
-export function packageApplication({ input = 'dist', target, output, allowDev = false }) {
+export function packageApplication({ input, target, output }) {
   const spec = packageTargets[target];
   if (!spec) throw new Error(`Unknown package target "${target}"`);
   input = resolve(input);
   const nativeTargets = checkApplication(input);
-  // Lasm.target is stamped in when the program is linked (src/target-stamp.mjs): a build is packaged for its own target.
-  const linked = JSON.parse(readFileSync(join(input, 'build-info.json'), 'utf8')).target;
-  if (linked !== target)
-    throw new Error(`${input} is linked for --target ${linked ?? 'node'}, not ${target}: Lasm.target reports the target a program is linked for. `
-      + `Build it with lasm build <Main.lean> --target ${target}.`);
-  // Dev builds (lasm run, lasm build --dev) skip Binaryen's size optimization:
-  // larger and not the reproducible release artifact. Deploy release builds.
+  // Dev builds (lasm build --dev --allow-dev) skip Binaryen's size optimization:
+  // larger and not the reproducible release artifact. lasm build refuses one without --allow-dev.
   const profile = buildProfile(input);
-  if (profile === 'dev' && !allowDev)
-    throw new Error(`${input} is a dev build (lasm build --dev or lasm run): unoptimized and not for deployment. `
-      + 'Rebuild it with lasm build Main.lean (the release profile), or pass --allow-dev to package it anyway.');
   output = resolve(output ?? spec.output);
   if (output === input || input.startsWith(output + sep)) throw new Error('The output must not contain the build directory');
   const shims = shimFiles(target);
@@ -191,7 +136,7 @@ export function packageApplication({ input = 'dist', target, output, allowDev = 
   if (spec.unzipped && unzipped > spec.unzipped)
     throw new Error(`The package is ${format(unzipped)} unpacked; ${target} allows ${format(spec.unzipped)}.`);
   const summary = { target, input, output, files: files.length, unzippedBytes: unzipped, nativeTargets, profile, warnings: [] };
-  if (profile === 'dev') summary.warnings.push('This package holds a dev build (--allow-dev): unoptimized and larger. Deploy release builds (lasm build).');
+  if (profile === 'dev') summary.warnings.push('This package holds a dev build (--allow-dev): unoptimized and larger. Deploy release builds (lasm build without --dev).');
   if (target === 'lambda' || target === 'lambda-edge') {
     const archive = zip(files.map(file => ({ name: file.name, data: file.data ?? readFileSync(file.source), mode: file.mode })));
     summary.zippedBytes = archive.length;
@@ -258,12 +203,8 @@ export function packageApplication({ input = 'dist', target, output, allowDev = 
   return summary;
 }
 
-export async function runPackage(options) {
-  // A browser build (lasm build --target browser): checked in place, with host configuration added.
-  if (options.target === 'browser') return (await import('./browser/browser-package.mjs')).packageBrowser({ input: options.input });
-  return runFunctionPackage(options);
-}
-function runFunctionPackage(options) {
+/** Packages a Node build for its function platform and reports where the package is and the next step. */
+export function packageFunction(options) {
   const result = packageApplication(options);
   const where = relative(process.cwd(), result.output) || '.';
   const size = result.zippedBytes ? `${format(result.zippedBytes)} zipped, ${format(result.unzippedBytes)} unpacked`

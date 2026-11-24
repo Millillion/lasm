@@ -1,7 +1,7 @@
 {
   "name": "lasm-target-report",
   "private": true,
-  "$comment": "Azure Functions and Google Cloud Functions packages carry the platform's npm package (src/package.mjs); scripts/ci/target-report.mjs installs these.",
+  "$comment": "Azure Functions and Google Cloud Functions apps list the platform's npm package in their dependencies, which lasm build --target deploys; scripts/ci/target-report.mjs installs these.",
   "dependencies": {
     "@azure/functions": "4.17.0",
     "@google-cloud/functions-framework": "5.0.5"

@@ -1,22 +1,17 @@
-// `lasm package` in-process (src/package.mjs): arguments, the files a package
-// holds and their permissions, each target's layout and summary, and the CLI
-// report. The shims' behaviour is tested by test/serverless.test.mjs.
+// The function-platform packaging of `lasm build --target <platform>`
+// in-process (src/package.mjs): the files a package holds and their
+// permissions, each target's layout and summary, and the CLI report. The shims' behaviour is tested by test/serverless.test.mjs.
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, relative } from 'node:path';
 import { inflateRawSync } from 'node:zlib';
-import { buildProfile, packageApplication, packageTargets, packageUsage, parsePackageArguments, runPackage } from '../src/package.mjs';
+import { buildProfile, packageApplication, packageFunction, packageTargets } from '../src/package.mjs';
 import { standInApplication } from '../scripts/serverless/stand-in-app.mjs';
 
-/** A build linked for `target` (Lasm.target, src/target-stamp.mjs): `lasm package` packages a build for its own target only. */
-function linkFor(input = 'dist', target) {
-  const file = join(input, 'build-info.json');
-  if (existsSync(file)) writeFileSync(file, JSON.stringify({ ...JSON.parse(readFileSync(file, 'utf8')), target }));
-}
-const pack = options => { linkFor(options.input, options.target); return packageApplication(options); };
-const runPack = options => { linkFor(options.input, options.target); return runPackage(options); };
+const pack = packageApplication;
+const runPack = packageFunction;
 
 /** Entries of a zip archive: name → { mode, data }. */
 function unzip(archive) {
@@ -44,34 +39,6 @@ function setup(t, options) {
   const write = (name, text) => { mkdirSync(join(app, name, '..'), { recursive: true }); writeFileSync(join(app, name), text); };
   return { directory, app, write };
 }
-
-test('package arguments: forms, values, repetition, unknown options and targets', () => {
-  assert.deepEqual(parsePackageArguments(['--target', 'lambda']), { command: 'package', target: 'lambda', input: 'dist' });
-  assert.deepEqual(parsePackageArguments(['build', '--target=cloud-functions', '--output=out', '--allow-dev']),
-    { command: 'package', target: 'cloud-functions', output: 'out', allowDev: true, input: 'build' });
-  assert.deepEqual(parsePackageArguments(['--output', 'o', '-h']), { command: 'package-help' });
-  assert.deepEqual(parsePackageArguments(['--target', 'browser', 'site']), { command: 'package', target: 'browser', input: 'site' });
-  for (const target of Object.keys(packageTargets)) assert.equal(parsePackageArguments(['--target', target]).target, target);
-  assert.throws(() => parsePackageArguments(['--target']), { message: `--target requires a value\n\n${packageUsage}` });
-  assert.throws(() => parsePackageArguments(['--target=']), { message: `--target requires a value\n\n${packageUsage}` });
-  assert.throws(() => parsePackageArguments(['--output', '--target', 'lambda']), { message: `--output requires a value\n\n${packageUsage}` });
-  assert.throws(() => parsePackageArguments(['--target', 'lambda', '--output', 'a', '--output=b']), { message: 'Specify --output only once' });
-  assert.throws(() => parsePackageArguments(['--target', 'lambda', '-x']), { message: `Unknown lasm package option: -x\n\n${packageUsage}` });
-  assert.throws(() => parsePackageArguments(['a', 'b', '--target', 'lambda']), { message: packageUsage });
-  assert.throws(() => parsePackageArguments(['a']), { message: '--target is required\n\n' + packageUsage });
-  assert.throws(() => parsePackageArguments(['--target', 'heroku']),
-    { message: 'Unknown package target "heroku". Choose one of: lambda, lambda-edge, vercel, netlify, azure-functions, cloud-functions, browser' });
-  assert.throws(() => parsePackageArguments(['--target', 'toString']), /Unknown package target "toString"/);
-  assert.throws(() => parsePackageArguments(['--target', 'browser', '--output', 'x']),
-    { message: 'lasm package --target browser checks the build in place; --output does not apply' });
-});
-
-test('the usage lists every target with its output and summary', () => {
-  assert.match(packageUsage, /^Usage: lasm package \[dist\] --target lambda\|lambda-edge\|vercel\|netlify\|azure-functions\|cloud-functions\|browser \[--output PATH\] \[--allow-dev\]\n/);
-  for (const [name, spec] of Object.entries(packageTargets))
-    assert.ok(packageUsage.includes(`  ${name.padEnd(15)} ${spec.output.padEnd(23)} ${spec.summary}`), name);
-  assert.ok(packageUsage.includes(`  ${'browser'.padEnd(15)} ${'(in place)'.padEnd(23)} a browser build`));
-});
 
 test('the build profile defaults to release for builds before profiles', t => {
   const { app } = setup(t);
@@ -130,15 +97,8 @@ test('Lambda@Edge needs linux-x64 native support', t => {
   assert.equal(pack({ input: app, target: 'lambda-edge', output: join(directory, 'edge.zip') }).runtime, 'nodejs24.x');
 });
 
-test('builds without their entry, program, Wasm or build record, or without native support, are refused', t => {
+test('builds without native support are refused', t => {
   const { directory, app, write } = setup(t);
-  for (const file of ['main.mjs', 'program.cjs', 'program.wasm', 'build-info.json']) {
-    const saved = readFileSync(join(app, file));
-    rmSync(join(app, file));
-    assert.throws(() => pack({ input: app, target: 'lambda', output: join(directory, 'x.zip') }),
-      { message: `${app} is not a Lasm build (no ${file}). Run lasm build Main.lean first.` });
-    writeFileSync(join(app, file), saved);
-  }
   write('host/native/manifest.json', '{}');
   assert.throws(() => pack({ input: app, target: 'lambda', output: join(directory, 'x.zip') }),
     { message: `${app} carries no Linux native support (none). Rebuild it with the current Lasm.` });
@@ -150,18 +110,15 @@ test('builds without their entry, program, Wasm or build record, or without nati
   assert.throws(() => pack({ input: app, target: 'workers' }), { message: 'Unknown package target "workers"' });
 });
 
-test('the output may neither be nor contain the build; a dev build is refused with the reason', t => {
+test('the output may neither be nor contain the build; a dev build (--allow-dev) is packaged with a warning', t => {
   const { directory, app } = setup(t);
   for (const output of [app, directory]) assert.throws(() => pack({ input: app, target: 'netlify', output }),
     { message: 'The output must not contain the build directory' });
   // A sibling whose name starts like the build is not the build.
   assert.equal(pack({ input: app, target: 'netlify', output: app + '-netlify' }).output, app + '-netlify');
   writeFileSync(join(app, 'build-info.json'), JSON.stringify({ profile: 'dev' }));
-  assert.throws(() => pack({ input: app, target: 'netlify', output: join(directory, 'nf') }), {
-    message: `${app} is a dev build (lasm build --dev or lasm run): unoptimized and not for deployment. `
-      + 'Rebuild it with lasm build Main.lean (the release profile), or pass --allow-dev to package it anyway.' });
-  assert.deepEqual(pack({ input: app, target: 'netlify', output: join(directory, 'nf'), allowDev: true }).warnings,
-    ['This package holds a dev build (--allow-dev): unoptimized and larger. Deploy release builds (lasm build).']);
+  assert.deepEqual(pack({ input: app, target: 'netlify', output: join(directory, 'nf') }).warnings,
+    ['This package holds a dev build (--allow-dev): unoptimized and larger. Deploy release builds (lasm build without --dev).']);
 });
 
 test('only regular files are packaged', { skip: process.platform === 'win32' }, t => {
@@ -227,10 +184,10 @@ test('Azure and Google Cloud Functions pin every deployed npm package and name t
   assert.deepEqual(readdirSync(join(directory, 'gcf/node_modules')).sort(), ['.bin', '@azure', '@google-cloud', '@scope', 'plain']);
   rmSync(join(app, 'node_modules/@google-cloud'), { recursive: true });
   assert.throws(() => pack({ input: app, target: 'cloud-functions', output: join(directory, 'gcf') }), {
-    message: 'This target needs the npm package @google-cloud/functions-framework in the build. Run npm install @google-cloud/functions-framework next to package.json, then lasm build again.' });
+    message: 'This target needs the npm package @google-cloud/functions-framework: add it to package.json\'s dependencies (npm install @google-cloud/functions-framework), then lasm build again.' });
 });
 
-test('runPackage reports where the package is, its size and the next step', async t => {
+test('packageFunction reports where the package is, its size and the next step', async t => {
   const { directory, app } = setup(t);
   const logged = [], warned = [];
   const { log, warn } = console;
@@ -240,8 +197,8 @@ test('runPackage reports where the package is, its size and the next step', asyn
     process.chdir(directory);
     assert.equal(await runPack({ input: 'dist', target: 'lambda', output: 'fn.zip' }), 0);
     writeFileSync(join(app, 'build-info.json'), JSON.stringify({ profile: 'dev' }));
-    assert.equal(await runPack({ input: 'dist', target: 'vercel', output: '.vercel/output', allowDev: true }), 0);
-    await runPack({ input: 'dist', target: 'netlify', output: 'nf', allowDev: true });
+    assert.equal(await runPack({ input: 'dist', target: 'vercel', output: '.vercel/output' }), 0);
+    await runPack({ input: 'dist', target: 'netlify', output: 'nf' });
   } finally { process.chdir(cwd); console.log = log; console.warn = warn; }
   const size = statSync(join(directory, 'fn.zip')).size;
   assert.match(logged[0], new RegExp(`^Packaged dist for lambda: fn\\.zip \\(\\d+ files, ${(size / 1048576).toFixed(1).replace('.', '\\.')} MB zipped, \\d+\\.\\d MB unpacked\\)\\.\\n`
@@ -249,8 +206,8 @@ test('runPackage reports where the package is, its size and the next step', asyn
     + '  aws lambda create-function --function-name my-app --runtime nodejs24\\.x --handler lasm-lambda\\.handler --zip-file fileb://fn\\.zip '));
   assert.match(logged[1], /^Packaged dist for vercel: \.vercel\/output \(\d+ files, \d+\.\d MB\)\.\nDeploy the prebuilt output: npx vercel deploy --prebuilt$/);
   assert.match(logged[2], /^Packaged dist for netlify: nf .*\nDeploy with netlify deploy/);
-  assert.deepEqual(warned, ['Warning: This package holds a dev build (--allow-dev): unoptimized and larger. Deploy release builds (lasm build).',
-    'Warning: This package holds a dev build (--allow-dev): unoptimized and larger. Deploy release builds (lasm build).']);
+  assert.deepEqual(warned, ['Warning: This package holds a dev build (--allow-dev): unoptimized and larger. Deploy release builds (lasm build without --dev).',
+    'Warning: This package holds a dev build (--allow-dev): unoptimized and larger. Deploy release builds (lasm build without --dev).']);
 });
 
 test('the targets: their outputs, shims, limits and platform packages', () => {
@@ -266,9 +223,6 @@ test('the targets: their outputs, shims, limits and platform packages', () => {
   for (const [name, words] of [['lambda', /AWS Lambda.*nodejs24\.x/], ['lambda-edge', /Lambda@Edge.*CloudFront/], ['vercel', /Vercel.*Build Output API v3/],
     ['netlify', /Netlify Function \(v2/], ['azure-functions', /Azure Functions.*v4/], ['cloud-functions', /Google Cloud Functions \(gen2/]])
     assert.match(packageTargets[name].summary, words, name);
-  assert.ok(packageUsage.includes('\n  lambda          lambda.zip              AWS Lambda'));
-  assert.throws(() => parsePackageArguments(['--targets', 'lambda']), { message: `Unknown lasm package option: --targets\n\n${packageUsage}` });
-  assert.throws(() => parsePackageArguments(['x--target', 'lambda']), { message: packageUsage });
 });
 
 test('size limits: an oversized unpacked package or a hard zip limit is refused, a soft zip limit warns', t => {
@@ -327,30 +281,11 @@ test('the report of every target, from inside the build, with only the Linux tar
     await runPack({ input: '.', target: 'azure-functions', output: '../az' });
     await runPack({ input: '.', target: 'cloud-functions', output: '../gcf' });
     process.chdir(directory);
-    assert.equal(pack({ target: 'netlify', output: 'nf' }).input, app, 'dist by default');
-    await assert.rejects(runPack({ input: 'dist', target: 'browser' }), { message: 'dist is not a browser build (no lasm-manifest.json); run lasm build Main.lean --target browser first' });
+    assert.equal(pack({ input: 'dist', target: 'netlify', output: 'nf' }).input, app, 'relative to the working directory');
   } finally { process.chdir(cwd); console.log = log; }
   assert.match(logged[0], /^Packaged \. for lambda: \.\.\/a\.zip \(/);
   assert.match(logged[0], /\(both included: linux-x64\)\./);
   assert.match(logged[1], /\nCreate it in us-east-1 with runtime nodejs24\.x, handler lasm-lambda\.handler, architecture x86_64, then attach a published version to a CloudFront origin-request trigger \(with "Include body" for POST bodies\)\.$/);
   assert.match(logged[2], /\nRun locally with func start in \.\.\/az; publish with func azure functionapp publish APP_NAME\.$/);
   assert.match(logged[3], /\nRun locally with npx @google-cloud\/functions-framework --target=lasm in \.\.\/gcf; deploy with gcloud functions deploy my-app --gen2 --runtime nodejs24 --trigger-http --entry-point lasm --source \.\.\/gcf\.$/);
-});
-
-test('a misspelled package target names the target (0.7-24)', () => {
-  const list = 'lambda, lambda-edge, vercel, netlify, azure-functions, cloud-functions, browser';
-  for (const [old, now] of [['aws', 'lambda'], ['cloud-run-functions', 'cloud-functions'], ['lamda', 'lambda'], ['brwser', 'browser']])
-    assert.throws(() => parsePackageArguments(['--target', old]), { message: `Unknown package target "${old}" (did you mean --target ${now}?). Choose one of: ${list}` });
-  for (const word of ['heroku', 'azure', 'gcf'])
-    assert.throws(() => parsePackageArguments(['--target', word]), { message: `Unknown package target "${word}". Choose one of: ${list}` });
-});
-
-test('a build is packaged only for the target it is linked for (Lasm.target)', t => {
-  const { directory, app } = setup(t);
-  writeFileSync(join(app, 'build-info.json'), JSON.stringify({ target: 'node' }));
-  assert.throws(() => packageApplication({ input: app, target: 'lambda', output: join(directory, 'l.zip') }),
-    { message: `${app} is linked for --target node, not lambda: Lasm.target reports the target a program is linked for. Build it with lasm build <Main.lean> --target lambda.` });
-  writeFileSync(join(app, 'build-info.json'), JSON.stringify({ target: 'vercel' }));
-  assert.throws(() => packageApplication({ input: app, target: 'netlify', output: join(directory, 'nf') }), /is linked for --target vercel, not netlify/);
-  assert.equal(packageApplication({ input: app, target: 'vercel', output: join(directory, 'v') }).target, 'vercel');
 });

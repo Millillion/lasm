@@ -49,8 +49,8 @@ export function closest(word, candidates) {
   return distance <= Math.max(2, Math.floor((best === undefined ? 0 : [...best].length) / 3)) ? best : undefined;
 }
 
-/** The same hint among `candidates` only (lasm dev's targets, lasm package's,
- * lasm init's --deploy targets): an alias that names one of them, else the
+/** The same hint among `candidates` only (lasm dev's targets, lasm init's
+ * --deploy targets): an alias that names one of them, else the
  * closest of them. */
 export function targetHintAmong(value, candidates, option = '--target') {
   const alias = asciiLower(value);

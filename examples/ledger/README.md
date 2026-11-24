@@ -27,7 +27,7 @@ The same Lean runs on each platform below; only the SQLite module differs
 server (`Node.serve`, `Deno.serve`, `Bun.serve`: [`ServerNode.lean`](ServerNode.lean),
 [`ServerDeno.lean`](ServerDeno.lean), [`ServerBun.lean`](ServerBun.lean)), or the handler published
 with `exportDefault`, which Workers ([`ServerWorkers.lean`](ServerWorkers.lean)) and the function
-platforms ([`ServerFunction.lean`](ServerFunction.lean), built by `npm run build:function`) call
+platforms ([`ServerFunction.lean`](ServerFunction.lean), built by `lasm build ServerFunction.lean --target <platform>`) call
 for each request. No hand-written binding is left: every JavaScript API Ledger calls is generated. Each row is a CI job
 ([ledger.yml](../../.github/workflows/ledger.yml) for Node,
 [ledger-platforms.yml](../../.github/workflows/ledger-platforms.yml) for the rest) that builds
@@ -41,11 +41,11 @@ and runs the API test and the bank workload against it. No account, nothing depl
 | Deno 2.9.6 | `npm run build:deno` | `deno run -A deno/main.mjs` | `node:sqlite` in Deno, a file |
 | Cloudflare Workers | `npm run build:workers` | `wrangler dev` | D1 (local), whose `batch` is one transaction |
 | Docker | `npm run build:docker` | `docker run --read-only` | `node:sqlite` on the `/data` volume |
-| AWS Lambda (.zip and container image) | `npm run build:lambda`, `build:lambda-image` (from `dist/function`) | `sam local start-api` | `node:sqlite` in `/tmp`, per instance |
+| AWS Lambda (.zip and container image) | `npm run build:lambda`, `build:lambda-image` | `sam local start-api` | `node:sqlite` in `/tmp`, per instance |
 | Vercel Functions | `vercel build` | Vercel's Node launcher | `node:sqlite` in `/tmp`, per instance |
 | Netlify Functions | `netlify build` | Netlify's bootstrap in the Lambda image | `node:sqlite` in `/tmp`, per instance |
-| Azure Functions | `npm run build:azure-functions` (from `dist/function`) | `func start` | `node:sqlite` in the temporary directory, per instance |
-| Google Cloud Functions | `npm run build:cloud-functions` (from `dist/function`) | Functions Framework | `node:sqlite` in the temporary directory, per instance |
+| Azure Functions | `npm run build:azure-functions` | `func start` | `node:sqlite` in the temporary directory, per instance |
+| Google Cloud Functions | `npm run build:cloud-functions` | Functions Framework | `node:sqlite` in the temporary directory, per instance |
 | WASI (the auditor) | `npm run build:wasi` | wasmtime 49.0.4, wasmer 7.4.2, `node:wasi` | reads an exported journal |
 
 On the function platforms the database lives as long as the function's instance: that is

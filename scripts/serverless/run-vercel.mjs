@@ -1,9 +1,9 @@
 // Vercel Functions with no Vercel account:
-//   1. `lasm package --target vercel` output (Build Output API v3) is checked:
+//   1. `lasm build --target vercel` output (Build Output API v3) is checked:
 //      config, .vc-config.json, every application file, 250 MB limit;
 //   2. `vercel build` runs offline in each project (a local .vercel/project.json
 //      stands in for `vercel link`): it runs vercel.json's buildCommand, which
-//      writes .vercel/output with lasm package;
+//      writes .vercel/output with lasm build --target vercel;
 //   3. the built function runs under Vercel's own Node launcher (the
 //      dev-server of @vercel/node, which `vercel dev` uses) inside AWS's
 //      Lambda Node 24 image (Vercel Functions run on AWS Lambda, Amazon Linux
@@ -59,7 +59,7 @@ for (const app of apps.filter(app => app.packages.vercel)) {
     catch (error) { run.checks.push({ name, ok: false, error: error.message.slice(0, 2000) }); }
   };
   const output = app.packages.vercel.path, func = join(output, 'functions/index.func');
-  await check('lasm package output: Build Output API v3, Node 24 function, all files, within 250 MB', () => {
+  await check('lasm build --target vercel output: Build Output API v3, Node 24 function, all files, within 250 MB', () => {
     assert.equal(JSON.parse(readFileSync(join(output, 'config.json'), 'utf8')).version, 3);
     const config = JSON.parse(readFileSync(join(func, '.vc-config.json'), 'utf8'));
     assert.deepEqual([config.runtime, config.handler, config.launcherType], ['nodejs24.x', 'lasm-vercel.mjs', 'Nodejs']);

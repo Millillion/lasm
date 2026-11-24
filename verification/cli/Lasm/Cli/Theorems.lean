@@ -1678,13 +1678,13 @@ theorem run_args_kept : Spec.run_args_kept := by
     have := this.eq_of_length (by simp)
     simp at this
   have notWord : ∀ w : String, ¬ ".lean".toList <:+ w.toList → src ≠ w := by rintro w h rfl; exact h suffix
-  let env : ArgumentsEnv := ⟨fileExists, jsRuntime, parseInitArguments, parseDevArguments, parsePackageArguments⟩
+  let env : ArgumentsEnv := ⟨fileExists, jsRuntime, parseInitArguments, parseDevArguments⟩
   have hprog : parseLasmArguments (flags ++ [src, "--"] ++ args) =
       parseLasmArgumentsWith.program env parseLasmArgumentsWith.start (flags ++ src :: "--" :: args) := by
     cases flags with
     | nil =>
       simp [parseLasmArguments, parseLasmArgumentsWith, parseLasmArgumentsWith.rest, notWord "init" (by decide),
-        notWord "dev" (by decide), notWord "package" (by decide), notWord "editor" (by decide), notWord "cache" (by decide),
+        notWord "dev" (by decide), notWord "editor" (by decide), notWord "cache" (by decide),
         notWord "build" (by decide), notWord "run" (by decide)]
       rfl
     | cons f fs =>
@@ -1722,9 +1722,6 @@ theorem nb_initUsage : NB initUsage := by
 theorem nb_devUsage : NB devUsage := by
   unfold devUsage; repeat (with_reducible apply nb_left)
   decide
-theorem nb_packageUsage : NB packageUsage := by
-  unfold packageUsage; repeat (with_reducible apply nb_left)
-  decide
 theorem nb_cliUsage : NB cliUsage := by
   unfold cliUsage; repeat (with_reducible apply nb_left)
   decide
@@ -1733,7 +1730,7 @@ syntax "nb" : tactic
 macro_rules
   | `(tactic| nb) => `(tactic| first
     | with_reducible exact nb_initUsage | with_reducible exact nb_devUsage
-    | with_reducible exact nb_packageUsage | with_reducible exact nb_cliUsage
+    | with_reducible exact nb_cliUsage
     | (with_reducible apply nb_left; nb) | (with_reducible apply nb_right; nb) | decide)
 
 def LoopOK {α} (P : α → Prop) : Except String (Option α) → Prop
@@ -1795,37 +1792,6 @@ theorem parseInit_spec (toks : List String) : InitOK (parseInitArguments toks) :
           | (simp only [InitOK]; nb)
           | (simp only [InitOK]; exact deployChecks_nb _ _ _ _ ‹_›)
           | (simp only [InitOK, Parsed.template, Parsed.deploy, Option.getD]; exact Or.inl ⟨trivial, htm, hl⟩)
-
-/-! ### `lasm package` -/
-
-/-- What a parse of `lasm package` gives. -/
-def PackageOK : Except String Parsed → Prop
-  | .ok p => (p.command = "package" ∧ (p.target ∈ packageTargets ∨ p.target = "browser")) ∨ p.command = "package-help"
-  | .error m => NB m
-
-theorem packageLoop_spec (toks : List String) (r : Parsed) (pos : List String) (h : r.command = "package") :
-    LoopOK (fun x : Parsed × List String => x.1.command = "package") (packageLoop r pos toks) := by
-  fun_induction packageLoop r pos toks <;> simp only [LoopOK] at *
-  all_goals first
-    | exact h
-    | (with_reducible show NB _; nb)
-    | (rename_i ih; exact ih h)
-    | (rename_i ih; apply ih; split <;> exact h)
-
-theorem parsePackage_spec (toks : List String) : PackageOK (parsePackageArguments toks) := by
-  have hl := packageLoop_spec toks { command := "package" } [] rfl
-  unfold parsePackageArguments
-  split
-  · rename_i e he; rw [he] at hl; exact hl
-  · simp [PackageOK]
-  · rename_i r pos hst
-    rw [hst] at hl
-    simp only [LoopOK] at hl
-    repeat' split
-    all_goals first
-      | (simp only [PackageOK]; nb)
-      | (simp only [PackageOK, Parsed.target, Option.getD]; refine Or.inl ⟨hl, ?_⟩; simp_all
-         exact Decidable.or_iff_not_imp_left.mpr ‹_›)
 
 /-! ### `lasm dev` -/
 
@@ -2023,7 +1989,7 @@ theorem defaultProfile_fields (r : Parsed) (first : String) :
 theorem checkOptions_spec (r : Parsed) (first : String) (hc : r.command = "run" ∨ r.command = "build")
     (ht : ∀ t, r.target? = some t → t ∈ buildTargets) (hi : r.input? = some first)
     (hf : first.endsWith ".lean" = true ∨ first.endsWith ".json" = true) :
-    FinishOK (checkOptions ⟨fileExists, jsRuntime, parseInitArguments, parseDevArguments, parsePackageArguments⟩ r first) := by
+    FinishOK (checkOptions ⟨fileExists, jsRuntime, parseInitArguments, parseDevArguments⟩ r first) := by
   have hin : (r.input?.getD "").endsWith ".lean" = true ∨ (r.input?.getD "").endsWith ".json" = true := by simpa [hi] using hf
   have hdef : (r.target?.getD jsRuntime) ∈ buildTargets := by
     cases hrt : r.target? with
@@ -2039,7 +2005,7 @@ theorem checkOptions_spec (r : Parsed) (first : String) (hc : r.command = "run" 
     | exact ⟨hc, fun hb => absurd hb ‹_›, hin⟩
 
 theorem finish_spec (r : Parsed) (pos : List String) (h : ProgInv r) :
-    FinishOK (finish ⟨fileExists, jsRuntime, parseInitArguments, parseDevArguments, parsePackageArguments⟩ r pos) := by
+    FinishOK (finish ⟨fileExists, jsRuntime, parseInitArguments, parseDevArguments⟩ r pos) := by
   unfold finish
   cases pos with
   | nil => show NB _; nb
@@ -2089,22 +2055,21 @@ def Outcome : Except String Parsed → Prop
         (p.command = "build" → p.target ∈ buildTargets) ∧
         ((p.command = "build" ∨ p.command = "run") → p.input.endsWith ".lean" ∨ p.input.endsWith ".json") ∧
         (p.command = "init" → p.template ∈ templates ∧ ∀ d ∈ p.deploy, d ∈ deployTargets) ∧
-        (p.command = "package" → p.target ∈ packageTargets ∨ p.target = "browser") ∧
         (p.command = "dev" → ∀ o ∈ p.outputs, o.1 ∈ devTargets ∧ o.2.endsWith ".lean")
   | .error m => m.trimAscii.toString ≠ ""
 
 /-- A parse of a command with no checked fields. -/
-theorem outcome_plain (p : Parsed) (h : p.command ∈ ["version", "help", "editor", "cache-repair", "init-help", "dev-help", "package-help"]) :
+theorem outcome_plain (p : Parsed) (h : p.command ∈ ["version", "help", "editor", "cache-repair", "init-help", "dev-help"]) :
     Outcome (.ok p) := by
   simp only [List.mem_cons, List.not_mem_nil, or_false] at h
-  refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩ <;> rcases h with h | h | h | h | h | h | h <;> simp [h, commands]
+  refine ⟨?_, ?_, ?_, ?_, ?_⟩ <;> rcases h with h | h | h | h | h | h <;> simp [h, commands]
 
 theorem outcome_init (r : Except String Parsed) (h : InitOK r) : Outcome r := by
   cases r with
   | error m => exact readable_of_nb h
   | ok p =>
     rcases h with ⟨hc, ht, hd⟩ | h
-    · refine ⟨?_, ?_, ?_, fun _ => ⟨ht, hd⟩, ?_, ?_⟩ <;> simp [hc, commands]
+    · refine ⟨?_, ?_, ?_, fun _ => ⟨ht, hd⟩, ?_⟩ <;> simp [hc, commands]
     · exact outcome_plain p (by simp [h])
 
 theorem outcome_dev (r : Except String Parsed) (h : DevOK r) : Outcome r := by
@@ -2112,15 +2077,7 @@ theorem outcome_dev (r : Except String Parsed) (h : DevOK r) : Outcome r := by
   | error m => exact readable_of_nb h
   | ok p =>
     rcases h with ⟨hc, ho⟩ | h
-    · refine ⟨?_, ?_, ?_, ?_, ?_, fun _ => ho⟩ <;> simp [hc, commands]
-    · exact outcome_plain p (by simp [h])
-
-theorem outcome_package (r : Except String Parsed) (h : PackageOK r) : Outcome r := by
-  cases r with
-  | error m => exact readable_of_nb h
-  | ok p =>
-    rcases h with ⟨hc, ht⟩ | h
-    · refine ⟨?_, ?_, ?_, ?_, fun _ => ht, ?_⟩ <;> simp [hc, commands]
+    · refine ⟨?_, ?_, ?_, ?_, fun _ => ho⟩ <;> simp [hc, commands]
     · exact outcome_plain p (by simp [h])
 
 theorem outcome_finish (r : Except String Parsed) (h : FinishOK r) : Outcome r := by
@@ -2128,16 +2085,16 @@ theorem outcome_finish (r : Except String Parsed) (h : FinishOK r) : Outcome r :
   | error m => exact readable_of_nb h
   | ok p =>
     obtain ⟨hc, ht, hi⟩ := h
-    refine ⟨?_, ht, fun _ => hi, ?_, ?_, ?_⟩ <;> rcases hc with hc | hc <;> simp [hc, commands]
+    refine ⟨?_, ht, fun _ => hi, ?_, ?_⟩ <;> rcases hc with hc | hc <;> simp [hc, commands]
 
 theorem parse_known_or_refused : Spec.parse_known_or_refused := by
   intro argv
   show Outcome (parseLasmArguments argv)
   unfold parseLasmArguments parseLasmArgumentsWith
   have hrest : ∀ tokens, Outcome (parseLasmArgumentsWith.rest
-      ⟨fileExists, jsRuntime, parseInitArguments, parseDevArguments, parsePackageArguments⟩ tokens) := by
+      ⟨fileExists, jsRuntime, parseInitArguments, parseDevArguments⟩ tokens) := by
     have hprog : ∀ r toks, ProgInv r → Outcome (parseLasmArgumentsWith.program
-        ⟨fileExists, jsRuntime, parseInitArguments, parseDevArguments, parsePackageArguments⟩ r toks) := by
+        ⟨fileExists, jsRuntime, parseInitArguments, parseDevArguments⟩ r toks) := by
       intro r toks hr
       have hl := optionLoop_spec toks r [] [] hr
       unfold parseLasmArgumentsWith.program
@@ -2155,7 +2112,11 @@ theorem parse_known_or_refused : Spec.parse_known_or_refused := by
       · split
         · exact outcome_dev _ (parseDev_spec more)
         · split
-          · exact outcome_package _ (parsePackage_spec more)
+          · split
+            · exact outcome_plain _ (by simp)
+            · split
+              · exact readable_of_nb (by nb)
+              · exact outcome_plain _ (by simp)
           · split
             · split
               · exact outcome_plain _ (by simp)
@@ -2163,15 +2124,9 @@ theorem parse_known_or_refused : Spec.parse_known_or_refused := by
                 · exact readable_of_nb (by nb)
                 · exact outcome_plain _ (by simp)
             · split
-              · split
-                · exact outcome_plain _ (by simp)
-                · split
-                  · exact readable_of_nb (by nb)
-                  · exact outcome_plain _ (by simp)
-              · split
-                · rename_i hc
-                  exact hprog _ _ ⟨by rcases hc with hc | hc <;> simp [hc], fun _ h => nomatch h⟩
-                · exact hprog _ _ hstart
+              · rename_i hc
+                exact hprog _ _ ⟨by rcases hc with hc | hc <;> simp [hc], fun _ h => nomatch h⟩
+              · exact hprog _ _ hstart
     · exact hprog _ _ hstart
   split
   · split
@@ -2819,7 +2774,7 @@ theorem items_or_error : ∀ (gs : List (List String)) (r : Parsed) (pos sup : L
         · exact Or.inr (by intro g' hg'; simp only [List.mem_cons] at hg'; rcases hg' with rfl | hg' <;> simp_all)
 
 /-- What `parseLasmArguments` imports. -/
-def realEnv : ArgumentsEnv := ⟨fileExists, jsRuntime, parseInitArguments, parseDevArguments, parsePackageArguments⟩
+def realEnv : ArgumentsEnv := ⟨fileExists, jsRuntime, parseInitArguments, parseDevArguments⟩
 /-- The parse `lasm build` starts from. -/
 def buildStart : Parsed := { parseLasmArgumentsWith.start with command := "build" }
 

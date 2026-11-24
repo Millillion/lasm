@@ -1,5 +1,5 @@
-// The CLI's argument parser (src/cli-arguments.mjs and the init, dev and
-// package parsers it calls). Input: argv tokens separated by 0x00.
+// The CLI's argument parser (src/cli-arguments.mjs and the init and dev
+// parsers it calls). Input: argv tokens separated by 0x00.
 // Oracle: a parse is a plain object whose command, targets, templates and
 // deploy targets are ones Lasm has (own keys, never inherited ones such as
 // `constructor`), or a plain Error with a readable message (no TypeError,
@@ -11,16 +11,14 @@
 //         (p.command = "build" → p.target ∈ buildTargets) ∧
 //         ((p.command = "build" ∨ p.command = "run") → p.input.endsWith ".lean" ∨ p.input.endsWith ".json") ∧
 //         (p.command = "init" → p.template ∈ templates ∧ ∀ d ∈ p.deploy, d ∈ deployTargets) ∧
-//         (p.command = "package" → p.target ∈ packageTargets ∨ p.target = "browser") ∧
 //         (p.command = "dev" → ∀ o ∈ p.outputs, o.1 ∈ devTargets ∧ o.2.endsWith ".lean")
 //     | .error m => m.trimAscii.toString ≠ ""
 import { parseLasmArguments, buildTargets } from '../../../src/cli-arguments.mjs';
 import { templates, deployTargets } from '../../../src/init.mjs';
-import { packageTargets } from '../../../src/package.mjs';
 import { devTargets } from '../../../src/dev.mjs';
 import { Input } from '../input.mjs';
 
-export const sources = ['src/cli-arguments.mjs', 'src/init.mjs', 'src/dev.mjs', 'src/package.mjs'];
+export const sources = ['src/cli-arguments.mjs', 'src/init.mjs', 'src/dev.mjs'];
 export const maxLength = 512;
 const words = ['build', 'run', 'dev', 'init', 'package', 'editor', 'cache', 'repair', 'version', '--version', '-v',
   '--target', '--target=', '--output', '--output=', '--suspend', 'jspi', 'none', '--dev', '--release', '--rebuild', '--verbose',
@@ -33,7 +31,7 @@ const words = ['build', 'run', 'dev', 'init', 'package', 'editor', 'cache', 'rep
 export const dictionary = [...words.map(word => word + '\0'), ...words.map((_, i) => [2, i, 0])];
 
 const own = (table, key) => typeof key === 'string' && Object.hasOwn(table, key);
-const commands = new Set(['version', 'help', 'run', 'build', 'init', 'init-help', 'dev', 'dev-help', 'package', 'package-help', 'editor', 'cache-repair']);
+const commands = new Set(['version', 'help', 'run', 'build', 'init', 'init-help', 'dev', 'dev-help', 'editor', 'cache-repair']);
 
 function fail(message, argv) { throw Object.assign(new Error(`${message}\nargv: ${JSON.stringify(argv)}`), { name: 'OracleFailure' }); }
 
@@ -67,9 +65,6 @@ export function run(bytes) {
     for (const d of result.deploy) if (!own(deployTargets, d)) fail(`init accepted --deploy ${JSON.stringify(d)}`, argv);
     if (typeof result.directory !== 'string') fail('init directory', argv);
     break;
-  case 'package':
-    if (!own(packageTargets, result.target) && result.target !== 'browser') fail(`package accepted the target ${JSON.stringify(result.target)}`, argv);
-    break;
   case 'dev':
     for (const o of result.outputs) if (!devTargets.includes(o.target) || !o.input.endsWith('.lean')) fail(`dev output ${JSON.stringify(o)}`, argv);
     break;
@@ -82,7 +77,7 @@ export function seeds() {
     ['build', 'Main.lean', '--target=browser', '--suspend', 'jspi', '--bundler'], ['build', 'bindings.json'],
     ['init', 'app', '--template', 'fullstack', '--deploy', 'workers'], ['init', 'app', '-t', 'express', '--deploy=lambda'], ['init', 'app', '--template', 'plain'],
     ['dev', '--target', 'node=Server.lean,browser=Client.lean', '--port', '5173'], ['dev', 'Main.lean', '--release', '--no-run'],
-    ['package', 'dist', '--target', 'lambda', '--output', 'x.zip'], ['editor', '.'], ['cache', 'repair'], ['--version'], ['biuld', 'Main.lean'],
+    ['build', 'Main.lean', '--target', 'lambda', '--output', 'x.zip'], ['editor', '.'], ['cache', 'repair'], ['--version'], ['biuld', 'Main.lean'],
     ['build', 'Main.lean', '--target', 'cloudflare'],
   ];
 }
