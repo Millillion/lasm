@@ -11,6 +11,16 @@ export function hostMemory() {
     .matchAll(/^(\w+):\s+(\d+) kB$/gm)].map(([, key, value]) => [key, Number(value) * 1024]));
   return { total: values.MemTotal, available: values.MemAvailable };
 }
+/**
+ * The cgroup's working set: memory.current less its inactive file cache, as
+ * the kubelet, cAdvisor and `docker stats` count it. Inactive page cache (the
+ * toolchain archives a build extracts, files it wrote) is the first thing the
+ * kernel reclaims before MemoryMax, so it is no measure of what the workload
+ * needs. The macOS (RSS) and Windows (committed bytes) guards exclude it too.
+ */
+export function workingSetBytes(memoryCurrent, stat) {
+  return Math.max(0, memoryCurrent - (stat.inactive_file ?? 0));
+}
 export function currentCgroup() {
   const path = readFileSync('/proc/self/cgroup', 'utf8').match(/^0::(.+)$/m)?.[1];
   if (!path) throw new Error('The full-runtime harness requires cgroup v2');
