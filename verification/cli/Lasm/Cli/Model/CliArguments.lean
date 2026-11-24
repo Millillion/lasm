@@ -85,8 +85,8 @@ def commandNames : List String := ["build", "run", "dev", "init", "package", "ed
 def targetAliases : List (String × String) :=
   [("cloudflare", "workers"), ("cloudflare-workers", "workers"), ("worker", "workers"), ("aws", "lambda"), ("aws-lambda", "lambda"),
    ("cloudfront", "lambda-edge"), ("supabase", "supabase-edge"), ("deno-deploy-edge", "deno-deploy"), ("spin", "wasi-http"),
-   ("wasmtime", "wasi"), ("web", "browser"), ("vite", "browser"), ("azure", "azure-functions"), ("gcf", "cloud-functions"),
-   ("google-cloud-functions", "cloud-functions"), ("cloud-run-functions", "cloud-functions"), ("vercel-functions", "vercel"), ("netlify-functions", "netlify"), ("lambda-zip", "lambda")]
+   ("wasmtime", "wasi"), ("web", "browser"), ("vite", "browser"),
+   ("google-cloud-functions", "cloud-functions"), ("cloud-run-functions", "cloud-functions"), ("vercel-functions", "vercel"), ("netlify-functions", "netlify")]
 
 /-- The usage text: one literal in the JavaScript, two pieces here, so that a
 proof sees its first word without decoding the whole text. -/

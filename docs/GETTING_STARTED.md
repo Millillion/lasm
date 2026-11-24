@@ -115,14 +115,9 @@ Restart the Lean server after the first setup (VS Code: *Lean 4: Restart Server*
 
 Lasm changes nothing in elan, so `lake build` of your native targets (a
 `lean_exe`, tests) keeps using Lean's own toolchain, C compiler included.
-Lasm 0.3.0 to 0.10.0 instead set an elan override to Lasm's toolchain
-(`lasm-4.35.0-…`) on the project directory, which left a native `lake build` of a
-`lean_exe` without Lean's C compiler (issue #343). `lasm build`, `lasm dev`,
-`lasm init` and `lasm editor` remove that override and print one line when they
-do (`elan override unset` in the project does the same). `lasm build` and
-`lasm dev` also say once when a project imports `Lasm.*` but its lakefile does
-not require Lasm's package yet. `LASM_EDITOR=0` turns both off, and they never
-run on CI. `lasm editor` also writes `lean-toolchain` if the project has none.
+`lasm build` and `lasm dev` say once when a project imports `Lasm.*` but its
+lakefile does not require Lasm's package yet. `LASM_EDITOR=0` turns that off,
+and it never runs on CI. `lasm editor` also writes `lean-toolchain` if the project has none.
 Without elan, `lasm` prints how to get it.
 
 ## 3. Call an npm package from Lean

@@ -76,8 +76,8 @@ test('findElan: PATH (or Path) first, then ELAN_HOME/bin, then ~/.elan', () => {
 
 test('lasm editor: the directory with a lakefile, or the project around it; its exit code', async () => {
   const { project, env } = fixture();
-  const printed = [], calls = [];
-  const options = { env, log: line => printed.push(line), run: (file, args) => calls.push(args), provision: async (p, o) => { assert.equal(p, project); o.progress({ stage: 'Provisioning Lean' }); return lean; } };
+  const printed = [];
+  const options = { env, log: line => printed.push(line), provision: async (p, o) => { assert.equal(p, project); o.progress({ stage: 'Provisioning Lean' }); return lean; } };
   await assert.rejects(runEditor({ input: project }, options), { message: `lasm editor works in a Lake project (a directory with lakefile.toml); ${project} is not in one.` });
   let looked;
   globalThis.editorStandIns.findApplicationProject = source => { looked = source; return undefined; };
@@ -109,7 +109,7 @@ test('lasm editor: the directory with a lakefile, or the project around it; its 
   assert.equal(await runEditor({ input: project }, options), 0);
   assert.ok(printed.includes("[lasm] Editor: Lake could not resolve this project's dependencies (dependency dep: git failed); run `lake update` here."), printed.join('\n'));
   writeFileSync(join(project, 'lake-manifest.json'), '{}');
-  // A project's own lean-toolchain stays; a require already there is not added again; elan is never called.
+  // A project's own lean-toolchain stays; a require already there is not added again.
   writeFileSync(join(project, 'lean-toolchain'), 'leanprover/lean4:v4.35.0 # mine\n');
   globalThis.editorStandIns.addLakeRequire = () => false;
   globalThis.editorStandIns.findApplicationProject = () => project;
@@ -117,25 +117,22 @@ test('lasm editor: the directory with a lakefile, or the project around it; its 
   assert.equal(await runEditor({ input: join(project, 'deeper') }, options), 0);
   assert.equal(readFileSync(join(project, 'lean-toolchain'), 'utf8'), 'leanprover/lean4:v4.35.0 # mine\n');
   assert.equal(printed.length, 2);
-  assert.deepEqual(calls, []);
   const cwd = process.cwd();
   process.chdir(project);
   try { assert.equal(await runEditor(undefined, options), 0); } finally { process.chdir(cwd); }
 });
 
-test('lasm editor removes an older Lasm\'s elan override, and exits 1 when elan fails or is missing', async () => {
+test('lasm editor leaves any elan override alone, and exits 1 when elan is missing', async () => {
   const { project, env, elanHome } = fixture({ override: 'lasm-4.35.0-a88ecf8bf14e' });
   writeFileSync(join(project, 'lakefile.toml'), '');
   writeFileSync(join(project, 'lean-toolchain'), 'leanprover/lean4:v4.35.0\n');
-  const printed = [], calls = [];
+  const settings = readFileSync(join(elanHome, 'settings.toml'), 'utf8');
+  const printed = [];
   const options = { env, log: line => printed.push(line), provision: async () => lean };
-  assert.equal(await runEditor({ input: project }, { ...options, run: (file, args, o) => { calls.push([file, args, o.cwd]); } }), 0);
-  assert.deepEqual(calls, [[join(elanHome, 'bin', elanName), ['override', 'unset', '--path', project], project]]);
-  assert.ok(printed.some(line => /^\[lasm\] Editor: removed this directory's elan override to Lasm's toolchain lasm-4\.35\.0-a88ecf8bf14e/.test(line)), printed.join('\n'));
+  assert.equal(await runEditor({ input: project }, options), 0);
+  assert.equal(readFileSync(join(elanHome, 'settings.toml'), 'utf8'), settings);
+  assert.ok(!printed.some(line => /override/.test(line)), printed.join('\n'));
   assert.match(printed.at(-1), /Lasm changes nothing in elan\.$/);
-  printed.length = 0;
-  assert.equal(await runEditor({ input: project }, { ...options, run: () => { throw Object.assign(new Error('x'), { stderr: 'error: denied' }); } }), 1);
-  assert.match(printed.at(-1), /could not remove this directory's elan override .*\(error: denied\)/);
   // Without elan: how to get the editor, exit 1.
   const bare = fixture({ elan: false });
   writeFileSync(join(bare.project, 'lakefile.toml'), '');

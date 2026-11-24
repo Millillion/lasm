@@ -337,11 +337,12 @@ test('the report of every target, from inside the build, with only the Linux tar
   assert.match(logged[3], /\nRun locally with npx @google-cloud\/functions-framework --target=lasm in \.\.\/gcf; deploy with gcloud functions deploy my-app --gen2 --runtime nodejs24 --trigger-http --entry-point lasm --source \.\.\/gcf\.$/);
 });
 
-test('a renamed or misspelled package target names the target (0.7-24)', () => {
+test('a misspelled package target names the target (0.7-24)', () => {
   const list = 'lambda, lambda-edge, vercel, netlify, azure-functions, cloud-functions, browser';
-  for (const [old, now] of [['azure', 'azure-functions'], ['gcf', 'cloud-functions'], ['lamda', 'lambda'], ['brwser', 'browser']])
+  for (const [old, now] of [['aws', 'lambda'], ['cloud-run-functions', 'cloud-functions'], ['lamda', 'lambda'], ['brwser', 'browser']])
     assert.throws(() => parsePackageArguments(['--target', old]), { message: `Unknown package target "${old}" (did you mean --target ${now}?). Choose one of: ${list}` });
-  assert.throws(() => parsePackageArguments(['--target', 'heroku']), { message: `Unknown package target "heroku". Choose one of: ${list}` });
+  for (const word of ['heroku', 'azure', 'gcf'])
+    assert.throws(() => parsePackageArguments(['--target', word]), { message: `Unknown package target "${word}". Choose one of: ${list}` });
 });
 
 test('a build is packaged only for the target it is linked for (Lasm.target)', t => {
