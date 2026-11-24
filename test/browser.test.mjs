@@ -59,7 +59,7 @@ test('library modules: only those a program initializes, and their imports', () 
   const libraryText = module => library[module] ?? '';
   const read = text => text;
   // The test's own library, in import order (the real list reads library/, which the mutation sandbox does not have).
-  const modules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS', 'Lasm.JS.Class', 'Lasm.UI'];
+  const modules = ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS', 'Lasm.UI'];
   assert.deepEqual(linkedLibraryModules(['initialize_Lasm_JS('], { read, libraryText, modules }), ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS']);
   assert.deepEqual(linkedLibraryModules(['initialize_Lasm_JS_Core('], { read, libraryText, modules }), ['Lasm.JS.Core']);
   assert.deepEqual(linkedLibraryModules(['nothing'], { read, libraryText, modules }), []);

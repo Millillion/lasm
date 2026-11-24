@@ -464,11 +464,6 @@
       "kind": "runtime",
       "reason": "the app instance of Lasm.UI.Mount; tested in browsers (ui.yml)"
     },
-    "src/lasm-modules/class.mjs": {
-      "status": "exempt",
-      "kind": "runtime",
-      "reason": "lasm:class, behind Lasm.JS.Class.define: a JavaScript class built by the language itself (extends, super, prototype methods); tested in test/lasm-class.test.mjs and on every JavaScript target (test/fixtures/js-core)"
-    },
     "src/lasm-modules/node-serve.mjs": {
       "status": "pending",
       "reason": "Node.serve's node:http server and its req/res \u2194 Request/Response translation (the plain-Host rule, joined Cookie lines, hop-by-hop fields, null-body statuses): a model of the translation is still due; tested by test/node-serve.test.mjs and the node-serve mutation module"

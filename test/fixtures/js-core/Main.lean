@@ -6,17 +6,15 @@ its specification (docs/JS_BINDINGS.md):
 
 - project files: `@[js "./ffi/files.mjs" …]` binds the project's own ES module,
   relative to this file, and the files it imports by relative path ship with it;
-- classes: `Lasm.JS.Class.define` makes a real class extending a base, whose
-  constructor, methods and getters are Lean functions given `this`;
-- target: `Lasm.target` is the target the program is built for, which the host's
-  own globals show (ffi/host.mjs).
+- classes: the recipes of "JavaScript classes": a class in the project's own
+  file (ffi/classes.mjs) whose methods call Lean (an `Error` subclass, and a
+  custom element where there is a DOM).
 
 Output: a line `FAIL <check>: <detail>` per failed check, a line
 `section <name>: <passed> passed, <failed> failed` per section, and
 `summary <passed> <failed>`.
 -/
 import Lasm.JS
-import Lasm.JS.Class
 import Lasm.Target
 open Lasm.JS
 
@@ -61,42 +59,46 @@ def projectFiles (r : Checks) : IO Unit := runSection r "project-files" do
   let v ← box.get "value" Nat
   expect r "new" (v == 5) s!"{v}"
 
-/-! Classes (A6.2): exercised from JavaScript (ffi/files.mjs `useClass`). -/
+/-! Classes (docs/JS_BINDINGS.md, "JavaScript classes"): the class is JavaScript in
+ffi/classes.mjs, and its methods call Lean functions. -/
 
-@[js "./ffi/files.mjs" "useClass"] opaque useClass : Value → IO Data
-/-- The `Error` class itself (a binding would call it). -/
-def errorClass : IO Value := do (← global).get "Error"
+@[js "./ffi/classes.mjs" "new NotFound"] opaque newNotFound : String → IO Value
+@[js "./ffi/classes.mjs" "isNotFound"] opaque isNotFound : Value → IO Bool
+@[js "./ffi/classes.mjs" "find"] opaque find : String → IO String
+@[js "./ffi/classes.mjs" "defineGreeting"] opaque defineGreeting : String → Value → Value → IO Unit
 
 def classes (r : Checks) : IO Unit := runSection r "classes" do
-  let c ← Class.define {
-    name := "Counter"
-    extends? := some (← errorClass)
-    constructor := some fun self args => do
-      self.set "count" ((← decodeAs Nat "start" (args[1]?.getD (toJS (0 : Nat)))))
-    methods := #[("increment", .sync fun self args => do
-      let n := (← self.get "count" Nat) + (← decodeAs Nat "by" (args[0]?.getD (toJS (1 : Nat))))
-      self.set "count" n
-      return toJS n)]
-    getters := #[("double", fun self => do return toJS (2 * (← self.get "count" Nat)))]
-    statics := #[("kind", .string "counter")] }
-  -- useClass does: const c = new C("boom", 5); c.increment(); c.increment(2);
-  -- and reports [C.name, C.kind, c instanceof C, c instanceof Error, c.message, c.count, c.double].
-  let d ← useClass c
-  let get (i : Nat) : Data := match d with | .array xs => xs[i]?.getD .undefined | _ => .undefined
-  let str (i : Nat) : Option String := match get i with | .string s => some s | _ => none
-  let bool (i : Nat) : Option Bool := match get i with | .bool b => some b | _ => none
-  let num (i : Nat) : Option Float := match get i with | .number n => some n | _ => none
-  expect r "name" (str 0 == some "Counter") (get 0).describe
-  expect r "static" (str 1 == some "counter") (get 1).describe
-  expect r "instanceof" (bool 2 == some true && bool 3 == some true) s!"{(get 2).describe} {(get 3).describe}"
-  expect r "super" (str 4 == some "boom") (get 4).describe
-  expect r "methods with this" (num 5 == some 8) (get 5).describe
-  expect r "getter" (num 6 == some 16) (get 6).describe
-  -- Lean makes an instance too (Value.new), and sees the same state.
-  let inst ← c.new #[toJS "from Lean", toJS (1 : Nat)]
-  let _ ← inst.callMethod "increment" #[]
-  let n ← inst.get "count" Nat
-  expect r "new from Lean" (n == 2) s!"{n}"
+  -- An Error subclass: instanceof NotFound and Error, super's message, and thrown into Lean.
+  let e ← newNotFound "/missing"
+  expect r "instanceof" (← isNotFound e) ""
+  let message ← e.get "message" String
+  expect r "super" (message == "no such page: /missing") message
+  let name ← e.get "name" String
+  expect r "name" (name == "NotFound") name
+  let thrown ← tryCatch (do discard <| find "/gone"; pure "") fun err => pure (toString err)
+  expect r "thrown" ((thrown.splitOn "NotFound: no such page: /gone").length > 1) thrown
+  -- A custom element whose lifecycle callbacks are Lean functions: only where there is a DOM.
+  let g ← global
+  if (← g.get "customElements" Data) matches .undefined then return
+  let connected ← IO.mkRef (0 : Nat)
+  let onConnected ← Function.ofSyncFn fun _ => do connected.modify (· + 1); return .undefined
+  let onChanged ← Function.ofSyncFn fun args => do
+    let self ← decodeAs Value "this" (args[0]?.getD .undefined)
+    let value ← decodeAs (Option String) "newValue" (args[2]?.getD .undefined)
+    self.set "textContent" s!"hello, {value.getD "nobody"}"
+    return .undefined
+  defineGreeting "lean-greeting" onConnected onChanged
+  let doc ← g.get "document"
+  let el ← doc.callMethod "createElement" #[toJS "lean-greeting"]
+  discard <| el.callMethod "setAttribute" #[toJS "name", toJS "Lean"] Data
+  discard <| (← doc.get "documentElement").callMethod "appendChild" #[toJS el] Data
+  let text ← el.get "textContent" String
+  expect r "attributeChangedCallback" (text == "hello, Lean") text
+  let n ← connected.get
+  expect r "connectedCallback" (n == 1) s!"{n}"
+  discard <| el.callMethod "setAttribute" #[toJS "name", toJS "again"] Data
+  let text ← el.get "textContent" String
+  expect r "attributeChangedCallback again" (text == "hello, again") text
 
 /-! Lasm.target: the build's target, against the host the program runs on. -/
 

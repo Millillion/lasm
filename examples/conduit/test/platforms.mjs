@@ -97,9 +97,12 @@ export const platforms = {
   },
   // AWS SAM's local API Gateway in front of the .zip package in Lambda's
   // nodejs24.x image (warm containers: one instance, as Lambda keeps it).
+  // --skip-pull-image: use the image pinned by digest (scripts/ci/image-cache.mjs),
+  // not whatever public.ecr.aws serves at start (a registry timeout there
+  // failed porter's Lambda job on main, run 44938983688).
   lambda: {
     build: 'build:lambda',
-    serve: 'sam local start-api -t deploy/lambda/template.yaml --port {port} --host 127.0.0.1 --warm-containers EAGER --parameter-overrides JwtSecret=local-test-secret',
+    serve: 'sam local start-api -t deploy/lambda/template.yaml --port {port} --host 127.0.0.1 --warm-containers EAGER --skip-pull-image --parameter-overrides JwtSecret=local-test-secret',
     stop: samStop,
     // A fresh container: the template's DATABASE_PATH (sam local would take
     // a DATABASE_PATH from this environment instead).
@@ -110,7 +113,7 @@ export const platforms = {
   // AWS's Node 24 base image with the .zip package's handler).
   'lambda-image': {
     build: 'build:lambda-image',
-    serve: 'sam local start-api -t deploy/lambda-image/template.yaml --port {port} --host 127.0.0.1 --warm-containers EAGER --parameter-overrides JwtSecret=local-test-secret',
+    serve: 'sam local start-api -t deploy/lambda-image/template.yaml --port {port} --host 127.0.0.1 --warm-containers EAGER --skip-pull-image --parameter-overrides JwtSecret=local-test-secret',
     stop: samStop,
     // A fresh container: the template's DATABASE_PATH (sam local would take
     // a DATABASE_PATH from this environment instead).

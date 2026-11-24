@@ -3,8 +3,11 @@
 // `lasm dev` prints under Lean's unknown-name errors.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync, statSync } from 'node:fs';
-import { buildImportIndex, declaredNames, loadImportIndex, missingImportHints, modulesDefining, unknownNames, useImportIndex } from '../src/import-hints.mjs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { buildImportIndex, declaredNames, importingModule, indexPrefix, libraryLeanFiles, loadImportIndex, missingImportHints, modulesDefining, unknownNames, useImportIndex } from '../src/import-hints.mjs';
 import { formatLeanDiagnostics } from '../src/dev.mjs';
 
 test('declarations: namespaces and keywords, without enum values, checked downcasts or private ones', () => {
@@ -31,7 +34,8 @@ test('the index: per module, grouped by owner; a types module is indexed under i
   assert.deepEqual(index.modules, {
     'Lasm.JS.Deno.Serve': { '': ['serve'] },
     'Lasm.JS.Node.Serve': { '': ['serve'] },
-    'Lasm.JS.Web.Fetch': { '': ['Response', 'fetch'], Response: ['new'] } });
+    'Lasm.JS.Web.Fetch': { '': ['Response', 'fetch'], Response: ['new'] },
+    'Lasm.UI.Html': { UI: ['div'] } });
   const names = loadImportIndex(index);
   assert.deepEqual(names.get('Lasm.JS.Web.Response.new'), ['Lasm.JS.Web.Fetch']);
   assert.deepEqual(modulesDefining('fetch', names), ['Lasm.JS.Web.Fetch']);
@@ -90,12 +94,74 @@ test('lasm build and lasm dev print the hint under the error (formatLeanDiagnost
 const shipped = new URL('../library/Lasm/JS/import-index.json', import.meta.url);
 test('the shipped index is small and covers every generated namespace', { skip: !existsSync(shipped) && 'no library/ here (a mutation sandbox)' }, () => {
   const file = new URL('../library/Lasm/JS/import-index.json', import.meta.url);
-  // Measured 2026-11-17 after the whole Node and Cloudflare surfaces (Train B): 494 KB (105 KB compressed in the npm
-  // package) for about 24,000 names; it grows with the generated bindings, not with programs.
+  // Measured 2026-11-24 with every public module of Lasm's library (Stage 0 answer 19): 536 KB for about 26,800
+  // names; it grows with the library, not with programs. The cap stays at 600 KB.
   assert.ok(statSync(file).size < 600 * 1024, `${statSync(file).size} bytes`);
   const modules = Object.keys(JSON.parse(readFileSync(file, 'utf8')).modules);
   for (const host of ['Web', 'Node', 'Deno', 'Bun', 'Cloudflare']) assert.ok(modules.some(m => m.startsWith(`Lasm.JS.${host}.`)), host);
+  for (const module of ['Lasm.JS', 'Lasm.UI', 'Lasm.Fastly', 'Lasm.WASI.Http']) assert.ok(modules.includes(module), module);
   assert.ok(!modules.some(m => m.includes('.Types.')), 'types modules are indexed under their spec');
+});
+
+test('libraryLeanFiles: every .lean file under the directory, at any depth, sorted', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'lasm-import-hints-'));
+  try {
+    for (const file of ['UI.lean', 'UI/Html.lean', 'JS/Web/Types/Fetch.lean', 'JS/import-index.json', 'notes.md', 'A.lean.txt']) {
+      mkdirSync(join(dir, file, '..'), { recursive: true }); writeFileSync(join(dir, file), '');
+    }
+    assert.deepEqual(libraryLeanFiles(dir), ['JS/Web/Types/Fetch.lean', 'UI.lean', 'UI/Html.lean'].map(file => join(dir, file)));
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+// Stage 0 answer 19 (Jordan, 2026-11-24): every public Lasm.* module is in the index.
+test('the shipped index has every public module of Lasm\'s library, and none that is gone', { skip: !existsSync(shipped) && 'no library/ here (a mutation sandbox)' }, () => {
+  const library = fileURLToPath(new URL('../library', import.meta.url));
+  const sources = new Map(libraryLeanFiles(join(library, 'Lasm')).map(file => [file.slice(library.length + 1, -5).split(/[\\/]/).join('.'), readFileSync(file, 'utf8')]));
+  const indexed = new Set(Object.keys(JSON.parse(readFileSync(shipped, 'utf8')).modules));
+  const missing = [], expected = new Set();
+  for (const [module, text] of sources) {
+    // Public: a declaration under Lasm. outside private and Internal.
+    const target = importingModule(module, sources);
+    if (!declaredNames(text).some(n => n.startsWith(indexPrefix(target)) && !n.split('.').includes('Internal'))) continue;
+    expected.add(target);
+    if (!indexed.has(target)) missing.push(target === module ? module : `${module} (as ${target})`);
+  }
+  assert.deepEqual(missing, [], 'public modules missing from library/Lasm/JS/import-index.json: run node scripts/bindings/generate-web.mjs');
+  assert.deepEqual([...indexed].filter(m => !expected.has(m)), [], 'modules in the index that the library no longer has: run node scripts/bindings/generate-web.mjs');
+});
+
+test('the hints for the library beyond the generated namespaces: the module a program imports', () => {
+  const index = buildImportIndex(new Map([
+    ['Lasm.UI', 'import Lasm.UI.Html\nimport Lasm.UI.Cmd\n'],
+    ['Lasm.UI.Html', 'namespace Lasm.UI\ndef div : Nat := 1\nnamespace Internal\ndef secret : Nat := 1\nend Internal\nend Lasm.UI'],
+    ['Lasm.UI.Cmd', 'namespace Lasm.UI\nnamespace Cmd\ndef none : Nat := 1\nend Cmd\nend Lasm.UI'],
+    ['Lasm.UI.Model', 'namespace Lasm.UI.Model\ndef step : Nat := 1\nend Lasm.UI.Model'],
+    ['Lasm.JS', 'import Lasm.JS.Core\n'],
+    ['Lasm.JS.Core', 'namespace Lasm.JS\nstructure Value where\nend Lasm.JS'],
+    ['Lasm.WASI.Http', '/- doc -/\nimport Lasm.WASI.Io.Poll\n'],
+    ['Lasm.WASI.Io.Poll', 'namespace Lasm.WASI.Io.Poll\ndef poll : Nat := 1\nend Lasm.WASI.Io.Poll'],
+    ['Lasm.JS.Node.Serve', 'namespace Lasm.JS.Node\ndef serve : Nat := 1\nend Lasm.JS.Node'],
+    ['Lasm.Proofs', 'namespace Lasm.Proofs\ntheorem t : True := trivial\nend Lasm.Proofs']]));
+  assert.deepEqual(index.modules, {
+    'Lasm.JS': { JS: ['Value'] },
+    'Lasm.JS.Node.Serve': { '': ['serve'] },
+    'Lasm.UI': { UI: ['div'], 'UI.Cmd': ['none'] },
+    'Lasm.UI.Model': { 'UI.Model': ['step'] },
+    'Lasm.WASI.Io.Poll': { 'WASI.Io.Poll': ['poll'] } });
+  assert.deepEqual(index.roots, ['Lasm.JS', 'Lasm.JS.Node', 'Lasm.UI', 'Lasm.UI.Model', 'Lasm.WASI.Io.Poll']);
+  const names = loadImportIndex(index);
+  assert.deepEqual(names.roots, ['Lasm.JS', 'Lasm.JS.Web', 'Lasm.JS.Node', 'Lasm.JS.Deno', 'Lasm.JS.Bun', 'Lasm.JS.Cloudflare', 'Lasm.UI', 'Lasm.UI.Model', 'Lasm.WASI.Io.Poll', 'Lasm']);
+  assert.deepEqual(missingImportHints('error: Unknown identifier `div`', names), ['hint: div is defined in Lasm.UI; add: import Lasm.UI']);
+  assert.deepEqual(missingImportHints('error: Unknown identifier `Cmd.none`', names), ['hint: Cmd.none is defined in Lasm.UI; add: import Lasm.UI']);
+  assert.deepEqual(missingImportHints('error: Unknown identifier `Value`', names), ['hint: Value is defined in Lasm.JS; add: import Lasm.JS']);
+  assert.deepEqual(missingImportHints('error: Unknown identifier `Lasm.UI.Model.step`', names), ['hint: Lasm.UI.Model.step is defined in Lasm.UI.Model; add: import Lasm.UI.Model']);
+  assert.deepEqual(missingImportHints('error: Unknown identifier `poll`', names), ['hint: poll is defined in Lasm.WASI.Io.Poll; add: import Lasm.WASI.Io.Poll']);
+  assert.deepEqual(missingImportHints('error: Unknown identifier `secret`', names), []);
+  assert.deepEqual(missingImportHints('error: Unknown identifier `Internal.secret`', names), []);
+  // Several modules outside the generated namespaces: each with its namespace.
+  const both = loadImportIndex(buildImportIndex(new Map([
+    ['Lasm.A', 'namespace Lasm.A\ndef go : Nat := 1\nend Lasm.A'], ['Lasm.B', 'namespace Lasm.B\ndef go : Nat := 1\nend Lasm.B']])));
+  assert.deepEqual(missingImportHints('error: Unknown identifier `go`', both), ['hint: go is defined in several modules; add the one for your runtime:', '  import Lasm.A  (A)', '  import Lasm.B  (B)']);
 });
 
 test('lasm build\'s error report (reportCliError) carries the hint, as lasm dev\'s does', async () => {
@@ -116,5 +182,10 @@ test('the shipped index knows the generated declarations', { skip: !existsSync(s
   assert.deepEqual(modulesDefining('Response', names), ['Lasm.JS.Web.Fetch']);
   assert.deepEqual(modulesDefining('path.basename', names), ['Lasm.JS.Node.Path']);
   assert.deepEqual(modulesDefining('KVNamespace.get', names), ['Lasm.JS.Cloudflare.Kv']);
-  assert.deepEqual(modulesDefining('serve', names), ['Lasm.JS.Node.Serve', 'Lasm.JS.Deno.Serve', 'Lasm.JS.Bun.Serve']);
+  // wasi:http's incoming handler too (Lasm.WASI.Http.IncomingHandler.serve, imported with Lasm.WASI.Http).
+  assert.deepEqual(modulesDefining('serve', names), ['Lasm.JS.Node.Serve', 'Lasm.JS.Deno.Serve', 'Lasm.JS.Bun.Serve', 'Lasm.WASI.Http']);
+  assert.deepEqual(modulesDefining('Value', names), ['Lasm.JS']);
+  assert.deepEqual(modulesDefining('div', names), ['Lasm.UI']);
+  assert.deepEqual(modulesDefining('HttpReq.new', names), ['Lasm.Fastly']);
+  assert.deepEqual(modulesDefining('Fastly.HttpReq.new', names), ['Lasm.Fastly']);
 });
