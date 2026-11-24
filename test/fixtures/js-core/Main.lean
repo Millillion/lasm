@@ -78,7 +78,7 @@ def classes (r : Checks) : IO Unit := runSection r "classes" do
   expect r "thrown" ((thrown.splitOn "NotFound: no such page: /gone").length > 1) thrown
   -- A custom element whose lifecycle callbacks are Lean functions: only where there is a DOM.
   let g ← global
-  if (← g.get "customElements" (Option Value)).isNone then return
+  if (← g.get "customElements" Data) matches .undefined then return
   let connected ← IO.mkRef (0 : Nat)
   let onConnected ← Function.ofSyncFn fun _ => do connected.modify (· + 1); return .undefined
   let onChanged ← Function.ofSyncFn fun args => do
