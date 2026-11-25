@@ -33,6 +33,7 @@ seeds are the same, so a seed's trace is the same on every target. -/
 import Ledger
 import Server.App
 import Lasm.JS
+import Lasm.Target
 open Lasm.JS Ledger
 
 namespace Ledger.Sim
@@ -172,7 +173,7 @@ def main (args : List String) : IO UInt32 := do
     let code ← (Ledger.Sim.runAll { v := ← require path, remote := false }).block
     return code.toUInt32
   | none =>
-    unless ← onEdge do
+    unless Lasm.target == .workers || Lasm.target == .browser do
       IO.eprintln "usage: sim WORLD.mjs [options]"
       return 2
     -- Workers and browsers: scripts/sim/remote.mjs calls this handler once the
