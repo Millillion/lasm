@@ -74,7 +74,10 @@ A release is a version bump: a pull request that changes the root `package.json`
      `npm publish --access public --provenance --tag <dist-tag>` ([publish.mjs](../scripts/release/publish.mjs)).
      The dist-tag is `latest` for a normal version and `next` for a prerelease
      (`0.2.0-rc.1`). If any existing version has other bytes, it stops before
-     publishing anything;
+     publishing anything. It then waits, for at most 30 minutes, until the registry
+     serves every package's `dist.tarball` with HTTP 200 and the built integrity
+     (the registry document can list a version minutes before its CDN serves the
+     tarball);
    - it verifies from the public registry, in a clean directory with empty npm
      and Lasm caches: `npm create @lasm@<version> app -- --template hono`, `npm
      install`, `npm run build`, the server, and HTTP 200 with the expected bodies on
