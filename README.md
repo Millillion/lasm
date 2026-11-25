@@ -32,8 +32,8 @@ account, so "tested" means the platform's local tooling, not production
 | Vercel Functions / Vercel Edge | `vercel` / `vercel-edge` | `vercel build` offline; Lambda Node 24 image; Vercel's `edge-runtime` | 0.1.0 / 0.2.0 | L2 |
 | Netlify Functions / Netlify Edge | `netlify` / `netlify-edge` | `netlify build` and `netlify dev`, offline | 0.1.0 / 0.2.0 | L2 |
 | Deno Deploy | `deno-deploy` | Deno 2.9.6 | 0.2.0 | L2 |
-| Supabase Edge Functions | `supabase-edge` | Supabase's `edge-runtime` image | 0.2.0 | L2 |
-| AWS Lambda (.zip or container) / Lambda@Edge | `lambda` / `lambda-edge` | `public.ecr.aws/lambda/nodejs:24` via the Runtime Interface Emulator, x86_64 and arm64; `sam local` | 0.1.0 | L2 |
+| Supabase Edge Functions | `supabase-edge` | Supabase's `edge-runtime` image | 0.2.0 | — |
+| AWS Lambda (.zip or container) / Lambda@Edge | `lambda` / `lambda-edge` | `public.ecr.aws/lambda/nodejs:24` via the Runtime Interface Emulator, x86_64 and arm64; `sam local` | 0.1.0 | — |
 | Azure Functions | `azure-functions` | Azure Functions Core Tools `func start` | 0.1.0 | L2 |
 | Google Cloud Functions (gen2) | `cloud-functions` | Functions Framework; Google Cloud's buildpacks image | 0.1.0 | L2 |
 | Fastly Compute | `fastly` | Viceroy 0.21.1 | 0.3.0 | L2 |
