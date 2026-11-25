@@ -86,10 +86,12 @@ answers in `STAGE0_ANSWERS_2026-11-23.md`): every milestone is `[x]`, and
 every entry of the decision files reads "signed off by Jordan (2026-11-24)"
 or "changed by Jordan (2026-11-24)".
 
-**Follow-ups his answers asked for** (implemented after the review; each is
-breaking and gets a migration note):
+**Follow-ups his answers asked for** (implemented after the review and
+released in 0.11.0, which completes Stage 0; each breaking change has a
+migration note in [0.11.0-notes.md](docs/release/0.11.0-notes.md)):
 - `onEdge` deleted, and a core `Lasm.target : Target` in `Lasm.Target`, one
-  case per `--target` (0.6-1; answer 4).
+  case per `--target` (0.6-1; answer 4; #388), and `lasm package` removed
+  for `lasm build --target` (0.7-7; #388).
 - `Lasm.JS.Class.define` and `lasm:class` deleted; classes go in the
   project's `.mjs` files, with a docs recipe (A6.2; answer 10; #385).
 - No compatibility baggage: no hints for Lasm's old names and no automatic
@@ -448,7 +450,7 @@ in the release notes ([docs/release/](docs/release/)). In short:
   coverage on Node, JS/npm interop, the Node launch (0.1.0), the edge isolates
   and Bun/Deno (0.2.0), WASI, wasi-http/Spin, Fastly and browsers (0.3.0).
   Complete; Lean as a runtime library stays parked ([After 1.0](#after-10)).
-- **Releases** 0.3.6 to 0.10.0 (0.10.0, Stage 0's last release: `Lasm.Fetch` and `Lasm.KV` deleted, the targets renamed, the exports narrowed, and the apps and templates on the final APIs; [0.10.0-notes.md](docs/release/0.10.0-notes.md); 0.9.0, Stage 0's first API release: `Node.serve`, direct function handlers, `Lasm.JS.Cloudflare`, the binding rules, the templates per serving model, the CLI changes, `Lasm.UI`'s core cut, and the whole web platform, Node core, Deno, Bun and Cloudflare generated with no umbrella modules; [0.9.0-notes.md](docs/release/0.9.0-notes.md)).
+- **Releases** 0.3.6 to 0.11.0 (0.11.0 completes Stage 0 (API surface): `Lasm.target`, `lasm package` removed, `onEdge` and `Lasm.JS.Class` deleted, no compatibility hints, Lasm no longer changes elan, and missing-import hints for the whole library; [0.11.0-notes.md](docs/release/0.11.0-notes.md); 0.10.0, Stage 0's second release: `Lasm.Fetch` and `Lasm.KV` deleted, the targets renamed, the exports narrowed, and the apps and templates on the final APIs; [0.10.0-notes.md](docs/release/0.10.0-notes.md); 0.9.0, Stage 0's first API release: `Node.serve`, direct function handlers, `Lasm.JS.Cloudflare`, the binding rules, the templates per serving model, the CLI changes, `Lasm.UI`'s core cut, and the whole web platform, Node core, Deno, Bun and Cloudflare generated with no umbrella modules; [0.9.0-notes.md](docs/release/0.9.0-notes.md)).
 - **Five flagship apps:** Conduit, Ledger, Folio, Porter and Tandem, each on
   every platform it claims with its outside oracle, proofs and fuzzing.
 - **Testing:** the strategy (2026-11-09), differential testing against
