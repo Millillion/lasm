@@ -15,7 +15,7 @@ import { join, resolve, dirname } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import { pathToFileURL } from 'node:url';
 import { findNpm } from '../../src/npm-artifacts.mjs';
-import { publicRegistry, loopback, publicationOrder, published, run, summary, atLeast, minimumNpm } from './lib.mjs';
+import { publicRegistry, loopback, publicationOrder, published, run, summary, atLeast, minimumNpm, waitForTarballs } from './lib.mjs';
 
 /** Which packages to publish and which to skip; throws on bytes that differ. Pure, for tests. */
 export function publicationPlan(packages) {
@@ -72,6 +72,10 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     assert.equal(remote.integrity, pkg.integrity, `${pkg.name}@${pkg.version}: the registry serves ${remote.integrity}`);
     report.packages.push({ name: pkg.name, version: pkg.version, action: 'published', integrity: remote.integrity });
   }
+  // Every package's tarball, published now or before, downloaded and checked: the
+  // registry's CDN can 404 a tarball for minutes after its document lists the version,
+  // and the verification that follows installs from the tarballs.
+  report.tarballs = await waitForTarballs(registry, plan);
   report.finishedAt = new Date().toISOString();
   mkdirSync(dirname(resolve(args.report)), { recursive: true });
   writeFileSync(resolve(args.report), JSON.stringify(report, null, 2) + '\n');

@@ -2,7 +2,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { distTag, isVersion, atLeast, releasePackages, publicationOrder } from '../scripts/release/lib.mjs';
+import { createHash } from 'node:crypto';
+import { distTag, isVersion, atLeast, releasePackages, publicationOrder, waitForTarballs } from '../scripts/release/lib.mjs';
 import { decide } from '../scripts/release/detect.mjs';
 import { selectChecksRun, manifestProblems, releaseState } from '../scripts/release/plan.mjs';
 import { differences } from '../scripts/release/compare.mjs';
@@ -90,6 +91,66 @@ test('publication skips identical versions and never republishes other bytes', (
   const plan = publicationPlan([{ name: 'a', integrity: 'x', remote: { exists: true, integrity: 'x' } }, { name: 'b', integrity: 'y', remote: { exists: false } }]);
   assert.deepEqual(plan.map(p => p.action), ['skip', 'publish']);
   assert.throws(() => publicationPlan([{ name: 'a', version: '1', integrity: 'x', remote: { exists: true, integrity: 'z' } }]), /never republish/);
+});
+
+// A fake registry: documents and tarballs whose answers change over rounds.
+function fakeRegistry({ documents, tarballs }) {
+  const registry = 'https://registry.example/', requests = [];
+  let clock = 0;
+  const fetch = async url => {
+    url = String(url); requests.push(url);
+    if (url.endsWith('.tgz')) {
+      const next = tarballs[url].length > 1 ? tarballs[url].shift() : tarballs[url][0];
+      if (next instanceof Error) throw next;
+      return typeof next === 'number' ? new Response('Not Found', { status: next }) : new Response(next);
+    }
+    const name = decodeURIComponent(new URL(url).pathname.slice(1));
+    const doc = typeof documents[name] === 'function' ? documents[name]() : documents[name];
+    return doc ? Response.json(doc) : new Response('{}', { status: 404 });
+  };
+  return { registry, requests, options: { fetch, sleep: async ms => { clock += ms; }, now: () => clock, intervalMs: 10_000, timeoutMs: 60_000, log: () => {} } };
+}
+const sha512 = bytes => 'sha512-' + createHash('sha512').update(bytes).digest('base64');
+const entry = (name, version, bytes, file) => ({ versions: { [version]: { dist: { integrity: sha512(bytes), tarball: `https://registry.example/${name}/-/${file}` } } } });
+
+test('publication waits until every tarball is served with the built bytes, not just the document', async () => {
+  const cli = Buffer.from('cli bytes'), create = Buffer.from('create bytes');
+  let documentReads = 0;
+  const fake = fakeRegistry({
+    // @lasm/create's document appears only on the second read; @lasm/cli's tarball is a CDN 404 twice, then a 503, a reset, then served.
+    documents: { '@lasm/cli': entry('@lasm/cli', '0.11.0', cli, 'cli-0.11.0.tgz'), '@lasm/create': () => ++documentReads > 1 ? entry('@lasm/create', '0.11.0', create, 'create-0.11.0.tgz') : undefined },
+    tarballs: { 'https://registry.example/@lasm/cli/-/cli-0.11.0.tgz': [404, 404, 503, new Error('socket hang up'), cli],
+      'https://registry.example/@lasm/create/-/create-0.11.0.tgz': [create] } });
+  const logged = [];
+  const served = await waitForTarballs(fake.registry, [{ name: '@lasm/cli', version: '0.11.0', integrity: sha512(cli) }, { name: '@lasm/create', version: '0.11.0', integrity: sha512(create) }],
+    { ...fake.options, log: line => logged.push(line) });
+  assert.deepEqual(served.map(s => [s.name, s.bytes, s.integrity]), [['@lasm/cli', cli.length, sha512(cli)], ['@lasm/create', create.length, sha512(create)]]);
+  assert.equal(fake.requests.filter(url => url.endsWith('cli-0.11.0.tgz')).length, 5);
+  assert.equal(fake.requests.filter(url => url.endsWith('create-0.11.0.tgz')).length, 1, 'a served tarball is not fetched again');
+  assert.match(logged[0], /waiting for 2 of 2 tarballs \(round 1, 0\.0 of at most 1\.0 min\)/);
+  assert.match(logged[0], /@lasm\/cli@0\.11\.0: GET https:\/\/registry\.example\/@lasm\/cli\/-\/cli-0\.11\.0\.tgz: HTTP 404/);
+  assert.match(logged[0], /@lasm\/create@0\.11\.0: not in the registry document yet/);
+  assert.match(logged.join('\n'), /HTTP 503[\s\S]*socket hang up/);
+  assert.match(logged.at(-1), /serves all 2 tarballs with the built integrity/);
+});
+
+test('the tarball wait is bounded and names what is missing', async () => {
+  const cli = Buffer.from('cli bytes');
+  const fake = fakeRegistry({ documents: { '@lasm/cli': entry('@lasm/cli', '0.11.0', cli, 'cli-0.11.0.tgz') }, tarballs: { 'https://registry.example/@lasm/cli/-/cli-0.11.0.tgz': [404] } });
+  await assert.rejects(waitForTarballs(fake.registry, [{ name: '@lasm/cli', version: '0.11.0', integrity: sha512(cli) }], fake.options),
+    /did not serve 1 of 1 tarballs within 1\.0 min:\n {2}@lasm\/cli@0\.11\.0: GET .*cli-0\.11\.0\.tgz: HTTP 404/);
+  assert.equal(fake.requests.filter(url => url.endsWith('.tgz')).length, 7, 'a round every 10 s, at 0 to 60 s');
+});
+
+test('the tarball wait fails at once on other bytes, in the document or the tarball', async () => {
+  const cli = Buffer.from('cli bytes'), other = Buffer.from('other bytes');
+  const built = [{ name: '@lasm/cli', version: '0.11.0', integrity: sha512(cli) }];
+  const wrongDocument = fakeRegistry({ documents: { '@lasm/cli': entry('@lasm/cli', '0.11.0', other, 'cli-0.11.0.tgz') }, tarballs: {} });
+  await assert.rejects(waitForTarballs(wrongDocument.registry, built, wrongDocument.options), /never republish/);
+  const wrongBytes = fakeRegistry({ documents: { '@lasm/cli': entry('@lasm/cli', '0.11.0', cli, 'cli-0.11.0.tgz') },
+    tarballs: { 'https://registry.example/@lasm/cli/-/cli-0.11.0.tgz': [other] } });
+  await assert.rejects(waitForTarballs(wrongBytes.registry, built, wrongBytes.options), /served 11 bytes with sha512-.*, built sha512-/);
+  assert.equal(wrongBytes.requests.filter(url => url.endsWith('.tgz')).length, 1, 'no retry on other bytes');
 });
 
 test('bootstrap: placeholders, trust and deprecation only where missing', async () => {
