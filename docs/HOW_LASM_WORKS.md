@@ -44,7 +44,7 @@ This page goes one layer at a time:
       ┌────────────────────┼──────────────────────┬───────────────────────┐
       ▼                    ▼                      ▼                       ▼
  function shims       edge relink            WASI relink             browser bundle
- (lasm package)       single-threaded        no JavaScript           edge program +
+ (build --target)     single-threaded        no JavaScript           edge program +
  Lambda, Vercel,      ES module + JS host    wasi/main.wasm          loader, hashed
  Netlify, Azure, GCF  workers, vercel-edge,  fastly, wasi-http       assets
                       netlify-edge, deno-

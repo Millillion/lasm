@@ -168,7 +168,7 @@ Proofs/               the theorems (PROOFS.md); Model.lean is the database as Le
 public/               the RealWorld theme (styles.css), the default avatar, conduit.css
 Dockerfile            the Node server's image; deploy/ the other platforms' files:
 deploy/               lambda/ and lambda-image/ (SAM templates, the Lambda image), vercel-edge/,
-                      netlify-edge/, package-hosted.mjs (Azure, Google)
+                      netlify-edge/
 wrangler.toml, vercel.json, netlify.toml, fastly.toml, spin.toml, supabase/
                       each platform's own configuration
 test/
@@ -289,8 +289,8 @@ build must not mention `node:sqlite`. The full guide is [docs/JS_BINDINGS.md](..
   [`netlify.toml`](netlify.toml) run the build. For their edge runtimes use
   `deploy/vercel-edge/vercel.json` and `deploy/netlify-edge/netlify.toml` instead.
 - **Azure Functions / Google Cloud Functions**: `npm run build:azure-functions` writes `azure-functions/`
-  (`func azure functionapp publish APP` there; [`deploy/package-hosted.mjs`](deploy/package-hosted.mjs) builds
-  `ServerFunction.lean` and adds the platform's own npm package); `npm run build:cloud-functions` writes `cloud-functions/` (`gcloud
+  (`func azure functionapp publish APP` there; the platform's own npm package, `@azure/functions`, is in
+  `package.json`'s dependencies); `npm run build:cloud-functions` writes `cloud-functions/` (`gcloud
   functions deploy conduit --gen2 --runtime nodejs24 --trigger-http --entry-point lasm --source cloud-functions`).
 - **Deno Deploy**: `npm run build:deno-deploy`; the entrypoint is `deno/main.mjs`.
 - **Supabase**: `npx supabase link`, `npx supabase db push` (the table), `npm run

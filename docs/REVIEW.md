@@ -750,7 +750,7 @@ docstrings, the propositions and the names.
   - `fullstack`
 
 ### The CLI surface
-- [ ] The CLI's commands: `lasm <Main.lean>`, `lasm run`, `lasm build`, `lasm dev`, `lasm init`, `lasm package`, `lasm editor` and `lasm cache repair`.
+- [ ] The CLI's commands: `lasm <Main.lean>`, `lasm run`, `lasm build`, `lasm dev`, `lasm init`, `lasm editor` and `lasm cache repair` (`lasm package` removed, 0.7-7).
   - Options: `--release`, `--dev`, `--output`, `--target`, `--port`, `--host`, `--no-watch`, `--no-run`, and `--` for program arguments.
   - The README's command table ([README.md](../README.md)) and the usage text in [src/cli-arguments.mjs](../src/cli-arguments.mjs).
 - [ ] `npm create @lasm`, `bun create @lasm` and `deno run -A npm:@lasm/create`: [packages/create-lasm](../packages/create-lasm).

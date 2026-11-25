@@ -1,4 +1,4 @@
-// `lasm package` and the function-platform shims, with a stand-in application:
+// The function-platform packages of `lasm build --target <platform>` (src/package.mjs) and their shims, with a stand-in application:
 // a JavaScript program that publishes a fetch handler, as a Lean program does
 // with Lasm.JS.exportDefault, in place of a Lean build (no toolchain needed).
 // The shims call it directly: no server, no port. The real Lean builds run in
@@ -6,7 +6,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -14,6 +14,8 @@ import { parseLasmArguments } from '../src/cli-arguments.mjs';
 import { packageApplication, packageTargets } from '../src/package.mjs';
 import { zip } from '../src/serverless/zip.mjs';
 import { standInApplication } from '../scripts/serverless/stand-in-app.mjs';
+
+const pack = packageApplication;
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 
@@ -26,17 +28,6 @@ function inProcess(script, cwd) {
   return JSON.parse(run.stdout.trim().split('\n').at(-1));
 }
 
-test('lasm package arguments', () => {
-  assert.deepEqual(parseLasmArguments(['package', '--target', 'lambda']), { command: 'package', target: 'lambda', input: 'dist' });
-  assert.deepEqual(parseLasmArguments(['package', 'out', '--target=vercel', '--output', 'x']), { command: 'package', target: 'vercel', output: 'x', input: 'out' });
-  assert.deepEqual(parseLasmArguments(['package', '--help']), { command: 'package-help' });
-  assert.throws(() => parseLasmArguments(['package']), /--target is required/);
-  assert.throws(() => parseLasmArguments(['package', '--target', 'workers']), /Unknown package target "workers"/);
-  assert.throws(() => parseLasmArguments(['package', 'a', 'b', '--target', 'lambda']), /Usage: lasm package/);
-  assert.throws(() => parseLasmArguments(['package', '--target', 'lambda', '--target', 'vercel']), /only once/);
-  assert.throws(() => parseLasmArguments(['package', '--target', 'lambda', '--zip']), /Unknown lasm package option/);
-});
-
 test('zip entries keep the given permissions and extract with unzip', { skip: process.platform === 'win32' }, () => {
   const directory = mkdtempSync(join(tmpdir(), 'lasm-zip-'));
   const archive = zip([{ name: 'a/run', data: Buffer.from('#!/bin/sh\n'), mode: 0o755 }, { name: 'b.txt', data: Buffer.alloc(5000, 97), mode: 0o644 }]);
@@ -48,35 +39,36 @@ test('zip entries keep the given permissions and extract with unzip', { skip: pr
   assert.equal(readFileSync(join(directory, 'out/b.txt'), 'utf8'), 'a'.repeat(5000));
 });
 
-test('lasm package refuses what is not a Linux-capable Lasm build', () => {
+test('a function package refuses a build without Linux native support', () => {
   const directory = mkdtempSync(join(tmpdir(), 'lasm-package-'));
-  assert.throws(() => packageApplication({ input: directory, target: 'lambda', output: join(directory, '..', 'x.zip') }), /is not a Lasm build/);
+  assert.throws(() => pack({ input: directory, target: 'lambda', output: join(directory, '..', 'x.zip') }), /carries no Linux native support \(none\)/);
   const app = fakeApplication(join(directory, 'dist'));
   writeFileSync(join(app, 'host/native/manifest.json'), JSON.stringify({ deployment: { targets: ['darwin-arm64'] } }));
-  assert.throws(() => packageApplication({ input: app, target: 'lambda', output: join(directory, 'x.zip') }), /no Linux native support/);
+  assert.throws(() => pack({ input: app, target: 'lambda', output: join(directory, 'x.zip') }), /no Linux native support/);
   fakeApplication(app);
-  assert.throws(() => packageApplication({ input: app, target: 'azure-functions', output: join(directory, 'az') }), /needs the npm package @azure\/functions/);
-  assert.throws(() => packageApplication({ input: app, target: 'vercel', output: directory }), /must not contain the build/);
+  assert.throws(() => pack({ input: app, target: 'azure-functions', output: join(directory, 'az') }), /needs the npm package @azure\/functions/);
+  assert.throws(() => pack({ input: app, target: 'vercel', output: directory }), /must not contain the build/);
 });
 
-test('lasm package refuses a dev-profile build unless --allow-dev', () => {
+test('a dev-profile build (lasm build --dev --allow-dev) is packaged with a warning', () => {
   const directory = mkdtempSync(join(tmpdir(), 'lasm-package-dev-'));
   const app = fakeApplication(join(directory, 'dist'));
   writeFileSync(join(app, 'build-info.json'), JSON.stringify({ profile: 'dev' }));
-  assert.throws(() => packageApplication({ input: app, target: 'netlify', output: join(directory, 'nf') }), /is a dev build.*--allow-dev/);
-  const allowed = packageApplication({ input: app, target: 'netlify', output: join(directory, 'nf'), allowDev: true });
+  const allowed = pack({ input: app, target: 'netlify', output: join(directory, 'nf') });
   assert.equal(allowed.profile, 'dev');
   assert.match(allowed.warnings.join('\n'), /dev build/);
   writeFileSync(join(app, 'build-info.json'), JSON.stringify({ profile: 'release' }));
-  const release = packageApplication({ input: app, target: 'netlify', output: join(directory, 'nf2') });
+  const release = pack({ input: app, target: 'netlify', output: join(directory, 'nf2') });
   assert.equal(release.profile, 'release'); assert.deepEqual(release.warnings, []);
-  assert.deepEqual(parseLasmArguments(['package', '--target', 'lambda', '--allow-dev']), { command: 'package', target: 'lambda', input: 'dist', allowDev: true });
+  assert.deepEqual(parseLasmArguments(['build', 'Main.lean', '--target', 'lambda', '--dev', '--allow-dev']),
+    { command: 'build', rebuild: false, verbose: false, args: [], target: 'lambda', profile: 'dev', allowDev: true, input: 'Main.lean' });
+  assert.throws(() => parseLasmArguments(['package']), /Unknown command "package"/);
 });
 
 test('Lambda zip: every event shape reaches the handler and returns its response shape', { skip: process.platform === 'win32' || spawnSync('unzip', ['-v']).status !== 0 }, () => {
   const directory = mkdtempSync(join(tmpdir(), 'lasm-lambda-'));
   const app = fakeApplication(join(directory, 'dist'));
-  const result = packageApplication({ input: app, target: 'lambda', output: join(directory, 'lambda.zip') });
+  const result = pack({ input: app, target: 'lambda', output: join(directory, 'lambda.zip') });
   assert.equal(result.handler, 'lasm-lambda.handler');
   assert.ok(result.zippedBytes > 0 && result.zippedBytes < packageTargets.lambda.zipped);
   execFileSync('unzip', ['-q', 'lambda.zip', '-d', 'task'], { cwd: directory });
@@ -161,7 +153,7 @@ test('function packages leave out the musl (Alpine) native pieces', { skip: proc
   write('host/native/signals/linux-x64-gnu.so', 'gnu');
   write('host/native/signals/linux-x64-musl.so', 'musl');
   write('host/native/signals/manifest.json', JSON.stringify({ protocol: 1, files: { 'linux-x64-gnu.so': { sha256: 'c' }, 'linux-x64-musl.so': { sha256: 'd' } } }));
-  packageApplication({ input: app, target: 'lambda', output: join(directory, 'lambda.zip') });
+  pack({ input: app, target: 'lambda', output: join(directory, 'lambda.zip') });
   execFileSync('unzip', ['-q', 'lambda.zip', '-d', 'task'], { cwd: directory });
   const task = join(directory, 'task'), json = name => JSON.parse(readFileSync(join(task, name), 'utf8'));
   const listing = execFileSync('unzip', ['-Z1', 'lambda.zip'], { cwd: directory, encoding: 'utf8' });
@@ -183,7 +175,7 @@ test('Vercel, Netlify, Azure Functions and Google Cloud Functions outputs', () =
     '@azure/functions': 'export const app = { http(name, options) { globalThis.registered = { name, options }; } };',
     '@google-cloud/functions-framework': 'export default { http(name, fn) { globalThis.registered = { name, fn }; } };',
   } });
-  const vercel = packageApplication({ input: app, target: 'vercel', output: join(directory, '.vercel/output') });
+  const vercel = pack({ input: app, target: 'vercel', output: join(directory, '.vercel/output') });
   const func = join(vercel.output, 'functions/index.func');
   assert.deepEqual(JSON.parse(readFileSync(join(func, '.vc-config.json'), 'utf8')).handler, 'lasm-vercel.mjs');
   assert.equal(JSON.parse(readFileSync(join(vercel.output, 'config.json'), 'utf8')).version, 3);
@@ -211,7 +203,7 @@ test('Vercel, Netlify, Azure Functions and Google Cloud Functions outputs', () =
   assert.deepEqual([viaNode.seeOther.status, viaNode.seeOther.headers.location, viaNode.seeOther.body], [303, '/there', '']);
   assert.equal(viaNode.requestCookies.cookie, 'a=1; b=2');
 
-  const netlify = packageApplication({ input: app, target: 'netlify', output: join(directory, 'netlify/functions/lasm') });
+  const netlify = pack({ input: app, target: 'netlify', output: join(directory, 'netlify/functions/lasm') });
   const viaFetch = inProcess(`
     const mod = await import(${JSON.stringify(new URL('file://' + join(netlify.output, 'lasm.mjs')).href)});
     const post = await mod.default(new Request('https://site.netlify.app/echo?x=1', { method: 'POST', body: 'hi' }));
@@ -231,7 +223,7 @@ test('Vercel, Netlify, Azure Functions and Google Cloud Functions outputs', () =
   assert.deepEqual(viaFetch.seeOther, [303, '/there', null]);
   assert.equal(viaFetch.requestCookies.cookie, 'a=1; b=2');
 
-  const azure = packageApplication({ input: app, target: 'azure-functions', output: join(directory, 'azure') });
+  const azure = pack({ input: app, target: 'azure-functions', output: join(directory, 'azure') });
   assert.equal(azure.dependency, '@azure/functions@1.2.3');
   const azurePackage = JSON.parse(readFileSync(join(azure.output, 'package.json'), 'utf8'));
   assert.equal(azurePackage.main, 'lasm-azure.mjs');
@@ -252,7 +244,7 @@ test('Vercel, Netlify, Azure Functions and Google Cloud Functions outputs', () =
   assert.deepEqual(viaAzure.cookies, { list: [{ name: 'b', value: '2', path: '/' }], setCookie: ['a=1; Path=/'], many: 'p, q' });
   assert.deepEqual(viaAzure.seeOther, { status: 303, location: '/there', body: null });
 
-  const gcf = packageApplication({ input: app, target: 'cloud-functions', output: join(directory, 'gcf') });
+  const gcf = pack({ input: app, target: 'cloud-functions', output: join(directory, 'gcf') });
   assert.equal(JSON.parse(readFileSync(join(gcf.output, 'package.json'), 'utf8')).main, 'lasm-gcf.mjs');
   const viaGcf = inProcess(`
     import http from 'node:http';
@@ -402,7 +394,7 @@ test('a program that publishes no handler fails clearly, and one whose handler t
 const runtime = createRequire(import.meta.url)('./program.cjs');
 console.log("done"); process.exitCode = 0;
 setTimeout(() => runtime.onExit?.(0), 10);`);
-  packageApplication({ input: app, target: 'netlify', output: join(directory, 'fn') });
+  pack({ input: app, target: 'netlify', output: join(directory, 'fn') });
   const run = spawnSync(process.execPath, ['--input-type=module', '-e', `
     const { loadHandler } = await import('./fn/lasm-function.mjs');
     try { await loadHandler({ timeoutMs: 5000 }); } catch (error) { console.log(error.message); }

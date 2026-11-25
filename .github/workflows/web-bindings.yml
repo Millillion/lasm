@@ -39,7 +39,12 @@ name: Standard bindings (Lasm.JS.Web, Lasm.JS.Node, Lasm.JS.Deno, Lasm.JS.Bun, L
 #     Durable Objects and Queues; a cron trigger; a TCP echo server of the
 #     runner). No Cloudflare account is used.
 #   - conformance also builds test/fixtures/js-core, Lasm.JS's own features (the
-#     project's JavaScript files, @[js "./ffi/x.mjs" …]), for every target.
+#     project's JavaScript files, @[js "./ffi/x.mjs" …], Lasm.target against the
+#     host's own globals), for every target;
+#   - target-report: Lasm.target (docs/api/decisions/0.6.md, 0.6-20) on every
+#     --target but the browser (js-core's): the same candidate builds
+#     test/fixtures/target for each and runs it, which must print its own target
+#     (scripts/ci/target-report.mjs; wasi-http under wasmtime serve).
 on:
   pull_request:
     branches: [main]
@@ -61,6 +66,17 @@ on:
       - 'test/fixtures/js-cloudflare/**'
       - 'test/fixtures/js-cloudflare-size/**'
       - 'test/fixtures/js-core/**'
+      - 'library/Lasm/Target.lean'
+      - 'library/c/**'
+      - 'src/target-stamp.mjs'
+      - 'src/cli-names.mjs'
+      - 'src/application-link.mjs'
+      - 'src/application-cli.mjs'
+      - 'src/package.mjs'
+      - 'src/serverless/**'
+      - 'src/wasi/**'
+      - 'test/fixtures/target/**'
+      - 'scripts/ci/target-report.mjs'
       - 'test/web-bindings.test.mjs'
       - 'test/binding-overrides.test.mjs'
       - 'docs/api/decisions/0.3.md'
@@ -96,6 +112,17 @@ on:
       - 'src/node-js.mjs'
       - 'src/lasm-modules/**'
       - 'test/fixtures/js-core/**'
+      - 'library/Lasm/Target.lean'
+      - 'library/c/**'
+      - 'src/target-stamp.mjs'
+      - 'src/cli-names.mjs'
+      - 'src/application-link.mjs'
+      - 'src/application-cli.mjs'
+      - 'src/package.mjs'
+      - 'src/serverless/**'
+      - 'src/wasi/**'
+      - 'test/fixtures/target/**'
+      - 'scripts/ci/target-report.mjs'
       - 'src/project-modules.mjs'
       - 'src/browser/**'
       - 'src/application-build.mjs'
@@ -114,6 +141,9 @@ env:
   BUN_SHA256: bf8ccbfb2b0b80159e0f9a6d15c55317add8077534dbc6130a3edb52fccb395c
   DENO_VERSION: 2.9.6
   WRANGLER_VERSION: 4.152.0
+  # wasmtime for target-report's wasi-http check (the pin of wasi.yml).
+  WASMTIME_VERSION: v49.0.4
+  WASMTIME_SHA256: 6561abd54bdf941b6519cce883e0857cc9bce94d92c65287ed838d895a27f5a9
   PLAYWRIGHT: 1.63.0
 jobs:
   generated:
@@ -241,6 +271,45 @@ jobs:
           path: |
             ${{ runner.temp }}/js-web/*.txt
             ${{ runner.temp }}/js-web/report.json
+          retention-days: 14
+          if-no-files-found: ignore
+  target-report:
+    needs: pack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      CI: '1'
+      BROWSER: 'none'
+      LASM_CANDIDATE_VERSION: 0.1.0-experimental.${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26.13.1
+          package-manager-cache: false
+      - name: Install the candidate as a user would
+        id: candidate
+        uses: ./.github/actions/install-candidate
+        with:
+          artifact: web-bindings-candidate
+          version: ${{ env.LASM_CANDIDATE_VERSION }}
+      - name: wasmtime
+        run: |
+          set -euo pipefail
+          T="$RUNNER_TEMP/wasmtime"; mkdir -p "$T"
+          curl -fsSL --retry 3 -o "$T/wasmtime.tar.xz" "https://github.com/bytecodealliance/wasmtime/releases/download/$WASMTIME_VERSION/wasmtime-$WASMTIME_VERSION-x86_64-linux.tar.xz"
+          echo "$WASMTIME_SHA256  $T/wasmtime.tar.xz" | sha256sum -c
+          tar -xJf "$T/wasmtime.tar.xz" -C "$T" --strip-components=1
+          "$T/wasmtime" --version
+      - name: Build test/fixtures/target for every target and run what was built
+        run: node scripts/ci/target-report.mjs "${{ steps.candidate.outputs.lasm }}" "$RUNNER_TEMP/target-report" "$RUNNER_TEMP/wasmtime/wasmtime" "$RUNNER_TEMP/target-report/report.json"
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: target-report
+          path: ${{ runner.temp }}/target-report/report.json
           retention-days: 14
           if-no-files-found: ignore
   node-conformance:

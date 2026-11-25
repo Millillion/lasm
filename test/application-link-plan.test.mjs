@@ -19,6 +19,7 @@ import { responseFile } from '../src/platform.mjs';
 import { compactInitializerWrappers } from '../src/edge/edge-initializers.mjs';
 import { project, emccSdk, nodeSdk, writeRuntime, mainModule, helperModule, specializedIdentity } from './fixtures/link-stand-ins/application.mjs';
 import { expandResponseFiles } from './fixtures/link-stand-ins/toolchain.mjs';
+import { targetStampSource } from '../src/target-stamp.mjs';
 
 const posix = process.platform !== 'win32';
 const root = new URL('../', import.meta.url).pathname;
@@ -64,7 +65,9 @@ test('a release build: compiled modules, the initialization plan, the requiremen
   // Every module is compiled as recorded; Lasm's generated C as well.
   assert.deepEqual(compiles[0], { tool: 'emcc', args: [...compileFlags(p.runtime), '-c', p.sources[0], '-o', join(p.work, 'module-0.o')],
     options: { stdio: ['ignore', 'pipe', 'pipe'], timeout: 1800_000, maxBuffer: 8 * 1024 * 1024 } });
-  assert.deepEqual(compiles.slice(1, 4).map(call => basename(call.args.at(-3))), ['Helper.c', 'reachability.c', 'initialization.c']);
+  assert.deepEqual(compiles.slice(1, 5).map(call => basename(call.args.at(-3))), ['Helper.c', 'reachability.c', 'initialization.c', 'lasm-target.c']);
+  // Lasm.target: the build links the stamp of its target (node by default; src/target-stamp.mjs).
+  assert.equal(readFileSync(join(p.work, 'lasm-target.c'), 'utf8'), targetStampSource('node'));
   assert.equal(readFileSync(join(p.work, 'reachability.c'), 'utf8'), 'void *lasm_lookup_lean_symbol(const char *name) { (void)name; return 0; }\n');
   assert.match(readFileSync(join(p.work, 'initialization.c'), 'utf8'), /__wrap_lean_initialize/);
   for (const call of compiles) assert.deepEqual(call.args.slice(0, 11), compileFlags(p.runtime));
@@ -83,7 +86,7 @@ test('a release build: compiled modules, the initialization plan, the requiremen
   const wrap = ['-Wl,--wrap=initialize_Main', '-Wl,--wrap=initialize_Init', '-Wl,--wrap=initialize_Init_Data', '-Wl,--wrap=initialize_Helper'];
   const finalWrappers = [0, 1, 2, 3].map(part => join(p.work, `initializers-${part}.o`));
   const objects = [join(p.work, 'module-0.o'), join(p.work, 'module-1.o')];
-  const initialization = [join(p.work, 'initialization.o'), '-Wl,--wrap=lean_initialize'];
+  const initialization = [join(p.work, 'initialization.o'), '-Wl,--wrap=lean_initialize', join(p.work, 'lasm-target.o')];
   // The delivered link: no lookup marker; the planned wrappers; optimized with -g1.
   assert.deepEqual(readResponse(join(p.work, 'link.rsp')), [...objects, ...initialization, ...finalWrappers, ...wrap, '-Oz', '-g1',
     '-Wl,-Map=' + join(p.work, 'final.map'), ...linkFlags(p)]);
@@ -96,7 +99,7 @@ test('a release build: compiled modules, the initialization plan, the requiremen
   const firstRound = probeLinks[0];
   assert.equal(firstRound.map, join(p.work, 'initializers-0.map'));
   assert.deepEqual(firstRound.inputs.map(input => input.file), [...objects, join(p.work, 'reachability.o'), ...[0, 1, 2, 3].map(part => join(p.work, `initializers-probe-0-${part}.o`)),
-    join(p.work, 'initialization.o'), ...p.runtime.manifest.libraries.map(name => join(p.runtime.directory, name))]);
+    join(p.work, 'initialization.o'), join(p.work, 'lasm-target.o'), ...p.runtime.manifest.libraries.map(name => join(p.runtime.directory, name))]);
   assert.deepEqual([...firstRound.wrap], ['lean_initialize', ...wrap.map(flag => flag.slice('-Wl,--wrap='.length))]);
   // Planning probes: their own outputs, exports and maps, at -O0.
   const probe = readResponse(join(p.work, 'initializers-0.rsp'));
@@ -202,7 +205,7 @@ test('initialization "all" and "native" link every initializer without planning'
     assert.equal(toolchain.links.length, 2, 'the requirements check and the delivered link');
     assert.equal(existsSync(join(p.work, 'initializers-exports.json')), false);
     assert.deepEqual(readResponse(join(p.work, 'link.rsp')).slice(0, 6), [join(p.work, 'module-0.o'), join(p.work, 'module-1.o'),
-      join(p.work, 'initialization.o'), '-Wl,--wrap=lean_initialize', '-Oz', '-g1']);
+      join(p.work, 'initialization.o'), '-Wl,--wrap=lean_initialize', join(p.work, 'lasm-target.o'), '-Oz']);
   }
   // From the environment as well.
   const p = project({ runtime: { identity: specializedIdentity } });

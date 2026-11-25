@@ -502,6 +502,38 @@ exports, so it is a JavaScript class in the project whose methods call Lean
 functions: see [Durable Objects: a class in JavaScript](#durable-objects-a-class-in-javascript)
 (decisions A28 and 0.5-7 in [docs/api/decisions/0.5.md](api/decisions/0.5.md)).
 
+## The target a program is built for: `Lasm.target`
+
+`Lasm.target : Lasm.Target` (`import Lasm.Target`) is the `--target` the
+program is built for: `.node`, `.lambda`, … `.workers`, `.bun`, `.deno`, …
+`.wasi`, `.fastly`, `.wasiHttp`, `.browser`, one constructor per target of
+`lasm build --target`, and `Target.name` (or `toString`) gives the CLI's
+name (`Target.netlifyEdge.name = "netlify-edge"`). It is part of Lasm's
+core, not of Lasm.JS: it works on WASI, wasi-http and Fastly too.
+
+```lean
+import Lasm.Target
+
+def main : IO Unit := do
+  match Lasm.target with
+  | .workers => IO.println "on Cloudflare Workers"
+  | t => IO.println s!"built for {t}"
+```
+
+- The build stamps it in when it links the program, the same way on every
+  target, so it is a plain value, fixed for the whole run.
+- `lasm run`, `lasm build` and `lasm dev` without `--target` build for `node`
+  (under Bun or Deno, the CLI's default target is that runtime).
+- A function platform's build is linked for its platform: each platform is
+  its own `lasm build --target`.
+- A program that serves differently per target still uses one entry module per
+  serving model ([0.2-4](api/decisions/0.2.md)): the build checks every binding
+  a program links against its target, reachable or not.
+
+`waitForever` needs no target: each host decides whether it blocks (Node,
+WASI) or returns at once (the edge targets and the browser, whose platform owns
+the program's lifetime).
+
 ## Errors
 
 - **A JavaScript exception or rejected promise** becomes an `IO.userError` with
@@ -1393,8 +1425,8 @@ with Hono's own adapter in the same way.
 
 On Netlify (Functions v2), Vercel (Node functions), AWS Lambda and Lambda@Edge,
 Azure Functions and Google Cloud Functions, a program publishes its handler
-with `Lasm.JS.exportDefault`, as it does on Workers. The file that `lasm package`
-(or `lasm build --target …`) generates calls the handler directly. There is no
+with `Lasm.JS.exportDefault`, as it does on Workers. The file that
+`lasm build --target …` generates calls the handler directly. There is no
 HTTP server, no port and no loopback.
 
 ```lean

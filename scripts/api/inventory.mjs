@@ -82,20 +82,18 @@ export function flagsIn(body) {
 export async function cliSurfaces(base = root) {
   const src = name => readFileSync(join(base, 'src', name), 'utf8');
   const parsers = [['cli-arguments.mjs', 'parseLasmArguments'], ['init.mjs', 'parseInitArguments'],
-    ['dev.mjs', 'parseDevArguments'], ['package.mjs', 'parsePackageArguments']];
+    ['dev.mjs', 'parseDevArguments']];
   const flags = new Set();
   for (const [file, fn] of parsers) for (const flag of flagsIn(functionBody(src(file), fn))) flags.add(flag);
   const load = name => import(pathToFileURL(join(base, 'src', name)).href);
   const cli = await load('cli-arguments.mjs');
   const init = await load('init.mjs');
-  const pack = await load('package.mjs');
   const dev = await load('dev.mjs');
   return {
     commands: [...cli.commandNames, 'version'].sort(),
     flags: [...flags].sort(),
     buildTargets: [...cli.buildTargets],
     devTargets: [...dev.devTargets],
-    packageTargets: [...Object.keys(pack.packageTargets), 'browser'],
     deployTargets: Object.keys(init.deployTargets),
     templates: Object.keys(init.templates),
     templateDirectories: readdirSync(join(base, 'templates')).filter(name => statSync(join(base, 'templates', name)).isDirectory()).sort(),
@@ -142,7 +140,7 @@ export async function surfaces(base = root) {
     ...lean.namespaces.map(name => ({ kind: 'Lean namespace', name })),
     ...cli.commands.map(name => ({ kind: 'CLI command', name })),
     ...cli.flags.map(name => ({ kind: 'CLI flag', name })),
-    ...unique([...cli.buildTargets, ...cli.devTargets, ...cli.packageTargets, ...cli.deployTargets, ...cli.suspendModes]).map(name => ({ kind: 'target', name })),
+    ...unique([...cli.buildTargets, ...cli.devTargets, ...cli.deployTargets, ...cli.suspendModes]).map(name => ({ kind: 'target', name })),
     ...unique([...cli.templates, ...cli.templateDirectories]).map(name => ({ kind: 'template', name })),
     ...environmentVariables(base).map(name => ({ kind: 'environment variable', name })),
     ...builtinModules(base).map(name => ({ kind: 'builtin module', name })),

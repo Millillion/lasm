@@ -15,6 +15,7 @@ Output: a line `FAIL <check>: <detail>` per failed check, a line
 `summary <passed> <failed>`.
 -/
 import Lasm.JS
+import Lasm.Target
 open Lasm.JS
 
 structure Report where
@@ -99,21 +100,25 @@ def classes (r : Checks) : IO Unit := runSection r "classes" do
   let text ← el.get "textContent" String
   expect r "attributeChangedCallback again" (text == "hello, again") text
 
+/-! Lasm.target: the build's target, against the host the program runs on. -/
+
+@[js "./ffi/host.mjs" "host"] opaque jsHost : IO String
+
+def targetSection (r : Checks) : IO Unit := runSection r "target" do
+  let host ← jsHost
+  expect r "Lasm.target" (Lasm.target.name == host) s!"built for {Lasm.target}, running on {host}"
+
 def checks : IO String := do
   let r : Checks ← IO.mkRef {}
   projectFiles r
   classes r
+  targetSection r
   let s ← r.get
   return "\n".intercalate (s.lines.push s!"summary {s.passed} {s.failed}").toList ++ "\n"
 
-/-- Cloudflare Workers (`navigator.userAgent`), where a program runs its checks in a request. -/
-def onWorkers : IO Bool := do
-  if !(← onEdge) then return false
-  let nav ← (← global).get "navigator"
-  return (← nav.get "userAgent" (Option String)) == some "Cloudflare-Workers"
-
 def main : IO Unit := do
-  if ← onWorkers then
+  -- On Cloudflare Workers, a program runs its checks in a request.
+  if Lasm.target == .workers then
     -- On Workers, the checks run in the first request and answer its body.
     let handler ← Function.ofFn fun _ => do
       let text ← checks

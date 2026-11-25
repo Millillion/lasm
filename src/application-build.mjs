@@ -68,7 +68,7 @@ export async function buildApplication(file, options = {}) {
 
 async function buildLockedApplication(source, { output, rebuild = false, verbose = false,
   cache, runtimeDirectory, log = console.error, progress, profile = 'release', keepLinkWork = false, linkOnly = false, afterImports,
-  bindingTarget, webTarget } = {}) {
+  bindingTarget, webTarget, target = 'node' } = {}) {
   // linkOnly (dev edge and browser builds, src/application-cli.mjs buildEdge):
   // the Node program is only planned and linked for its link inputs; its
   // JavaScript glue, host and npm packages are not produced. A separate cache identity.
@@ -182,7 +182,8 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
       : { sdkCatalogIdentity: digest(JSON.stringify(sdkCatalog)) }),
     runtimeIdentity: runtime.identity, buildDriverIdentity: await buildDriverIdentity(),
     applicationPolicy,
-    target: 'node', host: `${process.platform}-${process.arch}`, nativeTargets: applicationNativeTargets(),
+    // The target Lasm.target reports (src/target-stamp.mjs): node, or the function platform the build is packaged for.
+    target, host: `${process.platform}-${process.arch}`, nativeTargets: applicationNativeTargets(),
     minimumNode: minimumApplicationNode, minimumGlibc: minimumApplicationGlibc, memoryMode, modules,
     ...(dependencyLicenses.length ? { dependencyLicenses: dependencyLicenses.map(({ name, files }) =>
       ({ name, files: files.map(({ name, sha256 }) => ({ name, sha256 })) })) } : {}),
@@ -218,7 +219,7 @@ async function buildLockedApplication(source, { output, rebuild = false, verbose
   try {
     linkRequirements = await linkApplication({ sources: generated.sources, sdk, runtime, work: temporary, dist,
       leanVersion: lean.version, memoryMode, verbose, progress, linkDriver, objectCache: join(work, 'objects'), sharedCache: join(cache ?? managedCacheDirectory(), 'objects'), analysisCache: join(cache ?? managedCacheDirectory(), 'analysis'), profile, nativeCompilations, nativeUnavailable,
-      initializationSeed: join(work, 'initialization-seed.json'), linkOnly });
+      initializationSeed: join(work, 'initialization-seed.json'), linkOnly, target });
   } catch (error) {
     // This unique staging directory contains only this failed build's files.
     // Preserve any previously delivered application and avoid retaining probes.

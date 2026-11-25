@@ -18,9 +18,8 @@ Lasm.Cli.Theorems proves its propositions.
 
 What the module imports is a parameter, `ArgumentsEnv`: whether a file
 exists (`existsSync`), the runtime the CLI runs on (`jsRuntime`, of
-src/js-runtime.mjs), and the parsers of `lasm init`, `lasm dev` and
-`lasm package` (their own modules', src/init.mjs, src/dev.mjs,
-src/package.mjs, not modelled here).
+src/js-runtime.mjs), and the parsers of `lasm init` and `lasm dev` (their
+own modules', src/init.mjs and src/dev.mjs, not modelled here).
 
 A JavaScript string is read as a Lean `String`: one with an unpaired
 surrogate has none, and the differential draws none. The words the parser
@@ -67,10 +66,8 @@ structure ArgumentsEnv where
   parseInit : List String → Except String Parsed
   /-- `parseDevArguments(tokens)`. -/
   parseDev : List String → Except String Parsed
-  /-- `parsePackageArguments(tokens)`. -/
-  parsePackage : List String → Except String Parsed
 
-instance : Inhabited ArgumentsEnv := ⟨⟨fun _ => false, "node", fun _ => .error "", fun _ => .error "", fun _ => .error ""⟩⟩
+instance : Inhabited ArgumentsEnv := ⟨⟨fun _ => false, "node", fun _ => .error "", fun _ => .error ""⟩⟩
 
 def edgeBuildTargets : List String := ["workers", "vercel-edge", "netlify-edge", "bun", "deno", "deno-deploy", "supabase-edge"]
 def wasiBuildTargets : List String := ["wasi", "fastly", "wasi-http"]
@@ -80,7 +77,7 @@ def buildTargets : List String :=
   ["node"] ++ ["lambda", "lambda-edge", "vercel", "netlify", "azure-functions", "cloud-functions"] ++ edgeBuildTargets ++ wasiBuildTargets ++ ["browser"]
 def fixedLayoutTargets : List String := ["vercel-edge", "netlify-edge"]
 def suspendModes : List String := ["none", "jspi"]
-def commandNames : List String := ["build", "run", "dev", "init", "package", "editor", "cache"]
+def commandNames : List String := ["build", "run", "dev", "init", "editor", "cache"]
 
 def targetAliases : List (String × String) :=
   [("cloudflare", "workers"), ("cloudflare-workers", "workers"), ("worker", "workers"), ("aws", "lambda"), ("aws-lambda", "lambda"),
@@ -95,12 +92,11 @@ def cliUsage : String := "Usage:" ++ " lasm <Main.lean> [--release] [-- argument
        lasm dev [Main.lean] [--target TARGET[,TARGET…]] [--release] [--no-run] [-- arguments…]
        lasm build <Main.lean> [--target node|lambda|lambda-edge|vercel|netlify|azure-functions|cloud-functions|workers|vercel-edge|netlify-edge|bun|deno|deno-deploy|supabase-edge|wasi|fastly|wasi-http|browser] [--output PATH] [--dev] [--allow-dev] [--suspend none|jspi] [--bundler]
        lasm init <directory> [--template NAME] [--deploy TARGET]…
-       lasm package [dist] --target lambda|lambda-edge|vercel|netlify|azure-functions|cloud-functions|browser [--output PATH] [--allow-dev]
        lasm editor [project-directory]
        lasm cache repair
 
-Options: --rebuild, --verbose, --help (-h), --version (-v). lasm init --help,
-lasm dev --help and lasm package --help show their own options and targets.
+Options: --rebuild, --verbose, --help (-h), --version (-v). lasm init --help
+and lasm dev --help show their own options and targets.
 --output: with --target node (the default under Node) the Node build (default
 dist/); with every other target what is deployed (default: the platform's own
 place, such as workers/, wasi/ or lambda.zip). The Node build those are made
@@ -265,7 +261,7 @@ def defaultProfile (r : Parsed) (_first : String) : Parsed :=
 /-- The checks after the profile is set, and `lasm build`'s target and output. -/
 def checkOptions (env : ArgumentsEnv) (r : Parsed) (_first : String) : Except String Parsed :=
   if r.allowDev? = some true ∧ !(r.command = "build" ∧ r.target?.any (· ≠ "node")) then
-    .error "--allow-dev applies to lasm build --target <platform> and lasm package"
+    .error "--allow-dev applies to lasm build --target <platform>"
   else if r.suspend?.isSome ∧ r.target? ≠ some "browser" then .error "--suspend applies to lasm build --target browser"
   else if r.bundler? = some true ∧ r.target? ≠ some "browser" then .error "--bundler applies to lasm build --target browser"
   else if r.command = "build" then
@@ -306,7 +302,6 @@ where
     | c :: more =>
       if c = "init" then env.parseInit more
       else if c = "dev" then env.parseDev more
-      else if c = "package" then env.parsePackage more
       else if c = "editor" then
         if "--help" ∈ tokens ∨ "-h" ∈ tokens then .ok { command := "help" }
         else if more.length > 1 ∨ more.head?.any (·.startsWith "-") then .error "Usage: lasm editor [project-directory]"

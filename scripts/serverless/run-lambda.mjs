@@ -1,4 +1,4 @@
-// Runs `lasm package --target lambda` and `--target lambda-edge` zips in AWS's
+// Runs `lasm build --target lambda` and `--target lambda-edge` zips in AWS's
 // own Lambda Node 24 image (public.ecr.aws/lambda/nodejs:24) through its
 // Runtime Interface Emulator: the zip is extracted with Info-ZIP unzip (keeping
 // its permissions) and mounted read-only at /var/task, with /tmp writable and

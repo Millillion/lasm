@@ -99,3 +99,13 @@ test('linkCachedEdgeProgram: a failed link leaves the cache as it was; LASM_KEEP
   finally { delete process.env.LASM_TEST_UNOPTIMIZED; }
   assert.throws(() => linkCachedEdgeProgram({ ...f.options, result: { ...f.options.result, profile: 'dev' }, key: '1'.repeat(64) }), /The edge dev profile needs the Node link driver/);
 });
+
+test('linkCachedEdgeProgram: programs linked for different targets are cached side by side (Lasm.target)', { skip: !posix }, () => {
+  const f = fixture();
+  linkCachedEdgeProgram({ ...f.options, key: 'a'.repeat(64), target: 'workers' });
+  linkCachedEdgeProgram({ ...f.options, key: 'b'.repeat(64), target: 'deno' });
+  assert.deepEqual(readdirSync(f.root).sort(), ['a'.repeat(64), 'b'.repeat(64)], 'another target is kept');
+  assert.equal(JSON.parse(readFileSync(join(f.root, 'b'.repeat(64), 'program.json'), 'utf8')).target, 'deno');
+  linkCachedEdgeProgram({ ...f.options, key: 'c'.repeat(64), target: 'workers' });
+  assert.deepEqual(readdirSync(f.root).sort(), ['b'.repeat(64), 'c'.repeat(64)], 'the same target\'s older program is superseded');
+});

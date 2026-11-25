@@ -189,7 +189,7 @@ Lasm code only, MIT, copyright Jordan Last.
 | `licenses/<package>/` | **licence files of every Lake dependency compiled in** | the dependencies' | also appended to `THIRD_PARTY_NOTICES.txt` |
 | `node_modules/` (npm interop) | the project's npm packages | each package's | each package's files |
 
-`lasm package` outputs (Lambda, Lambda@Edge, Vercel, Netlify, Azure Functions,
+Function-platform outputs (`lasm build --target` Lambda, Lambda@Edge, Vercel, Netlify, Azure Functions,
 Google Cloud Functions) are this `dist/` plus two Lasm handler files
 (`lasm-function.mjs`, `lasm-node-serve.mjs` and the platform's `lasm-*.mjs`, MIT, from `src/serverless/` and `src/lasm-modules/node-serve.mjs`),
 and, for Azure and Google, a generated `package.json`/`host.json`. They drop the
@@ -470,7 +470,7 @@ into any output.**
 
 | Target | Files a user ships | Third-party code in them | Licences |
 | --- | --- | --- | --- |
-| `node` (and `lasm package` for Lambda, Lambda@Edge, Vercel, Netlify, Azure, Google) | `dist/` (§3.9) | Lean runtime + stdlib; Emscripten system libraries and JS runtime; musl; libc++/libc++abi/libunwind/compiler-rt; mimalloc; libuv; koffi; Lasm's helpers (musl, Zig compiler-rt) | Apache-2.0; MIT OR NCSA; MIT; Apache-2.0 WITH LLVM-exception; ISC; BSD-2-Clause |
+| `node` (and the function platforms: Lambda, Lambda@Edge, Vercel, Netlify, Azure, Google) | `dist/` (§3.9) | Lean runtime + stdlib; Emscripten system libraries and JS runtime; musl; libc++/libc++abi/libunwind/compiler-rt; mimalloc; libuv; koffi; Lasm's helpers (musl, Zig compiler-rt) | Apache-2.0; MIT OR NCSA; MIT; Apache-2.0 WITH LLVM-exception; ISC; BSD-2-Clause |
 | Edge: `workers`, `vercel-edge`, `netlify-edge`, `deno`, `deno-deploy`, `bun`, `supabase-edge` | `lasm/program.wasm` (or `program.wasm.mjs`), `lasm/program.mjs`, `lasm/edge-*.mjs`, `lasm/modules/*.mjs`, the generated entry | The edge runtime's single-threaded Lean runtime, Lasm host bridge and Lasm.JS glue; Emscripten's single-threaded system libraries from the edge runtime's `sysroot/` (libc = musl + Emscripten's own libc code, libc++, libc++abi, libunwind, compiler-rt builtins, mimalloc, stubs/noexit/sockets/html5/al/GL-getprocaddr — all Emscripten's MIT OR NCSA code); the Node runtime's stdlib archives and libuv members where referenced; Emscripten's JS runtime | as above, without koffi |
 | `browser` (and the Vite plugin) | `app.<hash>.js`, `app.<hash>.wasm`, `index.html`, `public/` | the same as edge (the same cached JSPI link) plus Lasm's loader | as edge |
 | `wasi`, `fastly` | `main.wasm` (Fastly: `pkg/<name>.tar.gz` with it) | the edge runtime's Lean runtime and Emscripten system libraries (musl), linked by wasm-ld with Lasm's C WASI host (`src/wasi/*.c`): **no wasi-libc, no WASI SDK** — libc's `__wasi_*` calls are Lasm's own translations to preview 1 (`lasm_wasi_libc.c`) | Apache-2.0; MIT OR NCSA; MIT; Apache-2.0 WITH LLVM-exception; ISC; BSD-2-Clause |

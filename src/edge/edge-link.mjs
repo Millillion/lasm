@@ -22,6 +22,7 @@ import { linkWithNode, bundledNativeSigs, linkTemporaryDirectory, removeTemporar
 import { liveMembers, memberFiles, wasmImports } from '../application-live-members.mjs';
 import { compileObject, emscriptenCache } from '../link-driver/compile.mjs';
 import { compactInitializerWrappers } from './edge-initializers.mjs';
+import { targetStampObject, targetStampSource } from '../target-stamp.mjs';
 import { mimallocSettings, mimallocSources, mimallocLibraryFlags, mimallocIncludeArguments, mimallocClangArguments, mimallocUnits } from '../mimalloc/mimalloc.mjs';
 
 let recipeCache;
@@ -60,7 +61,7 @@ export const edgeLinkSettings = Object.freeze({ memory64: 2, initialMiB: 4, stac
  * save(record) }: link with the archive members the previous full edge link of
  * this program kept, accepted when the program imports nothing new. */
 const nmListings = new Map(), compactObjects = new Map(), mimallocObjects = new Map();
-export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend = 'jspi', verbose = false, driver = sdk.toolchain ? 'node' : 'emcc', optimize = true, stepCache, members }) {
+export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend = 'jspi', target = 'workers', verbose = false, driver = sdk.toolchain ? 'node' : 'emcc', optimize = true, stepCache, members }) {
   if (!edgeSuspendModes.includes(suspend)) throw new Error(`Unknown edge suspension ${JSON.stringify(suspend)}`);
   const s = edgeLinkSettings;
   const rsp = readResponse(join(linkWork, 'link.rsp'));
@@ -100,18 +101,12 @@ export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend
       { stdio, env, timeout: 600_000 });
     }
   }
-  // The Node build's initializer wrappers, regenerated without call chains
-  // (src/edge/edge-initializers.mjs) from its plan, compiled as the Node build
-  // compiles its generated C (src/application-link.mjs compileFlags).
-  const planFile = join(linkWork, 'initialization-plan.json');
-  const wrappers = /[\\/]initializers-\d+\.o$/;
-  if (existsSync(planFile) && objects.some(arg => wrappers.test(arg))) {
-    const source = join(out, 'initializers-compact.c'), object = join(out, 'initializers-compact.o');
-    const text = compactInitializerWrappers(JSON.parse(readFileSync(planFile, 'utf8')));
+  // C generated for this link, compiled as the Node build compiles its generated C
+  // (src/application-link.mjs compileFlags) and reused by content with the tools and runtime.
+  const compileGenerated = (source, object, text) => {
     writeFileSync(source, text);
     const flags = ['-O2', '-DNDEBUG', '-pthread', '-fwasm-exceptions', '-fPIC', '-DLEAN_EMSCRIPTEN', '-sMEMORY64=1',
       '-ffunction-sections', '-fdata-sections', '-I', join(nodeRuntime.directory, 'include')];
-    // Reused by content (the plan rarely changes between edits) with the tools and runtime.
     const key = createHash('sha256').update(JSON.stringify({ schema: 1, driver, tools: sdk.toolchain ?? sdk.driverIdentity ?? null, runtime: nodeRuntime.identity, flags: flags.slice(0, -1) })).update(text).digest('hex');
     const cached = compactObjects.get(key);
     if (cached) writeFileSync(object, cached);
@@ -121,6 +116,23 @@ export function linkEdgeProgram({ sdk, nodeRuntime, edge, linkWork, out, suspend
       compactObjects.set(key, readFileSync(object));
       if (compactObjects.size > 16) compactObjects.delete(compactObjects.keys().next().value);
     }
+  };
+  // Lasm.target: the Node build's stamp is replaced by this target's (src/target-stamp.mjs).
+  const nodeStamp = objects.findIndex(arg => basename(arg) === targetStampObject);
+  if (nodeStamp >= 0) {
+    const object = join(out, targetStampObject);
+    compileGenerated(join(out, 'lasm-target.c'), object, targetStampSource(target));
+    objects[nodeStamp] = object;
+  }
+  // The Node build's initializer wrappers, regenerated without call chains
+  // (src/edge/edge-initializers.mjs) from its plan, compiled as the Node build
+  // compiles its generated C (src/application-link.mjs compileFlags).
+  const planFile = join(linkWork, 'initialization-plan.json');
+  const wrappers = /[\\/]initializers-\d+\.o$/;
+  if (existsSync(planFile) && objects.some(arg => wrappers.test(arg))) {
+    const source = join(out, 'initializers-compact.c'), object = join(out, 'initializers-compact.o');
+    // Reused by content: the plan rarely changes between edits.
+    compileGenerated(source, object, compactInitializerWrappers(JSON.parse(readFileSync(planFile, 'utf8'))));
     const first = objects.findIndex(arg => wrappers.test(arg));
     objects = objects.filter(arg => !wrappers.test(arg));
     objects.splice(first, 0, object);

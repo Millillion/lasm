@@ -59,7 +59,10 @@ export function lazyArray(compute) {
 }
 // Lasm's library modules compiled with the prefix, in import order. Lazy: it reads library/Lasm/JS/Web's
 // module list and sources, and importing this module must touch no file (mutation sandboxes have no library/).
-export const libraryModules = lazyArray(() => ['Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS',
+export const libraryModules = lazyArray(() => [
+  // Lasm.target (library/Lasm/Target.lean): the target a program is built for, on every target.
+  'Lasm.Target',
+  'Lasm.JS.Core', 'Lasm.JS.Json', 'Lasm.JS.Meta', 'Lasm.JS',
   // Lasm.Fastly (docs/WASI_FASTLY_BINDINGS.md): Fastly Compute's host ABI, generated from its witx
   // by scripts/bindings/generate-fastly.mjs (fastlyModules, in import order).
   ...fastlyModules,

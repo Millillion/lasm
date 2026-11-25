@@ -745,7 +745,7 @@ path, the internal-error line, unhandled rejections and empty output.
 
 **Error corpus** ([`error-corpus.mjs`](../scripts/tooling/error-corpus.mjs)):
 about 120 errors a user can cause: bad and conflicting flags of `lasm build`,
-`lasm dev`, `lasm init` and `lasm package`; missing or misnamed sources (also a
+`lasm dev` and `lasm init`, and the removed `lasm package`; missing or misnamed sources (also a
 per-output source of `lasm dev --target node=A.lean,browser=B.lean`); Lean
 type, syntax and UTF-8 errors (also in an imported module), cyclic imports,
 missing imports, no `main`; broken `lakefile.toml`/`lakefile.lean`, a missing
@@ -1356,8 +1356,8 @@ src/edge/edge-js.mjs), `pythonJsonString` and `comparePythonStrings`
 `lakeName`, `supabaseFunctionNameOf`, src/init.mjs; Node's path functions and
 `toLowerCase` computed in JavaScript), and the whole command-line parser,
 src/cli-arguments.mjs (`parseLasmArguments`, `editDistance`, `closest`,
-`targetHint`; what it imports, the parsers of `lasm init`, `lasm dev` and
-`lasm package`, `existsSync` and the runtime, is a parameter of the model),
+`targetHint`; what it imports, the parsers of `lasm init` and `lasm dev`,
+`existsSync` and the runtime, is a parameter of the model),
 with `numbers_le64`,
 `changed_files_exact`, `response_file_round_trip`,
 `replace_one_core_module`, `drops_only_component_type` and
@@ -1999,7 +1999,7 @@ stay, with the reason; they are not chased with tests that look at the code.
 | application sources, application output | separators and labels inside hashed keys (`lakeConfigurationKey`'s `\0`, `manifest\0`, `header\0`, the adapter's source URL; `workspaceImportsKey`'s separators and entry sort; the binding cache's runtime label; the npm closure's `lasm-node-modules-1\0` and separators; the build driver identity's inputs and its `sessionTrusted` reuse) | A key only has to change with its inputs; these change only when Lasm's own sources or the directory order of the file system change, which no test controls |
 | application sources | paired fallbacks: `trim()` and `filter(Boolean)` on Lean's and Lake's output; the binding checker finding the project by `LASM_BINDING_PROJECT` or by its last argument; `?? ''` after `spawnSync` with an encoding; `Number(…)` of ar header fields with or without `trim()` | Each one alone gives the same result as both |
 | application sources | ar reading: the `/` and `/SYM64/` checks of members after the index, the header guards (`raw.length < 60`, the `` ` `` magic, `isFinite`), the `/` suffix and `/N` patterns of member names, `closeSync` in `finally`, `liveMembers`' region column for non-CODE sections and the duplicate guard of unattributed members | The index is read first, so later headers never repeat it; one guard stops the walk whenever the other would; names Lasm's archives use have one trailing `/`; only CODE sections are named by symbol |
-| application sources, application output | performance-only code: the `leanPrefixes`, library-text and archive-index caches, early returns for empty binding lists, `if (record)` inside `try` blocks, `Math.min(jobs, …)` of the npm copy, the npm closure's and `lasm package`'s second sort, `files.filter(name !== 'package.json')` before the generated `package.json` overwrites it | Same result, different speed |
+| application sources, application output | performance-only code: the `leanPrefixes`, library-text and archive-index caches, early returns for empty binding lists, `if (record)` inside `try` blocks, `Math.min(jobs, …)` of the npm copy, the npm closure's and the function packager's second sort, `files.filter(name !== 'package.json')` before the generated `package.json` overwrites it | Same result, different speed |
 | application sources (not equivalent) | `prebuiltLibrary`'s manifest checks (schema, release, library identity, file list) and its damaged-file error | They need a changed shipped `library/prebuilt`, which tests must not modify (the release checks verify the shipped copy) |
 | application output (not equivalent) | `requireApplicationSupport()` in `buildApplication`, `applicationSupport()`'s read errors; `options.cache ?? managedCacheDirectory()` for the cache lease | A research checkout has no `application-support.json`; the lease location only matters with the user's real cache |
 | application output | `kind` labels `'optional'`/`'peer'` in the npm closure; `wasm-objects.mjs`' `bytes.length < 8` and initial `codeStart`; `application-reachability.mjs`' `trimEnd`/blank-line handling | Only `'required'` is compared; a short buffer fails the magic check the same way; blank rows are skipped either way |

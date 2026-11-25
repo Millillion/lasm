@@ -13,7 +13,7 @@
 // minute); network adds an unreachable download. A case with `fixedIn` is
 // reported as known, not failed, when the CLI under test is older (the
 // published package before the fix was released).
-import { mkdirSync, chmodSync, existsSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs';
+import { mkdirSync, chmodSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:net';
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
@@ -75,9 +75,8 @@ export const cases = [
   { id: 'init-onto-a-file', kind: 'parse', args: ['init', 'Main.lean'], files: { 'Main.lean': main }, expect: /Main\.lean is a file/, fixedIn: '0.4.0' },
   { id: 'init-under-a-file', kind: 'parse', args: ['init', 'Main.lean/app'], files: { 'Main.lean': main }, expect: /Main\.lean/, fixedIn: '0.4.0' },
   { id: 'init-read-only-parent', kind: 'parse', posixUser: true, args: ['init', 'locked/app'], setup: dir => { mkdirSync(join(dir, 'locked')); chmodSync(join(dir, 'locked'), 0o555); }, expect: /locked/, fixedIn: '0.4.0' },
-  { id: 'package-without-target', kind: 'parse', args: ['package'], expect: /--target is required/ },
-  { id: 'package-unknown-target', kind: 'parse', args: ['package', '--target', 'nope'], expect: /Unknown (package )?target "nope"/ },
-  { id: 'package-missing-build', kind: 'parse', args: ['package', 'dist', '--target', 'lambda'], expect: /is not a Lasm build \(no main\.mjs\)\. Run lasm build Main\.lean first/ },
+  // There is no lasm package: lasm build --target packages for a function platform.
+  { id: 'package-is-no-command', kind: 'parse', args: ['package', 'dist'], expect: /Unknown command "package"\. Commands: build, run, dev, init, editor, cache;/, fixedIn: '0.11.0' },
   { id: 'cache-usage', kind: 'parse', args: ['cache'], expect: /Usage: lasm cache repair/ },
   { id: 'cache-extra', kind: 'parse', args: ['cache', 'repair', 'now'], expect: /Usage: lasm cache repair/ },
   { id: 'editor-usage', kind: 'parse', args: ['editor', 'a', 'b'], expect: /Usage: lasm editor/ },
@@ -95,7 +94,7 @@ export const cases = [
   { id: 'dev-two-sources', kind: 'parse', args: ['dev', 'Main.lean', 'Other.lean'], files: { 'Main.lean': main }, expect: /lasm dev takes one Lean source/ },
   { id: 'dev-not-a-lean-file', kind: 'parse', args: ['dev', 'Main.txt'], files: { 'Main.txt': main }, expect: /(lasm dev expects a Lean source|Expected a Lean source file) \(Main\.lean\), not Main\.txt/ },
   { id: 'dev-output-source-missing', kind: 'parse', args: ['dev', '--target', 'node=Server.lean,browser=Client.lean'], files: { 'Server.lean': main }, expect: /Client\.lean not found in .*Lean files there: Server\.lean/, fixedIn: '0.5.2' },
-  // lasm init's and lasm package's options.
+  // lasm init's options.
   { id: 'init-template-without-value', kind: 'parse', args: ['init', 'app', '--template'], expect: /--template requires a value/ },
   { id: 'init-deploy-without-value', kind: 'parse', args: ['init', 'app', '--deploy'], expect: /--deploy requires a value/, fixedIn: '0.10.0' },
   { id: 'init-unknown-deploy', kind: 'parse', args: ['init', 'app', '--deploy', 'heroku'], expect: /--deploy accepts lambda, |Unknown deploy target "heroku"/ },
@@ -105,12 +104,6 @@ export const cases = [
   { id: 'init-deploy-needs-server', kind: 'parse', args: ['init', 'app', '--template', 'plain', '--deploy', 'lambda'], expect: /--deploy lambda needs a server template/ },
   { id: 'init-deploy-wrong-template', kind: 'parse', args: ['init', 'app', '--template', 'express', '--deploy', 'workers'], expect: /--deploy workers supports the .* templates, not express/ },
   { id: 'init-deploy-conflict', kind: 'parse', args: ['init', 'app', '--template', 'hono', '--deploy', 'vercel', '--deploy', 'vercel-edge'], expect: /both configure the same platform; choose one/ },
-  { id: 'package-target-twice', kind: 'parse', args: ['package', '--target', 'lambda', '--target', 'cloud-functions'], expect: /Specify --target only once/ },
-  { id: 'package-output-without-value', kind: 'parse', args: ['package', '--target', 'lambda', '--output'], expect: /--output requires a value/ },
-  { id: 'package-unknown-option', kind: 'parse', args: ['package', '--target', 'lambda', '--bogus'], expect: /Unknown lasm package option: --bogus/ },
-  { id: 'package-two-builds', kind: 'parse', args: ['package', 'a', 'b', '--target', 'lambda'], expect: /^Usage: lasm package/m },
-  { id: 'package-browser-output', kind: 'parse', args: ['package', '--target', 'browser', '--output', 'x'], expect: /lasm package --target browser checks the build in place; --output does not apply/ },
-  { id: 'package-not-a-current-build', kind: 'parse', args: ['package', 'dist', '--target', 'lambda'], files: { 'dist/main.mjs': '// not Lasm\n' }, expect: /dist/ },
   { id: 'output-twice', kind: 'parse', args: ['build', 'Main.lean', '--output', 'a', '--output', 'b'], files: { 'Main.lean': main }, expect: /Specify --output only once/ },
   { id: 'suspend-twice', kind: 'parse', args: ['build', 'Main.lean', '--target', 'browser', '--suspend', 'jspi', '--suspend', 'none'], files: { 'Main.lean': main }, expect: /Specify --suspend only once/ },
   { id: 'output-for-vercel-edge', kind: 'parse', args: ['build', 'Main.lean', '--target', 'vercel-edge', '--output', 'x'], files: { 'Main.lean': main }, expect: /--output does not apply to --target vercel-edge: the platform fixes its layout/ },
@@ -211,13 +204,8 @@ export const cases = [
   { id: 'generated-file-edited', kind: 'build', args: ['build', 'Main.lean'], files: { 'Main.lean': main }, prepare: ['build', 'Main.lean'],
     afterPrepare: dir => writeFileSync(join(dir, 'dist/main.mjs'), readFileSync(join(dir, 'dist/main.mjs'), 'utf8') + '// my edit\n'),
     expect: /Generated application file was modified: .*main\.mjs\. Preserve the edit or choose a different output directory/ },
-  { id: 'package-needs-an-npm-package', kind: 'build', args: ['package', 'dist', '--target', 'azure-functions'], files: { 'Main.lean': main }, prepare: ['build', 'Main.lean'],
-    expect: /This target needs the npm package @azure\/functions in the build\. Run npm install @azure\/functions next to package\.json/, fixedIn: '0.10.0' },
-  { id: 'package-a-link', kind: 'build', posixUser: true, args: ['package', 'dist', '--target', 'lambda'], files: { 'Main.lean': main }, prepare: ['build', 'Main.lean'],
-    afterPrepare: dir => symlinkSync('main.mjs', join(dir, 'dist/link.mjs')), expect: /link\.mjs is not a regular file; function packages hold regular files only/ },
-  { id: 'package-over-the-build', kind: 'build', args: ['package', 'dist', '--target', 'vercel', '--output', '.'], files: { 'Main.lean': main }, prepare: ['build', 'Main.lean'],
-    expect: /The output must not contain the build directory/ },
-  { id: 'package-a-dev-build', kind: 'build', args: ['package', 'dist', '--target', 'lambda'], files: { 'Main.lean': main }, prepare: ['build', 'Main.lean', '--dev'], expect: /dev build/i },
+  { id: 'package-needs-an-npm-package', kind: 'build', args: ['build', 'Main.lean', '--target', 'azure-functions'], files: { 'Main.lean': main },
+    expect: /This target needs the npm package @azure\/functions(: add it to package\.json's dependencies \(npm install @azure\/functions\)| in the build\. Run npm install @azure\/functions next to package\.json)/, fixedIn: '0.10.0' },
 
   // lasm dev: a Lean error in the first build and in a rebuild (printed with
   // its file and line; lasm dev keeps watching, so the case ends with Ctrl+C,

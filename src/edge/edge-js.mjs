@@ -337,8 +337,7 @@ export function createEdgeJs({ modules = {}, notify = () => {}, syncCall } = {})
         [into, bytes] = intoPrefix(bytes);
       }
       switch (op) {
-      // Protocol 1; the second word (1) tells Lean it runs in an edge build (Lasm.JS.onEdge).
-      case 200: return new Uint8Array(Uint32Array.of(1, 1).buffer);
+      case 200: return new Uint8Array(Uint32Array.of(1).buffer);
       case 201: return encode(load(decoder.decode(bytes)), modeOf(arg));
       // Always a reference: Bun's globalThis has Object.prototype, so a data
       // conversion would try to copy the whole global object.

@@ -3,6 +3,15 @@
 // imports: src/package.mjs, src/init.mjs and src/dev.mjs use it while
 // src/cli-arguments.mjs is still loading them.
 
+// Every `--target`, in order: node, the function platforms (src/package.mjs
+// packageTargets), the edge targets, the WASI targets and the browser
+// (src/cli-arguments.mjs re-exports it; test/cli-parse.test.mjs checks it
+// against those lists). Lasm.Target's constructors are these, in this order:
+// a build links the target's index (src/target-stamp.mjs), and
+// test/lasm-target.test.mjs fails on drift.
+export const buildTargets = Object.freeze(['node', 'lambda', 'lambda-edge', 'vercel', 'netlify', 'azure-functions', 'cloud-functions',
+  'workers', 'vercel-edge', 'netlify-edge', 'bun', 'deno', 'deno-deploy', 'supabase-edge', 'wasi', 'fastly', 'wasi-http', 'browser']);
+
 // Names people try for a target, and the target they mean: the platforms'
 // own names, never a name Lasm used before (no compatibility hints).
 export const targetAliases = { cloudflare: 'workers', 'cloudflare-workers': 'workers', worker: 'workers', aws: 'lambda', 'aws-lambda': 'lambda',
@@ -40,8 +49,8 @@ export function closest(word, candidates) {
   return distance <= Math.max(2, Math.floor((best === undefined ? 0 : [...best].length) / 3)) ? best : undefined;
 }
 
-/** The same hint among `candidates` only (lasm dev's targets, lasm package's,
- * lasm init's --deploy targets): an alias that names one of them, else the
+/** The same hint among `candidates` only (lasm dev's targets, lasm init's
+ * --deploy targets): an alias that names one of them, else the
  * closest of them. */
 export function targetHintAmong(value, candidates, option = '--target') {
   const alias = asciiLower(value);

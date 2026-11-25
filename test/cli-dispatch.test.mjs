@@ -29,7 +29,7 @@ const stubs = {
   './cache-repair.mjs': forward('cache', ['repairManagedCache']),
   './init.mjs': `export * from ${JSON.stringify(real('init.mjs'))};\n` + forward('init', ['runInit']),
   './dev.mjs': `export * from ${JSON.stringify(real('dev.mjs'))};\n` + forward('dev', ['runDev']),
-  './package.mjs': `export * from ${JSON.stringify(real('package.mjs'))};\n` + forward('package', ['runPackage']),
+  './package.mjs': `export * from ${JSON.stringify(real('package.mjs'))};\n` + forward('package', ['packageFunction']),
   './application-support.mjs': forward('support', ['applicationSupport']),
   './js-runtime.mjs': `import * as real from ${JSON.stringify(real('js-runtime.mjs'))};
 export let [jsRuntime, runtimeExecutable] = globalThis.cliRuntime ?? [real.jsRuntime, real.runtimeExecutable];
@@ -51,7 +51,6 @@ const { runApplicationCli, runApplicationChild, buildEdge, reportCliError, descr
 const { cliUsage } = await import('../src/cli-arguments.mjs');
 const { initUsage } = await import('../src/init.mjs');
 const { devUsage } = await import('../src/dev.mjs');
-const { packageUsage } = await import('../src/package.mjs');
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 const defaultLean = JSON.parse(readFileSync(new URL('../src/toolchains.json', import.meta.url), 'utf8')).defaultLean;
 
@@ -101,7 +100,7 @@ beforeEach(() => {
     cache: { repairManagedCache: record('repairManagedCache', undefined) },
     init: { runInit: record('runInit', 0) },
     dev: { runDev: record('runDev', 0) },
-    package: { runPackage: record('runPackage', 0) },
+    package: { packageFunction: record('packageFunction', 0) },
     support: { applicationSupport: () => undefined },
     scriptPrefix: () => [],
   };
@@ -134,7 +133,7 @@ test('version and help print and return 0 without building', async () => {
   globalThis.cliStandIns.support.applicationSupport = () => ({ platforms: [] });
   assert.equal(await cli(['build', '-h']), 0);
   assert.equal(lines.log[2], cliUsage);
-  for (const [argv, usage] of [[['init', '--help'], initUsage], [['dev', '--help'], devUsage], [['package', '--help'], packageUsage]]) {
+  for (const [argv, usage] of [[['init', '--help'], initUsage], [['dev', '--help'], devUsage]]) {
     lines.log = [];
     assert.equal(await cli(argv), 0);
     assert.deepEqual(lines.log, [usage]);
@@ -142,13 +141,12 @@ test('version and help print and return 0 without building', async () => {
   assert.deepEqual(calls, []);
 });
 
-test('init, package, editor and dev go to their commands with the parsed options, and return their codes', async () => {
+test('init, editor and dev go to their commands with the parsed options, and return their codes', async () => {
   globalThis.cliStandIns.init.runInit = record('runInit', 3);
   assert.equal(await cli(['init', 'app', '-t', 'hono']), 3);
   assert.deepEqual(named('runInit'), [[{ command: 'init', template: 'hono', deploy: [], directory: 'app' }]]);
-  globalThis.cliStandIns.package.runPackage = record('runPackage', 4);
-  assert.equal(await cli(['package', '--target', 'lambda']), 4);
-  assert.equal(named('runPackage')[0][0].target, 'lambda');
+  // There is no lasm package (lasm build --target packages for a function platform).
+  await assert.rejects(cli(['package', '--target', 'lambda']), { message: '--target is available only with lasm build' });
   globalThis.cliStandIns.editor.runEditor = record('runEditor', 5);
   assert.equal(await cli(['editor', 'there']), 5);
   assert.deepEqual(named('runEditor'), [[{ command: 'editor', input: 'there' }]]);
@@ -196,23 +194,25 @@ test('dev builds for deployment targets are refused before building unless --all
 test('lasm build for Node: the build, its summary line, the editor, and packaging for a function platform', async () => {
   assert.equal(await cli(['build', source, '--rebuild']), 0);
   // webTarget: the target whose web APIs the build checks (src/web-availability.mjs).
-  assert.deepEqual(named('build'), [[source, { command: 'build', rebuild: true, verbose: false, args: [], input: source, profile: 'release', output: 'dist', webTarget: 'node' }]]);
+  assert.deepEqual(named('build'), [[source, { command: 'build', rebuild: true, verbose: false, args: [], input: source, profile: 'release', output: 'dist', webTarget: 'node', target: 'node' }]]);
   assert.deepEqual(lines.error, [`Built Lean 4.99.0 for Node (release profile): ${program}`]);
   assert.deepEqual(named('autoSetupEditor'), [[source]]);
-  assert.deepEqual(named('runPackage'), []);
+  assert.deepEqual(named('packageFunction'), []);
   globalThis.cliStandIns.build.buildApplicationWithProgress = () => ({ output: 'out', lean: '4.98.0', profile: 'dev', cacheHit: true });
   assert.equal(await cli(['build', source, '--dev']), 0);
   assert.equal(lines.error.at(-1), 'Reused Lean 4.98.0 for Node (dev profile: size optimizations skipped, not for deployment): out');
-  globalThis.cliStandIns.package.runPackage = record('runPackage', 9);
+  globalThis.cliStandIns.package.packageFunction = record('packageFunction', 9);
   assert.equal(await cli(['build', source, '--target', 'netlify', '--dev', '--allow-dev']), 9);
-  assert.deepEqual(named('runPackage'), [[{ input: 'out', target: 'netlify', allowDev: true }]]);
+  assert.deepEqual(named('packageFunction'), [[{ input: 'out', target: 'netlify' }]]);
   // --output names the package; the Node build stays in its cache entry (0.7-5).
   calls.length = 0;
   assert.equal(await cli(['build', source, '--target', 'lambda', '--output', 'app.zip']), 9);
-  assert.deepEqual(named('runPackage'), [[{ input: 'out', target: 'lambda', allowDev: undefined, output: 'app.zip' }]]);
+  assert.deepEqual(named('packageFunction'), [[{ input: 'out', target: 'lambda', output: 'app.zip' }]]);
   globalThis.cliStandIns.build.buildApplicationWithProgress = record('build', { output: 'out', lean: '4.98.0', profile: 'release', cacheHit: true });
   assert.equal(await cli(['build', source, '--target', 'vercel', '--output', 'v']), 9);
   assert.equal(named('build').at(-1)[1].output, undefined);
+  // A function platform's Node build is linked for it (Lasm.target).
+  assert.equal(named('build').at(-1)[1].target, 'vercel');
   assert.equal(await cli(['build', source, '--output', 'n']), 0);
   assert.equal(named('build').at(-1)[1].output, 'n');
 });
@@ -285,8 +285,9 @@ test('edge targets link a new edge program, building again when the Node build k
   assert.equal(edge, 'edge-runtime'); assert.equal(env, process.env); assert.equal(suspend, 'asyncify');
   assert.deepEqual(named('startElapsedTicker'), [['Linking the single-threaded program']]);
   assert.deepEqual(named('stopTicker'), [['Linking the single-threaded program']]);
+  assert.equal(named('findEdgeProgram')[0][0].target, 'supabase-edge', 'the edge program is linked and cached for its target');
   const [[link]] = named('linkCachedEdgeProgram');
-  assert.deepEqual({ ...link, result: undefined }, { result: undefined, nodeRuntime: 'node-runtime', edge: 'edge-runtime', key: 'edge-key', sdk: 'sdk', suspend: 'asyncify', verbose: true });
+  assert.deepEqual({ ...link, result: undefined }, { result: undefined, nodeRuntime: 'node-runtime', edge: 'edge-runtime', key: 'edge-key', sdk: 'sdk', suspend: 'asyncify', target: 'supabase-edge', verbose: true });
   assert.ok(!existsSync(link.result.linkWork), 'the link inputs are removed after the link');
   const [[written]] = named('writeEdgeOutput');
   assert.equal(written.program, 'linked-program'); assert.equal(written.cacheHit, false); assert.equal(written.output, 'fn');

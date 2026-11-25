@@ -212,7 +212,7 @@
     "src/browser/browser-package.mjs": {
       "status": "exempt",
       "kind": "io",
-      "reason": "`lasm package --target browser`; orchestration of files, processes or the network: its effect is the behaviour, tested end to end"
+      "reason": "checks a browser build against its manifest and writes _headers (lasm build --target browser); orchestration of files, processes or the network: its effect is the behaviour, tested end to end"
     },
     "src/browser/bundle.mjs": {
       "status": "pending",
@@ -926,17 +926,9 @@
       "reason": "moves a finished output into place; orchestration of files, processes or the network: its effect is the behaviour, tested end to end"
     },
     "src/package.mjs": {
-      "status": "modelled",
-      "models": [
-        {
-          "lean": "verification/cli/Lasm/Cli/Model/Package.lean",
-          "functions": [
-            "parsePackageArguments"
-          ],
-          "differential": "test/models/cli-differential.mjs"
-        }
-      ],
-      "reason": "its argument parsing is modelled (parse_known_or_refused proved); the rest packages a build (files, processes and archives), tested end to end"
+      "status": "exempt",
+      "kind": "io",
+      "reason": "packages a function platform's build (lasm build --target <platform>); orchestration of files, processes or the network: its effect is the behaviour, tested end to end"
     },
     "src/platform.mjs": {
       "status": "modelled",
@@ -1040,7 +1032,7 @@
     "src/serverless/lasm-node-serve.mjs": {
       "status": "exempt",
       "kind": "io",
-      "reason": "re-exports src/lasm-modules/node-serve.mjs, the name the function shims import it by in the repository (`lasm package` copies node-serve.mjs itself under this name)"
+      "reason": "re-exports src/lasm-modules/node-serve.mjs, the name the function shims import it by in the repository (`lasm build --target` copies node-serve.mjs itself into function packages under this name)"
     },
     "src/serverless/lasm-vercel.mjs": {
       "status": "exempt",
@@ -1072,6 +1064,10 @@
     "src/tar.mjs": {
       "status": "pending",
       "reason": "the tar reader and writer (tool archives, npm packages, the Fastly package): fuzzed against Python's tarfile, an independent implementation (test/fuzz/targets/tar.mjs); a Lean model of the reader's header and pax parsing is due (IRREDUCIBLE.md M4)"
+    },
+    "src/target-stamp.mjs": {
+      "status": "pending",
+      "reason": "Lasm.target's stamp (the C source returning the target's index in buildTargets): a pure function of the target, checked against Lasm.Target's constructors by test/lasm-target.test.mjs and on every target by web-bindings.yml's target-report job; a Lean model is due with the CLI models"
     },
     "src/test-switches.mjs": {
       "status": "exempt",

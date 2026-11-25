@@ -11,7 +11,7 @@ cd azure-functions && func start                      # local, with Azure's own 
 func azure functionapp publish APP_NAME --no-build    # deploy, as built
 ```
 
-`lasm build --target azure-functions` (or `lasm package --target azure-functions` for an existing build) writes a function app directory: `dist/` (with its
+`lasm build --target azure-functions` writes a function app directory: `dist/` (with its
 production `node_modules`, which must include `@azure/functions`), a `host.json`
 with `routePrefix: ""` (the server's own paths, no `/api`), a `package.json`
 whose `main` is the handler `lasm-azure.mjs` and whose `dependencies` pin every

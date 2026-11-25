@@ -45,7 +45,7 @@ test and deploy.
 | Platform | Recipe | Notes |
 | --- | --- | --- |
 | Docker, Kubernetes | [docker-kubernetes.md](docker-kubernetes.md) | The reference: what CI runs. |
-| Static hosting and CDNs (browser apps, from 0.3.0) | [browser.md](browser.md) | `lasm build --target browser` writes a static site (GitHub Pages, Cloudflare Pages, Netlify, Vercel, S3 + CloudFront, nginx); `lasm package dist --target browser` checks it and writes `_headers`. |
+| Static hosting and CDNs (browser apps, from 0.3.0) | [browser.md](browser.md) | `lasm build --target browser` writes a static site (GitHub Pages, Cloudflare Pages, Netlify, Vercel, S3 + CloudFront, nginx), checked against its manifest, with `_headers`. |
 | Fastly Compute (from 0.3.0) | [fastly.md](fastly.md) | A standard WASI module with Fastly's host calls, not a Node process: `lasm build --target fastly`, tested with Viceroy. |
 | WASI hosts, wasi-http and Spin (from 0.3.0) | [WASI.md](../WASI.md) | `--target wasi` (wasmtime, wasmer, `node:wasi`), `--target wasi-http` (`wasmtime serve`, Spin's HTTP trigger); `lasm init --template fetch --deploy spin` adds `spin.toml`. |
 | Cloudflare Workers (from 0.2.0) | [workers.md](workers.md) | An edge isolate, not a Node process: `lasm build --target workers`, tested with `wrangler dev`. |

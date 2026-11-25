@@ -17,12 +17,12 @@
     "start:deno": "deno run -A deno/main.mjs",
     "build:workers": "npm run build:client && lasm build ServerWorkers.lean --target workers",
     "build:docker": "npm run build && docker build -t porter .",
-    "build:lambda": "npm run build:export && lasm package dist/export --target lambda",
+    "build:lambda": "npm run build:client && lasm build ServerExport.lean --target lambda",
     "build:lambda-image": "npm run build:export && docker build -f deploy/lambda-image/Dockerfile -t porter-lambda:local .",
-    "build:vercel": "npm run build:export && lasm package dist/export --target vercel",
-    "build:netlify": "npm run build:export && lasm package dist/export --target netlify",
-    "build:azure-functions": "npm run build:export && node deploy/package-hosted.mjs azure-functions",
-    "build:cloud-functions": "npm run build:export && node deploy/package-hosted.mjs cloud-functions",
+    "build:vercel": "npm run build:client && lasm build ServerExport.lean --target vercel",
+    "build:netlify": "npm run build:client && lasm build ServerExport.lean --target netlify",
+    "build:azure-functions": "npm run build:client && lasm build ServerExport.lean --target azure-functions",
+    "build:cloud-functions": "npm run build:client && lasm build ServerExport.lean --target cloud-functions",
     "proofs": "node test/proofs.mjs",
     "proofs:paranoid": "node test/paranoid.mjs",
     "build:client": "lasm build Client.lean --target browser --output dist/public/ui",
@@ -42,5 +42,9 @@
   },
   "overrides": {
     "jose": "6.2.12"
+  },
+  "dependencies": {
+    "@azure/functions": "4.17.0",
+    "@google-cloud/functions-framework": "5.0.5"
   }
 }

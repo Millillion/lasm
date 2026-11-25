@@ -24,7 +24,6 @@ import { closest, editDistance } from '../../src/cli-names.mjs';
 import { changedFiles, parseDevArguments } from '../../src/dev.mjs';
 import { lakeName, packageName, parseInitArguments, supabaseFunctionNameOf } from '../../src/init.mjs';
 import { jsRuntime } from '../../src/js-runtime.mjs';
-import { parsePackageArguments } from '../../src/package.mjs';
 import { numbers } from '../../src/node-host.mjs';
 import { decodeFileMessage, encodeFileMessage } from '../../src/native-file-message.mjs';
 import { initializerClosure, unitsReaching } from '../../src/application-initialization.mjs';
@@ -183,9 +182,9 @@ const parseOutcome = fn => {
   const result = outcome(fn);
   return result.error !== undefined ? { error: hex(result.error) } : { parsed: parsedJson(result.value) };
 };
-const delegates = { init: parseInitArguments, dev: parseDevArguments, package: parsePackageArguments };
+const delegates = { init: parseInitArguments, dev: parseDevArguments };
 
-/** Words of `lasm init`, `lasm dev` and `lasm package`: their options in
+/** Words of `lasm init` and `lasm dev`: their options in
  * both forms, their tables' names and near misses, values with line breaks. */
 function subcommandLine(r, options, values) {
   const spaced = () => { const o = r.pick(options); return r.next() < 0.5 ? [o, r.pick(values)] : [`${o}=${r.pick(values)}`]; };
@@ -198,7 +197,6 @@ const initValues = ['plain', 'express', 'hono', 'fastify', 'std-http', 'web', 'f
 const devValues = ['node', 'bun', 'deno', 'browser', 'workers', 'node,browser', 'node=Server.lean,browser=Client.lean', 'browser=a.lean',
   'node,bun', 'node=', 'node=a', 'x', '', '--x', '-x', '80', '65535', '65536', '00080', '123456', 'a\nb', '127.0.0.1', 'out', 'deno=b.lean=c',
   'worker', 'cloudflare', 'brwser', 'node,brwser', 'aws', 'lambda'];
-const packageValues = ['lambda', 'lambda-edge', 'vercel', 'netlify', 'azure-functions', 'cloud-functions', 'browser', 'constructor', '', '--x', '-x', 'out', 'a\nb'];
 
 
 /** WebAssembly instructions as the lowering reads them: every immediate
@@ -498,7 +496,7 @@ const models = [
     input: argv => ({ argv: argv.map(hex), existing: inParseDirectory(() => argv.map(t => t + '.lean').filter(existsSync)).map(hex), runtime: jsRuntime }),
     js: argv => {
       const result = inParseDirectory(() => outcome(() => parseLasmArguments(argv)));
-      // `lasm init`, `lasm dev` and `lasm package` are their modules' parsers:
+      // `lasm init` and `lasm dev` are their modules' parsers:
       // the model checks only that the JavaScript hands the rest to them.
       if (Object.hasOwn(delegates, argv[0])) {
         assert.deepEqual(result, inParseDirectory(() => outcome(() => delegates[argv[0]](argv.slice(1)))), `parseLasmArguments(${JSON.stringify(argv)}) is not its delegate's`);
@@ -522,12 +520,6 @@ const models = [
       ...r.array(r.next() < 0.3 ? r.int(1, 2) : 0, () => r.pick(['--release', '--dev', '--no-run', '--verbose', '--no-watch']))].sort(() => r.next() - 0.5),
     input: tokens => ({ tokens: tokens.map(hex), runtime: jsRuntime }),
     js: tokens => parseOutcome(() => parseDevArguments(tokens)),
-  },
-  {
-    name: 'parsePackageArguments', source: 'src/package.mjs', lean: 'Lasm.Cli.Model.Package',
-    generate: r => [...subcommandLine(r, ['--target', '--target', '--output'], packageValues), ...(r.next() < 0.3 ? ['--allow-dev'] : [])],
-    input: tokens => tokens.map(hex),
-    js: tokens => parseOutcome(() => parsePackageArguments(tokens)),
   },
   {
     name: 'lowerAtomics', source: 'src/wasi/lower-atomics.mjs', lean: 'Lasm.Cli.Model.LowerAtomics',

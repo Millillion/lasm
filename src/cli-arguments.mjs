@@ -1,10 +1,9 @@
 import { existsSync } from 'node:fs';
 import { parseInitArguments } from './init.mjs';
-import { parsePackageArguments, packageTargets } from './package.mjs';
 import { jsRuntime } from './js-runtime.mjs';
 import { parseDevArguments } from './dev.mjs';
-import { asciiLower, closest, targetAliases } from './cli-names.mjs';
-export { asciiLower, closest, editDistance, targetHintAmong } from './cli-names.mjs';
+import { asciiLower, buildTargets, closest, targetAliases } from './cli-names.mjs';
+export { asciiLower, buildTargets, closest, editDistance, targetHintAmong } from './cli-names.mjs';
 
 // `lasm build --target`: `node` writes dist/ only; a function platform also
 // packages it (src/package.mjs). Lasm builds for the platform; it never
@@ -16,12 +15,12 @@ export const edgeBuildTargets = ['workers', 'vercel-edge', 'netlify-edge', 'bun'
 // list equals src/wasi/wasi-build.mjs wasiTargets (test/wasi.test.mjs).
 export const wasiBuildTargets = ['wasi', 'fastly', 'wasi-http'];
 // The browser (docs/BROWSER.md): the edge program as a static web app.
-export const buildTargets = ['node', ...Object.keys(packageTargets), ...edgeBuildTargets, ...wasiBuildTargets, 'browser'];
+// buildTargets (src/cli-names.mjs) is node, the function platforms, these and the browser.
 // Every target but node writes what is deployed: --output names it (default:
 // the platform's own place in the project, such as workers/, wasi/ or
 // lambda.zip), and the Node build it is made from stays in the build cache
 // (.lake/lasm/applications/). node writes the Node build to --output (default
-// dist/), which `lasm package` reads.
+// dist/). A function platform's Node build is linked for it (Lasm.target).
 // Targets whose layout the platform fixes (api/ for Vercel, netlify/ for
 // Netlify): the entry module imports the program by a fixed relative path.
 export const fixedLayoutTargets = ['vercel-edge', 'netlify-edge'];
@@ -38,12 +37,11 @@ export const cliUsage = `Usage: lasm <Main.lean> [--release] [-- arguments…]
        lasm dev [Main.lean] [--target TARGET[,TARGET…]] [--release] [--no-run] [-- arguments…]
        lasm build <Main.lean> [--target ${buildTargets.join('|')}] [--output PATH] [--dev] [--allow-dev] [--suspend none|jspi] [--bundler]
        lasm init <directory> [--template NAME] [--deploy TARGET]…
-       lasm package [dist] --target ${[...Object.keys(packageTargets), 'browser'].join('|')} [--output PATH] [--allow-dev]
        lasm editor [project-directory]
        lasm cache repair
 
-Options: --rebuild, --verbose, --help (-h), --version (-v). lasm init --help,
-lasm dev --help and lasm package --help show their own options and targets.
+Options: --rebuild, --verbose, --help (-h), --version (-v). lasm init --help
+and lasm dev --help show their own options and targets.
 --output: with --target node (the default under Node) the Node build (default
 dist/); with every other target what is deployed (default: the platform's own
 place, such as workers/, wasi/ or lambda.zip). The Node build those are made
@@ -55,7 +53,7 @@ lasm dev watches the sources, rebuilds and restarts the program after each chang
 lasm editor makes the Lean editor resolve import Lasm.* (Lasm's Lake package for this project).
 Application arguments must follow --.`;
 
-export const commandNames = ['build', 'run', 'dev', 'init', 'package', 'editor', 'cache'];
+export const commandNames = ['build', 'run', 'dev', 'init', 'editor', 'cache'];
 
 /** Parse independently of provisioning: help/errors must never download tools. */
 export function parseLasmArguments(argv) {
@@ -63,7 +61,6 @@ export function parseLasmArguments(argv) {
   if (tokens.length === 1 && ['--version', '-v'].includes(tokens[0])) return { command: 'version' };
   if (tokens[0] === 'init') return parseInitArguments(tokens.slice(1));
   if (tokens[0] === 'dev') return parseDevArguments(tokens.slice(1));
-  if (tokens[0] === 'package') return parsePackageArguments(tokens.slice(1));
   if (tokens[0] === 'editor') {
     if (tokens.includes('--help') || tokens.includes('-h')) return { command: 'help' };
     if (tokens.length > 2 || tokens[1]?.startsWith('-')) throw new Error('Usage: lasm editor [project-directory]');
@@ -138,7 +135,7 @@ export function parseLasmArguments(argv) {
   // lasm build defaults to the release profile, lasm run to the dev profile.
   result.profile ??= result.command === 'build' ? 'release' : 'dev';
   if (result.allowDev && !(result.command === 'build' && result.target && result.target !== 'node'))
-    throw new Error('--allow-dev applies to lasm build --target <platform> and lasm package');
+    throw new Error('--allow-dev applies to lasm build --target <platform>');
   if (result.suspend !== undefined && result.target !== 'browser') throw new Error('--suspend applies to lasm build --target browser');
   if (result.bundler && result.target !== 'browser') throw new Error('--bundler applies to lasm build --target browser');
   if (result.command === 'build') {

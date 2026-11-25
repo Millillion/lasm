@@ -30,8 +30,8 @@
     "build:lambda-image": "npm run build:lambda && rm -rf dist/lambda-image && unzip -q lambda.zip -d dist/lambda-image && docker build -f deploy/lambda-image/Dockerfile -t conduit-lambda:local .",
     "build:vercel": "npm run build:client && lasm build ServerFunction.lean --target vercel",
     "build:netlify": "npm run build:client && lasm build ServerFunction.lean --target netlify",
-    "build:azure-functions": "npm run build:client && node deploy/package-hosted.mjs azure-functions",
-    "build:cloud-functions": "npm run build:client && node deploy/package-hosted.mjs cloud-functions",
+    "build:azure-functions": "npm run build:client && lasm build ServerFunction.lean --target azure-functions",
+    "build:cloud-functions": "npm run build:client && lasm build ServerFunction.lean --target cloud-functions",
     "test:platform": "node test/api.mjs --platform",
     "proofs": "node test/proofs.mjs",
     "proofs:paranoid": "node test/paranoid.mjs",
@@ -46,5 +46,9 @@
     "@netlify/blobs": "11.1.7",
     "@orangeopensource/hurl": "8.0.4",
     "@playwright/test": "1.63.0"
+  },
+  "dependencies": {
+    "@azure/functions": "4.17.0",
+    "@google-cloud/functions-framework": "5.0.5"
   }
 }

@@ -49,10 +49,10 @@ test('edge host: output lines, env, clocks, random bytes and unavailable operati
   assert.match(decoder.decode(process.bytes.subarray(16)), /Processes is not available in the Lasm edge profile/);
 });
 
-test('edge host: Lasm.JS tells Lean it runs on the edge (op 200)', () => {
+test('edge host: Lasm.JS protocol version (op 200), as on Node', () => {
   const host = createEdgeRuntimeHost({ stdout: () => {} });
   const reply = call(host, 200, 0, 0n, new Uint8Array(4)).bytes;
-  assert.deepEqual([...new Uint32Array(reply.slice().buffer)], [1, 1]);
+  assert.deepEqual([...new Uint32Array(reply.slice().buffer)], [1]);
 });
 
 test('edge modules: bindings plus configuration, minus Node-only modules', () => {

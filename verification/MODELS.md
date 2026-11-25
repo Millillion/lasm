@@ -34,9 +34,9 @@ How a module moves from pending to modelled:
 <!-- BEGIN MODELS -->
 <!-- Generated from verification/models.json by `node scripts/models.mjs --write`; do not edit by hand. -->
 
-**181 shipped modules**: 20 modelled, 28 pending, 133 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 28 modules still need a model.
+**182 shipped modules**: 19 modelled, 29 pending, 134 exempt. The M4 exit check (every shipped module has a Lean model or a stated reason) is **not met**: 29 modules still need a model.
 
-### Modelled (20)
+### Modelled (19)
 
 | Module | Models (and their differentials) | Reason |
 | --- | --- | --- |
@@ -52,7 +52,6 @@ How a module moves from pending to modelled:
 | [`src/lasm-modules/ui-dom.mjs`](../src/lasm-modules/ui-dom.mjs) | [Decode.lean](../library/Lasm/UI/Proofs/Decode.lean) (the patch-frame reader; [ui-decode.mjs](../test/fuzz/targets/ui-decode.mjs)); [Applier.lean](../library/Lasm/UI/Proofs/Applier.lean) (apply (its DOM operations), node (hydration); [ui-applier-differential.mjs](../test/models/ui-applier-differential.mjs)) | the UI applier: its reading of patch frames is Lean's reference decoder (ui-decode, proved by Lasm.UI.Spec.frames_decode) and its DOM operations and hydration are the applier model (applier_correct, diff_conforms, applier_session, hydrate_correct proved; the differential runs it on happy-dom with the DOM standard's insertion checks); left out: events, commands, subscriptions and navigation (tested in test/ui-dom-applier.test.mjs and the browser suites) |
 | [`src/lean-io-errors.mjs`](../src/lean-io-errors.mjs) | [LeanIOErrors.lean](../verification/cli/Lasm/Cli/Model/LeanIOErrors.lean) (`leanAtLeast`, `leanIOError`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | leanAtLeast and the IO error policy leanIOError are modelled (lean_at_least_lexicographic proved), leanIOError with its tables (libuv's messages, Lean's CRT aliases, the Windows CRT cases: data, passed by the differential) and the host (platform, Node's errno names) parameters; checkLeanIOVersion is a list of reviewed releases and receiveSizeError a constant |
 | [`src/native-file-message.mjs`](../src/native-file-message.mjs) | [FileMessage.lean](../verification/cli/Lasm/Cli/Model/FileMessage.lean) (`encodeFileMessage`, `decodeFileMessage`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the whole codec is modelled, buffers by identity (a value's own or a copy) (file_message_transfers proved) |
-| [`src/package.mjs`](../src/package.mjs) | [Package.lean](../verification/cli/Lasm/Cli/Model/Package.lean) (`parsePackageArguments`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | its argument parsing is modelled (parse_known_or_refused proved); the rest packages a build (files, processes and archives), tested end to end |
 | [`src/platform.mjs`](../src/platform.mjs) | [Platform.lean](../verification/cli/Lasm/Cli/Model/Platform.lean) (`responseFile`, insideDirectory (path.posix.relative); [cli-differential.mjs](../test/models/cli-differential.mjs)) | responseFile and insideDirectory are modelled (response_file_round_trip and inside_directory_prefix proved), insideDirectory over POSIX paths with path.posix.relative checked by the differential; on Windows node:path's win32 rules apply instead (test/cli-parse.test.mjs); the rest is the host check and constants |
 | [`src/process-launcher.mjs`](../src/process-launcher.mjs) | [ProcessLauncher.lean](../verification/cli/Lasm/Cli/Model/ProcessLauncher.lean) (`encodeProcessConfiguration`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the configuration writer is modelled (launcher_config_round_trip proved with the reader's model); nativeProcessLauncher finds and verifies the shipped binary (files and hashes, test/cli-helpers.test.mjs) |
 | [`src/serverless/lasm-function.mjs`](../src/serverless/lasm-function.mjs) | [Model.lean](../verification/cli/Lasm/Serverless/Proofs/Model.lean) (`requestTarget`, `plainHost`, `joinCookies`, `outgoingHeaders`, `isTextual`, `webReply`, `parseSetCookie`, `azureReply`; [serverless-http.mjs](../test/fuzz/targets/serverless-http.mjs)) | the HTTP mapping is modelled; the rest starts the program once and calls its handler in-process |
@@ -61,7 +60,7 @@ How a module moves from pending to modelled:
 | [`src/wasi/lower-atomics.mjs`](../src/wasi/lower-atomics.mjs) | [LowerAtomics.lean](../verification/cli/Lasm/Cli/Model/LowerAtomics.lean) (`lowerAtomics`, `moduleImports`, `keepExports`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | the whole module is modelled (lowerAtomics with its readers, moduleImports, keepExports); candidates lowering_rewrites_atomics, lowering_leaves_no_atomics and lowering_keeps_runs are stated over the model, the last two also over WebAssembly validation and execution (outside semantics) |
 | [`src/wasi/wasi-component.mjs`](../src/wasi/wasi-component.mjs) | [WasiComponent.lean](../verification/cli/Lasm/Cli/Model/WasiComponent.lean) (`replaceCoreModule`, `placeholderModule`, `componentize`, `makeTemplate`, `extractCore`, `withoutComponentType`; [cli-differential.mjs](../test/models/cli-differential.mjs)) | every function runs as its Lean model, compiled by Lasm into the CLI's glue program (src/glue/glue.mjs, docs/proposals/M6_GLUE.md) through proved fast versions over byte arrays (verification/cli/Lasm/Cli/Fast/WasiComponent.lean, csimp theorems); what remains here is reading the template (component/proxy-template.wasm, an argument of the model) and taking any array of bytes, which the differential checks together with the compiled program; replace_one_core_module, drops_only_component_type and componentize_inverse proved |
 
-### Pending (28)
+### Pending (29)
 
 | Module | Models (and their differentials) | Reason |
 | --- | --- | --- |
@@ -91,10 +90,11 @@ How a module moves from pending to modelled:
 | [`src/project-modules.mjs`](../src/project-modules.mjs) | — | the project's JavaScript files (A6.1): pure over the binding records and the files, resolving each against its Lean file, the relative-import closure and the refusals; model it as BuiltinModules.lean models the builtin closure (tested in test/project-modules.test.mjs) |
 | [`src/step-output.mjs`](../src/step-output.mjs) | — | a failed step's reported output (stderr, then stdout, each once; issue #315): a pure function of two strings, to model |
 | [`src/tar.mjs`](../src/tar.mjs) | — | the tar reader and writer (tool archives, npm packages, the Fastly package): fuzzed against Python's tarfile, an independent implementation (test/fuzz/targets/tar.mjs); a Lean model of the reader's header and pax parsing is due (IRREDUCIBLE.md M4) |
+| [`src/target-stamp.mjs`](../src/target-stamp.mjs) | — | Lasm.target's stamp (the C source returning the target's index in buildTargets): a pure function of the target, checked against Lasm.Target's constructors by test/lasm-target.test.mjs and on every target by web-bindings.yml's target-report job; a Lean model is due with the CLI models |
 | [`src/wasm-objects.mjs`](../src/wasm-objects.mjs) | — | a reader of relocatable Wasm objects: pure |
 | [`src/web-availability.mjs`](../src/web-availability.mjs) | — | lasm build --target's web API check: pure over the program's C texts and the generated availability table; model the lookup |
 
-### Exempt (133)
+### Exempt (134)
 
 | Module | Kind | Reason |
 | --- | --- | --- |
@@ -120,7 +120,7 @@ How a module moves from pending to modelled:
 | [`src/application-support.mjs`](../src/application-support.mjs) | data | the supported Node and Lean releases |
 | [`src/browser/browser-build.mjs`](../src/browser/browser-build.mjs) | io | `lasm build --target browser`; orchestration of files, processes or the network: its effect is the behaviour, tested end to end |
 | [`src/browser/browser-dev.mjs`](../src/browser/browser-dev.mjs) | io | `lasm dev --target browser`; orchestration of files, processes or the network: its effect is the behaviour, tested end to end |
-| [`src/browser/browser-package.mjs`](../src/browser/browser-package.mjs) | io | `lasm package --target browser`; orchestration of files, processes or the network: its effect is the behaviour, tested end to end |
+| [`src/browser/browser-package.mjs`](../src/browser/browser-package.mjs) | io | checks a browser build against its manifest and writes _headers (lasm build --target browser); orchestration of files, processes or the network: its effect is the behaviour, tested end to end |
 | [`src/browser/loader.mjs`](../src/browser/loader.mjs) | runtime | the browser loader: instantiates the program; Lean's runtime primitives on this host: their meaning is native Lean's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) |
 | [`src/build-progress.mjs`](../src/build-progress.mjs) | io | progress reporting to the terminal |
 | [`src/cache-lifecycle.mjs`](../src/cache-lifecycle.mjs) | io | cache leases and cleanup; orchestration of files, processes or the network: its effect is the behaviour, tested end to end |
@@ -209,13 +209,14 @@ How a module moves from pending to modelled:
 | [`src/notices.mjs`](../src/notices.mjs) | data | license notices assembled from fixed texts |
 | [`src/npm-artifacts.mjs`](../src/npm-artifacts.mjs) | io | npm as an artifact source; orchestration of files, processes or the network: its effect is the behaviour, tested end to end |
 | [`src/output-directory.mjs`](../src/output-directory.mjs) | io | moves a finished output into place; orchestration of files, processes or the network: its effect is the behaviour, tested end to end |
+| [`src/package.mjs`](../src/package.mjs) | io | packages a function platform's build (lasm build --target <platform>); orchestration of files, processes or the network: its effect is the behaviour, tested end to end |
 | [`src/posix-arguments.mjs`](../src/posix-arguments.mjs) | runtime | Lean's runtime primitives on this host: their meaning is native Lean's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) |
 | [`src/process-exec.mjs`](../src/process-exec.mjs) | runtime | Lean's runtime primitives on this host: their meaning is native Lean's, checked by running the same programs on native Lean and on this target (differential testing and fuzzing, docs/TESTING.md) |
 | [`src/sdk-repairs.mjs`](../src/sdk-repairs.mjs) | io | repairs a downloaded SDK; orchestration of files, processes or the network: its effect is the behaviour, tested end to end |
 | [`src/serverless/lasm-azure.mjs`](../src/serverless/lasm-azure.mjs) | io | the Azure Functions entry: forwards to lasm-function.mjs, whose mapping is modelled |
 | [`src/serverless/lasm-gcf.mjs`](../src/serverless/lasm-gcf.mjs) | io | the Google Cloud Functions entry: forwards to lasm-function.mjs, whose mapping is modelled |
 | [`src/serverless/lasm-netlify.mjs`](../src/serverless/lasm-netlify.mjs) | io | the Netlify entry: forwards to lasm-function.mjs, whose mapping is modelled |
-| [`src/serverless/lasm-node-serve.mjs`](../src/serverless/lasm-node-serve.mjs) | io | re-exports src/lasm-modules/node-serve.mjs, the name the function shims import it by in the repository (`lasm package` copies node-serve.mjs itself under this name) |
+| [`src/serverless/lasm-node-serve.mjs`](../src/serverless/lasm-node-serve.mjs) | io | re-exports src/lasm-modules/node-serve.mjs, the name the function shims import it by in the repository (`lasm build --target` copies node-serve.mjs itself into function packages under this name) |
 | [`src/serverless/lasm-vercel.mjs`](../src/serverless/lasm-vercel.mjs) | io | the Vercel entry: forwards to lasm-function.mjs, whose mapping is modelled |
 | [`src/system-git.mjs`](../src/system-git.mjs) | io | runs the system git; orchestration of files, processes or the network: its effect is the behaviour, tested end to end |
 | [`src/test-switches.mjs`](../src/test-switches.mjs) | data | switches for Lasm's own tests |

@@ -105,7 +105,6 @@ def parse_known_or_refused : Prop :=
         (p.command = "build" → p.target ∈ buildTargets) ∧
         ((p.command = "build" ∨ p.command = "run") → p.input.endsWith ".lean" ∨ p.input.endsWith ".json") ∧
         (p.command = "init" → p.template ∈ templates ∧ ∀ d ∈ p.deploy, d ∈ deployTargets) ∧
-        (p.command = "package" → p.target ∈ packageTargets ∨ p.target = "browser") ∧
         (p.command = "dev" → ∀ o ∈ p.outputs, o.1 ∈ devTargets ∧ o.2.endsWith ".lean")
     | .error m => m.trimAscii.toString ≠ ""
 

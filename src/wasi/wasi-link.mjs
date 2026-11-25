@@ -28,6 +28,7 @@ import { emscriptenResponseFile } from '../link-driver/link.mjs';
 import { linkEvidenceDirectory, saveLinkEvidence, testUnoptimized } from '../test-switches.mjs';
 import { lowerAtomics, moduleImports, keepExports } from './lower-atomics.mjs';
 import { componentize, httpHandlerExport } from './wasi-component.mjs';
+import { targetStampObject, targetStampSource } from '../target-stamp.mjs';
 import { mimallocSettings, mimallocSources, mimallocClangArguments, mimallocUnits } from '../mimalloc/mimalloc.mjs';
 
 const here = fileURLToPath(new URL('./', import.meta.url));
@@ -139,6 +140,15 @@ export function linkWasiProgram({ toolchain, nodeRuntime, edge, linkWork, out, t
       '-O2', '-DNDEBUG', '-DLEAN_EMSCRIPTEN', '-DLASM_WASI_HTTP', '-ffunction-sections', '-fdata-sections',
       '-I', join(nodeRuntime.directory, 'include'), '-c', wasiHttpGlueSource, '-o', object]);
     objects.push(object);
+  }
+  // Lasm.target: the Node build's stamp is replaced by this target's (src/target-stamp.mjs).
+  const nodeStamp = inputs.findIndex(arg => basename(arg) === targetStampObject);
+  if (nodeStamp >= 0) {
+    const source = join(out, 'lasm-target.c'), object = join(out, targetStampObject);
+    writeFileSync(source, targetStampSource(target));
+    run('clang', ['-target', 'wasm64-unknown-emscripten', `--sysroot=${sysroot}`, '-O2', '-DNDEBUG', '-ffunction-sections', '-fdata-sections',
+      '-c', source, '-o', object]);
+    inputs[nodeStamp] = object;
   }
   const archive = name => edge.libraries[`lib${name}.a`] ?? join(nodeRuntime.directory, 'lib', `lib${name}.a`);
   const libraries = nodeRuntime.manifest.libraries.map(file => file.replace(/^lib\/lib(.+)\.a$/, '$1'))

@@ -241,8 +241,8 @@ test('static server: MIME types, precompressed files, caching, live reload', asy
   } finally { await server.close(); }
 });
 
-test('lasm package --target browser: checks the build against its manifest, writes _headers', async () => {
-  const { packageBrowser } = await import('../src/browser/browser-package.mjs');
+test('lasm build --target browser: checks its output against the manifest, writes _headers', async () => {
+  const { checkBrowserOutput } = await import('../src/browser/browser-package.mjs');
   const { brotliCompressSync, gzipSync } = await import('node:zlib');
   const { createHash } = await import('node:crypto');
   const directory = mkdtempSync(join(tmpdir(), 'lasm-package-'));
@@ -252,10 +252,8 @@ test('lasm package --target browser: checks the build against its manifest, writ
   writeFileSync(join(directory, 'app.0123456789ab.wasm.gz'), gzipSync(wasm));
   const manifest = { schema: 1, target: 'browser', entry: 'app.ba9876543210.js', wasm: 'app.0123456789ab.wasm', index: 'index.html', stableEntry: 'app.js',
     transfer: { brotli: 10 }, files: { 'app.0123456789ab.wasm': { bytes: 8, sha256, brotli: 1, gzip: 1 } } };
-  writeFileSync(join(directory, 'lasm-manifest.json'), JSON.stringify(manifest));
-  assert.equal(packageBrowser({ input: directory, log: () => {} }), 0);
+  checkBrowserOutput({ input: directory, manifest, log: () => {} });
   assert.match(readFileSync(join(directory, '_headers'), 'utf8'), /\/app\.0123456789ab\.wasm\n  Cache-Control: public, max-age=31536000, immutable\n  Content-Type: application\/wasm/);
   writeFileSync(join(directory, 'app.0123456789ab.wasm'), Buffer.from([1]));
-  assert.throws(() => packageBrowser({ input: directory, log: () => {} }), /changed since lasm build/);
-  assert.equal(parseLasmArguments(['package', 'dist', '--target', 'browser']).target, 'browser');
+  assert.throws(() => checkBrowserOutput({ input: directory, manifest, log: () => {} }), /does not match lasm-manifest\.json/);
 });

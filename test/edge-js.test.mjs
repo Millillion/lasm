@@ -7,6 +7,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createEdgeJs, describe, jsFailure, firstJsHandle } from '../src/edge/edge-js.mjs';
+import { jsProtocolVersion } from '../src/node-js.mjs';
 
 const enc = new TextEncoder(), dec = new TextDecoder('utf-8', { ignoreBOM: true });
 const cat = (...parts) => { const out = new Uint8Array(parts.reduce((n, p) => n + p.length, 0)); let o = 0; for (const p of parts) { out.set(p, o); o += p.length; } return out; };
@@ -71,9 +72,9 @@ function edge(options = {}) {
 }
 const settled = () => new Promise(resolve => setTimeout(resolve, 5));
 
-test('protocol: version 1, and the edge flag', () => {
+test('protocol: version 1, as the Node bridge answers (jsProtocolVersion)', () => {
   const { call } = edge();
-  assert.deepEqual([...new Uint32Array(call(200, 0, 0).slice().buffer)], [1, 1]);
+  assert.deepEqual([...new Uint32Array(call(200, 0, 0).slice().buffer)], [jsProtocolVersion]);
 });
 
 test('jsFailure and describe match the Node bridge', () => {

@@ -2,8 +2,9 @@
 Ledger on the function platforms (AWS Lambda .zip and container image, Vercel,
 Netlify, Azure Functions, Google Cloud Functions) with node:sqlite: the handler
 published with `exportDefault`, which the platform's generated file calls for
-each request (no HTTP server inside the function). `npm run build:function`,
-then `npm run build:lambda` (or `:vercel`, `:netlify`, `:azure`, `:gcf`).
+each request (no HTTP server inside the function). `npm run build:lambda` (or
+`:vercel`, `:netlify`, `:azure-functions`, `:cloud-functions`) builds it with
+`lasm build ServerFunction.lean --target <platform>`.
 -/
 import Lasm.JS
 import Server.App

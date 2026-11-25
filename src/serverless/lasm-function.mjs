@@ -2,7 +2,7 @@
 // process and calls the fetch handler it publishes with Lasm.JS.exportDefault
 // for each request: no HTTP server, no port, no loopback. Every platform shim
 // (AWS Lambda, Lambda@Edge, Vercel, Netlify, Azure Functions, Google Cloud
-// Functions) uses this file; `lasm package` copies it next to main.mjs, with
+// Functions) uses this file; `lasm build --target` copies it next to main.mjs, with
 // lasm-node-serve.mjs (src/lasm-modules/node-serve.mjs: Node req/res and web
 // Request/Response).
 //
