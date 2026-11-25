@@ -1,3 +1,0 @@
-## Testing
-
-- The Linux resource guard for CI and maintainer workloads (`scripts/full-lean/run-bounded.mjs`) counts the working set (memory.current less inactive file cache, as the kubelet and `docker stats` count it) toward its proactive budget, as the macOS and Windows guards already did. Page cache from the toolchains a build extracts had stopped Conduit's and Porter's Netlify Functions and Lambda builds on 16 GiB runners at 4.3 GiB, far below Netlify's 8 GiB build allowance. The kernel cap (MemoryMax) and the pressure and host-headroom stops are unchanged. SAM-served Lambda tests now use the digest-pinned image (`--skip-pull-image`) instead of asking public.ecr.aws for a newer one at every start.

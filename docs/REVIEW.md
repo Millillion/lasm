@@ -601,6 +601,13 @@ before; Workers uses the default export (`Lasm.JS.exportDefault`, D1 from
   `--target azure-functions` and `cloud-functions`, `@lasm/cli`'s exports
   narrowed with the new `@lasm/cli/lean`, and SQL NULL in the generated SQLite
   bindings. Each has a migration note ([0.10.0-notes.md](release/0.10.0-notes.md)).
+- [ ] **0.11.0's breaking changes (Stage 0 complete):** `lasm package` removed
+  for `lasm build --target` (the browser check moves into `lasm build --target
+  browser`, and Azure/Cloud Functions apps list their framework package
+  themselves), `Lasm.JS.onEdge` deleted for `Lasm.target`, `Lasm.JS.Class` and
+  `lasm:class` deleted, no hints for Lasm's old target names, and Lasm no
+  longer sets an elan override. Each has a one-line migration
+  ([0.11.0-notes.md](release/0.11.0-notes.md)).
 
 ### Process
 - [ ] **The browser dev-rebuild budget is 2.5 s, was 2 s (2026-11-09).** It

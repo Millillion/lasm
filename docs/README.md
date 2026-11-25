@@ -46,7 +46,7 @@ in the current release on npm (`npm view @lasm/cli version`).
 | [Installation hardening](INSTALLATION_HARDENING.md) | Retries, offline repair, proxies and private CAs |
 | [System Git](MANAGED_GIT.md) | Git for Lake dependencies |
 | [License audit](LICENSE_AUDIT.md) | Every distributed component and its license |
-| [Release notes](release/) | One file per release, `release/<version>-notes.md`, from 0.1.0 to 0.10.0; unreleased changes collect as one file per branch in `next/` between releases |
+| [Release notes](release/) | One file per release, `release/<version>-notes.md`, from 0.1.0 to 0.11.0; unreleased changes collect as one file per branch in `next/` between releases |
 
 ## 4. Deploy guides
 
