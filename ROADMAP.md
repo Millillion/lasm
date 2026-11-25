@@ -403,7 +403,7 @@ May interrupt any stage (Jordan, 2026-11-16).
   [docs/LEAN_UPGRADE.md](docs/LEAN_UPGRADE.md) on that branch. The two
   StackOverflow differences compare the advice text, not Lean's exact output
   (Jordan, 2026-11-16).
-- [x] The example apps move to `@lasm/cli` 0.10.0: all five pin it (Folio #363, Conduit #362, Porter #364, Ledger #367, Tandem #370).
+- [x] The example apps move to `@lasm/cli` 0.11.0: all five pin it (Folio #392, Conduit #393, Porter #395, Ledger #396, Tandem #397); 0.10.0 was Folio #363, Conduit #362, Porter #364, Ledger #367, Tandem #370.
 - Outside bug reports are fixed as they come.
 - Releases follow [docs/RELEASING.md](docs/RELEASING.md).
 
