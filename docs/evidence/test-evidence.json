@@ -1,9 +1,9 @@
 {
   "schema": 1,
   "about": "Lasm test evidence (scripts/evidence/page.mjs). \"ci\" holds what CI measured, read from the GitHub API at generatedAt; \"repository\" holds what is recorded in the repository and checked by CI on every change. Rendered as content/learn/test-evidence.md.",
-  "generatedAt": "2026-11-25T20:08:39.192Z",
+  "generatedAt": "2026-11-26T19:48:14.152Z",
   "repository": "Millillion/lasm",
-  "commit": "5f49e5b6bbb9ca9e84970c6052373cbfb99d0e43",
+  "commit": "22cfc10c203e3af29f885d00aaa408ff764cb9c7",
   "repository_facts": {
     "platformLevels": {
       "L0": "It builds",
@@ -303,7 +303,7 @@
     "quarantine": [],
     "quarantineHistory": {
       "days": 14,
-      "since": "2026-11-11",
+      "since": "2026-11-12",
       "commits": 0,
       "entries": []
     },
@@ -528,14 +528,22 @@
       {
         "id": "browser",
         "row": "Browsers",
-        "level": "L3",
+        "level": "L2",
         "levels": {
           "L0": "holds",
           "L1": "holds",
           "L2": "holds",
-          "L3": "holds"
+          "L3": "does not hold"
         },
-        "unmet": []
+        "unmet": [
+          {
+            "level": "L3",
+            "workflow": "folio-nightly.yml",
+            "job": "^fuzz-(chromium|firefox|webkit)$",
+            "why": "fuzz-webkit: failure; fuzz-firefox: failure",
+            "run": "https://github.com/Millillion/lasm/actions/runs/45827761026"
+          }
+        ]
       }
     ],
     "tiers": [
@@ -622,12 +630,12 @@
         "workflow": "ci-nightly.yml",
         "what": "the release suites: unit, browser, edge, Bun/Deno, WASI, UI, fullstack, dev loop, Lasm.JS stress",
         "run": {
-          "id": 45588213532,
-          "url": "https://github.com/Millillion/lasm/actions/runs/45588213532",
+          "id": 45791269623,
+          "url": "https://github.com/Millillion/lasm/actions/runs/45791269623",
           "event": "schedule",
           "branch": "main",
-          "date": "2026-11-25T10:09:50Z",
-          "conclusion": "success"
+          "date": "2026-11-26T09:54:40Z",
+          "conclusion": "failure"
         }
       },
       {
@@ -635,11 +643,11 @@
         "workflow": "nightly.yml",
         "what": "the upstream Lean suite and the ecosystem",
         "run": {
-          "id": 45670490324,
-          "url": "https://github.com/Millillion/lasm/actions/runs/45670490324",
+          "id": 45870360127,
+          "url": "https://github.com/Millillion/lasm/actions/runs/45870360127",
           "event": "schedule",
           "branch": "main",
-          "date": "2026-11-25T18:03:03Z",
+          "date": "2026-11-26T17:48:43Z",
           "conclusion": "failure"
         }
       },
@@ -648,12 +656,12 @@
         "workflow": "differential.yml",
         "what": "60-minute differential campaigns, both profiles; macOS jobs",
         "run": {
-          "id": 45624813028,
-          "url": "https://github.com/Millillion/lasm/actions/runs/45624813028",
+          "id": 45826924131,
+          "url": "https://github.com/Millillion/lasm/actions/runs/45826924131",
           "event": "schedule",
           "branch": "main",
-          "date": "2026-11-25T14:43:22Z",
-          "conclusion": "failure"
+          "date": "2026-11-26T14:22:40Z",
+          "conclusion": "success"
         }
       },
       {
@@ -661,11 +669,11 @@
         "workflow": "fuzz.yml",
         "what": "boundary fuzzing campaigns",
         "run": {
-          "id": 45604225613,
-          "url": "https://github.com/Millillion/lasm/actions/runs/45604225613",
+          "id": 45806376625,
+          "url": "https://github.com/Millillion/lasm/actions/runs/45806376625",
           "event": "schedule",
           "branch": "main",
-          "date": "2026-11-25T11:57:52Z",
+          "date": "2026-11-26T11:32:27Z",
           "conclusion": "failure"
         }
       },
@@ -674,11 +682,11 @@
         "workflow": "mutation.yml",
         "what": "mutation testing of every module",
         "run": {
-          "id": 45650271960,
-          "url": "https://github.com/Millillion/lasm/actions/runs/45650271960",
+          "id": 45851883561,
+          "url": "https://github.com/Millillion/lasm/actions/runs/45851883561",
           "event": "schedule",
           "branch": "main",
-          "date": "2026-11-25T17:02:37Z",
+          "date": "2026-11-26T16:37:39Z",
           "conclusion": "success"
         }
       },
@@ -687,11 +695,11 @@
         "workflow": "dst-nightly.yml",
         "what": "deterministic simulation of the example apps, random seeds",
         "run": {
-          "id": 45620522489,
-          "url": "https://github.com/Millillion/lasm/actions/runs/45620522489",
+          "id": 45823089550,
+          "url": "https://github.com/Millillion/lasm/actions/runs/45823089550",
           "event": "schedule",
           "branch": "main",
-          "date": "2026-11-25T13:40:27Z",
+          "date": "2026-11-26T13:20:06Z",
           "conclusion": "success"
         }
       },
@@ -700,11 +708,11 @@
         "workflow": "bridge-verification.yml",
         "what": "host bridge: model and schedule fuzzing on four platforms",
         "run": {
-          "id": 45618446275,
-          "url": "https://github.com/Millillion/lasm/actions/runs/45618446275",
+          "id": 45820830187,
+          "url": "https://github.com/Millillion/lasm/actions/runs/45820830187",
           "event": "schedule",
           "branch": "main",
-          "date": "2026-11-25T13:42:01Z",
+          "date": "2026-11-26T13:19:59Z",
           "conclusion": "success"
         }
       },
@@ -713,11 +721,11 @@
         "workflow": "tooling.yml",
         "what": "tooling metamorphic builds and fault injection",
         "run": {
-          "id": 45646537214,
-          "url": "https://github.com/Millillion/lasm/actions/runs/45646537214",
+          "id": 45846194845,
+          "url": "https://github.com/Millillion/lasm/actions/runs/45846194845",
           "event": "schedule",
           "branch": "main",
-          "date": "2026-11-25T15:56:21Z",
+          "date": "2026-11-26T15:30:14Z",
           "conclusion": "success"
         }
       },
@@ -726,12 +734,12 @@
         "workflow": "folio-nightly.yml",
         "what": "Folio campaign",
         "run": {
-          "id": 45625954022,
-          "url": "https://github.com/Millillion/lasm/actions/runs/45625954022",
+          "id": 45827761026,
+          "url": "https://github.com/Millillion/lasm/actions/runs/45827761026",
           "event": "schedule",
           "branch": "main",
-          "date": "2026-11-25T14:22:31Z",
-          "conclusion": "success"
+          "date": "2026-11-26T14:00:13Z",
+          "conclusion": "failure"
         }
       },
       {
@@ -739,11 +747,11 @@
         "workflow": "porter-nightly.yml",
         "what": "Porter campaign",
         "run": {
-          "id": 45624055634,
-          "url": "https://github.com/Millillion/lasm/actions/runs/45624055634",
+          "id": 45826144837,
+          "url": "https://github.com/Millillion/lasm/actions/runs/45826144837",
           "event": "schedule",
           "branch": "main",
-          "date": "2026-11-25T14:13:54Z",
+          "date": "2026-11-26T13:51:24Z",
           "conclusion": "success"
         }
       },
@@ -752,11 +760,11 @@
         "workflow": "tandem-nightly.yml",
         "what": "Tandem campaign",
         "run": {
-          "id": 45647980259,
-          "url": "https://github.com/Millillion/lasm/actions/runs/45647980259",
+          "id": 45848520376,
+          "url": "https://github.com/Millillion/lasm/actions/runs/45848520376",
           "event": "schedule",
           "branch": "main",
-          "date": "2026-11-25T16:30:17Z",
+          "date": "2026-11-26T16:11:38Z",
           "conclusion": "success"
         }
       },
@@ -765,11 +773,11 @@
         "workflow": "installation-confidence.yml",
         "what": "cold installation on every platform",
         "run": {
-          "id": 45617758424,
-          "url": "https://github.com/Millillion/lasm/actions/runs/45617758424",
+          "id": 45820132402,
+          "url": "https://github.com/Millillion/lasm/actions/runs/45820132402",
           "event": "schedule",
           "branch": "main",
-          "date": "2026-11-25T13:31:57Z",
+          "date": "2026-11-26T12:53:11Z",
           "conclusion": "success"
         }
       },
@@ -802,36 +810,90 @@
     ],
     "mutation": {
       "run": {
-        "id": 45650271960,
-        "url": "https://github.com/Millillion/lasm/actions/runs/45650271960",
+        "id": 45851883561,
+        "url": "https://github.com/Millillion/lasm/actions/runs/45851883561",
         "event": "schedule",
         "branch": "main",
-        "date": "2026-11-25T17:02:37Z",
+        "date": "2026-11-26T16:37:39Z",
         "conclusion": "success"
       },
       "modules": [
         {
+          "name": "module (build-service)",
+          "conclusion": "success",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350601",
+          "module": "build-service",
+          "score": 94.3,
+          "mutants": 464,
+          "threshold": 94
+        },
+        {
+          "name": "module (application-sources)",
+          "conclusion": "success",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350634",
+          "module": "application-sources",
+          "score": 85,
+          "mutants": 4006,
+          "threshold": 85
+        },
+        {
+          "name": "module (link-driver)",
+          "conclusion": "success",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350638",
+          "module": "link-driver",
+          "score": 93,
+          "mutants": 3288,
+          "threshold": 93
+        },
+        {
           "name": "module (ui-dom)",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45650271960/job/139332795643",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350662",
           "module": "ui-dom",
           "score": 94.1,
           "mutants": 749,
           "threshold": 93
         },
         {
-          "name": "module (edge-glue)",
+          "name": "module (cli)",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45650271960/job/139332795666",
-          "module": "edge-glue",
-          "score": 97.1,
-          "mutants": 1355,
-          "threshold": 97
+          "url": "https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350688",
+          "module": "cli",
+          "score": 95.8,
+          "mutants": 1722,
+          "threshold": 95
+        },
+        {
+          "name": "module (dev)",
+          "conclusion": "success",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350699",
+          "module": "dev",
+          "score": 92.1,
+          "mutants": 1621,
+          "threshold": 91
+        },
+        {
+          "name": "module (toolchains)",
+          "conclusion": "success",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350702",
+          "module": "toolchains",
+          "score": 89.3,
+          "mutants": 1676,
+          "threshold": 89
+        },
+        {
+          "name": "module (browser)",
+          "conclusion": "success",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350703",
+          "module": "browser",
+          "score": 96.1,
+          "mutants": 1334,
+          "threshold": 96
         },
         {
           "name": "module (target-link)",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45650271960/job/139332795687",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350705",
           "module": "target-link",
           "score": 91.1,
           "mutants": 2184,
@@ -840,432 +902,378 @@
         {
           "name": "module (tar)",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45650271960/job/139332795700",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350714",
           "module": "tar",
           "score": 90.6,
-          "mutants": 869,
+          "mutants": 870,
           "threshold": 90
         },
         {
           "name": "module (host-bridge)",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45650271960/job/139332795701",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350734",
           "module": "host-bridge",
           "score": 96.6,
           "mutants": 895,
           "threshold": 96
         },
         {
-          "name": "module (dev)",
+          "name": "module (wasi-build)",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45650271960/job/139332795708",
-          "module": "dev",
-          "score": 91.9,
-          "mutants": 1621,
-          "threshold": 91
-        },
-        {
-          "name": "module (build-service)",
-          "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45650271960/job/139332795726",
-          "module": "build-service",
-          "score": 94.3,
-          "mutants": 464,
-          "threshold": 94
-        },
-        {
-          "name": "module (project-files)",
-          "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45650271960/job/139332795759",
-          "module": "project-files",
-          "score": 100,
-          "mutants": 166,
-          "threshold": 100
-        },
-        {
-          "name": "module (toolchains)",
-          "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45650271960/job/139332795769",
-          "module": "toolchains",
-          "score": 89.3,
-          "mutants": 1676,
-          "threshold": 89
-        },
-        {
-          "name": "module (serverless)",
-          "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45650271960/job/139332795778",
-          "module": "serverless",
-          "score": 89.8,
-          "mutants": 845,
-          "threshold": 88
-        },
-        {
-          "name": "module (cli)",
-          "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45650271960/job/139332795794",
-          "module": "cli",
-          "score": 95.8,
-          "mutants": 1722,
+          "url": "https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350739",
+          "module": "wasi-build",
+          "score": 95.7,
+          "mutants": 938,
           "threshold": 95
-        },
-        {
-          "name": "module (link-driver)",
-          "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45650271960/job/139332795795",
-          "module": "link-driver",
-          "score": 93,
-          "mutants": 3288,
-          "threshold": 93
-        },
-        {
-          "name": "module (init)",
-          "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45650271960/job/139332795796",
-          "module": "init",
-          "score": 97.7,
-          "mutants": 965,
-          "threshold": 97
-        },
-        {
-          "name": "module (native-files)",
-          "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45650271960/job/139332795805",
-          "module": "native-files",
-          "score": 88.6,
-          "mutants": 1805,
-          "threshold": 88
-        },
-        {
-          "name": "module (application-sources)",
-          "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45650271960/job/139332795811",
-          "module": "application-sources",
-          "score": 85,
-          "mutants": 4006,
-          "threshold": 85
-        },
-        {
-          "name": "module (edge-build)",
-          "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45650271960/job/139332795812",
-          "module": "edge-build",
-          "score": 90.1,
-          "mutants": 1200,
-          "threshold": 89
-        },
-        {
-          "name": "module (node-host)",
-          "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45650271960/job/139332795817",
-          "module": "node-host",
-          "score": 86,
-          "mutants": 3800,
-          "threshold": 86
         },
         {
           "name": "module (application-output)",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45650271960/job/139332795830",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350743",
           "module": "application-output",
           "score": 92.2,
           "mutants": 2155,
           "threshold": 92
         },
         {
-          "name": "module (node-serve)",
+          "name": "module (init)",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45650271960/job/139332795836",
-          "module": "node-serve",
-          "score": 80.6,
-          "mutants": 392,
-          "threshold": 80
+          "url": "https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350792",
+          "module": "init",
+          "score": 97.7,
+          "mutants": 965,
+          "threshold": 97
+        },
+        {
+          "name": "module (edge-build)",
+          "conclusion": "success",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350808",
+          "module": "edge-build",
+          "score": 90.1,
+          "mutants": 1200,
+          "threshold": 89
         },
         {
           "name": "module (downloads)",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45650271960/job/139332795853",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350811",
           "module": "downloads",
           "score": 89.8,
           "mutants": 2408,
           "threshold": 89
         },
         {
+          "name": "module (node-serve)",
+          "conclusion": "success",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350830",
+          "module": "node-serve",
+          "score": 80.6,
+          "mutants": 392,
+          "threshold": 80
+        },
+        {
+          "name": "module (serverless)",
+          "conclusion": "success",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350854",
+          "module": "serverless",
+          "score": 89.8,
+          "mutants": 845,
+          "threshold": 88
+        },
+        {
+          "name": "module (node-host)",
+          "conclusion": "success",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350862",
+          "module": "node-host",
+          "score": 86,
+          "mutants": 3800,
+          "threshold": 86
+        },
+        {
+          "name": "module (edge-glue)",
+          "conclusion": "success",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350900",
+          "module": "edge-glue",
+          "score": 97.1,
+          "mutants": 1355,
+          "threshold": 97
+        },
+        {
           "name": "module (notices)",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45650271960/job/139332795854",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350924",
           "module": "notices",
           "score": 91.5,
           "mutants": 475,
           "threshold": 91
         },
         {
-          "name": "module (wasi-build)",
+          "name": "module (project-files)",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45650271960/job/139332795876",
-          "module": "wasi-build",
-          "score": 95.7,
-          "mutants": 937,
-          "threshold": 95
+          "url": "https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350998",
+          "module": "project-files",
+          "score": 100,
+          "mutants": 166,
+          "threshold": 100
         },
         {
-          "name": "module (browser)",
+          "name": "module (native-files)",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45650271960/job/139332795878",
-          "module": "browser",
-          "score": 96.1,
-          "mutants": 1334,
-          "threshold": 96
+          "url": "https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020351057",
+          "module": "native-files",
+          "score": 88.5,
+          "mutants": 1804,
+          "threshold": 88
         }
       ]
     },
     "fuzz": {
       "run": {
-        "id": 45604225613,
-        "url": "https://github.com/Millillion/lasm/actions/runs/45604225613",
+        "id": 45806376625,
+        "url": "https://github.com/Millillion/lasm/actions/runs/45806376625",
         "event": "schedule",
         "branch": "main",
-        "date": "2026-11-25T11:57:52Z",
+        "date": "2026-11-26T11:32:27Z",
         "conclusion": "failure"
       },
       "targets": [
         {
+          "name": "Fuzz ui-decode",
+          "conclusion": "failure",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45806376625/job/139862703818",
+          "seconds": 600,
+          "seed": 709220038,
+          "runs": 349428,
+          "ok": false
+        },
+        {
+          "name": "Fuzz ui-patch",
+          "conclusion": "success",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45806376625/job/139862703876",
+          "seconds": 600,
+          "seed": 709220038,
+          "runs": 270882,
+          "ok": true
+        },
+        {
           "name": "Fuzz cli-arguments",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45604225613/job/139170822500",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45806376625/job/139862703920",
           "seconds": 600,
-          "seed": 507069026,
-          "runs": 934619,
-          "ok": true
-        },
-        {
-          "name": "Fuzz edge-request",
-          "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45604225613/job/139170822553",
-          "seconds": 600,
-          "seed": 507069026,
-          "runs": 51021,
-          "ok": true
-        },
-        {
-          "name": "Fuzz lasm-js-wire",
-          "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45604225613/job/139170822571",
-          "seconds": 600,
-          "seed": 507069026,
-          "runs": 179823,
+          "seed": 709220038,
+          "runs": 711557,
           "ok": true
         },
         {
           "name": "Fuzz serverless-http",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45604225613/job/139170822590",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45806376625/job/139862703923",
           "seconds": 600,
-          "seed": 507069026,
-          "runs": 261591,
+          "seed": 709220038,
+          "runs": 259570,
           "ok": true
         },
         {
-          "name": "Fuzz ui-patch",
+          "name": "Fuzz dev-proxy",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45604225613/job/139170822605",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45806376625/job/139862703959",
           "seconds": 600,
-          "seed": 507069026,
-          "runs": 291617,
+          "seed": 709220038,
+          "runs": 345190,
           "ok": true
         },
         {
-          "name": "Fuzz lean-js-wire",
+          "name": "Fuzz lasm-js-wire",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45604225613/job/139170822612",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45806376625/job/139862703982",
           "seconds": 600,
-          "seed": 507069026,
-          "runs": 8652925,
+          "seed": 709220038,
+          "runs": 172229,
+          "ok": true
+        },
+        {
+          "name": "Fuzz edge-request",
+          "conclusion": "success",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45806376625/job/139862703986",
+          "seconds": 600,
+          "seed": 709220038,
+          "runs": 58231,
           "ok": true
         },
         {
           "name": "Fuzz project-files",
           "conclusion": "failure",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45604225613/job/139170822626",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45806376625/job/139862703998",
           "seconds": 600,
-          "seed": 507069026,
-          "runs": 1473,
+          "seed": 709220038,
+          "runs": 8382,
           "ok": false
-        },
-        {
-          "name": "Fuzz dev-proxy",
-          "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45604225613/job/139170822669",
-          "seconds": 600,
-          "seed": 507069026,
-          "runs": 461574,
-          "ok": true
         },
         {
           "name": "Fuzz tar",
           "conclusion": "failure",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45604225613/job/139170822834",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45806376625/job/139862704030",
           "seconds": 600,
-          "seed": 507069026,
-          "runs": 182165,
+          "seed": 709220038,
+          "runs": 20173,
           "ok": false
         },
         {
-          "name": "Fuzz ui-decode",
+          "name": "Fuzz lean-js-wire",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45604225613/job/139170823086",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45806376625/job/139862704242",
           "seconds": 600,
-          "seed": 507069026,
-          "runs": 240384,
+          "seed": 709220038,
+          "runs": 25823860,
           "ok": true
         }
       ]
     },
     "dst": {
       "run": {
-        "id": 45620522489,
-        "url": "https://github.com/Millillion/lasm/actions/runs/45620522489",
+        "id": 45823089550,
+        "url": "https://github.com/Millillion/lasm/actions/runs/45823089550",
         "event": "schedule",
         "branch": "main",
-        "date": "2026-11-25T13:40:27Z",
+        "date": "2026-11-26T13:20:06Z",
         "conclusion": "success"
       },
       "apps": [
         {
-          "name": "tandem, random seeds",
-          "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45620522489/job/139227177495",
-          "phases": [
-            {
-              "seeds": 342,
-              "failing": 0
-            },
-            {
-              "seeds": 169,
-              "failing": 0
-            }
-          ],
-          "seeds": 511,
-          "failing": 0
-        },
-        {
           "name": "ledger on headless WebKit, random seeds",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45620522489/job/139227177603",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45823089550/job/139920188306",
           "phases": [
             {
-              "seeds": 431,
+              "seeds": 598,
               "failing": 0
             }
           ],
-          "seeds": 431,
+          "seeds": 598,
           "failing": 0
         },
         {
           "name": "ledger on headless Chromium, random seeds",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45620522489/job/139227177606",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45823089550/job/139920188319",
           "phases": [
             {
-              "seeds": 471,
+              "seeds": 527,
               "failing": 0
             }
           ],
-          "seeds": 471,
+          "seeds": 527,
           "failing": 0
         },
         {
-          "name": "ledger on headless Firefox, random seeds",
+          "name": "tandem, random seeds",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45620522489/job/139227177705",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45823089550/job/139920188322",
           "phases": [
             {
-              "seeds": 396,
-              "failing": 0
-            }
-          ],
-          "seeds": 396,
-          "failing": 0
-        },
-        {
-          "name": "ledger, random seeds",
-          "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45620522489/job/139227177752",
-          "phases": [
-            {
-              "seeds": 7461,
+              "seeds": 431,
               "failing": 0
             },
             {
-              "seeds": 6080,
+              "seeds": 279,
               "failing": 0
             }
           ],
-          "seeds": 13541,
+          "seeds": 710,
           "failing": 0
         },
         {
           "name": "ledger on Cloudflare Workers (wrangler dev), random seeds",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45620522489/job/139227177850",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45823089550/job/139920188344",
           "phases": [
             {
-              "seeds": 672,
+              "seeds": 613,
               "failing": 0
             }
           ],
-          "seeds": 672,
+          "seeds": 613,
+          "failing": 0
+        },
+        {
+          "name": "ledger, random seeds",
+          "conclusion": "success",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45823089550/job/139920188370",
+          "phases": [
+            {
+              "seeds": 7402,
+              "failing": 0
+            },
+            {
+              "seeds": 5977,
+              "failing": 0
+            }
+          ],
+          "seeds": 13379,
           "failing": 0
         },
         {
           "name": "porter, random seeds",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45620522489/job/139227178105",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45823089550/job/139920188478",
           "phases": [
             {
-              "seeds": 6874,
+              "seeds": 7419,
               "failing": 0
             },
             {
-              "seeds": 3855,
+              "seeds": 3994,
               "failing": 0
             }
           ],
-          "seeds": 10729,
+          "seeds": 11413,
+          "failing": 0
+        },
+        {
+          "name": "ledger on headless Firefox, random seeds",
+          "conclusion": "success",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45823089550/job/139920188560",
+          "phases": [
+            {
+              "seeds": 400,
+              "failing": 0
+            }
+          ],
+          "seeds": 400,
           "failing": 0
         }
       ]
     },
     "differential": {
       "run": {
-        "id": 45624813028,
-        "url": "https://github.com/Millillion/lasm/actions/runs/45624813028",
+        "id": 45826924131,
+        "url": "https://github.com/Millillion/lasm/actions/runs/45826924131",
         "event": "schedule",
         "branch": "main",
-        "date": "2026-11-25T14:43:22Z",
-        "conclusion": "failure"
+        "date": "2026-11-26T14:22:40Z",
+        "conclusion": "success"
       },
       "jobs": [
         {
           "name": "differential (dev)",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45624813028/job/139243361742",
-          "programs": 40,
-          "cases": 4440,
+          "url": "https://github.com/Millillion/lasm/actions/runs/45826924131/job/139934628630",
+          "programs": 60,
+          "cases": 6660,
           "divergences": 0,
           "harnessErrors": 0,
           "coverage": {
-            "features": 15742,
-            "runtimeC": 14514,
-            "glue": 1228,
-            "new": 1074,
-            "newRuntimeC": 1074,
+            "features": 18871,
+            "runtimeC": 17645,
+            "glue": 1226,
+            "new": 1610,
+            "newRuntimeC": 1610,
             "newGlue": 0,
-            "newFromMutants": 181,
-            "newFromGenerated": 893,
-            "cumulative": 59135,
+            "newFromMutants": 272,
+            "newFromGenerated": 1338,
+            "cumulative": 60745,
             "corpus": 400,
-            "mutants": 304,
+            "mutants": 456,
             "nights": [
               {
                 "date": "2026-11-12",
@@ -1326,6 +1334,11 @@
                 "date": "2026-11-25",
                 "new": 1074,
                 "cumulative": 59135
+              },
+              {
+                "date": "2026-11-26",
+                "new": 1610,
+                "cumulative": 60745
               }
             ]
           }
@@ -1333,21 +1346,21 @@
         {
           "name": "differential (release)",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45624813028/job/139243361769",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45826924131/job/139934628960",
           "programs": 45,
           "cases": 4995,
           "divergences": 0,
           "harnessErrors": 0,
           "coverage": {
-            "features": 16029,
-            "runtimeC": 14802,
+            "features": 16647,
+            "runtimeC": 15420,
             "glue": 1227,
-            "new": 1426,
-            "newRuntimeC": 1426,
+            "new": 1550,
+            "newRuntimeC": 1550,
             "newGlue": 0,
-            "newFromMutants": 203,
-            "newFromGenerated": 1223,
-            "cumulative": 54364,
+            "newFromMutants": 243,
+            "newFromGenerated": 1307,
+            "cumulative": 55914,
             "corpus": 400,
             "mutants": 342,
             "nights": [
@@ -1410,6 +1423,11 @@
                 "date": "2026-11-25",
                 "new": 1426,
                 "cumulative": 54364
+              },
+              {
+                "date": "2026-11-26",
+                "new": 1550,
+                "cumulative": 55914
               }
             ]
           }
@@ -1556,18 +1574,18 @@
     },
     "coverage": {
       "run": {
-        "id": 45588213532,
-        "url": "https://github.com/Millillion/lasm/actions/runs/45588213532",
+        "id": 45791269623,
+        "url": "https://github.com/Millillion/lasm/actions/runs/45791269623",
         "event": "schedule",
         "branch": "main",
-        "date": "2026-11-25T10:09:50Z",
-        "conclusion": "success"
+        "date": "2026-11-26T09:54:40Z",
+        "conclusion": "failure"
       },
       "jobs": [
         {
           "name": "unit / unit",
           "conclusion": "success",
-          "url": "https://github.com/Millillion/lasm/actions/runs/45588213532/job/139115339554",
+          "url": "https://github.com/Millillion/lasm/actions/runs/45791269623/job/139810749136",
           "lines": 98.29,
           "branches": 96.98,
           "functions": 97.97,
@@ -1580,9 +1598,9 @@
     },
     "campaigns": {
       "nights": 0,
-      "endedOn": "2026-11-25",
-      "why": "differential.yml failure; fuzz.yml failure",
-      "run": "https://github.com/Millillion/lasm/actions/runs/45624813028"
+      "endedOn": "2026-11-26",
+      "why": "fuzz.yml failure",
+      "run": "https://github.com/Millillion/lasm/actions/runs/45806376625"
     },
     "apps": [
       {
@@ -1825,7 +1843,7 @@
       "item": 1,
       "name": "Platforms",
       "status": "not met",
-      "measured": "3 of 13 platforms at L3 (not: Bun / Deno at L2, Vercel Functions / Vercel Edge at L2, Netlify Functions / Netlify Edge at L2, Deno Deploy at L2, Supabase Edge Functions at no level, AWS Lambda at no level, Azure Functions at L2, Google Cloud Functions at L2, Fastly Compute at L2, WASI / wasi-http / Spin at L2)"
+      "measured": "2 of 13 platforms at L3 (not: Bun / Deno at L2, Vercel Functions / Vercel Edge at L2, Netlify Functions / Netlify Edge at L2, Deno Deploy at L2, Supabase Edge Functions at no level, AWS Lambda at no level, Azure Functions at L2, Google Cloud Functions at L2, Fastly Compute at L2, WASI / wasi-http / Spin at L2, Browsers at L2)"
     },
     {
       "item": 2,
@@ -1843,13 +1861,13 @@
       "item": 4,
       "name": "Campaigns",
       "status": "observed",
-      "measured": "0 of 30 consecutive clean nights of `differential.yml`, `fuzz.yml`, `dst-nightly.yml`; ended on 2026-11-25: differential.yml failure; fuzz.yml failure"
+      "measured": "0 of 30 consecutive clean nights of `differential.yml`, `fuzz.yml`, `dst-nightly.yml`; ended on 2026-11-26: fuzz.yml failure"
     },
     {
       "item": 5,
       "name": "Flakes",
       "status": "met",
-      "measured": "no test is quarantined, and none was since 2026-11-11 (test/quarantine.json's git history)"
+      "measured": "no test is quarantined, and none was since 2026-11-12 (test/quarantine.json's git history)"
     },
     {
       "item": 6,
@@ -1867,7 +1885,7 @@
       "item": 8,
       "name": "Differential fuzzing",
       "status": "met",
-      "measured": "model differentials in CI: `serverless-http`, `ui-decode`, `lasm-js-wire`, `project-files`; generated feature programs: yes; coverage feedback: the latest nightly campaign reached 15,742 features in (dev) (1,074 new, 181 of them by mutants of the corpus) and 16,029 features in (release) (1,426 new, 203 of them by mutants of the corpus); generated: `Thunk`, `ST`, `FloatArray`, structures with many fields"
+      "measured": "model differentials in CI: `serverless-http`, `ui-decode`, `lasm-js-wire`, `project-files`; generated feature programs: yes; coverage feedback: the latest nightly campaign reached 18,871 features in (dev) (1,610 new, 272 of them by mutants of the corpus) and 16,647 features in (release) (1,550 new, 243 of them by mutants of the corpus); generated: `Thunk`, `ST`, `FloatArray`, structures with many fields"
     }
   ]
 }
