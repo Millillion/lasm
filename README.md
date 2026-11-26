@@ -32,13 +32,13 @@ account, so "tested" means the platform's local tooling, not production
 | Vercel Functions / Vercel Edge | `vercel` / `vercel-edge` | `vercel build` offline; Lambda Node 24 image; Vercel's `edge-runtime` | 0.1.0 / 0.2.0 | L2 |
 | Netlify Functions / Netlify Edge | `netlify` / `netlify-edge` | `netlify build` and `netlify dev`, offline | 0.1.0 / 0.2.0 | L2 |
 | Deno Deploy | `deno-deploy` | Deno 2.9.6 | 0.2.0 | L2 |
-| Supabase Edge Functions | `supabase-edge` | Supabase's `edge-runtime` image | 0.2.0 | L2 |
-| AWS Lambda (.zip or container) / Lambda@Edge | `lambda` / `lambda-edge` | `public.ecr.aws/lambda/nodejs:24` via the Runtime Interface Emulator, x86_64 and arm64; `sam local` | 0.1.0 | L2 |
+| Supabase Edge Functions | `supabase-edge` | Supabase's `edge-runtime` image | 0.2.0 | — |
+| AWS Lambda (.zip or container) / Lambda@Edge | `lambda` / `lambda-edge` | `public.ecr.aws/lambda/nodejs:24` via the Runtime Interface Emulator, x86_64 and arm64; `sam local` | 0.1.0 | — |
 | Azure Functions | `azure-functions` | Azure Functions Core Tools `func start` | 0.1.0 | L2 |
 | Google Cloud Functions (gen2) | `cloud-functions` | Functions Framework; Google Cloud's buildpacks image | 0.1.0 | L2 |
 | Fastly Compute | `fastly` | Viceroy 0.21.1 | 0.3.0 | L2 |
 | WASI / wasi-http / Spin | `wasi` / `wasi-http` | wasmtime 49 (`run`, `serve`), wasmer 7.4, `node:wasi`, Spin 4.2 | 0.3.0 | L2 |
-| Browsers | `browser` (or the Vite plugin) | Playwright: Chromium, Firefox and WebKit (Linux and macOS) | 0.3.0 | L3 |
+| Browsers | `browser` (or the Vite plugin) | Playwright: Chromium, Firefox and WebKit (Linux and macOS) | 0.3.0 | L2 |
 
 How well tested, generated from CI ([how](docs/TESTING.md#evidence-levels)): **L0** it builds; **L1** its smoke tests pass; **L2** its output matches Node's across the differential tests, and the platform's own conformance suites pass; **L3** a full example app also passes an independent test suite, plus fuzzing and simulation.
 <!-- evidence-levels:end -->
