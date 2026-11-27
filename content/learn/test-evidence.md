@@ -11,7 +11,7 @@ sources:
 aiGenerated: true
 ---
 
-> **Generated** by [`scripts/evidence/page.mjs`](../../scripts/evidence/page.mjs) at **2026-11-26 19:48:14 UTC** from commit `22cfc10c20`, and regenerated Monday to Saturday by [`evidence-page.yml`](../../.github/workflows/evidence-page.yml). Do not edit it by hand. The same facts, machine-readable: [`test-evidence.json`](../../docs/evidence/test-evidence.json).
+> **Generated** by [`scripts/evidence/page.mjs`](../../scripts/evidence/page.mjs) at **2026-11-27 19:38:06 UTC** from commit `5b48b446ef`, and regenerated Monday to Saturday by [`evidence-page.yml`](../../.github/workflows/evidence-page.yml). Do not edit it by hand. The same facts, machine-readable: [`test-evidence.json`](../../docs/evidence/test-evidence.json).
 
 This page collects the evidence behind Lasm in one place. Each section has two parts:
 
@@ -26,14 +26,14 @@ How each layer works, and what it cannot catch, is in [How Lasm is tested](../..
 
 | # | Item | Status | Measured |
 | --- | --- | --- | --- |
-| 1 | Platforms | **not met** | 2 of 13 platforms at L3 (not: Bun / Deno at L2, Vercel Functions / Vercel Edge at L2, Netlify Functions / Netlify Edge at L2, Deno Deploy at L2, Supabase Edge Functions at no level, AWS Lambda at no level, Azure Functions at L2, Google Cloud Functions at L2, Fastly Compute at L2, WASI / wasi-http / Spin at L2, Browsers at L2) |
+| 1 | Platforms | **not met** | 0 of 13 platforms at L3 (not: Node.js 24+ at L1, Bun / Deno at L1, Cloudflare Workers at L1, Vercel Functions / Vercel Edge at L1, Netlify Functions / Netlify Edge at L1, Deno Deploy at L1, Supabase Edge Functions at no level, AWS Lambda at no level, Azure Functions at L1, Google Cloud Functions at L1, Fastly Compute at L1, WASI / wasi-http / Spin at L1, Browsers at L1) |
 | 2 | Mutation | **met** | 23 of 23 modules passed at 80 % or more in the latest nightly run (lowest 80.6 %) |
 | 3 | Coverage | **met** | 98.29 % of lines (139 files; the goal is 75 %); all 2 files at 0 % are named with the integration workflows that run them (docs/evidence/coverage-baseline.json) |
-| 4 | Campaigns | **observed** | 0 of 30 consecutive clean nights of `differential.yml`, `fuzz.yml`, `dst-nightly.yml`; ended on 2026-11-26: fuzz.yml failure |
-| 5 | Flakes | **met** | no test is quarantined, and none was since 2026-11-12 (test/quarantine.json's git history) |
+| 4 | Campaigns | **observed** | 0 of 30 consecutive clean nights of `differential.yml`, `fuzz.yml`, `dst-nightly.yml`; ended on 2026-11-27: differential.yml failure; fuzz.yml failure; dst-nightly.yml failure |
+| 5 | Flakes | **met** | no test is quarantined, and none was since 2026-11-13 (test/quarantine.json's git history) |
 | 6 | Apps | **not met** | 49 of 50 claimed platforms of 5 apps pass the app's outside oracle in CI (not: conduit on Supabase Edge Functions) |
 | 7 | Propositions | **not met** | the lint is green; 9 of 10 fuzz oracles and 44 of 44 properties name a proposition; 28 candidates, 242 proved propositions |
-| 8 | Differential fuzzing | **met** | model differentials in CI: `serverless-http`, `ui-decode`, `lasm-js-wire`, `project-files`; generated feature programs: yes; coverage feedback: the latest nightly campaign reached 18,871 features in (dev) (1,610 new, 272 of them by mutants of the corpus) and 16,647 features in (release) (1,550 new, 243 of them by mutants of the corpus); generated: `Thunk`, `ST`, `FloatArray`, structures with many fields |
+| 8 | Differential fuzzing | **met** | model differentials in CI: `serverless-http`, `ui-decode`, `lasm-js-wire`, `project-files`; generated feature programs: yes; coverage feedback for generated programs: in the repository, no guided nightly campaign read yet; generated: `Thunk`, `ST`, `FloatArray`, structures with many fields |
 
 ### About
 
@@ -45,28 +45,40 @@ Lasm is "rock solid" when items 1–3 and 5–8 of the [exit bar](../../docs/TES
 
 | Platform | Level | L0 | L1 | L2 | L3 |
 | --- | --- | --- | --- | --- | --- |
-| Node.js 24+ | **L3** | yes | yes | yes | yes |
-| Bun / Deno | **L2** | yes | yes | yes | none yet |
-| Cloudflare Workers | **L3** | yes | yes | yes | yes |
-| Vercel Functions / Vercel Edge | **L2** | yes | yes | yes | none yet |
-| Netlify Functions / Netlify Edge | **L2** | yes | yes | yes | none yet |
-| Deno Deploy | **L2** | yes | yes | yes | none yet |
+| Node.js 24+ | **L1** | yes | yes | no | no |
+| Bun / Deno | **L1** | yes | yes | no | none yet |
+| Cloudflare Workers | **L1** | yes | yes | no | yes |
+| Vercel Functions / Vercel Edge | **L1** | yes | yes | no | none yet |
+| Netlify Functions / Netlify Edge | **L1** | yes | yes | no | none yet |
+| Deno Deploy | **L1** | yes | yes | no | none yet |
 | Supabase Edge Functions | **—** | no | no | no | none yet |
-| AWS Lambda | **—** | no | no | yes | none yet |
-| Azure Functions | **L2** | yes | yes | yes | none yet |
-| Google Cloud Functions | **L2** | yes | yes | yes | none yet |
-| Fastly Compute | **L2** | yes | yes | yes | none yet |
-| WASI / wasi-http / Spin | **L2** | yes | yes | yes | none yet |
-| Browsers | **L2** | yes | yes | yes | no |
+| AWS Lambda | **—** | no | no | no | none yet |
+| Azure Functions | **L1** | yes | yes | no | none yet |
+| Google Cloud Functions | **L1** | yes | yes | no | none yet |
+| Fastly Compute | **L1** | yes | yes | no | none yet |
+| WASI / wasi-http / Spin | **L1** | yes | yes | no | none yet |
+| Browsers | **L1** | yes | yes | no | no |
 
 What keeps each platform from its next level:
 
+- Node.js 24+, L2: `differential.yml` job `/^differential \(release\)$/`: differential (release): failure ([run](https://github.com/Millillion/lasm/actions/runs/46004816644))
+- Bun / Deno, L2: `differential.yml` job `/^differential \(release\)$/`: differential (release): failure ([run](https://github.com/Millillion/lasm/actions/runs/46004816644))
+- Cloudflare Workers, L2: `differential.yml` job `/^differential \(release\)$/`: differential (release): failure ([run](https://github.com/Millillion/lasm/actions/runs/46004816644))
+- Vercel Functions / Vercel Edge, L2: `differential.yml` job `/^differential \(release\)$/`: differential (release): failure ([run](https://github.com/Millillion/lasm/actions/runs/46004816644))
+- Netlify Functions / Netlify Edge, L2: `differential.yml` job `/^differential \(release\)$/`: differential (release): failure ([run](https://github.com/Millillion/lasm/actions/runs/46004816644))
+- Deno Deploy, L2: `differential.yml` job `/^differential \(release\)$/`: differential (release): failure ([run](https://github.com/Millillion/lasm/actions/runs/46004816644))
 - Supabase Edge Functions, L0: `conduit-platforms.yml` job `/^Supabase Edge Functions /`: Supabase Edge Functions (supabase start, supabase functions serve; Postgres): failure ([run](https://github.com/Millillion/lasm/actions/runs/45556222449))
 - Supabase Edge Functions, L1: `conduit-platforms.yml` job `/^Supabase Edge Functions /`: Supabase Edge Functions (supabase start, supabase functions serve; Postgres): failure ([run](https://github.com/Millillion/lasm/actions/runs/45556222449))
+- Supabase Edge Functions, L2: `differential.yml` job `/^differential \(release\)$/`: differential (release): failure ([run](https://github.com/Millillion/lasm/actions/runs/46004816644))
 - Supabase Edge Functions, L2: `conduit-platforms.yml` job `/^Supabase Edge Functions /`: Supabase Edge Functions (supabase start, supabase functions serve; Postgres): failure ([run](https://github.com/Millillion/lasm/actions/runs/45556222449))
 - AWS Lambda, L0: `release-checks.yml` job `/^candidate / platform / lambda /`: no main-branch run has this job
 - AWS Lambda, L1: `release-checks.yml` job `/^candidate / platform / lambda /`: no main-branch run has this job
-- Browsers, L3: `folio-nightly.yml` job `/^fuzz-(chromium|firefox|webkit)$/`: fuzz-webkit: failure; fuzz-firefox: failure ([run](https://github.com/Millillion/lasm/actions/runs/45827761026))
+- AWS Lambda, L2: `differential.yml` job `/^differential \(release\)$/`: differential (release): failure ([run](https://github.com/Millillion/lasm/actions/runs/46004816644))
+- Azure Functions, L2: `differential.yml` job `/^differential \(release\)$/`: differential (release): failure ([run](https://github.com/Millillion/lasm/actions/runs/46004816644))
+- Google Cloud Functions, L2: `differential.yml` job `/^differential \(release\)$/`: differential (release): failure ([run](https://github.com/Millillion/lasm/actions/runs/46004816644))
+- Fastly Compute, L2: `differential.yml` job `/^differential \(release\)$/`: differential (release): failure ([run](https://github.com/Millillion/lasm/actions/runs/46004816644))
+- WASI / wasi-http / Spin, L2: `differential.yml` job `/^differential \(release\)$/`: differential (release): failure ([run](https://github.com/Millillion/lasm/actions/runs/46004816644))
+- Browsers, L2: `differential.yml` job `/^differential \(release\)$/`: differential (release): failure ([run](https://github.com/Millillion/lasm/actions/runs/46004816644))
 
 ### About
 
@@ -89,18 +101,18 @@ A platform has a level when CI's jobs for it, and for every level below, succeed
 | PR | [`library-proofs.yml`](../../.github/workflows/library-proofs.yml) | the library's proofs | [2026-11-25](https://github.com/Millillion/lasm/actions/runs/45515672608) | passed |
 | PR | [`conduit.yml`](../../.github/workflows/conduit.yml) | Conduit: RealWorld API and E2E suites, equivalence | [2026-11-25](https://github.com/Millillion/lasm/actions/runs/45556222453) | passed |
 | PR | [`conduit-platforms.yml`](../../.github/workflows/conduit-platforms.yml) | Conduit on 15 more platforms, equivalence | [2026-11-25](https://github.com/Millillion/lasm/actions/runs/45556222449) | failed |
-| Nightly | [`ci-nightly.yml`](../../.github/workflows/ci-nightly.yml) | the release suites: unit, browser, edge, Bun/Deno, WASI, UI, fullstack, dev loop, Lasm.JS stress | [2026-11-26](https://github.com/Millillion/lasm/actions/runs/45791269623) | failed |
-| Nightly | [`nightly.yml`](../../.github/workflows/nightly.yml) | the upstream Lean suite and the ecosystem | [2026-11-26](https://github.com/Millillion/lasm/actions/runs/45870360127) | failed |
-| Nightly | [`differential.yml`](../../.github/workflows/differential.yml) | 60-minute differential campaigns, both profiles; macOS jobs | [2026-11-26](https://github.com/Millillion/lasm/actions/runs/45826924131) | passed |
-| Nightly | [`fuzz.yml`](../../.github/workflows/fuzz.yml) | boundary fuzzing campaigns | [2026-11-26](https://github.com/Millillion/lasm/actions/runs/45806376625) | failed |
-| Nightly | [`mutation.yml`](../../.github/workflows/mutation.yml) | mutation testing of every module | [2026-11-26](https://github.com/Millillion/lasm/actions/runs/45851883561) | passed |
-| Nightly | [`dst-nightly.yml`](../../.github/workflows/dst-nightly.yml) | deterministic simulation of the example apps, random seeds | [2026-11-26](https://github.com/Millillion/lasm/actions/runs/45823089550) | passed |
-| Nightly | [`bridge-verification.yml`](../../.github/workflows/bridge-verification.yml) | host bridge: model and schedule fuzzing on four platforms | [2026-11-26](https://github.com/Millillion/lasm/actions/runs/45820830187) | passed |
-| Nightly | [`tooling.yml`](../../.github/workflows/tooling.yml) | tooling metamorphic builds and fault injection | [2026-11-26](https://github.com/Millillion/lasm/actions/runs/45846194845) | passed |
-| Nightly | [`folio-nightly.yml`](../../.github/workflows/folio-nightly.yml) | Folio campaign | [2026-11-26](https://github.com/Millillion/lasm/actions/runs/45827761026) | failed |
-| Nightly | [`porter-nightly.yml`](../../.github/workflows/porter-nightly.yml) | Porter campaign | [2026-11-26](https://github.com/Millillion/lasm/actions/runs/45826144837) | passed |
-| Nightly | [`tandem-nightly.yml`](../../.github/workflows/tandem-nightly.yml) | Tandem campaign | [2026-11-26](https://github.com/Millillion/lasm/actions/runs/45848520376) | passed |
-| Nightly | [`installation-confidence.yml`](../../.github/workflows/installation-confidence.yml) | cold installation on every platform | [2026-11-26](https://github.com/Millillion/lasm/actions/runs/45820132402) | passed |
+| Nightly | [`ci-nightly.yml`](../../.github/workflows/ci-nightly.yml) | the release suites: unit, browser, edge, Bun/Deno, WASI, UI, fullstack, dev loop, Lasm.JS stress | [2026-11-27](https://github.com/Millillion/lasm/actions/runs/45975058504) | passed |
+| Nightly | [`nightly.yml`](../../.github/workflows/nightly.yml) | the upstream Lean suite and the ecosystem | [2026-11-27](https://github.com/Millillion/lasm/actions/runs/46042246232) | failed |
+| Nightly | [`differential.yml`](../../.github/workflows/differential.yml) | 60-minute differential campaigns, both profiles; macOS jobs | [2026-11-27](https://github.com/Millillion/lasm/actions/runs/46004816644) | failed |
+| Nightly | [`fuzz.yml`](../../.github/workflows/fuzz.yml) | boundary fuzzing campaigns | [2026-11-27](https://github.com/Millillion/lasm/actions/runs/45986444816) | failed |
+| Nightly | [`mutation.yml`](../../.github/workflows/mutation.yml) | mutation testing of every module | [2026-11-27](https://github.com/Millillion/lasm/actions/runs/46025819803) | passed |
+| Nightly | [`dst-nightly.yml`](../../.github/workflows/dst-nightly.yml) | deterministic simulation of the example apps, random seeds | [2026-11-27](https://github.com/Millillion/lasm/actions/runs/46000739041) | failed |
+| Nightly | [`bridge-verification.yml`](../../.github/workflows/bridge-verification.yml) | host bridge: model and schedule fuzzing on four platforms | [2026-11-27](https://github.com/Millillion/lasm/actions/runs/45997815153) | passed |
+| Nightly | [`tooling.yml`](../../.github/workflows/tooling.yml) | tooling metamorphic builds and fault injection | [2026-11-27](https://github.com/Millillion/lasm/actions/runs/46021165282) | passed |
+| Nightly | [`folio-nightly.yml`](../../.github/workflows/folio-nightly.yml) | Folio campaign | [2026-11-27](https://github.com/Millillion/lasm/actions/runs/46005532312) | failed |
+| Nightly | [`porter-nightly.yml`](../../.github/workflows/porter-nightly.yml) | Porter campaign | [2026-11-27](https://github.com/Millillion/lasm/actions/runs/46004196114) | passed |
+| Nightly | [`tandem-nightly.yml`](../../.github/workflows/tandem-nightly.yml) | Tandem campaign | [2026-11-27](https://github.com/Millillion/lasm/actions/runs/46022473802) | passed |
+| Nightly | [`installation-confidence.yml`](../../.github/workflows/installation-confidence.yml) | cold installation on every platform | [2026-11-27](https://github.com/Millillion/lasm/actions/runs/45997079351) | passed |
 | Weekly | [`ci-weekly.yml`](../../.github/workflows/ci-weekly.yml) | 100-minute differential campaigns, Lasm.JS soak | [2026-11-21](https://github.com/Millillion/lasm/actions/runs/44938824519) | failed |
 | Release | [`release-checks.yml`](../../.github/workflows/release-checks.yml) | the release candidate: build, five-platform installed acceptance and every launch workflow | [2026-11-25](https://github.com/Millillion/lasm/actions/runs/45532768265) | passed |
 
@@ -112,33 +124,33 @@ The PR tier runs on every pull request, filtered by the paths it changes, and ag
 
 ### Measured by CI
 
-Latest nightly run: [2026-11-26](https://github.com/Millillion/lasm/actions/runs/45851883561), passed.
+Latest nightly run: [2026-11-27](https://github.com/Millillion/lasm/actions/runs/46025819803), passed.
 
 | Module | Score | Mutants | Threshold | Result |
 | --- | ---: | ---: | ---: | --- |
-| application-output | 92.2 % | 2,155 | 92 % | [passed](https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350743) |
-| application-sources | 85 % | 4,006 | 85 % | [passed](https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350634) |
-| browser | 96.1 % | 1,334 | 96 % | [passed](https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350703) |
-| build-service | 94.3 % | 464 | 94 % | [passed](https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350601) |
-| cli | 95.8 % | 1,722 | 95 % | [passed](https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350688) |
-| dev | 92.1 % | 1,621 | 91 % | [passed](https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350699) |
-| downloads | 89.8 % | 2,408 | 89 % | [passed](https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350811) |
-| edge-build | 90.1 % | 1,200 | 89 % | [passed](https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350808) |
-| edge-glue | 97.1 % | 1,355 | 97 % | [passed](https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350900) |
-| host-bridge | 96.6 % | 895 | 96 % | [passed](https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350734) |
-| init | 97.7 % | 965 | 97 % | [passed](https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350792) |
-| link-driver | 93 % | 3,288 | 93 % | [passed](https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350638) |
-| native-files | 88.5 % | 1,804 | 88 % | [passed](https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020351057) |
-| node-host | 86 % | 3,800 | 86 % | [passed](https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350862) |
-| node-serve | 80.6 % | 392 | 80 % | [passed](https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350830) |
-| notices | 91.5 % | 475 | 91 % | [passed](https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350924) |
-| project-files | 100 % | 166 | 100 % | [passed](https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350998) |
-| serverless | 89.8 % | 845 | 88 % | [passed](https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350854) |
-| tar | 90.6 % | 870 | 90 % | [passed](https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350714) |
-| target-link | 91.1 % | 2,184 | 91 % | [passed](https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350705) |
-| toolchains | 89.3 % | 1,676 | 89 % | [passed](https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350702) |
-| ui-dom | 94.1 % | 749 | 93 % | [passed](https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350662) |
-| wasi-build | 95.7 % | 938 | 95 % | [passed](https://github.com/Millillion/lasm/actions/runs/45851883561/job/140020350739) |
+| application-output | 92.2 % | 2,155 | 92 % | [passed](https://github.com/Millillion/lasm/actions/runs/46025819803/job/140596962942) |
+| application-sources | 85 % | 4,006 | 85 % | [passed](https://github.com/Millillion/lasm/actions/runs/46025819803/job/140596962658) |
+| browser | 96.1 % | 1,334 | 96 % | [passed](https://github.com/Millillion/lasm/actions/runs/46025819803/job/140596962480) |
+| build-service | 94.3 % | 464 | 94 % | [passed](https://github.com/Millillion/lasm/actions/runs/46025819803/job/140596962385) |
+| cli | 95.8 % | 1,722 | 95 % | [passed](https://github.com/Millillion/lasm/actions/runs/46025819803/job/140596962596) |
+| dev | 91.9 % | 1,621 | 91 % | [passed](https://github.com/Millillion/lasm/actions/runs/46025819803/job/140596962603) |
+| downloads | 89.8 % | 2,408 | 89 % | [passed](https://github.com/Millillion/lasm/actions/runs/46025819803/job/140596962768) |
+| edge-build | 90.1 % | 1,200 | 89 % | [passed](https://github.com/Millillion/lasm/actions/runs/46025819803/job/140596962961) |
+| edge-glue | 97.1 % | 1,355 | 97 % | [passed](https://github.com/Millillion/lasm/actions/runs/46025819803/job/140596962597) |
+| host-bridge | 96.7 % | 895 | 96 % | [passed](https://github.com/Millillion/lasm/actions/runs/46025819803/job/140596962488) |
+| init | 97.7 % | 965 | 97 % | [passed](https://github.com/Millillion/lasm/actions/runs/46025819803/job/140596962841) |
+| link-driver | 93 % | 3,288 | 93 % | [passed](https://github.com/Millillion/lasm/actions/runs/46025819803/job/140596962577) |
+| native-files | 88.5 % | 1,805 | 88 % | [passed](https://github.com/Millillion/lasm/actions/runs/46025819803/job/140596962540) |
+| node-host | 86 % | 3,800 | 86 % | [passed](https://github.com/Millillion/lasm/actions/runs/46025819803/job/140596962864) |
+| node-serve | 80.6 % | 392 | 80 % | [passed](https://github.com/Millillion/lasm/actions/runs/46025819803/job/140596962754) |
+| notices | 91.5 % | 475 | 91 % | [passed](https://github.com/Millillion/lasm/actions/runs/46025819803/job/140596962361) |
+| project-files | 100 % | 166 | 100 % | [passed](https://github.com/Millillion/lasm/actions/runs/46025819803/job/140596962615) |
+| serverless | 89.8 % | 845 | 88 % | [passed](https://github.com/Millillion/lasm/actions/runs/46025819803/job/140596962688) |
+| tar | 90.7 % | 871 | 90 % | [passed](https://github.com/Millillion/lasm/actions/runs/46025819803/job/140596962576) |
+| target-link | 91.1 % | 2,184 | 91 % | [passed](https://github.com/Millillion/lasm/actions/runs/46025819803/job/140596962551) |
+| toolchains | 89.3 % | 1,676 | 89 % | [passed](https://github.com/Millillion/lasm/actions/runs/46025819803/job/140596962556) |
+| ui-dom | 94.1 % | 749 | 93 % | [passed](https://github.com/Millillion/lasm/actions/runs/46025819803/job/140596962404) |
+| wasi-build | 95.7 % | 937 | 95 % | [passed](https://github.com/Millillion/lasm/actions/runs/46025819803/job/140596962524) |
 
 ### About
 
@@ -194,20 +206,20 @@ A proposition is a property stated in plain English and in Lean, proved for ever
 
 ### Measured by CI
 
-Latest scheduled campaign: [2026-11-26](https://github.com/Millillion/lasm/actions/runs/45806376625), failed.
+Latest scheduled campaign: [2026-11-27](https://github.com/Millillion/lasm/actions/runs/45986444816), failed.
 
 | Target | Seconds | Runs | Seed | Result |
 | --- | ---: | ---: | --- | --- |
-| ui-decode | 600 | 349,428 | 709220038 | [failed](https://github.com/Millillion/lasm/actions/runs/45806376625/job/139862703818) |
-| ui-patch | 600 | 270,882 | 709220038 | [passed](https://github.com/Millillion/lasm/actions/runs/45806376625/job/139862703876) |
-| cli-arguments | 600 | 711,557 | 709220038 | [passed](https://github.com/Millillion/lasm/actions/runs/45806376625/job/139862703920) |
-| serverless-http | 600 | 259,570 | 709220038 | [passed](https://github.com/Millillion/lasm/actions/runs/45806376625/job/139862703923) |
-| dev-proxy | 600 | 345,190 | 709220038 | [passed](https://github.com/Millillion/lasm/actions/runs/45806376625/job/139862703959) |
-| lasm-js-wire | 600 | 172,229 | 709220038 | [passed](https://github.com/Millillion/lasm/actions/runs/45806376625/job/139862703982) |
-| edge-request | 600 | 58,231 | 709220038 | [passed](https://github.com/Millillion/lasm/actions/runs/45806376625/job/139862703986) |
-| project-files | 600 | 8,382 | 709220038 | [failed](https://github.com/Millillion/lasm/actions/runs/45806376625/job/139862703998) |
-| tar | 600 | 20,173 | 709220038 | [failed](https://github.com/Millillion/lasm/actions/runs/45806376625/job/139862704030) |
-| lean-js-wire | 600 | 25,823,860 | 709220038 | [passed](https://github.com/Millillion/lasm/actions/runs/45806376625/job/139862704242) |
+| ui-patch | 600 | 216,931 | 889288229 | [passed](https://github.com/Millillion/lasm/actions/runs/45986444816/job/140463255226) |
+| lean-js-wire | 600 | 47,529,980 | 889288229 | [passed](https://github.com/Millillion/lasm/actions/runs/45986444816/job/140463255240) |
+| cli-arguments | 600 | 934,684 | 889288229 | [passed](https://github.com/Millillion/lasm/actions/runs/45986444816/job/140463255249) |
+| dev-proxy | 600 | 423,044 | 889288229 | [passed](https://github.com/Millillion/lasm/actions/runs/45986444816/job/140463255252) |
+| tar | 600 | 27,066 | 889288229 | [failed](https://github.com/Millillion/lasm/actions/runs/45986444816/job/140463255272) |
+| project-files | 600 | 2,116 | 889288229 | [failed](https://github.com/Millillion/lasm/actions/runs/45986444816/job/140463255278) |
+| serverless-http | 600 | 251,635 | 889288229 | [passed](https://github.com/Millillion/lasm/actions/runs/45986444816/job/140463255280) |
+| lasm-js-wire | 600 | 197,413 | 889288229 | [passed](https://github.com/Millillion/lasm/actions/runs/45986444816/job/140463255286) |
+| edge-request | 600 | 49,493 | 889288229 | [passed](https://github.com/Millillion/lasm/actions/runs/45986444816/job/140463255292) |
+| ui-decode | 600 | 78,925 | 889288229 | [failed](https://github.com/Millillion/lasm/actions/runs/45986444816/job/140463255408) |
 
 ### About
 
@@ -230,17 +242,17 @@ Details: [Fuzzing at the boundaries](../../docs/TESTING.md#fuzzing-at-the-bounda
 
 ### Measured by CI
 
-Latest night: [2026-11-26](https://github.com/Millillion/lasm/actions/runs/45823089550), passed.
+Latest night: [2026-11-27](https://github.com/Millillion/lasm/actions/runs/46000739041), failed.
 
 | App | Seeds | Failing | Result |
 | --- | ---: | ---: | --- |
-| ledger on headless WebKit | 598 | 0 | [passed](https://github.com/Millillion/lasm/actions/runs/45823089550/job/139920188306) |
-| ledger on headless Chromium | 527 | 0 | [passed](https://github.com/Millillion/lasm/actions/runs/45823089550/job/139920188319) |
-| tandem | 710 | 0 | [passed](https://github.com/Millillion/lasm/actions/runs/45823089550/job/139920188322) |
-| ledger on Cloudflare Workers (wrangler dev) | 613 | 0 | [passed](https://github.com/Millillion/lasm/actions/runs/45823089550/job/139920188344) |
-| ledger | 13,379 | 0 | [passed](https://github.com/Millillion/lasm/actions/runs/45823089550/job/139920188370) |
-| porter | 11,413 | 0 | [passed](https://github.com/Millillion/lasm/actions/runs/45823089550/job/139920188478) |
-| ledger on headless Firefox | 400 | 0 | [passed](https://github.com/Millillion/lasm/actions/runs/45823089550/job/139920188560) |
+| tandem | 482 | 0 | [passed](https://github.com/Millillion/lasm/actions/runs/46000739041/job/140511489831) |
+| ledger on headless Chromium | 701 | 0 | [passed](https://github.com/Millillion/lasm/actions/runs/46000739041/job/140511489865) |
+| ledger on Cloudflare Workers (wrangler dev) | 564 | 0 | [passed](https://github.com/Millillion/lasm/actions/runs/46000739041/job/140511489887) |
+| ledger | 13,137 | 0 | [passed](https://github.com/Millillion/lasm/actions/runs/46000739041/job/140511489913) |
+| ledger on headless WebKit | — | — | [failed](https://github.com/Millillion/lasm/actions/runs/46000739041/job/140511489927) |
+| ledger on headless Firefox | 452 | 0 | [passed](https://github.com/Millillion/lasm/actions/runs/46000739041/job/140511489933) |
+| porter | 11,701 | 2 | [failed](https://github.com/Millillion/lasm/actions/runs/46000739041/job/140511489997) |
 
 ### About
 
@@ -250,14 +262,12 @@ Each night, for Tandem, Ledger, Porter, the simulation runs the real app against
 
 ### Measured by CI
 
-Latest nightly campaign: [2026-11-26](https://github.com/Millillion/lasm/actions/runs/45826924131), passed.
+Latest nightly campaign: [2026-11-27](https://github.com/Millillion/lasm/actions/runs/46004816644), failed.
 
 | Job | Programs | Cases | Divergences | Coverage features (new) | Result |
 | --- | ---: | ---: | ---: | --- | --- |
-| differential (dev) | 60 | 6,660 | 0 | 18,871 (+1,610) | [passed](https://github.com/Millillion/lasm/actions/runs/45826924131/job/139934628630) |
-| differential (release) | 45 | 4,995 | 0 | 16,647 (+1,550) | [passed](https://github.com/Millillion/lasm/actions/runs/45826924131/job/139934628960) |
-
-Coverage growth by campaign (new features, and all features found so far): (dev): 2026-11-12 +19,727 (19,727), 2026-11-13 +6,654 (26,381), 2026-11-14 +7,219 (33,600), 2026-11-14 +4,920 (38,520), 2026-11-17 +4,048 (42,568), 2026-11-18 +2,966 (45,534), 2026-11-19 +3,022 (48,556), 2026-11-20 +2,255 (50,811), 2026-11-21 +2,767 (53,578), 2026-11-21 +2,619 (56,197), 2026-11-24 +1,864 (58,061), 2026-11-25 +1,074 (59,135), 2026-11-26 +1,610 (60,745); (release): 2026-11-12 +19,520 (19,520), 2026-11-13 +6,611 (26,131), 2026-11-14 +5,029 (31,160), 2026-11-14 +5,940 (37,100), 2026-11-17 +3,296 (40,396), 2026-11-18 +1,745 (42,141), 2026-11-19 +2,035 (44,176), 2026-11-20 +2,161 (46,337), 2026-11-21 +2,097 (48,434), 2026-11-21 +2,821 (51,255), 2026-11-24 +1,683 (52,938), 2026-11-25 +1,426 (54,364), 2026-11-26 +1,550 (55,914).
+| differential (dev) | — | — | — | — | [failed](https://github.com/Millillion/lasm/actions/runs/46004816644/job/140526165976) |
+| differential (release) | — | — | — | — | [failed](https://github.com/Millillion/lasm/actions/runs/46004816644/job/140526165995) |
 
 ### About
 
